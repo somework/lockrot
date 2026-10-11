@@ -35,8 +35,9 @@ use Lockrot\Verdict\VerdictEngine;
  * Turns a case of tests/fixtures/flags/cases.json into the report that the real {@see Analyzer}
  * writes for it. The case's `inputs` block (tools/schema/project_fixtures.py) holds the root
  * `composer.json`, the lock entries with the case's package first, that package's releases with
- * their dates and `php`, its advisories, its repository activity and the run settings. The loaders
- * answer from the block: a package other than the case's own has no metadata.
+ * their dates and `php`, its abandoned marking, its advisories, its repository activity, the
+ * `require` names of the direct dependents that C08 measured and the run settings. The loaders
+ * answer from the block: no other package has metadata.
  */
 final class CaseHydrator
 {
@@ -72,7 +73,8 @@ final class CaseHydrator
         $entries = JsonPath::arrayAt($inputs, ['lock']);
         $package = JsonPath::stringAt($entries, [0, 'name']);
         $activity = \is_array($inputs['activity'] ?? null) ? $inputs['activity'] : null;
-        $lock = self::lock($entries, $activity);
+        $marking = \is_array($inputs['abandoned'] ?? null) ? $inputs['abandoned'] : null;
+        $lock = self::lock($entries, $activity, $marking);
         /** @var array<string, mixed> $root */
         $root = JsonPath::arrayAt($inputs, ['root']);
         $project = ProjectConfig::fromArray($root);
@@ -81,12 +83,19 @@ final class CaseHydrator
         if ($locked === null) {
             throw new \InvalidArgumentException('the lock has no '.$package);
         }
-        $metadata = PackageMetadata::fromPackages($package, self::releases($package, JsonPath::arrayAt($inputs, ['releases'])), $clock->now(), $locked->normalizedVersion());
+        $byName = [$package => PackageMetadata::fromPackages($package, self::releases($package, JsonPath::arrayAt($inputs, ['releases']), $marking), $clock->now(), $locked->normalizedVersion())];
+        foreach (\is_array($inputs['dependents'] ?? null) ? $inputs['dependents'] : [] as $name => $releases) {
+            $dependent = $lock->find((string) $name);
+            self::assertArray($releases);
+            if ($dependent !== null) {
+                $byName[(string) $name] = PackageMetadata::fromPackages((string) $name, self::releases((string) $name, $releases, null), $clock->now(), $dependent->normalizedVersion());
+            }
+        }
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
         $targetPhp = JsonPath::stringAt($run, ['target_php']);
         $projectPhp = \is_string($run['project_php'] ?? null) ? $run['project_php'] : null;
         $analyzer = new Analyzer(
-            self::metadataLoader(new MetadataBatch([$package => $metadata], [], [])),
+            self::metadataLoader(new MetadataBatch($byName, [], [])),
             new ActivityClient(new FakeHttpClient(self::activityAnswers($activity)), $auth),
             new ActivityFetchPlanner($auth),
             new RepoLocator(),
@@ -102,10 +111,11 @@ final class CaseHydrator
     }
 
     /**
-     * @param array<mixed, mixed>       $entries
-     * @param array<mixed, mixed>|null  $activity
+     * @param array<mixed, mixed>      $entries
+     * @param array<mixed, mixed>|null $activity
+     * @param array<mixed, mixed>|null $marking  S1's marking: `by` the repository or the lock, and the replacement
      */
-    private static function lock(array $entries, ?array $activity): LockFile
+    private static function lock(array $entries, ?array $activity, ?array $marking): LockFile
     {
         $packages = [];
         $dev = [];
@@ -115,7 +125,10 @@ final class CaseHydrator
             if (\is_string($entry['php'] ?? null)) {
                 $require = ['php' => $entry['php']] + $require;
             }
-            $locked = ['name' => $entry['name'], 'version' => $entry['version'], 'require' => $require];
+            $locked = ['name' => $entry['name'], 'version' => $entry['version'], 'require' => $require] + array_intersect_key($entry, ['conflict' => true]);
+            if ($i === 0 && $marking !== null && ($marking['by'] ?? null) === 'lock') {
+                $locked['abandoned'] = $marking['replacement'] ?? true;
+            }
             if (\is_string($entry['time'] ?? null)) {
                 $locked['time'] = $entry['time'];
             }
@@ -136,11 +149,12 @@ final class CaseHydrator
     }
 
     /**
-     * @param array<mixed, mixed> $releases
+     * @param array<mixed, mixed>      $releases
+     * @param array<mixed, mixed>|null $marking  S1's marking: a registry marking marks every release
      *
      * @return list<BasePackage>
      */
-    private static function releases(string $package, array $releases): array
+    private static function releases(string $package, array $releases, ?array $marking): array
     {
         $versions = [];
         foreach ($releases as $release) {
@@ -149,8 +163,9 @@ final class CaseHydrator
             $versions[] = (new ArrayLoader())->load([
                 'name' => $package,
                 'version' => JsonPath::stringAt($release, ['version']),
-                'require' => \is_string($release['php'] ?? null) ? ['php' => $release['php']] : [],
-            ] + (\is_string($release['time'] ?? null) ? ['time' => $release['time']] : []));
+                'require' => (\is_string($release['php'] ?? null) ? ['php' => $release['php']] : []) + (\is_array($release['require'] ?? null) ? $release['require'] : []),
+            ] + (\is_string($release['time'] ?? null) ? ['time' => $release['time']] : [])
+              + ($marking !== null && ($marking['by'] ?? null) === 'repository' ? ['abandoned' => $marking['replacement'] ?? true] : []));
         }
 
         return $versions;

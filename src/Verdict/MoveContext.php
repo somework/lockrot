@@ -1,0 +1,270 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Verdict;
+
+use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\ConstraintInterface;
+use Composer\Semver\Constraint\MultiConstraint;
+use Composer\Semver\Intervals;
+use Composer\Semver\VersionParser;
+use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Data\Repository\StableRelease;
+use Lockrot\Security\Candidate;
+use Lockrot\Security\FixFinder;
+use Lockrot\Security\PackageFixes;
+use Lockrot\Signal\BranchRow;
+use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\PhpFloor;
+
+/**
+ * What the moves of one finding read: the finding, its branch rows and releases, the release scan
+ * and the run's floors and clock. The advisories that the finding does not count, on any version,
+ * raise the lower bound of a maintenance move as they raise a security move's ({@see FixFinder}).
+ *
+ * @internal
+ */
+final class MoveContext
+{
+    private Finding $finding;
+    private MoveSubject $subject;
+    /** @var list<BranchRow> */
+    private array $rows;
+    private ?PackageMetadata $metadata;
+    /** @var list<StableRelease>|null the stable releases above the installed one, ascending */
+    private ?array $releases;
+    private ?PackageFixes $fixes;
+    private FixFinder $finder;
+    private PhpFloor $floor;
+    private \DateTimeImmutable $now;
+    private int $warnYears;
+    private ?\DateTimeImmutable $ga;
+    /** @var array<string, ConstraintInterface> */
+    private array $ranges;
+    /** @var list<ConstraintInterface> */
+    private array $own;
+    private bool $advisoriesComplete;
+
+    /**
+     * @param list<BranchRow>                    $rows      highest branch first
+     * @param array<string, ConstraintInterface> $ranges    the affected range of each counted advisory that has one
+     * @param list<ConstraintInterface>          $own       the ranges of the advisories on other versions
+     * @param ?\DateTimeImmutable                $ga        the GA of the target PHP's major
+     */
+    public function __construct(Finding $finding, MoveSubject $subject, ?PackageMetadata $metadata, array $rows, ?PackageFixes $fixes, FixFinder $finder, PhpFloor $floor, \DateTimeImmutable $now, int $warnYears, ?\DateTimeImmutable $ga, array $ranges, array $own, bool $advisoriesComplete)
+    {
+        $this->metadata = $metadata;
+        $releases = $metadata === null ? null : $metadata->releasesAbove();
+        $this->finding = $finding;
+        $this->subject = $subject;
+        $this->rows = $rows;
+        $this->releases = $releases;
+        $this->fixes = $fixes;
+        $this->finder = $finder;
+        $this->floor = $floor;
+        $this->now = $now;
+        $this->warnYears = $warnYears;
+        $this->ga = $ga;
+        $this->ranges = $ranges;
+        $this->own = $own;
+        $this->advisoriesComplete = $advisoriesComplete;
+    }
+
+    public function finding(): Finding
+    {
+        return $this->finding;
+    }
+
+    public function subject(): MoveSubject
+    {
+        return $this->subject;
+    }
+
+    /** @return list<BranchRow> highest branch first */
+    public function rows(): array
+    {
+        return $this->rows;
+    }
+
+    public function installedRow(): ?BranchRow
+    {
+        foreach ($this->rows as $row) {
+            if ($row->installed()) {
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
+    public function row(string $branch): ?BranchRow
+    {
+        foreach ($this->rows as $row) {
+            if ($row->branch() === $branch) {
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
+    /** The newest stable release, null when lockrot read none. */
+    public function lastStableVersion(): ?string
+    {
+        return $this->metadata === null ? null : $this->metadata->lastStableVersion();
+    }
+
+    public function lastStableReleased(): ?string
+    {
+        $at = $this->metadata === null ? null : $this->metadata->lastStableReleaseAt();
+
+        return $at === null ? null : $at->format(\DATE_ATOM);
+    }
+
+    public function fixes(): ?PackageFixes
+    {
+        return $this->fixes;
+    }
+
+    public function floor(): PhpFloor
+    {
+        return $this->floor;
+    }
+
+    public function ga(): ?\DateTimeImmutable
+    {
+        return $this->ga;
+    }
+
+    public function advisoriesComplete(): bool
+    {
+        return $this->advisoriesComplete;
+    }
+
+    /** @return list<string> the counted advisories in S9's order: points, severity, then id */
+    public function advisoryIds(): array
+    {
+        $s9 = $this->finding->signalData(AdvisoryData::class);
+
+        return $s9 === null ? [] : array_map(static fn (AdvisoryRow $row): string => $row->id(), $s9->rows());
+    }
+
+    /** @return array<string, ConstraintInterface> */
+    public function ranges(): array
+    {
+        return $this->ranges;
+    }
+
+    /** The installed branch as a label, or a branch-alias snapshot's own line (`5.x` for `5.4.x-dev`). */
+    public function installedBranch(): ?string
+    {
+        $version = $this->subject->version();
+        $key = ReleaseBranch::of($version);
+        if ($key === null && preg_match('/^v?(\d+)(?:\.(\d+))?\.x-dev$/', $version, $m) === 1) {
+            $key = ReleaseBranch::of($m[1].'.'.($m[2] ?? '0').'.0');
+        }
+
+        return $key === null ? null : ReleaseBranch::label($key);
+    }
+
+    /** Whether a row lies above the installed release: its newest release is higher. */
+    public function isAbove(BranchRow $row): bool
+    {
+        $release = $this->release($row->highest());
+
+        return $release !== null;
+    }
+
+    /** The row's date, or S8's date for the same branch when the row has none. */
+    public function releasedAt(BranchRow $row): ?\DateTimeImmutable
+    {
+        if ($row->highestReleased() !== null) {
+            return $row->highestReleased();
+        }
+        $s8 = $this->finding->signalData(LeftBehindData::class);
+
+        return $s8 !== null && $s8->newestBranch() === $row->branch() ? new \DateTimeImmutable($s8->newestRelease()) : null;
+    }
+
+    public function isReleasing(?\DateTimeImmutable $at): bool
+    {
+        return $at !== null && $at > $this->now->modify('-'.$this->warnYears.' years');
+    }
+
+    /** A release above the installed one, by its version as the repository writes it. */
+    public function release(string $pretty): ?StableRelease
+    {
+        foreach ($this->releases ?? [] as $release) {
+            if ($release->pretty() === $pretty) {
+                return $release;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The lowest release on $row that $constraint admits, with its class and holders, and the
+     * constraint from it. The advisories on the package's other versions raise it while a release
+     * stays: an advisory on the branch's newest release reaches every constraint on the branch.
+     *
+     * @return array{0: ?Candidate, 1: string}
+     */
+    public function lowestAdmitted(BranchRow $row, string $constraint): array
+    {
+        try {
+            $admits = (new VersionParser())->parseConstraints($constraint);
+        } catch (\UnexpectedValueException $e) {
+            return [null, $constraint];
+        }
+        $onRow = [];
+        foreach ($this->releases ?? [] as $release) {
+            $branch = ReleaseBranch::of($release->normalized());
+            if ($branch !== null && ReleaseBranch::label($branch) === $row->branch() && $admits->matches(new Constraint('==', $release->normalized()))) {
+                $onRow[] = $release;
+            }
+        }
+        if ($onRow === []) {
+            return [null, $constraint];
+        }
+        $from = \count($onRow);
+        while ($from > 0 && !self::insideAny($onRow[$from - 1], $this->own)) {
+            --$from;
+        }
+        if ($from === 0 || $from === \count($onRow)) {
+            return [$this->candidate($onRow[0]), $constraint];
+        }
+
+        return [$this->candidate($onRow[$from]), '^'.ltrim($onRow[$from]->pretty(), 'vV')];
+    }
+
+    public function candidate(StableRelease $release): ?Candidate
+    {
+        return $this->finder->candidate($this->subject->package(), $release);
+    }
+
+    /** Whether some release from $lower up to $newest lies inside $range. */
+    public static function reaches(ConstraintInterface $range, string $lower, string $newest): bool
+    {
+        $span = new MultiConstraint([new Constraint('>=', $lower), new Constraint('<=', $newest)]);
+
+        return Intervals::haveIntersections($range, $span);
+    }
+
+    /** @param list<ConstraintInterface> $ranges */
+    private static function insideAny(StableRelease $release, array $ranges): bool
+    {
+        $point = new Constraint('==', $release->normalized());
+        foreach ($ranges as $range) {
+            if (Intervals::haveIntersections($range, $point)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

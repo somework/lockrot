@@ -22,6 +22,8 @@ final class SignalSet
     /** @var list<SignalRule> */
     private array $rules;
     private PhpFloor $floor;
+    private Thresholds $thresholds;
+    private ?\DateTimeImmutable $targetMajorGa = null;
 
     /**
      * @param list<SignalRule> $rules
@@ -31,6 +33,7 @@ final class SignalSet
     {
         $this->rules = $rules;
         $this->floor = $floor ?? new PhpFloor(null);
+        $this->thresholds = new Thresholds();
     }
 
     /**
@@ -41,7 +44,7 @@ final class SignalSet
     {
         $floor = new PhpFloor($targetPhp, $projectPhp);
 
-        return new self([
+        $set = new self([
             new AbandonedRule(),
             new NoReleaseRule($clock, $thresholds),
             new ArchivedRule(),
@@ -52,6 +55,21 @@ final class SignalSet
             new AdvisoryRule(),
             new NotCheckedRule(),
         ], $floor);
+        $set->thresholds = $thresholds;
+        $set->targetMajorGa = $dates->gaDate(explode('.', PhpReleaseDates::minorOf($targetPhp))[0].'.0');
+
+        return $set;
+    }
+
+    public function thresholds(): Thresholds
+    {
+        return $this->thresholds;
+    }
+
+    /** The GA of the target PHP's major, the line `old-promise` reads. */
+    public function targetMajorGa(): ?\DateTimeImmutable
+    {
+        return $this->targetMajorGa;
     }
 
     public function phpFloor(): PhpFloor

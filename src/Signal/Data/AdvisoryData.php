@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Signal\Data;
 
 use Lockrot\Signal\Signal;
+use Lockrot\Verdict\GradedPackage;
 
 /** @internal */
 final class AdvisoryData implements SignalData
@@ -42,6 +43,15 @@ final class AdvisoryData implements SignalData
     {
         $clone = clone $this;
         $clone->rows = array_map(static fn (AdvisoryRow $row): AdvisoryRow => $row->withDeciding($row->id() === $id), $this->rows);
+
+        return $clone;
+    }
+
+    /** @param array<string, GradedPackage> $findings by package name */
+    public function withFindings(array $findings): self
+    {
+        $clone = clone $this;
+        $clone->rows = array_map(static fn (AdvisoryRow $row): AdvisoryRow => $row->withFindings($findings), $this->rows);
 
         return $clone;
     }

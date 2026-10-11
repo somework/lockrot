@@ -93,6 +93,8 @@ final class PackageMetadata
     private ?array $installedRequires = null;
     /** @var list<string>|null */
     private ?array $newestRequires = null;
+    /** The highest stable release not dated after the run clock: the one {@see $newestRequires} reads. */
+    private ?StableRelease $newestStable = null;
 
     /**
      * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}> $latestStableByBranch
@@ -338,6 +340,7 @@ final class PackageMetadata
         }
         if ($newest !== null) {
             $this->newestRequires = self::requireNames($newest);
+            $this->newestStable = $this->stableRelease($newest->getVersion(), $stable[$newest->getVersion()], $sharedCommit);
         }
         try {
             $installed = (new VersionParser())->normalize($installedVersion);
@@ -484,6 +487,7 @@ final class PackageMetadata
         );
         $dated->installedRequires = $this->installedRequires;
         $dated->newestRequires = $this->newestRequires;
+        $dated->newestStable = $this->newestStable;
         $dated->releasesAbove = $this->releasesAbove === null ? null : array_map(
             static fn (StableRelease $release): StableRelease => $release->sharedCommit() ? $release->withDate($parent->releaseDateOf($release->normalized())) : $release,
             $this->releasesAbove
@@ -652,6 +656,11 @@ final class PackageMetadata
     public function newestRequires(): ?array
     {
         return $this->newestRequires;
+    }
+
+    public function newestStable(): ?StableRelease
+    {
+        return $this->newestStable;
     }
 
     /**

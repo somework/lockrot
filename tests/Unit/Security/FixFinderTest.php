@@ -123,7 +123,7 @@ final class FixFinderTest extends TestCase
         self::assertFalse($gets->clearsAll());
         self::assertSame(
             ['requires' => '>=7.2.5', 'project_allows' => false, 'target_runs' => true, 'raise_to' => '>=7.2.5', 'raise_size' => 'minor'],
-            $gets->phpCheck()->toArray()
+            $gets->phpCheck()->jsonSerialize()
         );
         self::assertSame(Fix::UPDATE, $fixes->forAdvisory('A')->kind(), 'v2.16.1 needs >=7.1.3, which the project admits: easier than v1.44.7');
         self::assertSame('v2.16.1', $fixes->forAdvisory('A')->version());
@@ -336,7 +336,7 @@ final class FixFinderTest extends TestCase
         self::assertSame('2.2.0', $gets->version());
         self::assertSame(['A', 'B'], $gets->clears());
         self::assertTrue($gets->clearsAll());
-        self::assertSame(['requires' => null, 'project_allows' => null, 'target_runs' => null, 'raise_to' => null, 'raise_size' => null], $gets->phpCheck()->toArray());
+        self::assertSame(['requires' => null, 'project_allows' => null, 'target_runs' => null, 'raise_to' => null, 'raise_size' => null], $gets->phpCheck()->jsonSerialize());
     }
 
     /** composer update installs the highest release on the branch that the lock's links allow. */
@@ -496,7 +496,8 @@ final class FixFinderTest extends TestCase
 
     /**
      * A row's `fixed` counts the advisories that the branch's newest release lies outside: the
-     * branch has a lower bound for them. One that a later release reintroduces is not fixed on it.
+     * branch has a lower bound for them. One that a later release reintroduces is not fixed on it,
+     * and no release below the reintroduction fixes it either.
      */
     public function testARowFixesOnlyWhatItsNewestReleaseClears(): void
     {
@@ -510,7 +511,108 @@ final class FixFinderTest extends TestCase
         $row = $fixes->installedBranch();
         self::assertNotNull($row);
         self::assertSame([0, null, null], [$row->fixed(), $row->lowest(), $row->fixKind()]);
-        self::assertSame('2.4.0', $fixes->forAdvisory('A')->version(), 'the advisory itself has a release outside its range');
+        self::assertSame(Fix::NONE, $fixes->forAdvisory('A')->kind(), '2.7.0 brings the advisory back, so 2.4.0 fixes nothing');
+    }
+
+    /** P2b step 5: an advisory's fix is the easiest release from which the rest of its branch lies outside the range. */
+    public function testAnAdvisoryThatALaterReleaseReintroducesIsFixedOnTheNextBranch(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '2.3.0'],
+            [['2.3.0', null], ['2.4.0', null], ['2.7.0', null], ['3.0.0', null]],
+            ['A' => '<2.4.0 || >=2.7.0,<3.0.0'],
+            new PhpFloor('8.4', null)
+        );
+
+        $fix = $fixes->forAdvisory('A');
+        self::assertSame(['3.0.0', '3.x', Fix::UPDATE], [$fix->version(), $fix->toBranch(), $fix->kind()]);
+    }
+
+    /**
+     * P2b: the row's candidate is the easiest release in the branch's safe window, then the lowest.
+     * A conflict `<1.4.5` holds 1.4.3 and 1.4.4, and 1.4.5 to 1.4.9 are free.
+     */
+    public function testTheCandidateIsTheEasiestReleaseOfTheWindow(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.4.2'],
+            [['1.4.2', null], ['1.4.3', null], ['1.4.4', null], ['1.4.5', null], ['1.4.9', null]],
+            ['A' => '<1.4.3'],
+            new PhpFloor('8.4', null),
+            [['name' => 'c/c', 'version' => '1.0.0', 'conflict' => ['a/b' => '<1.4.5']]]
+        );
+
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+        self::assertSame(['1.4.5', Fix::UPDATE, 1], [$row->lowest(), $row->fixKind(), $row->fixed()]);
+        $candidate = $row->candidate();
+        self::assertNotNull($candidate);
+        self::assertSame([], $candidate->heldBy());
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame(['1.4.5', Fix::UPDATE], [$move->release()->pretty(), $move->kind()], 'the move is the row candidate');
+        self::assertSame(['1.4.5', Fix::UPDATE], [$fixes->forAdvisory('A')->version(), $fixes->forAdvisory('A')->kind()]);
+    }
+
+    public function testABranchBelowTheInstalledOneFixesNothing(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '2.0.0'],
+            [['1.9.0', null], ['2.0.0', null], ['2.1.0', null]],
+            ['A' => '>=2.0.0,<2.1.0'],
+            new PhpFloor('8.4', null)
+        );
+
+        [$two, $one] = $fixes->branches();
+        self::assertSame(['2.x', 1], [$two->branch(), $two->fixed()]);
+        self::assertSame(['1.x', 0, null], [$one->branch(), $one->fixed(), $one->lowest()]);
+    }
+
+    /**
+     * P2b: the window starts above every advisory on its own versions. prestashop-v1's
+     * symfony/http-client 4.4.26: `^5.4.47` admits 5.4.47 to 5.4.52, inside an advisory that 4.4.26
+     * does not count.
+     */
+    public function testTheWindowStartsAboveAnAdvisoryOnItsOwnVersions(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'symfony/http-client', 'version' => 'v4.4.26'],
+            [['v4.4.26', null], ['v5.4.47', null], ['v5.4.52', null], ['v5.4.53', null], ['v5.4.55', null]],
+            ['A' => '<5.4.47'],
+            new PhpFloor('8.4', null),
+            [],
+            [],
+            [],
+            [],
+            [self::advisory('PKSA-35by', '>=5.4.0,<5.4.53')]
+        );
+
+        $five = $fixes->branches()[0];
+        self::assertSame(['5.x', 'v5.4.53', 1], [$five->branch(), $five->lowest(), $five->fixed()]);
+        self::assertSame('v5.4.53', $fixes->forAdvisory('A')->version());
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame('v5.4.53', $move->release()->pretty());
+    }
+
+    /** An advisory on the branch's newest release itself leaves the window where the counted ranges put it. */
+    public function testAnAdvisoryOnTheNewestReleaseDoesNotEmptyTheWindow(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['1.2.0', null]],
+            ['A' => '<1.1.0'],
+            new PhpFloor('8.4', null),
+            [],
+            [],
+            [],
+            [],
+            [self::advisory('B', '>=1.2.0')]
+        );
+
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+        self::assertSame(['1.1.0', 1], [$row->lowest(), $row->fixed()]);
     }
 
     /** Among two raise-php candidates, the one that nothing holds is easier. */
@@ -660,8 +762,9 @@ final class FixFinderTest extends TestCase
      * @param list<array<string, mixed>>          $devPackages packages-dev entries
      * @param array<string, mixed>                $root        composer.json
      * @param list<Advisory>                      $extra       advisories with no range
+     * @param list<Advisory>                      $own         advisories on other versions of the package, not counted on the installed one
      */
-    private function find(array $package, array $releases, array $ranges, PhpFloor $floor, array $packages = [], array $devPackages = [], array $root = [], array $extra = []): PackageFixes
+    private function find(array $package, array $releases, array $ranges, PhpFloor $floor, array $packages = [], array $devPackages = [], array $root = [], array $extra = [], array $own = []): PackageFixes
     {
         $package += ['notification-url' => self::PACKAGIST];
         $lock = LockFile::fromArray(['packages' => array_merge([$package], $packages), 'packages-dev' => $devPackages]);
@@ -686,7 +789,7 @@ final class FixFinderTest extends TestCase
             $advisories[] = self::advisory((string) $id, $range);
         }
 
-        return (new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::fromArray($root))))->find(new PackageFacts($locked, $metadata, null, $advisories));
+        return (new FixFinder($floor, LinkIndex::of($lock, ProjectConfig::fromArray($root))))->find(new PackageFacts($locked, $metadata, null, $advisories), array_merge($advisories, $own));
     }
 
     /** @param list<array<string, mixed>> $packages */

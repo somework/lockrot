@@ -276,7 +276,11 @@ def project_explain(doc, proj):
 
 
 def inputs_of(case):
-    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows."""
+    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows.
+
+    The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix or
+    a move names. `dependents` holds the `require` names of each direct dependent that C08 measured, and `abandoned` the
+    marking that S1 reads."""
     f, det, run = case['finding'], case.get('details') or {}, case['run']
     rows = ((det.get('metadata') or {}).get('branches')) or []
     if not rows or f['metadata']['status'] != 'read':
@@ -290,34 +294,71 @@ def inputs_of(case):
             releases[version] = {'version': version, 'time': at, 'php': php}
     for r in rows:
         release(r['highest'], r['highest_released'], r['php'])
+        # The model dates a branch by its newest release only, so a lower release stays undated.
         lowest = (r.get('fixes') or {}).get('lowest')
-        release(lowest, r['highest_released'], r['php'])
+        release(lowest, None, r['php'])
     by_branch = {r['branch']: r for r in rows}
     for a in advisories:
         fx = a['fix']
         row = by_branch.get(fx['to_branch'])
         if fx['version'] and row is not None:
-            release(fx['version'], row['highest_released'], row['php'])
+            release(fx['version'], None, row['php'])
     age = f.get('age') or {}
     installed_at = (age.get('installed') or {}).get('at')
     release(f['version'], installed_at, f['installed_php']['requires'])
-    holders = {}
     root_require = {f['package']: '*'} if f['direct'] else {}
-    for a in advisories:
-        for h in a['fix']['held_by']:
-            if h['source'] == 'root':
-                root_require[f['package']] = h['constraint']
-            else:
-                holders[h['package']] = {'name': h['package'], 'version': h['version'], h['link']: {f['package']: h['constraint']}}
+    lock = {}
+    through = {e['package']: e for e in (f.get('next_step') or {}).get('through') or []}
+
+    def entry(name):
+        """A lock entry of another package: a link of the case's package, a holder or a dependent."""
+        if name not in lock:
+            e = through.get(name) or {}
+            lock[name] = {'name': name, 'version': e.get('installed_version') or '1.0.0', 'dev': False,
+                          'origin': 'vcs' if e.get('newest_requires_unmeasured') == 'not_from_composer_repository' else 'packagist'}
+        return lock[name]
+    chain = f['chain']
+    if len(chain) >= 2:
+        root_require.setdefault(chain[0], '*')
+        for parent, child in zip(chain, chain[1:]):
+            entry(parent).setdefault('require', {})[child] = '*'
+    for name in f['direct_dependents']:
+        if name != f['package'] and name not in lock:
+            root_require.setdefault(name, '*')
+            requires_it = (through.get(name) or {}).get('installed_requires') is not False or len(chain) < 3
+            entry(name).setdefault('require', {})[f['package'] if requires_it else chain[-2]] = '*'
+    moves = [m for m in [f.get('next_step')] if m] + [m for m in ((f.get('next_step') or {}).get('also') or [])]
+    held = [h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m['held_by']]
+    for h in held:
+        if h['source'] == 'root':
+            root_require[f['package']] = h['constraint']
+        else:
+            e = entry(h['package'])
+            e['version'] = h['version']
+            e.setdefault(h['link'], {})[f['package']] = h['constraint']
+    dependents = {}
+    for name, e in through.items():
+        if e['installed_requires'] is None or e['installed_version'] is None:
+            continue
+        newest = e.get('newest_stable')
+        own = [{'version': e['installed_version'], 'time': newest['released'] if newest and newest['version'] == e['installed_version'] else None,
+                'require': {f['package']: '*'} if e['installed_requires'] else {}}]
+        if newest and newest['version'] != e['installed_version']:
+            own.append({'version': newest['version'], 'time': newest['released'], 'require': {f['package']: '*'} if e['newest_requires'] else {}})
+        dependents[name] = own
+    s1 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S1'), None)
+    marking = None if s1 is None else {'by': s1['marked_by'], 'replacement': s1['replacement']}
     act = f.get('activity') or {}
     push = age.get('push') or {}
     return {
         'root': {'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **root_require)},
         'lock': [{'name': f['package'], 'version': f['version'], 'time': installed_at, 'php': f['installed_php']['requires'], 'dev': f['dev'],
-                  'origin': f['origin']['kind']}] + [dict(v, dev=False) for v in holders.values()],
+                  'origin': f['origin']['kind']}] + list(lock.values()),
         'releases': sorted(releases.values(), key=lambda r: r['version']),
         'advisories': [{'id': a['id'], 'cve': a['cve'], 'title': a['title'], 'link': a['link'], 'reported_at': a['reported_at'],
                         'severity': a['severity_published'], 'affected_versions': a['affected_versions']} for a in advisories],
+        'abandoned': marking,
+        'dependents': dependents,
         'activity': None if act.get('status') != 'read' else {'host': act['host'], 'repo': act['repo'], 'pushed_at': push.get('at'), 'archived': act['archived']},
         'run': {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev']},
     }

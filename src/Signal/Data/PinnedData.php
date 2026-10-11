@@ -55,6 +55,26 @@ final class PinnedData implements SignalData
         return $this->reason;
     }
 
+    public function lastStableRelease(): ?string
+    {
+        return $this->lastStableRelease;
+    }
+
+    public function lastStableVersion(): ?string
+    {
+        return $this->lastStableVersion;
+    }
+
+    public function snapshotTime(): ?string
+    {
+        return $this->snapshotTime;
+    }
+
+    public function tagRelation(): ?string
+    {
+        return $this->tagRelation;
+    }
+
     /** @return array{version: string, reason: string, has_stable_release: ?bool, last_stable_release: ?string, last_stable_version: ?string, last_stable_dated_by: ?string, snapshot_time: ?string, tag_relation: ?string} */
     public function jsonSerialize(): array
     {

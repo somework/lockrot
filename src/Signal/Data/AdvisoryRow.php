@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Signal\Data;
 
 use Lockrot\Security\Fix;
+use Lockrot\Verdict\GradedPackage;
 
 /**
  * One counted advisory of S9: `signals[].data.advisories[]` (docs/verdicts.md#security-advisories).
@@ -50,6 +51,15 @@ final class AdvisoryRow implements \JsonSerializable
     {
         $clone = clone $this;
         $clone->deciding = $deciding;
+
+        return $clone;
+    }
+
+    /** @param array<string, GradedPackage> $findings by package name */
+    public function withFindings(array $findings): self
+    {
+        $clone = clone $this;
+        $clone->fix = $this->fix->withFindings($findings);
 
         return $clone;
     }

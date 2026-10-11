@@ -435,7 +435,7 @@ final class ExplanationTest extends TestCase
 
         $branches = JsonPath::arrayAt((new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report()))->toArray(), ['metadata', 'branches']);
 
-        self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two), '1.x' => FindingDetails::branchFixes($one)], array_column($branches, 'fixes', 'branch'));
+        self::assertSame(['3.x' => null, '2.x' => FindingDetails::branchFixes($two, null), '1.x' => FindingDetails::branchFixes($one, null)], array_column($branches, 'fixes', 'branch'));
     }
 
     /**

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Lockrot\Verdict\GradedPackage;
+
 /**
  * A release branch's `fixes`: what a move onto the branch
  * clears, from its lower bound, and what holds that move.
@@ -44,6 +46,15 @@ final class BranchFixes
     public static function installedFromRows(string $branch, array $clears, int $unknown, int $of): self
     {
         return new self($branch, true, $unknown, $of, null, null, $clears);
+    }
+
+    /** @param array<string, GradedPackage> $findings by package name */
+    public function withFindings(array $findings): self
+    {
+        $clone = clone $this;
+        $clone->candidate = $this->candidate === null ? null : $this->candidate->withFindings($findings);
+
+        return $clone;
     }
 
     /** `ReleaseBranch::label()`, `2.x`. */

@@ -1,5 +1,5 @@
 {
- "pr": "4b",
+ "pr": "4c",
  "cases": [
   {
    "id": "A",
@@ -2105,7 +2105,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "twig/twig": "^2.0"
+      "twig/twig": "^2.0",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -2120,10 +2121,11 @@
      {
       "name": "symfony/twig-bridge",
       "version": "v3.4.47",
+      "dev": false,
+      "origin": "packagist",
       "require": {
        "twig/twig": "^1.41|^2.10"
-      },
-      "dev": false
+      }
      }
     ],
     "releases": [
@@ -2139,17 +2141,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -2295,6 +2297,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -3842,7 +3846,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -3852,7 +3856,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -3862,7 +3866,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -3882,6 +3886,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -5052,7 +5058,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -5063,6 +5071,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -5083,6 +5109,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/debug",
@@ -6237,6 +6268,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "tubalmartin/YUI-CSS-compressor-PHP-port",
@@ -7659,7 +7692,7 @@
      },
      {
       "version": "v5.4.52",
-      "time": "2026-05-20T17:13:41+00:00",
+      "time": null,
       "php": ">=7.2.5"
      },
      {
@@ -7669,7 +7702,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-09-26T06:15:25+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -7679,7 +7712,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-09-26T06:31:10+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -7689,7 +7722,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-09-26T06:33:49+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -7727,6 +7760,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/yaml",
@@ -8890,7 +8925,8 @@
     "root": {
      "name": "phpbb/phpbb",
      "require": {
-      "php": "^7.2 || ^8.0.0"
+      "php": "^7.2 || ^8.0.0",
+      "guzzlehttp/guzzle": "*"
      }
     },
     "lock": [
@@ -8901,6 +8937,15 @@
       "php": ">=7.2",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "guzzlehttp/guzzle",
+      "version": "6.5.8",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/polyfill-intl-idn": "*"
+      }
      }
     ],
     "releases": [
@@ -8911,7 +8956,7 @@
      },
      {
       "version": "v1.38.1",
-      "time": "2026-09-23T14:40:04+00:00",
+      "time": null,
       "php": ">=7.2"
      },
      {
@@ -8931,6 +8976,23 @@
       "affected_versions": ">=1.17.1,<1.38.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {
+     "guzzlehttp/guzzle": [
+      {
+       "version": "6.5.8",
+       "time": null,
+       "require": {
+        "symfony/polyfill-intl-idn": "*"
+       }
+      },
+      {
+       "version": "8.2.0",
+       "time": "2026-09-06T13:55:09+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": null,
     "run": {
      "target_php": "8.4",
@@ -10077,6 +10139,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
@@ -11117,6 +11181,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "roots/wp-config",
@@ -12302,7 +12368,8 @@
     "root": {
      "name": "akaunting/akaunting",
      "require": {
-      "php": "^8.1"
+      "php": "^8.1",
+      "lorisleiva/laravel-search-string": "*"
      }
     },
     "lock": [
@@ -12313,6 +12380,24 @@
       "php": ">=5.5.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "lorisleiva/laravel-search-string",
+      "version": "v1.3.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/compiler": "*"
+      }
+     },
+     {
+      "name": "hoa/compiler",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/consistency": "*"
+      }
      }
     ],
     "releases": [
@@ -12333,6 +12418,19 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": null
+    },
+    "dependents": {
+     "lorisleiva/laravel-search-string": [
+      {
+       "version": "v1.3.0",
+       "time": "2023-03-11T10:11:33+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "hoaproject/Consistency",
@@ -14056,27 +14154,27 @@
      },
      {
       "version": "7.12.1",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.12.3",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.14.2",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.15.1",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.15.2",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
@@ -14086,7 +14184,7 @@
      },
      {
       "version": "8.0.1",
-      "time": "2026-09-06T13:55:09+00:00",
+      "time": null,
       "php": "^7.4 || ^8.0"
      },
      {
@@ -14193,6 +14291,8 @@
       "affected_versions": "<7.15.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "guzzle/guzzle",
@@ -15739,7 +15839,7 @@
      },
      {
       "version": "v5.4.52",
-      "time": "2026-05-20T17:13:41+00:00",
+      "time": null,
       "php": ">=7.2.5"
      },
      {
@@ -15749,7 +15849,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-09-26T06:15:25+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -15759,7 +15859,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-09-26T06:31:10+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -15769,7 +15869,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-09-26T06:33:49+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -15807,6 +15907,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/yaml",
@@ -17345,7 +17447,8 @@
     "root": {
      "name": "phpbb/phpbb",
      "require": {
-      "php": "^7.2 || ^8.0.0"
+      "php": "^7.2 || ^8.0.0",
+      "guzzlehttp/guzzle": "*"
      }
     },
     "lock": [
@@ -17360,10 +17463,11 @@
      {
       "name": "guzzlehttp/guzzle",
       "version": "6.5.8",
+      "dev": false,
+      "origin": "packagist",
       "require": {
        "guzzlehttp/psr7": "^1.9"
-      },
-      "dev": false
+      }
      }
     ],
     "releases": [
@@ -17374,17 +17478,17 @@
      },
      {
       "version": "2.10.2",
-      "time": "2026-08-24T09:13:11+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "2.12.1",
-      "time": "2026-08-24T09:13:11+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "2.12.3",
-      "time": "2026-08-24T09:13:11+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
@@ -17436,6 +17540,25 @@
       "affected_versions": "<2.12.3"
      }
     ],
+    "abandoned": null,
+    "dependents": {
+     "guzzlehttp/guzzle": [
+      {
+       "version": "6.5.8",
+       "time": null,
+       "require": {
+        "guzzlehttp/psr7": "*"
+       }
+      },
+      {
+       "version": "8.2.0",
+       "time": "2026-09-06T13:55:09+00:00",
+       "require": {
+        "guzzlehttp/psr7": "*"
+       }
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "guzzle/psr7",
@@ -19173,7 +19296,10 @@
      "name": "prestashop/prestashop",
      "require": {
       "php": "^7.1.3",
-      "twig/twig": "*"
+      "twig/twig": "*",
+      "csa/guzzle-bundle": "*",
+      "prestashop/translationtools-bundle": "*",
+      "symfony/symfony": "*"
      }
     },
     "lock": [
@@ -19184,6 +19310,33 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "csa/guzzle-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
+     },
+     {
+      "name": "prestashop/translationtools-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
+     },
+     {
+      "name": "symfony/symfony",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
      }
     ],
     "releases": [
@@ -19194,7 +19347,7 @@
      },
      {
       "version": "v1.44.7",
-      "time": "2024-09-09T17:17:16+00:00",
+      "time": null,
       "php": ">=7.2.5"
      },
      {
@@ -19204,12 +19357,12 @@
      },
      {
       "version": "v2.15.3",
-      "time": "2024-09-09T17:53:56+00:00",
+      "time": null,
       "php": ">=7.1.3"
      },
      {
       "version": "v2.16.0",
-      "time": "2024-09-09T17:53:56+00:00",
+      "time": null,
       "php": ">=7.1.3"
      },
      {
@@ -19219,17 +19372,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -19384,6 +19537,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -20740,7 +20895,9 @@
    "inputs": {
     "root": {
      "name": "mautic/mautic",
-     "require": {}
+     "require": {
+      "mautic/core-lib": "*"
+     }
     },
     "lock": [
      {
@@ -20750,6 +20907,42 @@
       "php": ">= 5.4",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "4.3.x-dev",
+      "dev": false,
+      "origin": "vcs",
+      "require": {
+       "lightsaml/sp-bundle": "*"
+      }
+     },
+     {
+      "name": "lightsaml/sp-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "lightsaml/symfony-bridge": "*"
+      }
+     },
+     {
+      "name": "lightsaml/symfony-bridge",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "lightsaml/lightsaml": "*"
+      }
+     },
+     {
+      "name": "lightsaml/lightsaml",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "robrichards/xmlseclibs": "*"
+      }
      }
     ],
     "releases": [
@@ -20799,6 +20992,8 @@
       "affected_versions": "<=3.1.3"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "robrichards/xmlseclibs",
@@ -22191,7 +22386,9 @@
    "inputs": {
     "root": {
      "name": "mautic/mautic",
-     "require": {}
+     "require": {
+      "mautic/core-lib": "*"
+     }
     },
     "lock": [
      {
@@ -22201,6 +22398,24 @@
       "php": "^7.2.5 || ^8.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "4.3.x-dev",
+      "dev": false,
+      "origin": "vcs",
+      "require": {
+       "barryvdh/elfinder-flysystem-driver": "*"
+      }
+     },
+     {
+      "name": "barryvdh/elfinder-flysystem-driver",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "league/flysystem": "*"
+      }
      }
     ],
     "releases": [
@@ -22261,6 +22476,8 @@
       "affected_versions": "<=3.35.2"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "thephpleague/flysystem",
@@ -24328,6 +24545,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": null
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "fgrosse/PHPASN1",
@@ -25537,6 +25759,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": null
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "guzzle/cache-subscriber",
@@ -27332,7 +27559,10 @@
     "root": {
      "name": "coollabsio/coolify",
      "require": {
-      "php": "^8.4"
+      "php": "^8.4",
+      "laravel/framework": "*",
+      "laravel/nightwatch": "*",
+      "spatie/laravel-markdown": "*"
      }
     },
     "lock": [
@@ -27343,6 +27573,33 @@
       "php": "^7.4 || ^8.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "laravel/framework",
+      "version": "v12.65.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "league/commonmark": "*"
+      }
+     },
+     {
+      "name": "laravel/nightwatch",
+      "version": "v1.28.6",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "league/commonmark": "*"
+      }
+     },
+     {
+      "name": "spatie/laravel-markdown",
+      "version": "2.8.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "league/commonmark": "*"
+      }
      }
     ],
     "releases": [
@@ -27448,7 +27705,7 @@
      },
      {
       "version": "2.10.0",
-      "time": "2026-09-21T13:07:34+00:00",
+      "time": null,
       "php": "^7.4 || ^8.0"
      },
      {
@@ -27491,6 +27748,46 @@
       "affected_versions": ">=1.3.0,<=2.10.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {
+     "laravel/framework": [
+      {
+       "version": "v12.65.0",
+       "time": null,
+       "require": {
+        "league/commonmark": "*"
+       }
+      },
+      {
+       "version": "v13.34.0",
+       "time": "2026-09-29T12:46:21+00:00",
+       "require": {
+        "league/commonmark": "*"
+       }
+      }
+     ],
+     "laravel/nightwatch": [
+      {
+       "version": "v1.28.6",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v1.30.2",
+       "time": "2026-09-18T00:37:28+00:00",
+       "require": {}
+      }
+     ],
+     "spatie/laravel-markdown": [
+      {
+       "version": "2.8.0",
+       "time": "2026-02-22T18:53:36+00:00",
+       "require": {
+        "league/commonmark": "*"
+       }
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "thephpleague/commonmark",
@@ -28551,6 +28848,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "akaunting/laravel-debugbar-collector",
@@ -30759,6 +31058,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "thephpleague/uri",
@@ -32299,7 +32600,45 @@
     "root": {
      "name": "wallabag/wallabag",
      "require": {
-      "php": ">=7.4"
+      "php": ">=7.4",
+      "friendsofsymfony/user-bundle": "*",
+      "babdev/pagerfanta-bundle": "*",
+      "bdunogier/guzzle-site-authenticator": "*",
+      "craue/config-bundle": "*",
+      "doctrine/doctrine-bundle": "*",
+      "doctrine/doctrine-migrations-bundle": "*",
+      "friendsofsymfony/jsrouting-bundle": "*",
+      "friendsofsymfony/oauth-server-bundle": "*",
+      "friendsofsymfony/rest-bundle": "*",
+      "jms/serializer-bundle": "*",
+      "kphoen/rulerz-bundle": "*",
+      "lexik/form-filter-bundle": "*",
+      "nelmio/api-doc-bundle": "*",
+      "nelmio/cors-bundle": "*",
+      "php-amqplib/rabbitmq-bundle": "*",
+      "php-http/httplug-bundle": "*",
+      "scheb/2fa-backup-code": "*",
+      "scheb/2fa-bundle": "*",
+      "scheb/2fa-email": "*",
+      "scheb/2fa-google-authenticator": "*",
+      "scheb/2fa-qr-code": "*",
+      "scheb/2fa-trusted-device": "*",
+      "sensio/framework-extra-bundle": "*",
+      "sentry/sentry-symfony": "*",
+      "stof/doctrine-extensions-bundle": "*",
+      "symfony/event-dispatcher": "*",
+      "symfony/form": "*",
+      "symfony/framework-bundle": "*",
+      "symfony/google-mailer": "*",
+      "symfony/http-kernel": "*",
+      "symfony/mailer": "*",
+      "symfony/monolog-bundle": "*",
+      "symfony/security-bundle": "*",
+      "symfony/security-core": "*",
+      "symfony/security-http": "*",
+      "symfony/twig-bundle": "*",
+      "twig/extra-bundle": "*",
+      "willdurand/hateoas-bundle": "*"
      }
     },
     "lock": [
@@ -32310,6 +32649,348 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "friendsofsymfony/user-bundle",
+      "version": "v3.4.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "babdev/pagerfanta-bundle",
+      "version": "v3.8.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "bdunogier/guzzle-site-authenticator",
+      "version": "1.1.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "craue/config-bundle",
+      "version": "2.7.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "doctrine/doctrine-bundle",
+      "version": "2.7.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "doctrine/doctrine-migrations-bundle",
+      "version": "3.2.5",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "friendsofsymfony/jsrouting-bundle",
+      "version": "2.8.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "friendsofsymfony/oauth-server-bundle",
+      "version": "dev-master",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "friendsofsymfony/rest-bundle",
+      "version": "3.5.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "jms/serializer-bundle",
+      "version": "5.3.1",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "kphoen/rulerz-bundle",
+      "version": "0.15.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "lexik/form-filter-bundle",
+      "version": "v7.0.3",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "nelmio/api-doc-bundle",
+      "version": "v4.11.1",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "nelmio/cors-bundle",
+      "version": "2.3.1",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "php-amqplib/rabbitmq-bundle",
+      "version": "2.17.4",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "php-http/httplug-bundle",
+      "version": "1.34.3",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-backup-code",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-bundle",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-email",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-google-authenticator",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-qr-code",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-trusted-device",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "sensio/framework-extra-bundle",
+      "version": "v6.2.10",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "sentry/sentry-symfony",
+      "version": "4.14.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "stof/doctrine-extensions-bundle",
+      "version": "v1.7.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/event-dispatcher",
+      "version": "v4.4.44",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/form",
+      "version": "v4.4.48",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/framework-bundle",
+      "version": "v4.4.51",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/google-mailer",
+      "version": "v4.4.41",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "v4.4.51",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/mailer",
+      "version": "v4.4.49",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/monolog-bundle",
+      "version": "v3.8.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/security-bundle",
+      "version": "v4.4.50",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/security-core",
+      "version": "v4.4.48",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/security-http",
+      "version": "v4.4.50",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "symfony/twig-bundle",
+      "version": "v4.4.41",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "twig/extra-bundle",
+      "version": "v3.7.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
+     },
+     {
+      "name": "willdurand/hateoas-bundle",
+      "version": "2.6.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/event-dispatcher-contracts": "*"
+      }
      }
     ],
     "releases": [
@@ -32330,6 +33011,445 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {
+     "babdev/pagerfanta-bundle": [
+      {
+       "version": "v3.8.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v4.6.0",
+       "time": "2025-11-29T13:01:51+00:00",
+       "require": {}
+      }
+     ],
+     "bdunogier/guzzle-site-authenticator": [
+      {
+       "version": "1.1.0",
+       "time": "2023-08-21T14:33:48+00:00",
+       "require": {}
+      }
+     ],
+     "craue/config-bundle": [
+      {
+       "version": "2.7.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.0.0",
+       "time": "2026-09-15T09:43:34+00:00",
+       "require": {}
+      }
+     ],
+     "doctrine/doctrine-bundle": [
+      {
+       "version": "2.7.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.3.2",
+       "time": "2026-09-09T11:58:04+00:00",
+       "require": {}
+      }
+     ],
+     "doctrine/doctrine-migrations-bundle": [
+      {
+       "version": "3.2.5",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "4.0.1",
+       "time": "2026-08-26T05:54:54+00:00",
+       "require": {}
+      }
+     ],
+     "friendsofsymfony/jsrouting-bundle": [
+      {
+       "version": "2.8.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.6.1",
+       "time": "2025-11-04T21:03:25+00:00",
+       "require": {}
+      }
+     ],
+     "friendsofsymfony/rest-bundle": [
+      {
+       "version": "3.5.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.9.0",
+       "time": "2026-02-10T02:36:12+00:00",
+       "require": {}
+      }
+     ],
+     "friendsofsymfony/user-bundle": [
+      {
+       "version": "v3.4.0",
+       "time": null,
+       "require": {
+        "symfony/event-dispatcher-contracts": "*"
+       }
+      },
+      {
+       "version": "v4.1.0",
+       "time": "2026-02-13T21:22:55+00:00",
+       "require": {
+        "symfony/event-dispatcher-contracts": "*"
+       }
+      }
+     ],
+     "jms/serializer-bundle": [
+      {
+       "version": "5.3.1",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "5.5.2",
+       "time": "2025-11-25T21:41:31+00:00",
+       "require": {}
+      }
+     ],
+     "kphoen/rulerz-bundle": [
+      {
+       "version": "0.15.0",
+       "time": "2018-09-17T09:02:32+00:00",
+       "require": {}
+      }
+     ],
+     "lexik/form-filter-bundle": [
+      {
+       "version": "v7.0.3",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.0.1",
+       "time": "2023-05-19T06:37:47+00:00",
+       "require": {}
+      }
+     ],
+     "nelmio/api-doc-bundle": [
+      {
+       "version": "v4.11.1",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v5.12.2",
+       "time": "2026-09-14T11:12:11+00:00",
+       "require": {}
+      }
+     ],
+     "nelmio/cors-bundle": [
+      {
+       "version": "2.3.1",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "2.6.1",
+       "time": "2026-01-12T15:59:08+00:00",
+       "require": {}
+      }
+     ],
+     "php-amqplib/rabbitmq-bundle": [
+      {
+       "version": "2.17.4",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "2.19.0",
+       "time": "2026-01-16T12:34:27+00:00",
+       "require": {}
+      }
+     ],
+     "php-http/httplug-bundle": [
+      {
+       "version": "1.34.3",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "2.3.1",
+       "time": "2026-04-25T08:45:32+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-backup-code": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-01-24T13:26:10+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-bundle": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-07-10T18:29:30+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-email": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-06-02T20:21:59+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-google-authenticator": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-01-24T13:27:55+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-qr-code": [
+      {
+       "version": "v5.13.2",
+       "time": "2022-01-03T10:21:24+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-trusted-device": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-01-24T13:26:10+00:00",
+       "require": {}
+      }
+     ],
+     "sensio/framework-extra-bundle": [
+      {
+       "version": "v6.2.10",
+       "time": "2023-02-24T14:57:12+00:00",
+       "require": {}
+      }
+     ],
+     "sentry/sentry-symfony": [
+      {
+       "version": "4.14.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "5.13.0",
+       "time": "2026-08-28T10:41:44+00:00",
+       "require": {}
+      }
+     ],
+     "stof/doctrine-extensions-bundle": [
+      {
+       "version": "v1.7.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v1.15.3",
+       "time": "2026-01-23T08:45:07+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/event-dispatcher": [
+      {
+       "version": "v4.4.44",
+       "time": null,
+       "require": {
+        "symfony/event-dispatcher-contracts": "*"
+       }
+      },
+      {
+       "version": "v8.1.5",
+       "time": "2026-08-21T17:47:34+00:00",
+       "require": {
+        "symfony/event-dispatcher-contracts": "*"
+       }
+      }
+     ],
+     "symfony/form": [
+      {
+       "version": "v4.4.48",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-29T12:38:40+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/framework-bundle": [
+      {
+       "version": "v4.4.51",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-28T19:13:15+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/google-mailer": [
+      {
+       "version": "v4.4.41",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.0",
+       "time": "2026-05-29T05:06:50+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/http-kernel": [
+      {
+       "version": "v4.4.51",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-29T14:08:01+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/mailer": [
+      {
+       "version": "v4.4.49",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.7",
+       "time": "2026-09-15T06:01:24+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/monolog-bundle": [
+      {
+       "version": "v3.8.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v4.1.0",
+       "time": "2026-09-10T19:32:07+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/security-bundle": [
+      {
+       "version": "v4.4.50",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-24T11:09:32+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/security-core": [
+      {
+       "version": "v4.4.48",
+       "time": null,
+       "require": {
+        "symfony/event-dispatcher-contracts": "*"
+       }
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-28T19:13:15+00:00",
+       "require": {
+        "symfony/event-dispatcher-contracts": "*"
+       }
+      }
+     ],
+     "symfony/security-http": [
+      {
+       "version": "v4.4.50",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-28T19:13:15+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/twig-bundle": [
+      {
+       "version": "v4.4.41",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.7",
+       "time": "2026-09-11T14:51:16+00:00",
+       "require": {}
+      }
+     ],
+     "twig/extra-bundle": [
+      {
+       "version": "v3.7.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v3.29.0",
+       "time": "2026-09-11T08:59:50+00:00",
+       "require": {}
+      }
+     ],
+     "willdurand/hateoas-bundle": [
+      {
+       "version": "2.6.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.0.1",
+       "time": "2026-07-17T20:45:53+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "symfony/event-dispatcher-contracts",
@@ -33538,6 +34658,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "yosymfony/toml",
@@ -34650,6 +35772,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "matomo-org/component-network",
@@ -35656,7 +36780,11 @@
     "root": {
      "name": "pimcore/skeleton",
      "require": {
-      "php": "~8.4.0 || ~8.5.0"
+      "php": "~8.4.0 || ~8.5.0",
+      "pimcore/pimcore": "*",
+      "pimcore/quill-bundle": "*",
+      "pimcore/studio-backend-bundle": "*",
+      "pimcore/studio-ui-bundle": "*"
      }
     },
     "lock": [
@@ -35667,6 +36795,42 @@
       "php": "~8.4.0 || ~8.5.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "pimcore/pimcore",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "scheb/2fa-google-authenticator": "*"
+      }
+     },
+     {
+      "name": "pimcore/quill-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "scheb/2fa-google-authenticator": "*"
+      }
+     },
+     {
+      "name": "pimcore/studio-backend-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "scheb/2fa-google-authenticator": "*"
+      }
+     },
+     {
+      "name": "pimcore/studio-ui-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "scheb/2fa-google-authenticator": "*"
+      }
      }
     ],
     "releases": [
@@ -35692,6 +36856,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "scheb/2fa-google-authenticator",
@@ -36877,6 +38043,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "Pagerfanta/twig",
@@ -38768,7 +39936,9 @@
      "name": "wallabag/wallabag",
      "require": {
       "php": ">=7.4",
-      "guzzlehttp/guzzle": "*"
+      "guzzlehttp/guzzle": "*",
+      "bdunogier/guzzle-site-authenticator": "*",
+      "php-http/guzzle5-adapter": "*"
      }
     },
     "lock": [
@@ -38779,6 +39949,24 @@
       "php": ">=5.4.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "bdunogier/guzzle-site-authenticator",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "guzzlehttp/guzzle": "*"
+      }
+     },
+     {
+      "name": "php-http/guzzle5-adapter",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "guzzlehttp/guzzle": "*"
+      }
      }
     ],
     "releases": [
@@ -38794,12 +39982,12 @@
      },
      {
       "version": "6.5.6",
-      "time": "2022-06-20T22:16:07+00:00",
+      "time": null,
       "php": ">=5.5"
      },
      {
       "version": "6.5.7",
-      "time": "2022-06-20T22:16:07+00:00",
+      "time": null,
       "php": ">=5.5"
      },
      {
@@ -38809,27 +39997,27 @@
      },
      {
       "version": "7.12.1",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.12.3",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.14.2",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.15.1",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.15.2",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
@@ -38839,7 +40027,7 @@
      },
      {
       "version": "8.0.1",
-      "time": "2026-09-06T13:55:09+00:00",
+      "time": null,
       "php": "^7.4 || ^8.0"
      },
      {
@@ -38991,6 +40179,8 @@
       "affected_versions": "<7.15.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "guzzle/guzzle",
@@ -40321,6 +41511,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "web-token/jwt-library"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "web-token/jwt-key-mgmt",
@@ -41515,6 +42710,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "Symfony"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "sensiolabs/SensioFrameworkExtraBundle",
@@ -42959,7 +44159,9 @@
    "inputs": {
     "root": {
      "name": "mautic/mautic",
-     "require": {}
+     "require": {
+      "mautic/core-lib": "*"
+     }
     },
     "lock": [
      {
@@ -42969,6 +44171,15 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "4.3.x-dev",
+      "dev": false,
+      "origin": "vcs",
+      "require": {
+       "symfony/routing": "*"
+      }
      }
     ],
     "releases": [
@@ -42994,7 +44205,7 @@
      },
      {
       "version": "v5.4.52",
-      "time": "2026-05-22T19:02:28+00:00",
+      "time": null,
       "php": ">=7.2.5"
      },
      {
@@ -43004,7 +44215,7 @@
      },
      {
       "version": "v6.4.41",
-      "time": "2026-09-28T18:59:50+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -43014,7 +44225,7 @@
      },
      {
       "version": "v7.4.13",
-      "time": "2026-09-28T19:09:50+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -43024,7 +44235,7 @@
      },
      {
       "version": "v8.0.13",
-      "time": "2026-09-28T19:13:15+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -43053,6 +44264,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/routing",
@@ -45193,7 +46406,8 @@
     "root": {
      "name": "akaunting/akaunting",
      "require": {
-      "php": "^8.1"
+      "php": "^8.1",
+      "genealabs/laravel-model-caching": "*"
      }
     },
     "lock": [
@@ -45204,6 +46418,15 @@
       "php": null,
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "genealabs/laravel-model-caching",
+      "version": "0.13.9",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "genealabs/laravel-pivot-events": "*"
+      }
      }
     ],
     "releases": [
@@ -45254,6 +46477,23 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {
+     "genealabs/laravel-model-caching": [
+      {
+       "version": "0.13.9",
+       "time": null,
+       "require": {
+        "genealabs/laravel-pivot-events": "*"
+       }
+      },
+      {
+       "version": "13.1.11",
+       "time": "2026-09-19T19:55:47+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "mikebronner/laravel-pivot-events",
@@ -46323,6 +47563,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "hyvor/php-json-exporter",
@@ -48223,7 +49465,10 @@
      "name": "prestashop/prestashop",
      "require": {
       "php": "^7.1.3",
-      "guzzlehttp/guzzle": "*"
+      "guzzlehttp/guzzle": "*",
+      "csa/guzzle-bundle": "*",
+      "guzzlehttp/cache-subscriber": "*",
+      "prestashop/circuit-breaker": "*"
      }
     },
     "lock": [
@@ -48234,6 +49479,33 @@
       "php": ">=5.4.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "csa/guzzle-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "guzzlehttp/guzzle": "*"
+      }
+     },
+     {
+      "name": "guzzlehttp/cache-subscriber",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "guzzlehttp/guzzle": "*"
+      }
+     },
+     {
+      "name": "prestashop/circuit-breaker",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "guzzlehttp/guzzle": "*"
+      }
      }
     ],
     "releases": [
@@ -48249,12 +49521,12 @@
      },
      {
       "version": "6.5.6",
-      "time": "2022-06-20T22:16:07+00:00",
+      "time": null,
       "php": ">=5.5"
      },
      {
       "version": "6.5.7",
-      "time": "2022-06-20T22:16:07+00:00",
+      "time": null,
       "php": ">=5.5"
      },
      {
@@ -48264,27 +49536,27 @@
      },
      {
       "version": "7.12.1",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.12.3",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.14.2",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.15.1",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
       "version": "7.15.2",
-      "time": "2026-08-24T09:21:06+00:00",
+      "time": null,
       "php": "^7.2.5 || ^8.0"
      },
      {
@@ -48294,7 +49566,7 @@
      },
      {
       "version": "8.0.1",
-      "time": "2026-09-06T13:55:09+00:00",
+      "time": null,
       "php": "^7.4 || ^8.0"
      },
      {
@@ -48446,6 +49718,8 @@
       "affected_versions": "<7.15.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "guzzle/guzzle",
@@ -49652,7 +50926,10 @@
      "name": "joomla/joomla-cms",
      "require": {
       "php": "^7.2.5",
-      "joomla/filter": "*"
+      "joomla/filter": "*",
+      "joomla/input": "*",
+      "joomla/oauth1": "*",
+      "joomla/oauth2": "*"
      }
     },
     "lock": [
@@ -49663,6 +50940,33 @@
       "php": "^7.2.5|~8.0.0|~8.1.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "joomla/input",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/filter": "*"
+      }
+     },
+     {
+      "name": "joomla/oauth1",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/filter": "*"
+      }
+     },
+     {
+      "name": "joomla/oauth2",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/filter": "*"
+      }
      }
     ],
     "releases": [
@@ -49683,7 +50987,7 @@
      },
      {
       "version": "3.0.5",
-      "time": "2026-09-29T16:10:51+00:00",
+      "time": null,
       "php": "^8.1.0"
      },
      {
@@ -49708,6 +51012,8 @@
       "affected_versions": "<2.0.6|>=3.0.0,<3.0.5|=4.0.0"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "joomla-framework/filter",
@@ -51321,7 +52627,7 @@
      "name": "matomo/matomo",
      "require": {
       "php": ">=7.2.5",
-      "symfony/monolog-bridge": "*"
+      "symfony/monolog-bridge": "^2.6"
      }
     },
     "lock": [
@@ -51387,6 +52693,8 @@
       "affected_versions": ">=2.0.0,<2.8.52"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -52922,7 +54230,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "twig/twig": "*"
+      "twig/twig": "*",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -52933,6 +54242,15 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/twig-bridge",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
      }
     ],
     "releases": [
@@ -52948,17 +54266,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -53104,6 +54422,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -54685,7 +56005,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "*",
-      "twig/twig": "*"
+      "twig/twig": "*",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -54696,6 +56017,15 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/twig-bridge",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
      }
     ],
     "releases": [
@@ -54711,17 +56041,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -54867,6 +56197,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -56582,7 +57914,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "twig/twig": "*"
+      "twig/twig": "*",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -56593,6 +57926,15 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/twig-bridge",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
      }
     ],
     "releases": [
@@ -56608,17 +57950,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -56764,6 +58106,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -57964,7 +59308,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -57975,6 +59321,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -57995,6 +59359,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/debug",
@@ -59552,7 +60921,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -59562,7 +60931,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -59572,7 +60941,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -59592,6 +60961,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -60746,7 +62117,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -60757,6 +62130,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -60777,6 +62168,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": null,
     "run": {
      "target_php": "8.4",
@@ -62236,6 +63632,8 @@
       "affected_versions": ">=2.0.0"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -63668,7 +65066,7 @@
      },
      {
       "version": "v5.4.52",
-      "time": "2026-05-20T17:13:41+00:00",
+      "time": null,
       "php": ">=7.2.5"
      },
      {
@@ -63678,7 +65076,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-09-26T06:15:25+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -63688,7 +65086,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-09-26T06:31:10+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -63698,7 +65096,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-09-26T06:33:49+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -63736,6 +65134,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/yaml",
@@ -66046,7 +67446,7 @@
      },
      {
       "version": "v5.4.52",
-      "time": "2026-05-20T17:13:41+00:00",
+      "time": null,
       "php": ">=7.2.5"
      },
      {
@@ -66056,7 +67456,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-09-26T06:15:25+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -66066,7 +67466,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-09-26T06:31:10+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -66076,7 +67476,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-09-26T06:33:49+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -66114,6 +67514,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": null,
     "run": {
      "target_php": "8.4",
@@ -67278,7 +68680,8 @@
     "root": {
      "name": "akaunting/akaunting",
      "require": {
-      "php": "^8.1"
+      "php": "^8.1",
+      "lorisleiva/laravel-search-string": "*"
      }
     },
     "lock": [
@@ -67289,6 +68692,24 @@
       "php": ">=5.5.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "lorisleiva/laravel-search-string",
+      "version": "v1.3.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/compiler": "*"
+      }
+     },
+     {
+      "name": "hoa/compiler",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/consistency": "*"
+      }
      }
     ],
     "releases": [
@@ -67309,6 +68730,19 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": null
+    },
+    "dependents": {
+     "lorisleiva/laravel-search-string": [
+      {
+       "version": "v1.3.0",
+       "time": "2023-03-11T10:11:33+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": null,
     "run": {
      "target_php": "8.4",
@@ -68474,7 +69908,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -68485,6 +69921,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -68505,6 +69959,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": null,
     "run": {
      "target_php": "8.4",
@@ -70001,7 +71460,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -70011,7 +71470,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -70021,7 +71480,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -70041,6 +71500,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -71639,7 +73100,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "twig/twig": "*"
+      "twig/twig": "*",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -71650,6 +73112,15 @@
       "php": ">=7.1.3",
       "dev": true,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/twig-bridge",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
      }
     ],
     "releases": [
@@ -71665,17 +73136,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -71821,6 +73292,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -74103,7 +75576,10 @@
      "name": "joomla/joomla-cms",
      "require": {
       "php": "^7.2.5",
-      "joomla/filter": "*"
+      "joomla/filter": "*",
+      "joomla/input": "*",
+      "joomla/oauth1": "*",
+      "joomla/oauth2": "*"
      }
     },
     "lock": [
@@ -74114,6 +75590,33 @@
       "php": "^7.2.5|~8.0.0|~8.1.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "joomla/input",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/filter": "*"
+      }
+     },
+     {
+      "name": "joomla/oauth1",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/filter": "*"
+      }
+     },
+     {
+      "name": "joomla/oauth2",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/filter": "*"
+      }
      }
     ],
     "releases": [
@@ -74134,7 +75637,7 @@
      },
      {
       "version": "3.0.5",
-      "time": "2026-09-29T16:10:51+00:00",
+      "time": null,
       "php": "^8.1.0"
      },
      {
@@ -74159,6 +75662,8 @@
       "affected_versions": "<2.0.6|>=3.0.0,<3.0.5|=4.0.0"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "joomla-framework/filter",
@@ -77107,6 +78612,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "tubalmartin/YUI-CSS-compressor-PHP-port",
@@ -78528,7 +80035,7 @@
      },
      {
       "version": "v5.4.52",
-      "time": "2026-05-20T17:13:41+00:00",
+      "time": null,
       "php": ">=7.2.5"
      },
      {
@@ -78538,7 +80045,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-09-26T06:15:25+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -78548,7 +80055,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-09-26T06:31:10+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -78558,7 +80065,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-09-26T06:33:49+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -78596,6 +80103,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/yaml",
@@ -79775,6 +81284,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
@@ -81086,6 +82597,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -82237,7 +83750,16 @@
      "name": "joomla/joomla-cms",
      "require": {
       "php": "^7.2.5",
-      "joomla/string": "*"
+      "joomla/string": "*",
+      "joomla/application": "*",
+      "joomla/console": "*",
+      "joomla/data": "*",
+      "joomla/filter": "*",
+      "joomla/input": "*",
+      "joomla/oauth1": "*",
+      "joomla/oauth2": "*",
+      "joomla/registry": "*",
+      "joomla/utilities": "*"
      }
     },
     "lock": [
@@ -82248,6 +83770,87 @@
       "php": "^7.2.5|~8.0.0|~8.1.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "joomla/application",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
+     },
+     {
+      "name": "joomla/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
+     },
+     {
+      "name": "joomla/data",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
+     },
+     {
+      "name": "joomla/filter",
+      "version": "2.0.5",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "^2.0"
+      }
+     },
+     {
+      "name": "joomla/input",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
+     },
+     {
+      "name": "joomla/oauth1",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
+     },
+     {
+      "name": "joomla/oauth2",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
+     },
+     {
+      "name": "joomla/registry",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
+     },
+     {
+      "name": "joomla/utilities",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "joomla/string": "*"
+      }
      }
     ],
     "releases": [
@@ -82273,6 +83876,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "joomla-framework/string",
@@ -83430,7 +85035,8 @@
     "root": {
      "name": "joomla/joomla-cms",
      "require": {
-      "php": "^7.2.5"
+      "php": "^7.2.5",
+      "jfcherng/php-diff": "*"
      }
     },
     "lock": [
@@ -83441,6 +85047,15 @@
       "php": ">=7.1.3",
       "dev": true,
       "origin": "packagist"
+     },
+     {
+      "name": "jfcherng/php-diff",
+      "version": "6.10.14",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "jfcherng/php-color-output": "*"
+      }
      }
     ],
     "releases": [
@@ -83461,6 +85076,25 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {
+     "jfcherng/php-diff": [
+      {
+       "version": "6.10.14",
+       "time": null,
+       "require": {
+        "jfcherng/php-color-output": "*"
+       }
+      },
+      {
+       "version": "7.0.1",
+       "time": "2026-06-22T13:04:52+00:00",
+       "require": {
+        "jfcherng/php-color-output": "*"
+       }
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "jfcherng/php-color-output",
@@ -85429,6 +87063,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "akaunting/laravel-version",
@@ -87165,7 +88801,8 @@
      "name": "djaiss/monica",
      "require": {
       "php": "^8.1",
-      "laravel/framework": "*"
+      "laravel/framework": "*",
+      "pragmarx/google2fa-laravel": "*"
      }
     },
     "lock": [
@@ -87176,12 +88813,21 @@
       "php": "^8.0.2",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "pragmarx/google2fa-laravel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "laravel/framework": "*"
+      }
      }
     ],
     "releases": [
      {
       "version": "v10.48.29",
-      "time": "2026-08-12T03:46:26+00:00",
+      "time": null,
       "php": "^8.1"
      },
      {
@@ -87191,7 +88837,7 @@
      },
      {
       "version": "v11.44.1",
-      "time": "2026-09-29T15:33:27+00:00",
+      "time": null,
       "php": "^8.2"
      },
      {
@@ -87201,17 +88847,17 @@
      },
      {
       "version": "v12.60.0",
-      "time": "2026-09-29T12:53:25+00:00",
+      "time": null,
       "php": "^8.2"
      },
      {
       "version": "v12.61.1",
-      "time": "2026-09-29T12:53:25+00:00",
+      "time": null,
       "php": "^8.2"
      },
      {
       "version": "v12.69.0",
-      "time": "2026-09-29T12:53:25+00:00",
+      "time": null,
       "php": "^8.2"
      },
      {
@@ -87221,7 +88867,7 @@
      },
      {
       "version": "v13.30.0",
-      "time": "2026-09-29T12:46:21+00:00",
+      "time": null,
       "php": "^8.3"
      },
      {
@@ -87261,7 +88907,7 @@
      },
      {
       "version": "v9.52.17",
-      "time": "2026-08-12T03:46:05+00:00",
+      "time": null,
       "php": "^8.0.2"
      },
      {
@@ -87326,6 +88972,8 @@
       "affected_versions": ">=13.0.0,<13.30.0|<12.69.0"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "laravel/framework",
@@ -89045,7 +90693,7 @@
      },
      {
       "version": "v3.0.0",
-      "time": "2026-07-16T22:11:20+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -89074,6 +90722,8 @@
       "affected_versions": "<2.13.0"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "maxmind/GeoIP2-php",
@@ -90528,7 +92178,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -90538,7 +92188,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -90548,7 +92198,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -90568,6 +92218,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -92775,6 +94427,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "Bacon/BaconQrCode",
@@ -93935,7 +95589,9 @@
    "inputs": {
     "root": {
      "name": "mautic/mautic",
-     "require": {}
+     "require": {
+      "mautic/core-lib": "*"
+     }
     },
     "lock": [
      {
@@ -93945,6 +95601,15 @@
       "php": ">=7.2.5",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "5.0.0-dev",
+      "dev": false,
+      "origin": "vcs",
+      "require": {
+       "symfony/event-dispatcher": "*"
+      }
      }
     ],
     "releases": [
@@ -93990,6 +95655,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/event-dispatcher",
@@ -95158,7 +96825,9 @@
    "inputs": {
     "root": {
      "name": "mautic/mautic",
-     "require": {}
+     "require": {
+      "mautic/core-lib": "*"
+     }
     },
     "lock": [
      {
@@ -95168,6 +96837,15 @@
       "php": ">=7.2.5",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "5.0.0-dev",
+      "dev": false,
+      "origin": "vcs",
+      "require": {
+       "symfony/event-dispatcher": "*"
+      }
      }
     ],
     "releases": [
@@ -95213,6 +96891,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/event-dispatcher",
@@ -96386,7 +98066,9 @@
    "inputs": {
     "root": {
      "name": "mautic/mautic",
-     "require": {}
+     "require": {
+      "mautic/core-lib": "*"
+     }
     },
     "lock": [
      {
@@ -96396,6 +98078,15 @@
       "php": ">=7.2.5",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "5.0.0-dev",
+      "dev": false,
+      "origin": "vcs",
+      "require": {
+       "symfony/event-dispatcher": "*"
+      }
      }
     ],
     "releases": [
@@ -96441,6 +98132,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/event-dispatcher",
@@ -97620,7 +99313,8 @@
     "root": {
      "name": "joomla/joomla-cms",
      "require": {
-      "php": "^7.2.5"
+      "php": "^7.2.5",
+      "web-auth/webauthn-lib": "*"
      }
     },
     "lock": [
@@ -97631,6 +99325,15 @@
       "php": "^7.1",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "web-auth/webauthn-lib",
+      "version": "v2.1.7",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "web-auth/metadata-service": "*"
+      }
      }
     ],
     "releases": [
@@ -97651,6 +99354,26 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "web-auth/webauthn-lib"
+    },
+    "dependents": {
+     "web-auth/webauthn-lib": [
+      {
+       "version": "v2.1.7",
+       "time": null,
+       "require": {
+        "web-auth/metadata-service": "*"
+       }
+      },
+      {
+       "version": "5.3.9",
+       "time": "2026-09-10T21:10:45+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "web-auth/webauthn-metadata-service",
@@ -99029,7 +100752,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -99040,6 +100765,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -99055,7 +100798,7 @@
      },
      {
       "version": "v4.4.0",
-      "time": "2022-07-28T16:29:46+00:00",
+      "time": null,
       "php": ">=7.1.3"
      },
      {
@@ -99075,6 +100818,11 @@
       "affected_versions": ">=3.0.0,<4.4.0"
      }
     ],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/debug",
@@ -100243,7 +101991,8 @@
     "root": {
      "name": "akaunting/akaunting",
      "require": {
-      "php": "^8.1"
+      "php": "^8.1",
+      "akaunting/laravel-apexcharts": "*"
      }
     },
     "lock": [
@@ -100254,6 +102003,15 @@
       "php": ">=7.0",
       "dev": true,
       "origin": "packagist"
+     },
+     {
+      "name": "akaunting/laravel-apexcharts",
+      "version": "3.2.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "balping/json-raw-encoder": "*"
+      }
      }
     ],
     "releases": [
@@ -100274,6 +102032,25 @@
       "affected_versions": ">=0.0.0"
      }
     ],
+    "abandoned": null,
+    "dependents": {
+     "akaunting/laravel-apexcharts": [
+      {
+       "version": "3.2.0",
+       "time": null,
+       "require": {
+        "balping/json-raw-encoder": "*"
+       }
+      },
+      {
+       "version": "4.0.0",
+       "time": "2026-05-17T19:32:55+00:00",
+       "require": {
+        "balping/json-raw-encoder": "*"
+       }
+      }
+     ]
+    },
     "activity": {
      "host": "gitlab.com",
      "repo": "balping/json-raw-encoder",
@@ -101444,7 +103221,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -101455,6 +103234,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -101475,6 +103272,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "bitbucket.org",
      "repo": "symfony/debug",
@@ -102645,7 +104447,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -102656,6 +104460,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -102676,6 +104498,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "gitlab.example.com/gitlab",
      "repo": "symfony/debug",
@@ -104725,7 +106552,8 @@
     "root": {
      "name": "akaunting/akaunting",
      "require": {
-      "php": "^8.1"
+      "php": "^8.1",
+      "lorisleiva/laravel-search-string": "*"
      }
     },
     "lock": [
@@ -104736,6 +106564,24 @@
       "php": ">=5.5.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "lorisleiva/laravel-search-string",
+      "version": "v1.3.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/compiler": "*"
+      }
+     },
+     {
+      "name": "hoa/compiler",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/consistency": "*"
+      }
      }
     ],
     "releases": [
@@ -104756,6 +106602,19 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": null
+    },
+    "dependents": {
+     "lorisleiva/laravel-search-string": [
+      {
+       "version": "v1.3.0",
+       "time": "2023-03-11T10:11:33+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": null,
     "run": {
      "target_php": "8.4",
@@ -105925,7 +107784,8 @@
     "root": {
      "name": "akaunting/akaunting",
      "require": {
-      "php": "^8.1"
+      "php": "^8.1",
+      "lorisleiva/laravel-search-string": "*"
      }
     },
     "lock": [
@@ -105936,6 +107796,24 @@
       "php": ">=5.5.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "lorisleiva/laravel-search-string",
+      "version": "v1.3.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/compiler": "*"
+      }
+     },
+     {
+      "name": "hoa/compiler",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "hoa/consistency": "*"
+      }
      }
     ],
     "releases": [
@@ -105956,6 +107834,19 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": null
+    },
+    "dependents": {
+     "lorisleiva/laravel-search-string": [
+      {
+       "version": "v1.3.0",
+       "time": "2023-03-11T10:11:33+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": {
      "host": "gitlab.com",
      "repo": "hoaproject/Consistency",
@@ -106871,7 +108762,9 @@
    "inputs": {
     "root": {
      "name": "mautic/mautic",
-     "require": {}
+     "require": {
+      "mautic/core-lib": "*"
+     }
     },
     "lock": [
      {
@@ -106881,6 +108774,15 @@
       "php": "^7.2 || ^8.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "mautic/core-lib",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/annotations": "*"
+      }
      }
     ],
     "releases": [
@@ -106896,6 +108798,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "doctrine/annotations",
@@ -107921,7 +109825,11 @@
      "name": "prestashop/prestashop",
      "require": {
       "php": ">=7.2.5",
-      "doctrine/cache": "*"
+      "doctrine/cache": "*",
+      "beberlei/doctrineextensions": "*",
+      "doctrine/doctrine-bundle": "*",
+      "doctrine/orm": "*",
+      "prestashop/ps_distributionapiclient": "*"
      }
     },
     "lock": [
@@ -107932,6 +109840,42 @@
       "php": "~7.1 || ^8.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "beberlei/doctrineextensions",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
+     },
+     {
+      "name": "doctrine/doctrine-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
+     },
+     {
+      "name": "doctrine/orm",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
+     },
+     {
+      "name": "prestashop/ps_distributionapiclient",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
      }
     ],
     "releases": [
@@ -107952,6 +109896,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "doctrine/cache",
@@ -109105,7 +111051,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -109116,6 +111064,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -109136,6 +111102,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/debug",
@@ -110337,7 +112305,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -110348,6 +112318,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -110368,6 +112356,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": null,
     "run": {
      "target_php": "8.4",
@@ -111337,7 +113327,11 @@
      "name": "prestashop/prestashop",
      "require": {
       "php": ">=7.2.5",
-      "doctrine/cache": "*"
+      "doctrine/cache": "*",
+      "beberlei/doctrineextensions": "*",
+      "doctrine/doctrine-bundle": "*",
+      "doctrine/orm": "*",
+      "prestashop/ps_distributionapiclient": "*"
      }
     },
     "lock": [
@@ -111348,6 +113342,42 @@
       "php": "~7.1 || ^8.0",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "beberlei/doctrineextensions",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
+     },
+     {
+      "name": "doctrine/doctrine-bundle",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
+     },
+     {
+      "name": "doctrine/orm",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
+     },
+     {
+      "name": "prestashop/ps_distributionapiclient",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "doctrine/cache": "*"
+      }
      }
     ],
     "releases": [
@@ -111368,6 +113398,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "doctrine/cache",
@@ -112550,7 +114582,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -112561,6 +114595,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -112581,6 +114633,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/debug",
@@ -113762,7 +115819,9 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "symfony/debug": "*"
+      "symfony/debug": "*",
+      "symfony/console": "*",
+      "symfony/http-kernel": "*"
      }
     },
     "lock": [
@@ -113773,6 +115832,24 @@
       "php": "^5.5.9|>=7.0.8",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/console",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/debug": "*"
+      }
      }
     ],
     "releases": [
@@ -113793,6 +115870,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/debug",
@@ -115382,7 +117464,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "twig/twig": "*"
+      "twig/twig": "*",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -115393,6 +117476,15 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/twig-bridge",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "twig/twig": "*"
+      }
      }
     ],
     "releases": [
@@ -115408,17 +117500,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -115564,6 +117656,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -126771,6 +128865,8 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -128263,7 +130359,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -128273,7 +130369,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -128283,7 +130379,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -128303,6 +130399,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -129774,7 +131872,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -129784,7 +131882,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -129794,7 +131892,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -129814,6 +131912,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -131378,7 +133478,41 @@
     "root": {
      "name": "wallabag/wallabag",
      "require": {
-      "php": ">=7.4"
+      "php": ">=7.4",
+      "symfony/error-handler": "*",
+      "babdev/pagerfanta-bundle": "*",
+      "bdunogier/guzzle-site-authenticator": "*",
+      "craue/config-bundle": "*",
+      "doctrine/doctrine-bundle": "*",
+      "doctrine/doctrine-migrations-bundle": "*",
+      "friendsofsymfony/jsrouting-bundle": "*",
+      "friendsofsymfony/oauth-server-bundle": "*",
+      "friendsofsymfony/rest-bundle": "*",
+      "friendsofsymfony/user-bundle": "*",
+      "jms/serializer-bundle": "*",
+      "kphoen/rulerz-bundle": "*",
+      "lexik/form-filter-bundle": "*",
+      "nelmio/api-doc-bundle": "*",
+      "nelmio/cors-bundle": "*",
+      "php-amqplib/rabbitmq-bundle": "*",
+      "php-http/httplug-bundle": "*",
+      "scheb/2fa-backup-code": "*",
+      "scheb/2fa-bundle": "*",
+      "scheb/2fa-email": "*",
+      "scheb/2fa-google-authenticator": "*",
+      "scheb/2fa-qr-code": "*",
+      "scheb/2fa-trusted-device": "*",
+      "sensio/framework-extra-bundle": "*",
+      "sentry/sentry-symfony": "*",
+      "stof/doctrine-extensions-bundle": "*",
+      "symfony/framework-bundle": "*",
+      "symfony/http-kernel": "*",
+      "symfony/monolog-bundle": "*",
+      "symfony/security-bundle": "*",
+      "symfony/security-http": "*",
+      "symfony/twig-bundle": "*",
+      "twig/extra-bundle": "*",
+      "willdurand/hateoas-bundle": "*"
      }
     },
     "lock": [
@@ -131389,6 +133523,312 @@
       "php": ">=7.1.3",
       "dev": false,
       "origin": "packagist"
+     },
+     {
+      "name": "symfony/error-handler",
+      "version": "v4.4.44",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "babdev/pagerfanta-bundle",
+      "version": "v3.8.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "bdunogier/guzzle-site-authenticator",
+      "version": "1.1.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "craue/config-bundle",
+      "version": "2.7.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "doctrine/doctrine-bundle",
+      "version": "2.7.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "doctrine/doctrine-migrations-bundle",
+      "version": "3.2.5",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "friendsofsymfony/jsrouting-bundle",
+      "version": "2.8.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "friendsofsymfony/oauth-server-bundle",
+      "version": "dev-master",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "friendsofsymfony/rest-bundle",
+      "version": "3.5.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "friendsofsymfony/user-bundle",
+      "version": "v3.4.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "jms/serializer-bundle",
+      "version": "5.3.1",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "kphoen/rulerz-bundle",
+      "version": "0.15.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "lexik/form-filter-bundle",
+      "version": "v7.0.3",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "nelmio/api-doc-bundle",
+      "version": "v4.11.1",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "nelmio/cors-bundle",
+      "version": "2.3.1",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "php-amqplib/rabbitmq-bundle",
+      "version": "2.17.4",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "php-http/httplug-bundle",
+      "version": "1.34.3",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-backup-code",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-bundle",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-email",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-google-authenticator",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-qr-code",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "scheb/2fa-trusted-device",
+      "version": "v5.13.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "sensio/framework-extra-bundle",
+      "version": "v6.2.10",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "sentry/sentry-symfony",
+      "version": "4.14.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "stof/doctrine-extensions-bundle",
+      "version": "v1.7.2",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "symfony/framework-bundle",
+      "version": "v4.4.51",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "symfony/http-kernel",
+      "version": "v4.4.51",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "symfony/monolog-bundle",
+      "version": "v3.8.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "symfony/security-bundle",
+      "version": "v4.4.50",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "symfony/security-http",
+      "version": "v4.4.50",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "symfony/twig-bundle",
+      "version": "v4.4.41",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "twig/extra-bundle",
+      "version": "v3.7.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
+     },
+     {
+      "name": "willdurand/hateoas-bundle",
+      "version": "2.6.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/var-dumper": "*"
+      }
      }
     ],
     "releases": [
@@ -131429,6 +133869,389 @@
      }
     ],
     "advisories": [],
+    "abandoned": null,
+    "dependents": {
+     "babdev/pagerfanta-bundle": [
+      {
+       "version": "v3.8.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v4.6.0",
+       "time": "2025-11-29T13:01:51+00:00",
+       "require": {}
+      }
+     ],
+     "bdunogier/guzzle-site-authenticator": [
+      {
+       "version": "1.1.0",
+       "time": "2023-08-21T14:33:48+00:00",
+       "require": {}
+      }
+     ],
+     "craue/config-bundle": [
+      {
+       "version": "2.7.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.0.0",
+       "time": "2026-09-15T09:43:34+00:00",
+       "require": {}
+      }
+     ],
+     "doctrine/doctrine-bundle": [
+      {
+       "version": "2.7.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.3.2",
+       "time": "2026-09-09T11:58:04+00:00",
+       "require": {}
+      }
+     ],
+     "doctrine/doctrine-migrations-bundle": [
+      {
+       "version": "3.2.5",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "4.0.1",
+       "time": "2026-08-26T05:54:54+00:00",
+       "require": {}
+      }
+     ],
+     "friendsofsymfony/jsrouting-bundle": [
+      {
+       "version": "2.8.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.6.1",
+       "time": "2025-11-04T21:03:25+00:00",
+       "require": {}
+      }
+     ],
+     "friendsofsymfony/rest-bundle": [
+      {
+       "version": "3.5.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.9.0",
+       "time": "2026-02-10T02:36:12+00:00",
+       "require": {}
+      }
+     ],
+     "friendsofsymfony/user-bundle": [
+      {
+       "version": "v3.4.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v4.1.0",
+       "time": "2026-02-13T21:22:55+00:00",
+       "require": {}
+      }
+     ],
+     "jms/serializer-bundle": [
+      {
+       "version": "5.3.1",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "5.5.2",
+       "time": "2025-11-25T21:41:31+00:00",
+       "require": {}
+      }
+     ],
+     "kphoen/rulerz-bundle": [
+      {
+       "version": "0.15.0",
+       "time": "2018-09-17T09:02:32+00:00",
+       "require": {}
+      }
+     ],
+     "lexik/form-filter-bundle": [
+      {
+       "version": "v7.0.3",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.0.1",
+       "time": "2023-05-19T06:37:47+00:00",
+       "require": {}
+      }
+     ],
+     "nelmio/api-doc-bundle": [
+      {
+       "version": "v4.11.1",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v5.12.2",
+       "time": "2026-09-14T11:12:11+00:00",
+       "require": {}
+      }
+     ],
+     "nelmio/cors-bundle": [
+      {
+       "version": "2.3.1",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "2.6.1",
+       "time": "2026-01-12T15:59:08+00:00",
+       "require": {}
+      }
+     ],
+     "php-amqplib/rabbitmq-bundle": [
+      {
+       "version": "2.17.4",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "2.19.0",
+       "time": "2026-01-16T12:34:27+00:00",
+       "require": {}
+      }
+     ],
+     "php-http/httplug-bundle": [
+      {
+       "version": "1.34.3",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "2.3.1",
+       "time": "2026-04-25T08:45:32+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-backup-code": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-01-24T13:26:10+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-bundle": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-07-10T18:29:30+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-email": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-06-02T20:21:59+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-google-authenticator": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-01-24T13:27:55+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-qr-code": [
+      {
+       "version": "v5.13.2",
+       "time": "2022-01-03T10:21:24+00:00",
+       "require": {}
+      }
+     ],
+     "scheb/2fa-trusted-device": [
+      {
+       "version": "v5.13.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.6.1",
+       "time": "2026-01-24T13:26:10+00:00",
+       "require": {}
+      }
+     ],
+     "sensio/framework-extra-bundle": [
+      {
+       "version": "v6.2.10",
+       "time": "2023-02-24T14:57:12+00:00",
+       "require": {}
+      }
+     ],
+     "sentry/sentry-symfony": [
+      {
+       "version": "4.14.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "5.13.0",
+       "time": "2026-08-28T10:41:44+00:00",
+       "require": {}
+      }
+     ],
+     "stof/doctrine-extensions-bundle": [
+      {
+       "version": "v1.7.2",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v1.15.3",
+       "time": "2026-01-23T08:45:07+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/error-handler": [
+      {
+       "version": "v4.4.44",
+       "time": null,
+       "require": {
+        "symfony/var-dumper": "*"
+       }
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-22T18:58:53+00:00",
+       "require": {
+        "symfony/var-dumper": "*"
+       }
+      }
+     ],
+     "symfony/framework-bundle": [
+      {
+       "version": "v4.4.51",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-28T19:13:15+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/http-kernel": [
+      {
+       "version": "v4.4.51",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-29T14:08:01+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/monolog-bundle": [
+      {
+       "version": "v3.8.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v4.1.0",
+       "time": "2026-09-10T19:32:07+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/security-bundle": [
+      {
+       "version": "v4.4.50",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-24T11:09:32+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/security-http": [
+      {
+       "version": "v4.4.50",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.8",
+       "time": "2026-09-28T19:13:15+00:00",
+       "require": {}
+      }
+     ],
+     "symfony/twig-bundle": [
+      {
+       "version": "v4.4.41",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v8.1.7",
+       "time": "2026-09-11T14:51:16+00:00",
+       "require": {}
+      }
+     ],
+     "twig/extra-bundle": [
+      {
+       "version": "v3.7.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "v3.29.0",
+       "time": "2026-09-11T08:59:50+00:00",
+       "require": {}
+      }
+     ],
+     "willdurand/hateoas-bundle": [
+      {
+       "version": "2.6.0",
+       "time": null,
+       "require": {}
+      },
+      {
+       "version": "3.0.1",
+       "time": "2026-07-17T20:45:53+00:00",
+       "require": {}
+      }
+     ]
+    },
     "activity": {
      "host": "github.com",
      "repo": "symfony/var-dumper",
@@ -132633,6 +135456,11 @@
      }
     ],
     "advisories": [],
+    "abandoned": {
+     "by": "repository",
+     "replacement": "symfony/error-handler"
+    },
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/debug",
@@ -134179,7 +137007,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -134189,7 +137017,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -134199,7 +137027,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -134219,6 +137047,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -136348,7 +139178,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "twig/twig": "^2.0"
+      "twig/twig": "^2.0",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -136363,10 +139194,11 @@
      {
       "name": "symfony/twig-bridge",
       "version": "v3.4.47",
+      "dev": false,
+      "origin": "packagist",
       "require": {
        "twig/twig": "^1.41|^2.10"
-      },
-      "dev": false
+      }
      }
     ],
     "releases": [
@@ -136382,17 +139214,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -136538,6 +139370,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",
@@ -138095,7 +140929,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -138105,7 +140939,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -138115,7 +140949,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -138135,6 +140969,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -139660,7 +142496,7 @@
      },
      {
       "version": "v6.4.40",
-      "time": "2026-08-30T01:18:12+00:00",
+      "time": null,
       "php": ">=8.1"
      },
      {
@@ -139670,7 +142506,7 @@
      },
      {
       "version": "v7.4.12",
-      "time": "2026-08-30T00:47:26+00:00",
+      "time": null,
       "php": ">=8.2"
      },
      {
@@ -139680,7 +142516,7 @@
      },
      {
       "version": "v8.0.12",
-      "time": "2026-08-30T01:03:44+00:00",
+      "time": null,
       "php": ">=8.4.1"
      },
      {
@@ -139700,6 +142536,8 @@
       "affected_versions": ">=2.0.0,<3.0.0|>=3.0.0,<4.0.0|>=4.0.0,<5.0.0|>=5.0.0,<5.1.0|>=5.1.0,<5.2.0|>=5.2.0,<5.3.0|>=5.3.0,<5.4.0|>=5.4.0,<5.4.52|>=6.0.0,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.40|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.12|>=8.0.0,<8.0.12"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "symfony/monolog-bridge",
@@ -141817,7 +144655,8 @@
      "name": "phpbb/phpbb",
      "require": {
       "php": "^7.2 || ^8.0.0",
-      "twig/twig": "^2.0"
+      "twig/twig": "^2.0",
+      "symfony/twig-bridge": "*"
      }
     },
     "lock": [
@@ -141832,10 +144671,11 @@
      {
       "name": "symfony/twig-bridge",
       "version": "v3.4.47",
+      "dev": false,
+      "origin": "packagist",
       "require": {
        "twig/twig": "^1.41|^2.10"
-      },
-      "dev": false
+      }
      }
     ],
     "releases": [
@@ -141851,17 +144691,17 @@
      },
      {
       "version": "v3.14.1",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.26.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
       "version": "v3.27.0",
-      "time": "2026-09-25T13:20:01+00:00",
+      "time": null,
       "php": ">=8.1.0"
      },
      {
@@ -142007,6 +144847,8 @@
       "affected_versions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1"
      }
     ],
+    "abandoned": null,
+    "dependents": {},
     "activity": {
      "host": "github.com",
      "repo": "twigphp/Twig",

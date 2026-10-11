@@ -1,0 +1,325 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Verdict;
+
+use Composer\Semver\VersionParser;
+use Lockrot\Score\Counterfactual;
+use Lockrot\Score\IfApplied;
+use Lockrot\Security\Candidate;
+use Lockrot\Security\Holder;
+use Lockrot\Security\PhpCheck;
+use Lockrot\Signal\BranchRow;
+use Lockrot\Signal\ConstraintOpenness;
+use Lockrot\Signal\Data\NoReleaseData;
+
+/**
+ * Judges a {@see MoveDraft}: what it clears for every version it admits, what it leaves, adds and
+ * cannot check, its PHP, what holds it, its commands as argv lists and the score after it (SPEC
+ * §5.6). lockrot does not solve dependencies: `assumes` says what the rerun takes as given.
+ *
+ * @internal
+ */
+final class MoveBuilder
+{
+    private const RESOLVED = [Move::REQUIRE, Move::RAISE_PHP, Move::TAG];
+    private const ACTIONS = [Move::REQUIRE, Move::RAISE_PHP, Move::TAG, Move::REPLACE, Move::FIND_ALTERNATIVE, Move::TEST];
+
+    /**
+     * @param list<string> $merged  the sources merged into the draft
+     * @param ?string      $fixKind the security fix kind, written when the move comes from `vulnerable`
+     */
+    public static function build(MoveDraft $draft, array $merged, ?string $fixKind, MoveContext $context): Move
+    {
+        $finding = $context->finding();
+        $flags = $finding->flags();
+        $kind = $draft->kind();
+        $row = $draft->row();
+        $lower = $draft->lower();
+        $clears = [];
+        $unverified = [];
+        $adds = [];
+        if ($draft->isRowMove() && $row !== null) {
+            [$clears, $unverified] = self::clearsFor($row, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context);
+        }
+        $phpCheck = null;
+        if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
+            $phpCheck = PhpCheck::of($lower === null || $draft->source() === FlagSet::PINNED ? $row->php() : $lower->php(), $context->floor());
+        }
+        $latest = $draft->latest();
+        if ($kind === Move::TAG) {
+            $clears = [MoveFact::on(MoveFact::FLAG, FlagSet::PINNED, MoveFact::TAGS_ONLY)];
+            [$adds, $unverified] = self::tagRisks($row, $latest, $flags, $context);
+        }
+        $cleared = self::keys(array_merge($clears, $unverified));
+        $leaves = [];
+        foreach (self::countedMaintenance($finding) as $flag) {
+            if (!isset($cleared[MoveFact::FLAG.' '.$flag])) {
+                $leaves[] = MoveFact::left(MoveFact::FLAG, $flag);
+            }
+        }
+        foreach ($context->advisoryIds() as $id) {
+            if (!isset($cleared[MoveFact::ADVISORY.' '.$id])) {
+                $leaves[] = MoveFact::left(MoveFact::ADVISORY, $id);
+            }
+        }
+        $toBranch = $row !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED, Move::TAG], true) ? $row->branch() : null;
+        $installed = $context->installedBranch();
+        $crosses = $toBranch === null || $installed === null ? null : (self::major($toBranch) !== self::major($installed) || (strpos($installed, '0.') === 0 && $toBranch !== $installed));
+        $heldBy = $lower !== null && $kind !== Move::TAG ? $lower->heldBy() : [];
+        $subject = $context->subject();
+        $because = self::because($kind, $crosses, $heldBy, $subject);
+        $ifApplied = null;
+        if ($clears !== [] && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
+            $assumes = array_merge([IfApplied::CLEARS_HOLD], $because !== [] || $heldBy !== [] ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
+            $ifApplied = self::rerun($draft, $clears, $unverified, $adds, $context, $assumes);
+        }
+        $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $draft->constraint() : null;
+        $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
+        $s2 = $finding->signalData(NoReleaseData::class);
+
+        return new Move(
+            $kind,
+            $draft->source(),
+            $merged,
+            $draft->source() === FlagSet::VULNERABLE || \in_array(FlagSet::VULNERABLE, $merged, true) ? $fixKind : null,
+            $draft->reason(),
+            $draft->replacement(),
+            $kind === Move::FIND_ALTERNATIVE && $draft->source() === FlagSet::SILENT && $s2 !== null ? $s2->years() : null,
+            $toBranch,
+            $version,
+            $row !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) ? $row->highest() : null,
+            $constraint,
+            $latest,
+            $phpCheck,
+            $crosses,
+            $heldBy,
+            $clears,
+            $unverified,
+            $adds,
+            $leaves,
+            $ifApplied,
+            $because,
+            self::commands($kind, $subject, $constraint, $phpCheck, $latest),
+            $subject
+        );
+    }
+
+    /** @return list<string> the counted maintenance flags in flag order */
+    private static function countedMaintenance(Finding $finding): array
+    {
+        return array_map(static fn ($term): string => $term->flag(), $finding->score()->maintenanceTerms());
+    }
+
+    /**
+     * What a move to $row from $lower clears of $flags and $advisories, for every version it admits
+     * up to the row's newest, and what it cannot check.
+     *
+     * @param list<string> $flags
+     * @param list<string> $advisories ids
+     *
+     * @return array{0: list<MoveFact>, 1: list<MoveFact>}
+     */
+    public static function clearsFor(BranchRow $row, ?Candidate $lower, array $flags, array $advisories, MoveContext $context): array
+    {
+        $clears = [];
+        $unverified = [];
+        if (\in_array(FlagSet::LEFT_BEHIND, $flags, true) && !$row->installed() && $context->isReleasing($context->releasedAt($row))) {
+            $clears[] = MoveFact::on(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::BRANCH_RELEASING);
+        }
+        if (\in_array(FlagSet::OLD_PROMISE, $flags, true)) {
+            $at = $lower === null ? null : $lower->release()->at();
+            $ga = $context->ga();
+            if ($at === null || $ga === null) {
+                $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::UNDATED);
+            } elseif ($at->format('Y-m-d') > $ga->format('Y-m-d')) {
+                $clears[] = MoveFact::on(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::RELEASED_AFTER_GA);
+            }
+        }
+        $ranges = $context->ranges();
+        $newest = $context->release($row->highest());
+        foreach ($advisories as $id) {
+            $range = $ranges[$id] ?? null;
+            if ($range === null) {
+                continue;
+            }
+            if ($lower === null || $newest === null) {
+                $unverified[] = MoveFact::unchecked(MoveFact::ADVISORY, $id, MoveFact::NO_RELEASE_DATA);
+            } elseif (!MoveContext::reaches($range, $lower->release()->normalized(), $newest->normalized())) {
+                $clears[] = MoveFact::on(MoveFact::ADVISORY, $id, MoveFact::OUTSIDE_RANGE);
+            }
+        }
+
+        return [$clears, $unverified];
+    }
+
+    /**
+     * What a tag move would raise that would count: old-promise on a tag released before the target
+     * major's GA with an open php, and left-behind on a line that no longer releases while a higher
+     * one does (S8's rule on the tag's row). A fact lockrot cannot date is unverified.
+     *
+     * @return array{0: list<MoveFact>, 1: list<MoveFact>}
+     */
+    private static function tagRisks(?BranchRow $row, ?Latest $latest, FlagSet $flags, MoveContext $context): array
+    {
+        $adds = [];
+        $unverified = [];
+        $quiet = static fn (string $flag): bool => !\in_array($flag, $flags->fired(), true) && !\in_array($flag, $flags->acceptSet(), true);
+        $target = $context->subject()->targetPhp();
+        $php = $row === null ? null : $row->php();
+        if ($row !== null && $row->admitsTargetPhp() !== false && $quiet(FlagSet::OLD_PROMISE) && ($php === null || ($target !== null && (new ConstraintOpenness())->isOpenEndedFor($php, $target)))) {
+            $released = $latest === null ? null : $latest->released();
+            $ga = $context->ga();
+            if ($released === null) {
+                $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::UNDATED);
+            } elseif ($ga !== null && substr($released, 0, 10) < $ga->format('Y-m-d')) {
+                $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::RELEASED_BEFORE_GA);
+            }
+        }
+        if ($row !== null && $quiet(FlagSet::LEFT_BEHIND)) {
+            $state = self::leftBehindOn($row, $context);
+            if ($state === 'fires') {
+                $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::BRANCH_NOT_RELEASING);
+            } elseif ($state === 'unknown') {
+                $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::UNDATED);
+            }
+        }
+
+        return [$adds, $unverified];
+    }
+
+    /**
+     * S8's rule on one row, as if a release there were installed: `fires` when its newest release is
+     * older than release-warn-years and a higher branch released after it within them, `unknown`
+     * when a date it needs is missing, else `quiet`.
+     */
+    private static function leftBehindOn(BranchRow $row, MoveContext $context): string
+    {
+        $parser = new VersionParser();
+        $own = $row->highestReleased();
+        $above = array_filter($context->rows(), static fn (BranchRow $other): bool => $other->branch() !== $row->branch() && version_compare($parser->normalize($other->highest()), $parser->normalize($row->highest()), '>'));
+        $undatedAbove = array_filter($above, static fn (BranchRow $other): bool => $other->highestReleased() === null) !== [];
+        $alive = array_filter($above, static fn (BranchRow $other): bool => $context->isReleasing($other->highestReleased()));
+        if ($own === null) {
+            return $alive !== [] || $undatedAbove ? 'unknown' : 'quiet';
+        }
+        if ($context->isReleasing($own)) {
+            return 'quiet';
+        }
+        foreach ($alive as $other) {
+            if ($other->highestReleased() > $own) {
+                return 'fires';
+            }
+        }
+
+        return $undatedAbove ? 'unknown' : 'quiet';
+    }
+
+    /**
+     * The engine rerun on the facts minus what the move clears and the accepted facts it settles,
+     * plus what it adds and every unverified flag that did not fire.
+     *
+     * @param list<MoveFact> $clears
+     * @param list<MoveFact> $unverified
+     * @param list<MoveFact> $adds
+     * @param list<string>   $assumes
+     */
+    private static function rerun(MoveDraft $draft, array $clears, array $unverified, array $adds, MoveContext $context, array $assumes): IfApplied
+    {
+        $finding = $context->finding();
+        $flags = $finding->flags();
+        $removed = [];
+        $advisories = [];
+        foreach ($clears as $fact) {
+            if ($fact->isFlag()) {
+                $removed[] = $fact->id();
+            } else {
+                $advisories[] = $fact->id();
+            }
+        }
+        $row = $draft->row();
+        if ($draft->isRowMove() && $row !== null && $flags->accepted() !== []) {
+            foreach (self::clearsFor($row, $draft->lower(), $flags->accepted(), [], $context)[0] as $settled) {
+                $removed[] = $settled->id();
+            }
+        }
+        $raised = [];
+        foreach (array_merge($adds, $unverified) as $fact) {
+            if ($fact->isFlag() && !\in_array($fact->id(), $flags->fired(), true) && !\in_array($fact->id(), $raised, true)) {
+                $raised[] = $fact->id();
+            }
+        }
+        $score = $finding->score();
+
+        return Counterfactual::afterMove($flags, $removed, $advisories, $raised, $score->reach(), $score->isDev(), $finding->isMaintenanceJudged(), $unverified !== [], $assumes);
+    }
+
+    /**
+     * @param list<Holder> $heldBy
+     *
+     * @return list<string>
+     */
+    private static function because(string $kind, ?bool $crosses, array $heldBy, MoveSubject $subject): array
+    {
+        $held = array_filter($heldBy, static fn (Holder $holder): bool => $holder->source() === Holder::PACKAGE) !== [];
+        $acts = \in_array($kind, self::ACTIONS, true) && !$subject->isDirect() && !$held;
+        $because = [];
+        if ($held) {
+            $because[] = Move::HOLDERS;
+        }
+        if ($crosses === true && \in_array($kind, self::RESOLVED, true)) {
+            $because[] = Move::CROSSES_MAJOR;
+        }
+        if ($acts) {
+            $because[] = $subject->dependents() === [] ? Move::UNREACHED : Move::TRANSITIVE;
+        }
+
+        return $because;
+    }
+
+    /** @return list<list<string>> */
+    private static function commands(string $kind, MoveSubject $subject, ?string $constraint, ?PhpCheck $phpCheck, ?Latest $latest): array
+    {
+        $package = $subject->package();
+        switch ($kind) {
+            case Move::UPDATE:
+                return [['composer', 'update', $package]];
+            case Move::REQUIRE:
+            case Move::RAISE_PHP:
+                $commands = [];
+                if ($kind === Move::RAISE_PHP && $phpCheck !== null && $phpCheck->raiseTo() !== null) {
+                    $commands[] = ['composer', 'require', 'php:'.$phpCheck->raiseTo(), '--no-update'];
+                }
+                if ($subject->isDirect() && $constraint !== null) {
+                    $commands[] = ['composer', 'require', $package.':'.$constraint];
+                }
+
+                return $commands;
+            case Move::TAG:
+                return $subject->isDirect() && $latest !== null ? [['composer', 'require', $package.':^'.ltrim($latest->version(), 'vV')]] : [];
+            default:
+                return [];
+        }
+    }
+
+    /**
+     * @param list<MoveFact> $facts
+     *
+     * @return array<string, true> `kind id` keys
+     */
+    private static function keys(array $facts): array
+    {
+        $keys = [];
+        foreach ($facts as $fact) {
+            $keys[$fact->kind().' '.$fact->id()] = true;
+        }
+
+        return $keys;
+    }
+
+    private static function major(string $branch): string
+    {
+        return explode('.', $branch)[0];
+    }
+}

@@ -16,7 +16,6 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\FindingDetails;
 
 /**
  * What it shows: docs/configuration.md#explaining-one-package. The finding is the report's and the
@@ -291,7 +290,7 @@ final class Explanation
         if ($fixes !== null) {
             foreach ($fixes->branches() as $branch) {
                 if ($branch->branch() === $row->branch()) {
-                    $out['fixes'] = FindingDetails::branchFixes($branch);
+                    $out['fixes'] = $this->finding->details()->rowFixes($branch);
                 }
             }
         }

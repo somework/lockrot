@@ -8,6 +8,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Score\IfApplied;
 use Lockrot\Security\BranchFixes;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Holder;
@@ -46,6 +47,7 @@ final class FindingDetails
     private array $ignored;
     private ?PackageFixes $fixes;
     private ?Check $releasesUnchecked = null;
+    private ?Moves $moves = null;
 
     /**
      * @param list<Check>                                                   $skipped
@@ -97,6 +99,33 @@ final class FindingDetails
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
 
         return $details;
+    }
+
+    public function withMoves(Moves $moves): self
+    {
+        $clone = clone $this;
+        $clone->moves = $moves;
+
+        return $clone;
+    }
+
+    public function moves(): Moves
+    {
+        return $this->moves ?? Moves::none();
+    }
+
+    /**
+     * The holders and the replacement of every move and candidate, each with its own finding.
+     *
+     * @param array<string, GradedPackage> $findings by package name
+     */
+    public function withFindings(array $findings): self
+    {
+        $clone = clone $this;
+        $clone->fixes = $this->fixes === null ? null : $this->fixes->withFindings($findings);
+        $clone->moves = $this->moves === null ? null : $this->moves->withFindings($findings);
+
+        return $clone;
     }
 
     /** The S10 entry for release data a counted advisory needed and did not get. */
@@ -210,15 +239,15 @@ final class FindingDetails
             'ignored' => $ignored,
             'ignored_count' => $standing->ignoredCount(),
             'fix_kind' => $standing->fixKind(),
-            'installed_branch_fixes' => $installed === null ? null : self::branchFixes($installed),
-            'move_in' => null,
+            'installed_branch_fixes' => $installed === null ? null : $this->rowFixes($installed),
+            'move_in' => $this->moves()->moveIn(),
             'gets' => $gets === null ? null : [
                 'version' => $gets->version(),
-                'php_check' => $gets->phpCheck()->toArray(),
+                'php_check' => $gets->phpCheck(),
                 'clears' => array_map(static fn (string $id): array => ['kind' => 'advisory', 'id' => $id, 'basis' => 'outside_range'], $gets->clears()),
                 'clears_all' => $gets->clearsAll(),
             ],
-            'partial' => null,
+            'partial' => $this->moves()->partial(),
         ];
     }
 
@@ -229,12 +258,13 @@ final class FindingDetails
             return SecurityStanding::notVulnerable($this->check, \count($this->ignored), self::counts([]));
         }
         // With no move, `fix_kind` is the hardest kind of its advisories: FIX_KINDS runs easiest first.
+        $fixKind = $this->moves()->fixKind();
         $hardest = 0;
         foreach ($rows as $row) {
             $hardest = max($hardest, (int) array_search($row->fix()->kind(), ScoreModel::FIX_KINDS, true));
         }
 
-        return SecurityStanding::vulnerable($this->check, \count($this->ignored), self::counts($rows), ScoreModel::FIX_KINDS[$hardest]);
+        return SecurityStanding::vulnerable($this->check, \count($this->ignored), self::counts($rows), $fixKind ?? ScoreModel::FIX_KINDS[$hardest]);
     }
 
     /**
@@ -298,11 +328,17 @@ final class FindingDetails
     }
 
     /**
-     * A branch row's `fixes`. The score after a move to its candidate waits for the move.
+     * A branch row's `fixes`, with the score after a move to its candidate.
      *
-     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: null}
+     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied}
      */
-    public static function branchFixes(BranchFixes $row): array
+    public function rowFixes(BranchFixes $row): array
+    {
+        return self::branchFixes($row, $this->moves()->rowIfApplied($row->branch()));
+    }
+
+    /** @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied} */
+    public static function branchFixes(BranchFixes $row, ?IfApplied $ifApplied): array
     {
         $candidate = $row->candidate();
 
@@ -314,7 +350,7 @@ final class FindingDetails
             'lowest' => $row->lowest(),
             'newest' => $row->newest(),
             'held_by' => $candidate === null ? [] : $candidate->heldBy(),
-            'if_applied' => null,
+            'if_applied' => $ifApplied,
         ];
     }
 

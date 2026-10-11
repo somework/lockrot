@@ -6,6 +6,7 @@ namespace Lockrot\Security;
 
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\StableRelease;
+use Lockrot\Verdict\GradedPackage;
 
 /**
  * A release the scan could move to, with its class and what holds it. The class
@@ -33,6 +34,15 @@ final class Candidate
         $this->branch = $branch;
         $this->kind = $kind;
         $this->heldBy = $heldBy;
+    }
+
+    /** @param array<string, GradedPackage> $findings by package name */
+    public function withFindings(array $findings): self
+    {
+        $clone = clone $this;
+        $clone->heldBy = Holder::filled($this->heldBy, $findings);
+
+        return $clone;
     }
 
     public function release(): StableRelease

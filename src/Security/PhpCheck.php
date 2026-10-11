@@ -15,7 +15,7 @@ use Lockrot\Signal\PhpFloor;
  *
  * @internal
  */
-final class PhpCheck
+final class PhpCheck implements \JsonSerializable
 {
     public const MAJOR = 'major';
     public const MINOR = 'minor';
@@ -124,7 +124,7 @@ final class PhpCheck
     }
 
     /** @return array{requires: ?string, project_allows: ?bool, target_runs: ?bool, raise_to: ?string, raise_size: ?string} */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'requires' => $this->requires,

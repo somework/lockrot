@@ -34,7 +34,9 @@ use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Security\PackageFixes;
+use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
@@ -43,7 +45,14 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\GradedPackage;
+use Lockrot\Verdict\MoveContext;
+use Lockrot\Verdict\Moves;
+use Lockrot\Verdict\MoveSubject;
+use Lockrot\Verdict\NextStep;
 use Lockrot\Verdict\Score;
+use Lockrot\Verdict\ThroughCheck;
+use Lockrot\Verdict\ThroughEntry;
 use Lockrot\Verdict\VerdictEngine;
 
 /** @internal */
@@ -173,8 +182,8 @@ final class Analyzer
         $notes = array_merge($notes, $activityNotes);
         $activity = $activityBatch->activity();
 
-        // LinkIndex parses every link of the lock. A run without a counted advisory needs none of them.
-        $fixes = $advisories->byName() === [] ? null : new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
+        $finder = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
+        $fixes = $advisories->byName() === [] ? null : $finder;
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;
@@ -185,7 +194,9 @@ final class Analyzer
             $entry = $allowlisted[$package->name()];
             $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()), isset($batch->failed()[$package->name()]));
             $factsByPackage[$package->name()] = $facts;
-            $findings[] = $this->buildFinding($facts, $entry, $graph, $batch, $fixes, $advisories->ignored($package->name()));
+            $every = $advisories->every($package->name());
+            $finding = $this->buildFinding($facts, $entry, $graph, $batch, $fixes, $advisories->ignored($package->name()), $every);
+            $findings[] = $finding->withMoves($this->moves($finding, $facts, $finder, ThroughCheck::of($package->name(), $finding->isDirect(), $finding->directDependents(), $lock, $metadata), $every));
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -194,6 +205,11 @@ final class Analyzer
             $notes[] = RunNote::notFromComposerRepository($notInRepository);
         }
         $findings = TransitiveExposure::attach($findings, $graph);
+        $graded = [];
+        foreach ($findings as $finding) {
+            $graded[$finding->package()] = GradedPackage::of($finding);
+        }
+        $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
 
         return new Analysis(
             new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev),
@@ -395,12 +411,15 @@ final class Analyzer
         return [$batch, $notes];
     }
 
-    /** @param list<IgnoredAdvisory> $ignored */
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes, array $ignored): Finding
+    /**
+     * @param list<IgnoredAdvisory> $ignored
+     * @param list<Advisory>        $every   every advisory of the package on any version
+     */
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every): Finding
     {
         $counted = [];
         if ($fixes !== null && $facts->advisories() !== []) {
-            $found = $fixes->find($facts);
+            $found = $fixes->find($facts, $every);
             $facts = $facts->withFixes($found);
             $counted = self::countedAdvisories($facts->advisories(), $found);
         }
@@ -445,6 +464,55 @@ final class Analyzer
         return $finding
             ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
             ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null));
+    }
+
+    /**
+     * The finding's moves (`next_step`) from its facts, its release scan and the run's floors.
+     *
+     * @param list<ThroughEntry> $through
+     * @param list<Advisory>     $every   every advisory of the package on any version
+     */
+    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, array $through, array $every): Moves
+    {
+        if (!$finding->isGraded()) {
+            return Moves::none();
+        }
+        $floor = $this->signals->phpFloor();
+        $details = $finding->details();
+        $s8 = null;
+        foreach ($finding->signals() as $signal) {
+            $s8 = $signal->id() === Signal::S8 ? $signal : $s8;
+        }
+        $ranges = [];
+        foreach ($facts->advisories() as $advisory) {
+            if ($advisory->affectedRange() !== null) {
+                $ranges[$advisory->id()] = $advisory->affectedRange();
+            }
+        }
+        $own = [];
+        foreach ($every as $advisory) {
+            if ($advisory->affectedRange() !== null && !isset($ranges[$advisory->id()])) {
+                $own[] = $advisory->affectedRange();
+            }
+        }
+        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), $floor->php(PhpFloor::TARGET), $floor->lowestAsString());
+        $context = new MoveContext(
+            $finding,
+            $subject,
+            $facts->metadata(),
+            BranchRow::all($facts, $floor, $this->clock, $s8, $details->fixes()),
+            $details->fixes(),
+            $finder,
+            $floor,
+            $this->clock->now(),
+            $this->signals->thresholds()->releaseWarnYears(),
+            $this->signals->targetMajorGa(),
+            $ranges,
+            $own,
+            $details->advisoriesComplete()
+        );
+
+        return NextStep::plan($context, $through);
     }
 
     /**
