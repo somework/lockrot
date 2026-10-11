@@ -23,6 +23,7 @@ fact in full twice only when a test reads every copy. Link the home's anchor whe
 | Moving from report-1 to report-2 | `schema.md#migrating-from-report-1` | CHANGELOG: links |
 | Priority | `verdicts.md#priority` | One sentence |
 | Security advisories and Composer's advisory settings | `verdicts.md#security-advisories` | `configuration.md#the-allowlist`: one sentence and a link |
+| A finding's move (`next_step`) | `verdicts.md#move` | Links |
 | `unchecked` and S10 | `verdicts.md#what-was-not-checked` | Links |
 | Transitive exposure, `unattributed` | `verdicts.md#transitive-exposure` | `schema.md` field rows |
 | Libyears | `verdicts.md#libyears` | One sentence |

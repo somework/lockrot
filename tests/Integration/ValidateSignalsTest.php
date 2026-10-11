@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * I21's signal checks on every fixture document: each signal's `data` has exactly its keys, S7's
+ * The signal checks on every fixture document: each signal's `data` has exactly its keys, S7's
  * `packages[]` entries have theirs, and S10's `blocks` is the union of its entries' blocks.
  */
 final class ValidateSignalsTest extends TestCase

@@ -21,7 +21,7 @@ final class Counterfactual
      *
      * @param list<string> $removed           the flags that the move clears or settles: their signals go
      * @param list<string> $clearedAdvisories the advisory ids that the move clears
-     * @param list<string> $raised            the flags that the move adds, and those it may raise unchecked
+     * @param list<string> $raised            the flags that the move adds, and those it can raise unchecked
      * @param list<string> $assumes           the rerun's `assumes`
      */
     public static function afterMove(FlagSet $flags, array $removed, array $clearedAdvisories, array $raised, string $reach, bool $dev, bool $maintenanceJudged, bool $atMost, array $assumes): IfApplied

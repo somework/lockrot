@@ -17,7 +17,7 @@ use Lockrot\Lock\LockFile;
 final class ThroughCheck
 {
     /**
-     * One entry per direct dependent, in `direct_dependents` order; `[]` for a direct package and an
+     * One entry per direct dependent, in `direct_dependents` order, and `[]` for a direct package and an
      * unreached one.
      *
      * @param list<string>                   $dependents `direct_dependents`

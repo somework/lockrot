@@ -148,7 +148,7 @@ final class SortTest extends TestCase
         self::assertSame(array_column($findings, 'package'), array_column($resorted, 'package'));
     }
 
-    /** I20 with moves in place: one finding of each package of the hydrated cases, in one report, stands in the published order. */
+    /** With moves in place, one finding of each package of the hydrated cases, in one report, stands in the published order. */
     public function testTheFindingsWithTheirMovesStandInThePublishedOrder(): void
     {
         $findings = [];

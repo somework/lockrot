@@ -68,7 +68,7 @@ final class MoveTest extends TestCase
         }
     }
 
-    /** monolog-bridge (B): S8 suggests ^5.4, the advisory fixes 5.x from 5.4.52, so the merged move is ^5.4.52. */
+    /** monolog-bridge: S8 suggests ^5.4, the advisory fixes 5.x from 5.4.52, so the merged move is ^5.4.52. */
     public function testMonologBridgeMergesIntoTheTightestConstraint(): void
     {
         $move = JsonPath::arrayAt(self::hydrated(CaseHydrator::case('B')), ['next_step']);
@@ -78,7 +78,7 @@ final class MoveTest extends TestCase
         self::assertContains('vulnerable', array_merge([$move['source']], JsonPath::arrayAt($move, ['merged'])));
     }
 
-    /** twig (A): PKSA-8zx5 `<=3.26.0` names no exclusive bound, and v3.27.0 clears every advisory. */
+    /** twig: PKSA-8zx5 `<=3.26.0` names no exclusive bound, and v3.27.0 clears every advisory. */
     public function testTwigRaisesPhpThenRequiresTheFirstReleaseThatClearsEveryAdvisory(): void
     {
         $finding = self::hydrated(CaseHydrator::case('A'));

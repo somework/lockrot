@@ -157,7 +157,7 @@ final class MoveBuilder
     }
 
     /**
-     * What a tag move would raise that would count: old-promise on a tag released before the target
+     * What a tag move raises that counts: old-promise on a tag released before the target
      * major's GA with an open php, and left-behind on a line that no longer releases while a higher
      * one does (S8's rule on the tag's row). A fact lockrot cannot date is unverified.
      *

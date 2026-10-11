@@ -33,14 +33,10 @@ use Lockrot\Verdict\VerdictEngine;
 
 /**
  * Turns a case of tests/fixtures/flags/cases.json into the report that the real {@see Analyzer}
- * writes for it. The case's `inputs` block (tools/schema/project_fixtures.py) holds the root
- * `composer.json`, the lock entries with the case's package first, that package's releases with
- * their dates and `php`, its abandoned marking, its advisories, its repository activity, the
- * `require` names of the direct dependents that `through[]` measured and the run settings. A test can add
- * `other_advisories`: advisories on other versions of the package, which none of its own counts.
- * `run.advisories_unchecked` says why the advisory lookup did not run, such as `offline`.
- * The loaders answer from the block: only the case's package and those dependents have metadata,
- * and a null `releases` leaves the package without it.
+ * writes for it. The loaders answer from the case's `inputs` block, which
+ * tools/schema/project_fixtures.py writes (`inputs_of`). Only the case's package and the measured
+ * dependents have metadata, and a null `releases` leaves the package without it. A test can add
+ * `other_advisories`, the advisories of the package's other versions.
  */
 final class CaseHydrator
 {
