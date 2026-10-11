@@ -2309,7 +2309,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -3898,7 +3899,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -5124,7 +5126,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -6280,7 +6283,8 @@
      "target_php": "8.4",
      "project_php": "~8.3.0||~8.4.0||~8.5.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -7772,7 +7776,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -8998,7 +9003,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -10120,7 +10126,7 @@
      {
       "name": "friendsofsymfony/oauth-server-bundle",
       "version": "dev-master",
-      "time": null,
+      "time": "2022-03-24T10:22:23+00:00",
       "php": "^7.2 || ^8.0",
       "dev": false,
       "origin": "packagist"
@@ -10134,7 +10140,7 @@
      },
      {
       "version": "dev-master",
-      "time": null,
+      "time": "2022-03-24T10:22:23+00:00",
       "php": "^7.2 || ^8.0"
      }
     ],
@@ -10151,7 +10157,8 @@
      "target_php": "8.4",
      "project_php": ">=7.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -11193,7 +11200,8 @@
      "target_php": "8.4",
      "project_php": ">=8.3",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -12441,7 +12449,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -14303,7 +14312,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -15919,7 +15929,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -17569,7 +17580,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -19549,7 +19561,8 @@
      "target_php": "8.4",
      "project_php": "^7.1.3",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -21004,7 +21017,8 @@
      "target_php": "8.4",
      "project_php": null,
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -22488,7 +22502,8 @@
      "target_php": "8.4",
      "project_php": null,
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -24560,7 +24575,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5 || ^8.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -25774,7 +25790,8 @@
      "target_php": "8.4",
      "project_php": "^7.1.3",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -27798,7 +27815,8 @@
      "target_php": "8.4",
      "project_php": "^8.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -28860,7 +28878,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -31070,7 +31089,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5 || ^8.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -33080,6 +33100,13 @@
        "require": {}
       }
      ],
+     "friendsofsymfony/oauth-server-bundle": [
+      {
+       "version": "1.6.2",
+       "time": "2019-01-23T15:23:04+00:00",
+       "require": {}
+      }
+     ],
      "friendsofsymfony/rest-bundle": [
       {
        "version": "3.5.0",
@@ -33460,7 +33487,8 @@
      "target_php": "8.4",
      "project_php": ">=7.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -34670,7 +34698,8 @@
      "target_php": "8.4",
      "project_php": "^8.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -35784,7 +35813,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -36868,7 +36898,8 @@
      "target_php": "8.4",
      "project_php": "~8.4.0 || ~8.5.0",
      "fail_on": "high,unchecked",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -38055,7 +38086,8 @@
      "target_php": "8.4",
      "project_php": ">=7.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -40191,7 +40223,8 @@
      "target_php": "8.4",
      "project_php": ">=7.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -41526,7 +41559,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -42725,7 +42759,8 @@
      "target_php": "8.4",
      "project_php": ">=7.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -44276,7 +44311,8 @@
      "target_php": "8.4",
      "project_php": null,
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -46504,7 +46540,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -47575,7 +47612,8 @@
      "target_php": "8.4",
      "project_php": "^8.2|^8.3|^8.4|^8.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -49730,7 +49768,8 @@
      "target_php": "8.4",
      "project_php": "^7.1.3",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -51024,7 +51063,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -52705,7 +52745,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -54434,7 +54475,8 @@
      "target_php": "8.0",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -56209,7 +56251,8 @@
      "target_php": "8.4",
      "project_php": "*",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -58118,7 +58161,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -59374,7 +59418,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -60973,7 +61018,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -62178,7 +62224,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -63644,7 +63691,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -65146,7 +65194,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -67521,7 +67570,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -68748,7 +68798,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -69969,7 +70020,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high,unchecked",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": "offline"
     }
    }
   },
@@ -71512,7 +71564,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": true
+     "include_dev": true,
+     "advisories_unchecked": null
     }
    }
   },
@@ -73304,7 +73357,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": true
+     "include_dev": true,
+     "advisories_unchecked": null
     }
    }
   },
@@ -75674,7 +75728,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high,unchecked",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -78624,7 +78679,8 @@
      "target_php": "8.4",
      "project_php": "~8.3.0||~8.4.0||~8.5.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -80115,7 +80171,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -81265,7 +81322,7 @@
      {
       "name": "friendsofsymfony/oauth-server-bundle",
       "version": "dev-master",
-      "time": null,
+      "time": "2018-06-01T00:00:00+00:00",
       "php": "^7.2 || ^8.0",
       "dev": false,
       "origin": "packagist"
@@ -81279,7 +81336,7 @@
      },
      {
       "version": "dev-master",
-      "time": null,
+      "time": "2018-06-01T00:00:00+00:00",
       "php": "^7.2 || ^8.0"
      }
     ],
@@ -81296,7 +81353,8 @@
      "target_php": "8.4",
      "project_php": ">=7.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -82609,7 +82667,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high,unchecked",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": "offline"
     }
    }
   },
@@ -83888,7 +83947,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -85105,7 +85165,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": true
+     "include_dev": true,
+     "advisories_unchecked": null
     }
    }
   },
@@ -87075,7 +87136,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -88984,7 +89046,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -90734,7 +90797,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -92230,7 +92294,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -94439,7 +94504,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5 || ^8.0",
      "fail_on": "high",
-     "include_dev": true
+     "include_dev": true,
+     "advisories_unchecked": null
     }
    }
   },
@@ -95597,7 +95663,7 @@
      {
       "name": "symfony/event-dispatcher",
       "version": "5.4.x-dev",
-      "time": null,
+      "time": "2024-09-25T14:11:13+00:00",
       "php": ">=7.2.5",
       "dev": false,
       "origin": "packagist"
@@ -95615,7 +95681,7 @@
     "releases": [
      {
       "version": "5.4.x-dev",
-      "time": null,
+      "time": "2024-09-25T14:11:13+00:00",
       "php": ">=7.2.5"
      },
      {
@@ -95667,7 +95733,8 @@
      "target_php": "8.4",
      "project_php": null,
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -96833,7 +96900,7 @@
      {
       "name": "symfony/event-dispatcher",
       "version": "4.4.x-dev",
-      "time": null,
+      "time": "2024-09-25T14:11:13+00:00",
       "php": ">=7.2.5",
       "dev": false,
       "origin": "packagist"
@@ -96851,7 +96918,7 @@
     "releases": [
      {
       "version": "4.4.x-dev",
-      "time": null,
+      "time": "2024-09-25T14:11:13+00:00",
       "php": ">=7.2.5"
      },
      {
@@ -96903,7 +96970,8 @@
      "target_php": "8.4",
      "project_php": null,
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -98074,7 +98142,7 @@
      {
       "name": "symfony/event-dispatcher",
       "version": "4.4.x-dev",
-      "time": null,
+      "time": "2024-09-25T14:11:13+00:00",
       "php": ">=7.2.5",
       "dev": false,
       "origin": "packagist"
@@ -98092,7 +98160,7 @@
     "releases": [
      {
       "version": "4.4.x-dev",
-      "time": null,
+      "time": "2024-09-25T14:11:13+00:00",
       "php": ">=7.2.5"
      },
      {
@@ -98144,7 +98212,8 @@
      "target_php": "8.4",
      "project_php": null,
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -99384,7 +99453,8 @@
      "target_php": "8.4",
      "project_php": "^7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -100833,7 +100903,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -102061,7 +102132,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": true
+     "include_dev": true,
+     "advisories_unchecked": null
     }
    }
   },
@@ -103287,7 +103359,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -104513,7 +104586,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -106620,7 +106694,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high,unchecked",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -107857,7 +107932,8 @@
      "target_php": "8.4",
      "project_php": "^8.1",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -108810,7 +108886,8 @@
      "target_php": "8.4",
      "project_php": null,
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -109908,7 +109985,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -111114,7 +111192,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -112363,7 +112442,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high,unchecked",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -113410,7 +113490,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -114648,7 +114729,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -115885,7 +115967,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -117668,7 +117751,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -128877,7 +128961,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": "offline"
     }
    }
   },
@@ -130411,7 +130496,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -131924,7 +132010,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "none",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -133938,6 +134025,13 @@
        "require": {}
       }
      ],
+     "friendsofsymfony/oauth-server-bundle": [
+      {
+       "version": "1.6.2",
+       "time": "2019-01-23T15:23:04+00:00",
+       "require": {}
+      }
+     ],
      "friendsofsymfony/rest-bundle": [
       {
        "version": "3.5.0",
@@ -134262,7 +134356,8 @@
      "target_php": "8.4",
      "project_php": ">=7.4",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -135471,7 +135566,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -137059,7 +137155,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "old-promise",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -139382,7 +139479,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "vulnerable-high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -140981,7 +141079,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "left-behind,vulnerable-high",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -142548,7 +142647,8 @@
      "target_php": "8.4",
      "project_php": ">=7.2.5",
      "fail_on": "none",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   },
@@ -144859,7 +144959,8 @@
      "target_php": "8.4",
      "project_php": "^7.2 || ^8.0.0",
      "fail_on": "critical",
-     "include_dev": false
+     "include_dev": false,
+     "advisories_unchecked": null
     }
    }
   }

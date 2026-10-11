@@ -10572,7 +10572,7 @@
       },
       "allOf": [
         {
-          "description": "The verdict, its `priority` alias and the score's shape agree: a grade has the graded score; a score-0 word has the score-0 shape, priority `none` and no move.",
+          "description": "The verdict, its `priority` alias, the score's shape and `next_step` agree: a grade has the graded score and a move; a score-0 word has the score-0 shape, priority `none` and no move.",
           "anyOf": [
             {
               "properties": {
@@ -10590,6 +10590,9 @@
                   "required": [
                     "terms"
                   ]
+                },
+                "next_step": {
+                  "type": "object"
                 }
               }
             },
@@ -10609,6 +10612,9 @@
                   "required": [
                     "terms"
                   ]
+                },
+                "next_step": {
+                  "type": "object"
                 }
               }
             },
@@ -10628,6 +10634,9 @@
                   "required": [
                     "terms"
                   ]
+                },
+                "next_step": {
+                  "type": "object"
                 }
               }
             },
@@ -10647,6 +10656,9 @@
                   "required": [
                     "terms"
                   ]
+                },
+                "next_step": {
+                  "type": "object"
                 }
               }
             },

@@ -103,7 +103,7 @@ final class MaintenanceMove
 
     private static function relation(\DateTimeImmutable $released, \DateTimeImmutable $snapshot): string
     {
-        if ($released == $snapshot) {
+        if ($released->getTimestamp() === $snapshot->getTimestamp()) {
             return 'same';
         }
 

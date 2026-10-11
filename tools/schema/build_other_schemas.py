@@ -500,9 +500,9 @@ def add_relations_round3(D):
 
 def add_relations(D):
     f = D['finding']
-    relate(f, 'The verdict, its `priority` alias and the score\'s shape agree: a grade has the graded score; a score-0 word has the score-0 shape, '
-              'priority `none` and no move.',
-           [P(verdict=E(g), priority=E(g), score={'required': ['terms']}) for g in GRADES]
+    relate(f, 'The verdict, its `priority` alias, the score\'s shape and `next_step` agree: a grade has the graded score and a move; a score-0 '
+              'word has the score-0 shape, priority `none` and no move (I21).',
+           [P(verdict=E(g), priority=E(g), score={'required': ['terms']}, next_step=OBJ) for g in GRADES]
            + [P(verdict=E(*ZERO_WORDS), priority=E('none'), score={'not': {'required': ['terms']}}, next_step=NULL)])
     relate(f, '`reach` follows `direct` and `chain`: `direct` when composer.json requires it; `transitive` with a chain of two or more; `unreached` with an '
               'empty one.',

@@ -36,14 +36,20 @@ use Lockrot\Verdict\VerdictEngine;
  * writes for it. The case's `inputs` block (tools/schema/project_fixtures.py) holds the root
  * `composer.json`, the lock entries with the case's package first, that package's releases with
  * their dates and `php`, its abandoned marking, its advisories, its repository activity, the
- * `require` names of the direct dependents that C08 measured and the run settings. The loaders
- * answer from the block: no other package has metadata.
+ * `require` names of the direct dependents that C08 measured and the run settings. A test can add
+ * `other_advisories`: advisories on other versions of the package, which none of its own counts.
+ * `run.advisories_unchecked` says why the advisory lookup did not run, such as `offline`.
+ * The loaders answer from the block: only the case's package and those dependents have metadata,
+ * and a null `releases` leaves the package without it.
  */
 final class CaseHydrator
 {
     public const CASES = __DIR__.'/../fixtures/flags/cases.json';
     private const PROVENANCE = __DIR__.'/../fixtures/flags/provenance.json';
     private const PACKAGIST = 'https://packagist.org/downloads/';
+
+    /** @var array<string, array<mixed, mixed>>|null */
+    private static ?array $findings = null;
 
     /**
      * @return array<mixed, mixed> the case with that id
@@ -56,6 +62,33 @@ final class CaseHydrator
             }
         }
         throw new \InvalidArgumentException('no case '.$id.' in '.self::CASES);
+    }
+
+    /**
+     * The case package's finding as report-2 writes it, for every case with an `inputs` block, run
+     * once per process.
+     *
+     * @return array<string, array<mixed, mixed>> by case id
+     */
+    public static function findings(): array
+    {
+        if (self::$findings !== null) {
+            return self::$findings;
+        }
+        self::$findings = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CASES), ['cases']) as $case) {
+            if (!\is_array($case) || !\is_array($case['inputs'] ?? null)) {
+                continue;
+            }
+            $package = JsonPath::stringAt($case, ['finding', 'package']);
+            foreach (JsonPath::arrayAt(JsonPath::decoded(self::report($case)->toArray()), ['findings']) as $finding) {
+                if (\is_array($finding) && $finding['package'] === $package) {
+                    self::$findings[JsonPath::stringAt($case, ['id'])] = $finding;
+                }
+            }
+        }
+
+        return self::$findings;
     }
 
     /**
@@ -83,7 +116,7 @@ final class CaseHydrator
         if ($locked === null) {
             throw new \InvalidArgumentException('the lock has no '.$package);
         }
-        $byName = [$package => PackageMetadata::fromPackages($package, self::releases($package, JsonPath::arrayAt($inputs, ['releases']), $marking), $clock->now(), $locked->normalizedVersion())];
+        $byName = \is_array($inputs['releases'] ?? null) ? [$package => PackageMetadata::fromPackages($package, self::releases($package, $inputs['releases'], $marking), $clock->now(), $locked->normalizedVersion())] : [];
         foreach (\is_array($inputs['dependents'] ?? null) ? $inputs['dependents'] : [] as $name => $releases) {
             $dependent = $lock->find((string) $name);
             self::assertArray($releases);
@@ -104,7 +137,7 @@ final class CaseHydrator
             new VerdictEngine(),
             $clock,
             false,
-            self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []))
+            self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []), self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null)
         );
 
         return $analyzer->analyze($lock, $project, ($run['include_dev'] ?? false) === true);
@@ -228,11 +261,19 @@ final class CaseHydrator
         };
     }
 
-    /** @param list<Advisory> $advisories */
-    private static function advisoryLoader(string $package, array $advisories): AdvisoryLoaderInterface
+    /**
+     * @param list<Advisory> $advisories the counted ones
+     * @param list<Advisory> $others     those on other versions of the package
+     * @param ?string        $unchecked  why the lookup did not run (`offline`), null when it answered
+     */
+    private static function advisoryLoader(string $package, array $advisories, array $others, ?string $unchecked): AdvisoryLoaderInterface
     {
-        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [], 0, [$package => new AdvisoryNameCoverage([['composer_repository' => 'packagist.org', 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => \count($advisories)]], \count($advisories), null)]);
-        $batch = new AdvisoryBatch($advisories === [] ? [] : [$package => $advisories], [], [], [], $coverage, true);
+        $feed = $unchecked === null
+            ? ['composer_repository' => 'packagist.org', 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => \count($advisories)]
+            : ['composer_repository' => 'packagist.org', 'answer' => 'not_asked', 'reason' => $unchecked, 'message' => null, 'records' => null];
+        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [], 0, [$package => new AdvisoryNameCoverage([$feed], $feed['records'], $unchecked)]);
+        $every = array_merge($advisories, $others);
+        $batch = new AdvisoryBatch($advisories === [] ? [] : [$package => $advisories], [], [], $every === [] ? [] : [$package => $every], $coverage, $unchecked === null);
 
         return new class ($batch) implements AdvisoryLoaderInterface {
             private AdvisoryBatch $batch;

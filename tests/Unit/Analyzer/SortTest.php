@@ -8,6 +8,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Report;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\CorpusFloor;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
@@ -145,6 +146,26 @@ final class SortTest extends TestCase
         });
 
         self::assertSame(array_column($findings, 'package'), array_column($resorted, 'package'));
+    }
+
+    /** I20 with moves in place: one finding of each package of the hydrated cases, in one report, stands in the published order. */
+    public function testTheFindingsWithTheirMovesStandInThePublishedOrder(): void
+    {
+        $findings = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
+            self::assertIsArray($case);
+            foreach (\is_array($case['inputs'] ?? null) ? CaseHydrator::report($case)->findings() : [] as $finding) {
+                $findings[$finding->package()] ??= $finding;
+            }
+        }
+        $findings = array_values($findings);
+        self::assertNotSame([], $findings);
+        $report = new Report($findings, [], new \DateTimeImmutable('2026-10-08T00:00:00+00:00'), \count($findings), 0);
+        foreach ($report->graded() as $finding) {
+            self::assertNotNull($finding->nextStep(), $finding->package());
+        }
+
+        $this->testTheReport2FindingsStandInThePublishedOrder($report);
     }
 
     /** wallabag's twig carries a critical advisory, which no other critical finding there outweighs. */

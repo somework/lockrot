@@ -304,7 +304,9 @@ def inputs_of(case):
         if fx['version'] and row is not None:
             release(fx['version'], None, row['php'])
     age = f.get('age') or {}
-    installed_at = (age.get('installed') or {}).get('at')
+    s6 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S6'), None) or {}
+    # A snapshot has no release date: its lock time is the snapshot's commit time.
+    installed_at = (age.get('installed') or {}).get('at') or s6.get('snapshot_time')
     release(f['version'], installed_at, f['installed_php']['requires'])
     root_require = {f['package']: '*'} if f['direct'] else {}
     lock = {}
@@ -338,11 +340,12 @@ def inputs_of(case):
             e.setdefault(h['link'], {})[f['package']] = h['constraint']
     dependents = {}
     for name, e in through.items():
-        if e['installed_requires'] is None or e['installed_version'] is None:
-            continue
         newest = e.get('newest_stable')
-        own = [{'version': e['installed_version'], 'time': newest['released'] if newest and newest['version'] == e['installed_version'] else None,
-                'require': {f['package']: '*'} if e['installed_requires'] else {}}]
+        unlisted = e['newest_requires_unmeasured'] == 'installed_unlisted'
+        if (e['installed_requires'] is None and not unlisted) or e['installed_version'] is None:
+            continue
+        own = [] if unlisted else [{'version': e['installed_version'], 'time': newest['released'] if newest and newest['version'] == e['installed_version'] else None,
+                                    'require': {f['package']: '*'} if e['installed_requires'] else {}}]
         if newest and newest['version'] != e['installed_version']:
             own.append({'version': newest['version'], 'time': newest['released'], 'require': {f['package']: '*'} if e['newest_requires'] else {}})
         dependents[name] = own
@@ -360,7 +363,8 @@ def inputs_of(case):
         'abandoned': marking,
         'dependents': dependents,
         'activity': None if act.get('status') != 'read' else {'host': act['host'], 'repo': act['repo'], 'pushed_at': push.get('at'), 'archived': act['archived']},
-        'run': {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev']},
+        'run': {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev'],
+                'advisories_unchecked': f['security']['unchecked_reason']},
     }
 
 
