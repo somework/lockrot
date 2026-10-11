@@ -38,7 +38,7 @@ final class Score
     private bool $dev;
 
     /**
-     * @param list<string> $maintenance the counted maintenance flags in flag order
+     * @param list<string> $maintenance the counted maintenance flags, in any order
      * @param ?Advisory    $deciding    with the severity bucket, not Composer's word
      * @param list<string> $tied
      */
@@ -48,7 +48,7 @@ final class Score
         $this->advisories = $advisories;
         $this->reach = $reach;
         $this->dev = $dev;
-        foreach ($maintenance as $flag) {
+        foreach (array_intersect(array_keys(ScoreModel::POINTS), $maintenance) as $flag) {
             $divisor = $this->terms === [] ? 1 : ScoreModel::CORROBORATING_DIVISOR;
             $weight = ScoreModel::POINTS[$flag];
             $points = intdiv($weight, $divisor);
@@ -112,7 +112,7 @@ final class Score
             }
         }
 
-        return new self(array_values(array_intersect(array_keys(ScoreModel::POINTS), $maintenance)), $deciding, $tied, \count($advisories), $reach, $dev);
+        return new self($maintenance, $deciding, $tied, \count($advisories), $reach, $dev);
     }
 
     /** @return list<MaintenanceTerm> the counted maintenance flags in flag order, the lead first */
