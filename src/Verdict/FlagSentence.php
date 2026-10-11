@@ -139,7 +139,7 @@ final class FlagSentence
             return self::s8($d);
         }
 
-        throw new \LogicException('No maintenance sentence reads '.\get_class($d).'.');
+        throw new \LogicException('Only the data of a maintenance signal has a maintenance sentence.');
     }
 
     private static function s8(LeftBehindData $d): string

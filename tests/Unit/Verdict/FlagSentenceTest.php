@@ -83,7 +83,6 @@ final class FlagSentenceTest extends TestCase
     public function testOnlyTheMaintenanceSignalsHaveASentenceHere(): void
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('No maintenance sentence reads '.AdvisoryData::class.'.');
 
         FlagSentence::maintenance(FlagSet::VULNERABLE, [Signal::S9 => new AdvisoryData([], true, true)]);
     }

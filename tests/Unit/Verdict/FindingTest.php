@@ -1003,7 +1003,7 @@ final class FindingTest extends TestCase
         yield 'skipped release metadata beside S3 unread' => ['1.0.0', false, [['S3']], false, true];
     }
 
-    /** S10's gaps keep their string blocks, and a gap without a check or a reason keeps empty words. */
+    /** S10's gaps keep their check, their reason and their blocks. */
     public function testChecksMissingWritesS10sChecks(): void
     {
         $signals = [new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [
