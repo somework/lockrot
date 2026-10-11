@@ -51,9 +51,19 @@ final class SecurityTerm implements Term
         return self::ROLE;
     }
 
+    public function advisory(): string
+    {
+        return $this->advisory;
+    }
+
     public function severity(): string
     {
         return $this->severity;
+    }
+
+    public function fixKind(): string
+    {
+        return $this->fixKind;
     }
 
     public function weight(): int

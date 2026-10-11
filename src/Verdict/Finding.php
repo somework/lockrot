@@ -14,6 +14,7 @@ use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\ScoreBasis;
 use Lockrot\Score\SecurityTerm;
 use Lockrot\Signal\Data\AbandonedData;
@@ -223,7 +224,7 @@ final class Finding
     public function flagIds(): array
     {
         $score = $this->score();
-        $ids = array_column($score->maintenanceTerms(), 'flag');
+        $ids = array_map(static fn (MaintenanceTerm $term): string => $term->flag(), $score->maintenanceTerms());
         if ($score->deciding() !== null) {
             $ids[] = FlagSet::VULNERABLE;
         }
@@ -732,7 +733,7 @@ final class Finding
         $out = [];
         foreach ($this->signals as $signal) {
             $data = $signal->data();
-            $out[] = $data instanceof AdvisoryData ? new Signal($signal->id(), $signal->level(), $signal->summary(), $data->withDeciding($deciding === null ? null : $deciding['id'])) : $signal;
+            $out[] = $data instanceof AdvisoryData ? new Signal($signal->id(), $signal->level(), $signal->summary(), $data->withDeciding($deciding === null ? null : $deciding->advisory())) : $signal;
         }
         $releases = $details->releasesUnchecked();
         if ($releases === null) {

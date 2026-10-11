@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Security\Severity;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
@@ -165,7 +166,9 @@ final class ScoreModelTest extends TestCase
     {
         $score = Score::compute([], [['id' => 'GHSA-b', 'severity' => 'high', 'fix_kind' => 'update'], ['id' => 'GHSA-a', 'severity' => 'high', 'fix_kind' => 'update'], ['id' => 'GHSA-c', 'severity' => 'medium', 'fix_kind' => 'none']], 'direct', false);
 
-        self::assertSame('GHSA-a', $score->deciding()['id'] ?? null);
+        $deciding = $score->deciding();
+        self::assertNotNull($deciding);
+        self::assertSame('GHSA-a', $deciding->advisory());
         self::assertSame(['GHSA-b', 'GHSA-c'], $score->tied(), 'a medium advisory nothing fixes scores 16 too, and comes after by severity');
         self::assertSame(3, $score->advisoryCount());
     }
@@ -179,10 +182,38 @@ final class ScoreModelTest extends TestCase
         $moderate = Score::compute([], [['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], ['id' => 'B', 'severity' => 'moderate', 'fix_kind' => 'update']], 'direct', false);
         $unrated = Score::compute([], [['id' => 'B', 'severity' => '', 'fix_kind' => 'update'], ['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update']], 'direct', false);
 
-        self::assertSame(['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], $moderate->deciding());
+        self::assertSame(['A', 'medium', 'update'], self::deciding($moderate));
         self::assertSame(['B'], $moderate->tied());
-        self::assertSame(['id' => 'A', 'severity' => 'medium', 'fix_kind' => 'update'], $unrated->deciding());
-        self::assertSame(['id' => 'B', 'severity' => 'unrated', 'fix_kind' => 'none'], Score::compute([], [['id' => 'B', 'severity' => 'unknown', 'fix_kind' => 'none']], 'direct', false)->deciding());
+        self::assertSame(['A', 'medium', 'update'], self::deciding($unrated));
+        self::assertSame(['B', 'unrated', 'none'], self::deciding(Score::compute([], [['id' => 'B', 'severity' => 'unknown', 'fix_kind' => 'none']], 'direct', false)));
+    }
+
+    /**
+     * Score builds the terms that report-2 writes: each maintenance term with its contribution after
+     * the reach and dev halvings, and the deciding advisory with the doubling of no reachable fix.
+     */
+    public function testTheEngineBuildsTheTermsItCounts(): void
+    {
+        $score = Score::compute(['stale', 'left-behind'], [Score::advisory('A', 'critical', 'none'), Score::advisory('B', 'low', 'update')], 'transitive', true);
+
+        self::assertSame([
+            ['part' => 'maintenance', 'flag' => 'left-behind', 'role' => 'lead', 'weight' => 16, 'divisor' => 1, 'points' => 16, 'contribution' => 4],
+            ['part' => 'maintenance', 'flag' => 'stale', 'role' => 'corroborating', 'weight' => 8, 'divisor' => 4, 'points' => 2, 'contribution' => 0.5],
+        ], JsonPath::decoded($score->maintenanceTerms()));
+        self::assertSame(
+            ['part' => 'security', 'flag' => 'vulnerable', 'role' => 'security', 'advisory' => 'A', 'severity' => 'critical', 'fix_kind' => 'none', 'weight' => 32, 'multiplier' => 2, 'points' => 64, 'contribution' => 32],
+            JsonPath::decoded($score->deciding())
+        );
+        self::assertNull(Score::compute(['stale'], [], 'direct', false)->deciding());
+    }
+
+    /** @return array{string, string, string} the deciding advisory's id, severity bucket and fix kind */
+    private static function deciding(Score $score): array
+    {
+        $deciding = $score->deciding();
+        self::assertNotNull($deciding);
+
+        return [$deciding->advisory(), $deciding->severity(), $deciding->fixKind()];
     }
 
     public function testAnAdvisoryRowKeepsItsId(): void
@@ -195,7 +226,7 @@ final class ScoreModelTest extends TestCase
         $score = Score::compute(['old-promise', 'pinned', 'abandoned'], [], 'direct', false);
 
         self::assertSame('abandoned', $score->lead());
-        self::assertSame(['abandoned', 'pinned', 'old-promise'], array_column($score->maintenanceTerms(), 'flag'));
+        self::assertSame(['abandoned', 'pinned', 'old-promise'], array_map(static fn (MaintenanceTerm $term): string => $term->flag(), $score->maintenanceTerms()));
     }
 
     /**

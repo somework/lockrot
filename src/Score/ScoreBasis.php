@@ -49,8 +49,8 @@ final class ScoreBasis implements \JsonSerializable
         $this->maintenancePart = Part::maintenance($this->maintenanceStatus(), $score->maintenanceHalves());
         $this->securityPart = Part::security($this->securityStatus(), $score->securityHalves(), $score->advisoryCount(), $score->tied());
         if ($score->grade() !== null) {
-            $this->maintenanceTerms = $this->maintenanceTermsOf();
-            $this->securityTerm = $this->securityTermOf();
+            $this->maintenanceTerms = $score->maintenanceTerms();
+            $this->securityTerm = $score->deciding();
             $this->modifiers = self::modifiersOf($score);
             $this->without = $this->withoutRows();
         }
@@ -191,30 +191,6 @@ final class ScoreBasis implements \JsonSerializable
         ];
     }
 
-    /** @return list<MaintenanceTerm> */
-    private function maintenanceTermsOf(): array
-    {
-        $score = $this->score;
-        $terms = [];
-        foreach ($score->maintenanceTerms() as $term) {
-            $terms[] = new MaintenanceTerm($term['flag'], $term['role'], $term['weight'], $term['divisor'], $term['points'], $score->halveForDev($score->halveForReach(2 * $term['points'])));
-        }
-
-        return $terms;
-    }
-
-    private function securityTermOf(): ?SecurityTerm
-    {
-        $score = $this->score;
-        $deciding = $score->deciding();
-        if ($deciding === null) {
-            return null;
-        }
-        $multiplier = \in_array($deciding['fix_kind'], ScoreModel::DOUBLING, true) ? ScoreModel::NO_REACHABLE_FIX_FACTOR : 1;
-
-        return new SecurityTerm($deciding['id'], $deciding['severity'], $deciding['fix_kind'], intdiv($score->securityPointsHalves(), 2 * $multiplier), $multiplier, intdiv($score->securityPointsHalves(), 2), $score->securityHalves());
-    }
-
     /** @return list<Modifier> */
     private static function modifiersOf(Score $score): array
     {
@@ -238,7 +214,7 @@ final class ScoreBasis implements \JsonSerializable
             $rerun = Score::of($counting, $this->score->reach(), $this->score->isDev());
             $role = null;
             foreach ($rerun->maintenanceTerms() as $term) {
-                $role = $term['flag'] === $flag ? $term['role'] : $role;
+                $role = $term->flag() === $flag ? $term->role() : $role;
             }
             $rows[] = new Accepted(
                 $flag,
@@ -262,16 +238,16 @@ final class ScoreBasis implements \JsonSerializable
         $deciding = $score->deciding();
         if (\count($score->maintenanceTerms()) + ($deciding === null ? 0 : 1) >= 2) {
             foreach ($score->maintenanceTerms() as $term) {
-                $flags = $this->flags->without($term['flag']);
-                $hidden = $term['flag'] === FlagSet::ABANDONED ? $this->flags->hidden() : null;
-                $rows[] = $this->rerun('flag', $term['flag'], $flags, $hidden === null ? [] : [$hidden], $this->atLeast($term['flag']));
+                $flags = $this->flags->without($term->flag());
+                $hidden = $term->flag() === FlagSet::ABANDONED ? $this->flags->hidden() : null;
+                $rows[] = $this->rerun('flag', $term->flag(), $flags, $hidden === null ? [] : [$hidden], $this->atLeast($term->flag()));
             }
             if ($deciding !== null) {
                 $rows[] = $this->rerun('flag', FlagSet::VULNERABLE, $this->flags->without(FlagSet::VULNERABLE), [], false);
             }
         }
         if ($deciding !== null && $score->advisoryCount() >= 2) {
-            $rows[] = $this->rerun('advisory', $deciding['id'], $this->flags->withoutAdvisory($deciding['id']), [], false);
+            $rows[] = $this->rerun('advisory', $deciding->advisory(), $this->flags->withoutAdvisory($deciding->advisory()), [], false);
         }
 
         return $rows;
@@ -281,7 +257,11 @@ final class ScoreBasis implements \JsonSerializable
     private function rerun(string $kind, string $id, FlagSet $flags, array $revealed, bool $atLeast): Without
     {
         $rerun = Score::of($flags, $this->score->reach(), $this->score->isDev());
-        $roles = array_column($rerun->maintenanceTerms(), 'role', 'flag');
+        $roles = [];
+        foreach ($rerun->maintenanceTerms() as $term) {
+            $roles[$term->flag()] = $term->role();
+        }
+        $deciding = $rerun->deciding();
 
         return new Without(
             $kind,
@@ -290,7 +270,7 @@ final class ScoreBasis implements \JsonSerializable
             $rerun->total(),
             self::verdict($rerun, $flags, $this->context['maintenance_judged']),
             $rerun->lead(),
-            $rerun->deciding()['id'] ?? null,
+            $deciding === null ? null : $deciding->advisory(),
             $atLeast
         );
     }
