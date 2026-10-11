@@ -63,6 +63,7 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 - Signal levels, lowest first: `info`, `warn`, `high`.
 - A finding's standing against the baseline: `known`, `new`, `worsened`.
 - A `priority_basis` step's `from` and `to`: the priority order without `none`.
+- A finding's `activity.status` in report-2: `read`, `not_found`, `not_read`.
 
 The document number `lockrot.schema` is `1` for all of 1.x. A new verdict, priority, level or
 standing needs report-2 and lockrot 2.0. [verdicts.md](verdicts.md#the-nine-verdicts) says what each

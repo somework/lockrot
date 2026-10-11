@@ -272,20 +272,6 @@ def explain_metadata():
     return rows
 
 
-def explain_activity():
-    """explain-1's `activity` block, every member described."""
-    act = copy.deepcopy(E1['definitions']['activity'])
-    act['description'] = 'What the repository host answered for the package.'
-    words = {'forge': 'The host, as a display label (`GitHub`, `GitLab`, `Bitbucket`).',
-             'repository': 'The repository path on the host (`owner/repo`).',
-             'archived': 'Whether the host marks the repository archived.',
-             'pushed_at': 'The last push or commit the host reported; null when it reported none.',
-             'fetched_at': 'When lockrot fetched the answer; null when the answer carries no fetch time.',
-             'from_cache': "Whether the answer came from lockrot's cache."}
-    act['properties'] = {k: dict({'description': words[k]}, **v) for k, v in act['properties'].items()}
-    return act
-
-
 # the field reference's relations
 def P(**props):
     """a branch that only constrains properties (no `type`: the strict twin leaves it as it is)."""
@@ -610,7 +596,7 @@ def add_relations(D):
 
 EXPLAIN_RUN_KEYS = ['target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts',
                     'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model']
-EXPLAIN_ONLY = ['legacy', 'priority', 'priorityStep', 'flaggedPriority', 'lock', 'repositoryMetadata', 'activity', 'explainRun']
+EXPLAIN_ONLY = ['legacy', 'priority', 'priorityStep', 'flaggedPriority', 'lock', 'repositoryMetadata', 'explainRun']
 
 
 def refs_in(node, out):
@@ -661,7 +647,6 @@ def explain_schema():
     D['lock'] = lock
     D['metadata'] = explain_metadata()
     D['repositoryMetadata'] = D.pop('metadata')
-    D['activity'] = explain_activity()
     for k in D:
         assert k in EXPLAIN_ONLY, k
         assert k not in RD, ('an explain-only definition collides with report-2', k)
@@ -682,7 +667,7 @@ def explain_schema():
                         'file unchanged; the number in the id changes only when a field is removed or renamed. Open sets carry a `pattern` and '
                         '`x-known-values`; closed sets are enums.'),
         'type': 'object',
-        'required': ['$schema', 'lockrot', 'package', 'version', 'finding', 'lock', 'metadata', 'activity', 'run', 'legacy', 'generated_at', 'notes', 'note_details'],
+        'required': ['$schema', 'lockrot', 'package', 'version', 'finding', 'lock', 'metadata', 'run', 'legacy', 'generated_at', 'notes', 'note_details'],
         'properties': {
             '$schema': {'description': 'This schema\'s published URL; always written (schema round), so an explain-1 document fails at once.', 'type': 'string', 'enum': ['https://lockrot.dev/schema/explain-2.json']},
             'lockrot': ref('envelope', 'The writer and the schema number.'),
@@ -691,7 +676,6 @@ def explain_schema():
             'finding': ref('finding', 'The finding, exactly as the report carries it (report-2\'s definition, copied).'),
             'lock': ref('lock', 'The package\'s entry in composer.lock.'),
             'metadata': nullable(ref('repositoryMetadata'), 'What the Composer repository said; null when it could not be loaded or was never asked.'),
-            'activity': nullable(ref('activity'), 'What the repository host said; null when the repository was not checked.'),
             'run': ref('explainRun', 'What the run read.'),
             'legacy': ref('legacy', '0.13\'s reading of the finding (the `0.13:` line).'),
             'generated_at': ref('dateTime', 'The run clock: every years field is measured against it.'),

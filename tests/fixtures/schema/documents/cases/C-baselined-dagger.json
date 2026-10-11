@@ -1168,6 +1168,17 @@
     "reason": null,
     "message": null
    },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "symfony/debug",
+    "event": "push",
+    "archived": true,
+    "fetched_at": "2026-10-01T16:05:47+00:00",
+    "cached_at": "2026-10-01T16:05:47+00:00"
+   },
    "allowlist": null,
    "from_composer_repository": true,
    "origin": {
@@ -1233,7 +1244,7 @@
       "host": "github.com",
       "years": 4.2,
       "forge": "github",
-      "activity": "push"
+      "event": "push"
      }
     },
     {

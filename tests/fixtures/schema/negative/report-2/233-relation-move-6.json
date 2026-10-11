@@ -1112,6 +1112,17 @@
     "reason": null,
     "message": null
    },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "tubalmartin/YUI-CSS-compressor-PHP-port",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:04:08+00:00",
+    "cached_at": "2026-10-01T16:04:08+00:00"
+   },
    "allowlist": {
     "by": "project",
     "pattern": "tubalmartin/cssmin",

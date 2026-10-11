@@ -634,6 +634,44 @@ def _(d): d['findings'][6]['signals'][0]['data']['advisories'][0]['fix'] = {'kin
 @case('strict-p1-security-check-disabled', 'ok-unchecked', 'findings[0].security.check', strict=True)
 def _(d): d['findings'][0]['security']['check'] = 'disabled'
 
+# finding.activity: one reason by precedence, and the checks that go with it
+@case('c73-read-with-a-reason', 'composite', f + '.activity')
+def _(d): d['findings'][m]['activity']['reason'] = 'rate_limit'
+@case('c73-status-skipped', 'composite', f + '.activity.status')
+def _(d): d['findings'][m]['activity']['status'] = 'skipped'
+@case('c73-not-found-other-reason', 'not-found-dagger', 'findings[0].activity')
+def _(d): d['findings'][0]['activity']['reason'] = 'rate_limit'
+@case('c73-not-read-with-an-event', 'host-unsupported', 'findings[0].activity')
+def _(d): d['findings'][0]['activity']['event'] = 'push'
+@case('c73-forge-without-repo', 'composite', f + '.activity')
+def _(d): d['findings'][m]['activity']['repo'] = None
+@case('c73-host-not-supported-on-a-forge', 'host-unsupported', 'findings[0].activity')
+def _(d): d['findings'][0]['activity'].update(forge='github', repo='danb/HtmlDiff')
+@case('c73-archived-null-without-the-skip', 'gitlab-anon-dagger', 'findings[0]')
+def _(d): d['findings'][0]['checks_skipped'] = []
+@case('c73-s3-beside-archived-false', 'composite', 'findings[%d]' % DEBUG)
+def _(d): d['findings'][DEBUG]['activity']['archived'] = False
+@case('c73-not-read-without-its-entry', 'host-unsupported', 'findings[0]')
+def _(d):
+    d['findings'][0]['checks_missing'] = []
+    d['findings'][0]['signals'] = [x for x in d['findings'][0]['signals'] if x['id'] != 'S10']
+@case('c73-s4-beside-a-404', 'stale-only', 'findings[0]')
+def _(d):
+    x = d['findings'][0]
+    x['activity'].update(status='not_found', reason='repository_not_found', event=None, archived=None, fetched_at=None, cached_at=None)
+    x['checks_skipped'] = [dict(check='repository_activity', reason='repository_not_found', blocks=['S3', 'S4'])]
+    x['flags'][0]['degree']['liveness_complete'] = False
+@case('c73-s4-data-activity', 'composite', 'data.event: The property event is required')
+def _(d):
+    x = sig(d['findings'][DEBUG], 'S4')['data']
+    x['activity'] = x.pop('event')
+
+# the origin split: no S10 `not_from_composer_repository` on a package from a Composer repository, nor on a path origin
+@case('o12-path-package-with-s10', 'local-path-advisory', 'findings[0]')
+def _(d): d['findings'][0]['checks_missing'].append(dict(check='release_metadata', reason='not_from_composer_repository', blocks=['S2', 'S8']))
+@case('o12-registry-package-with-s10', 'composite', f)
+def _(d): d['findings'][m]['checks_missing'].append(dict(check='repository_activity', reason='not_from_composer_repository', blocks=['S3', 'S4']))
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for old in glob.glob(os.path.join(OUT, '*.json')):

@@ -2,16 +2,21 @@
 <?php
 
 declare(strict_types=1);
-// Records Composer repository (p2), advisory and GitHub responses for the acceptance fixtures, so
-// tests run offline. Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
+// Records Composer repository (p2), advisory, GitHub and GitLab responses for the acceptance
+// fixtures, so tests run offline.
+// Usage: GITHUB_TOKEN=... bin/record-fixtures [--gitlab-domain=<host> ...] [fixtureDir ...]
 //
 // It records packages and packages-dev: a `--dev` test replays them. The advisory answer is one
 // packagist.org POST with every locked name, whatever its origin, as lockrot's lookup sends it.
 //
-// The script trims each p2 body to KEEP and each GitHub body to the keys that GitHubApi reads. The
-// fixtures hold GitHub-hosted packages only, so it records no GitLab or Bitbucket answer. It reuses
-// an envelope on disk only when its recorded `status` is not 0: status 0 is a transport failure (a
-// timeout or a DNS error), so the script fetches that answer again.
+// The script trims each p2 body to KEEP and each forge body to the keys that its ForgeApi reads. A
+// packages.drupal.org entry's p2 answer goes to <fixtureDir>/http/p2. A repository on a
+// --gitlab-domain host gets its commits answer, asked anonymously, in <fixtureDir>/http/gitlab. Its
+// project document is recorded only with a gitlab-token that Composer's config (auth.json or
+// COMPOSER_AUTH) holds for that host: anonymously GitLab leaves `archived` out. The token is never
+// written. Bitbucket answers are not recorded. It reuses an envelope on disk only when its recorded
+// `status` is not 0: status 0 is a transport failure (a timeout or a DNS error), so the script
+// fetches that answer again.
 require __DIR__.'/../vendor/autoload.php';
 
 use Composer\Factory;
@@ -19,6 +24,7 @@ use Composer\IO\NullIO;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Data\Forge\GitHubApi;
+use Lockrot\Data\Forge\GitLabApi;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Http\HttpResult;
@@ -29,10 +35,20 @@ use Lockrot\Lock\LockFile;
 const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'replace', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
 const ADVISORY_API_URL = 'https://packagist.org/api/security-advisories/';
+const DRUPAL_NOTIFICATION = '{^https://packages\.drupal\.org/(\d+)/downloads$}';
+const GITLAB_COMMIT_KEYS = ['committed_date'];
+const GITLAB_PROJECT_KEYS = ['path_with_namespace', 'archived'];
 
 $root = \dirname(__DIR__);
-$fixtures = $argv;
-array_shift($fixtures);
+$fixtures = [];
+$gitlabDomains = ['gitlab.com'];
+foreach (\array_slice($argv, 1) as $arg) {
+    if (strpos($arg, '--gitlab-domain=') === 0) {
+        $gitlabDomains[] = substr($arg, \strlen('--gitlab-domain='));
+    } else {
+        $fixtures[] = $arg;
+    }
+}
 if ($fixtures === []) {
     $fixtures = [
         'tests/fixtures/apps/wallabag_wallabag', 'tests/fixtures/apps/nextcloud_3rdparty', 'tests/fixtures/apps/matomo-org_matomo',
@@ -88,7 +104,24 @@ $composerConfig = Factory::createConfig($io);
 $repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), $io, $composerConfig, new Clock());
 $github = new GitHubApi();
 $githubHeaders = GitHubApi::headersFor(getenv('GITHUB_TOKEN') ?: null);
-$locator = new RepoLocator();
+$locator = new RepoLocator($gitlabDomains);
+$gitlab = new GitLabApi();
+$gitlabTokens = $composerConfig->get('gitlab-token');
+$record = static function (string $dir, HttpResult $result, ?string $body): void {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    file_put_contents(RecordedHttpClient::pathFor($dir, $result->url()), json_encode((new HttpResult($result->url(), $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+};
+$keep = static function (?string $body, array $keys, bool $list): ?string {
+    $json = $body === null ? null : json_decode($body, true);
+    if (!\is_array($json)) {
+        return $body;
+    }
+    $trimmed = $list ? array_map(static fn ($item): array => \is_array($item) ? array_intersect_key($item, array_flip($keys)) : [], \array_slice($json, 0, 1)) : array_intersect_key($json, array_flip($keys));
+
+    return (string) json_encode($trimmed, \JSON_UNESCAPED_SLASHES);
+};
 $recordP2 = static function (string $name) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
     foreach ([false, true] as $dev) {
         $url = REPOSITORY_BASE_URL.$name.($dev ? '~dev' : '').'.json';
@@ -107,8 +140,14 @@ foreach (MonorepoParents::load()->candidates() as $parent) {
     $recordP2($parent);
 }
 $repos = [];
+$gitlabRepos = [];
 foreach ($fixtures as $fixture) {
     $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
+    $notificationUrls = [];
+    $rawLock = json_decode((string) file_get_contents($root.'/'.$fixture.'/composer.lock'), true);
+    foreach (array_merge($rawLock['packages'] ?? [], $rawLock['packages-dev'] ?? []) as $entry) {
+        $notificationUrls[$entry['name']] = $entry['notification-url'] ?? '';
+    }
     $advisoryPath = $advisoryDir.'/'.basename($fixture).'.json';
     if (!$isRecorded($advisoryPath)) {
         $names = array_map(static fn ($package): string => $package->name(), $lock->packages(true));
@@ -120,11 +159,39 @@ foreach ($fixtures as $fixture) {
         if (!$package->isFromComposerRepository()) {
             continue;
         }
-        $recordP2($package->name());
-        $repo = $locator->locate($package->repositoryUrl());
+        $sourceUrl = $package->repositoryUrl();
+        if (preg_match(DRUPAL_NOTIFICATION, $notificationUrls[$package->name()] ?? '', $m) === 1) {
+            foreach (['', '~dev'] as $suffix) {
+                $url = 'https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().$suffix.'.json';
+                $dir = $root.'/'.$fixture.'/http/p2';
+                if (!$isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
+                    $result = $repositoryHttp->fetchAll([$url])[$url];
+                    $record($dir, $result, $result->body() === null ? null : $trim($result->body(), $package->name()));
+                    fwrite(STDERR, \sprintf("p2 %s %d\n", $url, $result->status()));
+                }
+            }
+        } else {
+            $recordP2($package->name());
+        }
+        $repo = $locator->locate($sourceUrl);
         if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
             $repos[$repo->path()] = $repo;
         }
+        if ($repo !== null && $repo->forge() === RepoRef::GITLAB) {
+            $gitlabRepos[$repo->key()] = [$repo, $root.'/'.$fixture.'/http/gitlab'];
+        }
+    }
+}
+foreach ($gitlabRepos as [$ref, $dir]) {
+    $token = \is_array($gitlabTokens) ? ($gitlabTokens[$ref->host()] ?? null) : null;
+    $requests = $gitlab->requests($ref, \is_string($token));
+    foreach ($requests as $role => $url) {
+        if ($isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
+            continue;
+        }
+        $result = $fetch($url, $gitlab->headers($role === 'project' ? $token : null));
+        $record($dir, $result, $keep($result->body(), $role === 'commits' ? GITLAB_COMMIT_KEYS : GITLAB_PROJECT_KEYS, $role === 'commits'));
+        fwrite(STDERR, \sprintf("gitlab %s %s %d\n", $ref->key(), $role, $result->status()));
     }
 }
 foreach ($repos as $repo => $ref) {

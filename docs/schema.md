@@ -88,12 +88,14 @@ Objects are open, and so are these sets of values, which grow in minor releases:
   ignored advisory's `by` and `matched`
 - in report-2, the `check` and `reason` of `checks_missing[]` and `checks_skipped[]`, S6's
   `tag_relation`, and an allowlist entry's `reason_id`
+- in report-2, a finding's `activity.reason`, `activity.forge` and `activity.event`, S4's `event`,
+  and the `listed_in` of a `repository_activity_host_not_supported` note's host
 - in report-2, the words of `run.score_model`
 - the configuration's `format`, and format names wherever lockrot writes one.
 
-Repository hosts are an open set only in a run note's `forge_id`, and Composer registries only in a
-finding's `origin.registry`. S3 and S4's `host` and the explanation's `activity.forge` are plain
-strings.
+Repository hosts are an open set in a run note's `forge_id` and in report-2's `forge` of S3, S4 and
+`activity`. Composer registries are an open set only in a finding's `origin.registry`. S3 and S4's
+`host` and a finding's `activity.host` are plain strings.
 
 How the schemas write an open set:
 
@@ -473,10 +475,10 @@ change them:
 
 - a finding's `note` and `evidence` when its metadata did not come.
 
-- the hosts and repositories in S3, S4 and the repository activity notes.
+- the hosts and repositories in S3, S4, a finding's `activity` and the repository activity notes.
 
 - on the HTML page, each package's `details` (`lock.repository`, `metadata.repository`,
-  `repository_link`, `activity`).
+  `repository_link`).
 
 None of them carries a credential or a local path. Hosts and URL paths stay visible, and name a
 private repository as plainly as its host does.

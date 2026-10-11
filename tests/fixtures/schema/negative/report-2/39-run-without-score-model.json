@@ -609,6 +609,17 @@
     "reason": null,
     "message": null
    },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "twigphp/Twig",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:05:47+00:00",
+    "cached_at": "2026-10-01T16:05:47+00:00"
+   },
    "allowlist": null,
    "from_composer_repository": true,
    "origin": {
@@ -1786,6 +1797,17 @@
     "reason": null,
     "message": null
    },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "symfony/monolog-bridge",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:03:43+00:00",
+    "cached_at": "2026-10-01T16:03:43+00:00"
+   },
    "allowlist": null,
    "from_composer_repository": true,
    "origin": {
@@ -2123,6 +2145,17 @@
     "reason": null,
     "message": null
    },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "symfony/debug",
+    "event": "push",
+    "archived": true,
+    "fetched_at": "2026-10-01T16:05:47+00:00",
+    "cached_at": "2026-10-01T16:05:47+00:00"
+   },
    "allowlist": null,
    "from_composer_repository": true,
    "origin": {
@@ -2188,7 +2221,7 @@
       "host": "github.com",
       "years": 4.2,
       "forge": "github",
-      "activity": "push"
+      "event": "push"
      }
     },
     {
@@ -2429,6 +2462,17 @@
     "status": "read",
     "reason": null,
     "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:04:02+00:00",
+    "cached_at": "2026-10-01T16:04:02+00:00"
    },
    "allowlist": null,
    "from_composer_repository": true,
@@ -2711,6 +2755,17 @@
     "status": "read",
     "reason": null,
     "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "tubalmartin/YUI-CSS-compressor-PHP-port",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:04:08+00:00",
+    "cached_at": "2026-10-01T16:04:08+00:00"
    },
    "allowlist": null,
    "from_composer_repository": true,
@@ -3015,6 +3070,17 @@
     "status": "read",
     "reason": null,
     "message": null
+   },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "symfony/yaml",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T16:05:49+00:00",
+    "cached_at": "2026-10-01T16:05:49+00:00"
    },
    "allowlist": null,
    "from_composer_repository": true,
@@ -3366,6 +3432,17 @@
     "status": "read",
     "reason": null,
     "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "symfony/polyfill-intl-idn",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
    },
    "allowlist": {
     "by": "builtin",

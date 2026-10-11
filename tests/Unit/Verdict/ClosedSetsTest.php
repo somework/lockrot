@@ -132,6 +132,18 @@ final class ClosedSetsTest extends TestCase
         self::assertSame([1], JsonPath::arrayAt($schema, ['definitions', 'envelope', 'properties', 'schema', 'enum']), 'report-1 names its own number');
     }
 
+    /** report-2's `activity.status` is closed, in the order the code keeps. Its reason and event are open sets. */
+    public function testTheActivityStatusIsAClosedSetOfReport2(): void
+    {
+        $schema = self::schema(Schemas::REPORT, 2);
+        $status = JsonPath::arrayAt($schema, ['definitions', 'activity', 'properties', 'status']);
+
+        self::assertSame(ClosedSets::activityStatuses(), $status['enum']);
+        self::assertArrayNotHasKey(KnownValues::KEYWORD, $status);
+        self::assertArrayHasKey(KnownValues::KEYWORD, JsonPath::arrayAt($schema, ['definitions', 'activityReason']));
+        self::assertArrayHasKey(KnownValues::KEYWORD, JsonPath::arrayAt($schema, ['definitions', 'activityEvent']));
+    }
+
     /**
      * A priority step's `from` and `to` are the priority order without `none`, in the same order:
      * the frozen set restricted, not a set of its own. The explain schema copies the three

@@ -49,6 +49,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive bound the next patch
   (`>7.1` no longer admits a branch that needs exactly `7.1.0`). S8 can then name another branch
   to follow. ([Within reach](docs/verdicts.md#within-reach))
+- **Breaking:** **CLI:** `--fail-on=unchecked` also fails when lockrot cannot ask a package's
+  repository host (S10 `host_not_supported`), and on a package installed from vcs or from an origin
+  lockrot cannot tell (S10 `not_from_composer_repository`). A package installed from a path is a
+  skip, and so is an artifact or package origin. No flag, score or grade changes. Action: list a
+  self-hosted GitLab in Composer's `gitlab-domains`, or accept a permanent gap in
+  `extra.lockrot.accept-unchecked`. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **All formats:** a repository that answers 404 no longer carries S10 `rate_limit` when the same
+  host also rate-limits: the 404 is an answer.
+  ([Not found](docs/notes.md#repository_activity_not_found))
 
 ### Security
 
@@ -65,6 +74,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
   through a dependency, `through[]` says whether that dependency's newest release requires it.
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
+- **json:** each finding states its repository activity lookup (`activity`: read, not found, or not
+  read and why). It changes no verdict. ([Schema](docs/schema.md))
+- **All formats:** the run note `repository_activity_host_not_supported` names each repository host
+  that lockrot cannot ask. ([Run notes](docs/notes.md#repository_activity_host_not_supported))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
   (`config.policy: false`, `policy.advisories: false`, `policy.advisories.audit: ignore` or
   `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
@@ -74,18 +87,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** **json:** report-2: `verdict` is a grade, and `lead`, `flags`, `score`,
   `next_step`, `security`, `checks_missing` and `run.score_model` join it. `run.gates[]` carry a
-  kind, and `evidence` holds the counted flags' summaries only. Action: assert `."$schema" ==
-  "https://lockrot.dev/schema/report-2.json"` first, then read `.findings[] | [.flags[].summary]`.
+  kind, S4's `data.activity` is `data.event`, and `evidence` holds the counted flags' summaries
+  only. Action: assert `."$schema" == "https://lockrot.dev/schema/report-2.json"` first, then read
+  `.findings[] | [.flags[].summary]`.
   ([Schema](docs/schema.md#migrating-from-report-1))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 
 ### Removed
 
 - **Breaking:** **json:** `priority_basis`, `no_fix_expected`, `run.flagged_verdicts`,
-  `run.fail_on_kind`, S9's `fixed_by` and `fixed_on_branch`, `baseline.previous_verdict` and the
-  cause keys of `counts`. Action: read `score`, `security`, `run.flag_ids`, `run.gates[].kind`,
-  `baseline.recorded.lead` and the root `flags.<flag>.leading`.
-  ([Migrating](docs/schema.md#migrating-from-report-1))
+  `run.fail_on_kind`, S9's `fixed_by` and `fixed_on_branch`, `baseline.previous_verdict`, the
+  cause keys of `counts` and the html details block's `activity`. Action: read `score`, `security`,
+  `run.flag_ids`, `run.gates[].kind`, `baseline.recorded.lead`, the root `flags.<flag>.leading`
+  and the finding's `activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
+- **Breaking:** **json (explain):** the explanation's top-level `activity` moves to `finding`.
+  Action: read `.finding.activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
 
 ### Fixed
 

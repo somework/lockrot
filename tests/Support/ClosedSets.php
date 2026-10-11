@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support;
 
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Signal\Signal;
 
 /**
@@ -18,6 +19,12 @@ final class ClosedSets
     public static function levels(): array
     {
         return [Signal::LEVEL_INFO, Signal::LEVEL_WARN, Signal::LEVEL_HIGH];
+    }
+
+    /** @return list<string> the order report-2's schema lists them in */
+    public static function activityStatuses(): array
+    {
+        return [ActivityLookup::READ, ActivityLookup::NOT_FOUND, ActivityLookup::NOT_READ];
     }
 
     /** @return list<string> */

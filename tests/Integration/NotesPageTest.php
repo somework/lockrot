@@ -32,6 +32,7 @@ final class NotesPageTest extends TestCase
         'https://lockrot.dev/notes/#repository_activity_not_found',
         'https://lockrot.dev/notes/#not_from_composer_repository',
         'https://lockrot.dev/notes/#advisories_disabled_by_policy',
+        'https://lockrot.dev/notes/#repository_activity_host_not_supported',
     ];
 
     public function testEveryCodeLinksToAUrlAlreadyPublished(): void

@@ -25,6 +25,7 @@ use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
@@ -923,6 +924,7 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityRateLimited(RepoRef::GITLAB, [[$repo, 'HTTP 429']]),
             RunNote::repositoryActivityUnreachable(RepoRef::GITLAB, [[$repo, 'curl error 7']]),
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
+            RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
             RunNote::notFromComposerRepository(2),
         ];
         self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
