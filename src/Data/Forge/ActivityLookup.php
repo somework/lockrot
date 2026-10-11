@@ -60,7 +60,6 @@ final class ActivityLookup implements \JsonSerializable
         return new self(self::NOT_READ, $reason, $where, null, null);
     }
 
-    /** @return self::READ|self::NOT_FOUND|self::NOT_READ */
     public function status(): string
     {
         return $this->status;

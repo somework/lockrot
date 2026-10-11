@@ -49,7 +49,6 @@ final class LocatedRepository
         return new self(self::NO_REPOSITORY, $host, null, null);
     }
 
-    /** @return self::LOCATED|self::HOST_NOT_SUPPORTED|self::NO_REPOSITORY */
     public function kind(): string
     {
         return $this->kind;

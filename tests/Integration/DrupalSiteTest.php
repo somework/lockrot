@@ -65,12 +65,12 @@ final class DrupalSiteTest extends TestCase
 
         self::assertNotSame([], $findings);
         foreach ($findings as $name => $finding) {
-            self::assertSame(['not_read', 'host_not_supported', self::DRUPALCODE, null], [$finding['activity']['status'], $finding['activity']['reason'], $finding['activity']['host'], $finding['activity']['forge']], $name);
-            self::assertContains(['check' => 'repository_activity', 'reason' => 'host_not_supported', 'blocks' => ['S3', 'S4']], $finding['checks_missing'], $name);
+            self::assertSame(['not_read', 'host_not_supported', self::DRUPALCODE, null], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['host'], JsonPath::arrayAt($finding, ['activity'])['forge']], $name);
+            self::assertContains(['check' => 'repository_activity', 'reason' => 'host_not_supported', 'blocks' => ['S3', 'S4']], JsonPath::arrayAt($finding, ['checks_missing']), $name);
         }
         $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED));
         self::assertCount(1, $notes);
-        self::assertSame([['host' => self::DRUPALCODE, 'packages' => \count($findings), 'listed_in' => null]], JsonPath::decoded($notes[0]->toArray())['data']['hosts']);
+        self::assertSame([['host' => self::DRUPALCODE, 'packages' => \count($findings), 'listed_in' => null]], JsonPath::arrayAt(JsonPath::decoded($notes[0]->toArray()), ['data', 'hosts']));
         self::assertTrue(Gate::decide($report, FailOn::fromString('unchecked'), false, Gate::MODE_CHECK)->fails(), '--fail-on=unchecked exits 1');
     }
 
@@ -81,11 +81,11 @@ final class DrupalSiteTest extends TestCase
 
         self::assertNotSame([], $findings);
         foreach ($findings as $name => $finding) {
-            self::assertSame(['read', 'gitlab', 'commit', null], [$finding['activity']['status'], $finding['activity']['forge'], $finding['activity']['event'], $finding['activity']['archived']], $name);
-            self::assertContains(['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']], $finding['checks_skipped'], $name);
+            self::assertSame(['read', 'gitlab', 'commit', null], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['event'], JsonPath::arrayAt($finding, ['activity'])['archived']], $name);
+            self::assertContains(['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']], JsonPath::arrayAt($finding, ['checks_skipped']), $name);
         }
         foreach ($report->findings() as $finding) {
-            self::assertSame([], array_values(array_filter(JsonPath::decoded($finding->toArray())['checks_missing'], static fn (array $entry): bool => $entry['check'] === 'repository_activity')), $finding->package());
+            self::assertSame([], array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['checks_missing']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'repository_activity')), $finding->package());
         }
         self::assertSame([], array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED));
     }
@@ -143,15 +143,15 @@ final class DrupalSiteTest extends TestCase
     /**
      * The findings of the lock entries whose source is on git.drupalcode.org, by the lock itself.
      *
-     * @return array<string, array<string, mixed>>
+     * @return array<string, array<mixed, mixed>>
      */
     private static function findingsOn(Report $report): array
     {
         $lock = JsonPath::decodeFile(self::SITE.'composer.lock');
         $names = [];
         foreach (JsonPath::arrayAt($lock, ['packages']) as $entry) {
-            if (\is_array($entry) && strpos((string) ($entry['source']['url'] ?? ''), 'https://'.self::DRUPALCODE.'/') === 0) {
-                $names[] = $entry['name'];
+            if (\is_array($entry) && JsonPath::has($entry, ['source', 'url']) && strpos(JsonPath::stringAt($entry, ['source', 'url']), 'https://'.self::DRUPALCODE.'/') === 0) {
+                $names[] = JsonPath::stringAt($entry, ['name']);
             }
         }
         $findings = [];

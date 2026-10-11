@@ -68,7 +68,7 @@ final class AnalyzerActivityTest extends TestCase
     {
         $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://gitlab.com/group/pkg.git')], [self::GL_COMMITS => [200, self::COMMIT]], false);
 
-        self::assertSame(['read', null, 'gitlab', 'commit', null], [$finding['activity']['status'], $finding['activity']['reason'], $finding['activity']['forge'], $finding['activity']['event'], $finding['activity']['archived']]);
+        self::assertSame(['read', null, 'gitlab', 'commit', null], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['event'], JsonPath::arrayAt($finding, ['activity'])['archived']]);
         self::assertSame([['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']]], self::checks($finding, 'repository_archived'));
         self::assertSame([], $finding['checks_missing']);
     }
@@ -78,7 +78,7 @@ final class AnalyzerActivityTest extends TestCase
         $auth = ForgeAuth::withTokens(new Tokens(null, 'glpat-x'));
         $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://gitlab.com/group/pkg.git')], [self::GL_COMMITS => [200, self::COMMIT], self::GL_PROJECT => [500, '']], false, null, $auth);
 
-        self::assertNull($finding['activity']['archived']);
+        self::assertNull(JsonPath::arrayAt($finding, ['activity'])['archived']);
         self::assertSame([['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]], self::checks($finding, 'repository_archived'));
     }
 
@@ -87,7 +87,7 @@ final class AnalyzerActivityTest extends TestCase
         $auth = ForgeAuth::withTokens(new Tokens(null, 'glpat-x'));
         $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://gitlab.com/group/pkg.git')], [self::GL_COMMITS => [200, self::COMMIT], self::GL_PROJECT => [200, '{"archived":false}']], false, null, $auth);
 
-        self::assertFalse($finding['activity']['archived']);
+        self::assertFalse(JsonPath::arrayAt($finding, ['activity'])['archived']);
         self::assertSame([], self::checks($finding, 'repository_archived'));
     }
 
@@ -110,7 +110,7 @@ final class AnalyzerActivityTest extends TestCase
 
         $byName = $this->findings($packages, $metadata, [self::GH => [404, ''], self::GH_OTHER => [429, '']], true);
 
-        self::assertSame(['not_found', 'repository_not_found'], [$byName['vendor/pkg']['activity']['status'], $byName['vendor/pkg']['activity']['reason']]);
+        self::assertSame(['not_found', 'repository_not_found'], [JsonPath::arrayAt($byName['vendor/pkg'], ['activity'])['status'], JsonPath::arrayAt($byName['vendor/pkg'], ['activity'])['reason']]);
         self::assertSame([], $byName['vendor/pkg']['checks_missing'], 'an answer beats a rate limit');
         self::assertSame([['check' => 'repository_activity', 'reason' => 'rate_limit', 'blocks' => ['S3', 'S4']]], $byName['vendor/other']['checks_missing'], 'the control: the rate limit is S10');
     }
@@ -128,7 +128,7 @@ final class AnalyzerActivityTest extends TestCase
         self::assertSame([], self::checks($finding, 'repository_activity', ['checks_skipped']));
         $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === 'repository_activity_host_not_supported'));
         self::assertCount(1, $notes);
-        self::assertSame([['host' => 'gitea.example.com:3000', 'packages' => 1, 'listed_in' => null]], JsonPath::decoded($notes[0]->toArray())['data']['hosts']);
+        self::assertSame([['host' => 'gitea.example.com:3000', 'packages' => 1, 'listed_in' => null]], JsonPath::arrayAt(JsonPath::decoded($notes[0]->toArray()), ['data', 'hosts']));
     }
 
     public function testAnUnsupportedHostOnARegistryAbandonedPackageIsASkip(): void
@@ -137,7 +137,7 @@ final class AnalyzerActivityTest extends TestCase
         $report = $this->report([self::packagist('vendor/pkg')], ['vendor/pkg' => $abandoned], [], true);
         $finding = JsonPath::decoded($report->findings()[0]->toArray());
 
-        self::assertSame('host_not_supported', $finding['activity']['reason']);
+        self::assertSame('host_not_supported', JsonPath::arrayAt($finding, ['activity'])['reason']);
         self::assertSame([], $finding['checks_missing'], 'S1 drops the gap');
         self::assertSame([['check' => 'repository_activity', 'reason' => 'host_not_supported', 'blocks' => ['S3', 'S4']]], self::checks($finding, 'repository_activity', ['checks_skipped']));
         self::assertSame(['repository_activity_host_not_supported'], array_values(array_filter(array_map(static fn (RunNote $note): string => $note->code(), $report->runNotes()), static fn (string $code): bool => $code === 'repository_activity_host_not_supported')), 'the note counts a skip too');
@@ -149,7 +149,7 @@ final class AnalyzerActivityTest extends TestCase
         $report = $this->report([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', self::GITEA)], [], true, $allowlist);
         $finding = JsonPath::decoded($report->findings()[0]->toArray());
 
-        self::assertSame(['not_read', 'allowlisted', null, 'gitea.example.com:3000'], [$finding['activity']['status'], $finding['activity']['reason'], $finding['activity']['forge'], $finding['activity']['host']]);
+        self::assertSame(['not_read', 'allowlisted', null, 'gitea.example.com:3000'], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['host']]);
         self::assertSame([['check' => 'repository_activity', 'reason' => 'allowlisted', 'blocks' => ['S3', 'S4']]], self::checks($finding, 'repository_activity'));
         self::assertSame([], array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === 'repository_activity_host_not_supported'));
     }
@@ -159,14 +159,14 @@ final class AnalyzerActivityTest extends TestCase
         $allowlist = new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]);
         $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://github.com/vendor/pkg.git')], [], true, $allowlist);
 
-        self::assertSame(['allowlisted', 'github', 'github.com', 'vendor/pkg'], [$finding['activity']['reason'], $finding['activity']['forge'], $finding['activity']['host'], $finding['activity']['repo']]);
+        self::assertSame(['allowlisted', 'github', 'github.com', 'vendor/pkg'], [JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['host'], JsonPath::arrayAt($finding, ['activity'])['repo']]);
     }
 
     public function testAPackageWithNoRepositoryUrlIsNoRepository(): void
     {
         $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', null)], [], true);
 
-        self::assertSame(['not_read', 'no_repository', null, null], [$finding['activity']['status'], $finding['activity']['reason'], $finding['activity']['forge'], $finding['activity']['host']]);
+        self::assertSame(['not_read', 'no_repository', null, null], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['host']]);
         self::assertSame([['check' => 'repository_activity', 'reason' => 'no_repository', 'blocks' => ['S3', 'S4']]], self::checks($finding, 'repository_activity'));
     }
 
@@ -179,7 +179,7 @@ final class AnalyzerActivityTest extends TestCase
         $analyzer = $this->analyzer($this->loader(['vendor/pkg' => self::meta('vendor/pkg', 'https://github.com/vendor/pkg.git')]), $this->http([]), $token ? ForgeAuth::withTokens(new Tokens('t', null)) : ForgeAuth::anonymous(), new Allowlist([]), $offline);
         $finding = JsonPath::decoded($analyzer->analyze(LockFile::fromArray(['packages' => [self::packagist('vendor/pkg')]]), ProjectConfig::empty(), false)->findings()[0]->toArray());
 
-        self::assertSame(['not_read', $reason, 'github', 'github.com', 'vendor/pkg'], [$finding['activity']['status'], $finding['activity']['reason'], $finding['activity']['forge'], $finding['activity']['host'], $finding['activity']['repo']]);
+        self::assertSame(['not_read', $reason, 'github', 'github.com', 'vendor/pkg'], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['host'], JsonPath::arrayAt($finding, ['activity'])['repo']]);
         self::assertSame([['check' => 'repository_activity', 'reason' => $reason, 'blocks' => ['S3', 'S4']]], $finding['checks_missing']);
     }
 
@@ -199,7 +199,7 @@ final class AnalyzerActivityTest extends TestCase
 
         $byName = $this->findings($packages, $metadata, [self::GH_OTHER => [200, self::LIVE]], false, null, null, 1);
 
-        self::assertSame('read', $byName['vendor/other']['activity']['status'], 'the first candidate takes the budget');
+        self::assertSame('read', JsonPath::arrayAt($byName['vendor/other'], ['activity'])['status'], 'the first candidate takes the budget');
         self::assertSame([['check' => 'repository_activity', 'reason' => 'anonymous_budget', 'blocks' => ['S3', 'S4']]], $byName['vendor/pkg']['checks_missing']);
     }
 
@@ -219,14 +219,14 @@ final class AnalyzerActivityTest extends TestCase
 
         $byName = $this->projectFindings($lock, $project);
 
-        self::assertSame([PackageOrigin::VCS, PackageOrigin::UNKNOWN], [$byName['acme/vcs']['origin']['kind'], $byName['acme/unknown']['origin']['kind']]);
+        self::assertSame([PackageOrigin::VCS, PackageOrigin::UNKNOWN], [JsonPath::stringAt($byName['acme/vcs'], ['origin', 'kind']), JsonPath::stringAt($byName['acme/unknown'], ['origin', 'kind'])]);
         foreach (['acme/vcs', 'acme/unknown'] as $name) {
             self::assertSame(self::ORIGIN_S10, $byName[$name]['checks_missing'], $name);
             self::assertSame([], self::checks($byName[$name], 'repository_activity', ['checks_skipped']), $name);
             self::assertSame([], self::checks($byName[$name], 'release_metadata', ['checks_skipped']), $name);
-            self::assertSame(['not_read', 'not_from_composer_repository'], [$byName[$name]['activity']['status'], $byName[$name]['activity']['reason']], $name);
+            self::assertSame(['not_read', 'not_from_composer_repository'], [JsonPath::arrayAt($byName[$name], ['activity'])['status'], JsonPath::arrayAt($byName[$name], ['activity'])['reason']], $name);
         }
-        self::assertSame(['github', 'github.com', 'acme/vcs'], [$byName['acme/vcs']['activity']['forge'], $byName['acme/vcs']['activity']['host'], $byName['acme/vcs']['activity']['repo']], 'placed, though not asked');
+        self::assertSame(['github', 'github.com', 'acme/vcs'], [JsonPath::arrayAt($byName['acme/vcs'], ['activity'])['forge'], JsonPath::arrayAt($byName['acme/vcs'], ['activity'])['host'], JsonPath::arrayAt($byName['acme/vcs'], ['activity'])['repo']], 'placed, though not asked');
     }
 
     public function testThePathArtifactAndPackageOriginsKeepBothSkips(): void
@@ -245,7 +245,7 @@ final class AnalyzerActivityTest extends TestCase
         $byName = $this->projectFindings($lock, $project);
 
         foreach (['acme/local' => PackageOrigin::PATH, 'acme/artifact' => PackageOrigin::ARTIFACT, 'acme/inline' => PackageOrigin::PACKAGE] as $name => $kind) {
-            self::assertSame($kind, $byName[$name]['origin']['kind'], $name);
+            self::assertSame($kind, JsonPath::stringAt($byName[$name], ['origin', 'kind']), $name);
             self::assertSame([], $byName[$name]['checks_missing'], $name);
             self::assertSame(self::ACTIVITY_SKIPS, self::origin($byName[$name]), $name);
         }
@@ -262,7 +262,7 @@ final class AnalyzerActivityTest extends TestCase
         self::assertSame([], $byName['acme/vcs']['checks_missing'], 'S1 raised');
         self::assertSame(self::ACTIVITY_SKIPS, self::origin($byName['acme/vcs']));
         self::assertSame([], $byName['acme/unknown']['checks_missing'], 'accepted whole');
-        self::assertSame('allowlisted', $byName['acme/unknown']['activity']['reason']);
+        self::assertSame('allowlisted', JsonPath::arrayAt($byName['acme/unknown'], ['activity'])['reason']);
         self::assertSame(
             [['check' => 'repository_activity', 'reason' => 'allowlisted', 'blocks' => ['S3', 'S4']], ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']]],
             self::origin($byName['acme/unknown'])
@@ -284,10 +284,10 @@ final class AnalyzerActivityTest extends TestCase
         $byName = $this->projectFindings($lock, $project ?? ProjectConfig::empty());
 
         foreach (['acme/vcs', 'acme/artifact'] as $name) {
-            self::assertSame(PackageOrigin::UNKNOWN, $byName[$name]['origin']['kind'], $name);
+            self::assertSame(PackageOrigin::UNKNOWN, JsonPath::stringAt($byName[$name], ['origin', 'kind']), $name);
             self::assertSame(self::ORIGIN_S10, $byName[$name]['checks_missing'], $name);
         }
-        self::assertSame(PackageOrigin::PATH, $byName['acme/local']['origin']['kind']);
+        self::assertSame(PackageOrigin::PATH, JsonPath::stringAt($byName['acme/local'], ['origin', 'kind']));
         self::assertSame([], $byName['acme/local']['checks_missing']);
         self::assertSame(self::ACTIVITY_SKIPS, self::origin($byName['acme/local']));
     }
@@ -334,26 +334,26 @@ final class AnalyzerActivityTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $finding
+     * @param array<mixed, mixed> $finding
      * @param list<string>         $lists   `checks_skipped`, `checks_missing` or both
      *
      * @return list<mixed> the entries of those lists with that check
      */
     private static function checks(array $finding, string $check, array $lists = ['checks_skipped', 'checks_missing']): array
     {
-        $entries = array_merge(...array_map(static fn (string $list): array => $finding[$list], $lists));
+        $entries = array_merge(...array_map(static fn (string $list): array => JsonPath::arrayAt($finding, [$list]), $lists));
 
-        return array_values(array_filter($entries, static fn (array $entry): bool => $entry['check'] === $check));
+        return array_values(array_filter($entries, static fn ($entry): bool => \is_array($entry) && $entry['check'] === $check));
     }
 
     /**
-     * @param array<string, mixed> $finding
+     * @param array<mixed, mixed> $finding
      *
      * @return list<mixed> the skips of the two checks that the origin decides
      */
     private static function origin(array $finding): array
     {
-        return array_values(array_filter($finding['checks_skipped'], static fn (array $entry): bool => \in_array($entry['check'], ['repository_activity', 'release_metadata'], true)));
+        return array_values(array_filter(JsonPath::arrayAt($finding, ['checks_skipped']), static fn ($entry): bool => \is_array($entry) && \in_array($entry['check'], ['repository_activity', 'release_metadata'], true)));
     }
 
     /**
@@ -361,7 +361,7 @@ final class AnalyzerActivityTest extends TestCase
      * @param array<string, PackageMetadata>          $metadata
      * @param array<string, array{int, string}>       $answers
      *
-     * @return array<string, mixed>
+     * @return array<mixed, mixed>
      */
     private function one(array $packages, array $metadata, array $answers, bool $token, ?Allowlist $allowlist = null, ?ForgeAuth $auth = null): array
     {
@@ -373,7 +373,7 @@ final class AnalyzerActivityTest extends TestCase
      * @param array<string, PackageMetadata>    $metadata
      * @param array<string, array{int, string}> $answers
      *
-     * @return array<string, array<string, mixed>>
+     * @return array<string, array<mixed, mixed>>
      */
     private function findings(array $packages, array $metadata, array $answers, bool $token, ?Allowlist $allowlist = null, ?ForgeAuth $auth = null, int $budget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET): array
     {
@@ -396,7 +396,7 @@ final class AnalyzerActivityTest extends TestCase
     /**
      * @param list<array<string, mixed>> $packages
      *
-     * @return array<string, array<string, mixed>>
+     * @return array<string, array<mixed, mixed>>
      */
     private function projectFindings(array $packages, ProjectConfig $project, ?Allowlist $allowlist = null, ?AdvisoryBatch $advisories = null): array
     {
@@ -404,7 +404,7 @@ final class AnalyzerActivityTest extends TestCase
             ->analyze(LockFile::fromArray(['packages' => $packages]), $project, false));
     }
 
-    /** @return array<string, array<string, mixed>> */
+    /** @return array<string, array<mixed, mixed>> */
     private static function byName(Report $report): array
     {
         $byName = [];
