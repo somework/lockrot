@@ -89,6 +89,14 @@ final class ThroughCheckTest extends TestCase
         self::assertSame([true, null, null, 'no_stable_release'], [$entries[0]['installed_requires'], $entries[0]['newest_stable'], $entries[0]['newest_requires'], $entries[0]['newest_requires_unmeasured']]);
     }
 
+    /** An undated newest release is not known to be out on the run date. */
+    public function testAnUndatedNewestReleaseIsNoStableRelease(): void
+    {
+        $entries = self::check(['d/x' => [['1.0.0', '2024-01-01', true], ['2.0.0', null, false]]]);
+
+        self::assertSame([null, null, 'no_stable_release'], [$entries[0]['newest_stable'], $entries[0]['newest_requires'], $entries[0]['newest_requires_unmeasured']]);
+    }
+
     public function testADirectPackageHasNoEntries(): void
     {
         self::assertSame([], ThroughCheck::of('a/b', true, ['a/b'], LockFile::fromArray(['packages' => []]), []));
@@ -117,7 +125,7 @@ final class ThroughCheckTest extends TestCase
     /**
      * One dependent d/x of a/b, through which a/b comes in.
      *
-     * @param array<string, list<array{0: string, 1: string, 2: bool}>|null> $dependents d/x's releases: version, date, whether it requires a/b; null for no metadata
+     * @param array<string, list<array{0: string, 1: ?string, 2: bool}>|null> $dependents d/x's releases: version, date or null, whether it requires a/b; null for no metadata
      * @param list<string>                                                   $outside    the dependents installed from vcs
      *
      * @return list<array<string, mixed>>
@@ -133,7 +141,7 @@ final class ThroughCheckTest extends TestCase
             }
             $versions = [];
             foreach ($releases as [$version, $date, $requires]) {
-                $loaded = (new ArrayLoader())->load(['name' => $name, 'version' => $version, 'time' => $date.'T00:00:00+00:00', 'require' => $requires ? ['a/b' => '^1.0'] : []]);
+                $loaded = (new ArrayLoader())->load(['name' => $name, 'version' => $version, 'require' => $requires ? ['a/b' => '^1.0'] : []] + ($date === null ? [] : ['time' => $date.'T00:00:00+00:00']));
                 self::assertInstanceOf(BasePackage::class, $loaded);
                 $versions[] = $loaded;
             }

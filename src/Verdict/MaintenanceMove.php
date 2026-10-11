@@ -9,6 +9,7 @@ use Lockrot\Security\Fix;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\OldPromiseData;
 use Lockrot\Signal\Data\PinnedData;
 
 /**
@@ -152,10 +153,13 @@ final class MaintenanceMove
                 return self::require(FlagSet::OLD_PROMISE, $context, $row, '^'.ltrim($row->highest(), 'vV'));
             }
         }
-        $version = $context->lastStableVersion();
-        $test = MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE);
+        // With no stable release read, the installed one is the newest that lockrot knows.
+        $installedVersion = $context->subject()->version();
+        $s5 = $context->finding()->signalData(OldPromiseData::class);
+        $version = $context->lastStableVersion() ?? $installedVersion;
+        $released = $context->lastStableVersion() === null ? ($s5 === null ? null : $s5->released()) : $context->lastStableReleased();
 
-        return $version === null ? $test : $test->withLatest(new Latest($version, $context->lastStableReleased(), ltrim($version, 'vV') === ltrim($context->subject()->version(), 'vV'), null, null), null);
+        return MoveDraft::of(Move::TEST, FlagSet::OLD_PROMISE)->withLatest(new Latest($version, $released, ltrim($version, 'vV') === ltrim($installedVersion, 'vV'), null, null), null);
     }
 
     private static function after(?\DateTimeImmutable $released, ?\DateTimeImmutable $ga): bool

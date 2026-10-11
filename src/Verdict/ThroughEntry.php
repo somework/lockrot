@@ -51,6 +51,8 @@ final class ThroughEntry implements \JsonSerializable
      */
     public static function measured(string $package, string $installedVersion, string $required, ?array $installedRequires, ?StableRelease $newestStable, ?array $newestRequires): self
     {
+        // An undated newest release is not known to be out on the run date.
+        $newestStable = $newestStable === null || $newestStable->at() === null ? null : $newestStable;
         if ($installedRequires === null) {
             return new self($package, $installedVersion, null, $newestStable, null, self::INSTALLED_UNLISTED);
         }
