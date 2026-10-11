@@ -24,6 +24,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
@@ -129,7 +130,7 @@ final class SplitPackageDatesTest extends TestCase
         self::assertNotNull($s8);
         self::assertSame(Verdict::LEFT_BEHIND, $finding->verdict());
         self::assertStringContainsString('branch 8.x last released 2024-11-20 (1.8 years ago, dated by laravel/framework)', $s8->summary());
-        self::assertSame('laravel/framework', $s8->data()['dated_by']);
+        self::assertSame('laravel/framework', JsonPath::decoded($s8->data())['dated_by']);
         self::assertSame([], $report->notes(), 'the parent loads from the same repositories: nothing to report');
         self::assertFalse($report->hadNetworkFailures());
         self::assertSame(1, $report->packagesChecked(), 'the parent is not a package of the lock');

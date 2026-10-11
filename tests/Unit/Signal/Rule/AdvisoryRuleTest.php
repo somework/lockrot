@@ -54,14 +54,14 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame(Signal::LEVEL_WARN, $signal->level(), 'a medium advisory');
-        self::assertSame(['advisories', 'releases_read', 'complete'], array_keys($signal->data()));
+        self::assertSame(['advisories', 'releases_read', 'complete'], array_keys(JsonPath::decoded($signal->data())));
         self::assertSame([
             'id' => 'PKSA-1', 'cve' => 'CVE-2024-0001', 'title' => 'a title', 'link' => null, 'reported_at' => null,
-            'severity' => 'medium', 'severity_published' => 'moderate', 'affected_versions' => null, 'counted' => true, 'points' => 8,
+            'severity' => 'medium', 'severity_published' => 'moderate', 'affected_versions' => null, 'counted' => true, 'points' => 8, 'deciding' => false,
             'fix' => ['kind' => 'unknown', 'to_branch' => null, 'version' => null, 'newest' => null, 'on_installed_branch' => null, 'php' => null, 'held_by' => [], 'reason' => 'affected_range_unknown'],
             'baseline' => null,
-        ], JsonPath::arrayAt($signal->data(), ['advisories', 0]));
-        self::assertFalse($signal->data()['complete'], 'no lookup coverage');
+        ], JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['advisories', 0]));
+        self::assertFalse(JsonPath::decoded($signal->data())['complete'], 'no lookup coverage');
     }
 
     public function testNoAdvisoriesIsNull(): void
@@ -300,7 +300,7 @@ final class AdvisoryRuleTest extends TestCase
         $signal = (new AdvisoryRule())->evaluate(new PackageFacts(F::package(['version' => 'v1.2.3']), null, null, $advisories));
 
         self::assertNotNull($signal);
-        $rows = JsonPath::arrayAt($signal->data(), ['advisories']);
+        $rows = JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['advisories']);
         self::assertSame(['PKSA-e', 'PKSA-a', 'PKSA-b', 'PKSA-c', 'PKSA-d'], array_column($rows, 'id'));
         self::assertSame([32, 8, 8, 8, 2], array_column($rows, 'points'));
     }
@@ -319,7 +319,7 @@ final class AdvisoryRuleTest extends TestCase
         $signal = (new AdvisoryRule())->evaluate($facts);
 
         self::assertNotNull($signal);
-        self::assertSame($reason, JsonPath::stringAt($signal->data(), ['advisories', 0, 'fix', 'reason']));
+        self::assertSame($reason, JsonPath::stringAt(JsonPath::decoded($signal->data()), ['advisories', 0, 'fix', 'reason']));
     }
 
     /** @return iterable<string, array{bool, string}> */
@@ -333,11 +333,11 @@ final class AdvisoryRuleTest extends TestCase
     {
         self::assertSame(
             ['source' => Holder::PACKAGE, 'package' => 'acme/b', 'version' => '2.0.0', 'link' => Holder::REQUIRE, 'constraint' => '^1.0', 'holder' => null],
-            AdvisoryRule::heldBy(new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0'))
+            JsonPath::decoded(new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0'))
         );
         self::assertSame(
             ['source' => Holder::ROOT, 'package' => null, 'version' => null, 'link' => Holder::REQUIRE_DEV, 'constraint' => '^1.0', 'holder' => null],
-            AdvisoryRule::heldBy(new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE_DEV, '^1.0'))
+            JsonPath::decoded(new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE_DEV, '^1.0'))
         );
     }
 
@@ -353,7 +353,7 @@ final class AdvisoryRuleTest extends TestCase
         $signal = (new AdvisoryRule())->evaluate($facts);
 
         self::assertNotNull($signal);
-        self::assertSame(['PKSA-b' => 16, 'PKSA-a' => 8], array_column(JsonPath::arrayAt($signal->data(), ['advisories']), 'points', 'id'));
+        self::assertSame(['PKSA-b' => 16, 'PKSA-a' => 8], array_column(JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['advisories']), 'points', 'id'));
     }
 
     public function testAFixHeldByALinkNamesTheHolder(): void
@@ -366,7 +366,7 @@ final class AdvisoryRuleTest extends TestCase
         $signal = (new AdvisoryRule())->evaluate($facts);
 
         self::assertNotNull($signal);
-        self::assertSame([AdvisoryRule::heldBy($holder)], JsonPath::arrayAt($signal->data(), ['advisories', 0, 'fix', 'held_by']));
+        self::assertSame([JsonPath::decoded($holder)], JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['advisories', 0, 'fix', 'held_by']));
     }
 
     public function testAnIdThatLooksLikeANumberStaysAString(): void
@@ -374,7 +374,7 @@ final class AdvisoryRuleTest extends TestCase
         $signal = (new AdvisoryRule())->evaluate(new PackageFacts(F::package(['version' => '1.0.0']), null, null, [$this->advisory('42')]));
 
         self::assertNotNull($signal);
-        self::assertSame('42', JsonPath::arrayAt($signal->data(), ['advisories', 0])['id']);
+        self::assertSame('42', JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['advisories', 0])['id']);
     }
 
     public function testTheDataIsCompleteWhenEveryFeedAnswered(): void
@@ -387,8 +387,8 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($complete);
         self::assertNotNull($partial);
-        self::assertTrue($complete->data()['complete']);
-        self::assertFalse($partial->data()['complete']);
+        self::assertTrue(JsonPath::decoded($complete->data())['complete']);
+        self::assertFalse(JsonPath::decoded($partial->data())['complete']);
     }
 
     /**

@@ -50,6 +50,7 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\NegativeFixtures;
 use Lockrot\Tests\Support\ReportSample;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -289,7 +290,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => $roots]), false);
         $at = new \DateTimeImmutable(self::NOW);
         $findings = [];
-        $stale = [new Signal(Signal::S2, Signal::LEVEL_WARN, 'no release for 3.0 years', ['last_release' => '2023-09-14T00:00:00+00:00', 'last_version' => '1.0.0', 'years' => 3.0, 'dated_by' => null])];
+        $stale = [new Signal(Signal::S2, Signal::LEVEL_WARN, 'no release for 3.0 years', SignalDataStub::of(Signal::S2, ['last_release' => '2023-09-14T00:00:00+00:00', 'last_version' => '1.0.0', 'years' => 3.0, 'dated_by' => null]))];
         foreach (array_merge(['vendor/shared', 'vendor/leaf'], array_keys($roots)) as $package) {
             $verdict = strpos($package, 'vendor/') === 0 ? Verdict::STALE : Verdict::OK;
             $findings[] = (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withSignals($verdict === Verdict::STALE ? $stale : [])->withChain($graph->shortestChain($package))->withDataDate($at)->withDirectDependents(array_keys($graph->chainsTo($package)))->build();

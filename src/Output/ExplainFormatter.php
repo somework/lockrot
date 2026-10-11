@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Json\Schemas;
+use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Legacy\SignalData013;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
@@ -24,6 +25,8 @@ use Lockrot\Verdict\Verdict;
  * the repository escaped.
  *
  * @internal
+ *
+ * @phpstan-import-type Row013 from AdvisoryFacts013
  */
 final class ExplainFormatter
 {
@@ -33,10 +36,6 @@ final class ExplainFormatter
 
     /** Under a signal's `S8 warn ` line: the data hangs beneath the summary's first character. */
     private const DATA_INDENT = '           ';
-
-    private const ADVISORY_LIST = 'advisories';
-    /** S9's key the text leaves out ({@see signalData()}). */
-    private const RELEASES_READ = 'releases_read';
 
     public function text(Explanation $explanation): string
     {
@@ -119,26 +118,20 @@ final class ExplainFormatter
 
     /**
      * S6 skips a null value: its release facts are null when unknown or not applicable, and they
-     * bury the facts a reader wants (docs/verdicts.md#what-s6-carries). S9 skips `releases_read`.
-     * The JSON carries every key.
+     * bury the facts a reader wants (docs/verdicts.md#what-s6-carries). S9 prints one line per
+     * report-1 advisory row. The JSON carries every key.
      *
      * @return list<string>
      */
     private function signalData(Signal $signal, Finding $finding): array
     {
+        if ($signal->id() === Signal::S9) {
+            return array_map([self::class, 'advisory'], $finding->advisoryFacts013()->rows());
+        }
         $scalars = [];
         $lines = [];
         $skipNulls = $signal->id() === Signal::S6;
-        foreach (SignalData013::of($signal, $finding->advisoryFacts013()) as $key => $value) {
-            if ($key === self::RELEASES_READ && $signal->id() === Signal::S9) {
-                continue;
-            }
-            if ($key === self::ADVISORY_LIST && \is_array($value)) {
-                foreach ($value as $row) {
-                    $lines[] = \is_array($row) ? self::advisory($row) : self::encode($row);
-                }
-                continue;
-            }
+        foreach (SignalData013::of($signal) as $key => $value) {
             if ($value === null && $skipNulls) {
                 continue;
             }
@@ -156,32 +149,32 @@ final class ExplainFormatter
     }
 
     /**
-     * The row as {@see \Lockrot\Signal\Rule\AdvisoryRule} shapes it. A key it does not set is left out.
+     * An empty text counts as none.
      *
-     * @param array<mixed, mixed> $row
+     * @param Row013 $row
      */
     private static function advisory(array $row): string
     {
         $parts = [];
-        $id = self::string($row['id'] ?? null);
-        $cve = self::string($row['cve'] ?? null);
+        $id = self::nonEmpty($row['id']);
+        $cve = self::nonEmpty($row['cve']);
         $name = $cve ?? $id ?? '?';
         if ($cve !== null && $id !== null && $cve !== $id) {
             $name .= ' ('.$id.')';
         }
-        $severity = self::string($row['severity'] ?? null);
+        $severity = self::nonEmpty($row['severity']);
         $parts[] = $severity === null ? $name : $name.' '.$severity;
-        $fixedBy = self::string($row['fixed_by'] ?? null);
+        $fixedBy = self::nonEmpty($row['fixed_by']);
         if ($fixedBy === null) {
             $parts[] = 'no listed release fixes it';
         } else {
-            $parts[] = 'fixed by '.$fixedBy.(($row['fixed_on_branch'] ?? null) === false ? ', not on the installed branch' : '');
+            $parts[] = 'fixed by '.$fixedBy.($row['fixed_on_branch'] ? '' : ', not on the installed branch');
         }
-        $reported = self::string($row['reported_at'] ?? null);
+        $reported = self::nonEmpty($row['reported_at']);
         if ($reported !== null) {
             $parts[] = 'reported '.substr($reported, 0, 10);
         }
-        $link = self::string($row['link'] ?? null);
+        $link = self::nonEmpty($row['link']);
         if ($link !== null) {
             $parts[] = $link;
         }
@@ -401,10 +394,9 @@ final class ExplainFormatter
         return JsonWriter::encode($value, \JSON_UNESCAPED_SLASHES) ?? '?';
     }
 
-    /** @param mixed $value */
-    private static function string($value): ?string
+    private static function nonEmpty(?string $value): ?string
     {
-        return \is_string($value) && $value !== '' ? $value : null;
+        return $value === '' ? null : $value;
     }
 
     private static function source(?string $url): ?string

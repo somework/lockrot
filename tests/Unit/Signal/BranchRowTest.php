@@ -20,6 +20,7 @@ use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\SignalDataStub;
 use PHPUnit\Framework\TestCase;
 
 /** The details block's branch rows, as values: report-1 writes none of the new keys. */
@@ -66,7 +67,7 @@ final class BranchRowTest extends TestCase
             self::release(['version' => 'v2.0.2', 'time' => '2025-09-14T00:00:00+00:00', 'source' => $shared]),
         ];
         $facts = new PackageFacts(self::locked('v1.0.0'), PackageMetadata::fromPackages('a/b', $versions, new \DateTimeImmutable(self::NOW), '1.0.0.0'), null);
-        $s8 = new Signal(Signal::S8, Signal::LEVEL_HIGH, 'x', ['newest_branch' => '2.x', 'newest_release' => '2025-09-14T00:00:00+00:00']);
+        $s8 = new Signal(Signal::S8, Signal::LEVEL_HIGH, 'x', SignalDataStub::of(Signal::S8, ['newest_branch' => '2.x', 'newest_release' => '2025-09-14T00:00:00+00:00']));
         $clock = Clock::fixed(self::NOW);
 
         $rows = BranchRow::all($facts, new PhpFloor('8.4'), $clock, $s8);
@@ -75,7 +76,7 @@ final class BranchRowTest extends TestCase
         self::assertSame(7.7, $rows[1]->releasedYears());
 
         self::assertNull(BranchRow::all($facts, new PhpFloor('8.4'), $clock)[0]->releasedYears(), 'no S8, no date');
-        $other = new Signal(Signal::S8, Signal::LEVEL_HIGH, 'x', ['newest_branch' => '3.x', 'newest_release' => '2025-09-14T00:00:00+00:00']);
+        $other = new Signal(Signal::S8, Signal::LEVEL_HIGH, 'x', SignalDataStub::of(Signal::S8, ['newest_branch' => '3.x', 'newest_release' => '2025-09-14T00:00:00+00:00']));
         self::assertNull(BranchRow::all($facts, new PhpFloor('8.4'), $clock, $other)[0]->releasedYears(), 'S8 dates another branch');
     }
 

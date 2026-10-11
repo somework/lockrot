@@ -39,6 +39,7 @@ use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
@@ -334,7 +335,7 @@ final class AnalyzerTest extends TestCase
         // the finding says so rather than reading as "checked, nothing found".
         self::assertSame(['S7', 'S10'], array_map(static fn ($s) => $s->id(), $byName['vendor/direct']->signals()));
         $notChecked = $byName['vendor/direct']->signals()[1];
-        self::assertSame(['S3', 'S4'], $notChecked->data()['blocks']);
+        self::assertSame(['S3', 'S4'], JsonPath::decoded($notChecked->data())['blocks']);
         self::assertStringContainsString('repository activity not checked', $notChecked->summary());
         self::assertSame('repository activity not checked (no token for the repository host), so S3 and S4 could not be read; pulls in 1 flagged package: vendor/transitive (silent)', $byName['vendor/direct']->evidence(), 'nothing observed about the package itself: what it pulls in, and what was not checked');
         self::assertSame(['vendor/direct' => 1], $report->exposure());
@@ -930,7 +931,7 @@ final class AnalyzerTest extends TestCase
 
         self::assertSame(Verdict::SILENT, $finding->verdict());
         self::assertStringContainsString('last commit 2015-01-01 (11.7 years ago)', $finding->evidence());
-        self::assertSame('bitbucket.org', $finding->signals()[1]->data()['host']);
+        self::assertSame('bitbucket.org', JsonPath::decoded($finding->signals()[1]->data())['host']);
     }
 
     public function testTheDataDateIsTheNewerOfTheMetadataAndTheRepositoryActivity(): void

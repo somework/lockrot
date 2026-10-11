@@ -20,6 +20,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
@@ -176,7 +177,7 @@ final class ReportTest extends TestCase
     /** `abandoned` alone does not say whether a package died or moved. */
     public function testTheAbandonedCountIsSplitByWhetherAReplacementIsNamed(): void
     {
-        $s1 = static fn (?string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository', ['replacement' => $replacement]);
+        $s1 = static fn (?string $replacement): Signal => new Signal('S1', 'high', 'marked abandoned by its repository', SignalDataStub::of('S1', ['replacement' => $replacement]));
         $report = $this->report(
             (new FindingBuilder())->withPackage('vendor/moved')->withVerdict(Verdict::ABANDONED)->withSignals([$s1('vendor/successor')])->withChain(['vendor/moved'])->build(),
             (new FindingBuilder())->withPackage('vendor/dead')->withVerdict(Verdict::ABANDONED)->withSignals([$s1(null)])->withChain(['vendor/dead'])->build(),
@@ -592,7 +593,7 @@ final class ReportTest extends TestCase
     public function testUnflaggedAdvisoriesAreTotalledForTheFooterAndFlaggedOnesAreNot(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $s9 = static fn (int $n): Signal => new Signal('S9', 'warn', $n.' security advisories affect x', ['advisories' => array_fill(0, $n, ['id' => 'x'])]);
+        $s9 = static fn (int $n): Signal => new Signal('S9', 'warn', $n.' security advisories affect x', SignalDataStub::of('S9', ['advisories' => array_fill(0, $n, ['id' => 'x'])]));
         $report = new Report([
             (new FindingBuilder())->withPackage('vendor/ok')->withSignals([$s9(12)])->withChain(['vendor/ok'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('vendor/done')->withVerdict(Verdict::FINISHED)->withSignals([$s9(4)])->withChain(['vendor/done'])->withAllowlistReason('interfaces')->withDataDate($at)->build(),
@@ -610,7 +611,7 @@ final class ReportTest extends TestCase
     public function testWithoutDevTheFooterSaysWhyAuditCountsMore(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $finding = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '2 security advisories affect x', ['advisories' => [['id' => 'x'], ['id' => 'y']]])])->withChain(['vendor/ok'])->withDataDate($at)->build();
+        $finding = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '2 security advisories affect x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x'], ['id' => 'y']]]))])->withChain(['vendor/ok'])->withDataDate($at)->build();
         $withoutDev = new Report([$finding], [], $at, 1, 0);
         $withDev = new Report([$finding], [], $at, 1, 0, null, null, true);
 
@@ -629,8 +630,8 @@ final class ReportTest extends TestCase
     public function testUnflaggedAdvisoriesLineIsSingularAndEmptyWhenNoneAreThere(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $one = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '1 security advisory affects x', ['advisories' => [['id' => 'x']]])])->withChain(['vendor/ok'])->withDataDate($at)->build()], [], $at, 1, 0, null, null, true);
-        $none = new Report([(new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S9', 'warn', 'x', ['advisories' => [['id' => 'x']]])])->withChain(['vendor/gone'])->withDataDate($at)->build()], [], $at, 1, 0);
+        $one = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '1 security advisory affects x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x']]]))])->withChain(['vendor/ok'])->withDataDate($at)->build()], [], $at, 1, 0, null, null, true);
+        $none = new Report([(new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('S9', 'warn', 'x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x']]]))])->withChain(['vendor/gone'])->withDataDate($at)->build()], [], $at, 1, 0);
 
         self::assertSame('1 security advisory on 1 package the report does not flag; see composer audit', $one->unflaggedAdvisoriesLine());
         self::assertSame('', $none->unflaggedAdvisoriesLine());
@@ -822,7 +823,7 @@ final class ReportTest extends TestCase
 
     public function testFlaggedCountsTheGradedAndMultiFlagThoseWithTwoFlagsOrMore(): void
     {
-        $two = (new FindingBuilder())->withPackage('vendor/two')->withSignals([new Signal(Signal::S2, Signal::LEVEL_WARN, 'old', ['years' => 3.0]), new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise')])->build();
+        $two = (new FindingBuilder())->withPackage('vendor/two')->withSignals([new Signal(Signal::S2, Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, ['years' => 3.0])), new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise')])->build();
         $one = $this->finding('vendor/one', Verdict::STALE);
         $none = $this->finding('vendor/none', Verdict::OK);
 

@@ -6,9 +6,12 @@ namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -51,8 +54,8 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame(Signal::S10, $signal->id());
         self::assertSame(Signal::LEVEL_INFO, $signal->level(), 'it observes nothing, so it warns about nothing');
         self::assertSame('repository activity not checked (no token for the repository host), so S3 and S4 could not be read', $signal->summary());
-        self::assertSame([Signal::S3, Signal::S4], $signal->data()['blocks']);
-        self::assertSame([['check' => 'repository_activity', 'reason' => NotCheckedRule::NO_TOKEN, 'blocks' => [Signal::S3, Signal::S4]]], $signal->data()['unchecked']);
+        self::assertSame([Signal::S3, Signal::S4], JsonPath::decoded($signal->data())['blocks']);
+        self::assertSame([['check' => 'repository_activity', 'reason' => NotCheckedRule::NO_TOKEN, 'blocks' => [Signal::S3, Signal::S4]]], JsonPath::decoded($signal->data())['unchecked']);
     }
 
     /**
@@ -65,7 +68,7 @@ final class NotCheckedRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertStringContainsString($words, $signal->summary());
-        $unchecked = $signal->data()['unchecked'];
+        $unchecked = JsonPath::decoded($signal->data())['unchecked'];
         self::assertIsArray($unchecked);
         $first = $unchecked[0];
         self::assertIsArray($first);
@@ -93,9 +96,9 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), self::undated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S2, Signal::S8], $signal->data()['blocks']);
+        self::assertSame([Signal::S2, Signal::S8], JsonPath::decoded($signal->data())['blocks']);
         self::assertStringContainsString('the age of the package was not read', $signal->summary());
-        $unchecked = $signal->data()['unchecked'];
+        $unchecked = JsonPath::decoded($signal->data())['unchecked'];
         self::assertIsArray($unchecked);
         self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S8]]], $unchecked);
     }
@@ -105,8 +108,8 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), self::undated(), null, [], NotCheckedRule::OFFLINE));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S3, Signal::S4, Signal::S2, Signal::S8], $signal->data()['blocks']);
-        $unchecked = $signal->data()['unchecked'];
+        self::assertSame([Signal::S3, Signal::S4, Signal::S2, Signal::S8], JsonPath::decoded($signal->data())['blocks']);
+        $unchecked = JsonPath::decoded($signal->data())['unchecked'];
         self::assertIsArray($unchecked);
         self::assertCount(2, $unchecked);
         self::assertStringContainsString('; ', $signal->summary(), 'one sentence per missing check');
@@ -122,8 +125,8 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'dev-main']), self::undated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S2], $signal->data()['blocks']);
-        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2]]], $signal->data()['unchecked']);
+        self::assertSame([Signal::S2], JsonPath::decoded($signal->data())['blocks']);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2]]], JsonPath::decoded($signal->data())['unchecked']);
         self::assertStringContainsString('so S2 could not measure it', $signal->summary());
         self::assertStringNotContainsString('S8', $signal->summary());
     }
@@ -133,7 +136,7 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), self::undated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S2, Signal::S8], $signal->data()['blocks']);
+        self::assertSame([Signal::S2, Signal::S8], JsonPath::decoded($signal->data())['blocks']);
         self::assertStringContainsString('so S2 and S8 could not measure it', $signal->summary());
     }
 
@@ -156,16 +159,30 @@ final class NotCheckedRuleTest extends TestCase
     /** A raised S1 makes the upkeep gaps moot, never another check: that entry keeps its own words. */
     public function testDroppingTheMaintenanceGapsKeepsAnyOtherEntryWithItsSummary(): void
     {
-        $s10 = new \Lockrot\Signal\Signal(\Lockrot\Signal\Signal::S10, \Lockrot\Signal\Signal::LEVEL_INFO, 'repository activity not checked (the run is offline), so S3 and S4 could not be read; advisories not checked (offline), so S9 could not be read', ['unchecked' => [
-            ['check' => 'repository_activity', 'reason' => 'offline', 'blocks' => ['S3', 'S4']],
-            ['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']],
-        ], 'blocks' => ['S3', 'S4', 'S9']]);
+        $advisories = new Check('advisories', 'offline', [Signal::S9]);
+        $s10 = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked (the run is offline), so S3 and S4 could not be read; advisories not checked (offline), so S9 could not be read', new NotCheckedData([
+            new Check('repository_activity', 'offline', [Signal::S3, Signal::S4]),
+            $advisories,
+        ]));
 
-        $kept = \Lockrot\Signal\Rule\NotCheckedRule::withoutMaintenanceGaps([$s10]);
+        $kept = NotCheckedRule::withoutMaintenanceGaps([$s10]);
 
         self::assertCount(1, $kept);
         self::assertSame('advisories not checked (offline), so S9 could not be read', $kept[0]->summary());
-        self::assertSame(['unchecked' => [['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']]], 'blocks' => ['S9']], $kept[0]->data());
+        $data = $kept[0]->data();
+        self::assertInstanceOf(NotCheckedData::class, $data);
+        self::assertSame([$advisories], $data->checks());
+    }
+
+    public function testAnS10OfMaintenanceChecksAloneGoesWhileTheOtherSignalsStay(): void
+    {
+        $s2 = new Signal(Signal::S2, Signal::LEVEL_WARN, 'last release 2021-05-05 (5.4 years ago)');
+        $s10 = new Signal(Signal::S10, Signal::LEVEL_INFO, 'not checked', new NotCheckedData([
+            new Check('repository_activity', 'no_token', [Signal::S3, Signal::S4]),
+            new Check('release_dates', 'undated_releases', [Signal::S2, Signal::S8]),
+        ]));
+
+        self::assertSame([$s2], NotCheckedRule::withoutMaintenanceGaps([$s2, $s10]));
     }
 
     /**
@@ -178,7 +195,7 @@ final class NotCheckedRuleTest extends TestCase
         $advisory = new Advisory('PKSA-1', null, null, null, 'high', null, null);
         $unavailable = new PackageFacts(F::package(), null, null, [$advisory], null, null, null, true);
 
-        self::assertSame(['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => [Signal::S9]], NotCheckedRule::releasesUnchecked($unavailable));
+        self::assertEquals(new Check('releases', 'releases_unknown', [Signal::S9]), NotCheckedRule::releasesUnchecked($unavailable));
         self::assertSame(PackageFacts::METADATA_UNAVAILABLE, $unavailable->metadataStatus());
         self::assertSame(PackageFacts::METADATA_NOT_FOUND, (new PackageFacts(F::package(), null, null, [$advisory]))->metadataStatus(), 'facts built without the flag: no repository failed');
         self::assertNull($this->rule()->evaluate($unavailable), 'the signal itself does not carry it');

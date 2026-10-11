@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Legacy\AdvisoryFacts013;
+use Lockrot\Security\Fix;
+use Lockrot\Security\Severity;
+use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
+use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Assert;
 
@@ -46,13 +51,50 @@ final class CorpusFloor
     }
 
     /**
+     * The signals with their ids and levels. No reader of the floor reads their data, except
+     * report-2's S9 rows: each advisory with its severity bucket and an `unknown` fix. S9's
+     * report-1 rows are {@see legacy()}.
+     *
      * @param FloorFinding $finding
      *
      * @return list<Signal>
      */
     public static function signals(array $finding): array
     {
-        return array_map(static fn (array $signal): Signal => new Signal($signal['id'], $signal['level'], '', $signal['data']), $finding['signals']);
+        $signals = [];
+        foreach ($finding['signals'] as $signal) {
+            $data = null;
+            if ($signal['id'] === Signal::S9) {
+                $rows = [];
+                foreach (self::advisories($finding) as $advisory) {
+                    $bucket = Severity::fromComposer($advisory['severity'])->bucket();
+                    $rows[] = SignalDataStub::row(['id' => $advisory['id'], 'severity' => $bucket, 'points' => ScoreModel::advisoryPoints($bucket, Fix::UNKNOWN)]);
+                }
+                $data = new AdvisoryData($rows, ($signal['data']['releases_read'] ?? false) === true, true);
+            }
+            $signals[] = new Signal($signal['id'], $signal['level'], '', $data);
+        }
+
+        return $signals;
+    }
+
+    /**
+     * report-1's advisory facts of the finding's S9.
+     *
+     * @param FloorFinding $finding
+     */
+    public static function legacy(array $finding): AdvisoryFacts013
+    {
+        foreach ($finding['signals'] as $signal) {
+            if ($signal['id'] === Signal::S9) {
+                $rows = $signal['data']['advisories'];
+                Assert::assertIsArray($rows);
+                /** @var list<array<string, mixed>> $rows */
+                return SignalDataStub::legacy($rows, ($signal['data']['releases_read'] ?? false) === true);
+            }
+        }
+
+        return AdvisoryFacts013::none();
     }
 
     /**
@@ -100,7 +142,7 @@ final class CorpusFloor
         $judged = $finding['verdict'] !== 'unknown';
         $verdict = (new VerdictEngine())->decide($signals, $entry !== null, $judged);
 
-        $built = new Finding($finding['package'], $finding['version'], $verdict, $signals, $finding['chain'], $reason, null, null, $finding['dev']);
+        $built = new Finding($finding['package'], $finding['version'], $verdict, $signals, $finding['chain'], $reason, null, null, $finding['dev'], [], null, null, null, self::legacy($finding));
 
         return $built->withFlags(FlagSet::fromSignals($signals, $entry, $advisories), $judged)->withDetails(FindingBuilder::detailsOf($built, $judged));
     }

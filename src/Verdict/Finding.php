@@ -16,10 +16,25 @@ use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Score\ScoreBasis;
 use Lockrot\Score\SecurityTerm;
+use Lockrot\Signal\Data\AbandonedData;
+use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\NoPushData;
+use Lockrot\Signal\Data\NoReleaseData;
+use Lockrot\Signal\Data\NotCheckedData;
+use Lockrot\Signal\Data\OldPromiseData;
+use Lockrot\Signal\Data\PinnedData;
+use Lockrot\Signal\Data\SignalData;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @phpstan-import-type Row013 from AdvisoryFacts013
+ */
 final class Finding
 {
     /**
@@ -107,33 +122,7 @@ final class Finding
         $this->libyears = $libyears;
         $this->origin = $origin;
         $this->replacementNamedBy = $replacementNamedBy;
-        $this->advisoryFacts013 = $advisoryFacts013 ?? self::legacyFactsOf($signals);
-    }
-
-    /**
-     * A finding built without report-1's S9 facts takes them from an S9 that still carries them, so
-     * a report-1 S9 written by hand reads as it always did.
-     *
-     * @param list<Signal> $signals
-     */
-    private static function legacyFactsOf(array $signals): AdvisoryFacts013
-    {
-        foreach ($signals as $signal) {
-            if ($signal->id() === Signal::S9) {
-                $data = $signal->data();
-                $rows = [];
-                foreach (\is_array($data['advisories'] ?? null) ? $data['advisories'] : [] as $row) {
-                    if (\is_array($row) && \is_string($row['id'] ?? null)) {
-                        $rows[] = $row;
-                    }
-                }
-
-                /** @var list<array{id: string, cve: ?string, title: ?string, link: ?string, severity: ?string, reported_at: ?string, affected_versions: ?string, fixed_by: ?string, fixed_on_branch: bool}> $rows */
-                return new AdvisoryFacts013($rows, ($data['releases_read'] ?? false) === true);
-            }
-        }
-
-        return AdvisoryFacts013::none();
+        $this->advisoryFacts013 = $advisoryFacts013 ?? AdvisoryFacts013::none();
     }
 
     public function advisoryFacts013(): AdvisoryFacts013
@@ -396,11 +385,11 @@ final class Finding
         if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict013::flagged($this->verdict)) {
             return null;
         }
-        // Only S9 knows whether a null fixed_by was looked for. Without the key, nothing says that it was.
-        $releasesRead = ($this->advisoryData()['releases_read'] ?? false) === true;
+        // Only S9 knows whether a null fixed_by was looked for.
+        $releasesRead = $this->advisoryFacts013->releasesRead();
         $list = [];
-        foreach ($this->advisoryRows() as $row) {
-            $fixed = $this->verdict === Verdict::LEFT_BEHIND ? ($row['fixed_on_branch'] ?? false) === true : ($row['fixed_by'] ?? null) !== null;
+        foreach ($this->advisoryFacts013->rows() as $row) {
+            $fixed = $this->verdict === Verdict::LEFT_BEHIND ? $row['fixed_on_branch'] : $row['fixed_by'] !== null;
             if (!$fixed) {
                 $list[] = ['id' => $row['id'], 'reason' => $this->noFixReason($row, $releasesRead)];
             }
@@ -409,16 +398,16 @@ final class Finding
         return $list;
     }
 
-    /** @param array<mixed, mixed> $row */
+    /** @param Row013 $row */
     private function noFixReason(array $row, bool $releasesRead): string
     {
-        if ($this->verdict === Verdict::LEFT_BEHIND && ($row['fixed_by'] ?? null) !== null) {
+        if ($this->verdict === Verdict::LEFT_BEHIND && $row['fixed_by'] !== null) {
             return NoFix013::NOT_ON_INSTALLED_BRANCH;
         }
         if (!$releasesRead) {
             return NoFix013::RELEASES_UNKNOWN;
         }
-        if (($row['affected_versions'] ?? null) === null) {
+        if ($row['affected_versions'] === null) {
             return NoFix013::AFFECTED_RANGE_UNKNOWN;
         }
 
@@ -485,10 +474,11 @@ final class Finding
     public function replacement(): ?string
     {
         foreach ($this->signals as $signal) {
-            if ($signal->id() === Signal::S1) {
-                $replacement = $signal->data()['replacement'] ?? null;
+            $data = $signal->data();
+            if ($data instanceof AbandonedData) {
+                $replacement = $data->replacement();
 
-                return \is_string($replacement) && $replacement !== '' ? $replacement : null;
+                return $replacement !== null && $replacement !== '' ? $replacement : null;
             }
         }
 
@@ -501,36 +491,13 @@ final class Finding
      */
     private function followClause(Signal $s8): ?string
     {
-        if ($this->verdict !== Verdict::LEFT_BEHIND || !$this->isDirect()) {
+        $data = $s8->data();
+        if ($this->verdict !== Verdict::LEFT_BEHIND || !$this->isDirect() || !$data instanceof LeftBehindData) {
             return null;
         }
-        $constraint = $s8->data()['suggested_constraint'] ?? null;
+        $constraint = $data->suggestedConstraint();
 
-        return \is_string($constraint) && $constraint !== '' ? 'require '.$constraint.' to follow' : null;
-    }
-
-    /**
-     * A row that is not an array, or has no string id, counts as no advisory.
-     *
-     * @return list<array{id: string}&array<mixed, mixed>>
-     */
-    private function advisoryRows(): array
-    {
-        $rows = [];
-        $list = $this->advisoryData()['advisories'] ?? [];
-        foreach (\is_array($list) ? $list : [] as $row) {
-            if (\is_array($row) && \is_string($row['id'] ?? null)) {
-                $rows[] = $row;
-            }
-        }
-
-        return $rows;
-    }
-
-    /** @return array<string, mixed> */
-    private function advisoryData(): array
-    {
-        return $this->advisoryFacts013->data();
+        return $constraint !== null && $constraint !== '' ? 'require '.$constraint.' to follow' : null;
     }
 
     /** Every signal but S7, the deciding ones ({@see self::DECIDING}) first. The note when there is none. */
@@ -646,19 +613,18 @@ final class Finding
         $details = $this->details();
         $flags = $this->flags();
         $signals = $this->signalsOut($details);
-        $data = array_column($signals, 'data', 'id');
-        $checksMissing = self::checks($data[Signal::S10]['unchecked'] ?? []);
+        $checksMissing = self::checksOf($signals);
         $context = $this->context($details, $checksMissing);
         $branchKey = ReleaseBranch::of($this->version);
         $branch = $branchKey === null ? null : ReleaseBranch::label($branchKey);
         $basis = $this->scoreBasisOf($context);
-        $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
-        $flagsOut = $this->flagsOut($flags, $basis, $data, $context['liveness_complete'], $branch);
+        $rows = self::rowsOf($signals);
+        $summaries = $this->flagSummaries($flags, $basis, $signals, $rows, $branch);
         $counted = $this->flagIds();
         $evidence = [];
-        foreach ($flagsOut as $flag) {
-            if (\in_array($flag['id'], $counted, true)) {
-                $evidence[] = \sprintf('%s: %s', self::scalarOrNull($flag['id']), self::scalarOrNull($flag['summary']));
+        foreach ($summaries as $flag => $summary) {
+            if (\in_array($flag, $counted, true)) {
+                $evidence[] = \sprintf('%s: %s', $flag, $summary);
             }
         }
         $entry = $details->entry();
@@ -672,7 +638,7 @@ final class Finding
             'verdict' => $this->grade(),
             'priority' => $this->gradeOrNone(),
             'lead' => $this->lead(),
-            'flags' => $flagsOut,
+            'flags' => $this->flagsOut($flags, $basis, $signals, $summaries, \count($rows), $context['liveness_complete']),
             'score' => $basis,
             'next_step' => null,
             'security' => $details->toSecurityArray($rows, $branch),
@@ -708,9 +674,8 @@ final class Finding
     public function scoreBasis(): ScoreBasis
     {
         $details = $this->details();
-        $data = array_column($this->signalsOut($details), 'data', 'id');
 
-        return $this->scoreBasisOf($this->context($details, self::checks($data[Signal::S10]['unchecked'] ?? [])));
+        return $this->scoreBasisOf($this->context($details, self::checksOf($this->signalsOut($details))));
     }
 
     /** @param array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool} $context */
@@ -727,13 +692,12 @@ final class Finding
     public function securityStanding(): SecurityStanding
     {
         $details = $this->details();
-        $data = array_column($this->signalsOut($details), 'data', 'id');
 
-        return $details->standing(self::rows($data[Signal::S9]['advisories'] ?? []));
+        return $details->standing(self::rowsOf($this->signalsOut($details)));
     }
 
     /**
-     * @param list<array{check: string, reason: string, blocks: list<string>}> $checksMissing S10's checks as report-2 writes them
+     * @param list<Check> $checksMissing S10's checks as report-2 writes them
      *
      * @return array{maintenance_judged: bool, advisories_complete: bool, liveness_complete: bool, s3_unread: bool, s8_unread: bool}
      */
@@ -742,8 +706,8 @@ final class Finding
         $livenessComplete = true;
         $s3Unread = false;
         foreach (array_merge($details->skipped(), $checksMissing) as $check) {
-            $livenessComplete = $livenessComplete && array_intersect($check['blocks'], [Signal::S2, Signal::S4]) === [];
-            $s3Unread = $s3Unread || \in_array(Signal::S3, $check['blocks'], true);
+            $livenessComplete = $livenessComplete && array_intersect($check->blocks(), [Signal::S2, Signal::S4]) === [];
+            $s3Unread = $s3Unread || \in_array(Signal::S3, $check->blocks(), true);
         }
 
         return [
@@ -756,68 +720,87 @@ final class Finding
     }
 
     /**
-     * The signals as report-2 writes them: S10 gains the release data a counted advisory needed
-     * and did not get.
+     * The signals as report-2 writes them. S9 marks the advisory that the score's security term
+     * counts, so the row and the term cannot name two advisories. S10 gains the release data a
+     * counted advisory needed and did not get.
      *
-     * @return list<array{id: string, level: string, summary: string, data: array<string, mixed>}>
+     * @return list<Signal>
      */
     private function signalsOut(FindingDetails $details): array
     {
+        $deciding = $this->score === null ? null : $this->score->deciding();
         $out = [];
         foreach ($this->signals as $signal) {
             $data = $signal->data();
-            if ($signal->id() === Signal::S9) {
-                $data['advisories'] = $this->decidingMarked($data['advisories'] ?? []);
-            }
-            $out[] = ['id' => $signal->id(), 'level' => $signal->level(), 'summary' => $signal->summary(), 'data' => $data];
+            $out[] = $data instanceof AdvisoryData ? new Signal($signal->id(), $signal->level(), $signal->summary(), $data->withDeciding($deciding === null ? null : $deciding['id'])) : $signal;
         }
         $releases = $details->releasesUnchecked();
         if ($releases === null) {
             return $out;
         }
         foreach ($out as $i => $signal) {
-            if ($signal['id'] === Signal::S10) {
-                $unchecked = array_merge(self::checks($signal['data']['unchecked'] ?? []), [$releases]);
-                $out[$i]['data'] = ['unchecked' => $unchecked, 'blocks' => array_values(array_unique(array_merge(...array_column($unchecked, 'blocks'))))];
-                $out[$i]['summary'] .= '; '.NotCheckedRule::RELEASES_WORDS;
+            $data = $signal->data();
+            if ($data instanceof NotCheckedData) {
+                $out[$i] = new Signal(Signal::S10, $signal->level(), $signal->summary().'; '.NotCheckedRule::RELEASES_WORDS, new NotCheckedData(array_merge($data->checks(), [$releases])));
 
                 return $out;
             }
         }
-        $out[] = ['id' => Signal::S10, 'level' => Signal::LEVEL_INFO, 'summary' => NotCheckedRule::RELEASES_WORDS, 'data' => ['unchecked' => [$releases], 'blocks' => $releases['blocks']]];
+        $out[] = new Signal(Signal::S10, Signal::LEVEL_INFO, NotCheckedRule::RELEASES_WORDS, new NotCheckedData([$releases]));
 
         return $out;
     }
 
     /**
-     * @param array<string, array<string, mixed>> $data
+     * Each fired flag's sentence, in flag order.
+     *
+     * @param list<Signal>      $signals
+     * @param list<AdvisoryRow> $rows
+     *
+     * @return array<string, string>
+     */
+    private function flagSummaries(FlagSet $flags, ScoreBasis $basis, array $signals, array $rows, ?string $branch): array
+    {
+        $data = self::dataById($signals);
+        $security = $basis->securityTerm();
+        $summaries = [];
+        foreach ($flags->fired() as $flag) {
+            $summaries[$flag] = $flag === FlagSet::VULNERABLE
+                ? $this->details()->vulnerableSummary($rows, $branch, $security === null ? '' : $security->severity())
+                : FlagSentence::maintenance($flag, $data);
+        }
+
+        return $summaries;
+    }
+
+    /**
+     * @param list<Signal>          $signals
+     * @param array<string, string> $summaries each fired flag's sentence
      *
      * @return list<array<string, mixed>>
      */
-    private function flagsOut(FlagSet $flags, ScoreBasis $basis, array $data, bool $livenessComplete, ?string $branch): array
+    private function flagsOut(FlagSet $flags, ScoreBasis $basis, array $signals, array $summaries, int $advisories, bool $livenessComplete): array
     {
         $roles = [];
         foreach ($basis->maintenanceTerms() as $term) {
             $roles[$term->flag()] = $term->role();
         }
-        $security = $basis->securityTerm();
+        $fired = array_map(static fn (Signal $signal): string => $signal->id(), $signals);
+        $data = self::dataById($signals);
         $out = [];
         foreach ($flags->fired() as $flag) {
-            $ids = array_values(array_filter(FlagSentence::SIGNALS[$flag], static fn (string $id): bool => isset($data[$id])));
             if ($flag === FlagSet::VULNERABLE) {
-                $rows = self::rows($data[Signal::S9]['advisories'] ?? []);
-                $summary = $this->details()->vulnerableSummary($rows, $branch, $security === null ? '' : $security->severity());
-                $out[] = ['id' => $flag, 'role' => SecurityTerm::ROLE, 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => \count($rows), 'source' => null], 'summary' => $summary];
+                $out[] = ['id' => $flag, 'role' => SecurityTerm::ROLE, 'baseline' => null, 'signal_ids' => [Signal::S9], 'degree' => null, 'headline' => ['unit' => 'advisories', 'value' => $advisories, 'source' => null], 'summary' => $summaries[$flag]];
                 continue;
             }
             $out[] = [
                 'id' => $flag,
                 'role' => $roles[$flag] ?? 'accepted',
                 'baseline' => null,
-                'signal_ids' => $ids,
+                'signal_ids' => array_values(array_intersect(FlagSentence::SIGNALS[$flag], $fired)),
                 'degree' => $flag === FlagSet::ABANDONED ? ['reasons' => $flags->reasons(), 'liveness_complete' => $livenessComplete] : (\in_array($flag, [FlagSet::SILENT, FlagSet::STALE], true) ? ['liveness_complete' => $livenessComplete] : null),
                 'headline' => self::headline($flag, $flags, $data),
-                'summary' => FlagSentence::maintenance($flag, $data),
+                'summary' => $summaries[$flag],
             ];
         }
 
@@ -825,33 +808,7 @@ final class Finding
     }
 
     /**
-     * The S9 rows with `deciding` after `points`: true on the advisory that the score's security
-     * term counts, so the row and the term cannot name two advisories.
-     *
-     * @param mixed $rows
-     *
-     * @return list<array<string, mixed>>
-     */
-    private function decidingMarked($rows): array
-    {
-        $deciding = $this->score === null ? null : $this->score->deciding();
-        $out = [];
-        foreach (self::rows($rows) as $row) {
-            $marked = [];
-            foreach ($row as $key => $value) {
-                $marked[$key] = $value;
-                if ($key === 'points') {
-                    $marked['deciding'] = $deciding !== null && $deciding['id'] === ($row['id'] ?? null);
-                }
-            }
-            $out[] = $marked;
-        }
-
-        return $out;
-    }
-
-    /**
-     * @param array<string, array<string, mixed>> $data
+     * @param array<string, SignalData> $data
      *
      * @return array{unit: string, value: int|float|string|null, source: ?string}
      */
@@ -861,14 +818,22 @@ final class Finding
             case FlagSet::ABANDONED:
                 return ['unit' => 'reason', 'value' => \in_array(FlagSet::ARCHIVED, $flags->reasons(), true) ? 'archived' : 'marked', 'source' => null];
             case FlagSet::PINNED:
-                return ['unit' => 'reason', 'value' => self::scalarOrNull($data[Signal::S6]['reason'] ?? null), 'source' => null];
+                $s6 = $data[Signal::S6] ?? null;
+
+                return ['unit' => 'reason', 'value' => $s6 instanceof PinnedData ? $s6->reason() : null, 'source' => null];
             case FlagSet::LEFT_BEHIND:
-                return ['unit' => 'years', 'value' => self::scalarOrNull($data[Signal::S8]['years'] ?? null), 'source' => 'branch'];
+                $s8 = $data[Signal::S8] ?? null;
+
+                return ['unit' => 'years', 'value' => $s8 instanceof LeftBehindData ? $s8->years() : null, 'source' => 'branch'];
             case FlagSet::OLD_PROMISE:
-                return ['unit' => 'php', 'value' => self::scalarOrNull($data[Signal::S5]['written_for_php'] ?? null), 'source' => null];
+                $s5 = $data[Signal::S5] ?? null;
+
+                return ['unit' => 'php', 'value' => $s5 instanceof OldPromiseData ? $s5->writtenForPhp() : null, 'source' => null];
             default:
-                $release = self::scalarOrNull($data[Signal::S2]['years'] ?? null);
-                $push = self::scalarOrNull($data[Signal::S4]['years'] ?? null);
+                $s2 = $data[Signal::S2] ?? null;
+                $s4 = $data[Signal::S4] ?? null;
+                $release = $s2 instanceof NoReleaseData ? $s2->years() : null;
+                $push = $s4 instanceof NoPushData ? $s4->years() : null;
                 if ($release === null && $push === null) {
                     return ['unit' => 'years', 'value' => null, 'source' => null];
                 }
@@ -878,45 +843,54 @@ final class Finding
     }
 
     /**
-     * @param mixed $value
+     * @param list<Signal> $signals
      *
-     * @return int|float|string|null
+     * @return array<string, SignalData>
      */
-    private static function scalarOrNull($value)
+    private static function dataById(array $signals): array
     {
-        return \is_int($value) || \is_float($value) || \is_string($value) ? $value : null;
-    }
-
-    /**
-     * @param mixed $value a list of objects from a signal's data or the score basis
-     *
-     * @return list<array<string, mixed>>
-     */
-    private static function rows($value): array
-    {
-        $rows = [];
-        foreach (\is_array($value) ? $value : [] as $row) {
-            if (\is_array($row)) {
-                $rows[] = array_filter($row, 'is_string', \ARRAY_FILTER_USE_KEY);
+        $data = [];
+        foreach ($signals as $signal) {
+            $payload = $signal->data();
+            if ($payload !== null) {
+                $data[$signal->id()] = $payload;
             }
         }
 
-        return $rows;
+        return $data;
     }
 
     /**
-     * @param mixed $value S10's `unchecked` list
+     * @param list<Signal> $signals
      *
-     * @return list<array{check: string, reason: string, blocks: list<string>}>
+     * @return list<AdvisoryRow>
      */
-    private static function checks($value): array
+    private static function rowsOf(array $signals): array
     {
-        $checks = [];
-        foreach (self::rows($value) as $row) {
-            $blocks = array_values(array_filter(\is_array($row['blocks'] ?? null) ? $row['blocks'] : [], 'is_string'));
-            $checks[] = ['check' => (string) self::scalarOrNull($row['check'] ?? null), 'reason' => (string) self::scalarOrNull($row['reason'] ?? null), 'blocks' => $blocks];
+        foreach ($signals as $signal) {
+            $data = $signal->data();
+            if ($data instanceof AdvisoryData) {
+                return $data->rows();
+            }
         }
 
-        return $checks;
+        return [];
+    }
+
+    /**
+     * @param list<Signal> $signals
+     *
+     * @return list<Check>
+     */
+    private static function checksOf(array $signals): array
+    {
+        foreach ($signals as $signal) {
+            $data = $signal->data();
+            if ($data instanceof NotCheckedData) {
+                return $data->checks();
+            }
+        }
+
+        return [];
     }
 }

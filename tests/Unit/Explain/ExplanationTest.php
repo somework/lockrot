@@ -19,6 +19,7 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
@@ -132,7 +133,7 @@ final class ExplanationTest extends TestCase
             $facts = F::facts(F::package(['version' => 'dev-main', 'time' => '2025-03-04T05:06:07+00:00']), $metadata);
             $s6 = (new PinnedRule())->evaluate($facts);
             self::assertNotNull($s6, $what);
-            $array = (new Explanation($this->finding('dev-main', Verdict::PINNED, [$s6]), $facts, new Thresholds(), '8.4', $this->report()))->toArray();
+            $array = JsonPath::decoded((new Explanation($this->finding('dev-main', Verdict::PINNED, [$s6]), $facts, new Thresholds(), '8.4', $this->report()))->toArray());
 
             $data = JsonPath::arrayAt($array, ['finding', 'signals', 0, 'data']);
             $meta = JsonPath::arrayAt($array, ['metadata']);
@@ -145,7 +146,7 @@ final class ExplanationTest extends TestCase
 
     public function testToArrayCarriesTheFindingTheFactsAndTheRun(): void
     {
-        $signal = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', ['branch' => '1.x']);
+        $signal = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', SignalDataStub::of(Signal::S8, ['branch' => '1.x']));
         $metadata = F::metadata([['2.1.0', '2026-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00']]);
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1', 'time' => '2021-06-01T00:00:00+00:00']);
         $explanation = new Explanation($this->finding('1.5.0', Verdict::LEFT_BEHIND, [$signal]), F::facts($package, $metadata, F::activity(false, '2026-02-01T00:00:00+00:00')), new Thresholds(2, 4, 3, 5), '8.3', $this->report());

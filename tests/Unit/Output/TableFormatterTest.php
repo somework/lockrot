@@ -17,6 +17,7 @@ use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +56,7 @@ final class TableFormatterTest extends TestCase
         $at = new \DateTimeImmutable(self::AT);
         $advisories = array_fill(0, 3, ['id' => 'x']);
         $report = new Report([
-            (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '3 security advisories affect 1.0.0 (a, b, c)', ['advisories' => $advisories])])->withChain(['vendor/ok'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '3 security advisories affect 1.0.0 (a, b, c)', SignalDataStub::of('S9', ['advisories' => $advisories]))])->withChain(['vendor/ok'])->withDataDate($at)->build(),
         ], [], $at, 1, 0, null, null, true);
 
         $at74 = $this->plainLines($this->formatter(74)->format($report));

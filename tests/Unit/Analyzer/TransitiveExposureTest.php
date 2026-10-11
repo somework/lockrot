@@ -12,6 +12,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
@@ -93,12 +94,12 @@ final class TransitiveExposureTest extends TestCase
         self::assertSame('pulls in 1 flagged package: vendor/leaf (stale)', $a->summary());
         self::assertSame(
             ['flagged' => 1, 'packages' => [['package' => 'vendor/leaf', 'chain' => ['root/a', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]]],
-            $a->data()
+            JsonPath::decoded($a->data())
         );
         $b = self::s7($f['root/b']);
         self::assertNotNull($b);
         // The chain is from this parent, not the one the finding's own chain starts from.
-        self::assertSame([['package' => 'vendor/leaf', 'chain' => ['root/b', 'vendor/mid', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]], $b->data()['packages']);
+        self::assertSame([['package' => 'vendor/leaf', 'chain' => ['root/b', 'vendor/mid', 'vendor/leaf'], 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale']]], JsonPath::decoded($b->data())['packages']);
         self::assertNull(self::s7($f['vendor/mid']));
         self::assertNull(self::s7($f['vendor/lonely']));
         self::assertSame([$stale], $f['vendor/leaf']->signals());
@@ -181,8 +182,8 @@ final class TransitiveExposureTest extends TestCase
             'pulls in 7 flagged packages: vendor/z-abandoned (abandoned), vendor/f-silent (silent), vendor/a-stale (stale), vendor/b-stale (stale), vendor/c-stale (stale) and 2 more',
             $s7->summary()
         );
-        self::assertSame(7, $s7->data()['flagged']);
-        $pulledIn = $s7->data()['packages'];
+        self::assertSame(7, JsonPath::decoded($s7->data())['flagged']);
+        $pulledIn = JsonPath::decoded($s7->data())['packages'];
         self::assertIsArray($pulledIn);
         self::assertCount(7, $pulledIn);
     }
@@ -312,7 +313,7 @@ final class TransitiveExposureTest extends TestCase
     {
         $packages = [['name' => 'root/a', 'version' => '1.0.0', 'require' => ['vendor/leaf' => '^1']], ['name' => 'vendor/leaf', 'version' => '1.0.0']];
         $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => ['root/a' => '^1']]), false);
-        $s9 = new Signal(Signal::S9, Signal::LEVEL_HIGH, '1 advisory', ['advisories' => [['id' => 'PKSA-1', 'severity' => 'high']], 'releases_read' => true, 'complete' => true]);
+        $s9 = new Signal(Signal::S9, Signal::LEVEL_HIGH, '1 advisory', SignalDataStub::of(Signal::S9, ['advisories' => [['id' => 'PKSA-1', 'severity' => 'high']], 'releases_read' => true, 'complete' => true]));
         $leaf = (new FindingBuilder())->withPackage('vendor/leaf')->withSignals([$s9])->withChain($graph->shortestChain('vendor/leaf'))->withDirectDependents(['root/a'])
             ->withFlags(FlagSet::fromSignals([$s9], null, [Score::advisory('PKSA-1', 'high', 'update')]))->build();
         $findings = [$this->finding($graph, 'root/a', Verdict::OK), $leaf];
@@ -321,6 +322,6 @@ final class TransitiveExposureTest extends TestCase
 
         self::assertNotNull($a);
         self::assertSame('pulls in 1 flagged package: vendor/leaf (vulnerable)', $a->summary());
-        self::assertNull(JsonPath::arrayAt($a->data(), ['packages', 0])['lead']);
+        self::assertNull(JsonPath::arrayAt(JsonPath::decoded($a->data()), ['packages', 0])['lead']);
     }
 }

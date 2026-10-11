@@ -22,13 +22,6 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Lockrot\Explain\Explanation',
         'Lockrot\Html\ReportDocument',
         'Lockrot\Json\JsonWriter',
-        // Writes report-2's `signals[].data.advisories[]`.
-        'Lockrot\Signal\Rule\AdvisoryRule',
-    ];
-    /** Per class, the writers that can pass it a written array. */
-    private const HOLDERS = [
-        // A signal holds report-2's `signals[].data` as its rule wrote it.
-        'Lockrot\Signal\Signal' => ['Lockrot\Signal\Rule\AdvisoryRule'],
     ];
     /** The namespaces whose every class writes a document: the formatters and report-1. */
     private const WRITER_NAMESPACES = ['Lockrot\Output\\', 'Lockrot\Legacy\\'];
@@ -69,18 +62,13 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Lock/ConfiguredRepositories.php' => 1,
         'Lock/LockFile.php' => 1,
         'Lock/ProjectConfig.php' => 6,
-        'Output/ExplainFormatter.php' => 1,
         'Output/GitlabFormatter.php' => 2,
         'Output/HtmlFormatter.php' => 1,
         'Output/SarifFormatter.php' => 4,
         'SelfUpdate/ReleaseLocator.php' => 9,
-        'Signal/Rule/AdvisoryRule.php' => 3,
-        'Signal/Rule/PinnedRule.php' => 1,
-        'Signal/Signal.php' => 3,
         'Signal/Thresholds.php' => 1,
-        'Verdict/Finding.php' => 10,
-        'Verdict/FindingDetails.php' => 9,
-        'Verdict/FlagSentence.php' => 4,
+        'Verdict/Finding.php' => 2,
+        'Verdict/FindingDetails.php' => 2,
         'Verdict/ScoreModel.php' => 6,
     ];
 
@@ -91,7 +79,7 @@ final class ArraysAtTheBoundaryTest extends TestCase
     {
         $violations = [];
         foreach (self::sourceFiles() as $relative => $path) {
-            foreach (WrittenArrayReads::inSource(self::read($path), [self::class, 'isWriter'], self::HOLDERS) as $violation) {
+            foreach (WrittenArrayReads::inSource(self::read($path), [self::class, 'isWriter']) as $violation) {
                 $violations[] = $relative.':'.$violation;
             }
         }

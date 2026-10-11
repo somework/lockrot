@@ -32,6 +32,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -215,7 +216,7 @@ final class AnalyzerLookupTest extends TestCase
         $finding = self::finding(self::analyzeOne(self::analyzer(self::loader($metadata), self::http([self::GITHUB => [500, '']], $requested), true, new Allowlist([]), self::listed())));
 
         self::assertSame([Signal::S10], self::ids($finding));
-        self::assertSame([['check' => 'repository_activity', 'reason' => 'fetch_failed', 'blocks' => [Signal::S3, Signal::S4]]], $finding->signals()[0]->data()['unchecked']);
+        self::assertSame([['check' => 'repository_activity', 'reason' => 'fetch_failed', 'blocks' => [Signal::S3, Signal::S4]]], JsonPath::decoded($finding->signals()[0]->data())['unchecked']);
     }
 
     /** Where S1 counts, a tokenless run asks nothing about the package and raises no S10 for it. */

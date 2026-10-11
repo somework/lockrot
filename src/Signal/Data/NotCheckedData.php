@@ -10,7 +10,7 @@ final class NotCheckedData implements SignalData
     /** @var non-empty-list<Check> */
     private array $checks;
 
-    /** @param non-empty-list<Check> $checks no two of them block the same signal */
+    /** @param non-empty-list<Check> $checks */
     public function __construct(array $checks)
     {
         $this->checks = $checks;
@@ -22,7 +22,7 @@ final class NotCheckedData implements SignalData
         return $this->checks;
     }
 
-    /** @return array{unchecked: non-empty-list<Check>, blocks: list<string>} */
+    /** @return array{unchecked: non-empty-list<Check>, blocks: list<string>} each blocked signal once, in check order */
     public function jsonSerialize(): array
     {
         $blocks = [];
@@ -32,6 +32,6 @@ final class NotCheckedData implements SignalData
             }
         }
 
-        return ['unchecked' => $this->checks, 'blocks' => $blocks];
+        return ['unchecked' => $this->checks, 'blocks' => array_values(array_unique($blocks))];
     }
 }

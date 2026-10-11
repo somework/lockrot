@@ -17,6 +17,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -570,7 +571,7 @@ final class SarifFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', ['flagged' => 1, 'packages' => []])])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
+            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('S2', 'warn', 'old'), new Signal(Signal::S7, Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]))])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
         ], [], $at, 1, 0);
         $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report);
         $this->assertValidSarif($sarif);

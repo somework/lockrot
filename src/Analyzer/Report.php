@@ -9,6 +9,7 @@ use Lockrot\Config\Gate;
 use Lockrot\Legacy\Compare013;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\Verdict013;
+use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
@@ -267,7 +268,8 @@ final class Report
             foreach ($finding->signals() as $signal) {
                 if ($signal->id() === Signal::S9) {
                     ++$packages;
-                    $advisories += \count((array) ($signal->data()['advisories'] ?? []));
+                    $data = $signal->data();
+                    $advisories += $data instanceof AdvisoryData ? \count($data->rows()) : 0;
                 }
             }
         }

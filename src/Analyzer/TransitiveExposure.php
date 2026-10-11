@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 use Lockrot\Graph\DependencyGraph;
+use Lockrot\Signal\Data\ExposedPackage;
+use Lockrot\Signal\Data\ExposureData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
@@ -111,24 +113,24 @@ final class TransitiveExposure
     {
         $packages = [];
         foreach ($descendants as [$finding, $chain]) {
-            $packages[] = ['package' => $finding->package(), 'chain' => $chain, 'verdict' => $finding->grade(), 'lead' => $finding->lead(), 'flag_ids' => $finding->flagIds()];
+            $packages[] = new ExposedPackage($finding->package(), $chain, $finding->grade(), $finding->lead(), $finding->flagIds());
         }
 
-        return new Signal(Signal::S7, Signal::LEVEL_INFO, self::summary($packages), ['flagged' => \count($packages), 'packages' => $packages]);
+        return new Signal(Signal::S7, Signal::LEVEL_INFO, self::summary($packages), new ExposureData($packages));
     }
 
     /**
      * Names each package by its lead, which is report-1's verdict word on every package report-1
      * flagged, and a package graded by its advisories alone by `vulnerable`.
      *
-     * @param non-empty-list<array{package: string, chain: list<string>, verdict: string, lead: ?string, flag_ids: list<string>}> $packages
+     * @param non-empty-list<ExposedPackage> $packages
      */
     private static function summary(array $packages): string
     {
         $count = \count($packages);
         $named = [];
         foreach (\array_slice($packages, 0, self::SUMMARY_NAMES) as $package) {
-            $named[] = $package['package'].' ('.($package['lead'] ?? FlagSet::VULNERABLE).')';
+            $named[] = $package->package().' ('.($package->lead() ?? FlagSet::VULNERABLE).')';
         }
         $summary = \sprintf('pulls in %d flagged %s: %s', $count, $count === 1 ? 'package' : 'packages', implode(', ', $named));
         if ($count > self::SUMMARY_NAMES) {

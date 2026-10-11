@@ -19,6 +19,7 @@ use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
@@ -122,7 +123,7 @@ final class Report2RootTest extends TestCase
     public function testAbandonedCountsTheReplacementsAndTheSuggestions(): void
     {
         $abandoned = static fn (?string $replacement, ?string $reason = null): Finding => (new FindingBuilder())->withPackage('acme/old')->withVerdict(Verdict::ABANDONED)->withChain(['acme/old'])
-            ->withSignals([new Signal('S1', 'high', 'marked abandoned', ['replacement' => $replacement])])->withAllowlistReason($reason)->build();
+            ->withSignals([new Signal('S1', 'high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => $replacement]))])->withAllowlistReason($reason)->build();
         $findings = [
             $abandoned('acme/new'),
             $abandoned('Symfony'),
@@ -213,7 +214,7 @@ final class Report2RootTest extends TestCase
         foreach ($advisories as $i => [$severity, $kind]) {
             $rows[] = ['id' => 'PKSA-'.$i, 'severity' => $severity, 'fix' => ['kind' => $kind]];
         }
-        $finding = (new FindingBuilder())->withPackage($package)->withChain([$package])->withSignals([new Signal('S9', 'warn', 'advisories', ['advisories' => $rows])])->build();
+        $finding = (new FindingBuilder())->withPackage($package)->withChain([$package])->withSignals([new Signal('S9', 'warn', 'advisories', SignalDataStub::of('S9', ['advisories' => $rows]))])->build();
 
         return self::withDetails($finding, 'complete', $ignored);
     }

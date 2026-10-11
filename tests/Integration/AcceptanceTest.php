@@ -156,14 +156,14 @@ final class AcceptanceTest extends TestCase
             $rulerzS7 = self::signal($f['wallabag/rulerz'], Signal::S7);
             self::assertNotNull($rulerzS7);
             self::assertSame(Signal::LEVEL_INFO, $rulerzS7->level());
-            $pulledIn = $rulerzS7->data()['packages'];
+            $pulledIn = JsonPath::decoded($rulerzS7->data())['packages'];
             self::assertIsArray($pulledIn);
             self::assertContains('hoa/ruler', array_column($pulledIn, 'package'));
             self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
             self::assertNull(self::signal($f['hoa/ruler'], Signal::S7), 'a transitive package is not a parent');
             $exposure = $report->exposure();
             self::assertArrayHasKey('wallabag/rulerz', $exposure);
-            self::assertSame($rulerzS7->data()['flagged'], $exposure['wallabag/rulerz']);
+            self::assertSame(JsonPath::decoded($rulerzS7->data())['flagged'], $exposure['wallabag/rulerz']);
             $counts = array_values($exposure);
             self::assertSame($counts, array_reverse(array_reverse($counts, false)), 'counts are a list');
             for ($i = 1; $i < \count($counts); ++$i) {
@@ -231,7 +231,7 @@ final class AcceptanceTest extends TestCase
                 'last_stable_dated_by' => null,
                 'snapshot_time' => $snapshotTime,
                 'tag_relation' => $tagRelation,
-            ], $s6->data(), $package);
+            ], JsonPath::decoded($s6->data()), $package);
             self::assertSame('pinned to branch snapshot dev-master', $s6->summary(), $package);
             self::assertSame(Verdict::PINNED, $f[$package]->verdict(), $package);
             self::assertSame($priority, $f[$package]->priority(), $package);
@@ -264,7 +264,7 @@ final class AcceptanceTest extends TestCase
         self::assertContains('S6', $ids, 'the pinned-to-branch signal fires under the abandoned verdict');
         $s6 = self::signal($f['lox/xhprof'], Signal::S6);
         self::assertNotNull($s6);
-        self::assertSame('branch_snapshot', $s6->data()['reason']);
+        self::assertSame('branch_snapshot', JsonPath::decoded($s6->data())['reason']);
     }
 
     public function testPhpzipCarriesS5UnderItsSilentVerdict(): void

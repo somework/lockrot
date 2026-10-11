@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Signal\Rule;
 
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -48,7 +50,7 @@ final class NotCheckedRule implements SignalRule
         $unchecked = [];
         $reason = $facts->activityNotChecked();
         if ($reason !== null && isset(self::ACTIVITY_WORDS[$reason])) {
-            $unchecked[] = ['check' => 'repository_activity', 'reason' => $reason, 'blocks' => [Signal::S3, Signal::S4]];
+            $unchecked[] = new Check('repository_activity', $reason, [Signal::S3, Signal::S4]);
         }
 
         $metadata = $facts->metadata();
@@ -59,7 +61,7 @@ final class NotCheckedRule implements SignalRule
             // package's newest release whatever the lock installs, and with S4 it can make
             // the snapshot `silent`, not `pinned`.
             $ageBlocks = ReleaseBranch::of($facts->package()->version()) === null ? [Signal::S2] : [Signal::S2, Signal::S8];
-            $unchecked[] = ['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => $ageBlocks];
+            $unchecked[] = new Check('release_dates', 'undated_releases', $ageBlocks);
         }
 
         return self::signalOf($unchecked);
@@ -69,16 +71,14 @@ final class NotCheckedRule implements SignalRule
      * The S10 entry for release data that a repository listing the package did not serve, beside a
      * counted advisory: every fix is unknown then. report-1's S10 has no `releases`
      * check, so {@see evaluate()} leaves it out and report-2's finding adds it.
-     *
-     * @return array{check: string, reason: string, blocks: list<string>}|null
      */
-    public static function releasesUnchecked(PackageFacts $facts): ?array
+    public static function releasesUnchecked(PackageFacts $facts): ?Check
     {
         if ($facts->advisories() === [] || $facts->metadataStatus() !== PackageFacts::METADATA_UNAVAILABLE) {
             return null;
         }
 
-        return ['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => [Signal::S9]];
+        return new Check('releases', 'releases_unknown', [Signal::S9]);
     }
 
     /**
@@ -94,18 +94,17 @@ final class NotCheckedRule implements SignalRule
     {
         $kept = [];
         foreach ($signals as $signal) {
-            if ($signal->id() !== Signal::S10) {
+            $data = $signal->data();
+            if (!$data instanceof NotCheckedData) {
                 $kept[] = $signal;
                 continue;
             }
-            /** @var list<array{check: string, reason: string, blocks: list<string>}> $unchecked {@see signalOf()} writes it */
-            $unchecked = $signal->data()['unchecked'];
             // signalOf() joins one summary per entry, in entry order.
             $summaries = explode('; ', $signal->summary());
             $entries = [];
             $entrySummaries = [];
-            foreach ($unchecked as $index => $entry) {
-                if (!\in_array($entry['check'], self::MAINTENANCE_CHECKS, true)) {
+            foreach ($data->checks() as $index => $entry) {
+                if (!\in_array($entry->check(), self::MAINTENANCE_CHECKS, true)) {
                     $entries[] = $entry;
                     $entrySummaries[] = $summaries[$index] ?? self::summaryOf($entry);
                 }
@@ -120,35 +119,28 @@ final class NotCheckedRule implements SignalRule
     }
 
     /**
-     * @param list<array{check: string, reason: string, blocks: list<string>}> $unchecked
-     * @param list<string>|null                                                $summaries one per entry, else the rule's own words
+     * @param list<Check>       $unchecked
+     * @param list<string>|null $summaries one per entry, else the rule's own words
      */
     private static function signalOf(array $unchecked, ?array $summaries = null): ?Signal
     {
         if ($unchecked === []) {
             return null;
         }
-        $blocks = [];
-        foreach ($unchecked as $entry) {
-            foreach ($entry['blocks'] as $id) {
-                $blocks[] = $id;
-            }
-        }
         $summaries ??= array_map([self::class, 'summaryOf'], $unchecked);
 
-        return new Signal(Signal::S10, Signal::LEVEL_INFO, implode('; ', $summaries), ['unchecked' => $unchecked, 'blocks' => $blocks]);
+        return new Signal(Signal::S10, Signal::LEVEL_INFO, implode('; ', $summaries), new NotCheckedData($unchecked));
     }
 
-    /** @param array{check: string, reason: string, blocks: list<string>} $entry */
-    private static function summaryOf(array $entry): string
+    private static function summaryOf(Check $entry): string
     {
-        if ($entry['check'] === 'repository_activity') {
-            return 'repository activity not checked ('.(self::ACTIVITY_WORDS[$entry['reason']] ?? $entry['reason']).'), so S3 and S4 could not be read';
+        if ($entry->check() === 'repository_activity') {
+            return 'repository activity not checked ('.(self::ACTIVITY_WORDS[$entry->reason()] ?? $entry->reason()).'), so S3 and S4 could not be read';
         }
-        if ($entry['check'] === 'release_dates') {
-            return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.implode(' and ', $entry['blocks']).' could not measure it';
+        if ($entry->check() === 'release_dates') {
+            return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.implode(' and ', $entry->blocks()).' could not measure it';
         }
 
-        throw new \LogicException('S10 has no words for the check '.$entry['check'].'.');
+        throw new \LogicException('S10 has no words for the check '.$entry->check().'.');
     }
 }

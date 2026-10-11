@@ -7,10 +7,13 @@ namespace Lockrot\Tests\Unit\Signal\Rule;
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Clock;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\TestCase;
 
@@ -48,7 +51,7 @@ final class LeftBehindRuleTest extends TestCase
             'reachable_release' => '2026-06-01T00:00:00+00:00',
             'suggested_constraint' => '^3.4',
             'dated_by' => null,
-        ], array_diff_key($signal->data(), array_flip(['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years'])));
+        ], array_diff_key(JsonPath::decoded($signal->data()), array_flip(['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years'])));
     }
 
     public function testWarnBetweenThreeAndFiveYears(): void
@@ -148,8 +151,8 @@ final class LeftBehindRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 3.x released 3.0.0 (2026-01-01)', $signal->summary());
-        self::assertSame('3.x', $signal->data()['reachable_branch'], 'the branch within reach ties the same way');
-        self::assertSame('^3.0', $signal->data()['suggested_constraint']);
+        self::assertSame('3.x', JsonPath::decoded($signal->data())['reachable_branch'], 'the branch within reach ties the same way');
+        self::assertSame('^3.0', JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
     public function testAHigherBranchWithoutADateIsNotEvidence(): void
@@ -302,10 +305,10 @@ final class LeftBehindRuleTest extends TestCase
         $minor = $this->rule()->evaluate(F::facts(F::package(['version' => '0.2.1']), F::metadata([['0.4.3', '2026-01-01'], ['0.2.1', '2020-01-01']])));
 
         self::assertNotNull($major);
-        self::assertSame('^8.2', $major->data()['suggested_constraint']);
-        self::assertSame('8.x', $major->data()['newest_branch']);
+        self::assertSame('^8.2', JsonPath::decoded($major->data())['suggested_constraint']);
+        self::assertSame('8.x', JsonPath::decoded($major->data())['newest_branch']);
         self::assertNotNull($minor);
-        self::assertSame('^0.4.3', $minor->data()['suggested_constraint']);
+        self::assertSame('^0.4.3', JsonPath::decoded($minor->data())['suggested_constraint']);
     }
 
     public function testABranchDatedByTheMonorepoNamesIt(): void
@@ -326,8 +329,8 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::LEVEL_WARN, $signal->level());
         self::assertSame('branch 8.x last released 2021-11-20 (4.8 years ago, dated by laravel/framework); 13.x released 13.24.0 (2026-09-01)', $signal->summary());
-        self::assertSame('laravel/framework', $signal->data()['dated_by']);
-        self::assertSame('^13.24', $signal->data()['suggested_constraint']);
+        self::assertSame('laravel/framework', JsonPath::decoded($signal->data())['dated_by']);
+        self::assertSame('^13.24', JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
     /**
@@ -345,7 +348,7 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::LEVEL_WARN, $signal->level());
         self::assertSame('branch 1.x last released 2022-06-09 (4.3 years ago); 3.x released 3.12.0 (2026-09-09), needs php >=8.1 above the project\'s php >=7.2.5; 2.x released 2.11.1 (2026-09-02)', $signal->summary());
-        $data = $signal->data();
+        $data = JsonPath::decoded($signal->data());
         self::assertSame('3.x', $data['newest_branch']);
         self::assertSame('>=8.1', $data['newest_php']);
         self::assertFalse($data['newest_within_reach']);
@@ -367,7 +370,7 @@ final class LeftBehindRuleTest extends TestCase
         self::assertNotNull($signal);
         self::assertSame(Signal::LEVEL_HIGH, $signal->level());
         self::assertSame('branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.7 (2026-09-10), needs php >=8.4.1 above the project\'s php ^7.2 || ^8.0.0; no releasing branch within reach', $signal->summary());
-        $data = $signal->data();
+        $data = JsonPath::decoded($signal->data());
         self::assertFalse($data['newest_within_reach']);
         self::assertNull($data['reachable_branch']);
         self::assertNull($data['reachable_version']);
@@ -383,9 +386,9 @@ final class LeftBehindRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 3.x released 3.12.0 (2026-09-09), needs php >=8.1 above the target PHP 7.2; 2.x released 2.11.1 (2026-09-02)', $signal->summary());
-        self::assertSame('7.2', $signal->data()['floor_php']);
-        self::assertSame('target', $signal->data()['floor_source']);
-        self::assertSame('^2.11', $signal->data()['suggested_constraint']);
+        self::assertSame('7.2', JsonPath::decoded($signal->data())['floor_php']);
+        self::assertSame('target', JsonPath::decoded($signal->data())['floor_source']);
+        self::assertSame('^2.11', JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
     public function testABranchWithinReachThatWentQuietIsNotNamed(): void
@@ -396,7 +399,7 @@ final class LeftBehindRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('needs php >=8.1 above the target PHP 7.4; no releasing branch within reach', $signal->summary());
-        self::assertNull($signal->data()['suggested_constraint']);
+        self::assertNull(JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
     /** The newest branch within reach is the one named, whatever is between: 2.x here, not the higher 3.x that also fits but released earlier. */
@@ -408,7 +411,7 @@ final class LeftBehindRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertStringEndsWith('; 4.x released 4.0.0 (2026-06-01), needs php >=8.2 above the target PHP 7.4; 2.x released 2.9.0 (2026-03-01)', $signal->summary());
-        self::assertSame('^2.9', $signal->data()['suggested_constraint']);
+        self::assertSame('^2.9', JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
     public function testANewestBranchWithinReachIsNamedAsBefore(): void
@@ -419,23 +422,22 @@ final class LeftBehindRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('branch 1.x last released 2022-08-01 (4.1 years ago); 2.x released 2.0.0 (2024-01-10)', $signal->summary());
-        self::assertTrue($signal->data()['newest_within_reach']);
-        self::assertSame('>=7.2', $signal->data()['newest_php']);
-        self::assertSame('^2.0', $signal->data()['suggested_constraint']);
+        self::assertTrue(JsonPath::decoded($signal->data())['newest_within_reach']);
+        self::assertSame('>=7.2', JsonPath::decoded($signal->data())['newest_php']);
+        self::assertSame('^2.0', JsonPath::decoded($signal->data())['suggested_constraint']);
     }
 
-    /** The S8 keys that report-2 adds, which the signal's data carries. */
-    public function testTheReadingCarriesTheReachableBranchsPhpAndWhatAdmitsIt(): void
+    /** The S8 keys that report-2 adds: the reachable branch's php and what admits it. */
+    public function testTheDataCarriesTheReachableBranchsPhpAndWhatAdmitsIt(): void
     {
         $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.4'], ['2.9.0', '2026-03-01', '>=7.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
         $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
 
-        $reading = $this->rule(new PhpFloor('8.4', '>=8.1'))->reading($facts);
+        $data = $this->data($this->rule(new PhpFloor('8.4', '>=8.1')), $facts);
 
-        self::assertNotNull($reading);
-        self::assertSame('>=7.4', $reading->reachablePhp());
-        self::assertSame(['project' => true, 'target' => true], $reading->reachableAdmits());
-        self::assertSame('2.x', $reading->signal()->data()['reachable_branch']);
+        self::assertSame('>=7.4', $data->reachablePhp());
+        self::assertSame(['project' => true, 'target' => true], $data->reachableAdmits());
+        self::assertSame('2.x', $data->reachableBranch());
     }
 
     public function testTheReachableAdmitsAnswersEachFloorOnItsOwn(): void
@@ -443,24 +445,22 @@ final class LeftBehindRuleTest extends TestCase
         $meta = F::metadata([['2.9.0', '2026-03-01', '>=7.4 <8.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
         $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
 
-        $reading = $this->rule(new PhpFloor('8.3', null))->reading($facts);
+        $data = $this->data($this->rule(new PhpFloor('8.3', null)), $facts);
 
-        self::assertNotNull($reading);
-        self::assertSame(['project' => null, 'target' => true], $reading->reachableAdmits(), 'no require.php gives no answer, never "admitted"');
+        self::assertSame(['project' => null, 'target' => true], $data->reachableAdmits(), 'no require.php gives no answer, never "admitted"');
     }
 
-    public function testTheReadingCarriesTheAgesOfTheNewestAndTheReachableBranch(): void
+    public function testTheDataCarriesTheAgesOfTheNewestAndTheReachableBranch(): void
     {
         $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.5'], ['2.9.0', '2025-09-14', '>=7.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
         $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
 
-        $reading = $this->rule(new PhpFloor('8.4', '>=8.1'))->reading($facts);
+        $data = $this->data($this->rule(new PhpFloor('8.4', '>=8.1')), $facts);
 
-        self::assertNotNull($reading);
-        self::assertSame(0.3, $reading->newestYears());
-        self::assertSame(1.0, $reading->reachableYears());
-        self::assertSame('2.x', $reading->signal()->data()['reachable_branch']);
-        self::assertSame('3.x', $reading->signal()->data()['newest_branch']);
+        self::assertSame(0.3, $data->newestYears());
+        self::assertSame(1.0, $data->reachableYears());
+        self::assertSame('2.x', $data->reachableBranch());
+        self::assertSame('3.x', $data->newestBranch());
     }
 
     public function testWithNoReachableBranchItsKeysAreNull(): void
@@ -468,33 +468,21 @@ final class LeftBehindRuleTest extends TestCase
         $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.5'], ['1.9.2', '2019-03-02', '>=7.1']]);
         $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
 
-        $reading = $this->rule(new PhpFloor('8.4', '>=8.1'))->reading($facts);
+        $data = $this->data($this->rule(new PhpFloor('8.4', '>=8.1')), $facts);
 
-        self::assertNotNull($reading);
-        self::assertNull($reading->reachablePhp());
-        self::assertNull($reading->reachableAdmits());
-        self::assertNull($reading->reachableYears());
-        self::assertSame(0.3, $reading->newestYears());
+        self::assertNull($data->reachablePhp());
+        self::assertNull($data->reachableAdmits());
+        self::assertNull($data->reachableYears());
+        self::assertSame(0.3, $data->newestYears());
     }
 
-    /** report-2's S8 carries the reachable branch's keys of the reading behind it. */
-    public function testTheSignalWritesTheReadingsKeys(): void
+    private function data(LeftBehindRule $rule, PackageFacts $facts): LeftBehindData
     {
-        $meta = F::metadata([['3.4.1', '2026-06-01', '>=8.4'], ['1.9.2', '2019-03-02', '>=7.1']]);
-        $facts = F::facts(F::package(['version' => '1.9.2']), $meta);
-        $rule = $this->rule(new PhpFloor('8.4', '>=8.1'));
-
-        $reading = $rule->reading($facts);
-
-        self::assertNotNull($reading);
         $signal = $rule->evaluate($facts);
         self::assertNotNull($signal);
-        self::assertSame($reading->signal()->data() + [
-            'reachable_php' => $reading->reachablePhp(),
-            'reachable_admits' => $reading->reachableAdmits(),
-            'newest_years' => $reading->newestYears(),
-            'reachable_years' => $reading->reachableYears(),
-        ], $signal->data(), 'S8 writes the reading behind it');
-        self::assertNull($rule->reading(F::facts(F::package(['version' => '3.4.1']), $meta)));
+        $data = $signal->data();
+        self::assertInstanceOf(LeftBehindData::class, $data);
+
+        return $data;
     }
 }

@@ -16,14 +16,19 @@ use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
+use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\Data\LeftBehindData;
+use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\Origins;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -51,17 +56,18 @@ final class ExplainFormatterTest extends TestCase
     /**
      * The whole text of a flagged, transitive, abandoned-with-replacement package with an archived
      * repository read from the cache: every block, every separator, the raw data in every shape a
-     * signal can carry (scalars, null, a nested array, the advisory list with a row that is not one).
+     * signal can carry (scalars, null, a nested array, the advisory list).
      */
     public function testAFlaggedPackageReadsVerdictSignalsDataAndBranches(): void
     {
-        $s8 = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', ['branch' => '1.x', 'years' => 5.3, 'suggested_constraint' => null, 'flags' => ['a' => true]]);
-        $s9 = new Signal(Signal::S9, Signal::LEVEL_WARN, '2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)', ['advisories' => [
+        $s8 = new Signal(Signal::S8, Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', new LeftBehindData('1.x', '2021-06-01T00:00:00+00:00', '1.5.0', 5.3, '2.x', '2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1', true, null, null, '2.x', '2.1.0', '2026-01-01T00:00:00+00:00', null, null, '>=8.1', ['project' => true, 'target' => true], 0.7, 0.7));
+        $s9 = new Signal(Signal::S9, Signal::LEVEL_WARN, '2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)');
+        $s10 = new Signal(Signal::S10, Signal::LEVEL_INFO, 'repository activity not checked (no token for the repository host), so S3 and S4 could not be read', new NotCheckedData([new Check('repository_activity', 'no_token', [Signal::S3, Signal::S4])]));
+        $legacy = SignalDataStub::legacy([
             ['id' => 'PKSA-1', 'cve' => 'CVE-2026-1', 'severity' => 'high', 'fixed_by' => '2.1.0', 'fixed_on_branch' => false, 'reported_at' => '2026-03-01T00:00:00+00:00', 'link' => 'https://example.test/a'],
             ['id' => 'PKSA-2', 'cve' => '', 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
-            'not-a-row',
-        ], 'count' => 2]);
-        $finding = (new FindingBuilder())->withVersion('1.5.0')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9])->withChain(['root/app', 'vendor/mid', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->withDirectDependents(['root/app', 'root/other'])->withLibyears(LibyearsMeasurement::of(4.58))->build();
+        ]);
+        $finding = (new FindingBuilder())->withVersion('1.5.0')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9, $s10])->withChain(['root/app', 'vendor/mid', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->withDirectDependents(['root/app', 'root/other'])->withLibyears(LibyearsMeasurement::of(4.58))->withAdvisoryFacts013($legacy)->build();
         // Branches listed out of order: the table sorts them.
         $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00', '>=7.1 <8.0'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1']], true, 'vendor/next');
         $package = F::package(['version' => '1.5.0', 'php' => '>=7.1 <8.0', 'time' => '2021-06-01T00:00:00+00:00']);
@@ -75,13 +81,13 @@ final class ExplainFormatterTest extends TestCase
 
             signals
               S8 warn branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)
-                       branch 1.x · years 5.3 · suggested_constraint null
-                       flags {"a":true}
+                       branch 1.x · branch_last_release 2021-06-01T00:00:00+00:00 · branch_last_version 1.5.0 · years 5.3 · newest_branch 2.x · newest_version 2.1.0 · newest_release 2026-01-01T00:00:00+00:00 · newest_php >=8.1 · newest_within_reach true · floor_php null · floor_source null · reachable_branch 2.x · reachable_version 2.1.0 · reachable_release 2026-01-01T00:00:00+00:00 · suggested_constraint null · dated_by null
               S9 warn 2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)
-                       count 2
                        CVE-2026-1 (PKSA-1) high · fixed by 2.1.0, not on the installed branch · reported 2026-03-01 · https://example.test/a
                        PKSA-2 · no listed release fixes it
-                       "not-a-row"
+              S10 info repository activity not checked (no token for the repository host), so S3 and S4 could not be read
+                       unchecked [{"check":"repository_activity","reason":"no_token","blocks":["S3","S4"]}]
+                       blocks ["S3","S4"]
 
             composer.lock
               version 1.5.0 · php >=7.1 <8.0 · released 2021-06-01 · from a Composer repository
@@ -127,8 +133,8 @@ final class ExplainFormatterTest extends TestCase
             $facts = F::facts($package, $meta, null, [$advisory]);
             $s9 = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($s9);
-            self::assertSame($read, $s9->data()['releases_read'], $case);
-            $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $s9])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
+            self::assertSame($read, JsonPath::decoded($s9->data())['releases_read'], $case);
+            $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $s9])->withDataDate(new \DateTimeImmutable(F::NOW))->withAdvisoryFacts013(AdvisoryRule::legacy($facts)[1])->build();
 
             $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
 
@@ -136,10 +142,6 @@ final class ExplainFormatterTest extends TestCase
             self::assertStringNotContainsString('releases_read', $text, $case);
         }
 
-        // Skipped where it stands, not where AdvisoryRule happens to put it: the keys after it still print.
-        $reordered = new Signal(Signal::S9, Signal::LEVEL_WARN, '1 security advisory affects 1.0.0 (CVE-2024-0001)', ['releases_read' => true, 'advisories' => $s9->data()['advisories']]);
-        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::S1, Signal::LEVEL_HIGH, 'marked abandoned by its repository'), $reordered])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
-        self::assertStringContainsString("\n".$expected."\n", $this->plain(new Explanation($finding, F::facts($package), new Thresholds(), '8.4', $this->report())));
     }
 
     /**
@@ -534,7 +536,7 @@ final class ExplainFormatterTest extends TestCase
         $facts = F::facts(F::package(['version' => '1.0.0']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']], true));
         $s1 = (new AbandonedRule())->evaluate($facts);
         self::assertNotNull($s1);
-        self::assertSame(['marked_by' => 'repository', 'replacement' => null, 'replacement_url' => null], $s1->data());
+        self::assertSame(['marked_by' => 'repository', 'replacement' => null, 'replacement_url' => null], JsonPath::decoded($s1->data()));
         $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
 
         $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));

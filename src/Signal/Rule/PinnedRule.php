@@ -7,6 +7,7 @@ namespace Lockrot\Signal\Rule;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Signal\Data\PinnedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -40,24 +41,18 @@ final class PinnedRule implements SignalRule
         return null;
     }
 
-    /**
-     * The S6 data (docs/verdicts.md#what-s6-carries). Without metadata every release fact is null,
-     * never `has_stable_release: false`, which claims that the package never released.
-     *
-     * @return array<string, mixed>
-     */
-    private static function data(LockedPackage $package, ?PackageMetadata $metadata, string $reason, ?\DateTimeImmutable $snapshotTime): array
+    private static function data(LockedPackage $package, ?PackageMetadata $metadata, string $reason, ?\DateTimeImmutable $snapshotTime): PinnedData
     {
-        return [
-            'version' => $package->version(),
-            'reason' => $reason,
-            'has_stable_release' => $metadata === null ? null : $metadata->hasStableRelease(),
-            'last_stable_release' => self::date($metadata === null ? null : $metadata->lastStableReleaseAt()),
-            'last_stable_version' => $metadata === null ? null : $metadata->lastStableVersion(),
-            'last_stable_dated_by' => $metadata === null ? null : $metadata->lastStableDatedBy(),
-            'snapshot_time' => self::date($snapshotTime),
-            'tag_relation' => self::tagRelation($metadata === null ? null : $metadata->lastStableReleaseAt(), $snapshotTime),
-        ];
+        return new PinnedData(
+            $package->version(),
+            $reason,
+            $metadata === null ? null : $metadata->hasStableRelease(),
+            self::date($metadata === null ? null : $metadata->lastStableReleaseAt()),
+            $metadata === null ? null : $metadata->lastStableVersion(),
+            $metadata === null ? null : $metadata->lastStableDatedBy(),
+            self::date($snapshotTime),
+            self::tagRelation($metadata === null ? null : $metadata->lastStableReleaseAt(), $snapshotTime)
+        );
     }
 
     private static function date(?\DateTimeImmutable $date): ?string

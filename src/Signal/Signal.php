@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal;
 
+use Lockrot\Signal\Data\SignalData;
+
 /** @internal */
-final class Signal
+final class Signal implements \JsonSerializable
 {
     public const S1 = 'S1';
     public const S2 = 'S2';
@@ -31,11 +33,10 @@ final class Signal
     private string $id;
     private string $level;
     private string $summary;
-    /** @var array<string, mixed> */
-    private array $data;
+    private ?SignalData $data;
 
-    /** @param array<string, mixed> $data */
-    public function __construct(string $id, string $level, string $summary, array $data = [])
+    /** @param ?SignalData $data the class of the signal's id. Without it the signal writes an empty `data`. */
+    public function __construct(string $id, string $level, string $summary, ?SignalData $data = null)
     {
         $this->id = $id;
         $this->level = $level;
@@ -58,8 +59,7 @@ final class Signal
         return $this->summary;
     }
 
-    /** @return array<string, mixed> */
-    public function data(): array
+    public function data(): ?SignalData
     {
         return $this->data;
     }
@@ -67,5 +67,11 @@ final class Signal
     public function isHigh(): bool
     {
         return $this->level === self::LEVEL_HIGH;
+    }
+
+    /** @return array{id: string, level: string, summary: string, data: SignalData|array{}} */
+    public function jsonSerialize(): array
+    {
+        return ['id' => $this->id, 'level' => $this->level, 'summary' => $this->summary, 'data' => $this->data ?? []];
     }
 }

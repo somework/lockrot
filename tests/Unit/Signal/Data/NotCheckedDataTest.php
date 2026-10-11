@@ -28,6 +28,13 @@ final class NotCheckedDataTest extends TestCase
         self::assertStringEndsWith('"blocks":["S3","S4","S2","S8","S9"]}', (string) JsonWriter::encode($data, 0));
     }
 
+    public function testTheBlocksNameEachSignalOnce(): void
+    {
+        $data = new NotCheckedData([new Check('repository_activity', 'no_token', ['S9', 'S3', 'S4']), new Check('releases', 'releases_unknown', ['S9'])]);
+
+        self::assertStringEndsWith('"blocks":["S9","S3","S4"]}', (string) JsonWriter::encode($data, 0));
+    }
+
     public function testACheckWritesItsKeysInOrder(): void
     {
         $check = new Check('release_dates', 'undated_releases', ['S2']);

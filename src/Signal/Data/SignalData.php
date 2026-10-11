@@ -12,4 +12,6 @@ namespace Lockrot\Signal\Data;
  */
 interface SignalData extends \JsonSerializable
 {
+    /** @return array<string, scalar|list<string|\JsonSerializable>|array{project: ?bool, target: ?bool}|null> */
+    public function jsonSerialize(): array;
 }

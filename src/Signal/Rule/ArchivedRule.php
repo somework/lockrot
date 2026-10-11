@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Rule;
 
+use Lockrot\Signal\Data\ArchivedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalRule;
@@ -18,6 +19,6 @@ final class ArchivedRule implements SignalRule
             return null;
         }
 
-        return new Signal(Signal::S3, Signal::LEVEL_HIGH, 'repository archived on '.$activity->ref()->forgeLabel(), ['repo' => $activity->repo(), 'host' => $activity->ref()->host(), 'forge' => $activity->ref()->forge()]);
+        return new Signal(Signal::S3, Signal::LEVEL_HIGH, 'repository archived on '.$activity->ref()->forgeLabel(), new ArchivedData($activity->repo(), $activity->ref()->host(), $activity->ref()->forge()));
     }
 }

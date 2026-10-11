@@ -18,6 +18,7 @@ use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RootRecount;
+use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
@@ -93,9 +94,9 @@ final class RootRecountTest extends TestCase
     private static function factsNoCaseHas(): array
     {
         $abandoned = static fn (string $package, string $replacement, string $date): Finding => (new FindingBuilder())->withPackage($package)->withChain([$package])
-            ->withSignals([new Signal('S1', 'high', 'marked abandoned', ['replacement' => $replacement])])->withDataDate(new \DateTimeImmutable($date))->build();
+            ->withSignals([new Signal('S1', 'high', 'marked abandoned', SignalDataStub::of('S1', ['replacement' => $replacement]))])->withDataDate(new \DateTimeImmutable($date))->build();
         $stale = new AllowlistEntry('acme/kept', null, 'kept', null, AllowlistEntry::BY_PROJECT, ['stale']);
-        $s9 = new Signal('S9', 'warn', '1 advisory', ['advisories' => [['id' => 'PKSA-u', 'severity' => 'high', 'fix' => ['kind' => 'unknown']]]]);
+        $s9 = new Signal('S9', 'warn', '1 advisory', SignalDataStub::of('S9', ['advisories' => [['id' => 'PKSA-u', 'severity' => 'high', 'fix' => ['kind' => 'unknown']]]]));
         $vulnerable = (new FindingBuilder())->withPackage('acme/vulnerable')->withChain(['acme/vulnerable'])->withSignals([$s9])
             ->withFlags(FlagSet::fromSignals([$s9], null, [Score::advisory('PKSA-u', 'high', 'unknown')]))->build();
         $ignored = new IgnoredAdvisory(new Advisory('PKSA-i', null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, 'PKSA-i', null, AdvisoryIgnoreMatch::BY_AUDIT));
