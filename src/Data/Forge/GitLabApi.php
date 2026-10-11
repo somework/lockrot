@@ -11,7 +11,8 @@ use Lockrot\Data\Http\HttpResult;
  * project's `last_activity_at` is not used: it moves on stars, forks and issue traffic.
  *
  * Only an authenticated request to the project document carries `archived`: an anonymous request
- * gets GitLab's basic projection, which omits it. See docs/internals.md, "What is sent".
+ * gets GitLab's basic projection, which omits it. See docs/internals.md, "What is sent". Without
+ * that answer the flag is null, never false.
  *
  * @internal
  */
@@ -49,8 +50,8 @@ final class GitLabApi implements ForgeApi
     {
         $newest = $json['commits'][0] ?? null;
         $committedAt = \is_array($newest) ? JsonDate::parse($newest['committed_date'] ?? null) : null;
-        $archived = (($json['project'] ?? [])['archived'] ?? false) === true;
+        $archived = $json['project']['archived'] ?? null;
 
-        return new RepositoryActivity($repo, $archived, $committedAt, $fetchedAt, $cachedAt);
+        return new RepositoryActivity($repo, \is_bool($archived) ? $archived : null, $committedAt, $fetchedAt, $cachedAt);
     }
 }

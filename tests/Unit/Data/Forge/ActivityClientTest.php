@@ -84,7 +84,7 @@ final class ActivityClientTest extends TestCase
         $batch = $client->fetch([self::github(), new RepoRef(RepoRef::GITHUB, 'github.com', 'gone/repo')]);
 
         $activity = $batch->activity()['github.com/Grandt/PHPZip'];
-        self::assertFalse($activity->isArchived());
+        self::assertFalse($activity->archived());
         self::assertSame('Grandt/PHPZip', $activity->repo());
         self::assertSame(self::github()->key(), $activity->ref()->key());
         self::assertSame('2015-11-16', self::day($activity->pushedAt()));
@@ -198,6 +198,7 @@ final class ActivityClientTest extends TestCase
 
         $activity = $client->fetch([self::gitlab()])->activity()['gitlab.com/group/sub/project'];
 
+        self::assertNull($activity->archived(), 'not read, never false');
         self::assertFalse($activity->isArchived());
         $pushedAt = $activity->pushedAt();
         self::assertNotNull($pushedAt);
@@ -216,9 +217,22 @@ final class ActivityClientTest extends TestCase
 
         $activity = $client->fetch([self::gitlab()])->activity()['gitlab.com/group/sub/project'];
 
+        self::assertTrue($activity->archived());
         self::assertTrue($activity->isArchived());
         self::assertSame('2012-01-11', self::day($activity->pushedAt()), 'last_activity_at is not what S4 reads');
         self::assertSame([[[self::GL_COMMITS, self::GL_PROJECT], ['Accept: application/json', 'User-Agent: lockrot', 'PRIVATE-TOKEN: glpat-x']]], $batches->getArrayCopy());
+    }
+
+    public function testGitlabReadsAnArchivedFlagOnlyWhenTheProjectDocumentCarriesIt(): void
+    {
+        $token = ForgeAuth::withTokens(new Tokens(null, 'glpat-x'));
+        $commits = [200, '[{"committed_date":"2012-01-11T17:34:28.000+01:00"}]'];
+
+        $kept = (new ActivityClient($this->http([self::GL_COMMITS => $commits, self::GL_PROJECT => [200, '{"archived":false}']], new \ArrayObject()), $token))->fetch([self::gitlab()]);
+        $basic = (new ActivityClient($this->http([self::GL_COMMITS => $commits, self::GL_PROJECT => [200, '{"path_with_namespace":"group/sub/project"}']], new \ArrayObject()), $token))->fetch([self::gitlab()]);
+
+        self::assertFalse($kept->activity()['gitlab.com/group/sub/project']->archived());
+        self::assertNull($basic->activity()['gitlab.com/group/sub/project']->archived(), 'a project document without the flag');
     }
 
     public function testGitlabAnEmptyRepositoryHasNoCommitDate(): void
@@ -240,11 +254,11 @@ final class ActivityClientTest extends TestCase
         self::assertSame(['gitlab.com/group/sub/project' => 'HTTP 429'], $batch->failedOn(RepoRef::GITLAB));
 
         // The commits call decides. The project call is enrichment. When it fails the commit date
-        // stands and the archived flag stays unknown (false), as in the anonymous run.
+        // stands and the archived flag stays unread (null), as in the anonymous run.
         $client = new ActivityClient($this->http([self::GL_COMMITS => [200, '[{"committed_date":"2012-01-11T17:34:28.000+01:00"}]'], self::GL_PROJECT => [403, '{"message":"403 Forbidden"}']], new \ArrayObject()), ForgeAuth::withTokens(new Tokens(null, 'glpat-x')));
         $batch = $client->fetch([self::gitlab()]);
         $activity = $batch->activity()['gitlab.com/group/sub/project'];
-        self::assertFalse($activity->isArchived());
+        self::assertNull($activity->archived());
         self::assertSame('2012-01-11', self::day($activity->pushedAt()));
         self::assertSame([], $batch->failed());
 
@@ -283,7 +297,7 @@ final class ActivityClientTest extends TestCase
 
         $activity = $client->fetch([self::bitbucket()])->activity()['bitbucket.org/workspace/repo'];
 
-        self::assertFalse($activity->isArchived());
+        self::assertFalse($activity->archived(), 'Bitbucket has no archived state');
         self::assertSame('2026-09-16', self::day($activity->pushedAt()));
         self::assertSame([[[self::BB_COMMITS], ['Accept: application/json', 'User-Agent: lockrot']]], $batches->getArrayCopy());
 
