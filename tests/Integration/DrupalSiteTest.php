@@ -45,7 +45,8 @@ final class DrupalSiteTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$server = FixtureRepositoryServer::fromLockFiles([self::SITE.'composer.lock'], self::FIXTURES.'http/p2', [], [
-            'https://packages.drupal.org/files/packages/8/p2/' => self::SITE.'http/p2',
+            ['https://repo.packagist.org/p2/', self::SITE.'http/p2'],
+            ['https://packages.drupal.org/files/packages/8/p2/', self::SITE.'http/p2'],
         ]);
         self::$server->start();
     }
@@ -112,27 +113,31 @@ final class DrupalSiteTest extends TestCase
         return $analyzer->analyze(LockFile::fromFile(self::SITE.'composer.lock'), ProjectConfig::fromFile(self::SITE.'composer.json'), false);
     }
 
-    /** The recorded GitHub answers, shared with the other fixtures, and the site's own git.drupalcode.org answers. */
+    /** The site's own GitHub and git.drupalcode.org answers, then the GitHub answers it shares with the other fixtures. */
     private static function recordings(): HttpClientInterface
     {
-        return new class (new RecordedHttpClient(self::FIXTURES.'http/github'), new RecordedHttpClient(self::SITE.'http/gitlab'), 'https://'.self::DRUPALCODE.'/') implements HttpClientInterface {
-            private HttpClientInterface $github;
-            private HttpClientInterface $gitlab;
-            private string $gitlabBase;
+        return new class ([self::SITE.'http/gitlab', self::SITE.'http/github', self::FIXTURES.'http/github']) implements HttpClientInterface {
+            /** @var list<string> */
+            private array $dirs;
 
-            public function __construct(HttpClientInterface $github, HttpClientInterface $gitlab, string $gitlabBase)
+            /** @param list<string> $dirs searched in order */
+            public function __construct(array $dirs)
             {
-                $this->github = $github;
-                $this->gitlab = $gitlab;
-                $this->gitlabBase = $gitlabBase;
+                $this->dirs = $dirs;
             }
 
             public function fetchAll(array $urls, array $headers = []): array
             {
                 $out = [];
                 foreach ($urls as $url) {
-                    $client = strpos($url, $this->gitlabBase) === 0 ? $this->gitlab : $this->github;
-                    $out += $client->fetchAll([$url], $headers);
+                    $dir = $this->dirs[\count($this->dirs) - 1];
+                    foreach ($this->dirs as $candidate) {
+                        if (is_file(RecordedHttpClient::pathFor($candidate, $url))) {
+                            $dir = $candidate;
+                            break;
+                        }
+                    }
+                    $out += (new RecordedHttpClient($dir))->fetchAll([$url], $headers);
                 }
 
                 return $out;

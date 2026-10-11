@@ -10,8 +10,10 @@ declare(strict_types=1);
 // packagist.org POST with every locked name, whatever its origin, as lockrot's lookup sends it.
 //
 // The script trims each p2 body to KEEP and each forge body to the keys that its ForgeApi reads. A
-// packages.drupal.org entry's p2 answer goes to <fixtureDir>/http/p2. A repository on a
-// --gitlab-domain host gets its commits answer, asked anonymously, in <fixtureDir>/http/gitlab. Its
+// fixture with its own `http` directory keeps its answers there (p2, github, gitlab, advisories),
+// so they move no other fixture's results. Its packages.drupal.org entries' p2 answers go to
+// <fixtureDir>/http/p2. A repository on a --gitlab-domain host gets its commits answer, asked
+// anonymously, in <fixtureDir>/http/gitlab. Its
 // project document is recorded only with a gitlab-token that Composer's config (auth.json or
 // COMPOSER_AUTH) holds for that host: anonymously GitLab leaves `archived` out. The token is never
 // written. Bitbucket answers are not recorded. It reuses an envelope on disk only when its recorded
@@ -122,11 +124,11 @@ $keep = static function (?string $body, array $keys, bool $list): ?string {
 
     return (string) json_encode($trimmed, \JSON_UNESCAPED_SLASHES);
 };
-$recordP2 = static function (string $name) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
+$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
     foreach ([false, true] as $dev) {
         $url = REPOSITORY_BASE_URL.$name.($dev ? '~dev' : '').'.json';
-        $path = RecordedHttpClient::pathFor($p2Dir, $url);
-        if ($isRecorded($path)) {
+        $path = RecordedHttpClient::pathFor($ownDir ?? $p2Dir, $url);
+        if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($p2Dir, $url))) {
             continue;
         }
         $result = $repositoryHttp->fetchAll([$url])[$url];
@@ -143,12 +145,13 @@ $repos = [];
 $gitlabRepos = [];
 foreach ($fixtures as $fixture) {
     $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
+    $own = is_dir($root.'/'.$fixture.'/http') ? $root.'/'.$fixture.'/http' : null;
     $notificationUrls = [];
     $rawLock = json_decode((string) file_get_contents($root.'/'.$fixture.'/composer.lock'), true);
     foreach (array_merge($rawLock['packages'] ?? [], $rawLock['packages-dev'] ?? []) as $entry) {
         $notificationUrls[$entry['name']] = $entry['notification-url'] ?? '';
     }
-    $advisoryPath = $advisoryDir.'/'.basename($fixture).'.json';
+    $advisoryPath = ($own !== null ? $own.'/advisories' : $advisoryDir).'/'.basename($fixture).'.json';
     if (!$isRecorded($advisoryPath)) {
         $names = array_map(static fn ($package): string => $package->name(), $lock->packages(true));
         $result = $fetch(ADVISORY_API_URL, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
@@ -171,11 +174,11 @@ foreach ($fixtures as $fixture) {
                 }
             }
         } else {
-            $recordP2($package->name());
+            $recordP2($package->name(), $own !== null ? $own.'/p2' : null);
         }
         $repo = $locator->locate($sourceUrl);
         if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
-            $repos[$repo->path()] = $repo;
+            $repos[$repo->path()] = [$repo, $own !== null ? $own.'/github' : $ghDir];
         }
         if ($repo !== null && $repo->forge() === RepoRef::GITLAB) {
             $gitlabRepos[$repo->key()] = [$repo, $root.'/'.$fixture.'/http/gitlab'];
@@ -194,11 +197,14 @@ foreach ($gitlabRepos as [$ref, $dir]) {
         fwrite(STDERR, \sprintf("gitlab %s %s %d\n", $ref->key(), $role, $result->status()));
     }
 }
-foreach ($repos as $repo => $ref) {
+foreach ($repos as $repo => [$ref, $dir]) {
     $url = $github->requests($ref, false)['repo'];
-    $path = RecordedHttpClient::pathFor($ghDir, $url);
-    if ($isRecorded($path)) {
+    $path = RecordedHttpClient::pathFor($dir, $url);
+    if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($ghDir, $url))) {
         continue;
+    }
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
     }
     $result = $fetch($url, $githubHeaders);
     $json = $result->body() === null ? null : json_decode($result->body(), true);

@@ -5,8 +5,9 @@
  "recorded": "2026-10-12",
  "recorder": "GITHUB_TOKEN=$(gh auth token) bin/record-fixtures --gitlab-domain=git.drupalcode.org tests/fixtures/apps/drupal-site",
  "recordings": {
-  "http/p2": "packages.drupal.org p2 answers of the packages.drupal.org entries",
-  "http/gitlab": "git.drupalcode.org commits answers, asked anonymously; no project document, because no token was set",
-  "../../http/p2, ../../http/github, ../../http/advisories": "packagist.org and GitHub answers, shared with the other fixtures"
+  "http/p2": "the p2 answers of packages.drupal.org and of the packagist.org packages that tests/fixtures/http/p2 lacks",
+  "http/github": "the GitHub answers that tests/fixtures/http/github lacks",
+  "http/gitlab": "git.drupalcode.org commits answers, asked anonymously, and no project document, because no token was set",
+  "http/advisories": "packagist.org's advisory answer for every locked name"
  }
 }

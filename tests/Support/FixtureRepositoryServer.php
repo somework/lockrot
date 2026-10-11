@@ -80,10 +80,10 @@ final class FixtureRepositoryServer
      * @param list<string> $lockFiles  absolute paths of composer.lock files whose package names to serve
      * @param list<string> $extraNames package names to serve on top of the locks' — the monorepo parents the
      *                                 analyzer loads to date a split package, which no lock lists
-     * @param array<string, string> $otherRegistries p2 base URL => the directory of its recordings: a name
-     *                                              that packagist.org's recordings lack is served from these
+     * @param list<array{string, string}> $moreRecordings [p2 base URL, directory of its recordings]: a name
+     *                                                    that $envelopeDir lacks is served from these, in order
      */
-    public static function fromLockFiles(array $lockFiles, string $envelopeDir = __DIR__.'/../fixtures/http/p2', array $extraNames = [], array $otherRegistries = []): self
+    public static function fromLockFiles(array $lockFiles, string $envelopeDir = __DIR__.'/../fixtures/http/p2', array $extraNames = [], array $moreRecordings = []): self
     {
         $docroot = self::freshTempDir('lockrot-fixture-repo-');
         $cacheDir = self::freshTempDir('lockrot-fixture-cache-');
@@ -91,11 +91,11 @@ final class FixtureRepositoryServer
         file_put_contents($docroot.'/'.self::ROUTER_FILENAME, self::ROUTER_SCRIPT);
 
         $names = array_values(array_unique(array_merge(self::namesFromLockFiles($lockFiles), $extraNames)));
-        $bases = ['https://repo.packagist.org/p2/' => $envelopeDir] + $otherRegistries;
+        $recordings = array_merge([['https://repo.packagist.org/p2/', $envelopeDir]], $moreRecordings);
         foreach ($names as $name) {
             foreach (self::SUFFIXES as $suffix) {
-                foreach ($bases as $baseUrl => $dir) {
-                    if (self::writeEnvelopeIfOk($docroot, $dir, (string) $baseUrl, $name, $suffix)) {
+                foreach ($recordings as [$baseUrl, $dir]) {
+                    if (self::writeEnvelopeIfOk($docroot, $dir, $baseUrl, $name, $suffix)) {
                         break;
                     }
                 }
