@@ -331,9 +331,10 @@ def inputs_of(case):
             entry(name).setdefault('require', {})[f['package'] if requires_it else chain[-2]] = '*'
     moves = [m for m in [f.get('next_step')] if m] + [m for m in ((f.get('next_step') or {}).get('also') or [])]
     held = [h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m['held_by']]
+    root_links = {}
     for h in held:
         if h['source'] == 'root':
-            root_require[f['package']] = h['constraint']
+            root_links.setdefault(h['link'], {})[f['package']] = h['constraint']
         else:
             e = entry(h['package'])
             e['version'] = h['version']
@@ -354,7 +355,7 @@ def inputs_of(case):
     act = f.get('activity') or {}
     push = age.get('push') or {}
     return {
-        'root': {'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **root_require)},
+        'root': dict({'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **dict(root_require, **root_links.pop('require', {})))}, **root_links),
         'lock': [{'name': f['package'], 'version': f['version'], 'time': installed_at, 'php': f['installed_php']['requires'], 'dev': f['dev'],
                   'origin': f['origin']['kind']}] + list(lock.values()),
         'releases': sorted(releases.values(), key=lambda r: r['version']),
