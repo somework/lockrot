@@ -271,7 +271,7 @@ final class FindingDetails
             $unknown += $row->fix()->kind() === Fix::UNKNOWN ? 1 : 0;
         }
 
-        return new BranchFixes($branch, true, $fixed, $unknown, \count($rows), null, null, []);
+        return BranchFixes::installedFromRows($branch, $fixed, $unknown, \count($rows));
     }
 
     /**

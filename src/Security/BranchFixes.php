@@ -38,6 +38,15 @@ final class BranchFixes
         $this->clears = $clears;
     }
 
+    /**
+     * The installed branch's row when the release scan did not run, counted from the S9 rows. It
+     * has no lower bound: unread release data gives no fix (SPEC §5.3).
+     */
+    public static function installedFromRows(string $branch, int $fixed, int $unknown, int $of): self
+    {
+        return new self($branch, true, $fixed, $unknown, $of, null, null, []);
+    }
+
     /** `ReleaseBranch::label()`, `2.x`. */
     public function branch(): string
     {

@@ -30,7 +30,7 @@ final class NotCheckedDataTest extends TestCase
 
     public function testTheBlocksNameEachSignalOnce(): void
     {
-        $data = new NotCheckedData([new Check('repository_activity', 'no_token', ['S9', 'S3', 'S4']), new Check('releases', 'releases_unknown', ['S9'])]);
+        $data = new NotCheckedData([new Check('releases', 'releases_unknown', ['S9']), new Check('repository_activity', 'no_token', ['S9', 'S3', 'S4'])]);
 
         self::assertStringEndsWith('"blocks":["S9","S3","S4"]}', (string) JsonWriter::encode($data, 0));
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Security\BranchFixes;
+use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -77,6 +78,14 @@ final class FlagSentenceTest extends TestCase
         yield 'pinned to a branch snapshot' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'branch_snapshot', 'version' => 'dev-main']], 'pinned to branch snapshot dev-main'];
         yield 'pinned with no tagged release' => [FlagSet::PINNED, [Signal::S6 => ['reason' => 'no_stable_release', 'version' => '1.0.0-beta1']], 'pinned to 1.0.0-beta1'];
         yield 'whole years' => [FlagSet::STALE, [Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5]], 'last release 2021-05-05 (5.0 years ago)'];
+    }
+
+    public function testOnlyTheMaintenanceSignalsHaveASentenceHere(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('No maintenance sentence reads '.AdvisoryData::class.'.');
+
+        FlagSentence::maintenance(FlagSet::VULNERABLE, [Signal::S9 => new AdvisoryData([], true, true)]);
     }
 
     public function testTheSilentSentenceReadsBothDates(): void

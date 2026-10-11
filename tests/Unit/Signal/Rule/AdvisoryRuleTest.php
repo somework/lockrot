@@ -44,6 +44,19 @@ final class AdvisoryRuleTest extends TestCase
         self::assertSame(['C-1', 'H-1', 'H-2', 'M-1', 'L-1', 'N-1'], array_column(AdvisoryRule::legacy($facts)[1]->rows(), 'id'), 'the JSON list is ordered the same way');
     }
 
+    /** A row writes the report date as ISO 8601 and the affected range as the repository wrote it. */
+    public function testARowWritesTheReportDateAndTheRange(): void
+    {
+        $advisory = new Advisory('PKSA-1', null, null, null, 'high', new \DateTimeImmutable('2024-03-01T12:00:00+00:00'), (new VersionParser())->parseConstraints('>=1.0,<1.4'));
+
+        $signal = (new AdvisoryRule())->evaluate(new PackageFacts(F::package(), null, null, [$advisory]));
+
+        self::assertNotNull($signal);
+        $row = JsonPath::arrayAt(JsonPath::decoded($signal->data()), ['advisories', 0]);
+        self::assertSame('2024-03-01T12:00:00+00:00', $row['reported_at']);
+        self::assertSame('>=1.0,<1.4', $row['affected_versions']);
+    }
+
     /** report-2's rows: the severity bucket beside Composer's word, the points and the fix. The finding marks the deciding row. */
     public function testARowCarriesTheBucketThePointsAndTheFix(): void
     {

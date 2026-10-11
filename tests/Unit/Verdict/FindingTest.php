@@ -158,11 +158,15 @@ final class FindingTest extends TestCase
         $transitive = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s5, $s8])->withChain(['root/app', 'guzzlehttp/guzzle'])->build();
         $finished = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::FINISHED)->withSignals([$s8])->withChain(['guzzlehttp/guzzle'])->withAllowlistReason('frozen')->build();
         $noConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S8', 'warn', $s8->summary())])->withChain(['guzzlehttp/guzzle'])->build();
+        $nullConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S8', 'warn', $s8->summary(), SignalDataStub::of('S8', []))])->withChain(['guzzlehttp/guzzle'])->build();
+        $emptyConstraint = (new FindingBuilder())->withPackage('guzzlehttp/guzzle')->withVersion('6.5.8')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([new Signal('S8', 'warn', $s8->summary(), SignalDataStub::of('S8', ['suggested_constraint' => '']))])->withChain(['guzzlehttp/guzzle'])->build();
 
         self::assertSame($s8->summary().'; require ^8.2 to follow; '.$s5->summary(), $direct->ownEvidence());
         self::assertSame($s8->summary().'; '.$s5->summary(), $transitive->ownEvidence(), 'not the project\'s line to change');
         self::assertSame($s8->summary(), $finished->ownEvidence(), 'the allowlist decided; nothing to follow');
         self::assertSame($s8->summary(), $noConstraint->ownEvidence(), 'no constraint on the signal, no clause');
+        self::assertSame($s8->summary(), $nullConstraint->ownEvidence(), 'a null constraint, no clause');
+        self::assertSame($s8->summary(), $emptyConstraint->ownEvidence(), 'an empty constraint, no clause');
         $signals = JsonPath::decoded($direct->toArray())['signals'];
         self::assertIsArray($signals);
         self::assertSame('^8.2', JsonPath::stringAt($signals, [1, 'data', 'suggested_constraint']), 'the data travels into --format=json');
@@ -1071,6 +1075,9 @@ final class FindingTest extends TestCase
         yield 'as old as each other' => [[$s2(Signal::LEVEL_HIGH, 5.0), $s4(Signal::LEVEL_HIGH, 5.0)], FlagSet::SILENT, ['unit' => 'years', 'value' => 5.0, 'source' => 'release']];
         yield 'the push alone' => [[$s2(Signal::LEVEL_HIGH, null), $s4(Signal::LEVEL_HIGH, 3.0)], FlagSet::SILENT, ['unit' => 'years', 'value' => 3.0, 'source' => 'push']];
         yield 'no years' => [[$s2(Signal::LEVEL_WARN, null)], FlagSet::STALE, ['unit' => 'years', 'value' => null, 'source' => null]];
+        yield 'pinned with no S6 data' => [[new Signal(Signal::S6, Signal::LEVEL_WARN, 'pinned')], FlagSet::PINNED, ['unit' => 'reason', 'value' => null, 'source' => null]];
+        yield 'left behind with no S8 data' => [[new Signal(Signal::S8, Signal::LEVEL_WARN, 'left behind')], FlagSet::LEFT_BEHIND, ['unit' => 'years', 'value' => null, 'source' => 'branch']];
+        yield 'an old promise with no S5 data' => [[new Signal(Signal::S5, Signal::LEVEL_WARN, 'old promise')], FlagSet::OLD_PROMISE, ['unit' => 'php', 'value' => null, 'source' => null]];
     }
 
     /** Abandoned reads the signals that fired in its order, and every fired flag is written. */

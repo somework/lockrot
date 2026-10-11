@@ -627,6 +627,15 @@ final class ReportTest extends TestCase
         self::assertTrue($withDev->withBaseline($comparison)->includesDev(), 'the baseline view keeps the scope');
     }
 
+    public function testAnS9WithoutDataCountsItsPackageAndNoAdvisory(): void
+    {
+        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
+        $bare = (new FindingBuilder())->withPackage('vendor/bare')->withSignals([new Signal('S9', 'warn', 'advisories')])->withChain(['vendor/bare'])->withDataDate($at)->build();
+        $two = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('S9', 'warn', '2 security advisories affect x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x'], ['id' => 'y']]]))])->withChain(['vendor/ok'])->withDataDate($at)->build();
+
+        self::assertSame('2 security advisories on 2 packages the report does not flag; see composer audit', (new Report([$bare, $two], [], $at, 2, 0, null, null, true))->unflaggedAdvisoriesLine());
+    }
+
     public function testUnflaggedAdvisoriesLineIsSingularAndEmptyWhenNoneAreThere(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');

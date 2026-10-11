@@ -42,7 +42,11 @@ final class FlagSentence
         FlagSet::VULNERABLE => [Signal::S9],
     ];
 
-    /** @param array<string, SignalData> $data the data of each signal that fired, by id */
+    /**
+     * @param array<string, SignalData> $data the data of each signal that fired, by id
+     *
+     * @throws \LogicException for the data of a signal that no maintenance flag reads
+     */
     public static function maintenance(string $flag, array $data): string
     {
         $parts = [];
@@ -131,7 +135,11 @@ final class FlagSentence
             return 'pinned to '.($d->reason() === 'branch_snapshot' ? 'branch snapshot ' : '').$d->version();
         }
 
-        return $d instanceof LeftBehindData ? self::s8($d) : '';
+        if ($d instanceof LeftBehindData) {
+            return self::s8($d);
+        }
+
+        throw new \LogicException('No maintenance sentence reads '.\get_class($d).'.');
     }
 
     private static function s8(LeftBehindData $d): string

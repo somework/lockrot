@@ -47,6 +47,7 @@ final class AdvisoryDataTest extends TestCase
             JsonWriter::encode($data->withDeciding('PKSA-h8hf-ytnd-5t9q'), \JSON_UNESCAPED_SLASHES)
         );
         self::assertSame([false, false], array_map(static fn (AdvisoryRow $row): bool => $row->isDeciding(), $data->withDeciding(null)->rows()));
+        self::assertSame([$row, $other], $data->rows(), 'marking returns a copy');
     }
 
     public function testAFixAndAHolderWriteTheS9Shapes(): void
