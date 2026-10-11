@@ -11,7 +11,7 @@ namespace Lockrot\Security;
  *
  * @internal
  */
-final class Fix
+final class Fix implements \JsonSerializable
 {
     public const UPDATE = 'update';
     public const UPGRADE = 'upgrade';
@@ -138,5 +138,20 @@ final class Fix
     public function reason(): ?string
     {
         return $this->reason;
+    }
+
+    /** @return array{kind: string, to_branch: ?string, version: ?string, newest: ?string, on_installed_branch: ?bool, php: ?string, held_by: list<Holder>, reason: ?string} */
+    public function jsonSerialize(): array
+    {
+        return [
+            'kind' => $this->kind,
+            'to_branch' => $this->toBranch(),
+            'version' => $this->version(),
+            'newest' => $this->newest,
+            'on_installed_branch' => $this->onInstalledBranch,
+            'php' => $this->php(),
+            'held_by' => $this->heldBy(),
+            'reason' => $this->reason,
+        ];
     }
 }
