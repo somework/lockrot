@@ -177,16 +177,20 @@ final class WrittenArrayReads
 
     /**
      * The variables that an assignment of $child puts the array into: the target, the root of a
-     * key target, a union with `+=` or the variables of a destructuring.
+     * key target, a union with `+=`, a `foreach` value or the variables of a destructuring.
      *
      * @return list<string>
      */
     private static function assigned(?Node $parent, Node $child): array
     {
-        if (!($parent instanceof Expr\Assign || $parent instanceof Expr\AssignOp\Plus) || $parent->expr !== $child) {
+        if ($parent instanceof Node\Stmt\Foreach_ && $parent->expr === $child) {
+            $var = $parent->valueVar;
+        } elseif (($parent instanceof Expr\Assign || $parent instanceof Expr\AssignOp\Plus) && $parent->expr === $child) {
+            $var = $parent->var;
+        } else {
             return [];
         }
-        $targets = $parent->var instanceof Expr\List_ || $parent->var instanceof Expr\Array_ ? array_map(static fn (?Node\ArrayItem $item): ?Expr => $item === null ? null : $item->value, $parent->var->items) : [$parent->var];
+        $targets = $var instanceof Expr\List_ || $var instanceof Expr\Array_ ? array_map(static fn (?Node\ArrayItem $item): ?Expr => $item === null ? null : $item->value, $var->items) : [$var];
         $names = [];
         foreach ($targets as $target) {
             while ($target instanceof Expr\ArrayDimFetch) {

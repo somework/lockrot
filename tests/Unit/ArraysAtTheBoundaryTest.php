@@ -216,6 +216,8 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'a copy of a key' => ["    public function a(\$o) { return Other::f(array_values(\$o->toArray()['findings'])); }", ['6: '.$other]];
         yield 'a destructured key' => ["    public function a(\$o) { ['findings' => \$f] = \$o->toArray(); return Other::f(\$f); }", ['6: '.$other]];
         yield 'an element of a list' => ["    public function rows(\$fs): array { \$rows = []; foreach (\$fs as \$x) { \$rows[] = \$x->toArray(); } return \$rows; }", ['6: '.$returns]];
+        yield 'a foreach value' => ["    public function a(\$o) { foreach (\$o->toArray() as \$row) { Other::f(\$row); } }", ['6: '.$other]];
+        yield 'a destructured foreach value' => ["    public function a(\$o) { foreach (\$o->findingRows() as ['id' => \$id]) { Other::f(\$id); } }", ['6: '.$other]];
         yield 'a union' => ["    public function a(\$o) { \$rows = []; \$rows += \$o->toArray(); return Other::f(\$rows); }", ['6: '.$other]];
         yield 'a yield' => ["    public function rows(\$fs): iterable { foreach (\$fs as \$f) { yield \$f->toArray(); } }", ['6: '.$returns]];
         yield 'a parameter of an arrow function with the same name' => ["    public function a(\$o, \$items) { \$row = \$o->toArray(); echo \$row['id']; return array_map(static fn (\$row) => Other::f(\$row), \$items); }", []];
