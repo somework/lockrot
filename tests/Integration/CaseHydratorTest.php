@@ -28,7 +28,7 @@ final class CaseHydratorTest extends TestCase
         $case = CaseHydrator::case('A');
         $recorded = JsonPath::arrayAt($case, ['finding']);
 
-        $document = CaseHydrator::report($case)->toArray();
+        $document = JsonPath::decoded(CaseHydrator::report($case)->toArray());
 
         $finding = null;
         foreach (JsonPath::arrayAt($document, ['findings']) as $row) {

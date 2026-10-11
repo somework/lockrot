@@ -57,7 +57,7 @@ final class FindingDetailsTest extends TestCase
         self::assertNotNull($package);
         $facts = new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage($feeds, $records, $reason));
 
-        $security = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->security([], null);
+        $security = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->toSecurityArray([], null);
 
         self::assertSame($check, $security['check']);
     }
@@ -71,14 +71,14 @@ final class FindingDetailsTest extends TestCase
         $rows = [['id' => 'PKSA-a', 'severity' => 'high', 'counted' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null, 'reason' => 'releases_unknown']]];
         $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null));
 
-        $security = $details->security($rows, '1.x');
+        $security = $details->toSecurityArray($rows, '1.x');
 
         self::assertSame(
             ['fixed' => 0, 'unknown' => 1, 'of' => 1, 'fix_kind' => null, 'lowest' => null, 'newest' => null, 'held_by' => [], 'if_applied' => null],
             $security['installed_branch_fixes']
         );
         self::assertStringContainsString(' — fix not known on 1.x;', $details->vulnerableSummary($rows, '1.x', 'high'));
-        self::assertNull($details->security($rows, null)['installed_branch_fixes'], 'a branch snapshot has no installed branch');
+        self::assertNull($details->toSecurityArray($rows, null)['installed_branch_fixes'], 'a branch snapshot has no installed branch');
     }
 
     /** Case `A-php-star‡`: the project's `require.php` is `*`, which admits the installed release. */
@@ -124,7 +124,7 @@ final class FindingDetailsTest extends TestCase
         $package = $lock->find('vendor/a');
         self::assertNotNull($package);
 
-        $security = FindingDetails::of(new PackageFacts($package, null, null, []), null, new PhpFloor('8.4', null), [$ignored], [], null)->security([], null);
+        $security = FindingDetails::of(new PackageFacts($package, null, null, []), null, new PhpFloor('8.4', null), [$ignored], [], null)->toSecurityArray([], null);
 
         self::assertSame(1, $security['ignored_count']);
         self::assertSame(
@@ -146,7 +146,7 @@ final class FindingDetailsTest extends TestCase
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
         ];
 
-        $security = $details->security($rows, '1.x');
+        $security = $details->toSecurityArray($rows, '1.x');
 
         self::assertSame('medium', $security['worst']);
         self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 1, 'unrated' => 0, 'low' => 1], $security['counts']);
@@ -171,13 +171,48 @@ final class FindingDetailsTest extends TestCase
             ['id' => 'PKSA-d', 'severity' => 'low', 'fix' => []],
         ];
 
-        $security = $details->security($rows, '1.x');
+        $security = $details->toSecurityArray($rows, '1.x');
 
         self::assertSame(['fixed' => 2, 'unknown' => 2, 'of' => 4], \array_slice(JsonPath::arrayAt($security, ['installed_branch_fixes']), 0, 3));
         self::assertSame(1, JsonPath::intAt($security, ['counts', 'acme:severe']));
         self::assertSame(3, JsonPath::intAt($security, ['counts', 'low']));
         self::assertSame('low', $security['worst']);
         self::assertSame('unknown', $security['fix_kind'], 'a row with no kind reads as unknown');
+    }
+
+    /** The standing that report-2's root counts: the status, the counts and the hardest fix kind of the counted rows. */
+    public function testTheStandingOfCountedRowsIsVulnerableWithTheHardestKind(): void
+    {
+        $ignored = new IgnoredAdvisory(new Advisory('PKSA-i', null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, 'PKSA-i', null, AdvisoryIgnoreMatch::BY_AUDIT));
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null);
+        $rows = [
+            ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update']],
+            ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'raise-php']],
+            ['id' => 'PKSA-c', 'severity' => 'low', 'fix' => ['kind' => 'upgrade']],
+        ];
+
+        $standing = $details->standing($rows);
+
+        self::assertSame('vulnerable', $standing->status());
+        self::assertSame('partial', $standing->check());
+        self::assertSame(1, $standing->ignoredCount());
+        self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 0, 'unrated' => 0, 'low' => 2, 'acme:severe' => 1], $standing->counts());
+        self::assertSame('raise-php', $standing->fixKind());
+        self::assertSame(1, $details->toSecurityArray($rows, null)['ignored_count'], 'a vulnerable package counts its ignored advisories too');
+    }
+
+    /** With no counted row, the lookup decides the status, and nothing is counted or fixed. */
+    public function testTheStandingWithNoRowFollowsTheLookup(): void
+    {
+        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null);
+
+        self::assertSame('clear', $details('complete')->standing([])->status());
+        self::assertSame('unchecked', $details('partial')->standing([])->status());
+        self::assertSame('unchecked', $details('not_run')->standing([])->status());
+        self::assertSame('not_run', $details('not_run')->standing([])->check());
+        self::assertSame(0, $details('complete')->standing([])->ignoredCount());
+        self::assertNull($details('complete')->standing([])->fixKind());
+        self::assertSame([], array_filter($details('complete')->standing([])->counts()));
     }
 
     /**

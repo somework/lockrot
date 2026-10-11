@@ -21,7 +21,7 @@ final class ScoreBasisSampleTest extends TestCase
 
         foreach ($sample as $label => $row) {
             $inputs = ScoreSweep::parse($row);
-            self::assertSame([], ScoreInvariants::violations($inputs, ScoreSweep::basis($inputs)->toArray()), $label.': '.$row);
+            self::assertSame([], ScoreInvariants::violations($inputs, ScoreSweep::decoded(ScoreSweep::basis($inputs))), $label.': '.$row);
         }
     }
 }

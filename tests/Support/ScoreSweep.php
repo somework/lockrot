@@ -15,9 +15,17 @@ use Lockrot\Verdict\ScoreModel;
  * the canonical row of each evaluated score. tools/score/README.md documents the row and the commands
  * that write tests/fixtures/score/sweep-rows.txt.gz.
  *
- * @phpstan-import-type Graded from ScoreBasis
- * @phpstan-import-type Zero from ScoreBasis
+ * The shapes of `finding.score` as a reader decodes it:
  *
+ * @phpstan-type Modifier array{reason: string, applies_to: string, divide_by: int, before: int|float, after: int|float}
+ * @phpstan-type Accepted array{flag: string, weight: int, if_counted: array{total: int, verdict: string, role: ?string, at_least: bool, modifiers: list<Modifier>}}
+ * @phpstan-type Without array{remove: array{kind: string, id: string}, revealed: list<array{flag: string, role: string}>, total: int, verdict: string, lead: ?string, deciding_advisory: ?string, at_least: bool}
+ * @phpstan-type MaintenanceTerm array{part: 'maintenance', flag: string, role: string, weight: int, divisor: int, points: int, contribution: int|float}
+ * @phpstan-type SecurityTerm array{part: 'security', flag: string, role: string, advisory: string, severity: string, fix_kind: string, weight: int, multiplier: int, points: int, contribution: int|float}
+ * @phpstan-type Term MaintenanceTerm|SecurityTerm
+ * @phpstan-type Part array{status: string, contribution: int|float, alone: array{total: int, verdict: ?string}}
+ * @phpstan-type Graded array{model: int, total: int, exact: int|float, rounded_down: bool, band: array{floor: int, next: ?string, to_next: ?int}, decided_by: string, parts: array{maintenance: Part, security: array{status: string, contribution: int|float, alone: array{total: int, verdict: ?string}, of: int, tied: list<string>}}, terms: list<Term>, modifiers: list<Modifier>, accepted: list<Accepted>, without: list<Without>, text: string}
+ * @phpstan-type Zero array{model: int, total: int, exact: int, accepted: list<Accepted>, text: string}
  * @phpstan-type Advisory array{id: string, severity: string, fix_kind: string}
  * @phpstan-type Inputs array{axis: string, flags: list<string>, advisories: list<array{string, string}>, reach: string, dev: bool, under: ?string, accepted: ?string}
  */
@@ -186,6 +194,19 @@ final class ScoreSweep
     }
 
     /**
+     * The score object as a reader of report-2 decodes it.
+     *
+     * @return Graded|Zero
+     */
+    public static function decoded(ScoreBasis $basis): array
+    {
+        /** @var Graded|Zero $score json_decode() gives back what jsonSerialize() writes, each object as its own shape */
+        $score = JsonPath::decoded($basis);
+
+        return $score;
+    }
+
+    /**
      * @param Graded|Zero $score
      *
      * @return Graded
@@ -202,7 +223,7 @@ final class ScoreSweep
     /** @param Inputs $inputs */
     public static function row(array $inputs): string
     {
-        return self::format($inputs, self::basis($inputs)->toArray());
+        return self::format($inputs, self::decoded(self::basis($inputs)));
     }
 
     /**

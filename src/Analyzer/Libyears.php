@@ -28,8 +28,6 @@ final class Libyears
     /** The block lists the reasons in this order. {@see measure()} checks them in another. */
     public const REASONS = [self::BRANCH_SNAPSHOT, self::NO_STABLE_RELEASE_DATE, self::NOT_FROM_COMPOSER_REPOSITORY, self::METADATA_UNAVAILABLE];
 
-    private const DECIMALS = 2;
-
     private float $total;
     private float $direct;
     private int $measured;
@@ -248,21 +246,5 @@ final class Libyears
         }
 
         return \sprintf('%d of %d packages', $this->measured, $packages);
-    }
-
-    /** @return array<string, mixed> the block `--format=json` writes, each number rounded once */
-    public function toArray(): array
-    {
-        return [
-            'total' => $this->measured === 0 ? null : round($this->total, self::DECIMALS),
-            'direct_requirements' => $this->measured === 0 ? null : round($this->direct, self::DECIMALS),
-            'measured' => $this->measured,
-            'unmeasured' => $this->unmeasured,
-            'furthest_behind' => $this->worst === null ? null : [
-                'package' => $this->worst[0]->package(),
-                'version' => $this->worst[0]->version(),
-                'libyears' => round($this->worst[1], self::DECIMALS),
-            ],
-        ];
     }
 }

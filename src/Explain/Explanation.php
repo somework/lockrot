@@ -23,6 +23,10 @@ use Lockrot\Verdict\FindingDetails;
  * facts are the ones the rules read ({@see \Lockrot\Analyzer\Analysis}).
  *
  * @internal
+ *
+ * @phpstan-type Lock array{php: ?string, released: ?string, repository: ?string, from_composer_repository: bool, dev: bool, branch_snapshot: bool, type: ?string}
+ * @phpstan-type Metadata array<string, mixed>
+ * @phpstan-type Activity array{forge: string, repository: string, archived: bool, pushed_at: ?string, fetched_at: ?string, from_cache: bool}
  */
 final class Explanation
 {
@@ -162,9 +166,63 @@ final class Explanation
     public function toArray(): array
     {
         $package = $this->facts->package();
+        // Both command paths give the report its run. A caller that skips them passed the target PHP to the constructor.
+        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp);
+        $basis = $this->finding->priorityBasis();
+
+        return [
+            'package' => $package->name(),
+            'version' => $package->version(),
+            'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
+            'lock' => $this->lock(),
+            'metadata' => $this->metadata(),
+            'activity' => $this->activity(),
+            'run' => $run->toExplainArray(),
+            'legacy' => ['verdict' => $this->finding->verdict(), 'priority' => $basis->priority(), 'basis' => $basis->toArray()],
+            'generated_at' => self::date($this->report->generatedAt()),
+            'notes' => $this->report->notes(),
+            'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),
+        ];
+    }
+
+    /**
+     * The blocks that the HTML report puts beside a finding.
+     *
+     * @return array{metadata: ?Metadata, lock: Lock, activity: ?Activity}
+     */
+    public function toDetailsArray(): array
+    {
+        return ['metadata' => $this->metadata(), 'lock' => $this->lock(), 'activity' => $this->activity()];
+    }
+
+    /** @return Lock */
+    private function lock(): array
+    {
+        $package = $this->facts->package();
+
+        return [
+            'php' => $package->requirePhp(),
+            'released' => self::date($package->time()),
+            'repository' => RepositoryUrl::shown($package->repositoryUrl()),
+            'from_composer_repository' => $package->isFromComposerRepository(),
+            'dev' => $package->isDev(),
+            'branch_snapshot' => $package->isBranchSnapshot(),
+            'type' => $package->type(),
+        ];
+    }
+
+    /**
+     * The repository metadata with the branch rows, null when lockrot did not read it.
+     *
+     * @return ?Metadata
+     */
+    private function metadata(): ?array
+    {
         $metadata = $this->facts->metadata();
-        $activity = $this->facts->activity();
-        $installed = InstalledRelease::of($package, $metadata);
+        if ($metadata === null || $this->finding->details()->metadataStatus() !== PackageFacts::METADATA_READ) {
+            return null;
+        }
+        $installed = InstalledRelease::of($this->facts->package(), $metadata);
         $branches = [];
         foreach ($this->rows() as $row) {
             $branches[] = [
@@ -185,55 +243,37 @@ final class Explanation
             ] + $this->rowExtras($row);
         }
 
-        // Both command paths give the report its run. A caller that skips them passed the target PHP to the constructor.
-        $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp);
-        $runKeys = ['target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts', 'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model'];
-        $runArray = $run->toArray();
-        $basis = $this->finding->priorityBasis();
-
         return [
-            'package' => $package->name(),
-            'version' => $package->version(),
-            'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
-            'lock' => [
-                'php' => $package->requirePhp(),
-                'released' => self::date($package->time()),
-                'repository' => RepositoryUrl::shown($package->repositoryUrl()),
-                'from_composer_repository' => $package->isFromComposerRepository(),
-                'dev' => $package->isDev(),
-                'branch_snapshot' => $package->isBranchSnapshot(),
-                'type' => $package->type(),
-            ],
-            'metadata' => $metadata === null || $this->finding->details()->metadataStatus() !== PackageFacts::METADATA_READ ? null : [
-                'abandoned' => $metadata->isAbandoned(),
-                'replacement' => $metadata->replacement(),
-                'releases_listed' => $metadata->releaseCount(),
-                'has_stable_release' => $metadata->hasStableRelease(),
-                'last_stable_release' => self::date($metadata->lastStableReleaseAt()),
-                'last_stable_version' => $metadata->lastStableVersion(),
-                'last_stable_dated_by' => $metadata->lastStableDatedBy(),
-                // The installed end of the libyears, as {@see InstalledRelease::of()} dates it.
-                'installed_release' => self::date($installed->at()),
-                'installed_release_dated_by' => $installed->datedBy(),
-                'repository' => RepositoryUrl::shown($metadata->repositoryUrl()),
-                'type' => $metadata->type(),
-                'data_date' => self::date($metadata->dataDate()),
-                'branches' => $branches,
-                'installed_branch' => $this->installedBranch() === null ? null : ReleaseBranch::label((string) $this->installedBranch()),
-            ],
-            'activity' => $activity === null ? null : [
-                'forge' => $activity->ref()->forgeLabel(),
-                'repository' => $activity->repo(),
-                'archived' => $activity->isArchived(),
-                'pushed_at' => self::date($activity->pushedAt()),
-                'fetched_at' => self::date($activity->fetchedAt()),
-                'from_cache' => $activity->fromCache(),
-            ],
-            'run' => array_intersect_key($runArray, array_flip($runKeys)),
-            'legacy' => ['verdict' => $this->finding->verdict(), 'priority' => $basis->priority(), 'basis' => $basis->toArray()],
-            'generated_at' => self::date($this->report->generatedAt()),
-            'notes' => $this->report->notes(),
-            'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),
+            'abandoned' => $metadata->isAbandoned(),
+            'replacement' => $metadata->replacement(),
+            'releases_listed' => $metadata->releaseCount(),
+            'has_stable_release' => $metadata->hasStableRelease(),
+            'last_stable_release' => self::date($metadata->lastStableReleaseAt()),
+            'last_stable_version' => $metadata->lastStableVersion(),
+            'last_stable_dated_by' => $metadata->lastStableDatedBy(),
+            // The installed end of the libyears, as {@see InstalledRelease::of()} dates it.
+            'installed_release' => self::date($installed->at()),
+            'installed_release_dated_by' => $installed->datedBy(),
+            'repository' => RepositoryUrl::shown($metadata->repositoryUrl()),
+            'type' => $metadata->type(),
+            'data_date' => self::date($metadata->dataDate()),
+            'branches' => $branches,
+            'installed_branch' => $this->installedBranch() === null ? null : ReleaseBranch::label((string) $this->installedBranch()),
+        ];
+    }
+
+    /** @return ?Activity */
+    private function activity(): ?array
+    {
+        $activity = $this->facts->activity();
+
+        return $activity === null ? null : [
+            'forge' => $activity->ref()->forgeLabel(),
+            'repository' => $activity->repo(),
+            'archived' => $activity->isArchived(),
+            'pushed_at' => self::date($activity->pushedAt()),
+            'fetched_at' => self::date($activity->fetchedAt()),
+            'from_cache' => $activity->fromCache(),
         ];
     }
 

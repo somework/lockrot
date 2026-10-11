@@ -49,7 +49,7 @@ final class ScoreTextEvaluatesToExactTest extends TestCase
         self::assertNotSame([], $sample);
 
         foreach ($sample as $label => $row) {
-            $score = ScoreSweep::basis(ScoreSweep::parse($row))->toArray();
+            $score = ScoreSweep::decoded(ScoreSweep::basis(ScoreSweep::parse($row)));
             self::assertSame([$score['total'], ScoreSweep::halves($score['exact'])], ScoreLineEvaluator::evaluate($score['text']), $label.': '.$score['text']);
         }
     }
@@ -62,7 +62,7 @@ final class ScoreTextEvaluatesToExactTest extends TestCase
     {
         $lines = 0;
         foreach (ScoreSweep::inputs() as $inputs) {
-            $score = ScoreSweep::basis($inputs)->toArray();
+            $score = ScoreSweep::decoded(ScoreSweep::basis($inputs));
             if (ScoreLineEvaluator::evaluate($score['text']) !== [$score['total'], ScoreSweep::halves($score['exact'])]) {
                 self::fail(ScoreSweep::format($inputs, $score).': '.$score['text']);
             }

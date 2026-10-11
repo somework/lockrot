@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Lockrot\Json\JsonWriter;
+
 /**
  * Typed reads into a `json_decode(..., true)` result.
  *
@@ -16,6 +18,29 @@ final class JsonPath
 {
     /** @var array<string, array<mixed, mixed>> path => decoded contents */
     private static array $files = [];
+
+    /**
+     * A value as a reader of its JSON gets it: written by the writers' encoder, then decoded.
+     * The decoded array is the same for `{}` and `[]`. For a shape that can hold an empty map,
+     * assert the bytes of {@see JsonWriter::encode()} too.
+     *
+     * @param mixed $value an array or a \JsonSerializable tree
+     *
+     * @return array<mixed, mixed>
+     */
+    public static function decoded($value): array
+    {
+        $json = JsonWriter::encode($value, 0);
+        if ($json === null) {
+            throw new \RuntimeException('the value does not encode: '.json_last_error_msg());
+        }
+        $decoded = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
+        if (!\is_array($decoded)) {
+            throw new \RuntimeException('the value does not encode as an array or object');
+        }
+
+        return $decoded;
+    }
 
     /**
      * @param array<mixed, mixed> $data

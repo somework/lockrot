@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
-use Lockrot\Score\ScoreBasis;
-use Lockrot\Score\ScoreText;
 use Lockrot\Verdict\ScoreModel;
 
 /**
@@ -14,10 +12,10 @@ use Lockrot\Verdict\ScoreModel;
  * own copy of the cover, because it reads only the decoded model.
  *
  * @phpstan-import-type Inputs from ScoreSweep
- * @phpstan-import-type Graded from ScoreBasis
- * @phpstan-import-type Zero from ScoreBasis
- * @phpstan-import-type SecurityTerm from ScoreBasis
- * @phpstan-import-type Accepted from ScoreBasis
+ * @phpstan-import-type Graded from ScoreSweep
+ * @phpstan-import-type Zero from ScoreSweep
+ * @phpstan-import-type SecurityTerm from ScoreSweep
+ * @phpstan-import-type Accepted from ScoreSweep
  */
 final class ScoreInvariants
 {
@@ -289,7 +287,7 @@ final class ScoreInvariants
         /** @var array<string, mixed> $decoded */
         $decoded = json_decode((string) json_encode($s, \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR);
         $bad = [];
-        if (ScoreText::render($decoded) !== $s['text']) {
+        if (ScoreLineFromJson::render($decoded) !== $s['text']) {
             $bad[] = 'I17 the text from the decoded object';
         }
         [$head, $body] = ScoreLineEvaluator::evaluate($s['text']);

@@ -138,11 +138,11 @@ final class LibyearsTest extends TestCase
                 $reasons[] = $reason;
             }
         }
-        $block = Libyears::fromFindings($findings)->toArray();
+        $block = Libyears::fromFindings($findings);
 
-        self::assertSame(array_merge(array_fill_keys(Libyears::REASONS, 0), array_count_values($reasons)), $block['unmeasured']);
-        self::assertSame([Libyears::BRANCH_SNAPSHOT => 2, Libyears::NO_STABLE_RELEASE_DATE => 0, Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0, Libyears::METADATA_UNAVAILABLE => 1], $block['unmeasured']);
-        self::assertSame(2, $block['measured']);
+        self::assertSame(array_merge(array_fill_keys(Libyears::REASONS, 0), array_count_values($reasons)), $block->unmeasured());
+        self::assertSame([Libyears::BRANCH_SNAPSHOT => 2, Libyears::NO_STABLE_RELEASE_DATE => 0, Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0, Libyears::METADATA_UNAVAILABLE => 1], $block->unmeasured());
+        self::assertSame(2, $block->measured());
     }
 
     public function testAYearOfSecondsIsOneLibyear(): void
@@ -359,12 +359,11 @@ final class LibyearsTest extends TestCase
         self::assertEqualsWithDelta(4.06, $behind, 0.005);
     }
 
-    public function testTheTotalsSumTheUnroundedValuesAndRoundOnce(): void
+    public function testTheTotalsSumTheUnroundedValues(): void
     {
         $block = Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of(1.005)), self::finding('b/b', LibyearsMeasurement::of(1.005))]);
 
-        self::assertSame(2.01, $block->total());
-        self::assertSame([2.01, 2.01], [$block->toArray()['total'], $block->toArray()['direct_requirements']]);
+        self::assertSame([2.01, 2.01], [$block->total(), $block->direct()]);
     }
 
     public function testDirectCountsOnlyTheDirectRequirements(): void
@@ -428,7 +427,6 @@ final class LibyearsTest extends TestCase
 
         self::assertNull($block->worst());
         self::assertSame(2, $block->measured());
-        self::assertNull($block->toArray()['furthest_behind']);
         self::assertSame('libyears: 0.0 behind across all 2 packages', $block->line());
         // A package at zero never outranks one that is behind, whatever the order.
         $worst = Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of(0.0)), self::finding('b/b', LibyearsMeasurement::of(0.4))])->worst();
@@ -445,9 +443,6 @@ final class LibyearsTest extends TestCase
         self::assertSame(0, $block->measured());
         self::assertNull($block->worst());
         self::assertSame('libyears: nothing to measure', $block->line());
-        self::assertNull($block->toArray()['furthest_behind']);
-        self::assertNull($block->toArray()['total'], 'and the document says so too');
-        self::assertNull($block->toArray()['direct_requirements']);
     }
 
     /**
@@ -467,12 +462,10 @@ final class LibyearsTest extends TestCase
         ]);
 
         self::assertNull($unmeasurable->total());
-        self::assertNull($unmeasurable->toArray()['total']);
-        self::assertNull($unmeasurable->toArray()['direct_requirements']);
+        self::assertNull($unmeasurable->direct());
         self::assertSame(0, $unmeasurable->measured());
         self::assertSame(0.0, $measuredAndCurrent->total(), 'measured, and nothing is behind');
-        self::assertSame(0.0, $measuredAndCurrent->toArray()['total']);
-        self::assertSame(0.0, $measuredAndCurrent->toArray()['direct_requirements']);
+        self::assertSame(0.0, $measuredAndCurrent->direct());
         self::assertSame(2, $measuredAndCurrent->measured());
     }
 
@@ -501,27 +494,5 @@ final class LibyearsTest extends TestCase
 
         self::assertSame('libyears: none of the 2 packages could be measured', $block->line());
         self::assertSame('libyears: the one package could not be measured', Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-main')])->line());
-    }
-
-    public function testTheArrayIsTheBlockTheSchemaDescribes(): void
-    {
-        $block = Libyears::fromFindings([
-            self::finding('smalot/pdfparser', LibyearsMeasurement::of(4.7123), true, 'v1.1.0'),
-            self::finding('psr/log', LibyearsMeasurement::of(3.36), false, '1.1.4'),
-            self::finding('wallabag/rulerz', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-master'),
-        ]);
-
-        self::assertSame([
-            'total' => 8.07,
-            'direct_requirements' => 4.71,
-            'measured' => 2,
-            'unmeasured' => [
-                Libyears::BRANCH_SNAPSHOT => 1,
-                Libyears::NO_STABLE_RELEASE_DATE => 0,
-                Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0,
-                Libyears::METADATA_UNAVAILABLE => 0,
-            ],
-            'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.71],
-        ], $block->toArray());
     }
 }
