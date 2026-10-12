@@ -17,12 +17,12 @@ use PHPUnit\Framework\TestCase;
  */
 final class ValidateSignalsTest extends TestCase
 {
-    /** The reference model's `SIG_KEYS`, as `project_fixtures.py` projects them onto this draft: S4 keeps `activity`. */
+    /** The reference model's `SIG_KEYS`, as `project_fixtures.py` projects them onto this draft. */
     private const KEYS = [
         'S1' => ['marked_by', 'replacement', 'replacement_url'],
         'S2' => ['last_release', 'last_version', 'years', 'dated_by'],
         'S3' => ['repo', 'host', 'forge'],
-        'S4' => ['last_push', 'repo', 'host', 'years', 'forge', 'activity'],
+        'S4' => ['last_push', 'repo', 'host', 'years', 'forge', 'event'],
         'S5' => ['target_php', 'target_major', 'ga_date', 'php_constraint', 'written_for_php', 'released'],
         'S6' => ['version', 'reason', 'has_stable_release', 'last_stable_release', 'last_stable_version', 'last_stable_dated_by', 'snapshot_time', 'tag_relation'],
         'S7' => ['flagged', 'packages'],
