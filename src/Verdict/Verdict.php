@@ -48,6 +48,6 @@ final class Verdict
     /** @deprecated misreads a grade: call {@see Verdict013::flagged()} on a report-1 verdict, or {@see Finding::isGraded()} */
     public static function flagged(string $verdict): bool
     {
-        return Verdict013::flagged($verdict);
+        return (Verdict013::flagged($verdict));
     }
 }

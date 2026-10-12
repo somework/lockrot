@@ -29,6 +29,6 @@ final class MetadataFailure
     /** @param string $message a reason {@see MetadataBatch::failed()} gives for a package */
     public static function reason(string $message): string
     {
-        return self::BY_MESSAGE[$message] ?? self::FETCH_FAILED;
+        return (self::BY_MESSAGE[$message] ?? self::FETCH_FAILED);
     }
 }
