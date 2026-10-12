@@ -531,6 +531,7 @@ final class FindingTest extends TestCase
     public function testNamedInIsTheSectionsTheAnalyzerFound(array $sections): void
     {
         $finding = (new FindingBuilder())->withNamedIn($sections)->build();
+        $finding->withComposerJson(false, [ProjectConfig::REQUIRE_DEV]);
 
         self::assertSame($sections, $finding->namedIn());
         self::assertSame($sections, $finding->toArray()['named_in']);

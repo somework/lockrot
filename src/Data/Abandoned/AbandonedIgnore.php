@@ -47,7 +47,7 @@ final class AbandonedIgnore
      */
     public static function fromConfig(Config $config, ?AbandonedPolicyReader $reader = null): self
     {
-        $ignore = clone self::listOf($config, $reader ?? new ComposerAbandonedPolicyReader());
+        $ignore = self::listOf($config, $reader ?? new ComposerAbandonedPolicyReader());
         try {
             $ignore->notAuditedBy = self::notAudited($config);
         } catch (\Throwable $e) {

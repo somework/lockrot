@@ -14,6 +14,12 @@ final class ProjectConfigTest extends TestCase
     /** @var list<string> */
     private array $tempDirs = [];
 
+    public function testOnlyALockOnlyRunHasNotReadAComposerJson(): void
+    {
+        self::assertFalse(ProjectConfig::empty()->isRead());
+        self::assertTrue(ProjectConfig::fromArray([])->isRead());
+    }
+
     public function testReadsRequiresExtraAndPlatform(): void
     {
         $cfg = ProjectConfig::fromFile(__DIR__.'/../../fixtures/mini/composer.json');

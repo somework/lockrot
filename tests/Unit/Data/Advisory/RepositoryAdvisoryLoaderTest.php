@@ -442,6 +442,20 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         return array_map(static fn (AdvisoryRepository $repository): array => [$repository->outcome(), $repository->reason()], $batch->coverage()->repositories());
     }
 
+    /** A feed that lists one advisory twice for a name holds one record of it. */
+    public function testAFeedCountsEachAdvisoryOfANameOnce(): void
+    {
+        $server = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '<2.0', []), self::record('PKSA-cache-1', '<2.0', [])]]);
+        $server->start();
+        try {
+            $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['doctrine/cache' => '2.2.0']);
+        } finally {
+            $server->stop();
+        }
+
+        self::assertSame(1, self::feed($batch, 'doctrine/cache', 0)['records']);
+    }
+
     public function testOneRequestPerRepositoryAsksEveryNameForEveryVersion(): void
     {
         $server = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '>=2.0,<2.3', []), self::record('PKSA-cache-2', '<2.0', [])], 'doctrine/annotations' => []]);

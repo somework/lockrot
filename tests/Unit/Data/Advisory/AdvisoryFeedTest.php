@@ -44,6 +44,7 @@ final class AdvisoryFeedTest extends TestCase
         yield 'WP Packages' => ['composer repo (https://wp-packages.org)', 'wp-packages.org'];
         yield 'another repository' => ['composer repo (https://satis.example.test)', null];
         yield 'a name without a URL' => ['my-repo', null];
+        yield 'a host in capitals' => ['composer repo (https://Repo.Packagist.ORG)', 'packagist.org'];
     }
 
     /** @dataProvider registries */
@@ -62,6 +63,9 @@ final class AdvisoryFeedTest extends TestCase
             ['composer_repository' => self::PACKAGIST, 'registry' => 'packagist.org', 'outcome' => 'answered', 'reason' => null, 'message' => null, 'packages_with_records' => 4, 'records' => 33],
             JsonPath::decoded($answered)
         );
+        $unanswered = AdvisoryRepository::of(self::PACKAGIST, AdvisoryRepository::ANSWERED);
+        $unanswered->withRecords(3, 1);
+        self::assertNull($unanswered->records(), 'withRecords() returns a copy');
         self::assertSame([null, null], [AdvisoryRepository::of(self::PACKAGIST, AdvisoryRepository::NO_FEED)->records(), AdvisoryRepository::of(self::PACKAGIST, AdvisoryRepository::NO_FEED)->packagesWithRecords()]);
     }
 
