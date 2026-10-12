@@ -1137,7 +1137,7 @@ final class JsonSchemaConformanceTest extends TestCase
         mkdir($dir);
         try {
             foreach (['apps/wallabag_wallabag', 'skeletons/laravel'] as $fixture) {
-                $file = BaselineFile::resolve($dir, null);
+                $file = BaselineFile::resolve($dir, null, '0.14.0');
                 $file->write(Baseline::fromReport(self::analysis($fixture)->report()));
                 $json = (string) file_get_contents($file->path());
 

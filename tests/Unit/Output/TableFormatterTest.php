@@ -9,12 +9,12 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -548,10 +548,10 @@ final class TableFormatterTest extends TestCase
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
-        $baseline = Baseline::of([
-            new BaselineEntry('doctrine/cache', '2.2.0', Verdict::ABANDONED, '2026-01-15'),
-            new BaselineEntry('hoa/compiler', '3.17.08.08', Verdict::STALE, '2026-01-15'),
-            new BaselineEntry('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('doctrine/cache', '2.2.0', Verdict::ABANDONED, '2026-01-15'),
+            BaselineEntries::of('hoa/compiler', '3.17.08.08', Verdict::STALE, '2026-01-15'),
+            BaselineEntries::of('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
         ], '2026-09-14T06:00:00+00:00');
 
         return $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));

@@ -7,11 +7,11 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
@@ -40,14 +40,14 @@ final class FormatContextTest extends TestCase
     {
         $rows = [];
         foreach ($entries as [$package, $verdict]) {
-            $rows[] = new BaselineEntry($package, '1.0.0', $verdict, '2026-01-15');
+            $rows[] = BaselineEntries::of($package, '1.0.0', $verdict, '2026-01-15');
         }
         $names = [];
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
 
-        return BaselineComparison::compare(Baseline::of($rows, self::AT), $report, 'lockrot-baseline.json', $names);
+        return BaselineComparison::compare(BaselineEntries::baseline($rows, self::AT), $report, 'lockrot-baseline.json', $names);
     }
 
     public function testDefaultsWithoutABaseline(): void

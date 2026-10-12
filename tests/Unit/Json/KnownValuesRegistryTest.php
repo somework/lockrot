@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Json;
 
 use Lockrot\Allowlist\BuiltinAllowlist;
+use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Config\Gate;
+use Lockrot\Config\LockrotConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
@@ -18,6 +20,7 @@ use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Json\Schemas;
 use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Output\MarkedFact;
 use Lockrot\Security\Fix;
 use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\AgeMeasure;
@@ -26,15 +29,12 @@ use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Lockrot\Allowlist\UncheckedAcceptanceEntry;
-use Lockrot\Output\MarkedFact;
-use Lockrot\Verdict\FailOn;
-use Lockrot\Config\LockrotConfig;
 use PHPUnit\Framework\TestCase;
 
 /**

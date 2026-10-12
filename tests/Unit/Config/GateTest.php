@@ -7,11 +7,11 @@ namespace Lockrot\Tests\Unit\Config;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -196,14 +196,14 @@ final class GateTest extends TestCase
         $entries = [];
         foreach ($report->flagged() as $finding) {
             if ($baseline === 'known') {
-                $entries[] = new BaselineEntry($finding->package(), '1.0.0', $finding->verdict(), '2026-01-15');
+                $entries[] = BaselineEntries::of($finding->package(), '1.0.0', $finding->verdict(), '2026-01-15');
             } elseif ($baseline === 'worsened') {
-                $entries[] = new BaselineEntry($finding->package(), '1.0.0', Verdict::STALE, '2026-01-15');
+                $entries[] = BaselineEntries::of($finding->package(), '1.0.0', Verdict::STALE, '2026-01-15');
             }
         }
         $names = array_map(static fn (Finding $finding): string => $finding->package(), $findings);
 
-        return $report->withBaseline(BaselineComparison::compare(Baseline::of($entries, self::AT), $report, 'lockrot-baseline.json', $names));
+        return $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline($entries, self::AT), $report, 'lockrot-baseline.json', $names));
     }
 
     /** Oracle: the exit code of a check run, as a loop over the findings. */

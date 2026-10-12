@@ -317,7 +317,7 @@ final class SchemaEvolutionTest extends TestCase
         $findings = JsonPath::arrayAt(self::decode($version, self::BASELINE), ['findings']);
         self::assertNotSame([], $findings);
 
-        self::assertSame(\count($findings), BaselineFile::resolve(self::DIR.$version, self::BASELINE)->read()->count());
+        self::assertSame(\count($findings), BaselineFile::resolve(self::DIR.$version, self::BASELINE, '0.14.0')->read()->count());
         self::assertSame(self::BASELINE, JsonPath::stringAt(self::decode($version, 'report.json'), ['baseline', 'path']), 'the report was compared against it');
     }
 

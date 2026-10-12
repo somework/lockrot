@@ -9,15 +9,14 @@ use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\Report2Root;
-use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\Gate;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -39,7 +38,7 @@ final class Report2RootTest extends TestCase
         $new = (new FindingBuilder())->withPackage('vendor/new')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/new'])->build();
         $fine = (new FindingBuilder())->withPackage('vendor/fine')->withChain(['vendor/fine'])->build();
         $report = new Report([$known, $new, $fine], [], new \DateTimeImmutable(self::AT), 3, 0);
-        $baseline = Baseline::of([new BaselineEntry('vendor/known', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('vendor/known', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
         $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/new', 'vendor/fine']));
 
         $check = Report2Root::toGateArray(Gate::decide($compared, FailOn::fromString('low'), false, Gate::MODE_CHECK), Gate::MODE_CHECK);

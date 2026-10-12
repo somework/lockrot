@@ -7,7 +7,6 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
@@ -15,6 +14,7 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\GithubFormatter;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -274,9 +274,9 @@ final class GithubFormatterTest extends TestCase
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
-        $baseline = Baseline::of([
-            new BaselineEntry('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
-            new BaselineEntry('acme/silent', '2.0.8', Verdict::STALE, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+            BaselineEntries::of('acme/silent', '2.0.8', Verdict::STALE, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
 
@@ -290,8 +290,8 @@ final class GithubFormatterTest extends TestCase
     public function testBaselineStaleEntriesBecomeANotice(): void
     {
         $report = $this->report();
-        $baseline = Baseline::of([
-            new BaselineEntry('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
 

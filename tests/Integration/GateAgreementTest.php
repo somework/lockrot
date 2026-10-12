@@ -11,7 +11,6 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Clock;
 use Lockrot\Config\Gate;
 use Lockrot\Data\Forge\ActivityClient;
@@ -30,6 +29,7 @@ use Lockrot\Output\FormatContext;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
@@ -255,7 +255,7 @@ final class GateAgreementTest extends TestCase
             $entry = $written->entryFor($finding->package());
             self::assertNotNull($entry, $finding->package());
             if (!$worsened && Verdict::severity($finding->verdict()) > Verdict::severity(Verdict::STALE)) {
-                $entries[] = new BaselineEntry($entry->package(), $entry->version(), Verdict::STALE, $entry->firstSeen());
+                $entries[] = BaselineEntries::of($entry->package(), $entry->version(), Verdict::STALE, $entry->firstSeen());
                 $worsened = true;
             } elseif ($skipped++ === 1) {
                 continue;
@@ -264,7 +264,7 @@ final class GateAgreementTest extends TestCase
             }
         }
 
-        return $report->flagged() === [] ? null : Baseline::of($entries, self::NOW);
+        return $report->flagged() === [] ? null : BaselineEntries::baseline($entries, self::NOW);
     }
 
     /** The report with a failed lookup among its notes, or with none: the notes are what the flag is computed from. */

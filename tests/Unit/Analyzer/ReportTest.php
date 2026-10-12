@@ -13,11 +13,11 @@ use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\Gate;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -544,7 +544,7 @@ final class ReportTest extends TestCase
             0
         );
         $comparison = BaselineComparison::compare(
-            Baseline::of([new BaselineEntry('vendor/a', '1.0.0', Verdict::SILENT, '2026-01-15')], '2026-09-14T00:00:00+00:00'),
+            BaselineEntries::baseline([BaselineEntries::of('vendor/a', '1.0.0', Verdict::SILENT, '2026-01-15')], '2026-09-14T00:00:00+00:00'),
             $report,
             'lockrot-baseline.json',
             ['vendor/a']
@@ -623,7 +623,7 @@ final class ReportTest extends TestCase
         self::assertFalse($withoutDev->toArray()['include_dev']);
         self::assertTrue($withDev->includesDev());
         self::assertTrue($withDev->toArray()['include_dev']);
-        $comparison = BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00'), $withDev, 'lockrot-baseline.json', ['vendor/ok']);
+        $comparison = BaselineComparison::compare(BaselineEntries::baseline([], '2026-09-14T00:00:00+00:00'), $withDev, 'lockrot-baseline.json', ['vendor/ok']);
         self::assertTrue($withDev->withBaseline($comparison)->includesDev(), 'the baseline view keeps the scope');
     }
 
@@ -803,7 +803,7 @@ final class ReportTest extends TestCase
 
         self::assertSame($oldest, $report->activityCacheOldestAt());
         self::assertSame('2026-09-13T20:00:00+00:00', $report->toArray()['activity_cache_oldest_at']);
-        $withBaseline = $report->withBaseline(BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00'), $report, 'lockrot-baseline.json', []));
+        $withBaseline = $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline([], '2026-09-14T00:00:00+00:00'), $report, 'lockrot-baseline.json', []));
         self::assertSame($oldest, $withBaseline->activityCacheOldestAt());
     }
 

@@ -7,7 +7,7 @@ namespace Lockrot\Tests\Unit\Baseline;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
@@ -34,10 +34,10 @@ final class BaselineComparisonTest extends TestCase
     {
         $entries = [];
         foreach ($rows as [$package, $version, $verdict, $firstSeen]) {
-            $entries[] = new BaselineEntry($package, $version, $verdict, $firstSeen);
+            $entries[] = BaselineEntries::of($package, $version, $verdict, $firstSeen);
         }
 
-        return Baseline::of($entries, self::AT);
+        return BaselineEntries::baseline($entries, self::AT);
     }
 
     /** @param list<string> $present */

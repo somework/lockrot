@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\GitlabFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
@@ -141,8 +140,8 @@ final class GitlabFormatterTest extends TestCase
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
-        $baseline = Baseline::of([
-            new BaselineEntry('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
 
@@ -251,7 +250,7 @@ final class GitlabFormatterTest extends TestCase
     public function testTheBaselineStaleNoteIsNotRepresentableAndIsDropped(): void
     {
         $report = $this->report();
-        $baseline = Baseline::of([new BaselineEntry('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', ['acme/abandoned']));
 
         $out = $this->formatter(Verdict::SILENT, $this->lockPath())->format($withBaseline);
