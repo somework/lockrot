@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.
   ([The score](docs/verdicts.md#score))
+- **Breaking:** **CLI:** `--fail-on=unchecked` also fails on two S10 reasons. `host_not_supported`
+  is a repository on a host that lockrot cannot ask. `not_from_composer_repository` is a package
+  from vcs or an unknown origin. Path, artifact and package origins stay skips. S10 adds no flag.
+  Action: list a GitLab host in Composer's `gitlab-domains`, or accept it in `accept-unchecked`.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -49,12 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive bound the next patch
   (`>7.1` no longer admits a branch that needs exactly `7.1.0`). S8 can then name another branch
   to follow. ([Within reach](docs/verdicts.md#within-reach))
-- **Breaking:** **CLI:** `--fail-on=unchecked` also fails when lockrot cannot ask a package's
-  repository host (S10 `host_not_supported`), and on a package installed from vcs or from an origin
-  lockrot cannot tell (S10 `not_from_composer_repository`). A package installed from a path is a
-  skip, and so is an artifact or package origin. No flag, score or grade changes. Action: list a
-  self-hosted GitLab in Composer's `gitlab-domains`, or accept a permanent gap in
-  `extra.lockrot.accept-unchecked`. ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** a repository that answers 404 no longer carries S10 `rate_limit` when the same
   host also rate-limits: the 404 is an answer.
   ([Not found](docs/notes.md#repository_activity_not_found))
@@ -75,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   through a dependency, `through[]` says whether that dependency's newest release requires it.
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
 - **json:** each finding states its repository activity lookup (`activity`: read, not found, or not
-  read and why). It changes no verdict. ([Schema](docs/schema.md))
+  read and why). ([Schema](docs/schema.md))
 - **All formats:** the run note `repository_activity_host_not_supported` names each repository host
   that lockrot cannot ask. ([Run notes](docs/notes.md#repository_activity_host_not_supported))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
@@ -87,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** **json:** report-2: `verdict` is a grade, and `lead`, `flags`, `score`,
   `next_step`, `security`, `checks_missing` and `run.score_model` join it. `run.gates[]` carry a
-  kind, S4's `data.activity` is `data.event`, and `evidence` holds the counted flags' summaries
+  kind, S4's `data` gains `forge` and `event`, and `evidence` holds the counted flags' summaries
   only. Action: assert `."$schema" == "https://lockrot.dev/schema/report-2.json"` first, then read
   `.findings[] | [.flags[].summary]`.
   ([Schema](docs/schema.md#migrating-from-report-1))

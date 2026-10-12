@@ -147,6 +147,8 @@ removes or redefines.
 | `run.fail_on_kind` | `run.gates[].kind` |
 | the cause keys of `counts` | the root `flags.<flag>.leading`. `counts` holds the verdicts |
 | `baseline.previous_verdict` | `baseline.recorded.lead` |
+| explain-1's top-level `activity` | explain-2's `finding.activity` |
+| the html page's `details.<package>.activity` | the finding's `activity`. `repository_link` stays in `details` |
 
 ## What the report schema types
 

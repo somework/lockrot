@@ -240,7 +240,7 @@ Composer's `gitlab-domains`:
 composer config gitlab-domains <host>
 ```
 
-lockrot cannot ask other forge software, such as Forgejo or Gitea, or a Subversion host.
+lockrot cannot ask other repository host software, such as Forgejo or Gitea, or a Subversion host.
 
 ## The lock
 
