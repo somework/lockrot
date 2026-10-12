@@ -1996,9 +1996,14 @@ final class LockrotCommandTest extends TestCase
      */
     private static function pagePayload(string $html): array
     {
-        if (preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $html, $match) !== 1) {
+        // A lazy regex over a page this size runs into PCRE's backtrack limit: find the element by position.
+        $open = '<script id="lockrot-data" type="application/json">';
+        $start = strpos($html, $open);
+        $end = $start === false ? false : strpos($html, '</script>', $start);
+        if ($start === false || $end === false) {
             self::fail('the page carries no data');
         }
+        $match = [1 => substr($html, $start + \strlen($open), $end - $start - \strlen($open))];
         $payload = json_decode($match[1], true);
         self::assertIsArray($payload);
 

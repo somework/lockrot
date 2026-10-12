@@ -110,8 +110,13 @@ final class SchemaClaimsTest extends TestCase
         'securityVulnerable/properties/partial/oneOf/0/properties/if_applied.at_most' => 'unverified is a sibling of if_applied in partial: encoded there when present; else engine',
         'findingBaseline/oneOf/0/properties/worsened_by/items.recorded' => 'encoded (worsened_by relation)',
         'findingBaseline/oneOf/0/properties/worsened_by/items.now' => 'encoded (worsened_by relation)',
-        '#/properties/libyears.unmeasured' => 'membership: each non-null libyears_unmeasured of a finding is one of its keys (a count over findings)',
-        '#/properties/libyears/properties/unmeasured.no_stable_release_date' => 'PROSE: what the reason covers',
+        'securityVulnerable.feeds' => 'order against another list: run.advisory_lookup.repositories (C75 R1)',
+        'securityClear.feeds' => 'order against another list: run.advisory_lookup.repositories (C75 R1)',
+        'securityUnchecked.feeds' => 'order against another list: run.advisory_lookup.repositories (C75 R1)',
+        'advisoryFeed.registry' => 'a host derived from the repository URL, outside the document',
+        'advisoryRepository.registry' => 'a host derived from the repository URL, outside the document',
+        'advisoryLookup.other_repositories' => 'the configured repositories are outside the document',
+        'rotDepth.require_dev_not_walked' => 'a count over findings (RotDepthTest)',
     ];
 
     /**

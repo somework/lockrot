@@ -72,6 +72,8 @@ final class ClosedSetsTest extends TestCase
      * constant while its file is still widened under its number.
      */
     private const FAIL_ON_KINDS_1 = ['none', 'verdict', 'priority', 'unchecked'];
+    /** report-1's libyears reasons, frozen with the `-1` files. */
+    private const LIBYEARS_REASONS_1 = ['branch_snapshot', 'no_stable_release_date', 'not_from_composer_repository', 'metadata_unavailable'];
     private const PRIORITY_STEPS_1 = ['transitive', 'unreached', 'dev', 'no_fix_expected'];
     private const NO_FIX_REASONS_1 = ['not_on_installed_branch', 'releases_unknown', 'affected_range_unknown', 'no_release_fixes'];
     /** The note codes lockrot 0.13.0 wrote: the `-1` files keep their 0.13.0 bytes, and RunNote::CODES writes one more. */
@@ -286,7 +288,7 @@ final class ClosedSetsTest extends TestCase
             ],
             'report-1 #/definitions/s6/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 's6', 'properties', 'reason']), self::WORD, [PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE], "S6's `reason`"],
             'report-1 #/definitions/s8/properties/floor_source/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 's8', 'properties', 'floor_source', 'oneOf', 0]), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "S8's `floor_source`"],
-            'report-1 #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
+            'report-1 #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, self::LIBYEARS_REASONS_1, "a finding's `libyears_unmeasured`"],
             'report-1 #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, self::PRIORITY_STEPS_1, "a `priority_basis` step's `reason`"],
             'report-1 #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($report, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, self::NO_FIX_REASONS_1, "a `no_fix_expected` item's `reason`"],
             'report-1 #/definitions/run/properties/mode' => [JsonPath::arrayAt($report, ['definitions', 'run', 'properties', 'mode']), self::WORD, Gate::MODES, '`run.mode`'],
@@ -295,7 +297,7 @@ final class ClosedSetsTest extends TestCase
             'report-1 #/definitions/findingGate/properties/exempt_by/oneOf/0' => [JsonPath::arrayAt($report, ['definitions', 'findingGate', 'properties', 'exempt_by', 'oneOf', 0]), self::WORD, Gate::EXEMPTIONS, "a finding's `gate.exempt_by`"],
             'explain-1 #/definitions/priorityStep/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'priorityStep', 'properties', 'reason']), self::WORD, self::PRIORITY_STEPS_1, "a `priority_basis` step's `reason`"],
             'explain-1 #/definitions/noFixAdvisory/properties/reason' => [JsonPath::arrayAt($explain, ['definitions', 'noFixAdvisory', 'properties', 'reason']), self::WORD, self::NO_FIX_REASONS_1, "a `no_fix_expected` item's `reason`"],
-            'explain-1 #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, Libyears::REASONS, "a finding's `libyears_unmeasured`"],
+            'explain-1 #/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [JsonPath::arrayAt($explain, ['definitions', 'finding', 'properties', 'libyears_unmeasured', 'oneOf', 0]), self::WORD, self::LIBYEARS_REASONS_1, "a finding's `libyears_unmeasured`"],
             'explain-1 #/definitions/metadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['php_blocked_by', 'oneOf', 0])), self::WORD, [PhpFloor::PROJECT, PhpFloor::TARGET], "the explanation's `php_blocked_by`"],
             'explain-1 #/definitions/metadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_target_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_target_php`'],
             'explain-1 #/definitions/metadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [JsonPath::arrayAt($explain, array_merge($branchRow, ['misses_project_php', 'oneOf', 0])), self::WORD, [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE], '`misses_project_php`'],

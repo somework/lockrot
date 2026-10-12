@@ -523,7 +523,7 @@ final class ReportTest extends TestCase
         self::assertSame($array['notes'], array_column($details, 'text'));
         self::assertSame(['offline', 'advisories_unavailable', 'not_from_composer_repository'], array_column($details, 'code'));
         self::assertSame('{}', json_encode(JsonPath::arrayAt($details, [0])['data']), 'no parameters is an empty object, never a list');
-        self::assertSame('{"package_count":2}', json_encode(JsonPath::arrayAt($details, [2])['data']));
+        self::assertSame('{"package_count":2,"advisories_asked":true}', json_encode(JsonPath::arrayAt($details, [2])['data']));
         self::assertSame([], (new Report([], [], $at, 0, 0))->toArray()['note_details']);
 
         $withRun = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::none(), RunSettings::SOURCE_OPTION, new Thresholds()));
