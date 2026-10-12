@@ -22,11 +22,11 @@ final class AbandonedIgnore
     private ?string $whyUnreadable;
     private ?AbandonedAuditOff $notAuditedBy = null;
 
-    /** @param list<array{pattern: string, reason: ?string, constraints: list<string>}> $rules */
+    /** @param list<AbandonedIgnoreRule> $rules */
     private function __construct(string $by, array $rules, ?string $whyUnreadable)
     {
         $this->by = $by;
-        $this->rules = array_map(static fn (array $rule): AbandonedIgnoreRule => new AbandonedIgnoreRule($rule['pattern'], $rule['reason'], $rule['constraints']), $rules);
+        $this->rules = $rules;
         $this->whyUnreadable = $whyUnreadable;
     }
 
@@ -35,7 +35,7 @@ final class AbandonedIgnore
         return new self(AbandonedIgnoreMatch::BY_POLICY, [], null);
     }
 
-    /** @param list<array{pattern: string, reason: ?string, constraints: list<string>}> $rules in config order */
+    /** @param list<AbandonedIgnoreRule> $rules in config order */
     public static function of(string $by, array $rules): self
     {
         return new self($by, $rules, null);
@@ -124,7 +124,7 @@ final class AbandonedIgnore
     /**
      * @param array<mixed> $list
      *
-     * @return list<array{pattern: string, reason: ?string, constraints: list<string>}>
+     * @return list<AbandonedIgnoreRule>
      */
     private static function fromAuditConfig(array $list): array
     {
@@ -132,9 +132,9 @@ final class AbandonedIgnore
         $isList = array_values($list) === $list;
         foreach ($list as $key => $value) {
             if (!$isList) {
-                $rules[] = ['pattern' => (string) $key, 'reason' => \is_string($value) ? $value : null, 'constraints' => []];
+                $rules[] = new AbandonedIgnoreRule((string) $key, \is_string($value) ? $value : null, []);
             } elseif (\is_string($value)) {
-                $rules[] = ['pattern' => $value, 'reason' => null, 'constraints' => []];
+                $rules[] = new AbandonedIgnoreRule($value, null, []);
             }
         }
 

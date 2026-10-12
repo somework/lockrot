@@ -42,7 +42,7 @@ final class ComposerAbandonedPolicyReader implements AbandonedPolicyReader
                     $constraints[] = $rule->constraint->getPrettyString();
                 }
             }
-            $rules[] = ['pattern' => (string) $pattern, 'reason' => $reason, 'constraints' => $constraints];
+            $rules[] = new AbandonedIgnoreRule((string) $pattern, $reason, $constraints);
         }
 
         return $rules;

@@ -30,7 +30,7 @@ interface AbandonedPolicyReader
      * @param array<mixed> $policy `config.policy`, an array
      * @param array<mixed> $audit  `config.audit`, an array
      *
-     * @return list<array{pattern: string, reason: ?string, constraints: list<string>}>
+     * @return list<AbandonedIgnoreRule>
      *
      * @throws \Throwable when Composer rejects the list
      */

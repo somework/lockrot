@@ -12,6 +12,7 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
@@ -151,7 +152,7 @@ final class AnalyzerLookupTest extends TestCase
 
     private static function listed(): AbandonedIgnore
     {
-        return AbandonedIgnore::of(AbandonedIgnoreMatch::BY_POLICY, [['pattern' => 'vendor/pkg', 'reason' => 'migration planned', 'constraints' => []]]);
+        return AbandonedIgnore::of(AbandonedIgnoreMatch::BY_POLICY, [new AbandonedIgnoreRule('vendor/pkg', 'migration planned', [])]);
     }
 
     /** An entry that accepts `stale` only cannot hide an archived repository: the lookup runs. */
