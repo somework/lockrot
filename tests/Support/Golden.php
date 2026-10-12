@@ -27,6 +27,15 @@ final class Golden
         $command = 'rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter '.$test.', then review the diff';
 
         Assert::assertFileExists($path, $command);
+        // Compare entry by entry first: a failing comparison of the whole file diffs every line, and on
+        // a large file that diff outruns the time limit of a mutant's test (MutantTestTimeLimit).
+        $expected = json_decode((string) file_get_contents($path), true);
+        $written = json_decode($json, true);
+        if (\is_array($expected) && \is_array($written)) {
+            foreach ($written as $key => $entry) {
+                Assert::assertSame($expected[$key] ?? null, $entry, $path.' '.$key.': '.$command);
+            }
+        }
         Assert::assertSame(file_get_contents($path), $json, $path.': '.$command);
     }
 }

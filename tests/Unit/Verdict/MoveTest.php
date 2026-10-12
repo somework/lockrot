@@ -88,7 +88,7 @@ final class MoveTest extends TestCase
     public function testEveryCaseWritesTheMoveInItsGoldenFile(): void
     {
         // Run the analyzer here, not through CaseHydrator::findings(): code that a data provider runs
-        // covers no test, so mutation testing would skip this one.
+        // covers no test, so mutation testing skips a test that reads it.
         $golden = [];
         foreach (self::casesWithInputs() as $id => [$case]) {
             $finding = self::hydrated(CaseHydrator::case($case));
