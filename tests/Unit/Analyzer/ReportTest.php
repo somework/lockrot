@@ -187,7 +187,7 @@ final class ReportTest extends TestCase
 
         self::assertSame(1, $report->abandonedWithReplacement());
         self::assertSame(['total' => 3, 'with_replacement' => 1, 'with_suggestion' => 1], $report->toArray()['abandoned'], 'Symfony names no package: a suggestion');
-        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 10, 3), 'the split sits right after the counts');
+        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 11, 3), 'the split sits right after the counts');
         self::assertStringStartsWith('4 packages checked · abandoned 3 (1 with a replacement) · silent 1 · ', $report->summaryLine());
 
         $none = $this->report($this->finding('vendor/dead', Verdict::ABANDONED));
@@ -254,7 +254,7 @@ final class ReportTest extends TestCase
             ['project' => 'Acme shop', 'root_package' => 'acme/shop', 'target_php' => '8.4', 'project_php' => '>=8.2', 'project_php_lowest' => '8.2.0', 'lock_file' => 'composer.lock', 'fail_on' => 'silent'],
             array_intersect_key($run, array_flip(['project', 'root_package', 'target_php', 'project_php', 'project_php_lowest', 'lock_file', 'fail_on']))
         );
-        self::assertSame([['value' => 'silent', 'kind' => 'flag', 'threshold' => 'silent']], $run['gates'], "report-1's verdict word is a flag gate");
+        self::assertSame([['value' => 'silent', 'kind' => 'flag', 'threshold' => 'silent']], JsonPath::decoded($run['gates']), 'a flag word is a flag gate');
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 6, 'push-high-years' => 8], $run['thresholds']);
         self::assertSame(['critical', 'high', 'medium', 'low'], $run['graded_verdicts']);
     }
@@ -312,7 +312,7 @@ final class ReportTest extends TestCase
      * report-2 writes a finding's standing against the baseline from baseline-2 on: with a
      * baseline-1 file, the root block names the file and each finding's `baseline` is null.
      */
-    public function testAFindingWritesNoStandingAgainstABaseline1File(): void
+    public function testEachFindingWritesItsStandingAgainstTheBaseline(): void
     {
         $report = $this->report(
             $this->finding('vendor/known', Verdict::STALE),
@@ -328,11 +328,14 @@ final class ReportTest extends TestCase
             ['vendor/known', 'vendor/worse', 'vendor/fresh']
         ));
 
+        $status = [];
         foreach (JsonPath::arrayAt($compared->toArray(), ['findings']) as $finding) {
             self::assertIsArray($finding);
-            self::assertNull($finding['baseline'], "report-2 writes a finding's standing from baseline-2 on");
+            $status[JsonPath::stringAt($finding, ['package'])] = JsonPath::stringAt($finding, ['baseline', 'status']);
         }
-        self::assertIsArray($compared->toArray()['baseline'], 'the root block names the file the run read');
+        ksort($status);
+        self::assertSame(['vendor/fresh' => 'new', 'vendor/known' => 'known', 'vendor/worse' => 'worsened'], $status);
+        self::assertSame(['path' => 'lockrot-baseline.json', 'known' => 1, 'new' => 1, 'worsened' => 1, 'stale' => []], JsonPath::arrayAt($compared->toArray(), ['baseline']));
     }
 
     public function testAFindingWithoutABaselineStandsNowhere(): void
@@ -386,7 +389,9 @@ final class ReportTest extends TestCase
         $document = $report->toArray();
 
         self::assertSame([], JsonPath::arrayAt($document, ['run', 'gates']));
-        self::assertNull($report->gate());
+        $gate = $report->gate();
+        self::assertNotNull($gate);
+        self::assertFalse($gate->fails());
         self::assertArrayHasKey('gate', $document);
         self::assertSame(['fails' => false, 'tripped_by' => []], \array_slice(JsonPath::arrayAt($document, ['gate']), 0, 2, true), 'report-2 always writes the gate');
         self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null, 'by' => [], 'basis' => null], JsonPath::arrayAt($document, ['findings', 0, 'gate']));
@@ -471,7 +476,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'rot_depth', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'packages_unchecked_accepted', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'rot_depth', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
             array_keys($array)
         );
         // The literal, not the constant: the document states the value it attributed by.
