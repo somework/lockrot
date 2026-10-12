@@ -280,7 +280,7 @@ def inputs_of(case):
 
     The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix or
     a move names. `dependents` holds the `require` names of each direct dependent that C08 measured, and `abandoned` the
-    marking that S1 reads."""
+    marking that S1 reads. `accept`, when present, holds the flags of the case's project allowlist entry."""
     f, det, run = case['finding'], case.get('details') or {}, case['run']
     rows = ((det.get('metadata') or {}).get('branches')) or []
     if not rows or f['metadata']['status'] != 'read':
@@ -354,7 +354,7 @@ def inputs_of(case):
     marking = None if s1 is None else {'by': s1['marked_by'], 'replacement': s1['replacement']}
     act = f.get('activity') or {}
     push = age.get('push') or {}
-    return {
+    inputs = {
         'root': dict({'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **dict(root_require, **root_links.pop('require', {})))}, **root_links),
         'lock': [{'name': f['package'], 'version': f['version'], 'time': installed_at, 'php': f['installed_php']['requires'], 'dev': f['dev'],
                   'origin': f['origin']['kind']}] + list(lock.values()),
@@ -367,6 +367,11 @@ def inputs_of(case):
         'run': {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev'],
                 'advisories_unchecked': f['security']['unchecked_reason']},
     }
+    # A builtin entry comes from lockrot's own allowlist. A project entry is the case's config: null accepts every flag.
+    allowlist = f.get('allowlist')
+    if allowlist is not None and allowlist['by'] == 'project':
+        inputs['accept'] = allowlist['flag_ids']
+    return inputs
 
 
 def dump(path, doc):

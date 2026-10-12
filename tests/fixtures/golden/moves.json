@@ -1017,10 +1017,8 @@
     "B-accepted\u2021": {
         "next_step": {
             "kind": "require",
-            "source": "left-behind",
-            "merged": [
-                "vulnerable"
-            ],
+            "source": "vulnerable",
+            "merged": [],
             "fix_kind": "update",
             "reason": null,
             "replacement": null,
@@ -1040,16 +1038,6 @@
             "crosses_major": true,
             "held_by": [],
             "clears": [
-                {
-                    "kind": "flag",
-                    "id": "left-behind",
-                    "basis": "branch_releasing"
-                },
-                {
-                    "kind": "flag",
-                    "id": "old-promise",
-                    "basis": "released_after_ga"
-                },
                 {
                     "kind": "advisory",
                     "id": "PKSA-4wjj-gy1p-ft3r",
@@ -1083,7 +1071,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "update",
         "installed_branch_fixes": {
@@ -2190,10 +2178,6 @@
                 {
                     "kind": "flag",
                     "id": "old-promise"
-                },
-                {
-                    "kind": "flag",
-                    "id": "stale"
                 }
             ],
             "clears_all": false,
@@ -2338,7 +2322,7 @@
             "clears_all": true,
             "if_applied": {
                 "total": 0,
-                "verdict": "ok",
+                "verdict": "finished",
                 "lead": null,
                 "deciding_advisory": null,
                 "at_most": false,
@@ -2369,7 +2353,7 @@
             "held_by": [],
             "if_applied": {
                 "total": 0,
-                "verdict": "ok",
+                "verdict": "finished",
                 "at_most": false,
                 "assumes": [
                     "clears_hold"
@@ -4248,39 +4232,7 @@
         "next_step": null
     },
     "ignored-marking-partial\u2021": {
-        "next_step": {
-            "kind": "no-move",
-            "source": "stale",
-            "merged": [],
-            "fix_kind": null,
-            "reason": "package_quiet",
-            "replacement": null,
-            "quiet_years": null,
-            "to_branch": null,
-            "version": null,
-            "newest": null,
-            "constraint": null,
-            "latest": null,
-            "php_check": null,
-            "crosses_major": null,
-            "held_by": [],
-            "clears": [],
-            "unverified": [],
-            "adds": [],
-            "leaves": [
-                {
-                    "kind": "flag",
-                    "id": "stale"
-                }
-            ],
-            "clears_all": false,
-            "if_applied": null,
-            "composer_moves_because": [],
-            "commands": [],
-            "through": [],
-            "also": [],
-            "text": "\u2014"
-        }
+        "next_step": null
     },
     "ignored-marking-stale\u2021": {
         "next_step": {
@@ -6633,39 +6585,7 @@
         }
     },
     "stale-accepted\u2021": {
-        "next_step": {
-            "kind": "no-move",
-            "source": "stale",
-            "merged": [],
-            "fix_kind": null,
-            "reason": "package_quiet",
-            "replacement": null,
-            "quiet_years": null,
-            "to_branch": null,
-            "version": null,
-            "newest": null,
-            "constraint": null,
-            "latest": null,
-            "php_check": null,
-            "crosses_major": null,
-            "held_by": [],
-            "clears": [],
-            "unverified": [],
-            "adds": [],
-            "leaves": [
-                {
-                    "kind": "flag",
-                    "id": "stale"
-                }
-            ],
-            "clears_all": false,
-            "if_applied": null,
-            "composer_moves_because": [],
-            "commands": [],
-            "through": [],
-            "also": [],
-            "text": "\u2014"
-        }
+        "next_step": null
     },
     "stale-only": {
         "next_step": {

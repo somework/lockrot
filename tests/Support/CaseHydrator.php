@@ -10,6 +10,7 @@ use Composer\Semver\VersionParser;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Allowlist\BuiltinAllowlist;
+use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Clock;
@@ -27,6 +28,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
@@ -37,9 +39,9 @@ use Lockrot\Verdict\VerdictEngine;
  * Turns a case of tests/fixtures/flags/cases.json into the report that the real {@see Analyzer}
  * writes for it. The loaders answer from the case's `inputs` block, which
  * tools/schema/project_fixtures.py writes (`inputs_of`). Only the case's package and the measured
- * dependents have metadata, and a null `releases` leaves the package without it. A test can add
- * `other_advisories`, the advisories of the package's other versions, and `accept`, the flags that
- * an allowlist entry for the package accepts.
+ * dependents have metadata, and a null `releases` leaves the package without it. `accept` holds the
+ * flags that a project allowlist entry for the package accepts, null for every flag. A test can add
+ * `other_advisories`, the advisories of the package's other versions.
  */
 final class CaseHydrator
 {
@@ -49,6 +51,8 @@ final class CaseHydrator
 
     /** @var array<string, array<mixed, mixed>>|null */
     private static ?array $findings = null;
+    /** @var array<string, list<array<mixed, mixed>>> the branch rows of each finding, by case id */
+    private static array $rows = [];
     /** @var array<mixed, mixed>|null the committed cases, read once per process */
     private static ?array $cases = null;
 
@@ -82,15 +86,55 @@ final class CaseHydrator
             if (!\is_array($case) || !\is_array($case['inputs'] ?? null)) {
                 continue;
             }
+            $id = JsonPath::stringAt($case, ['id']);
             $package = JsonPath::stringAt($case, ['finding', 'package']);
-            foreach (JsonPath::arrayAt(JsonPath::decoded(self::report($case)->toArray()), ['findings']) as $finding) {
+            $analysis = self::analysis($case);
+            foreach (JsonPath::arrayAt(JsonPath::decoded($analysis->report()->toArray()), ['findings']) as $finding) {
                 if (\is_array($finding) && $finding['package'] === $package) {
-                    self::$findings[JsonPath::stringAt($case, ['id'])] = $finding;
+                    self::$findings[$id] = $finding;
                 }
             }
+            self::$rows[$id] = self::branchRowsOf($analysis, $package, JsonPath::arrayAt($case, ['inputs', 'run']));
         }
 
         return self::$findings;
+    }
+
+    /**
+     * The branch rows that `--explain` writes for the case's package, for every case with an
+     * `inputs` block.
+     *
+     * @return array<string, list<array<mixed, mixed>>> by case id
+     */
+    public static function branchRows(): array
+    {
+        self::findings();
+
+        return self::$rows;
+    }
+
+    /**
+     * @param array<mixed, mixed> $run
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    private static function branchRowsOf(Analysis $analysis, string $package, array $run): array
+    {
+        $finding = $analysis->finding($package);
+        $facts = $analysis->facts($package);
+        if ($finding === null || $facts === null) {
+            return [];
+        }
+        $projectPhp = \is_string($run['project_php'] ?? null) ? $run['project_php'] : null;
+        $explanation = JsonPath::decoded((new Explanation($finding, $facts, new Thresholds(), JsonPath::stringAt($run, ['target_php']), $analysis->report(), $projectPhp))->toArray());
+        $metadata = $explanation['metadata'] ?? null;
+        $rows = [];
+        foreach (\is_array($metadata) && \is_array($metadata['branches'] ?? null) ? $metadata['branches'] : [] as $row) {
+            self::assertArray($row);
+            $rows[] = $row;
+        }
+
+        return $rows;
     }
 
     /**
@@ -99,6 +143,16 @@ final class CaseHydrator
      * @throws \InvalidArgumentException for a case without an `inputs` block
      */
     public static function report(array $case): Report
+    {
+        return self::analysis($case)->report();
+    }
+
+    /**
+     * @param array<mixed, mixed> $case
+     *
+     * @throws \InvalidArgumentException for a case without an `inputs` block
+     */
+    private static function analysis(array $case): Analysis
     {
         $inputs = $case['inputs'] ?? null;
         if (!\is_array($inputs)) {
@@ -142,12 +196,14 @@ final class CaseHydrator
             self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []), self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null)
         );
 
-        if (\is_array($inputs['accept'] ?? null)) {
-            $accept = array_values(array_filter($inputs['accept'], 'is_string'));
+        if (\array_key_exists('accept', $inputs)) {
+            $accept = \is_array($inputs['accept']) ? array_values(array_filter($inputs['accept'], 'is_string')) : null;
             $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(new Allowlist([new AllowlistEntry($package, null, 'accepted by the test', null, AllowlistEntry::BY_PROJECT, $accept)])));
         }
 
-        return $analyzer->analyze($lock, $project, ($run['include_dev'] ?? false) === true);
+        $includeDev = ($run['include_dev'] ?? false) === true;
+
+        return $analyzer->analyzeWithFacts($lock->packages($includeDev), $lock, $project, $includeDev);
     }
 
     /**

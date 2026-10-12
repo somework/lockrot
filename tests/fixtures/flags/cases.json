@@ -67572,7 +67572,8 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
-    }
+    },
+    "accept": null
    }
   },
   {
@@ -78681,7 +78682,10 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
-    }
+    },
+    "accept": [
+     "stale"
+    ]
    }
   },
   {
@@ -87138,7 +87142,10 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
-    }
+    },
+    "accept": [
+     "stale"
+    ]
    }
   },
   {
@@ -92296,7 +92303,11 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
-    }
+    },
+    "accept": [
+     "left-behind",
+     "old-promise"
+    ]
    }
   },
   {
@@ -113492,7 +113503,10 @@
      "fail_on": "high",
      "include_dev": false,
      "advisories_unchecked": null
-    }
+    },
+    "accept": [
+     "abandoned"
+    ]
    }
   },
   {
