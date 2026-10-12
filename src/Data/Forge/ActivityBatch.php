@@ -20,7 +20,7 @@ final class ActivityBatch
      * @param array<string, RepositoryActivity>    $activity    keyed by {@see RepoRef::key()}
      * @param array<string, list<string>>          $notFound    host => keys of repositories that it does not know or hides
      * @param array<string, array<string, string>> $failed      host => (key => reason)
-     * @param array<string, true>                  $rateLimited hosts that answered "too many requests"
+     * @param array<string, true>                  $rateLimited {@see RepoRef::host()} of each host that answered "too many requests"
      */
     public function __construct(array $activity, array $notFound, array $failed, array $rateLimited)
     {
@@ -65,8 +65,8 @@ final class ActivityBatch
         return $this->failed[$forge] ?? [];
     }
 
-    public function rateLimited(string $forge): bool
+    public function rateLimited(string $host): bool
     {
-        return isset($this->rateLimited[$forge]);
+        return isset($this->rateLimited[$host]);
     }
 }

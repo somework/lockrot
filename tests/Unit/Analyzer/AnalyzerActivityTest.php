@@ -120,6 +120,26 @@ final class AnalyzerActivityTest extends TestCase
         self::assertSame([['check' => 'repository_activity', 'reason' => 'rate_limit', 'blocks' => ['S3', 'S4']]], $byName['vendor/other']['checks_missing'], 'the control: the rate limit is S10');
     }
 
+    public function testARateLimitOnOneGitlabHostLeavesAFailureOnAnotherAFetchFailure(): void
+    {
+        $packages = [self::packagist('vendor/pkg'), self::packagist('vendor/other')];
+        $metadata = ['vendor/pkg' => self::meta('vendor/pkg', 'https://gitlab.com/group/pkg.git'), 'vendor/other' => self::meta('vendor/other', 'https://gitlab.example.com/group/other.git')];
+        $analyzer = $this->analyzer($this->loader($metadata), $this->http([self::GL_COMMITS => [429, '']]), ForgeAuth::anonymous(), new Allowlist([]), false, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, null, new RepoLocator(['gitlab.com', 'gitlab.example.com']));
+
+        $report = $analyzer->analyze(LockFile::fromArray(['packages' => $packages]), ProjectConfig::empty(), false);
+        $byName = self::byName($report);
+
+        self::assertSame('rate_limit', JsonPath::arrayAt($byName['vendor/pkg'], ['activity'])['reason']);
+        self::assertSame('fetch_failed', JsonPath::arrayAt($byName['vendor/other'], ['activity'])['reason'], 'the other host answered 500, not 429');
+        $named = [];
+        foreach ($report->runNotes() as $note) {
+            if (\in_array($note->code(), [RunNote::REPOSITORY_ACTIVITY_RATE_LIMITED, RunNote::REPOSITORY_ACTIVITY_UNREACHABLE], true)) {
+                $named[$note->code()] = array_column(JsonPath::arrayAt($note->data(), ['repositories']), 'host');
+            }
+        }
+        self::assertSame([RunNote::REPOSITORY_ACTIVITY_RATE_LIMITED => ['gitlab.com'], RunNote::REPOSITORY_ACTIVITY_UNREACHABLE => ['gitlab.example.com']], $named);
+    }
+
     public function testAHostLockrotCannotAskRaisesS10AndOneNote(): void
     {
         $report = $this->report([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', self::GITEA)], [], true);
@@ -530,7 +550,7 @@ final class AnalyzerActivityTest extends TestCase
         };
     }
 
-    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, ForgeAuth $auth, Allowlist $allowlist, bool $offline = false, int $budget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?AdvisoryBatch $advisories = null): Analyzer
+    private function analyzer(MetadataLoaderInterface $metadata, HttpClientInterface $http, ForgeAuth $auth, Allowlist $allowlist, bool $offline = false, int $budget = ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, ?AdvisoryBatch $advisories = null, ?RepoLocator $locator = null): Analyzer
     {
         $clock = Clock::fixed(F::NOW);
 
@@ -538,7 +558,7 @@ final class AnalyzerActivityTest extends TestCase
             $metadata,
             new ActivityClient($http, $auth),
             new ActivityFetchPlanner($auth, $budget),
-            new RepoLocator(),
+            $locator ?? new RepoLocator(),
             $allowlist,
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),

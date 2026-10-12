@@ -99,26 +99,26 @@ final class AnalyzerRunNotesTest extends TestCase
         $report = $analysis->report();
 
         self::assertSame([
-            'GitLab API rate limit reached; repository activity missing for 2 repositories',
+            'GitLab API rate limit reached; repository activity missing for 1 repositories',
+            'GitLab unreachable for 1 repositories: HTTP 500',
             'GitLab did not answer for 1 repositories (private, renamed or removed); repository activity missing',
         ], $report->notes());
-        [$limited, $notFound] = $report->runNotes();
+        [$limited, $unreachable, $notFound] = $report->runNotes();
         self::assertSame(RunNote::REPOSITORY_ACTIVITY_RATE_LIMITED, $limited->code());
+        self::assertSame(RunNote::REPOSITORY_ACTIVITY_UNREACHABLE, $unreachable->code());
         self::assertSame(RunNote::REPOSITORY_ACTIVITY_NOT_FOUND, $notFound->code());
         self::assertSame('gitlab', $limited->data()['forge_id']);
-        self::assertSame([
-            ['host' => 'gitlab.com', 'repo' => 'group/limited', 'message' => 'HTTP 429'],
-            ['host' => 'gitlab.example.org', 'repo' => 'team/down', 'message' => 'HTTP 500'],
-        ], self::sorted($limited->data()['repositories']));
+        self::assertSame([['host' => 'gitlab.com', 'repo' => 'group/limited', 'message' => 'HTTP 429']], $limited->data()['repositories']);
+        self::assertSame([['host' => 'gitlab.example.org', 'repo' => 'team/down', 'message' => 'HTTP 500']], $unreachable->data()['repositories'], 'a rate limit on one host is no cause on another');
         self::assertSame(['forge_id' => 'gitlab', 'repositories' => [['host' => 'gitlab.com', 'repo' => 'group/gone']]], $notFound->data());
         self::assertTrue($limited->setsNetworkFailures());
         self::assertFalse($notFound->setsNetworkFailures());
         self::assertTrue($report->hadNetworkFailures());
 
         self::assertSame(
-            ['vendor/down' => NotCheckedRule::RATE_LIMIT, 'vendor/gone' => 'repository_not_found', 'vendor/limited' => NotCheckedRule::RATE_LIMIT],
+            ['vendor/down' => NotCheckedRule::FETCH_FAILED, 'vendor/gone' => 'repository_not_found', 'vendor/limited' => NotCheckedRule::RATE_LIMIT],
             self::activityReasons($analysis, ['vendor/limited', 'vendor/down', 'vendor/gone']),
-            'rate_limit on the forge is the rate-limited note; the not-found note names the answer'
+            'rate_limit on the host is the rate-limited note; the not-found note names the answer'
         );
     }
 
@@ -268,23 +268,6 @@ final class AnalyzerRunNotesTest extends TestCase
         ksort($reasons);
 
         return $reasons;
-    }
-
-    /**
-     * @param mixed $repositories
-     *
-     * @return array<mixed, mixed> by host
-     */
-    private static function sorted($repositories): array
-    {
-        self::assertIsArray($repositories);
-        $byHost = [];
-        foreach (array_keys($repositories) as $at) {
-            $byHost[JsonPath::stringAt($repositories, [$at, 'host'])] = $repositories[$at];
-        }
-        ksort($byHost);
-
-        return array_values($byHost);
     }
 
     /** @return array<string, mixed> */

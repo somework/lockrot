@@ -75,7 +75,7 @@ final class ActivityClient
                         }
                         if (!$result->isOk()) {
                             if ($api->isRateLimited($result)) {
-                                $rateLimited[$forge] = true;
+                                $rateLimited[$repo->host()] = true;
                             }
                             $failed[$forge][$repo->key()] = $result->error() ?? ('HTTP '.$result->status());
                             continue 2;

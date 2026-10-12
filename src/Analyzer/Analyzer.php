@@ -387,7 +387,7 @@ final class Analyzer
             return $skipped === ActivityFetchPlan::BUDGET ? NotCheckedRule::RATE_BUDGET : NotCheckedRule::NO_TOKEN;
         }
 
-        return $batch->rateLimited($repo->forge()) ? NotCheckedRule::RATE_LIMIT : NotCheckedRule::FETCH_FAILED;
+        return $batch->rateLimited($repo->host()) ? NotCheckedRule::RATE_LIMIT : NotCheckedRule::FETCH_FAILED;
     }
 
     /**
@@ -420,14 +420,15 @@ final class Analyzer
             $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge));
         }
         foreach (RepoRef::FORGES as $forge) {
-            $failed = [];
+            $failed = [[], []];
             foreach ($batch->failedOn($forge) as $key => $message) {
-                $failed[] = [$repoByKey[$key], $message];
+                $failed[(int) $batch->rateLimited($repoByKey[$key]->host())][] = [$repoByKey[$key], $message];
             }
-            if ($batch->rateLimited($forge)) {
-                $notes[] = RunNote::repositoryActivityRateLimited($forge, $failed);
-            } elseif ($failed !== []) {
-                $notes[] = RunNote::repositoryActivityUnreachable($forge, $failed);
+            if ($failed[1] !== []) {
+                $notes[] = RunNote::repositoryActivityRateLimited($forge, $failed[1]);
+            }
+            if ($failed[0] !== []) {
+                $notes[] = RunNote::repositoryActivityUnreachable($forge, $failed[0]);
             }
             $notFound = array_map(static fn (string $key): RepoRef => $repoByKey[$key], $batch->notFoundOn($forge));
             if ($notFound !== []) {

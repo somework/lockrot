@@ -192,10 +192,12 @@ release age (S2 and no S1), and only up to a budget of them
 
 A repository host answered "too many requests".
 
-- `data`: `forge_id`, and `repositories`: every repository on any host of that `forge_id` that got
-  no answer, each with its `message`. The count in `text` is the number of entries in
-  `repositories`.
-- Findings: every package on a host of that `forge_id` that got no answer carries S10 `rate_limit`.
+- `data`: `forge_id`, and `repositories`: every repository on a host that answered "too many
+  requests" and that got no answer, each with its `message`. The count in `text` is the number of
+  entries in `repositories`.
+- Findings: every package on such a host that got no answer carries S10 `rate_limit`. A failure
+  on another host of the same `forge_id` is in the [unreachable](#repository_activity_unreachable)
+  note.
   A 404 is an answer, so its package carries `activity.status` `not_found`, and the
   [not found](#repository_activity_not_found) note lists it.
 - `sets_network_failures`: yes.
