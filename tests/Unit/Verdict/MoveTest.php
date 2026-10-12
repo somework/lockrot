@@ -87,8 +87,11 @@ final class MoveTest extends TestCase
      */
     public function testEveryCaseWritesTheMoveInItsGoldenFile(): void
     {
+        // Run the analyzer here, not through CaseHydrator::findings(): code that a data provider runs
+        // covers no test, so mutation testing would skip this one.
         $golden = [];
-        foreach (CaseHydrator::findings() as $id => $finding) {
+        foreach (self::casesWithInputs() as $id => [$case]) {
+            $finding = self::hydrated(CaseHydrator::case($case));
             $security = JsonPath::arrayAt($finding, ['security']);
             $golden[$id] = ['next_step' => $finding['next_step']] + array_intersect_key($security, array_flip(['fix_kind', 'installed_branch_fixes', 'move_in', 'partial']));
         }
@@ -508,6 +511,16 @@ final class MoveTest extends TestCase
             'pinned on a tag the target cannot run' => ['lock' => [['version' => 'dev-master']], 'releases' => [self::release('v2.3.0', '2026-06-01', '>=9.0')]],
             'pinned on an undated tag' => ['lock' => [['version' => '1.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']], 'releases' => [self::release('v1.0.0', null, '>=7.2')]],
             'a fix below the newest release of its line' => ['lock' => [['time' => '2026-01-01T00:00:00+00:00']], 'releases' => [self::release('1.0.0', '2026-01-01', '>=7.2'), self::release('2.0.0', '2026-02-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=8.1')], 'advisories' => [self::advisory('PKSA-1', 'high', '<2.0.0')]],
+            'pinned on a line older than the snapshot' => ['lock' => [['version' => '1.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']]],
+            'pinned on a line released at the snapshot' => ['lock' => [['version' => '1.x-dev', 'time' => '2020-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']]],
+            'pinned on a line with no release' => ['lock' => [['version' => '1.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']], 'releases' => [self::release('2.0.0', '2026-05-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=7.2')]],
+            'pinned on a line below one that releases' => ['lock' => [['version' => '2.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '2.x-dev']], 'releases' => [self::release('1.0.0', '2026-03-01', '>=7.2'), self::release('2.0.0', '2020-01-01', '>=7.2')]],
+            'pinned on a line below one that stopped' => ['lock' => [['version' => '1.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']], 'releases' => [self::release('1.0.0', '2020-01-01', '>=7.2'), self::release('2.0.0', '2021-01-01', '>=7.2')]],
+            'pinned on a line below an undated one' => ['lock' => [['version' => '1.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']], 'releases' => [self::release('1.0.0', '2020-01-01', '>=7.2'), self::release('2.0.0', null, '>=7.2')]],
+            'pinned on a tag that adds two flags' => ['lock' => [['version' => '1.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']], 'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('2.0.0', '2026-01-01', '>=9.0')]],
+            'an undated line below the newest one' => ['releases' => array_merge($one, [self::release('2.0.0', null, '>=7.2'), self::release('3.0.0', '2026-01-01', '>=8.1')])],
+            'a replacement that is graded itself' => ['lock' => [[], $holder], 'abandoned' => ['by' => 'repository', 'replacement' => 'h/old'], 'dependents' => ['h/old' => [['version' => '1.0.0', 'time' => '2015-01-01T00:00:00+00:00', 'require' => ['a/b' => '^1.0'], 'php' => '>=5.3,<7.0']]]],
+            'two advisories that no single release fixes' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2020-01-01', '>=7.2'), self::release('2.0.0', '2026-01-01', '>=7.2')], 'advisories' => [self::advisory('PKSA-1', 'high', '<1.5.0 || >=2.0.0'), self::advisory('PKSA-2', 'high', '<2.0.0')]],
             'a blocked move beside an advisory' => ['releases' => array_merge($one, [self::release('2.3.0', '2026-06-01', '>=9.0')]), 'advisories' => [self::advisory('PKSA-1', 'high', '<99.0')]],
             'two 0.x lines' => ['lock' => [['version' => '0.3.1']], 'root' => ['require' => ['a/b' => '^0.3']], 'releases' => [self::release('0.3.1', '2019-01-01', '>=7.2'), self::release('0.3.5', '2020-01-01', '>=7.2'), self::release('0.4.0', '2026-01-01', '>=7.2')], 'advisories' => [self::advisory('PKSA-1', 'high', '<0.3.5')]],
         ];
