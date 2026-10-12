@@ -91,13 +91,25 @@ final class DrupalSiteTest extends TestCase
         self::assertSame([], array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED));
     }
 
+    public function testWithTheRecipeAndARecordedTokenAnswerEveryDrupalcodePackageIsNotArchived(): void
+    {
+        $auth = new ForgeAuth(new Tokens('recorded', null), static fn (string $host): bool => $host === self::DRUPALCODE);
+        $findings = self::findingsOn($this->analyze(['gitlab.com', self::DRUPALCODE], $auth));
+
+        self::assertNotSame([], $findings);
+        foreach ($findings as $name => $finding) {
+            self::assertSame(['read', false], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['archived']], $name);
+            self::assertSame([], array_values(array_filter(JsonPath::arrayAt($finding, ['checks_skipped']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'repository_archived')), $name);
+        }
+    }
+
     /** @param list<string> $gitlabDomains */
-    private function analyze(array $gitlabDomains): Report
+    private function analyze(array $gitlabDomains, ?ForgeAuth $auth = null): Report
     {
         $server = self::$server;
         self::assertNotNull($server);
         $clock = Clock::fixed(self::NOW);
-        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+        $auth ??= ForgeAuth::withTokens(new Tokens('recorded', null));
         $analyzer = new Analyzer(
             new RepositoryMetadataLoader($server->repositories(), $clock),
             new ActivityClient(self::recordings(), $auth),

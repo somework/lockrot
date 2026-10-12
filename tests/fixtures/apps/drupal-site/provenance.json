@@ -1,13 +1,16 @@
 {
  "repository": "https://github.com/drunomics/lupus-nuxtjs-drupal-stack-example",
  "commit": "4df9306ccc491176b360bd4451e242740165d360",
- "files": ["composer.json", "composer.lock"],
+ "files": [
+  "composer.json",
+  "composer.lock"
+ ],
  "recorded": "2026-10-12",
  "recorder": "GITHUB_TOKEN=$(gh auth token) bin/record-fixtures --gitlab-domain=git.drupalcode.org tests/fixtures/apps/drupal-site",
  "recordings": {
   "http/p2": "the p2 answers of packages.drupal.org and of the packagist.org packages that tests/fixtures/http/p2 lacks",
   "http/github": "the GitHub answers that tests/fixtures/http/github lacks",
-  "http/gitlab": "git.drupalcode.org commits answers, asked anonymously, and no project document, because no token was set",
+  "http/gitlab": "git.drupalcode.org commits answers, asked anonymously, and project documents, asked with a gitlab-token from Composer's config that no file holds",
   "http/advisories": "packagist.org's advisory answer for every locked name"
  }
 }
