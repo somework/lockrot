@@ -197,7 +197,7 @@ final class Analyzer
                 ->withActivityLookup($lookups[$package->name()]);
             $factsByPackage[$package->name()] = $facts;
             $every = $advisories->every($package->name());
-            $finding = $this->buildFinding($facts, $entry, $graph, $batch, $fixes, $advisories->ignored($package->name()), $every);
+            $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $fixes, $advisories->ignored($package->name()), $every);
             $findings[] = $finding->withMoves($this->moves($finding, $facts, $finder, $lock, $metadata, $every));
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
@@ -450,7 +450,7 @@ final class Analyzer
      * @param list<IgnoredAdvisory> $ignored
      * @param list<Advisory>        $every   every advisory of the package on any version
      */
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every): Finding
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, bool $composerJsonRead, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every): Finding
     {
         $counted = [];
         if ($fixes !== null && $facts->advisories() !== []) {
@@ -497,6 +497,7 @@ final class Analyzer
         );
 
         return $finding
+            ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
             ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts)));
     }

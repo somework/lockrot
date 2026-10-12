@@ -52,6 +52,7 @@ final class SortTest extends TestCase
         yield 'a half point counts' => [self::graded('vendor/b', [Signal::S8, Signal::S5], [], null, true, ['vendor/root', 'vendor/b'], true), self::graded('vendor/a', [Signal::S8], [], null, true, ['vendor/root', 'vendor/a'], true)];
         yield 'with an equal score, direct first' => [self::graded('vendor/b', [Signal::S2]), self::graded('vendor/a', [Signal::S8], [], null, true, ['vendor/root', 'vendor/a'])];
         yield 'then the name' => [self::graded('vendor/a', [Signal::S8]), self::graded('vendor/b', [Signal::S8])];
+        yield 'the depth is no sort key: by name' => [self::graded('vendor/a', [Signal::S8], [], null, true, ['vendor/root', 'vendor/x', 'vendor/y', 'vendor/a']), self::graded('vendor/b', [Signal::S8], [], null, true, ['vendor/root', 'vendor/b'])];
         yield 'the name byte by byte' => [self::graded('Vendor/b', [Signal::S8]), self::graded('vendor/a', [Signal::S8])];
     }
 

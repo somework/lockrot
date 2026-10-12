@@ -478,6 +478,63 @@ final class FindingTest extends TestCase
         self::assertTrue($array['dev']);
     }
 
+    /** @return iterable<string, array{list<string>, bool, ?int, ?string}> the chain, whether the run read composer.json, the depth and its reason */
+    public static function depths(): iterable
+    {
+        yield 'direct' => [['vendor/pkg'], true, 0, null];
+        yield 'two hops below a requirement' => [['vendor/root', 'vendor/mid', 'vendor/pkg'], true, 2, null];
+        yield 'unreached' => [[], true, null, 'unreached'];
+        yield 'a run that read no composer.json' => [[], false, null, 'no_composer_json'];
+    }
+
+    /**
+     * @param list<string> $chain
+     *
+     * @dataProvider depths
+     */
+    #[DataProvider('depths')]
+    public function testTheDepthIsTheChainLessOneOrItsReason(array $chain, bool $composerJsonRead, ?int $depth, ?string $reason): void
+    {
+        $finding = (new FindingBuilder())->withChain($chain)->withNamedIn([])->withComposerJsonRead($composerJsonRead)->build();
+
+        self::assertSame([$depth, $reason], [$finding->depth(), $finding->depthUnmeasured()]);
+        self::assertSame([$depth, $reason], [$finding->toArray()['depth'], $finding->toArray()['depth_unmeasured']]);
+    }
+
+    /** The depth is context: two transitive findings that differ only in depth score the same. */
+    public function testTheDepthChangesNoScore(): void
+    {
+        $signals = [new Signal(Signal::LEVEL_HIGH, 'branch 1.x last released', SignalDataStub::of(Signal::S8, [])), new Signal(Signal::LEVEL_WARN, 'php promise', SignalDataStub::of(Signal::S5, []))];
+        $shallow = (new FindingBuilder())->withSignals($signals)->withChain(['vendor/root', 'vendor/pkg'])->build();
+        $deep = (new FindingBuilder())->withSignals($signals)->withChain(['vendor/root', 'vendor/a', 'vendor/b', 'vendor/c', 'vendor/pkg'])->build();
+
+        self::assertSame([1, 4], [$shallow->depth(), $deep->depth()]);
+        self::assertSame([$shallow->score()->total(), $shallow->grade()], [$deep->score()->total(), $deep->grade()]);
+    }
+
+    /** @return iterable<string, array{list<string>}> */
+    public static function sections(): iterable
+    {
+        yield 'require only' => [['require']];
+        yield 'require-dev only' => [['require-dev']];
+        yield 'both' => [['require', 'require-dev']];
+        yield 'none' => [[]];
+    }
+
+    /**
+     * @param list<string> $sections
+     *
+     * @dataProvider sections
+     */
+    #[DataProvider('sections')]
+    public function testNamedInIsTheSectionsTheAnalyzerFound(array $sections): void
+    {
+        $finding = (new FindingBuilder())->withNamedIn($sections)->build();
+
+        self::assertSame($sections, $finding->namedIn());
+        self::assertSame($sections, $finding->toArray()['named_in']);
+    }
+
     public function testAFindingIsFromAComposerRepositoryUnlessItSaysOtherwise(): void
     {
         $asked = (new FindingBuilder())->build();

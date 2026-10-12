@@ -13,6 +13,7 @@ use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Data\ArchivedData;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\AgeMeasure;
@@ -55,6 +56,9 @@ final class FindingBuilder
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private bool $unscored = false;
+    /** @var ?list<string> */
+    private ?array $namedIn = null;
+    private bool $composerJsonRead = true;
 
     /**
      * The signals that raise each report-1 verdict word as its flag, for a finding a test builds
@@ -185,6 +189,28 @@ final class FindingBuilder
         return $clone;
     }
 
+    /**
+     * The composer.json sections that name the package. Without a call, a direct finding is named in
+     * `require` (`require-dev` for a packages-dev one), and any other in none.
+     *
+     * @param list<string> $namedIn
+     */
+    public function withNamedIn(array $namedIn): self
+    {
+        $clone = clone $this;
+        $clone->namedIn = $namedIn;
+
+        return $clone;
+    }
+
+    public function withComposerJsonRead(bool $read): self
+    {
+        $clone = clone $this;
+        $clone->composerJsonRead = $read;
+
+        return $clone;
+    }
+
     public function withFlags(?FlagSet $flags, bool $maintenanceJudged = true): self
     {
         $clone = clone $this;
@@ -210,7 +236,9 @@ final class FindingBuilder
      */
     public function build(): Finding
     {
-        $finding = new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->advisoryFacts013);
+        $namedIn = $this->namedIn ?? (\count($this->chain) === 1 ? [$this->dev ? ProjectConfig::REQUIRE_DEV : ProjectConfig::REQUIRE] : []);
+        $finding = (new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->advisoryFacts013))
+            ->withComposerJson($this->composerJsonRead, $namedIn);
         if ($this->flags !== null) {
             return $finding->withFlags($this->flags, $this->maintenanceJudged)->withDetails(self::detailsOf($finding, $this->maintenanceJudged));
         }

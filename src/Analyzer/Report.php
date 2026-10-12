@@ -492,6 +492,7 @@ final class Report
             'exposure' => $this->exposureList(),
             'exposure_rule' => ['max_fan_in' => TransitiveExposure::MAX_FAN_IN],
             'unattributed' => $this->unattributedList(),
+            'rot_depth' => RotDepth::of($sorted),
             'libyears' => Report2Root::toLibyearsArray($this->libyears(), $sorted),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'gate' => Report2Root::toGateArray($gate, $run->mode()),

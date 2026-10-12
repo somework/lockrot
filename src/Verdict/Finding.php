@@ -14,6 +14,7 @@ use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\ScoreBasis;
 use Lockrot\Score\ScoreContext;
@@ -40,6 +41,10 @@ final class Finding
      * a branch snapshot or an open php constraint says nothing about a coming fix.
      */
     public const NO_FIX_VERDICTS = [Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND];
+
+    /** Why a finding has no depth: no path from the requirements that the run walked, or no composer.json read. */
+    public const UNREACHED = 'unreached';
+    public const NO_COMPOSER_JSON = 'no_composer_json';
 
     /** The note for a lock entry with no notification-url: no repository was asked. */
     public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
@@ -86,6 +91,9 @@ final class Finding
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private ?FindingDetails $details = null;
+    private bool $composerJsonRead = true;
+    /** @var list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> */
+    private array $namedIn = [];
 
     /**
      * @param list<Signal> $signals
@@ -269,6 +277,54 @@ final class Finding
         }, $this->signals);
 
         return $clone;
+    }
+
+    /**
+     * A copy that knows whether the run read composer.json, and the sections of it that name the
+     * package ({@see \Lockrot\Graph\DependencyGraph::namedIn()}).
+     *
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $namedIn
+     */
+    public function withComposerJson(bool $read, array $namedIn): self
+    {
+        $clone = clone $this;
+        $clone->composerJsonRead = $read;
+        $clone->namedIn = $namedIn;
+
+        return $clone;
+    }
+
+    /** `direct`, `transitive` or `unreached`, from the chain. */
+    public function reach(): string
+    {
+        return self::reachOf($this->chain);
+    }
+
+    /** The fewest hops from a composer.json requirement that the run walked, null when the chain is empty. */
+    public function depth(): ?int
+    {
+        return $this->chain === [] ? null : \count($this->chain) - 1;
+    }
+
+    /** Why {@see depth()} is null, null when it is not. */
+    public function depthUnmeasured(): ?string
+    {
+        if ($this->chain !== []) {
+            return null;
+        }
+
+        return $this->composerJsonRead ? self::UNREACHED : self::NO_COMPOSER_JSON;
+    }
+
+    /** @return list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> */
+    public function namedIn(): array
+    {
+        return $this->namedIn;
+    }
+
+    public function isComposerJsonRead(): bool
+    {
+        return $this->composerJsonRead;
     }
 
     /** @throws \LogicException for a finding built without its flags */
@@ -692,8 +748,11 @@ final class Finding
             'libyears_at_least' => $this->libyears->isAtLeast(),
             'direct' => $this->isDirect(),
             'dev' => $this->dev,
-            'reach' => self::reachOf($this->chain),
+            'reach' => $this->reach(),
             'chain' => $this->chain,
+            'depth' => $this->depth(),
+            'depth_unmeasured' => $this->depthUnmeasured(),
+            'named_in' => $this->namedIn,
             'direct_dependents' => $this->directDependents,
             'signals' => $signals,
             'evidence' => implode('; ', $evidence),
