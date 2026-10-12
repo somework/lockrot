@@ -120,13 +120,12 @@ final class RepoLocator
     {
         if (strpos($url, '://') !== false) {
             $host = parse_url($url, \PHP_URL_HOST);
-            $path = parse_url($url, \PHP_URL_PATH);
-            if (!\is_string($host) || $host === '' || !\is_string($path)) {
+            if (!\is_string($host) || $host === '') {
                 return null;
             }
             $port = parse_url($url, \PHP_URL_PORT);
 
-            return [\is_int($port) ? $host.':'.$port : $host, $path];
+            return [\is_int($port) ? $host.':'.$port : $host, (string) parse_url($url, \PHP_URL_PATH)];
         }
         if (preg_match('{^(?:[A-Za-z0-9_.-]+@)?([A-Za-z0-9_.-]+):(.+)$}', $url, $m) === 1) {
             return [$m[1], $m[2]];
@@ -150,9 +149,7 @@ final class RepoLocator
     /**
      * Matched as Composer's GitLabDriver matches a `gitlab-domains` entry against a clone URL
      * ({@see \Composer\Repository\Vcs\GitLabDriver::determineOrigin()}): the entry matches the URL's
-     * host with its port, or its bare host when the entry names no port. The ref's host is
-     * Composer's origin for the URL: the API base and the key of its credentials. So a
-     * `gitlab.com:443` URL is not `gitlab.com` to {@see ForgeAuth}, and gets no `GITLAB_TOKEN`.
+     * host with its port, or its bare host when the entry names no port.
      *
      * @param string $domainHost the host of a `gitlab-domains` entry, lowercased, with its port when it names one
      * @param string $lowerHost  the URL's host, lowercased, with its port when it has one
@@ -179,7 +176,12 @@ final class RepoLocator
         return [strtolower($parts[0]), isset($parts[1]) ? rtrim('/'.$parts[1], '/') : ''];
     }
 
-    /** @param string $prefix the entry's path prefix with its leading `/`, or '' */
+    /**
+     * The ref's host is Composer's origin for the URL: the API base and the key of its credentials.
+     * So a `gitlab.com:443` URL is not `gitlab.com` to {@see ForgeAuth}, and gets no `GITLAB_TOKEN`.
+     *
+     * @param string $prefix the entry's path prefix with its leading `/`, or ''
+     */
     private static function gitlab(string $prefix, string $lowerHost, string $path): ?RepoRef
     {
         $path = self::normalise($path);

@@ -179,6 +179,8 @@ final class RepoLocatorTest extends TestCase
         yield 'the gitlab-domains host without its port' => ['https://gitlab.example.com/gitlab/g/p.git', $unsupported, 'gitlab.example.com', null, null];
         yield 'a github-domains host' => ['https://ghe.example.com/o/r.git', $unsupported, 'ghe.example.com', null, 'github-domains'];
         yield 'github.com/owner' => ['https://github.com/owner', $none, 'github.com', null, null];
+        yield 'a known host without a path' => ['https://github.com', $none, 'github.com', null, null];
+        yield 'another host without a path' => ['https://codeberg.org', $unsupported, 'codeberg.org', null, null];
         yield 'a GitLab web route' => ['https://gitlab.com/g/p/-/tree/main', $none, 'gitlab.com', null, null];
         yield 'a prefix mismatch' => ['https://gitlab.example.com:8443/other/g/p.git', $none, 'gitlab.example.com:8443', null, null];
         yield 'an unparsable URL' => ['not a url', $none, null, null, null];
