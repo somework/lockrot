@@ -6,10 +6,16 @@ namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\LocatedRepository;
+use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Signal\Data\ArchivedData;
 use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\Data\NoPushData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
@@ -231,6 +237,22 @@ final class FindingBuilder
         $reason = $finding->allowlistReason();
         $entry = $reason === null ? null : new AllowlistEntry($finding->package(), null, $reason, null, AllowlistEntry::BY_PROJECT);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null);
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, self::activityOf($finding));
+    }
+
+    /** The lookup of a package with no repository URL, for details whose test reads no activity. */
+    public static function unread(): ActivityLookup
+    {
+        return ActivityLookup::notRead(ActivityLookup::NO_REPOSITORY, LocatedRepository::none(null));
+    }
+
+    /** A read on github.com, as the skips of {@see detailsOf()} imply: archived exactly when S3 fired, pushed when S4 dates it. */
+    public static function activityOf(Finding $finding): ActivityLookup
+    {
+        $s4 = $finding->signalData(NoPushData::class);
+        $pushedAt = $s4 === null ? null : new \DateTimeImmutable($s4->lastPush());
+        $read = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', $finding->package()), $finding->signalData(ArchivedData::class) !== null, $pushedAt, $finding->dataDate() ?? new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
+
+        return ActivityLookup::read($read);
     }
 }

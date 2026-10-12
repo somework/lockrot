@@ -349,7 +349,7 @@ final class ExplainFormatter
             return ['repository activity', self::INDENT.'not fetched — S3 and S4 have nothing to read; the run\'s notes below say why when a cap or a failure is the cause'];
         }
         $parts = [$activity->ref()->forgeLabel().' '.$activity->repo()];
-        $parts[] = $activity->isArchived() ? 'archived' : 'not archived';
+        $parts[] = $activity->archived() === null ? 'archived flag not read' : ($activity->archived() ? 'archived' : 'not archived');
         $parts[] = $activity->pushedAt() === null ? 'last push unknown' : 'last push '.$activity->pushedAt()->format('Y-m-d');
         $parts[] = 'fetched '.$activity->fetchedAt()->format('Y-m-d').($activity->fromCache() ? " (from lockrot's cache)" : '');
 

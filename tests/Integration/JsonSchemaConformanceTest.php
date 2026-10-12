@@ -25,6 +25,7 @@ use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
@@ -923,6 +924,7 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityRateLimited(RepoRef::GITLAB, [[$repo, 'HTTP 429']]),
             RunNote::repositoryActivityUnreachable(RepoRef::GITLAB, [[$repo, 'curl error 7']]),
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
+            RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
             RunNote::notFromComposerRepository(2),
         ];
         self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
@@ -958,7 +960,7 @@ final class JsonSchemaConformanceTest extends TestCase
             'a code with two colons' => [['note_details', 0, 'code'], 'acme:lint:licence'],
             'offline data as a list' => [['note_details', 0, 'data'], []],
             'a known code with another code\'s data' => [['note_details', 1, 'data'], ['message' => 'x']],
-            'a count of no packages' => [['note_details', 12, 'data', 'package_count'], 0],
+            'a count of no packages' => [['note_details', 13, 'data', 'package_count'], 0],
             'an unreachable note naming no repository' => [['note_details', 10, 'data', 'repositories'], []],
             'a repository without its host' => [['note_details', 11, 'data', 'repositories', 0], ['repo' => 'workspace/one']],
             'a policy key that is not a string' => [['note_details', 4, 'data', 'policy_key'], 1],

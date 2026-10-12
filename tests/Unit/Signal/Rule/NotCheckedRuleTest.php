@@ -5,7 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Repository\PackageMetadata;
+use Lockrot\Lock\ConfiguredRepositories;
+use Lockrot\Lock\LockedPackage;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
@@ -36,6 +42,70 @@ final class NotCheckedRuleTest extends TestCase
     private static function undated(): PackageMetadata
     {
         return new PackageMetadata('vendor/pkg', false, null, true, null, null, 12, null, 'library', new \DateTimeImmutable(self::NOW));
+    }
+
+    public function testTheHostSummaryNamesTheHostLockrotCannotAsk(): void
+    {
+        $facts = (new PackageFacts(F::package(), self::dated(), null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::HOST_NOT_SUPPORTED, LocatedRepository::unsupported('codeberg.org', null)));
+
+        $signal = $this->rule()->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame('repository activity not checked (lockrot cannot ask codeberg.org), so S3 and S4 could not be read', $signal->summary());
+        self::assertSame([['check' => 'repository_activity', 'reason' => 'host_not_supported', 'blocks' => [Signal::S3, Signal::S4]]], JsonPath::decoded($signal->data())['unchecked']);
+    }
+
+    /**
+     * @dataProvider originWords
+     */
+    #[DataProvider('originWords')]
+    public function testAVcsOrUnknownOriginRaisesBothOriginEntriesWordedByItsKind(LockedPackage $package, string $cause): void
+    {
+        $facts = (new PackageFacts($package, null, null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
+
+        $signal = $this->rule()->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame(
+            'release metadata not checked ('.$cause.'), so S2 and S8 could not be read; repository activity not checked ('.$cause.'), so S3 and S4 could not be read',
+            $signal->summary()
+        );
+        self::assertSame([
+            ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => [Signal::S2, Signal::S8]],
+            ['check' => 'repository_activity', 'reason' => 'not_from_composer_repository', 'blocks' => [Signal::S3, Signal::S4]],
+        ], JsonPath::decoded($signal->data())['unchecked']);
+    }
+
+    /** @return iterable<string, array{LockedPackage, string}> */
+    public static function originWords(): iterable
+    {
+        $vcs = LockFile::fromArray(['packages' => [['name' => 'acme/vcs', 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => 'https://github.com/acme/vcs.git', 'reference' => 'a']]]])->packages(false)[0]
+            ->withRepositories(ProjectConfig::fromArray(['repositories' => [['type' => 'vcs', 'url' => 'https://github.com/acme/vcs.git']]])->repositories());
+
+        yield 'vcs' => [$vcs, 'not installed from a Composer repository'];
+        yield 'unknown' => [F::package(['fromComposerRepository' => false]), 'lockrot cannot tell which repository serves it'];
+    }
+
+    public function testAPathOriginRaisesNoOriginEntry(): void
+    {
+        $path = LockFile::fromArray(['packages' => [['name' => 'acme/local', 'version' => 'dev-main', 'dist' => ['type' => 'path', 'url' => 'packages/local', 'reference' => 'a']]]])->packages(false)[0]
+            ->withRepositories(ConfiguredRepositories::none());
+        $facts = (new PackageFacts($path, null, null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
+
+        self::assertNull($this->rule()->evaluate($facts));
+    }
+
+    public function testARaisedS1DropsTheOriginEntriesWithTheActivityOne(): void
+    {
+        $facts = (new PackageFacts(F::package(['fromComposerRepository' => false]), null, null, []))
+            ->withActivityLookup(ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null)));
+        $s10 = $this->rule()->evaluate($facts);
+        self::assertNotNull($s10);
+
+        self::assertSame([], NotCheckedRule::withoutMaintenanceGaps([$s10]));
     }
 
     public function testACheckedRunRaisesNothing(): void
@@ -109,7 +179,7 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), self::undated(), null, [], NotCheckedRule::OFFLINE));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S3, Signal::S4, Signal::S2, Signal::S8], JsonPath::decoded($signal->data())['blocks']);
+        self::assertSame([Signal::S2, Signal::S3, Signal::S4, Signal::S8], JsonPath::decoded($signal->data())['blocks'], 'in signal order');
         $unchecked = JsonPath::decoded($signal->data())['unchecked'];
         self::assertIsArray($unchecked);
         self::assertCount(2, $unchecked);

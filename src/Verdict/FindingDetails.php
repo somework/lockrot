@@ -6,6 +6,7 @@ namespace Lockrot\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
+use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Score\IfApplied;
@@ -48,14 +49,16 @@ final class FindingDetails
     private ?PackageFixes $fixes;
     private ?Check $releasesUnchecked = null;
     private ?Moves $moves = null;
+    private ActivityLookup $activity;
 
     /**
      * @param list<Check>                                                   $skipped
      * @param array{requires: ?string, target_runs: ?bool, project_allows: ?bool} $installedPhp
      * @param list<IgnoredAdvisory>                                         $ignored
      */
-    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes)
+    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity)
     {
+        $this->activity = $activity;
         $this->metadataStatus = $metadataStatus;
         $this->metadataReason = $metadataReason;
         $this->metadataMessage = $metadataMessage;
@@ -94,7 +97,8 @@ final class FindingDetails
             $check,
             $reason,
             $ignored,
-            $facts->fixes()
+            $facts->fixes(),
+            $facts->activityLookup()
         );
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
 
@@ -128,6 +132,11 @@ final class FindingDetails
         return $clone;
     }
 
+    public function activity(): ActivityLookup
+    {
+        return $this->activity;
+    }
+
     /** The S10 entry for release data a counted advisory needed and did not get. */
     public function releasesUnchecked(): ?Check
     {
@@ -135,10 +144,10 @@ final class FindingDetails
     }
 
     /**
-     * The checks that did not run and raise no S10: the repository activity of a package lockrot does
-     * not ask about, or whose S10 a raised S1 or a whole-package entry drops; the release metadata
-     * that was not read; S8 on a branch snapshot; the advisories of a package the lookup scope or an
-     * unparseable version leaves out.
+     * The checks that did not run and raise no S10: the repository activity that lockrot did not
+     * read, unless S10 holds it; the archived flag that a read did not carry; the release metadata
+     * that was not read, unless S10 holds it; S8 on a branch snapshot; the advisories of a package
+     * the lookup scope or an unparseable version leaves out.
      *
      * @param list<Signal> $signals
      *
@@ -156,15 +165,17 @@ final class FindingDetails
             }
         }
         $skipped = [];
-        if ($facts->activity() === null && !\in_array('repository_activity', $inS10, true)) {
-            $activity = $facts->activityNotChecked();
-            if ($activity === null) {
-                $activity = $entry !== null && $entry->acceptsAll() ? 'allowlisted' : ($facts->package()->isFromComposerRepository() ? 'no_repository' : 'not_from_composer_repository');
-            }
-            $skipped[] = new Check('repository_activity', $activity, [Signal::S3, Signal::S4]);
+        $lookup = $facts->activityLookup();
+        if ($lookup->status() !== ActivityLookup::READ && !\in_array('repository_activity', $inS10, true)) {
+            $skipped[] = new Check('repository_activity', (string) $lookup->reason(), [Signal::S3, Signal::S4]);
+        }
+        if ($lookup->archivedUnread() !== null) {
+            $skipped[] = new Check('repository_archived', $lookup->archivedUnread(), [Signal::S3]);
         }
         if ($facts->metadataStatus() !== PackageFacts::METADATA_READ) {
-            $skipped[] = new Check('release_metadata', $facts->metadataStatus(), [Signal::S2, Signal::S8]);
+            if (!\in_array('release_metadata', $inS10, true)) {
+                $skipped[] = new Check('release_metadata', $facts->metadataStatus(), [Signal::S2, Signal::S8]);
+            }
         } elseif (ReleaseBranch::of($facts->package()->version()) === null) {
             $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
         }

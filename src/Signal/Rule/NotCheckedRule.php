@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Rule;
 
+use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Repository\ReleaseBranch;
+use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
@@ -28,6 +30,8 @@ final class NotCheckedRule implements SignalRule
     public const RATE_LIMIT = 'rate_limit';
     public const FETCH_FAILED = 'fetch_failed';
     public const OFFLINE = 'offline';
+    public const HOST_NOT_SUPPORTED = ActivityLookup::HOST_NOT_SUPPORTED;
+    public const NOT_FROM_COMPOSER_REPOSITORY = ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY;
 
     /** Short enough for the evidence line of a flagged row. The reason key carries the rest. */
     private const ACTIVITY_WORDS = [
@@ -42,15 +46,29 @@ final class NotCheckedRule implements SignalRule
     /** The words of the S10 entry for release data a counted advisory needed. */
     public const RELEASES_WORDS = 'the releases were not read, so S9 could not judge a fix';
 
+    /**
+     * The origins whose releases and activity lockrot does not read, though the code is a third
+     * party's: a path origin is the project's own code, and an artifact or package origin keeps
+     * its skips (docs/verdicts.md#what-was-not-checked).
+     */
+    private const ORIGIN_GAPS = [PackageOrigin::VCS, PackageOrigin::UNKNOWN];
+
+    /** An unknown origin can be a Composer repository that leaves no notification-url, so it gets words of its own. */
+    private const ORIGIN_CAUSE = [PackageOrigin::UNKNOWN => 'lockrot cannot tell which repository serves it'];
+
     /** The S10 checks about the package's upkeep, which a raised S1 makes moot. */
-    private const MAINTENANCE_CHECKS = ['repository_activity', 'release_dates'];
+    private const MAINTENANCE_CHECKS = ['repository_activity', 'release_dates', 'release_metadata'];
 
     public function evaluate(PackageFacts $facts): ?Signal
     {
         $unchecked = [];
         $reason = $facts->activityNotChecked();
-        if ($reason !== null && isset(self::ACTIVITY_WORDS[$reason])) {
+        $origin = $facts->package()->origin()->kind();
+        if ($reason === self::NOT_FROM_COMPOSER_REPOSITORY && \in_array($origin, self::ORIGIN_GAPS, true)) {
+            $unchecked[] = new Check('release_metadata', $reason, [Signal::S2, Signal::S8]);
             $unchecked[] = new Check('repository_activity', $reason, [Signal::S3, Signal::S4]);
+        } elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[(string) $reason])) {
+            $unchecked[] = new Check('repository_activity', (string) $reason, [Signal::S3, Signal::S4]);
         }
 
         $metadata = $facts->metadata();
@@ -64,7 +82,9 @@ final class NotCheckedRule implements SignalRule
             $unchecked[] = new Check('release_dates', 'undated_releases', $ageBlocks);
         }
 
-        return self::signalOf($unchecked);
+        $host = $reason === self::HOST_NOT_SUPPORTED ? $facts->activityLookup()->where()->host() : null;
+
+        return self::signalOf($unchecked, array_map(static fn (Check $entry): string => self::summaryOf($entry, $host, $origin), $unchecked));
     }
 
     /**
@@ -119,23 +139,35 @@ final class NotCheckedRule implements SignalRule
     }
 
     /**
-     * @param list<Check>       $unchecked
-     * @param list<string>|null $summaries one per entry, else the rule's own words
+     * @param list<Check>  $unchecked
+     * @param list<string> $summaries one per entry
      */
-    private static function signalOf(array $unchecked, ?array $summaries = null): ?Signal
+    private static function signalOf(array $unchecked, array $summaries): ?Signal
     {
         if ($unchecked === []) {
             return null;
         }
-        $summaries ??= array_map([self::class, 'summaryOf'], $unchecked);
 
         return new Signal(Signal::LEVEL_INFO, implode('; ', $summaries), new NotCheckedData($unchecked));
     }
 
-    private static function summaryOf(Check $entry): string
+    /**
+     * @param ?string $host   the host that lockrot cannot ask
+     * @param ?string $origin the package's `origin.kind`
+     */
+    private static function summaryOf(Check $entry, ?string $host = null, ?string $origin = null): string
     {
+        $cause = self::ACTIVITY_WORDS[$entry->reason()] ?? $entry->reason();
+        if ($entry->reason() === self::HOST_NOT_SUPPORTED) {
+            $cause = 'lockrot cannot ask '.($host ?? 'its host');
+        } elseif ($entry->reason() === self::NOT_FROM_COMPOSER_REPOSITORY) {
+            $cause = self::ORIGIN_CAUSE[(string) $origin] ?? 'not installed from a Composer repository';
+        }
+        if ($entry->check() === 'release_metadata') {
+            return 'release metadata not checked ('.$cause.'), so S2 and S8 could not be read';
+        }
         if ($entry->check() === 'repository_activity') {
-            return 'repository activity not checked ('.(self::ACTIVITY_WORDS[$entry->reason()] ?? $entry->reason()).'), so S3 and S4 could not be read';
+            return 'repository activity not checked ('.$cause.'), so S3 and S4 could not be read';
         }
         if ($entry->check() === 'release_dates') {
             return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.implode(' and ', $entry->blocks()).' could not measure it';

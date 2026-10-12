@@ -67,7 +67,7 @@ LIBYEARS_013_KEYS = ['branch_snapshot', 'no_stable_release_date', 'not_from_comp
 # The base documents make_negatives.py mutates, by file stem.
 NEGATIVE_BASES = ['composite', 'A', 'A-baselined-dagger', 'A-blocked-dagger', 'B-baselined-dagger', 'B-dev-dagger', 'C-baselined-dagger', 'D-partial-dagger',
                   'E-ignored-dagger', 'baseline-read-score0', 'composite-generate-baseline', 'ok-unchecked', 'partial-op-dagger', 'psr-log', 'rounded-dev-dagger',
-                  'routing', 'scope-registries-dagger', 'stale-only', 'unknown']
+                  'routing', 'scope-registries-dagger', 'stale-only', 'unknown', 'host-unsupported', 'not-found-dagger', 'gitlab-anon-dagger', 'local-path-advisory']
 
 
 class Projection:
@@ -102,6 +102,21 @@ def entry_words(signal):
     return signal['summary'].split('; ')
 
 
+def s10_words(entry, f):
+    """S10's clause for one entry, in NotCheckedRule's words. None for a check that NotCheckedRule does not word."""
+    if entry['reason'] == 'host_not_supported':
+        return 'repository activity not checked (lockrot cannot ask %s), so S3 and S4 could not be read' % f['activity']['host']
+    if entry['reason'] == 'not_from_composer_repository' and entry['check'] in ('release_metadata', 'repository_activity'):
+        cause = 'lockrot cannot tell which repository serves it' if f['origin']['kind'] == 'unknown' else 'not installed from a Composer repository'
+        what, blocks = {'release_metadata': ('release metadata', 'S2 and S8'), 'repository_activity': ('repository activity', 'S3 and S4')}[entry['check']]
+        return '%s not checked (%s), so %s could not be read' % (what, cause, blocks)
+    return None
+
+
+# NotCheckedRule writes the origin and activity entries before the others.
+S10_FIRST = ['release_metadata', 'repository_activity']
+
+
 def project_s10(f, proj):
     """Moves the S10 entries a later pull request writes back to what this one writes."""
     s10 = next((s for s in f['signals'] if s['id'] == 'S10'), None)
@@ -114,7 +129,8 @@ def project_s10(f, proj):
     if proj.after('6a'):
         # an accepted check is the S10 entry it stands for
         for a in accepted:
-            entries.append(({'check': a['check'], 'reason': a['reason'], 'blocks': a['blocks']}, None))
+            entry = {'check': a['check'], 'reason': a['reason'], 'blocks': a['blocks']}
+            entries.append((entry, s10_words(entry, f)))
             skipped = [c for c in skipped if not (c['reason'] == 'accepted_by_config' and c['check'] == a['check'])]
             proj.revert('checks_skipped accepted_by_config -> the S10 entry it accepted')
     kept = []
@@ -146,13 +162,12 @@ def project_s10(f, proj):
         skipped = [c for c in skipped if c['reason'] != 'repository_not_found']
     order = ['repository_activity', 'release_metadata', 'release_branch', 'advisories']
     skipped.sort(key=lambda c: order.index(c['check']) if c['check'] in order else len(order))
+    kept.sort(key=lambda pair: S10_FIRST.index(pair[0]['check']) if pair[0]['check'] in S10_FIRST else len(S10_FIRST))
     f['checks_skipped'] = skipped
     f['checks_missing'] = [e for e, _ in kept]
     signals = [s for s in f['signals'] if s['id'] != 'S10']
     if kept:
-        blocks = []
-        for e, _ in kept:
-            blocks += [b for b in e['blocks'] if b not in blocks]
+        blocks = sorted({b for e, _ in kept for b in e['blocks']}, key=lambda b: int(b[1:]))
         words = [w for _, w in kept]
         s10 = copy.deepcopy(s10) if s10 is not None else {'id': 'S10', 'level': 'info', 'summary': '', 'data': {}}
         s10['data'] = {'unchecked': [e for e, _ in kept], 'blocks': blocks}

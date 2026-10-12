@@ -33,6 +33,7 @@ start the reason with `in method():`.
 - `src/Analyzer/Analyzer.php` LogicalAnd `if ($fixes !== null && $facts->advisories() !== []) {` — a package with no advisory gets an empty scan, which writes the same finding as no scan: no row, no branch fix, no gets.
 - `src/Analyzer/Report.php` AssignCoalesce `$gate ??= $this->gate();` — the gate is derived from the report alone, so computing it again gives the gate that the caller passed.
 - `src/Analyzer/Report.php` UnwrapArraySlice ``$rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [`` — in findingRows(): the union keeps the first of each key, so the whole row in place of its tail adds the same keys in the same order.
+- `src/Analyzer/RunNote.php` CastString `$host = (string) $where->host();` — every entry of the host note comes from `LocatedRepository::unsupported()`, which always names a host.
 
 ## src/Baseline
 
@@ -73,7 +74,6 @@ start the reason with `in method():`.
 ## src/Data
 
 - `src/Data/Forge/ActivityClient.php` LessThan `if ($decoded !== null && $result->fromCache() && ($cachedAt === null || $result->fetchedAt() < $cachedAt)) {` — `<=` differs only when the two dates are equal, and then the assignment keeps the same value.
-- `src/Data/Forge/ActivityClient.php` TrueValue `$rateLimited[$forge] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Forge/ActivityClient.php` UnwrapArrayValues `return array_values($groups);` — `fetch()` only iterates the groups.
 - `src/Data/Forge/ActivityFetchPlanner.php` TrueValue `$capped[$forge] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Forge/ActivityFetchPlanner.php` DecrementInteger, IncrementInteger `$checkedPackages[$forge] = ($checkedPackages[$forge] ?? 0) + 1;` — in select(): for a repository already seen, an earlier package set the counter of its forge, so `?? 0` never applies.
@@ -145,6 +145,8 @@ start the reason with `in method():`.
 - `src/Signal/PhpFloor.php` CastString `return ($kind === self::PROJECT ? 'the project\'s php ' : 'the target PHP ').(string) $this->php($kind);` — `php($kind)` is null only for an absent floor, and no caller describes one.
 - `src/Signal/PhpFloor.php` ReturnRemoval `return null;` — in parse(): composer/semver reads null as `""` and throws, and the `catch` returns the same value.
 - `src/Signal/Rule/LeftBehindRule.php` LessThanOrEqualTo `if ($release['at'] === null || !ReleaseBranch::isAbove((string) $key, $branch) || $release['at'] <= $ownAt) {` — a higher branch released at the instant of the installed branch cannot be alive while the installed branch is old enough for S8.
+- `src/Signal/Rule/NotCheckedRule.php` CastString `} elseif ($reason === self::HOST_NOT_SUPPORTED || isset(self::ACTIVITY_WORDS[(string) $reason])) {` — PHP reads a null key as `""`, and `ACTIVITY_WORDS` holds no such key.
+- `src/Signal/Rule/NotCheckedRule.php` CastString `$cause = self::ORIGIN_CAUSE[(string) $origin] ?? 'not installed from a Composer repository';` — PHP reads a null key as `""`, and `ORIGIN_CAUSE` holds no such key.
 
 ## src/Verdict
 

@@ -47,6 +47,20 @@ expected error in a root `$expect` object. An explain-2 fixture has its entry in
 file name that ends in `.strict.json` is read against the strict twin. The conformance test
 validates each fixture and needs the error that it names.
 
+## Relations that draft-04 cannot state
+
+The activity relations below compare values across objects or across the document. The schema holds
+their shape only. The strict run of report-2 (I21), which pull request 6b of the 0.14 train adds,
+checks them.
+
+| Id | Relation |
+|---|---|
+| A5 | An activity that was not read has exactly one `repository_activity` entry, with the activity's `reason` and the blocks S3 and S4 |
+| A7 | When S3 fired, its `forge`, `host` and `repo` equal the activity's |
+| A8 | When S4 fired, its `forge` and `event` equal the activity's |
+| A9 | The root `activity_cache_oldest_at` is the oldest `findings[].activity.cached_at`, or null |
+| A10 | The note `repository_activity_host_not_supported` exists exactly when a finding has that reason, and its counts are the findings' counts |
+
 ## The projected fixtures
 
 `project_fixtures.py` takes the pull request id of the 0.14 train and the directory of the reference

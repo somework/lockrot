@@ -39,6 +39,7 @@ final class CompatibilityPageTest extends TestCase
         self::assertStringContainsString('Grades, highest first: `'.implode('`, `', ScoreModel::GRADES).'`.', $page);
         self::assertStringContainsString('Signal levels, lowest first: `'.implode('`, `', ClosedSets::levels()).'`.', $page);
         self::assertStringContainsString("A finding's standing against the baseline: `".implode('`, `', ClosedSets::standings()).'`.', $page);
+        self::assertStringContainsString("A finding's `activity.status` in report-2: `".implode('`, `', ClosedSets::activityStatuses()).'`.', $page);
     }
 
     /**

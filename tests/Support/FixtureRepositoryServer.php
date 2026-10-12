@@ -80,8 +80,10 @@ final class FixtureRepositoryServer
      * @param list<string> $lockFiles  absolute paths of composer.lock files whose package names to serve
      * @param list<string> $extraNames package names to serve on top of the locks' — the monorepo parents the
      *                                 analyzer loads to date a split package, which no lock lists
+     * @param list<array{string, string}> $moreRecordings [p2 base URL, directory of its recordings]: a name
+     *                                                    that $envelopeDir lacks is served from these, in order
      */
-    public static function fromLockFiles(array $lockFiles, string $envelopeDir = __DIR__.'/../fixtures/http/p2', array $extraNames = []): self
+    public static function fromLockFiles(array $lockFiles, string $envelopeDir = __DIR__.'/../fixtures/http/p2', array $extraNames = [], array $moreRecordings = []): self
     {
         $docroot = self::freshTempDir('lockrot-fixture-repo-');
         $cacheDir = self::freshTempDir('lockrot-fixture-cache-');
@@ -89,9 +91,14 @@ final class FixtureRepositoryServer
         file_put_contents($docroot.'/'.self::ROUTER_FILENAME, self::ROUTER_SCRIPT);
 
         $names = array_values(array_unique(array_merge(self::namesFromLockFiles($lockFiles), $extraNames)));
+        $recordings = array_merge([['https://repo.packagist.org/p2/', $envelopeDir]], $moreRecordings);
         foreach ($names as $name) {
             foreach (self::SUFFIXES as $suffix) {
-                self::writeEnvelopeIfOk($docroot, $envelopeDir, $name, $suffix);
+                foreach ($recordings as [$baseUrl, $dir]) {
+                    if (self::writeEnvelopeIfOk($docroot, $dir, $baseUrl, $name, $suffix)) {
+                        break;
+                    }
+                }
             }
         }
 
@@ -304,17 +311,18 @@ final class FixtureRepositoryServer
         file_put_contents($path, $body);
     }
 
-    private static function writeEnvelopeIfOk(string $docroot, string $envelopeDir, string $name, string $suffix): void
+    /** True when it wrote the file: the recording answered 200. */
+    private static function writeEnvelopeIfOk(string $docroot, string $envelopeDir, string $baseUrl, string $name, string $suffix): bool
     {
-        $url = 'https://repo.packagist.org/p2/'.$name.$suffix.'.json';
+        $url = $baseUrl.$name.$suffix.'.json';
         $path = RecordedHttpClient::pathFor($envelopeDir, $url);
         if (!is_file($path)) {
-            return;
+            return false;
         }
         $raw = file_get_contents($path);
         $result = $raw === false ? null : HttpResult::fromEnvelopeJson($url, $raw);
         if ($result === null || $result->status() !== 200 || $result->body() === null) {
-            return;
+            return false;
         }
 
         $target = $docroot.'/p2/'.$name.$suffix.'.json';
@@ -323,6 +331,8 @@ final class FixtureRepositoryServer
             throw new \RuntimeException('cannot create docroot directory: '.$dir);
         }
         file_put_contents($target, $result->body());
+
+        return true;
     }
 
     private static function freshTempDir(string $prefix): string

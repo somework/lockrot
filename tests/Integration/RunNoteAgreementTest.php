@@ -12,6 +12,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\ForgeAuth;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\Tokens;
@@ -132,7 +133,12 @@ final class RunNoteAgreementTest extends TestCase
             $facts = $analysis->facts($finding->package());
             self::assertNotNull($facts);
             $reason = $facts->activityNotChecked();
-            if ($reason === null) {
+            if ($reason === null || \in_array($reason, [ActivityLookup::ALLOWLISTED, ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, ActivityLookup::NO_REPOSITORY], true)) {
+                continue;
+            }
+            if ($reason === NotCheckedRule::HOST_NOT_SUPPORTED) {
+                self::assertArrayHasKey(RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED, $byCode, $what);
+                self::assertContains($facts->activityLookup()->where()->host(), array_column(JsonPath::arrayAt($byCode[RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED][0]->data(), ['hosts']), 'host'), $what.': the host note names the host of '.$finding->package());
                 continue;
             }
             $meta = $facts->metadata();

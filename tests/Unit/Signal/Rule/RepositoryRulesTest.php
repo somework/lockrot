@@ -42,7 +42,7 @@ final class RepositoryRulesTest extends TestCase
             'host' => 'github.com',
             'years' => 10.8,
             'forge' => 'github',
-            'activity' => 'push',
+            'event' => 'push',
         ], JsonPath::decoded($high->data()));
         $warn = $rule->evaluate(F::facts(F::package(), null, F::activity(false, '2022-01-01')));
         self::assertNotNull($warn);
@@ -66,7 +66,7 @@ final class RepositoryRulesTest extends TestCase
             self::assertNotNull($signal);
             self::assertSame('last commit 2015-11-16 (10.8 years ago)', $signal->summary(), $forge);
             self::assertSame($host, JsonPath::decoded($signal->data())['host'], $forge);
-            self::assertSame([$forge, 'commit'], [JsonPath::decoded($signal->data())['forge'], JsonPath::decoded($signal->data())['activity']], $forge);
+            self::assertSame([$forge, 'commit'], [JsonPath::decoded($signal->data())['forge'], JsonPath::decoded($signal->data())['event']], $forge);
         }
     }
 

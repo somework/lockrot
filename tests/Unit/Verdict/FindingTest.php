@@ -24,6 +24,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -467,7 +468,7 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->withDev(true)->build();
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'allowlist',
+            ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'activity', 'allowlist',
                 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'direct', 'dev', 'reach', 'chain', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears'],
             array_keys($array)
         );
@@ -873,7 +874,7 @@ final class FindingTest extends TestCase
     public function testAJudgementTheDetailsContradictIsRefused(string $status, bool $maintenanceJudged, bool $detailsFirst): void
     {
         $finding = (new FindingBuilder())->withoutFlags()->build();
-        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
+        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
         $flags = FlagSet::fromSignals([], null, []);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -952,7 +953,7 @@ final class FindingTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $package = $lock->find('vendor/pkg');
         self::assertNotNull($package);
-        $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
+        $facts = FactsBuilder::looked(new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true));
         $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S9', 'S3', 'S4']];
         $signals = $withS10 ? [new Signal(Signal::LEVEL_INFO, 'activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [$activity], 'blocks' => ['S9', 'S3', 'S4']]))] : [];
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
@@ -964,7 +965,7 @@ final class FindingTest extends TestCase
         $releases = ['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']];
         self::assertSame(Signal::S10, $s10['id']);
         self::assertCount(1, $written, 'one S10');
-        self::assertSame($withS10 ? ['unchecked' => [$activity, $releases], 'blocks' => ['S9', 'S3', 'S4']] : ['unchecked' => [$releases], 'blocks' => ['S9']], $s10['data']);
+        self::assertSame($withS10 ? ['unchecked' => [$activity, $releases], 'blocks' => ['S3', 'S4', 'S9']] : ['unchecked' => [$releases], 'blocks' => ['S9']], $s10['data']);
         self::assertSame($withS10 ? 'activity not checked; '.NotCheckedRule::RELEASES_WORDS : NotCheckedRule::RELEASES_WORDS, $s10['summary']);
     }
 
@@ -1003,7 +1004,7 @@ final class FindingTest extends TestCase
     {
         $finding = (new FindingBuilder())->build();
         $before = $finding->details();
-        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null);
+        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
 
         $copy = $finding->withDetails($details);
 
@@ -1114,7 +1115,7 @@ final class FindingTest extends TestCase
     public static function headlines(): iterable
     {
         $s2 = static fn (string $level, $years): Signal => new Signal($level, 'old', SignalDataStub::of(Signal::S2, ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => $years]));
-        $s4 = static fn (string $level, $years): Signal => new Signal($level, 'quiet', SignalDataStub::of(Signal::S4, ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => $years, 'activity' => 'push']));
+        $s4 = static fn (string $level, $years): Signal => new Signal($level, 'quiet', SignalDataStub::of(Signal::S4, ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => $years, 'event' => 'push']));
         yield 'marked abandoned' => [[new Signal(Signal::LEVEL_HIGH, 'marked', SignalDataStub::of(Signal::S1, []))], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'marked', 'source' => null]];
         yield 'archived' => [[new Signal(Signal::LEVEL_HIGH, 'archived', SignalDataStub::of(Signal::S3, []))], FlagSet::ABANDONED, ['unit' => 'reason', 'value' => 'archived', 'source' => null]];
         yield 'pinned' => [[new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'branch_snapshot']))], FlagSet::PINNED, ['unit' => 'reason', 'value' => 'branch_snapshot', 'source' => null]];
@@ -1159,7 +1160,7 @@ final class FindingTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $package = $lock->find('vendor/pkg');
         self::assertNotNull($package);
-        $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
+        $facts = FactsBuilder::looked(new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true));
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
             ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
 
@@ -1174,7 +1175,7 @@ final class FindingTest extends TestCase
     {
         $s6 = new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'no_stable_release', 'version' => '1.0.0']));
         $gaps = [['check' => 'a', 'reason' => 'no_token', 'blocks' => ['S9']], ['check' => 'b', 'reason' => 'no_token', 'blocks' => ['S9', 'S4']]];
-        yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']]))], ['S9', 'S4']];
+        yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']]))], ['S4', 'S9']];
         yield 'with no S10' => [[$s6], ['S9']];
     }
 }

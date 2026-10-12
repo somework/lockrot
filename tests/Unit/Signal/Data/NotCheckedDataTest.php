@@ -21,18 +21,18 @@ final class NotCheckedDataTest extends TestCase
         self::assertSame([$check], $data->checks());
     }
 
-    public function testTheBlocksListEachCheckInOrder(): void
+    public function testTheBlocksListTheSignalsInSignalOrder(): void
     {
-        $data = new NotCheckedData([new Check('repository_activity', 'no_token', ['S3', 'S4']), new Check('release_dates', 'undated_releases', ['S2', 'S8']), new Check('releases', 'releases_unknown', ['S9'])]);
+        $data = new NotCheckedData([new Check('release_metadata', 'not_from_composer_repository', ['S2', 'S8']), new Check('repository_activity', 'not_from_composer_repository', ['S3', 'S4']), new Check('releases', 'releases_unknown', ['S9']), new Check('release_dates', 'undated_releases', ['S10', 'S1'])]);
 
-        self::assertStringEndsWith('"blocks":["S3","S4","S2","S8","S9"]}', (string) JsonWriter::encode($data, 0));
+        self::assertStringEndsWith('"blocks":["S1","S2","S3","S4","S8","S9","S10"]}', (string) JsonWriter::encode($data, 0));
     }
 
     public function testTheBlocksNameEachSignalOnce(): void
     {
         $data = new NotCheckedData([new Check('releases', 'releases_unknown', ['S9']), new Check('repository_activity', 'no_token', ['S9', 'S3', 'S4'])]);
 
-        self::assertStringEndsWith('"blocks":["S9","S3","S4"]}', (string) JsonWriter::encode($data, 0));
+        self::assertStringEndsWith('"blocks":["S3","S4","S9"]}', (string) JsonWriter::encode($data, 0));
     }
 
     public function testACheckWritesItsKeysInOrder(): void

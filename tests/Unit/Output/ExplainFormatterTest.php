@@ -328,6 +328,14 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringNotContainsString('more', $this->plain($exactly), 'a table that fits is not counted');
     }
 
+    public function testAReadWithoutTheArchivedFlagSaysTheFlagWasNotRead(): void
+    {
+        $finding = (new FindingBuilder())->withDataDate(new \DateTimeImmutable(F::NOW))->build();
+        $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']]), F::activity(null, '2026-02-01T00:00:00+00:00', RepoRef::GITLAB)), new Thresholds(), '8.4', $this->report());
+
+        self::assertStringContainsString("repository activity\n  GitLab vendor/pkg · archived flag not read · last push 2026-02-01 · fetched 2026-09-14\n", $this->plain($explanation));
+    }
+
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void
     {
         $finding = (new FindingBuilder())->withDataDate(new \DateTimeImmutable(F::NOW))->build();

@@ -993,16 +993,7 @@
     "ignored": [],
     "ignored_count": 0
    },
-   "checks_missing": [],
-   "checks_skipped": [
-    {
-     "check": "repository_activity",
-     "reason": "not_from_composer_repository",
-     "blocks": [
-      "S3",
-      "S4"
-     ]
-    },
+   "checks_missing": [
     {
      "check": "release_metadata",
      "reason": "not_from_composer_repository",
@@ -1011,6 +1002,16 @@
       "S8"
      ]
     },
+    {
+     "check": "repository_activity",
+     "reason": "not_from_composer_repository",
+     "blocks": [
+      "S3",
+      "S4"
+     ]
+    }
+   ],
+   "checks_skipped": [
     {
      "check": "advisories",
      "reason": "not_from_composer_repository",
@@ -1024,6 +1025,17 @@
     "status": "not_from_composer_repository",
     "reason": null,
     "message": null
+   },
+   "activity": {
+    "status": "not_read",
+    "reason": "not_from_composer_repository",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "utopia-php/auth",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
    },
    "allowlist": null,
    "from_composer_repository": false,
@@ -1046,7 +1058,39 @@
    "direct_dependents": [
     "utopia-php/auth"
    ],
-   "signals": [],
+   "signals": [
+    {
+     "id": "S10",
+     "level": "info",
+     "summary": "release metadata not checked (not installed from a Composer repository), so S2 and S8 could not be read; repository activity not checked (not installed from a Composer repository), so S3 and S4 could not be read",
+     "data": {
+      "unchecked": [
+       {
+        "check": "release_metadata",
+        "reason": "not_from_composer_repository",
+        "blocks": [
+         "S2",
+         "S8"
+        ]
+       },
+       {
+        "check": "repository_activity",
+        "reason": "not_from_composer_repository",
+        "blocks": [
+         "S3",
+         "S4"
+        ]
+       }
+      ],
+      "blocks": [
+       "S2",
+       "S3",
+       "S4",
+       "S8"
+      ]
+     }
+    }
+   ],
    "evidence": "",
    "allowlist_reason": null,
    "data_date": null,

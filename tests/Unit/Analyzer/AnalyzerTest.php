@@ -307,7 +307,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame('2026-09-14T06:00:00+00:00', $byName['vendor/transitive']->dataDate()->format(\DATE_ATOM));
         self::assertSame(Verdict::PINNED, $byName['vendor/snapshot']->verdict());
         self::assertSame(Verdict::UNKNOWN, $byName['private/thing']->verdict());
-        self::assertSame('not from a Composer repository, not checked', $byName['private/thing']->evidence());
+        self::assertSame('not from a Composer repository, not checked', $byName['private/thing']->note());
+        self::assertStringStartsWith('release metadata not checked (lockrot cannot tell which repository serves it)', $byName['private/thing']->evidence(), 'an unknown origin raises S10');
         // Only private/thing carries no notification-url.
         self::assertFalse($byName['private/thing']->isFromComposerRepository());
         foreach (['vendor/direct', 'vendor/transitive', 'vendor/snapshot'] as $asked) {

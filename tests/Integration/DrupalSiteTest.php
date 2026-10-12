@@ -1,0 +1,184 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lockrot\Tests\Integration;
+
+use Lockrot\Allowlist\BuiltinAllowlist;
+use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunNote;
+use Lockrot\Clock;
+use Lockrot\Config\Gate;
+use Lockrot\Data\Forge\ActivityClient;
+use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\Tokens;
+use Lockrot\Data\Http\HttpClientInterface;
+use Lockrot\Data\Http\RecordedHttpClient;
+use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\SignalSet;
+use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * One recorded Drupal site lock (tests/fixtures/sites/drupal-site, provenance.json names its commit):
+ * its git.drupalcode.org packages without and with Composer's `gitlab-domains` recipe.
+ */
+final class DrupalSiteTest extends TestCase
+{
+    private const FIXTURES = __DIR__.'/../fixtures/';
+    private const SITE = self::FIXTURES.'sites/drupal-site/';
+    private const DRUPALCODE = 'git.drupalcode.org';
+    private const NOW = '2026-10-12T00:00:00+00:00';
+
+    private static ?FixtureRepositoryServer $server = null;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$server = FixtureRepositoryServer::fromLockFiles([self::SITE.'composer.lock'], self::FIXTURES.'http/p2', [], [
+            ['https://repo.packagist.org/p2/', self::SITE.'http/p2'],
+            ['https://packages.drupal.org/files/packages/8/p2/', self::SITE.'http/p2'],
+        ]);
+        self::$server->start();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$server !== null) {
+            self::$server->stop();
+            self::$server = null;
+        }
+    }
+
+    public function testWithoutTheRecipeEveryDrupalcodePackageIsAHostLockrotCannotAsk(): void
+    {
+        $report = $this->analyze(['gitlab.com']);
+        $findings = self::findingsOn($report);
+
+        self::assertNotSame([], $findings);
+        foreach ($findings as $name => $finding) {
+            self::assertSame(['not_read', 'host_not_supported', self::DRUPALCODE, null], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['host'], JsonPath::arrayAt($finding, ['activity'])['forge']], $name);
+            self::assertContains(['check' => 'repository_activity', 'reason' => 'host_not_supported', 'blocks' => ['S3', 'S4']], JsonPath::arrayAt($finding, ['checks_missing']), $name);
+        }
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED));
+        self::assertCount(1, $notes);
+        self::assertSame([['host' => self::DRUPALCODE, 'packages' => \count($findings), 'listed_in' => null]], JsonPath::arrayAt(JsonPath::decoded($notes[0]->toArray()), ['data', 'hosts']));
+        self::assertTrue(Gate::decide($report, FailOn::fromString('unchecked'), false, Gate::MODE_CHECK)->fails(), '--fail-on=unchecked exits 1');
+    }
+
+    public function testWithTheRecipeEveryDrupalcodePackageIsReadAnonymouslyWithoutItsArchivedFlag(): void
+    {
+        $report = $this->analyze(['gitlab.com', self::DRUPALCODE]);
+        $findings = self::findingsOn($report);
+
+        self::assertNotSame([], $findings);
+        foreach ($findings as $name => $finding) {
+            self::assertSame(['read', 'gitlab', 'commit', null], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['event'], JsonPath::arrayAt($finding, ['activity'])['archived']], $name);
+            self::assertContains(['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']], JsonPath::arrayAt($finding, ['checks_skipped']), $name);
+        }
+        foreach ($report->findings() as $finding) {
+            self::assertSame([], array_values(array_filter(JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['checks_missing']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'repository_activity')), $finding->package());
+        }
+        self::assertSame([], array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED));
+    }
+
+    public function testWithTheRecipeAndARecordedTokenAnswerEveryDrupalcodePackageIsNotArchived(): void
+    {
+        $auth = new ForgeAuth(new Tokens('recorded', null), static fn (string $host): bool => $host === self::DRUPALCODE);
+        $findings = self::findingsOn($this->analyze(['gitlab.com', self::DRUPALCODE], $auth));
+
+        self::assertNotSame([], $findings);
+        foreach ($findings as $name => $finding) {
+            self::assertSame(['read', false], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['archived']], $name);
+            self::assertSame([], array_values(array_filter(JsonPath::arrayAt($finding, ['checks_skipped']), static fn ($entry): bool => \is_array($entry) && $entry['check'] === 'repository_archived')), $name);
+        }
+    }
+
+    /** @param list<string> $gitlabDomains */
+    private function analyze(array $gitlabDomains, ?ForgeAuth $auth = null): Report
+    {
+        $server = self::$server;
+        self::assertNotNull($server);
+        $clock = Clock::fixed(self::NOW);
+        $auth ??= ForgeAuth::withTokens(new Tokens('recorded', null));
+        $analyzer = new Analyzer(
+            new RepositoryMetadataLoader($server->repositories(), $clock),
+            new ActivityClient(self::recordings(), $auth),
+            new ActivityFetchPlanner($auth),
+            new RepoLocator($gitlabDomains),
+            BuiltinAllowlist::load(),
+            SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
+            new VerdictEngine(),
+            $clock,
+            false
+        );
+
+        return $analyzer->analyze(LockFile::fromFile(self::SITE.'composer.lock'), ProjectConfig::fromFile(self::SITE.'composer.json'), false);
+    }
+
+    /** The site's own GitHub and git.drupalcode.org answers, then the GitHub answers it shares with the other fixtures. */
+    private static function recordings(): HttpClientInterface
+    {
+        return new class ([self::SITE.'http/gitlab', self::SITE.'http/github', self::FIXTURES.'http/github']) implements HttpClientInterface {
+            /** @var list<string> */
+            private array $dirs;
+
+            /** @param list<string> $dirs searched in order */
+            public function __construct(array $dirs)
+            {
+                $this->dirs = $dirs;
+            }
+
+            public function fetchAll(array $urls, array $headers = []): array
+            {
+                $out = [];
+                foreach ($urls as $url) {
+                    $dir = $this->dirs[\count($this->dirs) - 1];
+                    foreach ($this->dirs as $candidate) {
+                        if (is_file(RecordedHttpClient::pathFor($candidate, $url))) {
+                            $dir = $candidate;
+                            break;
+                        }
+                    }
+                    $out += (new RecordedHttpClient($dir))->fetchAll([$url], $headers);
+                }
+
+                return $out;
+            }
+        };
+    }
+
+    /**
+     * The findings of the lock entries whose source is on git.drupalcode.org, by the lock itself.
+     *
+     * @return array<string, array<mixed, mixed>>
+     */
+    private static function findingsOn(Report $report): array
+    {
+        $lock = JsonPath::decodeFile(self::SITE.'composer.lock');
+        $names = [];
+        foreach (JsonPath::arrayAt($lock, ['packages']) as $entry) {
+            if (\is_array($entry) && JsonPath::has($entry, ['source', 'url']) && strpos(JsonPath::stringAt($entry, ['source', 'url']), 'https://'.self::DRUPALCODE.'/') === 0) {
+                $names[] = JsonPath::stringAt($entry, ['name']);
+            }
+        }
+        $findings = [];
+        foreach ($report->findings() as $finding) {
+            if (\in_array($finding->package(), $names, true)) {
+                $findings[$finding->package()] = JsonPath::decoded($finding->toArray());
+            }
+        }
+        self::assertCount(\count($names), $findings, 'one finding per git.drupalcode.org entry');
+
+        return $findings;
+    }
+}

@@ -675,6 +675,7 @@ final class Finding
             'checks_skipped' => $details->skipped(),
             'maintenance_judged' => $this->maintenanceJudged,
             'metadata' => $details->metadata(),
+            'activity' => $details->activity(),
             'allowlist' => $entry === null ? null : $entry->toArray(),
             'from_composer_repository' => $this->isFromComposerRepository(),
             'origin' => $this->origin->toArray(),

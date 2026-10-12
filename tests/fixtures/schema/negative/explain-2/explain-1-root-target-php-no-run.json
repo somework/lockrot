@@ -299,6 +299,17 @@
    "reason": null,
    "message": null
   },
+  "activity": {
+   "status": "read",
+   "reason": null,
+   "forge": "github",
+   "host": "github.com",
+   "repo": "symfony/monolog-bridge",
+   "event": "push",
+   "archived": false,
+   "fetched_at": "2026-10-01T16:03:43+00:00",
+   "cached_at": "2026-10-01T16:03:43+00:00"
+  },
   "allowlist": null,
   "from_composer_repository": true,
   "origin": {
@@ -719,14 +730,6 @@
     }
    }
   ]
- },
- "activity": {
-  "forge": "GitHub",
-  "repository": "symfony/monolog-bridge",
-  "archived": false,
-  "pushed_at": "2026-09-23T14:28:05+00:00",
-  "fetched_at": "2026-10-01T16:03:43+00:00",
-  "from_cache": true
  },
  "legacy": {
   "verdict": "left-behind",

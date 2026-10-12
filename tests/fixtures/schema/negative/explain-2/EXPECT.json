@@ -1,5 +1,4 @@
 {
-  "activity-missing.json": "activity",
   "allowlist-by-user.json": "finding.allowlist",
   "baseline-state-accepted.json": "finding.baseline",
   "branch-row-fixes-clears-revision-3.json": "metadata",
@@ -10,6 +9,7 @@
   "commands-posix-string.json": "finding.next_step",
   "composer-moves-boolean.json": "finding.next_step",
   "explain-1-root-target-php-no-run.json": "run",
+  "finding-activity-missing.json": "finding.activity",
   "fix-kind-held-revision-1.strict.json": "finding.security",
   "flag-weight-revision-2.json": "finding.flags",
   "gate-by-facts-empty.json": "finding.gate.by",

@@ -102,7 +102,7 @@ def explain_negatives():
         'maintenance-judged-without-metadata': (f(lambda d: d['finding']['metadata'].__setitem__('status', 'not_from_composer_repository')), 'finding'),
         'gates-hold-none': (f(lambda d: d['run'].__setitem__('gates', [{'value': 'none', 'kind': 'grade', 'threshold': None}])), 'run.gates'),
         'schema-url-missing': (f(lambda d: d.pop('$schema')), '$schema'),
-        'activity-missing': (f(lambda d: d.pop('activity')), 'activity'),
+        'finding-activity-missing': (f(lambda d: d['finding'].pop('activity')), 'finding.activity'),
         'branch-row-fixes-without-if-applied': (f(lambda d: d['metadata']['branches'][0]['fixes'].pop('if_applied')), 'metadata.branches[0].fixes'),
         'branch-row-fixing-nothing-held': (f(lambda d: d['metadata']['branches'][-1]['fixes'].update(
             held_by=[dict(source='root', package=None, version=None, link='require', constraint='^2.6', holder=None)])),

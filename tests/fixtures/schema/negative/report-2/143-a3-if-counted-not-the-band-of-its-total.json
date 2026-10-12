@@ -1042,6 +1042,17 @@
     "reason": null,
     "message": null
    },
+   "activity": {
+    "status": "not_read",
+    "reason": "allowlisted",
+    "forge": "github",
+    "host": "github.com",
+    "repo": "php-fig/log",
+    "event": null,
+    "archived": null,
+    "fetched_at": null,
+    "cached_at": null
+   },
    "allowlist": {
     "by": "builtin",
     "pattern": "psr/*",

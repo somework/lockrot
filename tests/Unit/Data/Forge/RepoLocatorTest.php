@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Forge;
 
 use Composer\Config;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -138,5 +139,82 @@ final class RepoLocatorTest extends TestCase
         self::assertNotNull($locator->locate('https://git.example.com/g/p.git'));
         self::assertNotNull($locator->locate('https://gitlab.com/g/p.git'));
         self::assertNull(RepoLocator::fromConfig(new Config(false))->locate('https://git.example.com/g/p.git'), 'Composer defaults to gitlab.com alone');
+    }
+    /**
+     * @param array{string, string, string}|null $located forge, host, path when the URL is a repository lockrot can ask
+     *
+     * @dataProvider classified
+     */
+    #[DataProvider('classified')]
+    public function testClassifyTellsALocatedRepositoryFromAnUnsupportedHostAndFromNoRepository(?string $url, string $kind, ?string $host, ?array $located, ?string $listedIn): void
+    {
+        $where = (new RepoLocator(['gitlab.com', 'gitlab.example.com:8443/gitlab'], ['github.com', 'ghe.example.com']))->classify($url);
+
+        $ref = $where->ref();
+        self::assertSame(
+            [$kind, $host, $located, $listedIn],
+            [$where->kind(), $where->host(), $ref === null ? null : [$ref->forge(), $ref->host(), $ref->path()], $where->listedIn()],
+            (string) $url
+        );
+    }
+
+    /** @return iterable<string, array{?string, string, ?string, array{string, string, string}|null, ?string}> */
+    public static function classified(): iterable
+    {
+        $located = LocatedRepository::LOCATED;
+        $unsupported = LocatedRepository::HOST_NOT_SUPPORTED;
+        $none = LocatedRepository::NO_REPOSITORY;
+
+        yield 'github.com' => ['https://github.com/o/r.git', $located, 'github.com', [RepoRef::GITHUB, 'github.com', 'o/r'], null];
+        yield 'www.github.com' => ['https://www.github.com/o/r.git', $located, 'github.com', [RepoRef::GITHUB, 'github.com', 'o/r'], null];
+        yield 'bitbucket.org' => ['https://bitbucket.org/w/r.git', $located, 'bitbucket.org', [RepoRef::BITBUCKET, 'bitbucket.org', 'w/r'], null];
+        yield 'gitlab.com' => ['https://gitlab.com/g/p.git', $located, 'gitlab.com', [RepoRef::GITLAB, 'gitlab.com', 'g/p'], null];
+        yield 'a gitlab-domains host with port and prefix' => ['https://gitlab.example.com:8443/gitlab/g/p.git', $located, 'gitlab.example.com:8443/gitlab', [RepoRef::GITLAB, 'gitlab.example.com:8443/gitlab', 'g/p'], null];
+        yield 'codeberg.org' => ['https://codeberg.org/o/r.git', $unsupported, 'codeberg.org', null, null];
+        yield 'git.drupalcode.org without the recipe' => ['https://git.drupalcode.org/project/admin_toolbar.git', $unsupported, 'git.drupalcode.org', null, null];
+        yield 'an svn URL' => ['https://themes.svn.wordpress.org/twentytwentyfive/', $unsupported, 'themes.svn.wordpress.org', null, null];
+        yield 'a Gitea host with a port' => ['https://gitea.example.com:3000/o/r.git', $unsupported, 'gitea.example.com:3000', null, null];
+        yield 'the scp form' => ['git@codeberg.org:o/r.git', $unsupported, 'codeberg.org', null, null];
+        yield 'userinfo dropped' => ['https://user:secret@Codeberg.org/o/r.git', $unsupported, 'codeberg.org', null, null];
+        yield 'the gitlab-domains host without its port' => ['https://gitlab.example.com/gitlab/g/p.git', $unsupported, 'gitlab.example.com', null, null];
+        yield 'a github-domains host' => ['https://ghe.example.com/o/r.git', $unsupported, 'ghe.example.com', null, 'github-domains'];
+        yield 'github.com/owner' => ['https://github.com/owner', $none, 'github.com', null, null];
+        yield 'a known host without a path' => ['https://github.com', $none, 'github.com', null, null];
+        yield 'another host without a path' => ['https://codeberg.org', $unsupported, 'codeberg.org', null, null];
+        yield 'a GitLab web route' => ['https://gitlab.com/g/p/-/tree/main', $none, 'gitlab.com', null, null];
+        yield 'a prefix mismatch' => ['https://gitlab.example.com:8443/other/g/p.git', $none, 'gitlab.example.com:8443', null, null];
+        yield 'an unparsable URL' => ['not a url', $none, null, null, null];
+        yield 'a file URL' => ['file:///srv/mirrors/repo.git', $none, null, null, null];
+        yield 'null' => [null, $none, null, null, null];
+    }
+
+    public function testLocateReturnsTheRefThatClassifyLocates(): void
+    {
+        $locator = new RepoLocator();
+
+        self::assertNull($locator->locate('https://codeberg.org/o/r.git'), 'an unsupported host is not located');
+        self::assertNull($locator->locate('https://github.com/owner'), 'no repository is not located');
+    }
+
+    public function testFromConfigReadsGithubDomainsForTheHostsItNames(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['github-domains' => ['github.com', 'GHE.example.com', 7]]]);
+        $where = RepoLocator::fromConfig($config)->classify('https://ghe.example.com/o/r.git');
+
+        self::assertSame([LocatedRepository::HOST_NOT_SUPPORTED, 'github-domains'], [$where->kind(), $where->listedIn()]);
+        self::assertNull(RepoLocator::fromConfig($config)->classify('https://github.com/o/r.git')->listedIn(), 'github.com is asked, not listed');
+    }
+
+    /** Composer's default `forgejo-domains` names codeberg.org. */
+    public function testFromConfigReadsForgejoDomainsForTheHostsItNames(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['forgejo-domains' => ['Codeberg.org', 7]]]);
+
+        $where = RepoLocator::fromConfig($config)->classify('https://codeberg.org/o/r.git');
+
+        self::assertSame([LocatedRepository::HOST_NOT_SUPPORTED, 'forgejo-domains'], [$where->kind(), $where->listedIn()]);
+        self::assertNull(RepoLocator::fromConfig($config)->classify('https://gitea.example.com/o/r.git')->listedIn());
     }
 }

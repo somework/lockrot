@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Analyzer;
 
 use Composer\Downloader\TransportException;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\RepositoryUrl;
@@ -31,6 +32,7 @@ final class RunNote
     public const REPOSITORY_ACTIVITY_RATE_LIMITED = 'repository_activity_rate_limited';
     public const REPOSITORY_ACTIVITY_UNREACHABLE = 'repository_activity_unreachable';
     public const REPOSITORY_ACTIVITY_NOT_FOUND = 'repository_activity_not_found';
+    public const REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED = 'repository_activity_host_not_supported';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     /**
      * The codes that lockrot writes, as the schemas list them in `x-known-values`, in the order of
@@ -49,6 +51,7 @@ final class RunNote
         self::REPOSITORY_ACTIVITY_RATE_LIMITED,
         self::REPOSITORY_ACTIVITY_UNREACHABLE,
         self::REPOSITORY_ACTIVITY_NOT_FOUND,
+        self::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED,
         self::NOT_FROM_COMPOSER_REPOSITORY,
     ];
 
@@ -274,6 +277,51 @@ final class RunNote
             false,
             ['forge_id' => $forge, 'repositories' => array_map(static fn (RepoRef $repo): array => ['host' => $repo->host(), 'repo' => $repo->path()], $repositories)]
         );
+    }
+
+    /**
+     * One entry per host, most packages first, then by host. lockrot cannot tell from a URL which
+     * software a host runs, so the hint names both cases and never claims that listing helps.
+     *
+     * @param list<LocatedRepository> $unsupported one per package whose host lockrot cannot ask
+     */
+    public static function repositoryActivityHostNotSupported(array $unsupported): self
+    {
+        if ($unsupported === []) {
+            throw new \InvalidArgumentException('A host note names at least one host.');
+        }
+        $count = [];
+        $listedIn = [];
+        foreach ($unsupported as $where) {
+            $host = (string) $where->host();
+            $count[$host] = ($count[$host] ?? 0) + 1;
+            $listedIn[$host] = $where->listedIn();
+        }
+        uksort($count, static fn (string $a, string $b): int => [$count[$b], $a] <=> [$count[$a], $b]);
+        $hosts = [];
+        $named = [];
+        $listed = [LocatedRepository::GITHUB_DOMAINS => [], LocatedRepository::FORGEJO_DOMAINS => []];
+        foreach ($count as $host => $packages) {
+            $host = (string) $host;
+            $hosts[] = ['host' => $host, 'packages' => $packages, 'listed_in' => $listedIn[$host]];
+            $named[] = \sprintf('%s (%d)', $host, $packages);
+            if ($listedIn[$host] !== null) {
+                $listed[$listedIn[$host]][] = $host;
+            }
+        }
+        $total = \count($unsupported);
+        $text = \sprintf('Repository activity not checked for %d %s on hosts lockrot cannot ask: %s.', $total, $total === 1 ? 'package' : 'packages', implode(', ', $named));
+        if (\in_array(null, $listedIn, true)) {
+            $text .= " A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.";
+        }
+        if ($listed[LocatedRepository::GITHUB_DOMAINS] !== []) {
+            $text .= \sprintf(' lockrot does not ask GitHub Enterprise hosts (%s).', implode(', ', $listed[LocatedRepository::GITHUB_DOMAINS]));
+        }
+        if ($listed[LocatedRepository::FORGEJO_DOMAINS] !== []) {
+            $text .= \sprintf(' lockrot does not ask Forgejo hosts (%s), and listing them in gitlab-domains does not help.', implode(', ', $listed[LocatedRepository::FORGEJO_DOMAINS]));
+        }
+
+        return self::of(self::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED, $text, false, ['hosts' => $hosts]);
     }
 
     public static function notFromComposerRepository(int $count): self

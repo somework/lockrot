@@ -10,6 +10,9 @@ use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\RepoRef;
+use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Lock\LockFile;
@@ -24,6 +27,7 @@ use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -56,7 +60,7 @@ final class FindingDetailsTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $package = $lock->find('vendor/a');
         self::assertNotNull($package);
-        $facts = new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage($feeds, $records, $reason));
+        $facts = F::looked(new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage($feeds, $records, $reason)));
 
         $security = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->toSecurityArray([], null);
 
@@ -70,7 +74,7 @@ final class FindingDetailsTest extends TestCase
     public function testUnreadReleasesGiveTheInstalledBranchARowWithNoFixKnown(): void
     {
         $rows = self::rows([['id' => 'PKSA-a', 'severity' => 'high', 'counted' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null, 'reason' => 'releases_unknown']]]);
-        $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null));
+        $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null), FindingBuilder::unread());
 
         $security = $details->toSecurityArray($rows, '1.x');
 
@@ -88,7 +92,7 @@ final class FindingDetailsTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'twig/twig', 'version' => 'v1.44.8', 'require' => ['php' => '>=7.1.3'], 'notification-url' => 'https://packagist.org/downloads/']]]);
         $package = $lock->find('twig/twig');
         self::assertNotNull($package);
-        $facts = new PackageFacts($package, null, null, [], null, null, null);
+        $facts = F::looked(new PackageFacts($package, null, null, [], null, null, null));
 
         $installed = FindingDetails::of($facts, null, new PhpFloor('8.4', '*'), [], [], null)->installedPhp();
 
@@ -101,7 +105,7 @@ final class FindingDetailsTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/a', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $package = $lock->find('vendor/a');
         self::assertNotNull($package);
-        $facts = new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage([], null, 'unparseable_version'));
+        $facts = F::looked(new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage([], null, 'unparseable_version')));
 
         $skipped = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->skipped();
 
@@ -111,7 +115,7 @@ final class FindingDetailsTest extends TestCase
     public function testASnapshotsVulnerableSummaryHasNoBranchClause(): void
     {
         $rows = self::rows([['id' => 'PKSA-a', 'cve' => 'CVE-2026-1', 'title' => 'a title', 'severity' => 'high', 'counted' => true, 'deciding' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null]]]);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
 
         self::assertSame('1 advisory: 1 high; advisory: CVE-2026-1 a title', $details->vulnerableSummary($rows, null, 'high'));
     }
@@ -125,7 +129,7 @@ final class FindingDetailsTest extends TestCase
         $package = $lock->find('vendor/a');
         self::assertNotNull($package);
 
-        $security = FindingDetails::of(new PackageFacts($package, null, null, []), null, new PhpFloor('8.4', null), [$ignored], [], null)->toSecurityArray([], null);
+        $security = FindingDetails::of(F::looked(new PackageFacts($package, null, null, [])), null, new PhpFloor('8.4', null), [$ignored], [], null)->toSecurityArray([], null);
 
         self::assertSame(1, $security['ignored_count']);
         self::assertSame(
@@ -141,7 +145,7 @@ final class FindingDetailsTest extends TestCase
         $candidate = new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, [$holder]);
         $branch = new BranchFixes('1.x', true, 0, 2, $candidate, '1.3.0', ['PKSA-a']);
         $gets = new Gets('1.3.0', PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=8.1')), ['PKSA-a'], false);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null));
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null), FindingBuilder::unread());
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'medium', 'fix' => ['kind' => 'upgrade', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
@@ -164,7 +168,7 @@ final class FindingDetailsTest extends TestCase
     /** Without the scan, the S9 rows give the branch row: each row on the branch is fixed, each without a kind is not known. */
     public function testTheS9RowsCountTheFixedAndTheUnknown(): void
     {
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
@@ -185,7 +189,7 @@ final class FindingDetailsTest extends TestCase
     public function testTheStandingOfCountedRowsIsVulnerableWithTheHardestKind(): void
     {
         $ignored = new IgnoredAdvisory(new Advisory('PKSA-i', null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, 'PKSA-i', null, AdvisoryIgnoreMatch::BY_AUDIT));
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null);
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null, FindingBuilder::unread());
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update']],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'raise-php']],
@@ -205,7 +209,7 @@ final class FindingDetailsTest extends TestCase
     /** With no counted row, the lookup decides the status, and nothing is counted or fixed. */
     public function testTheStandingWithNoRowFollowsTheLookup(): void
     {
-        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null);
+        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null, FindingBuilder::unread());
 
         self::assertSame('clear', $details('complete')->standing([])->status());
         self::assertSame('unchecked', $details('partial')->standing([])->status());
@@ -234,10 +238,10 @@ final class FindingDetailsTest extends TestCase
     public static function metadataAnswers(): iterable
     {
         $offline = MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON;
-        $unavailable = new PackageFacts(F::package(), null, null, [], null, null, null, true);
+        $unavailable = F::looked(new PackageFacts(F::package(), null, null, [], null, null, null, true));
         yield 'unavailable, offline' => [$unavailable, $offline, ['status' => 'unavailable', 'reason' => 'offline', 'message' => $offline]];
         yield 'unavailable, with no answer' => [$unavailable, null, ['status' => 'unavailable', 'reason' => null, 'message' => null]];
-        yield 'read' => [F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), $offline, ['status' => 'read', 'reason' => null, 'message' => null]];
+        yield 'read' => [F::looked(F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']]))), $offline, ['status' => 'read', 'reason' => null, 'message' => null]];
     }
 
     /**
@@ -259,7 +263,7 @@ final class FindingDetailsTest extends TestCase
     public static function skips(): iterable
     {
         $metadata = F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']]);
-        $read = F::facts(F::package(), $metadata);
+        $read = F::looked(F::facts(F::package(), $metadata));
         $asked = F::facts(F::package(), $metadata, F::activity(false, '2026-01-01T00:00:00+00:00'));
         $activity = static fn (string $reason): array => ['check' => 'repository_activity', 'reason' => $reason, 'blocks' => ['S3', 'S4']];
         $s10 = static fn ($unchecked): Signal => new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $unchecked]));
@@ -268,16 +272,24 @@ final class FindingDetailsTest extends TestCase
 
         yield 'every check ran' => [$asked, null, [], []];
         yield 'no repository to ask' => [$read, null, [], [$activity('no_repository')]];
-        yield 'a whole-package entry' => [$read, $whole, [], [$activity('allowlisted')]];
+        yield 'a whole-package entry' => [F::looked(F::facts(F::package(), $metadata), ActivityLookup::ALLOWLISTED), $whole, [], [$activity('allowlisted')]];
         yield 'an entry that accepts some flags' => [$read, $silentOnly, [], [$activity('no_repository')]];
-        yield 'the reason the facts give' => [new PackageFacts(F::package(), $metadata, null, [], 'no_token'), null, [], [$activity('no_token')]];
+        yield 'the reason the lookup gives' => [F::looked(new PackageFacts(F::package(), $metadata, null, []), 'no_token'), null, [], [$activity('no_token')]];
         yield 'S10 holds the activity gap' => [$read, null, [new Signal(Signal::LEVEL_WARN, 'old', SignalDataStub::of(Signal::S2, [])), $s10([['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]])], []];
         yield 'S10 holds another gap' => [$read, null, [$s10([['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']]])], [$activity('no_repository')]];
-        yield 'not from a Composer repository' => [F::facts(F::package(['fromComposerRepository' => false])), null, [], [
+        yield 'not from a Composer repository' => [F::looked(F::facts(F::package(['fromComposerRepository' => false])), ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY), null, [], [
             $activity('not_from_composer_repository'),
             ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],
         ]];
         yield 'a branch snapshot' => [F::facts(F::package(['version' => 'dev-main']), $metadata, F::activity(false, null)), null, [], [['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => ['S8']]]];
+        $gitlab = new RepositoryActivity(new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'group/pkg'), null, null, new \DateTimeImmutable(F::NOW));
+        yield 'a read without the archived flag' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read($gitlab)), null, [], [['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']]]];
+        yield 'a read whose request for the flag failed' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read(new RepositoryActivity($gitlab->ref(), null, null, new \DateTimeImmutable(F::NOW), null, true))), null, [], [['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]]];
+        yield 'a 404' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::notFound(new RepoRef(RepoRef::GITHUB, 'github.com', 'vendor/pkg'))), null, [], [$activity('repository_not_found')]];
+        yield 'S10 holds the origin gaps' => [F::looked(F::facts(F::package(['fromComposerRepository' => false])), ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY), null, [$s10([
+            ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],
+            ['check' => 'repository_activity', 'reason' => 'not_from_composer_repository', 'blocks' => ['S3', 'S4']],
+        ])], []];
     }
 
     /**

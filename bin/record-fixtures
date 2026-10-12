@@ -2,16 +2,23 @@
 <?php
 
 declare(strict_types=1);
-// Records Composer repository (p2), advisory and GitHub responses for the acceptance fixtures, so
-// tests run offline. Usage: GITHUB_TOKEN=... bin/record-fixtures [fixtureDir ...]
+// Records Composer repository (p2), advisory, GitHub and GitLab responses for the acceptance
+// fixtures, so tests run offline.
+// Usage: GITHUB_TOKEN=... bin/record-fixtures [--gitlab-domain=<host> ...] [fixtureDir ...]
 //
 // It records packages and packages-dev: a `--dev` test replays them. The advisory answer is one
 // packagist.org POST with every locked name, whatever its origin, as lockrot's lookup sends it.
 //
-// The script trims each p2 body to KEEP and each GitHub body to the keys that GitHubApi reads. The
-// fixtures hold GitHub-hosted packages only, so it records no GitLab or Bitbucket answer. It reuses
-// an envelope on disk only when its recorded `status` is not 0: status 0 is a transport failure (a
-// timeout or a DNS error), so the script fetches that answer again.
+// The script trims each p2 body to KEEP and each forge body to the keys that its ForgeApi reads. A
+// fixture with its own `http` directory keeps its answers there (p2, github, gitlab, advisories),
+// so they move no other fixture's results. Its packages.drupal.org entries' p2 answers go to
+// <fixtureDir>/http/p2. In such a fixture, a repository on a --gitlab-domain host gets its commits
+// answer, asked anonymously, in <fixtureDir>/http/gitlab. The script records its project document
+// only with a gitlab-token for that host from Composer's config (auth.json or COMPOSER_AUTH).
+// Anonymously, GitLab leaves `archived` out. The script never writes the token. It records no
+// Bitbucket answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
+// 0 is a transport failure (a timeout or a DNS error), so the script fetches that answer again.
+// It records a GitLab answer only with the status 200 or 404, and it stops on a 429.
 require __DIR__.'/../vendor/autoload.php';
 
 use Composer\Factory;
@@ -19,6 +26,7 @@ use Composer\IO\NullIO;
 use Lockrot\Clock;
 use Lockrot\Composer\ComposerHttpClient;
 use Lockrot\Data\Forge\GitHubApi;
+use Lockrot\Data\Forge\GitLabApi;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Http\HttpResult;
@@ -29,10 +37,20 @@ use Lockrot\Lock\LockFile;
 const KEEP = ['name', 'version', 'version_normalized', 'time', 'abandoned', 'source', 'require', 'replace', 'type', 'extra'];
 const REPOSITORY_BASE_URL = 'https://repo.packagist.org/p2/';
 const ADVISORY_API_URL = 'https://packagist.org/api/security-advisories/';
+const DRUPAL_NOTIFICATION = '{^https://packages\.drupal\.org/(\d+)/downloads$}';
+const GITLAB_COMMIT_KEYS = ['committed_date'];
+const GITLAB_PROJECT_KEYS = ['path_with_namespace', 'archived'];
 
 $root = \dirname(__DIR__);
-$fixtures = $argv;
-array_shift($fixtures);
+$fixtures = [];
+$gitlabDomains = ['gitlab.com'];
+foreach (\array_slice($argv, 1) as $arg) {
+    if (strpos($arg, '--gitlab-domain=') === 0) {
+        $gitlabDomains[] = substr($arg, \strlen('--gitlab-domain='));
+    } else {
+        $fixtures[] = $arg;
+    }
+}
 if ($fixtures === []) {
     $fixtures = [
         'tests/fixtures/apps/wallabag_wallabag', 'tests/fixtures/apps/nextcloud_3rdparty', 'tests/fixtures/apps/matomo-org_matomo',
@@ -47,8 +65,10 @@ foreach ([$p2Dir, $ghDir, $advisoryDir] as $dir) {
         mkdir($dir, 0777, true);
     }
 }
-$fetch = static function (string $url, array $headers, ?string $post = null): HttpResult {
-    $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30];
+// PHP's http wrapper sends the headers again to the host that a redirect names. So a request with a
+// token follows no redirect.
+$fetch = static function (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult {
+    $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30, 'follow_location' => $follow ? 1 : 0];
     if ($post !== null) {
         $http['content'] = $post;
     }
@@ -88,12 +108,29 @@ $composerConfig = Factory::createConfig($io);
 $repositoryHttp = new ComposerHttpClient(Factory::createHttpDownloader($io, $composerConfig), $io, $composerConfig, new Clock());
 $github = new GitHubApi();
 $githubHeaders = GitHubApi::headersFor(getenv('GITHUB_TOKEN') ?: null);
-$locator = new RepoLocator();
-$recordP2 = static function (string $name) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
+$locator = new RepoLocator($gitlabDomains);
+$gitlab = new GitLabApi();
+$gitlabTokens = $composerConfig->get('gitlab-token');
+$record = static function (string $dir, HttpResult $result, ?string $body): void {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    file_put_contents(RecordedHttpClient::pathFor($dir, $result->url()), json_encode((new HttpResult($result->url(), $result->status(), $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
+};
+$keep = static function (?string $body, array $keys, bool $list): ?string {
+    $json = $body === null ? null : json_decode($body, true);
+    if (!\is_array($json)) {
+        return $body;
+    }
+    $trimmed = $list ? array_map(static fn ($item): array => \is_array($item) ? array_intersect_key($item, array_flip($keys)) : [], \array_slice($json, 0, 1)) : array_intersect_key($json, array_flip($keys));
+
+    return (string) json_encode($trimmed, \JSON_UNESCAPED_SLASHES);
+};
+$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
     foreach ([false, true] as $dev) {
         $url = REPOSITORY_BASE_URL.$name.($dev ? '~dev' : '').'.json';
-        $path = RecordedHttpClient::pathFor($p2Dir, $url);
-        if ($isRecorded($path)) {
+        $path = RecordedHttpClient::pathFor($ownDir ?? $p2Dir, $url);
+        if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($p2Dir, $url))) {
             continue;
         }
         $result = $repositoryHttp->fetchAll([$url])[$url];
@@ -107,9 +144,16 @@ foreach (MonorepoParents::load()->candidates() as $parent) {
     $recordP2($parent);
 }
 $repos = [];
+$gitlabRepos = [];
 foreach ($fixtures as $fixture) {
     $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
-    $advisoryPath = $advisoryDir.'/'.basename($fixture).'.json';
+    $own = is_dir($root.'/'.$fixture.'/http') ? $root.'/'.$fixture.'/http' : null;
+    $notificationUrls = [];
+    $rawLock = json_decode((string) file_get_contents($root.'/'.$fixture.'/composer.lock'), true);
+    foreach (array_merge($rawLock['packages'] ?? [], $rawLock['packages-dev'] ?? []) as $entry) {
+        $notificationUrls[$entry['name']] = $entry['notification-url'] ?? '';
+    }
+    $advisoryPath = ($own !== null ? $own.'/advisories' : $advisoryDir).'/'.basename($fixture).'.json';
     if (!$isRecorded($advisoryPath)) {
         $names = array_map(static fn ($package): string => $package->name(), $lock->packages(true));
         $result = $fetch(ADVISORY_API_URL, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
@@ -120,24 +164,66 @@ foreach ($fixtures as $fixture) {
         if (!$package->isFromComposerRepository()) {
             continue;
         }
-        $recordP2($package->name());
-        $repo = $locator->locate($package->repositoryUrl());
+        $sourceUrl = $package->repositoryUrl();
+        if (preg_match(DRUPAL_NOTIFICATION, $notificationUrls[$package->name()] ?? '', $m) === 1) {
+            foreach (['', '~dev'] as $suffix) {
+                $url = 'https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().$suffix.'.json';
+                $dir = $own !== null ? $own.'/p2' : $p2Dir;
+                if (!$isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
+                    $result = $repositoryHttp->fetchAll([$url])[$url];
+                    $record($dir, $result, $result->body() === null ? null : $trim($result->body(), $package->name()));
+                    fwrite(STDERR, \sprintf("p2 %s %d\n", $url, $result->status()));
+                }
+            }
+        } else {
+            $recordP2($package->name(), $own !== null ? $own.'/p2' : null);
+        }
+        $repo = $locator->locate($sourceUrl);
         if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
-            $repos[$repo->path()] = $repo;
+            $githubDir = $own !== null ? $own.'/github' : $ghDir;
+            $repos[$githubDir.'|'.$repo->path()] = [$repo, $githubDir];
+        }
+        if ($own !== null && $repo !== null && $repo->forge() === RepoRef::GITLAB) {
+            $gitlabRepos[$own.'|'.$repo->key()] = [$repo, $own.'/gitlab'];
         }
     }
 }
-foreach ($repos as $repo => $ref) {
+foreach ($gitlabRepos as [$ref, $dir]) {
+    $token = \is_array($gitlabTokens) ? ($gitlabTokens[$ref->host()] ?? null) : null;
+    if ($token !== null && !\is_string($token)) {
+        fwrite(STDERR, \sprintf("gitlab-token for %s is not a string; the project document is not recorded\n", $ref->host()));
+        $token = null;
+    }
+    $requests = $gitlab->requests($ref, $token !== null);
+    foreach ($requests as $role => $url) {
+        if ($isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
+            continue;
+        }
+        $result = $fetch($url, $gitlab->headers($role === 'project' ? $token : null), null, $role !== 'project');
+        fwrite(STDERR, \sprintf("gitlab %s %s %d\n", $ref->key(), $role, $result->status()));
+        if ($result->status() === 429) {
+            fwrite(STDERR, "rate limited; wait for the window and re-run\n");
+            exit(1);
+        }
+        if (\in_array($result->status(), [200, 404], true)) {
+            $record($dir, $result, $keep($result->body(), $role === 'commits' ? GITLAB_COMMIT_KEYS : GITLAB_PROJECT_KEYS, $role === 'commits'));
+        }
+    }
+}
+foreach ($repos as [$ref, $dir]) {
     $url = $github->requests($ref, false)['repo'];
-    $path = RecordedHttpClient::pathFor($ghDir, $url);
-    if ($isRecorded($path)) {
+    $path = RecordedHttpClient::pathFor($dir, $url);
+    if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($ghDir, $url))) {
         continue;
+    }
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
     }
     $result = $fetch($url, $githubHeaders);
     $json = $result->body() === null ? null : json_decode($result->body(), true);
     $body = \is_array($json) ? json_encode(array_intersect_key($json, array_flip(['full_name', 'archived', 'disabled', 'pushed_at', 'default_branch'])), \JSON_UNESCAPED_SLASHES) : $result->body();
     file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body === false ? null : $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
-    fwrite(STDERR, "github {$repo} {$result->status()}\n");
+    fwrite(STDERR, \sprintf("github %s %d\n", $ref->path(), $result->status()));
     if ($result->status() === 403) {
         fwrite(STDERR, "rate limited; set GITHUB_TOKEN and re-run\n");
         exit(1);

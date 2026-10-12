@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Composer\Downloader\TransportException;
 use Lockrot\Analyzer\RunNote;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -244,6 +245,55 @@ final class RunNoteTest extends TestCase
         self::assertSame(json_encode($data === [] ? new \stdClass() : $data), json_encode($row['data']));
     }
 
+    public function testTheHostNoteCountsEachHostMostPackagesFirstAndGivesTheGitlabHint(): void
+    {
+        $note = RunNote::repositoryActivityHostNotSupported([
+            LocatedRepository::unsupported('codeberg.org', null),
+            LocatedRepository::unsupported('bitbucket.example.com', null),
+            LocatedRepository::unsupported('git.drupalcode.org', null),
+            LocatedRepository::unsupported('git.drupalcode.org', null),
+        ]);
+
+        self::assertSame(RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED, $note->code());
+        self::assertSame('https://lockrot.dev/notes/#repository_activity_host_not_supported', $note->docsUrl());
+        self::assertFalse($note->setsNetworkFailures());
+        self::assertSame(['hosts' => [
+            ['host' => 'git.drupalcode.org', 'packages' => 2, 'listed_in' => null],
+            ['host' => 'bitbucket.example.com', 'packages' => 1, 'listed_in' => null],
+            ['host' => 'codeberg.org', 'packages' => 1, 'listed_in' => null],
+        ]], $note->data(), 'most packages first, then by host');
+        self::assertSame(
+            "Repository activity not checked for 4 packages on hosts lockrot cannot ask: git.drupalcode.org (2), bitbucket.example.com (1), codeberg.org (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.",
+            $note->text()
+        );
+    }
+
+    /** A URL can name its host as a decimal IPv4 address, which PHP would turn into an integer key. */
+    public function testTheHostNoteKeepsAHostOfDigitsAString(): void
+    {
+        $note = RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('3232235777', null)]);
+
+        self::assertSame([['host' => '3232235777', 'packages' => 1, 'listed_in' => null]], $note->data()['hosts']);
+    }
+
+    public function testTheHostNoteNamesAForgejoHostWithoutTheGitlabHint(): void
+    {
+        $forgejo = RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', LocatedRepository::FORGEJO_DOMAINS)]);
+
+        self::assertSame([['host' => 'codeberg.org', 'packages' => 1, 'listed_in' => 'forgejo-domains']], $forgejo->data()['hosts']);
+        self::assertSame('Repository activity not checked for 1 package on hosts lockrot cannot ask: codeberg.org (1). lockrot does not ask Forgejo hosts (codeberg.org), and listing them in gitlab-domains does not help.', $forgejo->text());
+    }
+
+    public function testTheHostNoteNamesAGithubEnterpriseHostWithoutTheGitlabHint(): void
+    {
+        $enterprise = RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]);
+        $both = RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS), LocatedRepository::unsupported('codeberg.org', null)]);
+
+        self::assertSame([['host' => 'ghe.example.com', 'packages' => 1, 'listed_in' => 'github-domains']], $enterprise->data()['hosts']);
+        self::assertSame('Repository activity not checked for 1 package on hosts lockrot cannot ask: ghe.example.com (1). lockrot does not ask GitHub Enterprise hosts (ghe.example.com).', $enterprise->text());
+        self::assertStringContainsString("gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host. lockrot does not ask GitHub Enterprise hosts (ghe.example.com).", $both->text(), 'one hint per kind present');
+    }
+
     public function testTheCodesAreListedInTheOrderTheAnalyzersPassesRun(): void
     {
         self::assertSame([
@@ -259,6 +309,7 @@ final class RunNoteTest extends TestCase
             'repository_activity_rate_limited',
             'repository_activity_unreachable',
             'repository_activity_not_found',
+            'repository_activity_host_not_supported',
             'not_from_composer_repository',
         ], RunNote::CODES);
         self::assertSame(['offline', 'composer_too_old', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
@@ -273,6 +324,7 @@ final class RunNoteTest extends TestCase
             'no package outside a repository' => static fn () => RunNote::notFromComposerRepository(0),
             'no unreachable repository' => static fn () => RunNote::repositoryActivityUnreachable(RepoRef::GITHUB, []),
             'no repository not found' => static fn () => RunNote::repositoryActivityNotFound(RepoRef::GITHUB, []),
+            'no host lockrot cannot ask' => static fn () => RunNote::repositoryActivityHostNotSupported([]),
             'a reason advisories are not checked for that is not one' => static fn () => RunNote::advisoriesNotChecked('tired', 0),
             'a checked count below zero' => static fn () => RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, -1),
             'a cap on GitLab, which has none' => static fn () => RunNote::repositoryActivityAnonymousCap(RepoRef::GITLAB, 1, 0, 0),

@@ -8,6 +8,7 @@ use Lockrot\Legacy\SignalData013;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\ExposedPackage;
 use Lockrot\Signal\Data\ExposureData;
+use Lockrot\Signal\Data\NoPushData;
 use Lockrot\Signal\Data\NoReleaseData;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -21,6 +22,13 @@ final class SignalData013Test extends TestCase
         $signal = new Signal(Signal::LEVEL_HIGH, 'marked abandoned', new AbandonedData('lock', 'acme/next', 'https://packagist.org/packages/acme/next'));
 
         self::assertSame(['replacement' => 'acme/next'], SignalData013::toReport1Array($signal));
+    }
+
+    public function testS4KeepsReport1sKeysWithoutTheForgeAndTheEvent(): void
+    {
+        $signal = new Signal(Signal::LEVEL_HIGH, 'last push 2015-11-16', new NoPushData('2015-11-16T16:31:37+00:00', 'vendor/pkg', 'github.com', 10.8, 'github', 'push'));
+
+        self::assertSame(['last_push' => '2015-11-16T16:31:37+00:00', 'repo' => 'vendor/pkg', 'host' => 'github.com', 'years' => 10.8], SignalData013::toReport1Array($signal));
     }
 
     public function testS7NamesEachPackageByItsReport1Word(): void

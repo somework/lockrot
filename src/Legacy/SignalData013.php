@@ -21,7 +21,7 @@ final class SignalData013
     private const ADDED = [
         Signal::S1 => ['marked_by', 'replacement_url'],
         Signal::S3 => ['forge'],
-        Signal::S4 => ['forge', 'activity'],
+        Signal::S4 => ['forge', 'event'],
         Signal::S6 => ['tag_relation'],
         Signal::S8 => ['reachable_php', 'reachable_admits', 'newest_years', 'reachable_years'],
     ];

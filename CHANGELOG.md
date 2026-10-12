@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.
   ([The score](docs/verdicts.md#score))
+- **Breaking:** **CLI:** `--fail-on=unchecked` also fails on two S10 reasons. `host_not_supported`
+  is a repository on a host that lockrot cannot ask. `not_from_composer_repository` is a package
+  from vcs or an unknown origin. Path, artifact and package origins stay skips. S10 adds no flag.
+  Action: list a GitLab host in Composer's `gitlab-domains`, or accept it in `accept-unchecked`.
+  ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -49,6 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `X.Y.Z` (`>=8.2` now admits a branch that needs `8.2.0`), an exclusive bound the next patch
   (`>7.1` no longer admits a branch that needs exactly `7.1.0`). S8 can then name another branch
   to follow. ([Within reach](docs/verdicts.md#within-reach))
+- **All formats:** a repository that answers 404 no longer carries S10 `rate_limit` when the same
+  host also rate-limits: the 404 is an answer.
+  ([Not found](docs/notes.md#repository_activity_not_found))
 
 ### Security
 
@@ -65,6 +73,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
   through a dependency, `through[]` says whether that dependency's newest release requires it.
   `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
+- **json:** each finding states its repository activity lookup (`activity`: read, not found, or not
+  read and why). ([Schema](docs/schema.md))
+- **All formats:** the run note `repository_activity_host_not_supported` names each repository host
+  that lockrot cannot ask. ([Run notes](docs/notes.md#repository_activity_host_not_supported))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
   (`config.policy: false`, `policy.advisories: false`, `policy.advisories.audit: ignore` or
   `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
@@ -74,23 +86,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** **json:** report-2: `verdict` is a grade, and `lead`, `flags`, `score`,
   `next_step`, `security`, `checks_missing` and `run.score_model` join it. `run.gates[]` carry a
-  kind, and `evidence` holds the counted flags' summaries only. Action: assert `."$schema" ==
-  "https://lockrot.dev/schema/report-2.json"` first, then read `.findings[] | [.flags[].summary]`.
+  kind, S4's `data` gains `forge` and `event`, and `evidence` holds the counted flags' summaries
+  only. Action: assert `."$schema" == "https://lockrot.dev/schema/report-2.json"` first, then read
+  `.findings[] | [.flags[].summary]`.
   ([Schema](docs/schema.md#migrating-from-report-1))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 
 ### Removed
 
 - **Breaking:** **json:** `priority_basis`, `no_fix_expected`, `run.flagged_verdicts`,
-  `run.fail_on_kind`, S9's `fixed_by` and `fixed_on_branch`, `baseline.previous_verdict` and the
-  cause keys of `counts`. Action: read `score`, `security`, `run.flag_ids`, `run.gates[].kind`,
-  `baseline.recorded.lead` and the root `flags.<flag>.leading`.
-  ([Migrating](docs/schema.md#migrating-from-report-1))
+  `run.fail_on_kind`, S9's `fixed_by` and `fixed_on_branch`, `baseline.previous_verdict`, the
+  cause keys of `counts` and the html details block's `activity`. Action: read `score`, `security`,
+  `run.flag_ids`, `run.gates[].kind`, `baseline.recorded.lead`, the root `flags.<flag>.leading`
+  and the finding's `activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
+- **Breaking:** **json (explain):** the explanation's top-level `activity` moves to `finding`.
+  Action: read `.finding.activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
 
 ### Fixed
 
 - **All formats:** Symfony's extension polyfills keep their place on the built-in finished list
   under their own reason, because "intentionally frozen" was false for them.
+- **CLI:** `--explain` prints "archived flag not read" for a repository whose host did not send the
+  flag, such as gitlab.com without a token. It printed "not archived".
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
 
 ## [0.13.0] - 2026-10-01
 

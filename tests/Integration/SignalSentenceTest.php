@@ -123,7 +123,7 @@ final class SignalSentenceTest extends TestCase
             case 'S3':
                 return 'repository archived on '.self::FORGE_LABELS[self::text($d, 'forge')];
             case 'S4':
-                return 'last '.self::text($d, 'activity').' '.self::ago($d, 'last_push', null);
+                return 'last '.self::text($d, 'event').' '.self::ago($d, 'last_push', null);
             case 'S5':
                 $written = $d['written_for_php'] ?? null;
                 $constraint = self::text($d, 'php_constraint');

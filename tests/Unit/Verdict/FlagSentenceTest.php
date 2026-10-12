@@ -93,7 +93,7 @@ final class FlagSentenceTest extends TestCase
     {
         $data = [
             Signal::S2 => ['last_release' => '2021-05-05T00:00:00+00:00', 'years' => 5.4, 'dated_by' => null],
-            Signal::S4 => ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => 4.7, 'activity' => 'commit'],
+            Signal::S4 => ['last_push' => '2022-01-10T00:00:00+00:00', 'years' => 4.7, 'event' => 'commit'],
         ];
 
         self::assertSame('last release 2021-05-05 (5.4 years ago); last commit 2022-01-10 (4.7 years ago)', FlagSentence::maintenance(FlagSet::SILENT, [SignalDataStub::of(Signal::S4, $data[Signal::S4]), SignalDataStub::of(Signal::S2, $data[Signal::S2])]));

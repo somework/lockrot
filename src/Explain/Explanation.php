@@ -25,7 +25,6 @@ use Lockrot\Verdict\Finding;
  *
  * @phpstan-type Lock array{php: ?string, released: ?string, repository: ?string, from_composer_repository: bool, dev: bool, branch_snapshot: bool, type: ?string}
  * @phpstan-type Metadata array<string, mixed>
- * @phpstan-type Activity array{forge: string, repository: string, archived: bool, pushed_at: ?string, fetched_at: ?string, from_cache: bool}
  */
 final class Explanation
 {
@@ -175,7 +174,6 @@ final class Explanation
             'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
-            'activity' => $this->activity(),
             'run' => $run->toExplainArray(),
             'legacy' => ['verdict' => $this->finding->verdict(), 'priority' => $basis->priority(), 'basis' => $basis->toArray()],
             'generated_at' => self::date($this->report->generatedAt()),
@@ -187,11 +185,11 @@ final class Explanation
     /**
      * The blocks that the HTML report puts beside a finding.
      *
-     * @return array{metadata: ?Metadata, lock: Lock, activity: ?Activity}
+     * @return array{metadata: ?Metadata, lock: Lock}
      */
     public function toDetailsArray(): array
     {
-        return ['metadata' => $this->metadata(), 'lock' => $this->lock(), 'activity' => $this->activity()];
+        return ['metadata' => $this->metadata(), 'lock' => $this->lock()];
     }
 
     /** @return Lock */
@@ -258,21 +256,6 @@ final class Explanation
             'data_date' => self::date($metadata->dataDate()),
             'branches' => $branches,
             'installed_branch' => $this->installedBranch() === null ? null : ReleaseBranch::label((string) $this->installedBranch()),
-        ];
-    }
-
-    /** @return ?Activity */
-    private function activity(): ?array
-    {
-        $activity = $this->facts->activity();
-
-        return $activity === null ? null : [
-            'forge' => $activity->ref()->forgeLabel(),
-            'repository' => $activity->repo(),
-            'archived' => $activity->isArchived(),
-            'pushed_at' => self::date($activity->pushedAt()),
-            'fetched_at' => self::date($activity->fetchedAt()),
-            'from_cache' => $activity->fromCache(),
         ];
     }
 

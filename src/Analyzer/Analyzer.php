@@ -17,6 +17,8 @@ use Lockrot\Data\Forge\ActivityBatch;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlan;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoLocator;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
@@ -163,7 +165,7 @@ final class Analyzer
         foreach ($packages as $package) {
             $abandonedIgnore[$package->name()] = $this->abandonedIgnore->match($package->name());
         }
-        [$allowlisted, $repoByPackage, $candidateByPackage] = $this->classify($packages, $metadata, $abandonedIgnore, $now);
+        [$allowlisted, $repoByPackage, $candidateByPackage, $decided] = $this->classify($packages, $metadata, $abandonedIgnore, $now);
 
         $activityBatch = ActivityBatch::empty();
         if ($this->deadline->isPast()) {
@@ -177,8 +179,8 @@ final class Analyzer
             $plan = $this->planner->select($repoByPackage, $candidateByPackage);
             [$activityBatch, $activityNotes] = $this->fetchActivity($plan);
         }
-        $notChecked = $this->activityNotCheckedReasons($repoByPackage, $activityBatch, $plan);
-        $notes = array_merge($notes, $activityNotes);
+        $lookups = $decided + $this->answers($repoByPackage, $activityBatch, $plan);
+        $notes = array_merge($notes, $activityNotes, self::hostNotes($lookups));
         $activity = $activityBatch->activity();
 
         $finder = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
@@ -188,10 +190,9 @@ final class Analyzer
         $notInRepository = 0;
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
-            $repo = $repoByPackage[$package->name()] ?? null;
-            $act = $repo !== null ? ($activity[$repo->key()] ?? null) : null;
             $entry = $allowlisted[$package->name()];
-            $facts = new PackageFacts($package, $meta, $act, $advisories->for($package->name()), $notChecked[$package->name()] ?? null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()), isset($batch->failed()[$package->name()]));
+            $facts = (new PackageFacts($package, $meta, null, $advisories->for($package->name()), null, $abandonedIgnore[$package->name()], $advisories->coverage()->for($package->name()), isset($batch->failed()[$package->name()])))
+                ->withActivityLookup($lookups[$package->name()]);
             $factsByPackage[$package->name()] = $facts;
             $every = $advisories->every($package->name());
             $finding = $this->buildFinding($facts, $entry, $graph, $batch, $fixes, $advisories->ignored($package->name()), $every);
@@ -306,77 +307,104 @@ final class Analyzer
     }
 
     /**
-     * A candidate for a tokenless activity lookup raised no S1, and either S2 fired or Composer's
-     * list ignores its marking: then S3 is the only abandonment fact left for it.
+     * Which repository each package's activity lookup asks, and the lookups that lockrot decides
+     * before any request, in the precedence of docs/verdicts.md#what-was-not-checked. A candidate
+     * for a tokenless activity lookup raised no S1, and either S2 fired or Composer's list ignores
+     * its marking: then S3 is the only abandonment fact left for it.
      *
      * @param list<LockedPackage>                        $packages
      * @param array<string, PackageMetadata>             $metadata
      * @param array<string, AbandonedIgnoreMatch|null>   $abandonedIgnore
      *
-     * @return array{0: array<string, AllowlistEntry|null>, 1: array<string, RepoRef>, 2: array<string, bool>}
+     * @return array{0: array<string, AllowlistEntry|null>, 1: array<string, RepoRef>, 2: array<string, bool>, 3: array<string, ActivityLookup>}
      */
     private function classify(array $packages, array $metadata, array $abandonedIgnore, \DateTimeImmutable $now): array
     {
         $allowlisted = [];
         $repoByPackage = [];
         $candidateByPackage = [];
+        $decided = [];
         foreach ($packages as $package) {
             $meta = $metadata[$package->name()] ?? null;
             $entry = $this->allowlist->match($package, $meta, $now);
             $allowlisted[$package->name()] = $entry;
-            $repo = $this->locator->locate(($meta !== null ? $meta->repositoryUrl() : null) ?? $package->repositoryUrl());
-            if ($repo === null || ($entry !== null && $entry->acceptsAll()) || !$package->isFromComposerRepository()) {
-                continue;
+            $where = $this->locator->classify(($meta !== null ? $meta->repositoryUrl() : null) ?? $package->repositoryUrl());
+            $repo = $where->ref();
+            if ($entry !== null && $entry->acceptsAll()) {
+                $decided[$package->name()] = ActivityLookup::notRead(ActivityLookup::ALLOWLISTED, $where);
+            } elseif (!$package->isFromComposerRepository()) {
+                $decided[$package->name()] = ActivityLookup::notRead(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, $where);
+            } elseif ($repo === null) {
+                $decided[$package->name()] = ActivityLookup::notRead($where->kind(), $where);
+            } else {
+                $repoByPackage[$package->name()] = $repo;
+                $facts = new PackageFacts($package, $meta, null, [], null, $abandonedIgnore[$package->name()] ?? null);
+                $first = $this->signals->evaluate($facts);
+                $candidateByPackage[$package->name()] = !$this->hasSignal($first, Signal::S1) && ($this->hasSignal($first, Signal::S2) || AbandonedRule::ignored($facts) !== null);
             }
-            $repoByPackage[$package->name()] = $repo;
-            $facts = new PackageFacts($package, $meta, null, [], null, $abandonedIgnore[$package->name()] ?? null);
-            $first = $this->signals->evaluate($facts);
-            $candidateByPackage[$package->name()] = !$this->hasSignal($first, Signal::S1) && ($this->hasSignal($first, Signal::S2) || AbandonedRule::ignored($facts) !== null);
         }
 
-        return [$allowlisted, $repoByPackage, $candidateByPackage];
+        return [$allowlisted, $repoByPackage, $candidateByPackage, $decided];
     }
 
     /**
-     * Why a package's repository was never asked about, by package name. A check that ran and came
-     * back empty (a 404, a hidden repository) is not listed: S10
-     * ({@see \Lockrot\Signal\Rule\NotCheckedRule}) marks only a check that never happened.
+     * What the lookup gave each package it asked about: a read, a 404, or the plan or network
+     * cause, in that precedence. An answer beats a network cause.
      *
      * @param array<string, RepoRef> $repoByPackage
      *
-     * @return array<string, string>
+     * @return array<string, ActivityLookup>
      */
-    private function activityNotCheckedReasons(array $repoByPackage, ActivityBatch $batch, ?ActivityFetchPlan $plan): array
+    private function answers(array $repoByPackage, ActivityBatch $batch, ?ActivityFetchPlan $plan): array
     {
         $activity = $batch->activity();
-        $reasons = [];
-        $skipped = $plan === null ? [] : $plan->skippedPackages();
+        $lookups = [];
         foreach ($repoByPackage as $name => $repo) {
-            if (isset($activity[$repo->key()])) {
-                continue;
-            }
-            if ($this->offline) {
-                $reasons[$name] = NotCheckedRule::OFFLINE;
-                continue;
-            }
-            if ($plan === null) {
-                $reasons[$name] = NotCheckedRule::BUDGET;
-                continue;
-            }
-            if (isset($skipped[$name])) {
-                $reasons[$name] = $skipped[$name] === ActivityFetchPlan::BUDGET ? NotCheckedRule::RATE_BUDGET : NotCheckedRule::NO_TOKEN;
-                continue;
-            }
-            if ($batch->rateLimited($repo->forge())) {
-                $reasons[$name] = NotCheckedRule::RATE_LIMIT;
-                continue;
-            }
-            if (isset($batch->failedOn($repo->forge())[$repo->key()])) {
-                $reasons[$name] = NotCheckedRule::FETCH_FAILED;
+            $read = $activity[$repo->key()] ?? null;
+            if ($read !== null) {
+                $lookups[$name] = ActivityLookup::read($read);
+            } elseif (\in_array($repo->key(), $batch->notFoundOn($repo->forge()), true)) {
+                $lookups[$name] = ActivityLookup::notFound($repo);
+            } else {
+                $lookups[$name] = ActivityLookup::notRead($this->networkCause((string) $name, $repo, $batch, $plan), LocatedRepository::located($repo));
             }
         }
 
-        return $reasons;
+        return $lookups;
+    }
+
+    /** Why lockrot got no answer about an asked repository: S10 ({@see NotCheckedRule}) carries it. */
+    private function networkCause(string $name, RepoRef $repo, ActivityBatch $batch, ?ActivityFetchPlan $plan): string
+    {
+        if ($this->offline) {
+            return NotCheckedRule::OFFLINE;
+        }
+        if ($plan === null) {
+            return NotCheckedRule::BUDGET;
+        }
+        $skipped = $plan->skippedPackages()[$name] ?? null;
+        if ($skipped !== null) {
+            return $skipped === ActivityFetchPlan::BUDGET ? NotCheckedRule::RATE_BUDGET : NotCheckedRule::NO_TOKEN;
+        }
+
+        return $batch->rateLimited($repo->host()) ? NotCheckedRule::RATE_LIMIT : NotCheckedRule::FETCH_FAILED;
+    }
+
+    /**
+     * @param array<string, ActivityLookup> $lookups
+     *
+     * @return list<RunNote> the one note that names each host lockrot cannot ask, or none
+     */
+    private static function hostNotes(array $lookups): array
+    {
+        $hosts = [];
+        foreach ($lookups as $lookup) {
+            if ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED) {
+                $hosts[] = $lookup->where();
+            }
+        }
+
+        return $hosts === [] ? [] : [RunNote::repositoryActivityHostNotSupported($hosts)];
     }
 
     /** @return array{ActivityBatch, list<RunNote>} the batch, and the notes the round produced */
@@ -392,14 +420,20 @@ final class Analyzer
             $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge));
         }
         foreach (RepoRef::FORGES as $forge) {
-            $failed = [];
+            $limited = [];
+            $unreachable = [];
             foreach ($batch->failedOn($forge) as $key => $message) {
-                $failed[] = [$repoByKey[$key], $message];
+                if ($batch->rateLimited($repoByKey[$key]->host())) {
+                    $limited[] = [$repoByKey[$key], $message];
+                } else {
+                    $unreachable[] = [$repoByKey[$key], $message];
+                }
             }
-            if ($batch->rateLimited($forge)) {
-                $notes[] = RunNote::repositoryActivityRateLimited($forge, $failed);
-            } elseif ($failed !== []) {
-                $notes[] = RunNote::repositoryActivityUnreachable($forge, $failed);
+            if ($limited !== []) {
+                $notes[] = RunNote::repositoryActivityRateLimited($forge, $limited);
+            }
+            if ($unreachable !== []) {
+                $notes[] = RunNote::repositoryActivityUnreachable($forge, $unreachable);
             }
             $notFound = array_map(static fn (string $key): RepoRef => $repoByKey[$key], $batch->notFoundOn($forge));
             if ($notFound !== []) {

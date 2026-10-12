@@ -18,6 +18,7 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Lock\LockFile;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -236,14 +237,17 @@ final class RepositoryMetadataLoaderTest extends TestCase
         }
     }
 
-    // memory_get_peak_usage(true) is a whole-process high-water mark that PHPUnit never resets
-    // between tests, so this assertion is order-dependent on whatever else already ran earlier in
-    // the same process (same root cause as AcceptanceTest::testWallabagKeepsItsVerdictsPrioritiesAndExposure's identical isolation).
-    // Running this one test in its own process makes the peak reflect only this load. That
-    // process never runs setUpBeforeClass(), so this test builds its own single-use server instead
-    // of reaching for the class-level self::$server/self::$loader.
-    /** @runInSeparateProcess */
+    // memory_get_peak_usage(true) is a whole-process high-water mark that PHPUnit never resets. A
+    // separate process without the suite's global state measures only this load: the files that
+    // earlier tests loaded do not count. That process never runs setUpBeforeClass(), so this test
+    // builds its own server and not the class-level self::$server/self::$loader.
+    /**
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
     #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testFullWallabagListResolvesUnderMemoryBudget(): void
     {
         $names = $this->wallabagNames();

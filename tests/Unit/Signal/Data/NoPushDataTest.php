@@ -15,9 +15,9 @@ final class NoPushDataTest extends TestCase
     {
         $data = new NoPushData('2023-07-29T16:52:43+00:00', 'willdurand/JsonpCallbackValidator', 'github.com', 3.2, 'github', 'push');
 
-        self::assertSame('{"last_push":"2023-07-29T16:52:43+00:00","repo":"willdurand/JsonpCallbackValidator","host":"github.com","years":3.2,"forge":"github","activity":"push"}', JsonWriter::encode($data, \JSON_UNESCAPED_SLASHES));
+        self::assertSame('{"last_push":"2023-07-29T16:52:43+00:00","repo":"willdurand/JsonpCallbackValidator","host":"github.com","years":3.2,"forge":"github","event":"push"}', JsonWriter::encode($data, \JSON_UNESCAPED_SLASHES));
         self::assertSame('2023-07-29T16:52:43+00:00', $data->lastPush());
         self::assertSame(3.2, $data->years());
-        self::assertSame('push', $data->activity());
+        self::assertSame('push', $data->event());
     }
 }

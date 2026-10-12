@@ -29,16 +29,18 @@ final class NotCheckedData implements SignalData
         return $this->checks;
     }
 
-    /** @return array{unchecked: non-empty-list<Check>, blocks: list<string>} each blocked signal once, in check order */
+    /** @return array{unchecked: non-empty-list<Check>, blocks: list<string>} each blocked signal once, in signal order */
     public function jsonSerialize(): array
     {
         $blocks = [];
         foreach ($this->checks as $check) {
             foreach ($check->blocks() as $id) {
-                $blocks[] = $id;
+                // PHP stores the numeric key as an int, so ksort() orders S2 before S10.
+                $blocks[substr($id, 1)] = $id;
             }
         }
+        ksort($blocks);
 
-        return ['unchecked' => $this->checks, 'blocks' => array_values(array_unique($blocks))];
+        return ['unchecked' => $this->checks, 'blocks' => array_values($blocks)];
     }
 }

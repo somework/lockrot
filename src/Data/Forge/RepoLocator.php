@@ -7,12 +7,12 @@ namespace Lockrot\Data\Forge;
 use Composer\Config;
 
 /**
- * Turns a clone URL, or a `support.source` that {@see SupportSource} reduced, into a {@see RepoRef}.
- * It returns null for a host that lockrot does not ask: docs/internals.md, "Which host is asked".
+ * Places a clone URL, or a `support.source` that {@see SupportSource} reduced, on a host that
+ * lockrot asks: docs/internals.md, "Which host is asked".
  *
  * GitLab hosts come from Composer's `gitlab-domains`. A domain can carry a path prefix, matched as
- * Composer matches it. GitHub Enterprise is not recognised: its API base and authentication
- * differ from github.com's.
+ * Composer matches it. GitHub Enterprise is not asked: its API base and authentication differ from
+ * github.com's.
  *
  * @internal
  */
@@ -22,16 +22,36 @@ final class RepoLocator
 
     /** @var list<string> */
     private array $gitlabDomains;
+    /** @var list<string> lowercased */
+    private array $githubDomains;
+    /** @var list<string> lowercased */
+    private array $forgejoDomains;
 
-    /** @param list<string> $gitlabDomains as Composer's `gitlab-domains` lists them */
-    public function __construct(array $gitlabDomains = ['gitlab.com'])
+    /**
+     * @param list<string> $gitlabDomains as Composer's `gitlab-domains` lists them
+     * @param list<string> $githubDomains  as Composer's `github-domains` lists them: only to name
+     *                                     the setting that lists a host lockrot cannot ask
+     * @param list<string> $forgejoDomains as Composer's `forgejo-domains` lists them, for the same purpose
+     */
+    public function __construct(array $gitlabDomains = ['gitlab.com'], array $githubDomains = [], array $forgejoDomains = [])
     {
         $this->gitlabDomains = $gitlabDomains;
+        $this->githubDomains = array_map('strtolower', $githubDomains);
+        $this->forgejoDomains = array_map('strtolower', $forgejoDomains);
     }
 
     public static function fromConfig(Config $config): self
     {
-        $domains = $config->get('gitlab-domains');
+        return new self(self::hosts($config->get('gitlab-domains')), self::hosts($config->get('github-domains')), self::hosts($config->get('forgejo-domains')));
+    }
+
+    /**
+     * @param mixed $domains
+     *
+     * @return list<string>
+     */
+    private static function hosts($domains): array
+    {
         $out = [];
         if (\is_array($domains)) {
             foreach ($domains as $domain) {
@@ -41,17 +61,19 @@ final class RepoLocator
             }
         }
 
-        return new self($out);
+        return $out;
     }
 
     public function locate(?string $url): ?RepoRef
     {
-        if ($url === null || $url === '') {
-            return null;
-        }
-        $parts = self::hostAndPath($url);
+        return $this->classify($url)->ref();
+    }
+
+    public function classify(?string $url): LocatedRepository
+    {
+        $parts = $url === null ? null : self::hostAndPath($url);
         if ($parts === null) {
-            return null;
+            return LocatedRepository::none(null);
         }
         [$host, $path] = $parts;
         $lowerHost = strtolower($host);
@@ -60,19 +82,37 @@ final class RepoLocator
             $lowerHost = 'github.com';
         }
         if ($lowerHost === 'github.com') {
-            return self::twoSegments(RepoRef::GITHUB, 'github.com', $path);
+            return self::placed(self::twoSegments(RepoRef::GITHUB, 'github.com', $path), $lowerHost);
         }
         if ($lowerHost === 'bitbucket.org') {
-            return self::twoSegments(RepoRef::BITBUCKET, 'bitbucket.org', $path);
+            return self::placed(self::twoSegments(RepoRef::BITBUCKET, 'bitbucket.org', $path), $lowerHost);
         }
+        $known = false;
         foreach ($this->gitlabDomains as $domain) {
-            $ref = self::gitlab($domain, $lowerHost, $path);
+            [$domainHost, $prefix] = self::domainParts($domain);
+            if (!self::sameGitlab($domainHost, $lowerHost)) {
+                continue;
+            }
+            $known = true;
+            $ref = self::gitlab($prefix, $lowerHost, $path);
             if ($ref !== null) {
-                return $ref;
+                return LocatedRepository::located($ref);
             }
         }
+        if ($known) {
+            return LocatedRepository::none($lowerHost);
+        }
 
-        return null;
+        if (\in_array($lowerHost, $this->githubDomains, true)) {
+            return LocatedRepository::unsupported($lowerHost, LocatedRepository::GITHUB_DOMAINS);
+        }
+
+        return LocatedRepository::unsupported($lowerHost, \in_array($lowerHost, $this->forgejoDomains, true) ? LocatedRepository::FORGEJO_DOMAINS : null);
+    }
+
+    private static function placed(?RepoRef $ref, string $host): LocatedRepository
+    {
+        return $ref === null ? LocatedRepository::none($host) : LocatedRepository::located($ref);
     }
 
     /**
@@ -88,13 +128,12 @@ final class RepoLocator
     {
         if (strpos($url, '://') !== false) {
             $host = parse_url($url, \PHP_URL_HOST);
-            $path = parse_url($url, \PHP_URL_PATH);
-            if (!\is_string($host) || $host === '' || !\is_string($path)) {
+            if (!\is_string($host) || $host === '') {
                 return null;
             }
             $port = parse_url($url, \PHP_URL_PORT);
 
-            return [\is_int($port) ? $host.':'.$port : $host, $path];
+            return [\is_int($port) ? $host.':'.$port : $host, (string) parse_url($url, \PHP_URL_PATH)];
         }
         if (preg_match('{^(?:[A-Za-z0-9_.-]+@)?([A-Za-z0-9_.-]+):(.+)$}', $url, $m) === 1) {
             return [$m[1], $m[2]];
@@ -118,24 +157,41 @@ final class RepoLocator
     /**
      * Matched as Composer's GitLabDriver matches a `gitlab-domains` entry against a clone URL
      * ({@see \Composer\Repository\Vcs\GitLabDriver::determineOrigin()}): the entry matches the URL's
-     * host with its port, or its bare host when the entry names no port. The ref's host is
-     * Composer's origin for the URL: the API base and the key of its credentials. So a
-     * `gitlab.com:443` URL is not `gitlab.com` to {@see ForgeAuth}, and gets no `GITLAB_TOKEN`.
+     * host with its port, or its bare host when the entry names no port.
      *
-     * @param string $domain    a `gitlab-domains` entry: `host`, `host:port` or `host[:port]/prefix`
-     * @param string $lowerHost the URL's host, lowercased, with its port when it has one
+     * @param string $domainHost the host of a `gitlab-domains` entry, lowercased, with its port when it names one
+     * @param string $lowerHost  the URL's host, lowercased, with its port when it has one
      */
-    private static function gitlab(string $domain, string $lowerHost, string $path): ?RepoRef
+    private static function sameGitlab(string $domainHost, string $lowerHost): bool
+    {
+        if ($lowerHost === $domainHost) {
+            return true;
+        }
+        $bareHost = (string) preg_replace('{:\d+$}', '', $lowerHost);
+
+        return $bareHost !== $lowerHost && $bareHost === $domainHost;
+    }
+
+    /**
+     * @param string $domain a `gitlab-domains` entry: `host`, `host:port` or `host[:port]/prefix`
+     *
+     * @return array{0: string, 1: string} the lowercased host, and the prefix with its leading `/` or ''
+     */
+    private static function domainParts(string $domain): array
     {
         $parts = explode('/', $domain, 2);
-        $domainHost = strtolower($parts[0]);
-        $prefix = isset($parts[1]) ? rtrim('/'.$parts[1], '/') : '';
-        if ($lowerHost !== $domainHost) {
-            $bareHost = (string) preg_replace('{:\d+$}', '', $lowerHost);
-            if ($bareHost === $lowerHost || $bareHost !== $domainHost) {
-                return null;
-            }
-        }
+
+        return [strtolower($parts[0]), isset($parts[1]) ? rtrim('/'.$parts[1], '/') : ''];
+    }
+
+    /**
+     * The ref's host is Composer's origin for the URL: the API base and the key of its credentials.
+     * So a `gitlab.com:443` URL is not `gitlab.com` to {@see ForgeAuth}, and gets no `GITLAB_TOKEN`.
+     *
+     * @param string $prefix the entry's path prefix with its leading `/`, or ''
+     */
+    private static function gitlab(string $prefix, string $lowerHost, string $path): ?RepoRef
+    {
         $path = self::normalise($path);
         if ($prefix !== '') {
             if (strpos($path, $prefix.'/') !== 0) {

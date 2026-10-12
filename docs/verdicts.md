@@ -521,14 +521,17 @@ a recent release and an archived repository then never gets S3, and reads `ok` i
 | `repository_activity` | `rate_limit` | The host answered "too many requests" | S3, S4 |
 | `repository_activity` | `fetch_failed` | A timeout, a transport error or an unreachable host | S3, S4 |
 | `repository_activity` | `offline` | `--offline` | S3, S4 |
+| `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
+| `release_metadata` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell. On a path, artifact or package origin the gap is a skip | S2, S8 |
+| `repository_activity` | `not_from_composer_repository` | The same origins: lockrot asks no host for them | S3, S4 |
 | `release_dates` | `undated_releases` | The package's highest tag has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 and S8. S2 alone on a branch snapshot, which has no release branch |
 
 S10's `data` lists each missing check as `unchecked` (`{check, reason, blocks}`) and every blocked
 signal under `blocks`.
 
 - lockrot raises S10 only where the missing check could have changed the verdict. So it never
-  raises S10 on an allowlisted package, or for repository activity or release dates on a package
-  that S1 marks abandoned.
+  raises S10 on an allowlisted package, or for repository activity, release dates or release
+  metadata on a package that S1 marks abandoned.
 
 - Credentials for every host remove `no_token` and `anonymous_budget`. `rate_limit`, `fetch_failed`,
   `offline` and `install_time_budget` can still occur, and `release_dates` asks no host, so a fully

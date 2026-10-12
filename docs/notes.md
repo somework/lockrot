@@ -22,8 +22,9 @@ do, what each gap does to findings, and what to do about it.
 | [`repository_activity_anonymous_cap`](#repository_activity_anonymous_cap) | Without credentials, only some packages were asked about | no | S10 `no_token`, `anonymous_budget` | Set a token ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_rate_limited`](#repository_activity_rate_limited) | A host answered "too many requests" | yes | S10 `rate_limit` | Rerun, or add credentials for the host ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_unreachable`](#repository_activity_unreachable) | A host did not answer | yes | S10 `fetch_failed` | Rerun |
-| [`repository_activity_not_found`](#repository_activity_not_found) | A host answered 404: private, renamed or removed | no | None, so the note is the only record. S10 `rate_limit` when the host also rate-limited | For a private repository, credentials that can read it ([fixes](internals.md#when-a-date-is-missing-or-wrong)) |
-| [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository, and lockrot does not check them | no | `from_composer_repository` is false | Nothing on the project's side. A `type: composer` repository's operator can make it advertise a notify URL |
+| [`repository_activity_not_found`](#repository_activity_not_found) | A host answered 404: private, renamed or removed | no | `activity.status` `not_found` and a `checks_skipped` entry, no S10 | For a private repository, credentials that can read it ([fixes](internals.md#when-a-date-is-missing-or-wrong)) |
+| [`repository_activity_host_not_supported`](#repository_activity_host_not_supported) | Some repositories are on a host that lockrot cannot ask | no | S10 `host_not_supported` | For a host that runs GitLab, list it in Composer's `gitlab-domains` |
+| [`not_from_composer_repository`](#not_from_composer_repository) | Some packages come from no Composer repository, and lockrot does not check them | no | `from_composer_repository` is false. S10 `not_from_composer_repository` on a vcs or unknown origin | Nothing on the project's side. A `type: composer` repository's operator can make it advertise a notify URL |
 
 ## Reading a note {#reading-a-note}
 
@@ -191,12 +192,14 @@ release age (S2 and no S1), and only up to a budget of them
 
 A repository host answered "too many requests".
 
-- `data`: `forge_id`, and `repositories`: every repository on any host of that `forge_id` that got
-  no answer, each with its `message`. The count in `text` is the number of entries in
-  `repositories`.
-- Findings: every package on a host of that `forge_id` whose activity is missing carries S10
-  `rate_limit`. That includes a package whose repository answered 404, which the
-  [not found](#repository_activity_not_found) note also lists.
+- `data`: `forge_id`, and `repositories`: every repository on a host that answered "too many
+  requests" and that got no answer, each with its `message`. The count in `text` is the number of
+  entries in `repositories`.
+- Findings: every package on such a host that got no answer carries S10 `rate_limit`. A failure
+  on another host of the same `forge_id` is in the [unreachable](#repository_activity_unreachable)
+  note.
+  A 404 is an answer, so its package carries `activity.status` `not_found`, and the
+  [not found](#repository_activity_not_found) note lists it.
 - `sets_network_failures`: yes.
 
 ### Unreachable {#repository_activity_unreachable}
@@ -213,9 +216,35 @@ The host did not answer for some repositories.
 The host answered 404 for some repositories: private, renamed or removed.
 
 - `data`: `forge_id`, and `repositories`, each a `host` and a `repo`.
-- Findings: where the host did not also rate-limit, this note is the only record. The findings carry
-  no S10, and their `--explain` document's `activity` is null.
+- Findings: `activity.status` `not_found`, and the `checks_skipped` entry
+  `{repository_activity, repository_not_found, [S3, S4]}`. They carry no S10, also when the same
+  host rate-limited other repositories.
 - `sets_network_failures`: no.
+
+### Host not supported {#repository_activity_host_not_supported}
+
+Some repository URLs are on a host that lockrot cannot ask. lockrot asks github.com, bitbucket.org
+and every host in Composer's `gitlab-domains`, and no other host.
+
+- `data`: `hosts`, one entry per host, the most packages first, then by host name. Each entry has
+  `host`, with its port and without userinfo, `packages` and `listed_in`.
+- `packages` counts the findings whose `activity.reason` is `host_not_supported`.
+- `listed_in` names the Composer setting that lists the host, else it is null.
+  `github-domains` lists a GitHub Enterprise host. `forgejo-domains` lists a Forgejo host, which
+  `gitlab-domains` cannot make askable.
+- Findings: S10 `host_not_supported`, whose summary names the host. On a package that raised S1,
+  the gap is a `checks_skipped` entry instead.
+- `sets_network_failures`: no.
+
+Except for those two settings, lockrot cannot tell from a URL which software a host runs. If the
+host runs GitLab, list it in
+Composer's `gitlab-domains`:
+
+```sh
+composer config gitlab-domains <host>
+```
+
+lockrot cannot ask other repository host software, such as Forgejo or Gitea, or a Subversion host.
 
 ## The lock
 
@@ -230,6 +259,9 @@ operator of such a repository can make it advertise one.
 - Findings: `from_composer_repository` is false, and `origin.kind` says what lockrot could tell
   about where the package came from
   ([where a package came from](schema.md#where-a-package-came-from)).
+- A `vcs` or `unknown` origin carries S10 `not_from_composer_repository` for its release metadata
+  and its repository activity. A `path`, `artifact` or `package` origin carries both as
+  `checks_skipped` entries ([what was not checked](verdicts.md#what-was-not-checked)).
 - `sets_network_failures`: no.
 
 ## Related

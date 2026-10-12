@@ -16,13 +16,6 @@ use PHPUnit\Framework\TestCase;
 /** A committed case, run through the real analyzer, gives the score its document records. */
 final class CaseHydratorTest extends TestCase
 {
-    /**
-     * The cases whose projection onto this pull request leaves a finding that report-2 rejects.
-     * not-found‡: PR 4d writes the activity check that blocks S4. The projection drops it with
-     * `activity` and keeps `liveness_complete: false`.
-     */
-    private const INVALID_UNTIL = ['not-found‡'];
-
     public function testCaseAScoresItsRecordedScoreText(): void
     {
         $case = CaseHydrator::case('A');
@@ -87,7 +80,7 @@ final class CaseHydratorTest extends TestCase
             }
         }
 
-        self::assertSame(self::INVALID_UNTIL, $invalid);
+        self::assertSame([], $invalid, 'every case finding validates');
     }
 
     public function testACaseWithoutInputsIsRefused(): void

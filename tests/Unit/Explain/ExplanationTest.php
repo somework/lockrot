@@ -153,7 +153,7 @@ final class ExplanationTest extends TestCase
 
         $array = $explanation->toArray();
 
-        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'activity', 'run', 'legacy', 'generated_at', 'notes', 'note_details'], array_keys($array));
+        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'run', 'legacy', 'generated_at', 'notes', 'note_details'], array_keys($array));
         self::assertSame('vendor/pkg', $array['package']);
         $finding = $array['finding'];
         self::assertIsArray($finding);
@@ -178,7 +178,8 @@ final class ExplanationTest extends TestCase
             ],
             'installed_branch' => '1.x',
         ], $array['metadata']);
-        self::assertSame(['forge' => 'GitHub', 'repository' => 'vendor/pkg', 'archived' => false, 'pushed_at' => '2026-02-01T00:00:00+00:00', 'fetched_at' => F::NOW, 'from_cache' => false], $array['activity']);
+        self::assertArrayNotHasKey('activity', $array, 'explain-2 reads the activity from its finding');
+        self::assertSame('read', JsonPath::stringAt(JsonPath::decoded($array['finding']), ['activity', 'status']));
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 3, 'push-high-years' => 5], JsonPath::arrayAt($array, ['run', 'thresholds']));
         self::assertSame('8.3', JsonPath::stringAt($array, ['run', 'target_php']));
         self::assertNull(JsonPath::arrayAt($array, ['run'])['project_php'], 'no project php was given');
@@ -208,14 +209,13 @@ final class ExplanationTest extends TestCase
         self::assertSame('https://git.acme.test/pkg.git', JsonPath::arrayAt($elsewhere, ['metadata'])['repository']);
     }
 
-    public function testMissingMetadataAndActivityAreNullNotEmpty(): void
+    public function testMissingMetadataIsNullNotEmpty(): void
     {
         $explanation = new Explanation($this->finding('1.0.0', Verdict::UNKNOWN), F::facts(F::package(['fromComposerRepository' => false])), new Thresholds(), '8.4', $this->report());
 
         $array = $explanation->toArray();
 
         self::assertNull($array['metadata']);
-        self::assertNull($array['activity']);
         self::assertSame([], $explanation->branches());
         self::assertIsArray($array['lock']);
         self::assertFalse($array['lock']['from_composer_repository']);
@@ -429,8 +429,9 @@ final class ExplanationTest extends TestCase
     {
         $two = new BranchFixes('2.x', false, 0, 1, null, '2.1.0', ['PKSA-a']);
         $one = new BranchFixes('1.x', true, 0, 1, null, '1.5.0', []);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$two, $one], null, null, null));
-        $finding = $this->finding('1.4.0', Verdict::LEFT_BEHIND)->withDetails($details);
+        $finding = $this->finding('1.4.0', Verdict::LEFT_BEHIND);
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$two, $one], null, null, null), FindingBuilder::activityOf($finding));
+        $finding = $finding->withDetails($details);
         $metadata = F::metadata([['3.0.0', '2026-01-01T00:00:00+00:00'], ['2.1.0', '2024-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
 
         $branches = JsonPath::arrayAt((new Explanation($finding, F::facts(F::package(['version' => '1.4.0']), $metadata), new Thresholds(), '8.4', $this->report()))->toArray(), ['metadata', 'branches']);

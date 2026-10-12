@@ -1,5 +1,5 @@
 {
- "pr": "4c",
+ "pr": "4d",
  "cases": [
   {
    "id": "A",
@@ -1061,6 +1061,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -3371,6 +3382,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -4866,6 +4888,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -4931,7 +4964,7 @@
        "host": "github.com",
        "years": 4.2,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -6080,6 +6113,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "tubalmartin/YUI-CSS-compressor-PHP-port",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:08+00:00",
+     "cached_at": "2026-10-01T16:04:08+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -7283,6 +7327,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/yaml",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:49+00:00",
+     "cached_at": "2026-10-01T16:05:49+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -8776,6 +8831,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "not_read",
+     "reason": "allowlisted",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/polyfill-intl-idn",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
+    },
     "allowlist": {
      "by": "builtin",
      "pattern": "symfony/polyfill-*",
@@ -9972,6 +10038,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -11056,6 +11133,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "roots/wp-config",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -12183,6 +12271,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "hoaproject/Consistency",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:04:32+00:00",
+     "cached_at": "2026-10-01T16:04:32+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -12248,7 +12347,7 @@
        "host": "github.com",
        "years": 5.4,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -13506,6 +13605,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "guzzle/guzzle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -15385,6 +15495,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/yaml",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -17004,6 +17125,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "guzzle/psr7",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -18700,6 +18832,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:36+00:00",
+     "cached_at": "2026-10-01T16:04:36+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -20621,6 +20764,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "robrichards/xmlseclibs",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:29+00:00",
+     "cached_at": "2026-10-01T16:04:29+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -22040,6 +22194,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "thephpleague/flysystem",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:08+00:00",
+     "cached_at": "2026-10-01T16:04:08+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -23353,6 +23518,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "not_read",
+     "reason": "allowlisted",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "php-fig/log",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
+    },
     "allowlist": {
      "by": "builtin",
      "pattern": "psr/*",
@@ -24357,6 +24533,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "fgrosse/PHPASN1",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:26+00:00",
+     "cached_at": "2026-10-01T16:05:26+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -24416,7 +24603,7 @@
        "host": "github.com",
        "years": 3.4,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      }
     ],
@@ -25536,6 +25723,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "guzzle/cache-subscriber",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:01+00:00",
+     "cached_at": "2026-10-01T16:05:01+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -25599,7 +25797,7 @@
        "host": "github.com",
        "years": 7,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -26831,6 +27029,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "thephpleague/commonmark",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:14+00:00",
+     "cached_at": "2026-10-01T16:03:14+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -28712,6 +28921,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "akaunting/laravel-debugbar-collector",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:32+00:00",
+     "cached_at": "2026-10-01T16:04:32+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -28755,7 +28975,7 @@
        "host": "github.com",
        "years": 3.3,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      }
     ],
@@ -29764,16 +29984,7 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [],
-    "checks_skipped": [
-     {
-      "check": "repository_activity",
-      "reason": "not_from_composer_repository",
-      "blocks": [
-       "S3",
-       "S4"
-      ]
-     },
+    "checks_missing": [
      {
       "check": "release_metadata",
       "reason": "not_from_composer_repository",
@@ -29781,13 +29992,33 @@
        "S2",
        "S8"
       ]
+     },
+     {
+      "check": "repository_activity",
+      "reason": "not_from_composer_repository",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
      }
     ],
+    "checks_skipped": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "not_from_composer_repository",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "joomla-backports/json-api-php",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": false,
@@ -29824,6 +30055,37 @@
        "last_stable_dated_by": null,
        "snapshot_time": "2022-12-30T19:09:00+00:00",
        "tag_relation": null
+      }
+     },
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "release metadata not checked (not installed from a Composer repository), so S2 and S8 could not be read; repository activity not checked (not installed from a Composer repository), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "release_metadata",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S2",
+          "S8"
+         ]
+        },
+        {
+         "check": "repository_activity",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S2",
+        "S3",
+        "S4",
+        "S8"
+       ]
       }
      }
     ],
@@ -30853,6 +31115,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "thephpleague/uri",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:26+00:00",
+     "cached_at": "2026-10-01T16:05:26+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -32429,6 +32702,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/event-dispatcher-contracts",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -34437,6 +34721,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "yosymfony/toml",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:14+00:00",
+     "cached_at": "2026-10-01T16:03:14+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -34480,7 +34775,7 @@
        "host": "github.com",
        "years": 6.1,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -35614,6 +35909,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "matomo-org/component-network",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -36632,6 +36938,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "scheb/2fa-google-authenticator",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:29+00:00",
+     "cached_at": "2026-10-01T16:04:29+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -37831,6 +38148,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "Pagerfanta/twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -39207,6 +39535,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "guzzle/guzzle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -41134,6 +41473,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "web-token/jwt-key-mgmt",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:14+00:00",
+     "cached_at": "2026-10-01T16:03:14+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -42468,6 +42818,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "sensiolabs/SensioFrameworkExtraBundle",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -42531,7 +42892,7 @@
        "host": "github.com",
        "years": 3.6,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -43798,6 +44159,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/routing",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:29+00:00",
+     "cached_at": "2026-10-01T16:04:29+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -45134,6 +45506,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "not_read",
+     "reason": "not_from_composer_repository",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "drupal/core",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
+    },
     "allowlist": null,
     "from_composer_repository": false,
     "origin": {
@@ -46176,6 +46559,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "mikebronner/laravel-pivot-events",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:32+00:00",
+     "cached_at": "2026-10-01T16:04:32+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -47435,6 +47829,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "hyvor/php-json-exporter",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:56+00:00",
+     "cached_at": "2026-10-01T16:04:56+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -48742,6 +49147,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "guzzle/guzzle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:08+00:00",
+     "cached_at": "2026-10-01T16:04:08+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -50729,6 +51145,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "joomla-framework/filter",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:58+00:00",
+     "cached_at": "2026-10-01T16:05:58+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -52199,6 +52626,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -53738,6 +54176,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -55501,6 +55950,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -57283,6 +57743,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -59136,6 +59607,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -59201,7 +59683,7 @@
        "host": "github.com",
        "years": 4.2,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -60477,6 +60959,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -61991,6 +62484,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "not_read",
+     "reason": "no_token",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -63268,6 +63772,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -64702,6 +65217,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/yaml",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:49+00:00",
+     "cached_at": "2026-10-01T16:05:49+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -66010,6 +66536,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "composer/ca-bundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T17:41:33+00:00",
+     "cached_at": null
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -67072,6 +67609,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "allowlisted",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/yaml",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": {
      "by": "project",
@@ -68560,6 +69108,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "not_read",
+     "reason": "no_token",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "hoaproject/Consistency",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -69776,6 +70335,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "offline",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -71080,6 +71650,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -72605,6 +73186,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -74294,6 +74886,17 @@
      "reason": "fetch_failed",
      "message": "The \"https://repo.packagist.org/p2/composer/ca-bundle.json\" file could not be downloaded (HTTP/2 503 )"
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "composer/ca-bundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T17:41:33+00:00",
+     "cached_at": null
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -75382,6 +75985,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "joomla-framework/filter",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:58+00:00",
+     "cached_at": "2026-10-01T16:05:58+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -76540,6 +77154,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "composer/ca-bundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T17:41:33+00:00",
+     "cached_at": null
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -77454,6 +78079,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "allowlisted",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "php-fig/link-util",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": {
      "by": "builtin",
@@ -78467,6 +79103,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "tubalmartin/YUI-CSS-compressor-PHP-port",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:08+00:00",
+     "cached_at": "2026-10-01T16:04:08+00:00"
     },
     "allowlist": {
      "by": "project",
@@ -79675,6 +80322,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/yaml",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:49+00:00",
+     "cached_at": "2026-10-01T16:05:49+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -81167,6 +81825,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "FriendsOfSymfony/FOSOAuthServerBundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -82336,6 +83005,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -83618,6 +84298,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "joomla-framework/string",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:49+00:00",
+     "cached_at": "2026-10-01T16:05:49+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -84948,6 +85639,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "jfcherng/php-color-output",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:49+00:00",
+     "cached_at": "2026-10-01T16:05:49+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -86071,6 +86773,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "matomo-org/referrer-spam-list",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -86988,6 +87701,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "akaunting/laravel-version",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:32+00:00",
+     "cached_at": "2026-10-01T16:04:32+00:00"
+    },
     "allowlist": {
      "by": "project",
      "pattern": "akaunting/laravel-version",
@@ -87042,7 +87766,7 @@
        "host": "github.com",
        "years": 3.6,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      }
     ],
@@ -88173,6 +88897,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "laravel/framework",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:14+00:00",
+     "cached_at": "2026-10-01T16:03:14+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -90165,6 +90900,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "maxmind/GeoIP2-php",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:36+00:00",
+     "cached_at": "2026-10-01T16:04:36+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -91812,6 +92558,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
+    },
     "allowlist": {
      "by": "project",
      "pattern": "symfony/monolog-bridge",
@@ -93243,16 +94000,7 @@
      "gets": null,
      "partial": null
     },
-    "checks_missing": [],
-    "checks_skipped": [
-     {
-      "check": "repository_activity",
-      "reason": "not_from_composer_repository",
-      "blocks": [
-       "S3",
-       "S4"
-      ]
-     },
+    "checks_missing": [
      {
       "check": "release_metadata",
       "reason": "not_from_composer_repository",
@@ -93260,13 +94008,33 @@
        "S2",
        "S8"
       ]
+     },
+     {
+      "check": "repository_activity",
+      "reason": "not_from_composer_repository",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
      }
     ],
+    "checks_skipped": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "not_from_composer_repository",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": {
      "by": "project",
@@ -93347,6 +94115,37 @@
        ],
        "releases_read": false,
        "complete": true
+      }
+     },
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "release metadata not checked (not installed from a Composer repository), so S2 and S8 could not be read; repository activity not checked (not installed from a Composer repository), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "release_metadata",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S2",
+          "S8"
+         ]
+        },
+        {
+         "check": "repository_activity",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S2",
+        "S3",
+        "S4",
+        "S8"
+       ]
       }
      }
     ],
@@ -94322,6 +95121,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "Bacon/BaconQrCode",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:26+00:00",
+     "cached_at": "2026-10-01T16:05:26+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -95456,6 +96266,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/event-dispatcher",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:08+00:00",
+     "cached_at": "2026-10-01T16:04:08+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -96693,6 +97514,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/event-dispatcher",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:08+00:00",
+     "cached_at": "2026-10-01T16:04:08+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -97935,6 +98767,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/event-dispatcher",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:08+00:00",
+     "cached_at": "2026-10-01T16:04:08+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -99213,6 +100056,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "web-auth/webauthn-metadata-service",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:49+00:00",
+     "cached_at": "2026-10-01T16:05:49+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -100564,6 +101418,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -100629,7 +101494,7 @@
        "host": "github.com",
        "years": 4.2,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -101916,6 +102781,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "gitlab",
+     "host": "gitlab.com",
+     "repo": "balping/json-raw-encoder",
+     "event": "commit",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:32+00:00",
+     "cached_at": "2026-10-01T16:04:32+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -101960,7 +102836,7 @@
        "host": "gitlab.com",
        "years": 3.5,
        "forge": "gitlab",
-       "activity": "commit"
+       "event": "commit"
       }
      },
      {
@@ -103110,6 +103986,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "bitbucket",
+     "host": "bitbucket.org",
+     "repo": "symfony/debug",
+     "event": "commit",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -103175,7 +104062,7 @@
        "host": "bitbucket.org",
        "years": 4.2,
        "forge": "bitbucket",
-       "activity": "commit"
+       "event": "commit"
       }
      },
      {
@@ -104337,6 +105224,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "gitlab",
+     "host": "gitlab.example.com/gitlab",
+     "repo": "symfony/debug",
+     "event": "commit",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -104402,7 +105300,7 @@
        "host": "gitlab.example.com/gitlab",
        "years": 4.2,
        "forge": "gitlab",
-       "activity": "commit"
+       "event": "commit"
       }
      },
      {
@@ -105398,22 +106296,33 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [],
-    "checks_skipped": [
+    "checks_missing": [
      {
       "check": "repository_activity",
-      "reason": "no_repository",
+      "reason": "host_not_supported",
       "blocks": [
        "S3",
        "S4"
       ]
      }
     ],
+    "checks_skipped": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "host_not_supported",
+     "forge": null,
+     "host": "codeberg.org",
+     "repo": null,
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -105436,7 +106345,29 @@
     "direct_dependents": [
      "ssddanbrown/htmldiff"
     ],
-    "signals": [],
+    "signals": [
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "repository activity not checked (lockrot cannot ask codeberg.org), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "repository_activity",
+         "reason": "host_not_supported",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S3",
+        "S4"
+       ]
+      }
+     }
+    ],
     "evidence": "",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:39:37+00:00",
@@ -106459,12 +107390,32 @@
      "ignored_count": 0
     },
     "checks_missing": [],
-    "checks_skipped": [],
+    "checks_skipped": [
+     {
+      "check": "repository_activity",
+      "reason": "repository_not_found",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
+     }
+    ],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_found",
+     "reason": "repository_not_found",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "hoaproject/Consistency",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -107679,12 +108630,31 @@
      "ignored_count": 0
     },
     "checks_missing": [],
-    "checks_skipped": [],
+    "checks_skipped": [
+     {
+      "check": "repository_archived",
+      "reason": "no_token",
+      "blocks": [
+       "S3"
+      ]
+     }
+    ],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "gitlab",
+     "host": "gitlab.com",
+     "repo": "hoaproject/Consistency",
+     "event": "commit",
+     "archived": null,
+     "fetched_at": "2026-10-01T16:04:32+00:00",
+     "cached_at": "2026-10-01T16:04:32+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -107741,7 +108711,7 @@
        "host": "gitlab.com",
        "years": 5.4,
        "forge": "gitlab",
-       "activity": "commit"
+       "event": "commit"
       }
      },
      {
@@ -108748,6 +109718,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "doctrine/annotations",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:36+00:00",
+     "cached_at": "2026-10-01T16:04:36+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -109792,6 +110773,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "doctrine/cache",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:36+00:00",
+     "cached_at": "2026-10-01T16:04:36+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -110955,6 +111947,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -111010,7 +112013,7 @@
        "host": "github.com",
        "years": 4.2,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -112192,6 +113195,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "not_read",
+     "reason": "rate_limit",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -113288,6 +114302,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "doctrine/cache",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:36+00:00",
+     "cached_at": "2026-10-01T16:04:36+00:00"
     },
     "allowlist": {
      "by": "project",
@@ -114471,6 +115496,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -114536,7 +115572,7 @@
        "host": "github.com",
        "years": 4.2,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -115710,6 +116746,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -115775,7 +116822,7 @@
        "host": "github.com",
        "years": 4.2,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -117013,6 +118060,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -118563,16 +119621,7 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [],
-    "checks_skipped": [
-     {
-      "check": "repository_activity",
-      "reason": "not_from_composer_repository",
-      "blocks": [
-       "S3",
-       "S4"
-      ]
-     },
+    "checks_missing": [
      {
       "check": "release_metadata",
       "reason": "not_from_composer_repository",
@@ -118581,6 +119630,16 @@
        "S8"
       ]
      },
+     {
+      "check": "repository_activity",
+      "reason": "not_from_composer_repository",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
+     }
+    ],
+    "checks_skipped": [
      {
       "check": "advisories",
       "reason": "not_from_composer_repository",
@@ -118594,6 +119653,17 @@
      "status": "not_from_composer_repository",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "not_from_composer_repository",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "utopia-php/auth",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": false,
@@ -118616,7 +119686,39 @@
     "direct_dependents": [
      "utopia-php/auth"
     ],
-    "signals": [],
+    "signals": [
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "release metadata not checked (not installed from a Composer repository), so S2 and S8 could not be read; repository activity not checked (not installed from a Composer repository), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "release_metadata",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S2",
+          "S8"
+         ]
+        },
+        {
+         "check": "repository_activity",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S2",
+        "S3",
+        "S4",
+        "S8"
+       ]
+      }
+     }
+    ],
     "evidence": "",
     "allowlist_reason": null,
     "data_date": null,
@@ -119469,6 +120571,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "composer/ca-bundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T17:41:33+00:00",
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -120348,6 +121461,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "composer/ca-bundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T17:41:33+00:00",
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -121407,6 +122531,17 @@
      "status": "not_from_composer_repository",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "not_from_composer_repository",
+     "forge": null,
+     "host": null,
+     "repo": null,
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": false,
@@ -123954,16 +125089,7 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [],
-    "checks_skipped": [
-     {
-      "check": "repository_activity",
-      "reason": "not_from_composer_repository",
-      "blocks": [
-       "S3",
-       "S4"
-      ]
-     },
+    "checks_missing": [
      {
       "check": "release_metadata",
       "reason": "not_from_composer_repository",
@@ -123971,13 +125097,33 @@
        "S2",
        "S8"
       ]
+     },
+     {
+      "check": "repository_activity",
+      "reason": "not_from_composer_repository",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
      }
     ],
+    "checks_skipped": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "not_from_composer_repository",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "jquery/jquery-dist",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": false,
@@ -124003,7 +125149,39 @@
      "yiisoft/yii2-bootstrap5",
      "yiisoft/yii2-symfonymailer"
     ],
-    "signals": [],
+    "signals": [
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "release metadata not checked (lockrot cannot tell which repository serves it), so S2 and S8 could not be read; repository activity not checked (lockrot cannot tell which repository serves it), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "release_metadata",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S2",
+          "S8"
+         ]
+        },
+        {
+         "check": "repository_activity",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S2",
+        "S3",
+        "S4",
+        "S8"
+       ]
+      }
+     }
+    ],
     "evidence": "",
     "allowlist_reason": null,
     "data_date": null,
@@ -124860,22 +126038,33 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [],
-    "checks_skipped": [
+    "checks_missing": [
      {
       "check": "repository_activity",
-      "reason": "no_repository",
+      "reason": "host_not_supported",
       "blocks": [
        "S3",
        "S4"
       ]
      }
     ],
+    "checks_skipped": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "host_not_supported",
+     "forge": null,
+     "host": "codeberg.org",
+     "repo": null,
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -124898,7 +126087,29 @@
     "direct_dependents": [
      "ssddanbrown/htmldiff"
     ],
-    "signals": [],
+    "signals": [
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "repository activity not checked (lockrot cannot ask codeberg.org), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "repository_activity",
+         "reason": "host_not_supported",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S3",
+        "S4"
+       ]
+      }
+     }
+    ],
     "evidence": "",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:39:37+00:00",
@@ -125731,22 +126942,33 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [],
-    "checks_skipped": [
+    "checks_missing": [
      {
       "check": "repository_activity",
-      "reason": "no_repository",
+      "reason": "host_not_supported",
       "blocks": [
        "S3",
        "S4"
       ]
      }
     ],
+    "checks_skipped": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "host_not_supported",
+     "forge": null,
+     "host": "codeberg.org",
+     "repo": null,
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -125769,7 +126991,29 @@
     "direct_dependents": [
      "ssddanbrown/htmldiff"
     ],
-    "signals": [],
+    "signals": [
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "repository activity not checked (lockrot cannot ask codeberg.org), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "repository_activity",
+         "reason": "host_not_supported",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S3",
+        "S4"
+       ]
+      }
+     }
+    ],
     "evidence": "",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:39:37+00:00",
@@ -126624,6 +127868,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "composer/ca-bundle",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T17:41:33+00:00",
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -127570,16 +128825,7 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [],
-    "checks_skipped": [
-     {
-      "check": "repository_activity",
-      "reason": "not_from_composer_repository",
-      "blocks": [
-       "S3",
-       "S4"
-      ]
-     },
+    "checks_missing": [
      {
       "check": "release_metadata",
       "reason": "not_from_composer_repository",
@@ -127587,13 +128833,33 @@
        "S2",
        "S8"
       ]
+     },
+     {
+      "check": "repository_activity",
+      "reason": "not_from_composer_repository",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
      }
     ],
+    "checks_skipped": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "not_from_composer_repository",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "joomla-backports/json-api-php",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
     },
     "allowlist": null,
     "from_composer_repository": false,
@@ -127630,6 +128896,37 @@
        "last_stable_dated_by": null,
        "snapshot_time": "2022-12-30T19:09:00+00:00",
        "tag_relation": null
+      }
+     },
+     {
+      "id": "S10",
+      "level": "info",
+      "summary": "release metadata not checked (not installed from a Composer repository), so S2 and S8 could not be read; repository activity not checked (not installed from a Composer repository), so S3 and S4 could not be read",
+      "data": {
+       "unchecked": [
+        {
+         "check": "release_metadata",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S2",
+          "S8"
+         ]
+        },
+        {
+         "check": "repository_activity",
+         "reason": "not_from_composer_repository",
+         "blocks": [
+          "S3",
+          "S4"
+         ]
+        }
+       ],
+       "blocks": [
+        "S2",
+        "S3",
+        "S4",
+        "S8"
+       ]
       }
      }
     ],
@@ -128650,6 +129947,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -130026,6 +131334,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -131555,6 +132874,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -133320,6 +134650,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/var-dumper",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:04:02+00:00",
+     "cached_at": "2026-10-01T16:04:02+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -135347,6 +136688,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/debug",
+     "event": "push",
+     "archived": true,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -135406,7 +136758,7 @@
        "host": "github.com",
        "years": 4.2,
        "forge": "github",
-       "activity": "push"
+       "event": "push"
       }
      },
      {
@@ -136640,6 +137992,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -138233,6 +139596,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,
@@ -140559,6 +141933,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -142148,6 +143533,17 @@
      "reason": null,
      "message": null
     },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/monolog-bridge",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:03:43+00:00",
+     "cached_at": "2026-10-01T16:03:43+00:00"
+    },
     "allowlist": null,
     "from_composer_repository": true,
     "origin": {
@@ -143725,6 +145121,17 @@
      "status": "read",
      "reason": null,
      "message": null
+    },
+    "activity": {
+     "status": "read",
+     "reason": null,
+     "forge": "github",
+     "host": "github.com",
+     "repo": "twigphp/Twig",
+     "event": "push",
+     "archived": false,
+     "fetched_at": "2026-10-01T16:05:47+00:00",
+     "cached_at": "2026-10-01T16:05:47+00:00"
     },
     "allowlist": null,
     "from_composer_repository": true,

@@ -23,6 +23,9 @@ reviews:
     # composer.lock and composer.json taken from real projects; see tests/fixtures/README.md.
     - '!tests/fixtures/apps/**'
     - '!tests/fixtures/skeletons/**'
+    # One Drupal site lock and its recorded answers, re-recorded by bin/record-fixtures; see tests/fixtures/README.md.
+    - '!tests/fixtures/sites/*/composer.*'
+    - '!tests/fixtures/sites/*/http/**'
     # Research artefacts from one-off runs over those fixtures, kept as evidence.
     - '!tests/fixtures/summary.json'
     - '!tests/fixtures/big-summary.json'

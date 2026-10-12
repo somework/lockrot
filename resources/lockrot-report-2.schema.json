@@ -7996,17 +7996,18 @@
       ],
       "properties": {
         "check": {
-          "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's age, dated only by a shared commit), `releases` (S9's fix part: releases could not be read). An open set.",
+          "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's age, dated only by a shared commit), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "repository_activity",
             "release_dates",
-            "releases"
+            "releases",
+            "release_metadata"
           ]
         },
         "reason": {
-          "description": "Why it did not run. An open set: read an unknown reason as another reason.",
+          "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
@@ -8017,7 +8018,9 @@
             "fetch_failed",
             "offline",
             "undated_releases",
-            "releases_unknown"
+            "releases_unknown",
+            "host_not_supported",
+            "not_from_composer_repository"
           ]
         },
         "blocks": {
@@ -8041,18 +8044,19 @@
       ],
       "properties": {
         "check": {
-          "description": "`repository_activity` (blocks S3, S4), `release_metadata` (S2, S8), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch). An open set.",
+          "description": "`repository_activity` (blocks S3, S4), `release_metadata` (S2, S8), `advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch), `repository_archived` (S3: the host's answer did not carry the archived flag, as an anonymous GitLab answer does not). An open set.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "repository_activity",
             "release_metadata",
             "advisories",
-            "release_branch"
+            "release_branch",
+            "repository_archived"
           ]
         },
         "reason": {
-          "description": "Why: `unparseable_version` an installed version Composer cannot parse. An open set: read an unknown reason as another reason.",
+          "description": "Why: `repository_not_found` is the host's 404 (an answer, not a gap), `host_not_supported` a host lockrot cannot ask on a package whose S10 the filter drops, `unparseable_version` an installed version Composer cannot parse. An open set: read an unknown reason as another reason.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
@@ -8068,6 +8072,8 @@
             "unavailable",
             "not_found",
             "branch_snapshot",
+            "host_not_supported",
+            "repository_not_found",
             "unparseable_version"
           ]
         },
@@ -8277,7 +8283,7 @@
       ],
       "properties": {
         "status": {
-          "description": "Closed. `read` exactly when `maintenance_judged` is true; a package installed from vcs, path or an archive is `not_from_composer_repository` whatever its verdict, and its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]`.",
+          "description": "Closed. `read` exactly when `maintenance_judged` is true. A package installed from vcs, path or an archive is `not_from_composer_repository` whatever its verdict. Its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]` for a path, artifact or package origin. It is in `checks_missing[]` for vcs and unknown origins, unless the S10 filter moved it to `checks_skipped[]`.",
           "type": "string",
           "enum": [
             "read",
@@ -9303,7 +9309,7 @@
         "host",
         "years",
         "forge",
-        "activity"
+        "event"
       ],
       "properties": {
         "last_push": {
@@ -9330,7 +9336,7 @@
             "bitbucket"
           ]
         },
-        "activity": {
+        "event": {
           "$ref": "#/definitions/activityEvent"
         }
       }
@@ -10094,12 +10100,13 @@
           "$ref": "#/definitions/level"
         },
         "summary": {
-          "description": "The signal sentence, `SignalSentence`: S1–S6 and S8 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]`. Prose, not contract; key on the fields it is rendered from.",
+          "description": "The signal sentence, `SignalSentence`: S1–S6 and S8 from their `data`, S7 from `data.packages[]`, S9 from `security` and the S9 rows, S10 from `data.unchecked[]` and, for `host_not_supported`, `activity.host`. Prose, not contract; key on the fields it is rendered from.",
           "type": "string",
           "x-rendered-from": [
             "signals[].data",
             "security",
-            "branch"
+            "branch",
+            "activity.host"
           ]
         },
         "data": {
@@ -10260,6 +10267,280 @@
         "commit"
       ]
     },
+    "activityReason": {
+      "description": "Why the repository activity of a package was not read, by precedence: lockrot's decisions (`allowlisted`, `not_from_composer_repository`, `no_repository`, `host_not_supported`), then an answer (`repository_not_found`: the host answered 404), then the network and plan causes (`offline`, `install_time_budget`, `no_token`, `anonymous_budget`, `rate_limit`, `fetch_failed`). An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "allowlisted",
+        "not_from_composer_repository",
+        "no_repository",
+        "host_not_supported",
+        "repository_not_found",
+        "offline",
+        "install_time_budget",
+        "no_token",
+        "anonymous_budget",
+        "rate_limit",
+        "fetch_failed"
+      ]
+    },
+    "activity": {
+      "description": "What the repository activity lookup did for this package: read, a 404, or not read and why. The one home of the repository host's answer: S3 and S4 restate it when they fire.",
+      "type": "object",
+      "required": [
+        "status",
+        "reason",
+        "forge",
+        "host",
+        "repo",
+        "event",
+        "archived",
+        "fetched_at",
+        "cached_at"
+      ],
+      "properties": {
+        "status": {
+          "description": "`read`: the host answered. `not_found`: it answered 404. `not_read`: lockrot did not ask, or got no answer, and `reason` says why. Closed.",
+          "type": "string",
+          "enum": [
+            "read",
+            "not_found",
+            "not_read"
+          ]
+        },
+        "reason": {
+          "description": "Why it was not read. Null on `read`, `repository_not_found` on `not_found`, else the reason of the one `repository_activity` entry of `checks_missing` or `checks_skipped`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/activityReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forge": {
+          "description": "The forge id when lockrot placed the repository URL on a host that it can ask, whatever the status. Null otherwise, and `repo` is null with it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/forgeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "host": {
+          "description": "The host of the repository URL, with its port and without userinfo. Null when no URL parses.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "repo": {
+          "description": "The path on the host. Set together with `forge`.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "event": {
+          "description": "What the activity date measures (`push` or `commit`). Set on `read`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/activityEvent"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "archived": {
+          "description": "Whether the host marks the repository archived. Null when not read, and on a read whose answer did not carry the flag (then `checks_skipped` holds `repository_archived`). True exactly when S3 fired.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fetched_at": {
+          "description": "When lockrot fetched the deciding answer. Set on `read`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cached_at": {
+          "description": "The fetch time of the oldest cached answer behind this reading. Null when lockrot fetched every answer in this run, and unless `status` is `read`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "description": "`read`: no reason, an event, a fetch time, and a located repository.",
+          "properties": {
+            "status": {
+              "enum": [
+                "read"
+              ]
+            },
+            "reason": {
+              "type": "null"
+            },
+            "event": {
+              "type": "string"
+            },
+            "fetched_at": {
+              "type": "string"
+            },
+            "forge": {
+              "type": "string"
+            },
+            "host": {
+              "type": "string"
+            },
+            "repo": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "description": "`not_found`: the reason `repository_not_found`, a located repository, nothing read.",
+          "properties": {
+            "status": {
+              "enum": [
+                "not_found"
+              ]
+            },
+            "reason": {
+              "enum": [
+                "repository_not_found"
+              ]
+            },
+            "forge": {
+              "type": "string"
+            },
+            "host": {
+              "type": "string"
+            },
+            "repo": {
+              "type": "string"
+            },
+            "event": {
+              "type": "null"
+            },
+            "archived": {
+              "type": "null"
+            },
+            "fetched_at": {
+              "type": "null"
+            },
+            "cached_at": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "`not_read`: a reason other than `repository_not_found`, nothing read.",
+          "properties": {
+            "status": {
+              "enum": [
+                "not_read"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "not": {
+                "enum": [
+                  "repository_not_found"
+                ]
+              }
+            },
+            "event": {
+              "type": "null"
+            },
+            "archived": {
+              "type": "null"
+            },
+            "fetched_at": {
+              "type": "null"
+            },
+            "cached_at": {
+              "type": "null"
+            }
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "description": "`forge` and `repo` are set together, and a located repository has a host.",
+          "anyOf": [
+            {
+              "properties": {
+                "forge": {
+                  "type": "null"
+                },
+                "repo": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "forge": {
+                  "type": "string"
+                },
+                "repo": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "A host that lockrot cannot ask has `host` set and `forge` null.",
+          "anyOf": [
+            {
+              "properties": {
+                "reason": {
+                  "not": {
+                    "enum": [
+                      "host_not_supported"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "forge": {
+                  "type": "null"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
     "finding": {
       "description": "One locked package judged: every key always written, nulls explicit; `spec_flags_r3.py` `KEYS['finding']`.",
       "type": "object",
@@ -10280,6 +10561,7 @@
         "checks_skipped",
         "maintenance_judged",
         "metadata",
+        "activity",
         "allowlist",
         "from_composer_repository",
         "origin",
@@ -10416,7 +10698,7 @@
           }
         },
         "checks_skipped": {
-          "description": "The checks that did not run and raise no S10: `repository_activity` (allowlisted, no repository, a path package, or the activity plan's cause for a registry-abandoned package), `release_metadata` (metadata that did not come, or a package not from a Composer repository), `advisories` (the composer-repositories scope, an installed version Composer cannot parse), `release_branch` (a branch snapshot: S8 cannot run). No `unchecked` gate reads it.",
+          "description": "The checks that did not run and raise no S10: `repository_activity` (allowlisted, no repository, a path package, or the activity plan's cause for a registry-abandoned package, a 404, an S10 that the filter dropped), `repository_archived` (a read whose answer did not carry the archived flag), `release_metadata` (metadata that did not come, a path, artifact or package origin, or an S10 that the filter dropped), `advisories` (the composer-repositories scope, an installed version Composer cannot parse), `release_branch` (a branch snapshot: S8 cannot run). No `unchecked` gate reads it.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/checkSkipped"
@@ -10428,6 +10710,9 @@
         },
         "metadata": {
           "$ref": "#/definitions/metadata"
+        },
+        "activity": {
+          "$ref": "#/definitions/activity"
         },
         "allowlist": {
           "$ref": "#/definitions/allowlist"
@@ -15630,6 +15915,364 @@
               }
             }
           ]
+        },
+        {
+          "description": "An activity that was not read has its one `repository_activity` entry in `checks_missing` or `checks_skipped`. A read one has none.",
+          "anyOf": [
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "read"
+                      ]
+                    }
+                  }
+                },
+                "checks_missing": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "check": {
+                          "enum": [
+                            "repository_activity"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "checks_skipped": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "check": {
+                          "enum": [
+                            "repository_activity"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "status": {
+                      "not": {
+                        "enum": [
+                          "read"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "checks_missing": {
+                  "not": {
+                    "items": {
+                      "not": {
+                        "properties": {
+                          "check": {
+                            "enum": [
+                              "repository_activity"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "status": {
+                      "not": {
+                        "enum": [
+                          "read"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "checks_skipped": {
+                  "not": {
+                    "items": {
+                      "not": {
+                        "properties": {
+                          "check": {
+                            "enum": [
+                              "repository_activity"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "A read whose answer did not carry the archived flag (`activity.archived` null) has the `repository_archived` entry in `checks_skipped`, and only then.",
+          "anyOf": [
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "read"
+                      ]
+                    },
+                    "archived": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "checks_skipped": {
+                  "not": {
+                    "items": {
+                      "not": {
+                        "properties": {
+                          "check": {
+                            "enum": [
+                              "repository_archived"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "archived": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "checks_skipped": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "check": {
+                          "enum": [
+                            "repository_archived"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "status": {
+                      "not": {
+                        "enum": [
+                          "read"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "checks_skipped": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "check": {
+                          "enum": [
+                            "repository_archived"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "S3 fired exactly when `activity.archived` is true.",
+          "anyOf": [
+            {
+              "properties": {
+                "signals": {
+                  "not": {
+                    "items": {
+                      "not": {
+                        "properties": {
+                          "id": {
+                            "enum": [
+                              "S3"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "activity": {
+                  "properties": {
+                    "archived": {
+                      "enum": [
+                        true
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "signals": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "id": {
+                          "enum": [
+                            "S3"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "activity": {
+                  "properties": {
+                    "archived": {
+                      "not": {
+                        "enum": [
+                          true
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "S4 fired only on a read activity.",
+          "anyOf": [
+            {
+              "properties": {
+                "signals": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "id": {
+                          "enum": [
+                            "S4"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "read"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "A package installed from a Composer repository carries no S10 entry with the reason `not_from_composer_repository`.",
+          "anyOf": [
+            {
+              "properties": {
+                "from_composer_repository": {
+                  "enum": [
+                    false
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "checks_missing": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "reason": {
+                          "enum": [
+                            "not_from_composer_repository"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "A package installed from path, artifact or package origins carries no S10 entry with the reason `not_from_composer_repository`.",
+          "anyOf": [
+            {
+              "properties": {
+                "origin": {
+                  "properties": {
+                    "kind": {
+                      "not": {
+                        "enum": [
+                          "path",
+                          "artifact",
+                          "package"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "checks_missing": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "reason": {
+                          "enum": [
+                            "not_from_composer_repository"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -18081,6 +18724,57 @@
         }
       }
     },
+    "noteRepositoryActivityHostNotSupported": {
+      "description": "`repository_activity_host_not_supported`: packages whose repository is on a host lockrot cannot ask. Each of their findings carries `activity.reason` `host_not_supported`.",
+      "type": "object",
+      "required": [
+        "hosts"
+      ],
+      "properties": {
+        "hosts": {
+          "description": "One entry per host, by `packages` (most first), then host name.",
+          "type": "array",
+          "items": {
+            "description": "A host lockrot cannot ask.",
+            "type": "object",
+            "required": [
+              "host",
+              "packages",
+              "listed_in"
+            ],
+            "properties": {
+              "host": {
+                "description": "The host with its port, without userinfo.",
+                "type": "string",
+                "minLength": 1
+              },
+              "packages": {
+                "description": "Findings on this host whose `activity.reason` is `host_not_supported`.",
+                "type": "integer",
+                "minimum": 1
+              },
+              "listed_in": {
+                "description": "The Composer setting that already names the host, or null: `github-domains` (a GitHub Enterprise host lockrot does not ask) or `forgejo-domains` (a Forgejo host lockrot does not ask). An open set.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]*$",
+                    "x-known-values": [
+                      "github-domains",
+                      "forgejo-domains"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    },
     "noteCode": {
       "description": "What a run note is about. lockrot's codes are lower-case words; `<vendor>:<name>` is reserved for a note that does not come from lockrot, as it is for a signal id. A kind, not an identifier: a run writes one code once per forge, per Composer repository or per monorepo parent it concerns. A code keeps its meaning (a new meaning gets a new code) and is retired, never removed or reused. An open set: a later minor release can add a code; read one you do not know as another thing the run could not see.",
       "type": "string",
@@ -18098,6 +18792,7 @@
         "repository_activity_rate_limited",
         "repository_activity_unreachable",
         "repository_activity_not_found",
+        "repository_activity_host_not_supported",
         "not_from_composer_repository"
       ]
     },
@@ -18287,6 +18982,18 @@
           "properties": {
             "code": {
               "enum": [
+                "repository_activity_host_not_supported"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteRepositoryActivityHostNotSupported"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
                 "not_from_composer_repository"
               ]
             },
@@ -18313,6 +19020,7 @@
                   "repository_activity_rate_limited",
                   "repository_activity_unreachable",
                   "repository_activity_not_found",
+                  "repository_activity_host_not_supported",
                   "not_from_composer_repository"
                 ]
               }

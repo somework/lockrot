@@ -1015,6 +1015,17 @@
     "reason": null,
     "message": null
    },
+   "activity": {
+    "status": "read",
+    "reason": null,
+    "forge": "github",
+    "host": "github.com",
+    "repo": "composer/ca-bundle",
+    "event": "push",
+    "archived": false,
+    "fetched_at": "2026-10-01T17:41:33+00:00",
+    "cached_at": null
+   },
    "allowlist": null,
    "from_composer_repository": true,
    "origin": {

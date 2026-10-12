@@ -72,7 +72,7 @@ final class RepoRef
         return self::LABEL[$forge];
     }
 
-    /** `push` or `commit`: S4's `activity`. */
+    /** `push` or `commit`: S4's `event`. */
     public function event(): string
     {
         return self::EVENT[$this->forge];
