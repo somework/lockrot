@@ -97,9 +97,12 @@ final class NextStep
 
             return MoveDraft::of(Move::NO_MOVE, FlagSet::VULNERABLE)->withReason($reason)->withFixKind(Fix::UNKNOWN);
         }
-        $hardest = max(array_map(static fn (string $kind): int => (int) array_search($kind, ScoreModel::FIX_KINDS, true), $kinds));
+        $hardest = null;
+        foreach (ScoreModel::FIX_KINDS as $kind) {
+            $hardest = \in_array($kind, $kinds, true) ? $kind : $hardest;
+        }
 
-        return MoveDraft::of($kinds === [Fix::NONE] ? Move::NO_FIX : Move::NO_SINGLE_FIX, FlagSet::VULNERABLE)->withFixKind(ScoreModel::FIX_KINDS[$hardest]);
+        return MoveDraft::of($kinds === [Fix::NONE] ? Move::NO_FIX : Move::NO_SINGLE_FIX, FlagSet::VULNERABLE)->withFixKind($hardest);
     }
 
     /** A move to a row's candidate: `composer update` on the installed row, `require ^{lowest}` above it. */

@@ -192,14 +192,14 @@ final class MoveBuilder
 
     /**
      * S8's rule on one row, as if a release there were installed: `fires` when its newest release is
-     * older than release-warn-years and a higher branch released after it within them, `unknown`
+     * older than release-warn-years and a higher branch released within them, `unknown`
      * when a date it needs is missing, else `quiet`.
      */
     private static function leftBehindOn(BranchRow $row, MoveContext $context): string
     {
         $parser = new VersionParser();
         $own = $row->highestReleased();
-        $above = array_filter($context->rows(), static fn (BranchRow $other): bool => $other->branch() !== $row->branch() && version_compare($parser->normalize($other->highest()), $parser->normalize($row->highest()), '>'));
+        $above = array_filter($context->rows(), static fn (BranchRow $other): bool => version_compare($parser->normalize($other->highest()), $parser->normalize($row->highest()), '>'));
         $undatedAbove = array_filter($above, static fn (BranchRow $other): bool => $other->highestReleased() === null) !== [];
         $alive = array_filter($above, static fn (BranchRow $other): bool => $context->isReleasing($other->highestReleased()));
         if ($own === null) {
@@ -208,10 +208,8 @@ final class MoveBuilder
         if ($context->isReleasing($own)) {
             return 'quiet';
         }
-        foreach ($alive as $other) {
-            if ($other->highestReleased() > $own) {
-                return 'fires';
-            }
+        if ($alive !== []) {
+            return 'fires';
         }
 
         return $undatedAbove ? 'unknown' : 'quiet';

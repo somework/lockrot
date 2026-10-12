@@ -137,7 +137,7 @@ final class MoveText
         }
         $text .= self::phpClause($move, $subject, false);
         foreach (self::addsByBasis($move) as $basis => $ids) {
-            $text .= '; '.(self::ADDS[$basis] ?? str_replace('_', ' ', $basis)).', so '.implode(' and ', $ids).' would count';
+            $text .= '; '.(self::ADDS[$basis] ?? $basis).', so '.implode(' and ', $ids).' would count';
         }
 
         return $text;
@@ -285,7 +285,7 @@ final class MoveText
     {
         $by = [];
         foreach ($move->adds() as $fact) {
-            $by[(string) $fact->basis()][] = $fact->id();
+            $by[$fact->basis() ?? ''][] = $fact->id();
         }
 
         return $by;

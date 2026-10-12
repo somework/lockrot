@@ -104,11 +104,7 @@ final class MaintenanceMove
 
     private static function relation(\DateTimeImmutable $released, \DateTimeImmutable $snapshot): string
     {
-        if ($released->getTimestamp() === $snapshot->getTimestamp()) {
-            return 'same';
-        }
-
-        return $released < $snapshot ? 'older' : 'newer';
+        return ['older', 'same', 'newer'][($released->getTimestamp() <=> $snapshot->getTimestamp()) + 1];
     }
 
     private static function leftBehind(MoveContext $context): MoveDraft
