@@ -12,9 +12,8 @@ declare(strict_types=1);
 // The script trims each p2 body to KEEP and each forge body to the keys that its ForgeApi reads. A
 // fixture with its own `http` directory keeps its answers there (p2, github, gitlab, advisories),
 // so they move no other fixture's results. Its packages.drupal.org entries' p2 answers go to
-// <fixtureDir>/http/p2. A repository on a --gitlab-domain host gets its commits answer, asked
-// anonymously, in <fixtureDir>/http/gitlab. Its
-// project document is recorded only with a gitlab-token that Composer's config (auth.json or
+// <fixtureDir>/http/p2. In such a fixture, a repository on a --gitlab-domain host gets its commits
+// answer, asked anonymously, in <fixtureDir>/http/gitlab. Its project document is recorded only with a gitlab-token that Composer's config (auth.json or
 // COMPOSER_AUTH) holds for that host: anonymously GitLab leaves `archived` out. The token is never
 // written. Bitbucket answers are not recorded. It reuses an envelope on disk only when its recorded
 // `status` is not 0: status 0 is a transport failure (a timeout or a DNS error), so the script
@@ -65,8 +64,10 @@ foreach ([$p2Dir, $ghDir, $advisoryDir] as $dir) {
         mkdir($dir, 0777, true);
     }
 }
-$fetch = static function (string $url, array $headers, ?string $post = null): HttpResult {
-    $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30];
+// PHP's http wrapper sends the headers again to the host that a redirect names: a request with a token
+// does not follow one.
+$fetch = static function (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult {
+    $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30, 'follow_location' => $follow ? 1 : 0];
     if ($post !== null) {
         $http['content'] = $post;
     }
@@ -178,10 +179,11 @@ foreach ($fixtures as $fixture) {
         }
         $repo = $locator->locate($sourceUrl);
         if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
-            $repos[$repo->path()] = [$repo, $own !== null ? $own.'/github' : $ghDir];
+            $githubDir = $own !== null ? $own.'/github' : $ghDir;
+            $repos[$githubDir.'|'.$repo->path()] = [$repo, $githubDir];
         }
-        if ($repo !== null && $repo->forge() === RepoRef::GITLAB) {
-            $gitlabRepos[$repo->key()] = [$repo, $root.'/'.$fixture.'/http/gitlab'];
+        if ($own !== null && $repo !== null && $repo->forge() === RepoRef::GITLAB) {
+            $gitlabRepos[$own.'|'.$repo->key()] = [$repo, $own.'/gitlab'];
         }
     }
 }
@@ -192,12 +194,12 @@ foreach ($gitlabRepos as [$ref, $dir]) {
         if ($isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
             continue;
         }
-        $result = $fetch($url, $gitlab->headers($role === 'project' ? $token : null));
+        $result = $fetch($url, $gitlab->headers($role === 'project' ? $token : null), null, $role !== 'project');
         $record($dir, $result, $keep($result->body(), $role === 'commits' ? GITLAB_COMMIT_KEYS : GITLAB_PROJECT_KEYS, $role === 'commits'));
         fwrite(STDERR, \sprintf("gitlab %s %s %d\n", $ref->key(), $role, $result->status()));
     }
 }
-foreach ($repos as $repo => [$ref, $dir]) {
+foreach ($repos as [$ref, $dir]) {
     $url = $github->requests($ref, false)['repo'];
     $path = RecordedHttpClient::pathFor($dir, $url);
     if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($ghDir, $url))) {
@@ -210,7 +212,7 @@ foreach ($repos as $repo => [$ref, $dir]) {
     $json = $result->body() === null ? null : json_decode($result->body(), true);
     $body = \is_array($json) ? json_encode(array_intersect_key($json, array_flip(['full_name', 'archived', 'disabled', 'pushed_at', 'default_branch'])), \JSON_UNESCAPED_SLASHES) : $result->body();
     file_put_contents($path, json_encode((new HttpResult($url, $result->status(), $body === false ? null : $body, $result->fetchedAt()))->toEnvelope(), \JSON_UNESCAPED_SLASHES));
-    fwrite(STDERR, "github {$repo} {$result->status()}\n");
+    fwrite(STDERR, \sprintf("github %s %d\n", $ref->path(), $result->status()));
     if ($result->status() === 403) {
         fwrite(STDERR, "rate limited; set GITHUB_TOKEN and re-run\n");
         exit(1);
