@@ -103,7 +103,7 @@ def entry_words(signal):
 
 
 def s10_words(entry, f):
-    """S10's clause for an entry that a later pull request moves out of S10, in NotCheckedRule's words; None for a check it does not word."""
+    """S10's clause for one entry, in NotCheckedRule's words. None for a check that NotCheckedRule does not word."""
     if entry['reason'] == 'host_not_supported':
         return 'repository activity not checked (lockrot cannot ask %s), so S3 and S4 could not be read' % f['activity']['host']
     if entry['reason'] == 'not_from_composer_repository' and entry['check'] in ('release_metadata', 'repository_activity'):

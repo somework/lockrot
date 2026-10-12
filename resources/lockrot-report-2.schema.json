@@ -8007,7 +8007,7 @@
           ]
         },
         "reason": {
-          "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8; a package installed from a path is the project's own code and is a skip). An open set: read an unknown reason as another reason.",
+          "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). A package installed from a path is the project's own code and is a skip. An open set: read an unknown reason as another reason.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
@@ -8283,7 +8283,7 @@
       ],
       "properties": {
         "status": {
-          "description": "Closed. `read` exactly when `maintenance_judged` is true; a package installed from vcs, path or an archive is `not_from_composer_repository` whatever its verdict, and its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]` for a path package, in `checks_missing[]` for vcs and unknown origins unless the S10 filter moved it to `checks_skipped[]`; artifact and package origins keep their skips.",
+          "description": "Closed. `read` exactly when `maintenance_judged` is true. A package installed from vcs, path or an archive is `not_from_composer_repository` whatever its verdict. Its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]` for a path, artifact or package origin. It is in `checks_missing[]` for vcs and unknown origins, unless the S10 filter moved it to `checks_skipped[]`.",
           "type": "string",
           "enum": [
             "read",
@@ -10268,7 +10268,7 @@
       ]
     },
     "activityReason": {
-      "description": "Why the repository activity of a package was not read, by precedence: lockrot's decisions (`allowlisted`, `not_from_composer_repository`, `no_repository`, `host_not_supported`), then an answer (`repository_not_found`: the host answered 404), then the network and plan causes of 0.13's order. An open set: read an unknown reason as another reason.",
+      "description": "Why the repository activity of a package was not read, by precedence: lockrot's decisions (`allowlisted`, `not_from_composer_repository`, `no_repository`, `host_not_supported`), then an answer (`repository_not_found`: the host answered 404), then the network and plan causes (`offline`, `install_time_budget`, `no_token`, `anonymous_budget`, `rate_limit`, `fetch_failed`). An open set: read an unknown reason as another reason.",
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
       "x-known-values": [
@@ -10286,7 +10286,7 @@
       ]
     },
     "activity": {
-      "description": "What the repository activity lookup did for this package: read, a 404, or not read and why. The one home of the forge reading: S3 and S4 restate it when they fire.",
+      "description": "What the repository activity lookup did for this package: read, a 404, or not read and why. The one home of the repository host's answer: S3 and S4 restate it when they fire.",
       "type": "object",
       "required": [
         "status",
@@ -10301,7 +10301,7 @@
       ],
       "properties": {
         "status": {
-          "description": "`read`: the host answered; `not_found`: it answered 404; `not_read`: lockrot did not ask, or got no answer (`reason` says why). Closed.",
+          "description": "`read`: the host answered. `not_found`: it answered 404. `not_read`: lockrot did not ask, or got no answer, and `reason` says why. Closed.",
           "type": "string",
           "enum": [
             "read",
@@ -10310,7 +10310,7 @@
           ]
         },
         "reason": {
-          "description": "Why it was not read: null on `read`; `repository_not_found` on `not_found`; equal to the reason of the one `repository_activity` entry of `checks_missing` or `checks_skipped`.",
+          "description": "Why it was not read. Null on `read`, `repository_not_found` on `not_found`, else the reason of the one `repository_activity` entry of `checks_missing` or `checks_skipped`.",
           "oneOf": [
             {
               "$ref": "#/definitions/activityReason"
@@ -10321,7 +10321,7 @@
           ]
         },
         "forge": {
-          "description": "The forge id when lockrot placed the repository URL on a host it can ask, whatever the status; null otherwise (`repo` is null with it).",
+          "description": "The forge id when lockrot placed the repository URL on a host that it can ask, whatever the status. Null otherwise, and `repo` is null with it.",
           "oneOf": [
             {
               "$ref": "#/definitions/forgeId"
@@ -10332,7 +10332,7 @@
           ]
         },
         "host": {
-          "description": "The repository URL's host, with its port and without userinfo; null when no URL parses.",
+          "description": "The host of the repository URL, with its port and without userinfo. Null when no URL parses.",
           "type": [
             "string",
             "null"
@@ -10340,7 +10340,7 @@
           "minLength": 1
         },
         "repo": {
-          "description": "The path on the host; set together with `forge`.",
+          "description": "The path on the host. Set together with `forge`.",
           "type": [
             "string",
             "null"
@@ -10348,7 +10348,7 @@
           "minLength": 1
         },
         "event": {
-          "description": "What the activity date measures (`push` or `commit`); set on `read`.",
+          "description": "What the activity date measures (`push` or `commit`). Set on `read`.",
           "oneOf": [
             {
               "$ref": "#/definitions/activityEvent"
@@ -10359,14 +10359,14 @@
           ]
         },
         "archived": {
-          "description": "Whether the host marks the repository archived; null when not read, and on a read whose answer did not carry the flag (then `checks_skipped` holds `repository_archived`). True exactly when S3 fired.",
+          "description": "Whether the host marks the repository archived. Null when not read, and on a read whose answer did not carry the flag (then `checks_skipped` holds `repository_archived`). True exactly when S3 fired.",
           "type": [
             "boolean",
             "null"
           ]
         },
         "fetched_at": {
-          "description": "When the deciding answer was fetched; set on `read`.",
+          "description": "When lockrot fetched the deciding answer. Set on `read`.",
           "oneOf": [
             {
               "$ref": "#/definitions/dateTime"
@@ -10377,7 +10377,7 @@
           ]
         },
         "cached_at": {
-          "description": "The fetch time of the oldest cached answer behind this reading; null when every answer was fetched in this run, and unless `status` is `read`.",
+          "description": "The fetch time of the oldest cached answer behind this reading. Null when lockrot fetched every answer in this run, and unless `status` is `read`.",
           "oneOf": [
             {
               "$ref": "#/definitions/dateTime"
@@ -10514,7 +10514,7 @@
           ]
         },
         {
-          "description": "A host lockrot cannot ask is named, and is not placed on a forge.",
+          "description": "A host that lockrot cannot ask has `host` set and `forge` null.",
           "anyOf": [
             {
               "properties": {
@@ -10698,7 +10698,7 @@
           }
         },
         "checks_skipped": {
-          "description": "The checks that did not run and raise no S10: `repository_activity` (allowlisted, no repository, a path package, or the activity plan's cause for a registry-abandoned package, a 404), `repository_archived` (a read whose answer did not carry the archived flag), `release_metadata` (metadata that did not come, or a path, artifact or package origin), `advisories` (the composer-repositories scope, an installed version Composer cannot parse), `release_branch` (a branch snapshot: S8 cannot run). No `unchecked` gate reads it.",
+          "description": "The checks that did not run and raise no S10: `repository_activity` (allowlisted, no repository, a path package, or the activity plan's cause for a registry-abandoned package, a 404, an S10 that the filter dropped), `repository_archived` (a read whose answer did not carry the archived flag), `release_metadata` (metadata that did not come, a path, artifact or package origin, or an S10 that the filter dropped), `advisories` (the composer-repositories scope, an installed version Composer cannot parse), `release_branch` (a branch snapshot: S8 cannot run). No `unchecked` gate reads it.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/checkSkipped"
@@ -15917,7 +15917,7 @@
           ]
         },
         {
-          "description": "An activity that was not read has its one `repository_activity` entry in `checks_missing` or `checks_skipped`; a read one has none.",
+          "description": "An activity that was not read has its one `repository_activity` entry in `checks_missing` or `checks_skipped`. A read one has none.",
           "anyOf": [
             {
               "properties": {
@@ -18725,7 +18725,7 @@
       }
     },
     "noteRepositoryActivityHostNotSupported": {
-      "description": "`repository_activity_host_not_supported`: packages whose repository is on a host lockrot cannot ask; each of their findings carries `activity.reason` `host_not_supported`.",
+      "description": "`repository_activity_host_not_supported`: packages whose repository is on a host lockrot cannot ask. Each of their findings carries `activity.reason` `host_not_supported`.",
       "type": "object",
       "required": [
         "hosts"

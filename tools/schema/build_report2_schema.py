@@ -651,13 +651,13 @@ defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unch
     'reason': open_set(['no_token', 'anonymous_budget', 'install_time_budget', 'rate_limit', 'fetch_failed', 'offline', 'undated_releases', 'releases_unknown',
                         'host_not_supported', 'not_from_composer_repository'],
                        ('Why it did not run (§2.3, §7.9 page vocabulary): `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), '
-                        '`not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8; a package installed '
-                        'from a path is the project\'s own code and is a skip). An open set: read an unknown reason as another reason.')),
+                        '`not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). A package installed '
+                        'from a path is the project\'s own code and is a skip. An open set: read an unknown reason as another reason.')),
     'blocks': arr('The signals that could not be read without it.', ref('signalId'), minItems=1, uniqueItems=True),
 })
 defs['checkSkipped'] = obj("A check lockrot chose not to run (§2.3): a decision, not a gap; it raises no S10 and reaches no `unchecked` gate.", {
     'check': open_set(['repository_activity', 'release_metadata', 'advisories', 'release_branch', 'repository_archived'], ("`repository_activity` (blocks S3, S4), `release_metadata` (S2, S8), "
-                      "`advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch; attack round 1), `repository_archived` (S3: the host's "
+                      "`advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch, attack round 1), `repository_archived` (S3: the host's "
                       "answer did not carry the archived flag, as an anonymous GitLab answer does not). An open set.")),
     'reason': open_set(['allowlisted', 'no_repository', 'not_from_composer_repository', 'offline', 'rate_limit', 'fetch_failed', 'anonymous_budget', 'install_time_budget',
                         'no_token', 'unavailable', 'not_found', 'branch_snapshot', 'host_not_supported', 'repository_not_found', 'unparseable_version'],
@@ -683,9 +683,9 @@ defs['allowlist'] = nul("The allowlist entry that accepts maintenance flags of t
                         arr('Listed maintenance flags.', ref('maintenanceFlag'), minItems=1, uniqueItems=True)),
     }))
 defs['metadata'] = obj("How the repository metadata went (§7.6, revision 3): `note` stays as its rendering.", {
-    'status': closed(['read', 'not_from_composer_repository', 'unavailable', 'not_found'], ("Closed (§8.2). `read` exactly when `maintenance_judged` is true (schema round); a package installed from vcs, path or an archive is "
-                     "`not_from_composer_repository` whatever its verdict, and its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]` for a path package, "
-                     "in `checks_missing[]` for vcs and unknown origins unless the S10 filter moved it to `checks_skipped[]`; artifact and package origins keep their skips.")),
+    'status': closed(['read', 'not_from_composer_repository', 'unavailable', 'not_found'], ("Closed (§8.2). `read` exactly when `maintenance_judged` is true (schema round). A package installed from vcs, path or an archive is "
+                     "`not_from_composer_repository` whatever its verdict. Its `release_metadata` entry (S2, S8 not run) is in `checks_skipped[]` for a path, artifact "
+                     "or package origin. It is in `checks_missing[]` for vcs and unknown origins, unless the S10 filter moved it to `checks_skipped[]`.")),
     'reason': nul('Why it did not come (`MetadataFailure::REASONS`, the open set of report-1\'s run notes); null when read.', ref('metadataFailureReason')),
     'message': nul("Foreign text — a repository's, a host's or Composer's own words, redacted as report-1's notes redact them. Not contract. Null when read.", {'type': 'string'}),
 })
@@ -879,22 +879,22 @@ defs['activityEvent'] = open_set(['push', 'commit'], "What a forge's activity da
 ACT_REASONS = ['allowlisted', 'not_from_composer_repository', 'no_repository', 'host_not_supported', 'repository_not_found', 'offline', 'install_time_budget',
                'no_token', 'anonymous_budget', 'rate_limit', 'fetch_failed']
 defs['activityReason'] = open_set(ACT_REASONS, ("Why the repository activity of a package was not read, by precedence: lockrot's decisions (`allowlisted`, `not_from_composer_repository`, "
-    "`no_repository`, `host_not_supported`), then an answer (`repository_not_found`: the host answered 404), then the network and plan causes of 0.13's order. "
+    "`no_repository`, `host_not_supported`), then an answer (`repository_not_found`: the host answered 404), then the network and plan causes (`offline`, `install_time_budget`, `no_token`, `anonymous_budget`, `rate_limit`, `fetch_failed`). "
     "An open set: read an unknown reason as another reason."))
 _N = {'type': 'null'}
-defs['activity'] = obj(("What the repository activity lookup did for this package (C73): read, a 404, or not read and why. The one home of the forge reading: S3 and S4 "
+defs['activity'] = obj(("What the repository activity lookup did for this package (C73): read, a 404, or not read and why. The one home of the repository host's answer: S3 and S4 "
                         "restate it when they fire."), {
-    'status': closed(['read', 'not_found', 'not_read'], "`read`: the host answered; `not_found`: it answered 404; `not_read`: lockrot did not ask, or got no answer (`reason` says why). Closed."),
-    'reason': nul('Why it was not read: null on `read`; `repository_not_found` on `not_found`; equal to the reason of the one `repository_activity` entry of `checks_missing` or `checks_skipped`.',
+    'status': closed(['read', 'not_found', 'not_read'], "`read`: the host answered. `not_found`: it answered 404. `not_read`: lockrot did not ask, or got no answer, and `reason` says why. Closed."),
+    'reason': nul('Why it was not read. Null on `read`, `repository_not_found` on `not_found`, else the reason of the one `repository_activity` entry of `checks_missing` or `checks_skipped`.',
                   ref('activityReason')),
-    'forge': nul('The forge id when lockrot placed the repository URL on a host it can ask, whatever the status; null otherwise (`repo` is null with it).', ref('forgeId')),
-    'host': nul('The repository URL\'s host, with its port and without userinfo; null when no URL parses.', {'type': 'string', 'minLength': 1}),
-    'repo': nul('The path on the host; set together with `forge`.', {'type': 'string', 'minLength': 1}),
-    'event': nul('What the activity date measures (`push` or `commit`); set on `read`.', ref('activityEvent')),
-    'archived': nul(("Whether the host marks the repository archived; null when not read, and on a read whose answer did not carry the flag (then `checks_skipped` holds "
+    'forge': nul('The forge id when lockrot placed the repository URL on a host that it can ask, whatever the status. Null otherwise, and `repo` is null with it.', ref('forgeId')),
+    'host': nul('The host of the repository URL, with its port and without userinfo. Null when no URL parses.', {'type': 'string', 'minLength': 1}),
+    'repo': nul('The path on the host. Set together with `forge`.', {'type': 'string', 'minLength': 1}),
+    'event': nul('What the activity date measures (`push` or `commit`). Set on `read`.', ref('activityEvent')),
+    'archived': nul(("Whether the host marks the repository archived. Null when not read, and on a read whose answer did not carry the flag (then `checks_skipped` holds "
                      "`repository_archived`). True exactly when S3 fired."), {'type': 'boolean'}),
-    'fetched_at': nul('When the deciding answer was fetched; set on `read`.', ref('dateTime')),
-    'cached_at': nul("The fetch time of the oldest cached answer behind this reading; null when every answer was fetched in this run, and unless `status` is `read`.", ref('dateTime')),
+    'fetched_at': nul('When lockrot fetched the deciding answer. Set on `read`.', ref('dateTime')),
+    'cached_at': nul("The fetch time of the oldest cached answer behind this reading. Null when lockrot fetched every answer in this run, and unless `status` is `read`.", ref('dateTime')),
 }, anyOf=[
     {'description': '`read`: no reason, an event, a fetch time, and a located repository.',
      'properties': {'status': {'enum': ['read']}, 'reason': _N, 'event': {'type': 'string'}, 'fetched_at': {'type': 'string'}, 'forge': {'type': 'string'},
@@ -908,7 +908,7 @@ defs['activity'] = obj(("What the repository activity lookup did for this packag
 defs['activity']['allOf'] = [
     {'description': '`forge` and `repo` are set together, and a located repository has a host.',
      'anyOf': [{'properties': {'forge': _N, 'repo': _N}}, {'properties': {'forge': {'type': 'string'}, 'repo': {'type': 'string'}, 'host': {'type': 'string'}}}]},
-    {'description': 'A host lockrot cannot ask is named, and is not placed on a forge.',
+    {'description': 'A host that lockrot cannot ask has `host` set and `forge` null.',
      'anyOf': [{'properties': {'reason': {'not': {'enum': ['host_not_supported']}}}}, {'properties': {'host': {'type': 'string'}, 'forge': _N}}]},
 ]
 
@@ -934,8 +934,8 @@ FINDING = {
     'security': ref('security'),
     'checks_missing': arr('S10 restated (§7.6): the checks that did not run and raise S10.', ref('checkMissing')),
     'checks_skipped': arr(("The checks that did not run and raise no S10 (§2.3, round 3): `repository_activity` (allowlisted, no repository, a path package, or the "
-                           "activity plan's cause for a registry-abandoned package, a 404), `repository_archived` (a read whose answer did not carry the archived flag), "
-                           "`release_metadata` (metadata that did not come, or a path, artifact or package origin), `advisories` "
+                           "activity plan's cause for a registry-abandoned package, a 404, an S10 that the filter dropped), `repository_archived` (a read whose answer did not carry the archived flag), "
+                           "`release_metadata` (metadata that did not come, a path, artifact or package origin, or an S10 that the filter dropped), `advisories` "
                            "(the composer-repositories scope, an installed version Composer cannot parse), `release_branch` (a branch snapshot: S8 cannot run). "
                            "No `unchecked` gate reads it."),
                           ref('checkSkipped')),
@@ -1192,7 +1192,7 @@ defs['noteAdvisoriesDisabledByPolicy'] = obj(("`advisories_disabled_by_policy` (
                            'The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open.', POLICY_KEY),
     'value': d('Its value as configured (`false`, `"ignore"`, `"0"`).', {'type': ['boolean', 'string']}),
 })
-defs['noteRepositoryActivityHostNotSupported'] = obj(("`repository_activity_host_not_supported`: packages whose repository is on a host lockrot cannot ask; each of their findings "
+defs['noteRepositoryActivityHostNotSupported'] = obj(("`repository_activity_host_not_supported`: packages whose repository is on a host lockrot cannot ask. Each of their findings "
                                                       "carries `activity.reason` `host_not_supported`."), {
     'hosts': arr('One entry per host, by `packages` (most first), then host name.', obj('A host lockrot cannot ask.', {
         'host': d('The host with its port, without userinfo.', {'type': 'string', 'minLength': 1}),
@@ -1458,13 +1458,13 @@ add_relations_round4(defs)
 
 
 def add_relations_activity(defs):
-    """The relations of `finding.activity` and the origin split that draft-04 can say; the rest are engine-only (claims.py)."""
+    """The relations of `finding.activity` and the origin split that draft-04 can state. claims.py lists the engine-only rest."""
     import build_other_schemas as BO
     P, E, NOT, NULL, CONTAINS, NONE, relate = (BO.P, BO.E, BO.NOT, BO.NULL, BO.CONTAINS, BO.NONE, BO.relate)
     has = lambda sid: CONTAINS(P(id=E(sid)))
     lacks = lambda sid: NONE(P(id=E(sid)))
     nfcr = P(reason=E('not_from_composer_repository'))
-    relate(defs['finding'], ['An activity that was not read has its one `repository_activity` entry in `checks_missing` or `checks_skipped`; a read one has none (C73).',
+    relate(defs['finding'], ['An activity that was not read has its one `repository_activity` entry in `checks_missing` or `checks_skipped`. A read one has none (C73).',
                              'A read whose answer did not carry the archived flag (`activity.archived` null) has the `repository_archived` entry in `checks_skipped`, and only then.',
                              'S3 fired exactly when `activity.archived` is true.',
                              'S4 fired only on a read activity.',
