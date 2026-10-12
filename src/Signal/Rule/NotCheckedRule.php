@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Rule;
 
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\PackageOrigin;
@@ -41,6 +42,18 @@ final class NotCheckedRule implements SignalRule
         self::RATE_LIMIT => 'the host answered "too many requests"',
         self::FETCH_FAILED => 'the request failed',
         self::OFFLINE => 'the run is offline',
+    ];
+
+    /**
+     * The advisories reasons that are gaps: the lookup did not run, or not in full. A package outside
+     * the lookup's scope and a version Composer cannot parse are skips, never S10.
+     */
+    private const ADVISORY_CAUSES = [
+        self::OFFLINE => 'the run is offline',
+        AdvisoryCoverage::COMPOSER_TOO_OLD => 'Composer is older than 2.4',
+        self::BUDGET => 'the install-time budget ran out',
+        AdvisoryCoverage::LOOKUP_FAILED => 'an advisory repository failed',
+        AdvisoryCoverage::NO_FEED => 'no configured repository publishes advisories',
     ];
 
     /** The words of the S10 entry for release data a counted advisory needed. */
@@ -82,6 +95,12 @@ final class NotCheckedRule implements SignalRule
             $unchecked[] = new Check('release_dates', 'undated_releases', $ageBlocks);
         }
 
+        $coverage = $facts->advisoryCoverage();
+        $advisories = $coverage === null ? null : $coverage->reason();
+        if ($advisories !== null && isset(self::ADVISORY_CAUSES[$advisories])) {
+            $unchecked[] = new Check('advisories', $advisories, [Signal::S9]);
+        }
+
         $host = $reason === self::HOST_NOT_SUPPORTED ? $facts->activityLookup()->where()->host() : null;
 
         return self::signalOf($unchecked, array_map(static fn (Check $entry): string => self::summaryOf($entry, $host, $origin), $unchecked));
@@ -119,17 +138,8 @@ final class NotCheckedRule implements SignalRule
                 $kept[] = $signal;
                 continue;
             }
-            // signalOf() joins one summary per entry, in entry order.
-            $summaries = explode('; ', $signal->summary());
-            $entries = [];
-            $entrySummaries = [];
-            foreach ($data->checks() as $index => $entry) {
-                if (!\in_array($entry->check(), self::MAINTENANCE_CHECKS, true)) {
-                    $entries[] = $entry;
-                    $entrySummaries[] = $summaries[$index] ?? self::summaryOf($entry);
-                }
-            }
-            $rebuilt = self::signalOf($entries, $entrySummaries);
+            $entries = array_values(array_filter($data->checks(), static fn (Check $entry): bool => !\in_array($entry->check(), self::MAINTENANCE_CHECKS, true)));
+            $rebuilt = self::signalOf($entries, array_map(static fn (Check $entry): string => self::summaryOf($entry), $entries));
             if ($rebuilt !== null) {
                 $kept[] = $rebuilt;
             }
@@ -168,6 +178,12 @@ final class NotCheckedRule implements SignalRule
         }
         if ($entry->check() === 'repository_activity') {
             return 'repository activity not checked ('.$cause.'), so S3 and S4 could not be read';
+        }
+        if ($entry->check() === 'advisories') {
+            return 'security advisories not checked ('.(self::ADVISORY_CAUSES[$entry->reason()] ?? $entry->reason()).'), so S9 could not be read';
+        }
+        if ($entry->check() === 'releases') {
+            return self::RELEASES_WORDS;
         }
         if ($entry->check() === 'release_dates') {
             return 'the age of the package was not read (its newest releases are dated by a commit their tags share), so '.implode(' and ', $entry->blocks()).' could not measure it';

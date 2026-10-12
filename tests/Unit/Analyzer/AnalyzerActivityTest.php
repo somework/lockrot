@@ -12,6 +12,9 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryRepository;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -138,6 +141,27 @@ final class AnalyzerActivityTest extends TestCase
 
         self::assertSame(1, $restated, 'the silent headline names its source');
         self::assertSame(JsonPath::arrayAt($age, ['release'])['years'], JsonPath::arrayAt($finding, ['next_step'])['quiet_years']);
+    }
+
+    /**
+     * The S10 filter drops the upkeep gaps of a package that S1 marks or that an entry accepts whole,
+     * never its advisories entry (cases `C-offline‡` and `finished-offline‡`).
+     */
+    public function testTheS10FilterKeepsTheAdvisoriesEntryOfAnOfflineRun(): void
+    {
+        $packages = [self::packagist('vendor/marked'), self::packagist('other/accepted')];
+        $marked = new PackageMetadata('vendor/marked', true, null, true, new \DateTimeImmutable('2026-08-01T00:00:00+00:00'), '1.0.0', 1, 'https://github.com/vendor/marked.git', 'library', new \DateTimeImmutable(F::NOW));
+        $offline = new AdvisoryNameCoverage([], null, 'offline');
+        $batch = new AdvisoryBatch([], [], [], [], new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [AdvisoryRepository::of('composer repo (https://repo.packagist.org)', AdvisoryRepository::NOT_ASKED, 'offline')], 0, ['vendor/marked' => $offline, 'other/accepted' => $offline]));
+        $allowlist = new Allowlist([new AllowlistEntry('other/*', null, 'complete', null, 'builtin')]);
+        $report = $this->analyzer($this->loader(['vendor/marked' => $marked, 'other/accepted' => self::meta('other/accepted', 'https://github.com/other/accepted.git')]), $this->http([]), ForgeAuth::anonymous(), $allowlist, true, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, $batch)
+            ->analyze(LockFile::fromArray(['packages' => $packages]), ProjectConfig::empty(), false);
+        $byName = self::byName($report);
+
+        foreach (['vendor/marked', 'other/accepted'] as $name) {
+            self::assertSame([['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']]], $byName[$name]['checks_missing'], $name);
+            self::assertSame([], self::checks($byName[$name], 'repository_activity', ['checks_missing']), $name.': the upkeep gap is dropped');
+        }
     }
 
     public function testA404IsAnAnswerThatSkipsTheActivityChecks(): void
