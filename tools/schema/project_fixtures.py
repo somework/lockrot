@@ -15,6 +15,7 @@ documents). The script writes, relative to the repository root:
                                            case carries the release data a hydrator needs
     tests/fixtures/flags/composite.json    the composite report, projected
     tests/fixtures/flags/provenance.json   the source, every dropped key and every reverted value
+    tests/fixtures/flags/coverage/<variant>.json        the coverage variants with a failed feed, from PR 4f on
     tests/fixtures/schema/documents/cases/<base>.json   the base documents of make_negatives.py
     tests/fixtures/schema/documents/explain/B.json      the base document of make_negatives_other.py
 """
@@ -63,6 +64,10 @@ LIBYEARS_013 = {
     'undated_releases': 'no_stable_release_date',
 }
 LIBYEARS_013_KEYS = ['branch_snapshot', 'no_stable_release_date', 'not_from_composer_repository', 'metadata_unavailable']
+
+# The coverage variants with a failed feed, projected to this pull request's keys (pull request 6b
+# replaces them with the final documents).
+COVERAGE_VARIANTS = ['lookup-not-run-lookup-failed', 'feed-invalid-response', 'clear-partial-lookup', 'vulnerable-partial-lookup']
 
 # The base documents make_negatives.py mutates, by file stem.
 NEGATIVE_BASES = ['composite', 'A', 'A-baselined-dagger', 'A-blocked-dagger', 'B-baselined-dagger', 'B-dev-dagger', 'C-baselined-dagger', 'D-partial-dagger',
@@ -444,6 +449,9 @@ def main():
         with open(os.path.join(source, 'docs', 'cases', stem + '.json')) as fh:
             dump(os.path.join(DOCS_OUT, 'cases', stem + '.json'), project_report(json.load(fh), proj))
         bases.append(stem)
+    for stem in COVERAGE_VARIANTS if not proj.after('4f') else []:
+        with open(os.path.join(source, 'docs', 'coverage', 'variants', stem + '.json')) as fh:
+            dump(os.path.join(FLAGS_OUT, 'coverage', stem + '.json'), project_report(json.load(fh), proj))
     with open(os.path.join(source, 'docs', 'explain-2', 'B.json')) as fh:
         dump(os.path.join(DOCS_OUT, 'explain', 'B.json'), project_explain(json.load(fh), proj))
     dump(os.path.join(FLAGS_OUT, 'provenance.json'), {
