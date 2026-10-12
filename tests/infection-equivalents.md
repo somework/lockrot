@@ -74,7 +74,6 @@ start the reason with `in method():`.
 ## src/Data
 
 - `src/Data/Forge/ActivityClient.php` LessThan `if ($decoded !== null && $result->fromCache() && ($cachedAt === null || $result->fetchedAt() < $cachedAt)) {` — `<=` differs only when the two dates are equal, and then the assignment keeps the same value.
-- `src/Data/Forge/ActivityClient.php` TrueValue `$rateLimited[$forge] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Forge/ActivityClient.php` UnwrapArrayValues `return array_values($groups);` — `fetch()` only iterates the groups.
 - `src/Data/Forge/ActivityFetchPlanner.php` TrueValue `$capped[$forge] = true;` — a set. Only `isset()` reads it.
 - `src/Data/Forge/ActivityFetchPlanner.php` DecrementInteger, IncrementInteger `$checkedPackages[$forge] = ($checkedPackages[$forge] ?? 0) + 1;` — in select(): for a repository already seen, an earlier package set the counter of its forge, so `?? 0` never applies.
