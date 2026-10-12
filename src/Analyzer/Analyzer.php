@@ -461,6 +461,8 @@ final class Analyzer
         $patterns = [];
         $by = null;
         $marked = false;
+        // The note names the packages in the order that the report writes them.
+        usort($findings, [Report::class, 'compareGraded']);
         foreach ($findings as $finding) {
             $ignored = $finding->details()->abandonedIgnored();
             if ($ignored !== null) {
