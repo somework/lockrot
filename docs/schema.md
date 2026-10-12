@@ -90,6 +90,12 @@ Objects are open, and so are these sets of values, which grow in minor releases:
   `tag_relation`, and an allowlist entry's `reason_id`
 - in report-2, a finding's `activity.reason`, `activity.forge` and `activity.event`, S4's `event`,
   and the `listed_in` of a `repository_activity_host_not_supported` note's host
+- in report-2, each `*_unmeasured` key of a finding and of its `age`, and the keys of the report's
+  `libyears.unmeasured`
+- in report-2, `abandoned_ignored.by`, and the `by` and `policy_key` of the abandoned ignore list's
+  notes
+- in report-2, the `registry` and `reason` of `security.feeds[]` and of
+  `run.advisory_lookup.repositories[]`
 - in report-2, the words of `run.score_model`
 - the configuration's `format`, and format names wherever lockrot writes one.
 
