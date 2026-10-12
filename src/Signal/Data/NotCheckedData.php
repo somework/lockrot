@@ -35,7 +35,8 @@ final class NotCheckedData implements SignalData
         $blocks = [];
         foreach ($this->checks as $check) {
             foreach ($check->blocks() as $id) {
-                $blocks[(int) substr($id, 1)] = $id;
+                // PHP stores the numeric key as an int, so ksort() orders S2 before S10.
+                $blocks[substr($id, 1)] = $id;
             }
         }
         ksort($blocks);

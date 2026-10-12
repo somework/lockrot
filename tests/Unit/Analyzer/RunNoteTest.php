@@ -249,8 +249,8 @@ final class RunNoteTest extends TestCase
     {
         $note = RunNote::repositoryActivityHostNotSupported([
             LocatedRepository::unsupported('codeberg.org', null),
-            LocatedRepository::unsupported('git.drupalcode.org', null),
             LocatedRepository::unsupported('bitbucket.example.com', null),
+            LocatedRepository::unsupported('git.drupalcode.org', null),
             LocatedRepository::unsupported('git.drupalcode.org', null),
         ]);
 
@@ -266,6 +266,14 @@ final class RunNoteTest extends TestCase
             "Repository activity not checked for 4 packages on hosts lockrot cannot ask: git.drupalcode.org (2), bitbucket.example.com (1), codeberg.org (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.",
             $note->text()
         );
+    }
+
+    /** A URL can name its host as a decimal IPv4 address, which PHP would turn into an integer key. */
+    public function testTheHostNoteKeepsAHostOfDigitsAString(): void
+    {
+        $note = RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('3232235777', null)]);
+
+        self::assertSame([['host' => '3232235777', 'packages' => 1, 'listed_in' => null]], $note->data()['hosts']);
     }
 
     public function testTheHostNoteNamesAGithubEnterpriseHostWithoutTheGitlabHint(): void
