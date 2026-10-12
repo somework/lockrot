@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal;
 
 use Composer\Semver\VersionParser;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -104,9 +106,17 @@ final class FactsBuilder
         return new RepositoryActivity(new RepoRef($forge, $host, 'vendor/pkg'), $archived, $pushedAt === null ? null : new \DateTimeImmutable($pushedAt), new \DateTimeImmutable(self::NOW));
     }
 
+    /** The facts with the lookup of a repository that lockrot did not read, for that reason. */
+    public static function looked(PackageFacts $facts, string $reason = ActivityLookup::NO_REPOSITORY): PackageFacts
+    {
+        return $facts->withActivityLookup(ActivityLookup::notRead($reason, LocatedRepository::none(null)));
+    }
+
     /** @param list<\Lockrot\Data\Advisory\Advisory> $advisories */
     public static function facts(LockedPackage $p, ?PackageMetadata $m = null, ?RepositoryActivity $a = null, array $advisories = []): PackageFacts
     {
-        return new PackageFacts($p, $m, $a, $advisories);
+        $facts = new PackageFacts($p, $m, $a, $advisories);
+
+        return $a === null ? $facts : $facts->withActivityLookup(ActivityLookup::read($a, false));
     }
 }

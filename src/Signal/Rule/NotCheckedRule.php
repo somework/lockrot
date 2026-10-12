@@ -82,7 +82,7 @@ final class NotCheckedRule implements SignalRule
             $unchecked[] = new Check('release_dates', 'undated_releases', $ageBlocks);
         }
 
-        $host = $facts->activityLookup()->where()->host();
+        $host = $reason === self::HOST_NOT_SUPPORTED ? $facts->activityLookup()->where()->host() : null;
 
         return self::signalOf($unchecked, array_map(static fn (Check $entry): string => self::summaryOf($entry, $host, $origin), $unchecked));
     }

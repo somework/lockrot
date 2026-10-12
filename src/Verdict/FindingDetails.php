@@ -7,7 +7,6 @@ namespace Lockrot\Verdict;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
-use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Score\IfApplied;
@@ -50,15 +49,14 @@ final class FindingDetails
     private ?PackageFixes $fixes;
     private ?Check $releasesUnchecked = null;
     private ?Moves $moves = null;
-    private ?ActivityLookup $activity = null;
+    private ActivityLookup $activity;
 
     /**
      * @param list<Check>                                                   $skipped
      * @param array{requires: ?string, target_runs: ?bool, project_allows: ?bool} $installedPhp
      * @param list<IgnoredAdvisory>                                         $ignored
-     * @param ?ActivityLookup                                               $activity `finding.activity`; null for details that only part of a finding reads
      */
-    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ?ActivityLookup $activity = null)
+    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity)
     {
         $this->activity = $activity;
         $this->metadataStatus = $metadataStatus;
@@ -100,7 +98,7 @@ final class FindingDetails
             $reason,
             $ignored,
             $facts->fixes(),
-            self::lookupOf($facts, $entry)
+            $facts->activityLookup()
         );
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
 
@@ -134,33 +132,8 @@ final class FindingDetails
         return $clone;
     }
 
-    /**
-     * Facts that carry no reason and no read activity name no repository: the reason is the one
-     * that lockrot decides before any request.
-     */
-    private static function lookupOf(PackageFacts $facts, ?AllowlistEntry $entry): ActivityLookup
-    {
-        if ($facts->activity() !== null || $facts->activityNotChecked() !== null) {
-            return $facts->activityLookup();
-        }
-        if ($entry !== null && $entry->acceptsAll()) {
-            return ActivityLookup::notRead(ActivityLookup::ALLOWLISTED, LocatedRepository::none(null));
-        }
-
-        return ActivityLookup::notRead($facts->package()->isFromComposerRepository() ? ActivityLookup::NO_REPOSITORY : ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, LocatedRepository::none(null));
-    }
-
-    /**
-     * `finding.activity`.
-     *
-     * @throws \LogicException for details built without the package's facts
-     */
     public function activity(): ActivityLookup
     {
-        if ($this->activity === null) {
-            throw new \LogicException('These details were built without an activity lookup.');
-        }
-
         return $this->activity;
     }
 
@@ -192,7 +165,7 @@ final class FindingDetails
             }
         }
         $skipped = [];
-        $lookup = self::lookupOf($facts, $entry);
+        $lookup = $facts->activityLookup();
         if ($lookup->status() !== ActivityLookup::READ && !\in_array('repository_activity', $inS10, true)) {
             $skipped[] = new Check('repository_activity', (string) $lookup->reason(), [Signal::S3, Signal::S4]);
         }

@@ -8,7 +8,6 @@ use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
-use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
@@ -75,20 +74,17 @@ final class PackageFacts
     }
 
     /**
-     * The lookup that {@see withActivityLookup()} gave. Facts built without one read their activity
-     * and its reason, and place no repository.
+     * The lookup that {@see withActivityLookup()} gave.
+     *
+     * @throws \LogicException for facts built before the lookup, as the analyzer builds them to plan it
      */
     public function activityLookup(): ActivityLookup
     {
-        if ($this->lookup !== null) {
-            return $this->lookup;
+        if ($this->lookup === null) {
+            throw new \LogicException('These facts were built before the activity lookup.');
         }
-        if ($this->activity !== null) {
-            return ActivityLookup::read($this->activity, false);
-        }
-        $reason = $this->activityNotChecked ?? ($this->package->isFromComposerRepository() ? ActivityLookup::NO_REPOSITORY : ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY);
 
-        return ActivityLookup::notRead($reason, LocatedRepository::none(null));
+        return $this->lookup;
     }
 
     /** Null when the run counted no advisory, so the release scan did not run. */

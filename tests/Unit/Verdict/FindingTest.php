@@ -24,6 +24,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -873,7 +874,7 @@ final class FindingTest extends TestCase
     public function testAJudgementTheDetailsContradictIsRefused(string $status, bool $maintenanceJudged, bool $detailsFirst): void
     {
         $finding = (new FindingBuilder())->withoutFlags()->build();
-        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null);
+        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
         $flags = FlagSet::fromSignals([], null, []);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -952,7 +953,7 @@ final class FindingTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $package = $lock->find('vendor/pkg');
         self::assertNotNull($package);
-        $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
+        $facts = FactsBuilder::looked(new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true));
         $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S9', 'S3', 'S4']];
         $signals = $withS10 ? [new Signal(Signal::LEVEL_INFO, 'activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [$activity], 'blocks' => ['S9', 'S3', 'S4']]))] : [];
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
@@ -1003,7 +1004,7 @@ final class FindingTest extends TestCase
     {
         $finding = (new FindingBuilder())->build();
         $before = $finding->details();
-        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null);
+        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
 
         $copy = $finding->withDetails($details);
 
@@ -1159,7 +1160,7 @@ final class FindingTest extends TestCase
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/pkg', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $package = $lock->find('vendor/pkg');
         self::assertNotNull($package);
-        $facts = new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true);
+        $facts = FactsBuilder::looked(new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true));
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
             ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
 

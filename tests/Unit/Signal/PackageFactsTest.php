@@ -8,7 +8,6 @@ use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Security\PackageFixes;
-use Lockrot\Signal\PackageFacts;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\TestCase;
 
@@ -36,21 +35,14 @@ final class PackageFactsTest extends TestCase
         self::assertSame($lookup, $withLookup->activityLookup());
         self::assertSame(ActivityLookup::HOST_NOT_SUPPORTED, $withLookup->activityNotChecked());
         self::assertNull($facts->activityNotChecked());
-        self::assertSame(ActivityLookup::NO_REPOSITORY, $facts->activityLookup()->reason());
+        $this->expectException(\LogicException::class);
+        $facts->activityLookup();
     }
 
-    public function testFactsWithoutALookupReadTheirActivityAsAnAnonymousRead(): void
+    public function testFactsBuiltWithAReadAreAnAnonymousRead(): void
     {
         $facts = F::facts(F::package(), null, F::activity(null, '2026-02-01T00:00:00+00:00', RepoRef::GITLAB));
 
         self::assertSame([ActivityLookup::READ, ActivityLookup::NO_TOKEN], [$facts->activityLookup()->status(), $facts->activityLookup()->archivedUnread()]);
-    }
-
-    public function testFactsWithoutALookupOrAReasonNameTheGapByTheOrigin(): void
-    {
-        $outside = new PackageFacts(F::package(['fromComposerRepository' => false]), null, null);
-
-        self::assertSame(ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, $outside->activityLookup()->reason());
-        self::assertSame(ActivityLookup::NO_REPOSITORY, F::facts(F::package())->activityLookup()->reason());
     }
 }
