@@ -218,8 +218,9 @@ final class MoveContext
 
     /**
      * The lowest release on $row that $constraint admits, with its class and holders, and the
-     * constraint from it. The advisories on the package's other versions raise it, except one that
-     * holds the branch's newest release: that one reaches every constraint on the branch (SPEC §5.3).
+     * constraint from it. The advisories on the package's other versions raise it. An advisory whose
+     * range holds the branch's newest release reaches every constraint on the branch, so it does
+     * not raise the release (SPEC §5.3).
      *
      * @return array{0: ?Candidate, 1: string}
      */

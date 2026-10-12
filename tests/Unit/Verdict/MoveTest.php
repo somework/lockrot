@@ -276,7 +276,7 @@ final class MoveTest extends TestCase
         self::assertSame('raise require.php to >=8.1, then require a/b ^2.3 — clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve', $move['text']);
     }
 
-    /** SPEC §5.3: an advisory on the branch's newest release does not stop the constraint from rising past the others. */
+    /** SPEC §5.3: the constraint rises past the other advisories while one advisory holds the branch's newest release. */
     public function testALeftBehindConstraintRisesPastAnAdvisoryWhileAnotherHoldsTheNewestRelease(): void
     {
         $move = JsonPath::arrayAt(self::analyse([

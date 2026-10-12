@@ -175,8 +175,8 @@ final class FixFinder
     /**
      * A branch's safe window: every release from its lower bound R up to its newest, where R is the
      * lowest release from which each one lies outside every range. R then rises above each range of
-     * $own that leaves the newest release outside: a range that holds the newest release reaches
-     * every constraint on the branch (SPEC §5.3).
+     * $own that leaves the newest release outside. A range that holds the newest release reaches
+     * every constraint on the branch, so it does not raise R (SPEC §5.3).
      *
      * @param list<Candidate>            $candidates one branch, ascending
      * @param array<ConstraintInterface> $ranges
