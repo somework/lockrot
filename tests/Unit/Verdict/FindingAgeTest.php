@@ -142,6 +142,13 @@ final class FindingAgeTest extends TestCase
         self::assertSame(['branch_snapshot', 'branch_snapshot'], [$age['installed_unmeasured'], $age['branch_release_unmeasured']]);
     }
 
+    public function testAZeroLineSnapshotNamesNoLine(): void
+    {
+        $age = self::age(F::looked(F::facts(F::package(['version' => '0.x-dev']), F::metadata([['0.2.0', self::LONG_AGO], ['0.1.0', self::LONG_AGO]]))));
+
+        self::assertSame('branch_snapshot', $age['branch_release_unmeasured']);
+    }
+
     public function testABranchAliasSnapshotReadsItsOwnLine(): void
     {
         $age = self::age(F::looked(F::facts(F::package(['version' => '1.x-dev', 'time' => self::LONG_AGO]), F::metadata(self::releases()))));

@@ -45,7 +45,10 @@ final class ReleaseBranch
             return null;
         }
 
-        return self::of($m[1]);
+        $key = self::of($m[1]);
+
+        // A 0.0.n key is one release wide, so `0.x-dev` and `0.0.x-dev` name no line.
+        return $key === null || substr_count($key, '.') === 2 ? null : $key;
     }
 
     /**
