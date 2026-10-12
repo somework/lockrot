@@ -174,9 +174,9 @@ final class FixFinder
 
     /**
      * A branch's safe window: every release from its lower bound R up to its newest, where R is the
-     * lowest release from which each one lies outside every range. R then rises above the ranges of
-     * $own while a release stays: an advisory on the newest release itself reaches every constraint
-     * on the branch, so it moves nothing.
+     * lowest release from which each one lies outside every range. R then rises above each range of
+     * $own that leaves the newest release outside: a range that holds the newest release reaches
+     * every constraint on the branch (SPEC §5.3).
      *
      * @param list<Candidate>            $candidates one branch, ascending
      * @param array<ConstraintInterface> $ranges
@@ -187,9 +187,12 @@ final class FixFinder
     private static function window(array $candidates, array $ranges, array $own): array
     {
         $window = self::outsideFromTop($candidates, $ranges);
-        $raised = self::outsideFromTop($window, $own);
+        if ($window === []) {
+            return [];
+        }
+        $newest = $window[\count($window) - 1];
 
-        return $raised === [] ? $window : $raised;
+        return self::outsideFromTop($window, array_filter($own, static fn (ConstraintInterface $range): bool => self::clearsAll($newest, [$range])));
     }
 
     /**

@@ -622,6 +622,30 @@ final class FixFinderTest extends TestCase
         self::assertSame(['1.1.0', 1], [$row->lowest(), $row->fixed()]);
     }
 
+    /** SPEC §5.3: the window still rises past an advisory that a higher release on the branch avoids. */
+    public function testAnAdvisoryOnTheNewestReleaseStillLetsTheWindowRisePastTheOthers(): void
+    {
+        $fixes = $this->find(
+            ['name' => 'a/b', 'version' => '1.0.0'],
+            [['1.0.0', null], ['1.1.0', null], ['1.2.0', null], ['1.3.0', null]],
+            ['A' => '<1.1.0'],
+            new PhpFloor('8.4', null),
+            [],
+            [],
+            [],
+            [],
+            [self::advisory('B', '>=1.1.0,<1.2.0'), self::advisory('C', '>=1.3.0')]
+        );
+
+        $row = $fixes->installedBranch();
+        self::assertNotNull($row);
+        self::assertSame(['1.2.0', 1], [$row->lowest(), $row->fixed()]);
+        self::assertSame('1.2.0', $fixes->forAdvisory('A')->version());
+        $move = $fixes->move();
+        self::assertNotNull($move);
+        self::assertSame('1.2.0', $move->release()->pretty());
+    }
+
     /** No row fixes an advisory with no range, so no row fixes every counted advisory and there is no security move. */
     public function testAnAdvisoryWithNoRangeLeavesNoSecurityMove(): void
     {

@@ -276,6 +276,17 @@ final class MoveTest extends TestCase
         self::assertSame('raise require.php to >=8.1, then require a/b ^2.3 — clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve', $move['text']);
     }
 
+    /** SPEC §5.3: an advisory on the branch's newest release does not stop the constraint from rising past the others. */
+    public function testALeftBehindConstraintRisesPastAnAdvisoryWhileAnotherHoldsTheNewestRelease(): void
+    {
+        $move = JsonPath::arrayAt(self::analyse([
+            'releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.9.0', '2020-01-01', '>=7.2'), self::release('2.3.0', '2026-03-01', '>=8.1'), self::release('2.3.2', '2026-04-01', '>=8.1'), self::release('2.3.5', '2026-05-01', '>=8.1')],
+            'other_advisories' => [self::advisory('PKSA-low', 'high', '>=2.3.0,<2.3.2'), self::advisory('PKSA-top', 'high', '>=2.3.5')],
+        ]), ['next_step']);
+
+        self::assertSame(['raise-php', '2.x', '^2.3.2', '2.3.2'], [$move['kind'], $move['to_branch'], $move['constraint'], $move['version']]);
+    }
+
     public function testALeftBehindPackageWhoseHigherBranchTheTargetCannotRunIsBlocked(): void
     {
         $move = JsonPath::arrayAt(self::analyse(['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.9.0', '2020-01-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=9.0')]]), ['next_step']);

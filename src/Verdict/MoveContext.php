@@ -218,8 +218,8 @@ final class MoveContext
 
     /**
      * The lowest release on $row that $constraint admits, with its class and holders, and the
-     * constraint from it. The advisories on the package's other versions raise it while a release
-     * stays: an advisory on the branch's newest release reaches every constraint on the branch.
+     * constraint from it. The advisories on the package's other versions raise it, except one that
+     * holds the branch's newest release: that one reaches every constraint on the branch (SPEC §5.3).
      *
      * @return array{0: ?Candidate, 1: string}
      */
@@ -241,11 +241,13 @@ final class MoveContext
         if ($onRow === []) {
             return [null, $constraint];
         }
+        $newest = $onRow[\count($onRow) - 1];
+        $own = array_filter($this->own, static fn (ConstraintInterface $range): bool => !self::insideAny($newest, [$range]));
         $from = \count($onRow);
-        while ($from > 0 && !self::insideAny($onRow[$from - 1], $this->own)) {
+        while ($from > 0 && !self::insideAny($onRow[$from - 1], $own)) {
             --$from;
         }
-        if ($from === 0 || $from === \count($onRow)) {
+        if ($from === 0) {
             return [$this->candidate($onRow[0]), $constraint];
         }
 
@@ -265,7 +267,7 @@ final class MoveContext
         return Intervals::haveIntersections($range, $span);
     }
 
-    /** @param list<ConstraintInterface> $ranges */
+    /** @param array<ConstraintInterface> $ranges */
     private static function insideAny(StableRelease $release, array $ranges): bool
     {
         $point = new Constraint('==', $release->normalized());
