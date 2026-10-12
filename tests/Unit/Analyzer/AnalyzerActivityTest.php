@@ -30,6 +30,7 @@ use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\VerdictEngine;
@@ -308,6 +309,38 @@ final class AnalyzerActivityTest extends TestCase
         $finding = $this->projectFindings($lock, $project, null, new AdvisoryBatch(['acme/vcs' => [$advisory]]))['acme/vcs'];
 
         self::assertSame(self::ORIGIN_S10, $finding['checks_missing'], 'the release_metadata gap already fails --fail-on=unchecked');
+    }
+
+    /**
+     * The model's document of each case records the origin, the activity and the two origin
+     * checks. A case without an `inputs` block cannot hydrate, so the test rebuilds its lock entry.
+     *
+     * @dataProvider originCases
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('originCases')]
+    public function testAnOriginCaseOfTheModelGetsTheModelsActivityAndOriginChecks(string $id): void
+    {
+        $recorded = JsonPath::arrayAt(CaseHydrator::case($id), ['finding']);
+        $kind = JsonPath::stringAt($recorded, ['origin', 'kind']);
+        $name = JsonPath::stringAt($recorded, ['package']);
+        $url = 'https://github.com/'.JsonPath::stringAt($recorded, ['activity', 'repo']).'.git';
+        $entry = ['name' => $name, 'version' => '1.0.0', 'source' => ['type' => 'git', 'url' => $url, 'reference' => 'a1b2c3d']];
+        $project = ProjectConfig::fromArray($kind === PackageOrigin::VCS ? ['repositories' => [['type' => 'vcs', 'url' => $url]]] : []);
+
+        $finding = $this->projectFindings([$entry], $project)[$name];
+
+        self::assertSame($kind, JsonPath::stringAt($finding, ['origin', 'kind']));
+        self::assertSame($recorded['activity'], $finding['activity']);
+        self::assertSame($recorded['checks_missing'], $finding['checks_missing']);
+        self::assertSame(self::origin($recorded), self::origin($finding));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function originCases(): iterable
+    {
+        foreach (['pinned-unread', 'scope-registries‡', 'unknown-origin', 'B-accepted-unread‡'] as $id) {
+            yield $id => [$id];
+        }
     }
 
     /** @return array<string, mixed> */
