@@ -383,7 +383,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::assertSame(['reason' => 'composer_too_old', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
             self::assertSame([], $batch->byName());
             self::assertSame(AdvisoryCoverage::COMPOSER_TOO_OLD, self::nameCoverage($batch, 'doctrine/cache')->reason());
-            self::assertSame([], $batch->coverage()->repositories(), 'Composer 2.2 names no repository advisory-capable');
+            self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::COMPOSER_TOO_OLD]], self::outcomes($batch), 'Composer 2.2 names each Composer repository as not asked');
         }
     }
 

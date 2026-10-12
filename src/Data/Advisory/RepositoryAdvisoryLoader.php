@@ -7,6 +7,7 @@ namespace Lockrot\Data\Advisory;
 use Composer\Advisory\PartialSecurityAdvisory;
 use Composer\Downloader\TransportException;
 use Composer\Repository\AdvisoryProviderInterface;
+use Composer\Repository\ComposerRepository;
 use Composer\Repository\FilterRepository;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
@@ -101,8 +102,12 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
     private function notAsked(string $reason): array
     {
         $repositories = [];
+        // Below Composer 2.4 no repository is advisory-capable. A Composer repository still names
+        // the feed that a newer Composer asks, and naming it starts no I/O.
+        $tooOld = $reason === AdvisoryCoverage::COMPOSER_TOO_OLD;
         foreach ($this->repositories as $repository) {
-            if (self::isAdvisoryCapable($repository)) {
+            $inner = $repository instanceof FilterRepository ? $repository->getRepository() : $repository;
+            if (self::isAdvisoryCapable($repository) || ($tooOld && $inner instanceof ComposerRepository)) {
                 $repositories[] = AdvisoryRepository::of($repository->getRepoName(), AdvisoryCoverage::NOT_ASKED, $reason);
             }
         }
