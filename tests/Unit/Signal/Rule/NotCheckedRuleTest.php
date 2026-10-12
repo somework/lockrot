@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -12,7 +13,6 @@ use Lockrot\Lock\ConfiguredRepositories;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
-use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;

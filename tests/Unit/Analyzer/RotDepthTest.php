@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Lockrot\Allowlist\Allowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\RotDepth;
-use Lockrot\Allowlist\Allowlist;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;

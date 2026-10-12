@@ -6,11 +6,11 @@ namespace Lockrot\Tests\Unit\Support;
 
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Tests\Support\SignalDataStub;
-use Lockrot\Lock\ProjectConfig;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;

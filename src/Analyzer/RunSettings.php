@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
-use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Config\Gate;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;

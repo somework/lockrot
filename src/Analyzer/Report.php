@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
-use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Legacy\Compare013;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\Verdict013;

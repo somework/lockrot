@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Abandoned;
 
 use Composer\Config;
-use Composer\Util\Platform;
 use Composer\Policy\AbandonedPolicyConfig;
+use Composer\Util\Platform;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Abandoned\AbandonedPolicyReader;
