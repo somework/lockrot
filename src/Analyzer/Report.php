@@ -11,6 +11,7 @@ use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Legacy\Compare013;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\Verdict013;
+use Lockrot\Score\ScoreText;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -117,7 +118,10 @@ final class Report
         return $this->baseline;
     }
 
-    /** Returns a copy, like {@see self::withBaseline()}. */
+    /**
+     * Returns a copy, like {@see self::withBaseline()}. With a grade value active, the copy notes
+     * each finding that reached it under 0.13's rules and no longer does (`verdict_rules_changed`).
+     */
     public function withRun(RunSettings $run): self
     {
         $copy = new self(
@@ -132,8 +136,40 @@ final class Report
             $this->advisoryCoverage
         );
         $copy->run = $run;
+        $note = $this->verdictRulesChanged($run);
+        if ($note !== null) {
+            $copy->notes[] = $note;
+        }
 
         return $copy;
+    }
+
+    private function verdictRulesChanged(RunSettings $run): ?RunNote
+    {
+        $grade = null;
+        foreach ($run->failOn() === null ? [] : $run->failOn()->values() as $value) {
+            $grade = $value->kind() === FailOn::KIND_GRADE ? $value->value() : $grade;
+        }
+        if ($grade === null) {
+            return null;
+        }
+        $changed = [];
+        foreach ($this->findings as $finding) {
+            if (Priority013::rank($finding->priority()) < Priority013::rank($grade) || $finding->score()->total() >= ScoreModel::floorOf($grade)) {
+                continue;
+            }
+            $changed[] = [
+                'package' => $finding->package(),
+                'version' => $finding->version(),
+                'legacy' => ['verdict' => $finding->verdict(), 'priority' => $finding->priority(), 'basis' => $finding->priorityBasis()->toArray()],
+                'verdict' => $finding->grade(),
+                'score_total' => $finding->score()->total(),
+                'score_text' => ScoreText::render($finding->scoreBasis()),
+            ];
+        }
+        usort($changed, static fn (array $a, array $b): int => [$a['package'], $a['version']] <=> [$b['package'], $b['version']]);
+
+        return $changed === [] ? null : RunNote::verdictRulesChanged($grade, $changed);
     }
 
     /** @return list<Finding> */

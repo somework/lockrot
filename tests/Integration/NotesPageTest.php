@@ -36,6 +36,10 @@ final class NotesPageTest extends TestCase
         'https://lockrot.dev/notes/#abandoned_markings_ignored',
         'https://lockrot.dev/notes/#abandoned_not_audited_by_composer',
         'https://lockrot.dev/notes/#abandoned_ignore_unreadable',
+        'https://lockrot.dev/notes/#verdict_rules_changed',
+        'https://lockrot.dev/notes/#baseline_target_differs',
+        'https://lockrot.dev/notes/#baseline_fix_model_differs',
+        'https://lockrot.dev/notes/#ignore_does_not_cover_advisories',
     ];
 
     public function testEveryCodeLinksToAUrlAlreadyPublished(): void

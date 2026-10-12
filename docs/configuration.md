@@ -290,6 +290,10 @@ These variables exist for lockrot's own tests and are not part of the configurat
 | `LOCKROT_RELEASE_URL` | The release list `lockrot.phar self-update` reads, in the shape of GitHub's `GET /repos/{owner}/{repo}/releases`, instead of GitHub's |
 | `LOCKROT_RELEASE_KEY` | A PEM file whose public key `lockrot.phar self-update` verifies release signatures with, instead of the key built into the archive |
 
+### accept-unchecked {#accept-unchecked}
+
+`extra.lockrot.accept-unchecked` accepts a check that lockrot did not run and that no rerun can close, scoped by host, repository or package, with a reason and an optional `expires`.
+
 ## Related
 
 - [ci.md](ci.md) — choosing `--fail-on`, exit codes and every output format

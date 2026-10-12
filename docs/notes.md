@@ -286,6 +286,49 @@ Composer rejected the project's abandoned ignore list, so every abandoned markin
 - Findings: no change.
 - `sets_network_failures`: no.
 
+## Gate and baseline
+
+### Verdict rules changed {#verdict_rules_changed}
+
+A grade value of `--fail-on` is active, and some findings reached it under the rules of lockrot
+0.13 and no longer do. The sentence names each one with its score and gives why 0.13 placed it
+higher.
+
+- `data`: `fail_on`, the grade value. `findings`, one entry per finding, by package name: `package`,
+  `version`, `legacy` (the `verdict`, `priority` and `basis` of 0.13), `verdict`, `score_total` and
+  `score_text`.
+- Findings: no change.
+- `sets_network_failures`: no.
+
+### Baseline target differs {#baseline_target_differs}
+
+The baseline file was written for another target PHP. lockrot does not compare fix changes against
+it. It still compares flags, advisory ids and severities.
+
+- `data`: `baseline_target_php`, `baseline_target_php_source`, `run_target_php`,
+  `run_target_php_source`.
+- Findings: no advisory reads `fix_lost`.
+- `sets_network_failures`: no.
+
+### Baseline fix model differs {#baseline_fix_model_differs}
+
+The baseline file was written under another fix model. lockrot does not compare fix changes
+against it, so a release that classifies fixes again never reads as a lost fix.
+
+- `data`: `baseline_fix_model`, `run_fix_model`.
+- Findings: no advisory reads `fix_lost`.
+- `sets_network_failures`: no.
+
+### Ignore does not cover advisories {#ignore_does_not_cover_advisories}
+
+An `extra.lockrot.ignore[]` entry matches a package that carries a counted advisory. The entry
+accepts maintenance flags only, so the advisories count. Accept an advisory in Composer's audit
+policy if that is the decision.
+
+- `data`: `entries`, one per matched package: `package`, `pattern`, `advisories` (the counted ids).
+- Findings: no change.
+- `sets_network_failures`: no.
+
 ## The lock
 
 ### Not from a Composer repository {#not_from_composer_repository}

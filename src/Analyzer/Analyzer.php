@@ -223,7 +223,7 @@ final class Analyzer
         if ($notInRepository > 0) {
             $notes[] = RunNote::notFromComposerRepository($notInRepository, $advisories->coverage()->scope() === AdvisoryCoverage::SCOPE_ALL);
         }
-        $notes = array_merge($notes, $this->abandonedNotes($findings));
+        $notes = array_merge($notes, self::ignoreNotes($findings), $this->abandonedNotes($findings));
         $findings = TransitiveExposure::attach($findings, $graph);
         $graded = [];
         foreach ($findings as $finding) {
@@ -498,6 +498,29 @@ final class Analyzer
         }
 
         return $notes;
+    }
+
+    /**
+     * An `ignore[]` entry no longer hides the advisories of its package.
+     *
+     * @param list<Finding> $findings
+     *
+     * @return list<RunNote>
+     */
+    private static function ignoreNotes(array $findings): array
+    {
+        $entries = [];
+        foreach ($findings as $finding) {
+            $entry = $finding->details()->entry();
+            $advisories = array_map(static fn (CountedAdvisory $advisory): string => $advisory->id(), $finding->flags()->advisories());
+            if ($entry === null || $entry->by() !== AllowlistEntry::BY_PROJECT || $advisories === []) {
+                continue;
+            }
+            usort($advisories, 'strcmp');
+            $entries[] = ['package' => $finding->package(), 'pattern' => (string) $entry->pattern(), 'advisories' => $advisories];
+        }
+
+        return $entries === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($entries)];
     }
 
     /**

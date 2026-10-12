@@ -408,6 +408,40 @@ final class RunNote
         return self::of(self::ABANDONED_IGNORE_UNREADABLE, \sprintf("Composer rejected the project's abandoned ignore list (%s), so every abandoned marking counts.", $message), false, ['message' => $message]);
     }
 
+    /** Why 0.13 moved a priority, as the `verdict_rules_changed` sentence words each step reason. */
+    private const LEGACY_STEP_WORDS = [
+        'no_fix_expected' => '0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity',
+        'transitive' => '0.13 lowered a transitive package one step; model 1 halves its maintenance',
+        'dev' => '0.13 lowered a packages-dev package one step; model 1 halves its whole score',
+    ];
+
+    /**
+     * The findings that reached a grade value under the rules of 0.13 and no longer do. The sentence
+     * quotes each `score_text` from the note's own data.
+     *
+     * @param list<array{package: string, version: string, legacy: array{verdict: string, priority: string, basis: array{base: string, steps: list<array{reason: string, from: string, to: string}>}}, verdict: string, score_total: int, score_text: string}> $findings by package, then version
+     */
+    public static function verdictRulesChanged(string $failOn, array $findings): self
+    {
+        if ($findings === []) {
+            throw new \InvalidArgumentException('A note about changed verdict rules names at least one finding.');
+        }
+        $count = \count($findings);
+        $text = \sprintf("%d %s --fail-on=%s under 0.13's rules and no longer %s: ", $count, $count === 1 ? 'finding reached' : 'findings reached', $failOn, $count === 1 ? 'does' : 'do')
+            .implode(', ', array_map(static fn (array $f): string => \sprintf('%s %s (%s)', $f['package'], $f['version'], $f['score_text']), $findings)).'.';
+        $reasons = [];
+        foreach ($findings as $finding) {
+            foreach ($finding['legacy']['basis']['steps'] as $step) {
+                $reasons[$step['reason']] = self::LEGACY_STEP_WORDS[$step['reason']] ?? str_replace('_', ' ', $step['reason']);
+            }
+        }
+        foreach ($reasons as $words) {
+            $text .= ' '.$words.'.';
+        }
+
+        return self::of(self::VERDICT_RULES_CHANGED, $text, false, ['fail_on' => $failOn, 'findings' => $findings]);
+    }
+
     /** The baseline file was written for another target PHP: fix changes against it are not compared. */
     public static function baselineTargetDiffers(string $baselineTargetPhp, string $baselineSource, string $runTargetPhp, string $runSource): self
     {
