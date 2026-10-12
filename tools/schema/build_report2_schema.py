@@ -651,8 +651,8 @@ defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unch
     'reason': open_set(['no_token', 'anonymous_budget', 'install_time_budget', 'rate_limit', 'fetch_failed', 'offline', 'undated_releases', 'releases_unknown',
                         'host_not_supported', 'not_from_composer_repository'],
                        ('Why it did not run (§2.3, §7.9 page vocabulary): `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), '
-                        '`not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). A package installed '
-                        'from a path is the project\'s own code and is a skip. An open set: read an unknown reason as another reason.')),
+                        '`not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or '
+                        'package origin, the same gaps are skips. An open set: read an unknown reason as another reason.')),
     'blocks': arr('The signals that could not be read without it.', ref('signalId'), minItems=1, uniqueItems=True),
 })
 defs['checkSkipped'] = obj("A check lockrot chose not to run (§2.3): a decision, not a gap; it raises no S10 and reaches no `unchecked` gate.", {
@@ -1459,7 +1459,7 @@ add_relations_round4(defs)
 
 
 def add_relations_activity(defs):
-    """The relations of `finding.activity` and the origin split that draft-04 can state. claims.py lists the engine-only rest."""
+    """The relations of `finding.activity` and the origin split that draft-04 can state. tools/schema/README.md lists the rest."""
     import build_other_schemas as BO
     P, E, NOT, NULL, CONTAINS, NONE, relate = (BO.P, BO.E, BO.NOT, BO.NULL, BO.CONTAINS, BO.NONE, BO.relate)
     has = lambda sid: CONTAINS(P(id=E(sid)))

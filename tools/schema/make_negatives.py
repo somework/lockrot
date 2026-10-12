@@ -645,6 +645,10 @@ def _(d): d['findings'][0]['activity']['reason'] = 'rate_limit'
 def _(d): d['findings'][0]['activity']['event'] = 'push'
 @case('c73-forge-without-repo', 'composite', f + '.activity')
 def _(d): d['findings'][m]['activity']['repo'] = None
+@case('c73-repo-without-forge', 'composite', f + '.activity')
+def _(d): d['findings'][m]['activity']['forge'] = None
+@case('c73-located-without-host', 'composite', f + '.activity')
+def _(d): d['findings'][m]['activity']['host'] = None
 @case('c73-host-not-supported-on-a-forge', 'host-unsupported', 'findings[0].activity')
 def _(d): d['findings'][0]['activity'].update(forge='github', repo='danb/HtmlDiff')
 @case('c73-archived-null-without-the-skip', 'gitlab-anon-dagger', 'findings[0]')
@@ -666,9 +670,14 @@ def _(d):
     x = sig(d['findings'][DEBUG], 'S4')['data']
     x['activity'] = x.pop('event')
 
-# the origin split: no S10 `not_from_composer_repository` on a package from a Composer repository, nor on a path origin
+# the origin split: no S10 `not_from_composer_repository` on a package from a Composer repository, nor on a path, artifact or package origin
 @case('o12-path-package-with-s10', 'local-path-advisory', 'findings[0]')
 def _(d): d['findings'][0]['checks_missing'].append(dict(check='release_metadata', reason='not_from_composer_repository', blocks=['S2', 'S8']))
+@case('o12-artifact-package-with-s10', 'local-path-advisory', 'findings[0]')
+def _(d):
+    x = d['findings'][0]
+    x['origin'].update(kind='artifact', local=False)
+    x['checks_missing'].append(dict(check='release_metadata', reason='not_from_composer_repository', blocks=['S2', 'S8']))
 @case('o12-registry-package-with-s10', 'composite', f)
 def _(d): d['findings'][m]['checks_missing'].append(dict(check='repository_activity', reason='not_from_composer_repository', blocks=['S3', 'S4']))
 

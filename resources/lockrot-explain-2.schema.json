@@ -2156,7 +2156,7 @@
                     ]
                 },
                 "reason": {
-                    "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). A package installed from a path is the project's own code and is a skip. An open set: read an unknown reason as another reason.",
+                    "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
                     "type": "string",
                     "pattern": "^[a-z][a-z0-9_]*$",
                     "x-known-values": [
