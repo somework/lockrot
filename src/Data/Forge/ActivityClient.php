@@ -86,9 +86,7 @@ final class ActivityClient
                         }
                         $fetchedAt = $result->fetchedAt();
                     }
-                    if ($decoded !== null) {
-                        $json[$role] = $decoded;
-                    }
+                    $json[$role] = $decoded;
                 }
                 $activity[$repo->key()] = $api->activity($repo, $json, $fetchedAt ?? $this->neverFetched(), $cachedAt);
             }

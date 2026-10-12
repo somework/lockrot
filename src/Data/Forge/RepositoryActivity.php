@@ -12,20 +12,23 @@ final class RepositoryActivity
     private ?\DateTimeImmutable $pushedAt;
     private \DateTimeImmutable $fetchedAt;
     private ?\DateTimeImmutable $cachedAt;
+    private bool $archivedRequestFailed;
 
     /**
      * @param ?bool               $archived  null when the answer did not carry the flag
      * @param \DateTimeImmutable  $fetchedAt when the deciding answer was fetched
      * @param ?\DateTimeImmutable $cachedAt  the oldest fetch time among the answers that came from
      *                                       lockrot's cache, null when none did
+     * @param bool                $archivedRequestFailed lockrot asked for the flag in a request of its own, and that request got no answer
      */
-    public function __construct(RepoRef $ref, ?bool $archived, ?\DateTimeImmutable $pushedAt, \DateTimeImmutable $fetchedAt, ?\DateTimeImmutable $cachedAt = null)
+    public function __construct(RepoRef $ref, ?bool $archived, ?\DateTimeImmutable $pushedAt, \DateTimeImmutable $fetchedAt, ?\DateTimeImmutable $cachedAt = null, bool $archivedRequestFailed = false)
     {
         $this->ref = $ref;
         $this->archived = $archived;
         $this->pushedAt = $pushedAt;
         $this->fetchedAt = $fetchedAt;
         $this->cachedAt = $cachedAt;
+        $this->archivedRequestFailed = $archivedRequestFailed;
     }
 
     public function ref(): RepoRef
@@ -41,6 +44,11 @@ final class RepositoryActivity
     public function archived(): ?bool
     {
         return $this->archived;
+    }
+
+    public function archivedRequestFailed(): bool
+    {
+        return $this->archivedRequestFailed;
     }
 
     public function isArchived(): bool

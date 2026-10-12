@@ -26,7 +26,7 @@ interface ForgeApi
     public function isRateLimited(HttpResult $result): bool;
 
     /**
-     * @param array<string, array<string, mixed>> $json      decoded body per role: the deciding role always, a later one when it answered
+     * @param array<string, ?array<string, mixed>> $json     decoded body per requested role: the deciding role always, null for a later one that got no answer
      * @param \DateTimeImmutable                  $fetchedAt when the deciding answer was fetched
      * @param ?\DateTimeImmutable                 $cachedAt  the oldest fetch time among the answers that came from lockrot's cache, null when none did
      */

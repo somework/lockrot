@@ -42,10 +42,9 @@ final class ActivityLookup implements \JsonSerializable
         $this->archivedUnread = $archivedUnread;
     }
 
-    /** @param bool $authenticated the request carried credentials, so an unread archived flag means a failed request */
-    public static function read(RepositoryActivity $activity, bool $authenticated): self
+    public static function read(RepositoryActivity $activity): self
     {
-        $unread = $activity->archived() !== null ? null : ($authenticated ? self::FETCH_FAILED : self::NO_TOKEN);
+        $unread = $activity->archived() !== null ? null : ($activity->archivedRequestFailed() ? self::FETCH_FAILED : self::NO_TOKEN);
 
         return new self(self::READ, null, LocatedRepository::located($activity->ref()), $activity, $unread);
     }

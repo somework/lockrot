@@ -117,6 +117,6 @@ final class FactsBuilder
     {
         $facts = new PackageFacts($p, $m, $a, $advisories);
 
-        return $a === null ? $facts : $facts->withActivityLookup(ActivityLookup::read($a, false));
+        return $a === null ? $facts : $facts->withActivityLookup(ActivityLookup::read($a));
     }
 }

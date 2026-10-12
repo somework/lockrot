@@ -52,6 +52,6 @@ final class GitLabApi implements ForgeApi
         $committedAt = \is_array($newest) ? JsonDate::parse($newest['committed_date'] ?? null) : null;
         $archived = $json['project']['archived'] ?? null;
 
-        return new RepositoryActivity($repo, \is_bool($archived) ? $archived : null, $committedAt, $fetchedAt, $cachedAt);
+        return new RepositoryActivity($repo, \is_bool($archived) ? $archived : null, $committedAt, $fetchedAt, $cachedAt, \array_key_exists('project', $json) && $json['project'] === null);
     }
 }

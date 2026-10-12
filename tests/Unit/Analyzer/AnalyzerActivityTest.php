@@ -87,6 +87,16 @@ final class AnalyzerActivityTest extends TestCase
         self::assertSame([['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]], self::checks($finding, 'repository_archived'));
     }
 
+    /** Composer credentials that GitLab does not accept for the flag, such as http-basic, give an answer without it. */
+    public function testAGitlabProjectAnswerWithoutTheFlagIsNoFailedRequest(): void
+    {
+        $auth = ForgeAuth::withTokens(new Tokens(null, 'glpat-x'));
+        $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://gitlab.com/group/pkg.git')], [self::GL_COMMITS => [200, self::COMMIT], self::GL_PROJECT => [200, '{"path_with_namespace":"group/pkg"}']], false, null, $auth);
+
+        self::assertNull(JsonPath::arrayAt($finding, ['activity'])['archived']);
+        self::assertSame([['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']]], self::checks($finding, 'repository_archived'));
+    }
+
     public function testAnAuthenticatedGitlabReadThatCarriesTheFlagNeedsNoArchivedEntry(): void
     {
         $auth = ForgeAuth::withTokens(new Tokens(null, 'glpat-x'));

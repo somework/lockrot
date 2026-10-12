@@ -253,6 +253,6 @@ final class FindingBuilder
         $pushedAt = $s4 === null ? null : new \DateTimeImmutable($s4->lastPush());
         $read = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', $finding->package()), $finding->signalData(ArchivedData::class) !== null, $pushedAt, $finding->dataDate() ?? new \DateTimeImmutable('2026-09-14T00:00:00+00:00'));
 
-        return ActivityLookup::read($read, false);
+        return ActivityLookup::read($read);
     }
 }

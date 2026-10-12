@@ -283,8 +283,8 @@ final class FindingDetailsTest extends TestCase
         ]];
         yield 'a branch snapshot' => [F::facts(F::package(['version' => 'dev-main']), $metadata, F::activity(false, null)), null, [], [['check' => 'release_branch', 'reason' => 'branch_snapshot', 'blocks' => ['S8']]]];
         $gitlab = new RepositoryActivity(new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'group/pkg'), null, null, new \DateTimeImmutable(F::NOW));
-        yield 'a read without the archived flag' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read($gitlab, false)), null, [], [['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']]]];
-        yield 'an authenticated read without the archived flag' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read($gitlab, true)), null, [], [['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]]];
+        yield 'a read without the archived flag' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read($gitlab)), null, [], [['check' => 'repository_archived', 'reason' => 'no_token', 'blocks' => ['S3']]]];
+        yield 'a read whose request for the flag failed' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::read(new RepositoryActivity($gitlab->ref(), null, null, new \DateTimeImmutable(F::NOW), null, true))), null, [], [['check' => 'repository_archived', 'reason' => 'fetch_failed', 'blocks' => ['S3']]]];
         yield 'a 404' => [(new PackageFacts(F::package(), $metadata, null, []))->withActivityLookup(ActivityLookup::notFound(new RepoRef(RepoRef::GITHUB, 'github.com', 'vendor/pkg'))), null, [], [$activity('repository_not_found')]];
         yield 'S10 holds the origin gaps' => [F::looked(F::facts(F::package(['fromComposerRepository' => false])), ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY), null, [$s10([
             ['check' => 'release_metadata', 'reason' => 'not_from_composer_repository', 'blocks' => ['S2', 'S8']],

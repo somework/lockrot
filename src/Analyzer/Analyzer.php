@@ -362,7 +362,7 @@ final class Analyzer
         foreach ($repoByPackage as $name => $repo) {
             $read = $activity[$repo->key()] ?? null;
             if ($read !== null) {
-                $lookups[$name] = ActivityLookup::read($read, $read->archived() === null && $this->activity->auth()->isAuthenticated($repo));
+                $lookups[$name] = ActivityLookup::read($read);
             } elseif (\in_array($repo->key(), $batch->notFoundOn($repo->forge()), true)) {
                 $lookups[$name] = ActivityLookup::notFound($repo);
             } else {
