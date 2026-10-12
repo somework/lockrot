@@ -30,7 +30,7 @@ final class RepoLocator
      * @param list<string> $githubDomains as Composer's `github-domains` lists them: only to name
      *                                    the setting that lists a host lockrot cannot ask
      */
-    public function __construct(array $gitlabDomains = ['gitlab.com'], array $githubDomains = ['github.com'])
+    public function __construct(array $gitlabDomains = ['gitlab.com'], array $githubDomains = [])
     {
         $this->gitlabDomains = $gitlabDomains;
         $this->githubDomains = array_map('strtolower', $githubDomains);
