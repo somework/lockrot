@@ -53,7 +53,7 @@ final class RunSettingsTest extends TestCase
     {
         $config = LockrotConfig::fromSources($extra, $env, $cli, '8.4.0', null);
 
-        self::assertSame([$failOn, $source], [$config->failOn(), $config->failOnSource()]);
+        self::assertSame([$failOn, $source], [$config->failOn()->value(), $config->failOnSource()]);
     }
 
     /** @return iterable<string, array{array<string, mixed>, array<string, string>, array<string, string>, string, string}> */
@@ -69,7 +69,7 @@ final class RunSettingsTest extends TestCase
     #[DataProvider('gates')]
     public function testOneGateEntryStandsForTheFailOnValue(string $failOn, string $kinds): void
     {
-        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString($failOn), RunSettings::SOURCE_OPTION, new Thresholds(), null, false, 'check');
+        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse($failOn), RunSettings::SOURCE_OPTION, new Thresholds(), null, false, 'check');
 
         self::assertSame($kinds, json_encode($run->toArray(null, null, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['gates']));
     }

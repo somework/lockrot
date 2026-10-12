@@ -482,7 +482,7 @@ final class InstallTimeSummaryTest extends TestCase
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), [], [], \PHP_VERSION, $project->platformPhp());
             $analyzer = ($this->analyzerFactory())(new BufferIO(), $server->config(), [], $lockrot, new Tokens('recorded', null), Clock::fixed(self::FIXED_NOW), Deadline::inSeconds(60.0));
             $report = $analyzer->analyzePackages($lock->packages(false), $lock, $project, false);
-            $fails = Gate::decide($report, FailOn::fromString($value), false, Gate::MODE_CHECK)->fails();
+            $fails = Gate::decide($report, FailOn::parse($value), false, Gate::MODE_CHECK)->fails();
 
             $blocked = false;
             try {

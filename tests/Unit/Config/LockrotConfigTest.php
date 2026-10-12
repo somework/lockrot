@@ -29,7 +29,7 @@ final class LockrotConfigTest extends TestCase
     public function testDefaults(): void
     {
         $cfg = LockrotConfig::fromSources([], [], [], '8.5.10', null);
-        self::assertSame('none', $cfg->failOn());
+        self::assertSame('none', $cfg->failOn()->value());
         self::assertSame('8.5', $cfg->targetPhp());
         self::assertFalse($cfg->includeDev());
         // A source that names neither flag leaves both off: install time passes an empty $cli, so a
@@ -164,10 +164,10 @@ final class LockrotConfigTest extends TestCase
 
     public function testFailOnAcceptsAPriorityFromEverySource(): void
     {
-        self::assertSame('high', LockrotConfig::fromSources([], [], ['fail-on' => 'high'], '8.5.10', null)->failOn());
-        self::assertSame('low', LockrotConfig::fromSources([], ['LOCKROT_FAIL_ON' => 'low'], [], '8.5.10', null)->failOn());
-        self::assertSame('critical', LockrotConfig::fromSources(['fail-on' => 'critical'], [], [], '8.5.10', null)->failOn());
-        self::assertSame('medium', LockrotConfig::fromSources(['fail-on' => 'medium'], [], [], '8.5.10', null)->failOn());
+        self::assertSame('high', LockrotConfig::fromSources([], [], ['fail-on' => 'high'], '8.5.10', null)->failOn()->value());
+        self::assertSame('low', LockrotConfig::fromSources([], ['LOCKROT_FAIL_ON' => 'low'], [], '8.5.10', null)->failOn()->value());
+        self::assertSame('critical', LockrotConfig::fromSources(['fail-on' => 'critical'], [], [], '8.5.10', null)->failOn()->value());
+        self::assertSame('medium', LockrotConfig::fromSources(['fail-on' => 'medium'], [], [], '8.5.10', null)->failOn()->value());
     }
 
     public function testAnEmptyCliFailOnIsRejectedRatherThanFallingThrough(): void
@@ -180,16 +180,16 @@ final class LockrotConfigTest extends TestCase
     /** `none` is the absence of a threshold, not a priority level a run can fail on. */
     public function testThePriorityNoneIsTheSameNoneAsAlways(): void
     {
-        self::assertSame(LockrotConfig::FAIL_ON_NONE, LockrotConfig::fromSources([], [], ['fail-on' => 'none'], '8.5.10', null)->failOn());
+        self::assertSame(LockrotConfig::FAIL_ON_NONE, LockrotConfig::fromSources([], [], ['fail-on' => 'none'], '8.5.10', null)->failOn()->value());
     }
 
     public function testPrecedenceCliOverEnvOverExtra(): void
     {
         $cfg = LockrotConfig::fromSources(['fail-on' => 'stale', 'target-php' => '8.2'], ['LOCKROT_FAIL_ON' => 'silent', 'LOCKROT_TARGET_PHP' => '8.3'], ['fail-on' => 'abandoned'], '8.5.10', null);
-        self::assertSame('abandoned', $cfg->failOn());
+        self::assertSame('abandoned', $cfg->failOn()->value());
         self::assertSame('8.3', $cfg->targetPhp());
         $cfg2 = LockrotConfig::fromSources(['fail-on' => 'stale'], ['LOCKROT_FAIL_ON' => 'silent'], [], '8.5.10', null);
-        self::assertSame('silent', $cfg2->failOn());
+        self::assertSame('silent', $cfg2->failOn()->value());
     }
 
     /**
@@ -211,14 +211,14 @@ final class LockrotConfigTest extends TestCase
     /** @return iterable<string, array{0: array<string, string>, 1: string}> */
     public static function invalidEnvironmentUnderAnOption(): iterable
     {
-        yield 'LOCKROT_FAIL_ON' => [['LOCKROT_FAIL_ON' => 'dead'], 'LOCKROT_FAIL_ON must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low, unchecked; got "dead"'];
+        yield 'LOCKROT_FAIL_ON' => [['LOCKROT_FAIL_ON' => 'dead'], 'LOCKROT_FAIL_ON: unknown value "dead"'];
         yield 'LOCKROT_TARGET_PHP' => [['LOCKROT_TARGET_PHP' => 'latest'], 'LOCKROT_TARGET_PHP must look like "8.4"; got "latest"'];
     }
 
     public function testAnInvalidVariableIsNamedWhereItWouldHaveWon(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('LOCKROT_FAIL_ON must be one of');
+        $this->expectExceptionMessage('LOCKROT_FAIL_ON: unknown value');
         LockrotConfig::fromSources(['fail-on' => 'silent'], ['LOCKROT_FAIL_ON' => 'dead'], [], '8.5.10', null);
     }
 
@@ -227,7 +227,7 @@ final class LockrotConfigTest extends TestCase
     {
         $cfg = LockrotConfig::fromSources(['fail-on' => 'silent', 'target-php' => '8.2'], ['LOCKROT_FAIL_ON' => '', 'LOCKROT_TARGET_PHP' => ''], [], '8.5.10', null);
 
-        self::assertSame('silent', $cfg->failOn());
+        self::assertSame('silent', $cfg->failOn()->value());
         self::assertSame('8.2', $cfg->targetPhp());
     }
 
@@ -235,7 +235,7 @@ final class LockrotConfigTest extends TestCase
     {
         $cfg = LockrotConfig::fromSources([], ['LOCKROT_FAIL_ON' => 'high', 'LOCKROT_TARGET_PHP' => '8.1'], ['fail-on' => 'silent', 'target-php' => '8.4'], '8.5.10', null);
 
-        self::assertSame('silent', $cfg->failOn());
+        self::assertSame('silent', $cfg->failOn()->value());
         self::assertSame('8.4', $cfg->targetPhp());
     }
 
@@ -257,7 +257,7 @@ final class LockrotConfigTest extends TestCase
     public function testInvalidFailOn(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low, unchecked; got "dead"');
+        $this->expectExceptionMessage('--fail-on: unknown value "dead"');
         LockrotConfig::fromSources([], [], ['fail-on' => 'dead'], '8.5.10', null);
     }
 

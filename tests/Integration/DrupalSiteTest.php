@@ -72,7 +72,7 @@ final class DrupalSiteTest extends TestCase
         $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED));
         self::assertCount(1, $notes);
         self::assertSame([['host' => self::DRUPALCODE, 'packages' => \count($findings), 'listed_in' => null]], JsonPath::arrayAt(JsonPath::decoded($notes[0]->toArray()), ['data', 'hosts']));
-        self::assertTrue(Gate::decide($report, FailOn::fromString('unchecked'), false, Gate::MODE_CHECK)->fails(), '--fail-on=unchecked exits 1');
+        self::assertTrue(Gate::decide($report, FailOn::parse('unchecked'), false, Gate::MODE_CHECK)->fails(), '--fail-on=unchecked exits 1');
     }
 
     public function testWithTheRecipeEveryDrupalcodePackageIsReadAnonymouslyWithoutItsArchivedFlag(): void

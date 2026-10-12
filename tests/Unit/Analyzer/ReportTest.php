@@ -246,7 +246,7 @@ final class ReportTest extends TestCase
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 6, 8), '>=8.2'));
+            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::parse('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 6, 8), '>=8.2'));
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
@@ -363,7 +363,7 @@ final class ReportTest extends TestCase
 
     public function testTheRunSaysHowItWasToldToGate(): void
     {
-        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::fromString('high'), RunSettings::SOURCE_OPTION, null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
+        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
 
         self::assertSame('high', $run['fail_on']);
         self::assertSame('grade', JsonPath::stringAt($run, ['gates', 0, 'kind']));
@@ -417,7 +417,7 @@ final class ReportTest extends TestCase
     public function testTheGateIsDecidedOverTheReportAsItStands(): void
     {
         $report = $this->report($this->finding('vendor/known', Verdict::ABANDONED), $this->finding('vendor/fine', Verdict::OK))
-            ->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::fromString(Verdict::SILENT), RunSettings::SOURCE_OPTION, null));
+            ->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::parse(Verdict::SILENT), RunSettings::SOURCE_OPTION, null));
         $before = $report->toArray();
 
         self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($before, ['gate']), 0, 3, true));

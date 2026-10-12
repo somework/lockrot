@@ -97,7 +97,7 @@ final class AppRootRecountTest extends TestCase
             $clock,
             false
         );
-        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString('medium'), RunSettings::SOURCE_OPTION, null, null, false, 'check', $dev);
+        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('medium'), RunSettings::SOURCE_OPTION, null, null, false, 'check', $dev);
         $report = $analyzer->analyze(LockFile::fromFile($dir.'/composer.lock'), $project, $dev)->withRun($run);
         $document = json_decode((new JsonFormatter())->format($report), true, 512, \JSON_THROW_ON_ERROR);
         self::assertIsArray($document);

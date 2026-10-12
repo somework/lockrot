@@ -124,7 +124,7 @@ final class GateAgreementTest extends TestCase
             foreach ([null, self::changedBaseline($report)] as $baseline) {
                 $compared = $baseline === null ? $report : $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
                 foreach (FailOn::allowed() as $value) {
-                    $failOn = FailOn::fromString($value);
+                    $failOn = FailOn::parse($value);
                     $levels = FormatContext::create(null, $value);
                     foreach ([false, true] as $strict) {
                         foreach (Gate::MODES as $mode) {

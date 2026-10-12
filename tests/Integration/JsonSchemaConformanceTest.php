@@ -247,7 +247,7 @@ final class JsonSchemaConformanceTest extends TestCase
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $previous = Baseline::fromReport($report);
         $report = $report
-            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 2, 4), '>=8.2'))
+            ->withRun(new RunSettings('Acme internal API', 'acme/internal-api', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::parse('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 2, 4), '>=8.2'))
             ->withBaseline(BaselineComparison::compare($previous, $report, 'lockrot-baseline.json', []));
 
         $json = (new JsonFormatter())->format($report);
@@ -848,7 +848,7 @@ final class JsonSchemaConformanceTest extends TestCase
     {
         $report = self::analysis('apps/wallabag_wallabag')->report();
         $report = $report
-            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString(Verdict::STALE), RunSettings::SOURCE_OPTION, new Thresholds(), null, true))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse(Verdict::STALE), RunSettings::SOURCE_OPTION, new Thresholds(), null, true))
             ->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', []));
         $decoded = ReportSample::of(self::decoded((new JsonFormatter())->format($report)));
         $gate = JsonPath::arrayAt($decoded, ['gate']);
