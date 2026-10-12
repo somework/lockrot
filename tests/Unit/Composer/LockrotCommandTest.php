@@ -30,6 +30,7 @@ use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
@@ -816,7 +817,7 @@ final class LockrotCommandTest extends TestCase
     {
         $dir = sys_get_temp_dir().'/lockrot-badschema-'.bin2hex(random_bytes(8));
         mkdir($dir);
-        file_put_contents($dir.'/composer.json', json_encode(['extra' => ['lockrot' => ['fail-on' => 'dead']]]));
+        file_put_contents($dir.'/composer.json', json_encode(['extra' => ['lockrot' => ['include-dev' => 'yes']]]));
         chdir($dir);
         try {
             [$code, $stdout, $stderr] = $this->runWithSplitStreams([]);
@@ -949,13 +950,13 @@ final class LockrotCommandTest extends TestCase
      */
     public function testASchemaErrorAlsoNamesTheUnknownKeys(): void
     {
-        $this->fixtureCopy(self::LARAVEL_LOCK, ['install-tme' => 'off', 'fail-on' => 'dead']);
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['install-tme' => 'off', 'include-dev' => 'yes']);
 
         [$code, $stdout, $stderr] = $this->runWithSplitStreams([]);
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertStringStartsWith("lockrot: extra.lockrot is invalid:\n  - fail-on: ", $stderr);
+        self::assertStringStartsWith("lockrot: extra.lockrot is invalid:\n  - include-dev: ", $stderr);
         self::assertStringEndsWith("\n  - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n", $stderr);
         self::assertSame(1, substr_count($stderr, 'unknown key'), $stderr);
     }
@@ -1056,7 +1057,7 @@ final class LockrotCommandTest extends TestCase
      */
     public function testAConfigErrorQuotingAKeyThatLooksLikeMarkupIsPrintedAsWritten(): void
     {
-        $this->fixtureCopy(self::LARAVEL_LOCK, ['<<fg=red>>' => 1, 'fail-on' => 'dead']);
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['<<fg=red>>' => 1, 'include-dev' => 'yes']);
         $errors = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, false, new MarkupRefusingFormatter('<<'));
 
         [$code, $stdout] = $this->runWithErrorOutput([], $errors);
@@ -1092,7 +1093,7 @@ final class LockrotCommandTest extends TestCase
     /** A config error is coloured line by line, the error style, on a decorated stderr. */
     public function testADecoratedConfigErrorIsColouredLineByLine(): void
     {
-        $this->fixtureCopy(self::LARAVEL_LOCK, ['install-tme' => 'off', 'fail-on' => 'dead']);
+        $this->fixtureCopy(self::LARAVEL_LOCK, ['install-tme' => 'off', 'include-dev' => 'yes']);
         $errors = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true);
 
         [$code] = $this->runWithErrorOutput([], $errors);
@@ -1603,9 +1604,10 @@ final class LockrotCommandTest extends TestCase
         foreach ($findings as $package => $entry) {
             self::assertIsString($package);
             self::assertIsArray($entry);
+            $flags = array_keys(JsonPath::has($entry, ['flags']) ? JsonPath::arrayAt($entry, ['flags']) : []);
             $entries[$package] = [
                 'version' => JsonPath::stringAt($entry, ['version']),
-                'verdict' => JsonPath::stringAt($entry, ['verdict']),
+                'verdict' => (string) ($flags[0] ?? ''),
                 'first_seen' => JsonPath::stringAt($entry, ['first_seen']),
             ];
         }
@@ -1613,13 +1615,29 @@ final class LockrotCommandTest extends TestCase
         return $entries;
     }
 
-    /** @param array<string, array<string, string>> $findings */
+    /**
+     * The baseline-2 image of each entry: its recorded lead and every flag after it. An entry
+     * without a flag (advisories only) is left out.
+     *
+     * @param array<string, array<string, string>> $findings
+     */
     private function writeBaselineFile(string $path, array $findings): void
     {
+        $entries = [];
+        foreach ($findings as $package => $entry) {
+            if ($entry['verdict'] !== '') {
+                $entries[$package] = BaselineEntries::of((string) $package, $entry['version'], $entry['verdict'], $entry['first_seen']);
+            }
+        }
         file_put_contents($path, (string) json_encode([
-            'lockrot' => ['version' => Version::STRING, 'schema' => 1],
+            '$schema' => 'https://lockrot.dev/schema/baseline-2.json',
+            'lockrot' => ['version' => Version::STRING, 'schema' => 2],
             'generated_at' => self::FIXED_NOW,
-            'findings' => $findings,
+            'target_php' => '8.4',
+            'target_php_source' => 'option',
+            'score_model_id' => 1,
+            'fix_model' => 1,
+            'findings' => $entries === [] ? new \stdClass() : $entries,
         ], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");
     }
 
@@ -1788,12 +1806,12 @@ final class LockrotCommandTest extends TestCase
     {
         // json_decode() into objects cannot keep a property whose name starts with a NUL byte.
         yield 'a key starting with a NUL byte' => [
-            '{"lockrot": {"version": "0.1.0", "schema": 1}, "findings": {"\u0000acme/a": {}}}',
+            '{"lockrot": {"version": "0.14.0", "schema": 2}, "findings": {"\u0000acme/a": {}}}',
             'findings.\000acme/a: a key starting with a NUL byte cannot be read',
         ];
         // 1e400 reads as INF, which json_encode() refuses.
         yield 'a number too large for a float' => [
-            '{"lockrot": {"version": "0.1.0", "schema": 1e400}, "findings": {}}',
+            '{"lockrot": {"version": "0.14.0", "schema": 1e400}, "findings": {}}',
             '  - lockrot.schema: ',
         ];
     }
@@ -1888,8 +1906,7 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertCount(1, $errors);
-        self::assertStringStartsWith('lockrot: fail-on must be one of', $errors[0]);
-        self::assertStringEndsWith('got "dead"', $errors[0]);
+        self::assertStringStartsWith('lockrot: --fail-on: unknown value "dead"', $errors[0]);
     }
 
     /**
@@ -2470,13 +2487,11 @@ final class LockrotCommandTest extends TestCase
             $standing = JsonPath::arrayAt($finding, ['gate']);
             self::assertArrayHasKey($package, $levels, '--all gives every finding a result');
             $error = $levels[$package] === 'error';
-            self::assertSame($standing['reaches_fail_on'] && $standing['exempt_by'] !== 'baseline', $error, $package);
-            self::assertSame($standing['reaches_fail_on'] && $standing['exempt_by'] === null && !$gate['fail_on_applied'], $error && !$standing['fails'], $package.': the one place an error does not fail');
+            self::assertSame($standing['fails'], $error, $package.': a record is an error exactly when its finding fails the gate');
             $failing += $standing['fails'] ? 1 : 0;
-            $unjudged += $error && !$standing['fails'] ? 1 : 0;
         }
         self::assertSame($failing > 0, \in_array('fail_on', JsonPath::arrayAt($gate, ['tripped_by']), true));
-        self::assertSame($generate, $unjudged > 0, 'a generate run marks what reaches fail-on as error and fails nothing');
+        self::assertTrue(!$generate || $failing === 0, 'a generate run fails nothing');
     }
 
     /**
@@ -2903,7 +2918,7 @@ final class LockrotCommandTest extends TestCase
     public function testTheConfigurationIsReadFromTheManifestComposerNames(): void
     {
         $dir = $this->tempDir('lockrot-composer-env-config-');
-        file_put_contents($dir.'/alt.json', '{"extra": {"lockrot": {"fail-on": "dead"}}}');
+        file_put_contents($dir.'/alt.json', '{"extra": {"lockrot": {"include-dev": "yes"}}}');
         file_put_contents($dir.'/composer.json', '{}');
         copy(self::LARAVEL_LOCK, $dir.'/alt.lock');
         chdir($dir);

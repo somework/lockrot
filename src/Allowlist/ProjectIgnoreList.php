@@ -6,6 +6,7 @@ namespace Lockrot\Allowlist;
 
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Verdict\ScoreModel;
 
 /** @internal */
 final class ProjectIgnoreList
@@ -26,6 +27,32 @@ final class ProjectIgnoreList
         }
 
         return new Allowlist($entries, []);
+    }
+
+    /**
+     * Each `flags` list holds maintenance flags only. It runs before the config schema, so the
+     * allowlist's own message prints, never the schema's enum error.
+     *
+     * @param mixed $rows `extra.lockrot.ignore`
+     *
+     * @throws ConfigException for a flag that is not a maintenance flag, or an empty list
+     */
+    public static function checkFlags($rows): void
+    {
+        foreach (\is_array($rows) ? $rows : [] as $index => $row) {
+            $flags = \is_array($row) ? ($row['flags'] ?? null) : null;
+            if ($flags === null) {
+                continue;
+            }
+            if (!\is_array($flags) || $flags === []) {
+                throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list at least one maintenance flag', $index));
+            }
+            foreach ($flags as $flag) {
+                if (!\is_string($flag) || !isset(ScoreModel::POINTS[$flag])) {
+                    throw new ConfigException(\sprintf("extra.lockrot.ignore[%s] \"flags\": the allowlist accepts maintenance flags; accept advisories in Composer's audit policy (config.policy.advisories), which composer audit reads too", $index));
+                }
+            }
+        }
     }
 
     /**
@@ -54,7 +81,12 @@ final class ProjectIgnoreList
             throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] (%s) "version" must be a string', $index, $package));
         }
 
-        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), AllowlistEntry::BY_PROJECT);
+        $flags = $row['flags'] ?? null;
+        if ($flags !== null) {
+            self::checkFlags([$index => $row]);
+        }
+
+        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), AllowlistEntry::BY_PROJECT, \is_array($flags) ? array_values(array_unique(array_filter($flags, 'is_string'))) : null);
     }
 
     /** @param mixed $expires */
