@@ -168,7 +168,7 @@ foreach ($fixtures as $fixture) {
         if (preg_match(DRUPAL_NOTIFICATION, $notificationUrls[$package->name()] ?? '', $m) === 1) {
             foreach (['', '~dev'] as $suffix) {
                 $url = 'https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().$suffix.'.json';
-                $dir = $root.'/'.$fixture.'/http/p2';
+                $dir = $own !== null ? $own.'/p2' : $p2Dir;
                 if (!$isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
                     $result = $repositoryHttp->fetchAll([$url])[$url];
                     $record($dir, $result, $result->body() === null ? null : $trim($result->body(), $package->name()));
