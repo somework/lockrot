@@ -174,7 +174,7 @@ final class MoveBuilder
             $ga = $context->ga();
             if ($released === null) {
                 $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::UNDATED);
-            } elseif ($ga !== null && substr($released, 0, 10) < $ga->format('Y-m-d')) {
+            } elseif ($ga !== null && (new \DateTimeImmutable($released))->format('Y-m-d') < $ga->format('Y-m-d')) {
                 $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::RELEASED_BEFORE_GA);
             }
         }

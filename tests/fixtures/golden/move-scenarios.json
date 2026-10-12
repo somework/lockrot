@@ -4077,6 +4077,163 @@
             }
         }
     },
+    "pinned on a tag from the ga day": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.0.0",
+                "released": "2020-11-26T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "stale",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 1.0.0 (2020-11-26), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; stale stays"
+        }
+    },
+    "a security update merged with a later update": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [
+                "old-promise"
+            ],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.9.0",
+            "newest": "1.9.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "stale",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "a/b"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update a/b (gets 1.9.0) \u2014 clears old-promise and the advisory; stale stays"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "1.5.0",
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": {
+                "total": 18,
+                "verdict": "high",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "a blocked move beside an advisory": {
         "next_step": {
             "kind": "no-fix",
