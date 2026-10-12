@@ -127,6 +127,7 @@ final class AbandonedIgnoreTest extends TestCase
 
     public function testComposerPolicyZeroNamesTheVariable(): void
     {
+        self::needsPolicyApi();
         Platform::putEnv('COMPOSER_POLICY', '0');
         try {
             $off = self::read([])->notAuditedBy();
