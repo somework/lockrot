@@ -960,7 +960,7 @@ final class JsonSchemaConformanceTest extends TestCase
             'a code with two colons' => [['note_details', 0, 'code'], 'acme:lint:licence'],
             'offline data as a list' => [['note_details', 0, 'data'], []],
             'a known code with another code\'s data' => [['note_details', 1, 'data'], ['message' => 'x']],
-            'a count of no packages' => [['note_details', 12, 'data', 'package_count'], 0],
+            'a count of no packages' => [['note_details', 13, 'data', 'package_count'], 0],
             'an unreachable note naming no repository' => [['note_details', 10, 'data', 'repositories'], []],
             'a repository without its host' => [['note_details', 11, 'data', 'repositories', 0], ['repo' => 'workspace/one']],
             'a policy key that is not a string' => [['note_details', 4, 'data', 'policy_key'], 1],
