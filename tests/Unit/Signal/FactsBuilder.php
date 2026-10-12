@@ -97,7 +97,7 @@ final class FactsBuilder
         );
     }
 
-    public static function activity(bool $archived, ?string $pushedAt, string $forge = RepoRef::GITHUB): RepositoryActivity
+    public static function activity(?bool $archived, ?string $pushedAt, string $forge = RepoRef::GITHUB): RepositoryActivity
     {
         $host = [RepoRef::GITHUB => 'github.com', RepoRef::GITLAB => 'gitlab.com', RepoRef::BITBUCKET => 'bitbucket.org'][$forge];
 
