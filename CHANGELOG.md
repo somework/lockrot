@@ -33,6 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from vcs or an unknown origin. Path, artifact and package origins stay skips. S10 adds no flag.
   Action: list a GitLab host in Composer's `gitlab-domains`, or accept it in `accept-unchecked`.
   ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **Breaking:** **CLI:** `--fail-on=unchecked` also fails when the advisory lookup did not complete
+  for a package: S10 `{check: advisories}` with `offline`, `composer_too_old`,
+  `install_time_budget`, `lookup_failed` or `no_feed`. A package outside the `composer-repositories`
+  scope and a version that Composer cannot parse stay skips. Action: on Composer below 2.4, upgrade
+  Composer or run the PHAR. ([What was not checked](docs/verdicts.md#what-was-not-checked))
+- **All formats:** lockrot reads Composer's abandoned ignore list (`config.policy.abandoned.ignore`
+  on Composer 2.10+, `config.audit.ignore-abandoned` on 2.9), as `composer audit` does. A listed
+  package's abandoned marking no longer counts, and an archived repository still does. The finding
+  carries `abandoned_ignored`. ([Abandoned](docs/verdicts.md#abandoned))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
@@ -77,6 +86,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   read and why). ([Schema](docs/schema.md))
 - **All formats:** the run note `repository_activity_host_not_supported` names each repository host
   that lockrot cannot ask. ([Run notes](docs/notes.md#repository_activity_host_not_supported))
+- **json:** each finding writes `age`, `depth` and `named_in`, and the root `rot_depth` counts the
+  graded findings by depth. `age` holds four readings on the run clock: the installed release, the
+  newest release, the newest release of the installed branch and the last push. No score, gate or
+  sort reads these fields. ([Schema](docs/schema.md))
+- **json:** `libyears_at_least` marks a lower bound, and the root `libyears.at_least_count` counts
+  them. `security.records` and `security.feeds[]` say what each advisory repository holds and did
+  for the name. `run.advisory_lookup` says what the one advisory lookup of the run did.
+  ([Schema](docs/schema.md))
+- **All formats:** the run notes `abandoned_markings_ignored`, `abandoned_not_audited_by_composer`
+  and `abandoned_ignore_unreadable` say what Composer's abandoned ignore list and its audit setting
+  did. ([Run notes](docs/notes.md#abandoned_markings_ignored))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
   (`config.policy: false`, `policy.advisories: false`, `policy.advisories.audit: ignore` or
   `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
@@ -91,6 +111,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `.findings[] | [.flags[].summary]`.
   ([Schema](docs/schema.md#migrating-from-report-1))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
+- **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
+  and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
+  `shared_commit` or `undated` when the installed release has no trusted date. It is
+  `no_stable_release` or `undated_releases` when no dated stable release exists to measure to.
+  Action: match the new ids in jq. ([Libyears](docs/verdicts.md#libyears))
+- **All formats:** the run note `not_from_composer_repository` says whether the run asked those
+  packages' advisories (`data.advisories_asked`). ([Run notes](docs/notes.md#not_from_composer_repository))
 
 ### Removed
 
