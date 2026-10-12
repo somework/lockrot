@@ -111,7 +111,7 @@ final class Finding
         $this->dev = $dev;
         $this->directDependents = $directDependents;
         // No measurement means no dates were compared, or no repository was asked.
-        $libyears = $libyears ?? LibyearsMeasurement::unmeasured($fromComposerRepository ? Libyears::NO_STABLE_RELEASE_DATE : Libyears::NOT_FROM_COMPOSER_REPOSITORY);
+        $libyears = $libyears ?? LibyearsMeasurement::unmeasured($fromComposerRepository ? Libyears::UNDATED_RELEASES : Libyears::NOT_FROM_COMPOSER_REPOSITORY);
         // Libyears::measure() reads the flag first, so its first reason and the flag always agree.
         $unmeasuredAsNotAsked = $libyears->unmeasuredReason() === Libyears::NOT_FROM_COMPOSER_REPOSITORY;
         if ($unmeasuredAsNotAsked === $fromComposerRepository) {
@@ -404,6 +404,12 @@ final class Finding
         return $this->libyears->unmeasuredReason();
     }
 
+    /** Whether {@see libyears()} is a lower bound. False when it is null. */
+    public function isLibyearsAtLeast(): bool
+    {
+        return $this->libyears->isAtLeast();
+    }
+
     /**
      * The direct requirements that the chain does not name. Removing the chain's root from
      * composer.json leaves the package installed through any of them.
@@ -683,6 +689,7 @@ final class Finding
             'replacement_url' => $successor === null ? null : PackageOrigin::replacementPage($this->replacementNamedBy, $successor),
             'note' => $this->note,
             'libyears_unmeasured' => $this->libyears->unmeasuredReason(),
+            'libyears_at_least' => $this->libyears->isAtLeast(),
             'direct' => $this->isDirect(),
             'dev' => $this->dev,
             'reach' => self::reachOf($this->chain),

@@ -447,7 +447,7 @@ final class ReportTest extends TestCase
         self::assertSame(4.0, $block->direct());
         self::assertSame(2, $block->measured());
         self::assertSame(1, $block->unmeasured()[Libyears::BRANCH_SNAPSHOT]);
-        self::assertSame(['measured' => 2, 'unmeasured' => $block->unmeasured(), 'furthest_behind' => ['package' => 'vendor/direct', 'version' => '1.0.0', 'libyears' => 4.0]], array_diff_key(JsonPath::arrayAt($report->toArray(), ['libyears']), ['total' => true, 'direct_requirements' => true, 'packages' => true]));
+        self::assertSame(['measured' => 2, 'at_least_count' => 0, 'unmeasured' => $block->unmeasured(), 'furthest_behind' => ['package' => 'vendor/direct', 'version' => '1.0.0', 'libyears' => 4.0, 'at_least' => false]], array_diff_key(JsonPath::arrayAt($report->toArray(), ['libyears']), ['total' => true, 'direct_requirements' => true, 'packages' => true]));
         // and the block a consumer reads is recomputable from the findings it reads
         $sum = 0.0;
         foreach (JsonPath::arrayAt($report->toArray(), ['findings']) as $finding) {

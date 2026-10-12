@@ -417,8 +417,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame('Repository metadata unavailable: HTTP 503', $report->findings()[0]->evidence());
         self::assertTrue($report->findings()[0]->isFromComposerRepository(), 'a note, and still a package a repository was asked about');
         self::assertNull($report->findings()[0]->libyears());
-        self::assertSame(Libyears::METADATA_UNAVAILABLE, $report->findings()[0]->libyearsUnmeasured());
-        self::assertSame(1, $report->libyears()->unmeasured()[Libyears::METADATA_UNAVAILABLE]);
+        self::assertSame(Libyears::UNAVAILABLE, $report->findings()[0]->libyearsUnmeasured());
+        self::assertSame(1, $report->libyears()->unmeasured()[Libyears::UNAVAILABLE]);
     }
 
     public function testTwoFailedPackagesAreCountedInThePlural(): void

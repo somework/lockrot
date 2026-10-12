@@ -14,16 +14,24 @@ final class LibyearsMeasurement
 {
     private ?float $years;
     private ?string $unmeasured;
+    private bool $atLeast;
 
-    private function __construct(?float $years, ?string $unmeasured)
+    private function __construct(?float $years, ?string $unmeasured, bool $atLeast = false)
     {
         $this->years = $years;
         $this->unmeasured = $unmeasured;
+        $this->atLeast = $atLeast;
     }
 
     public static function of(float $years): self
     {
         return new self($years, null);
+    }
+
+    /** A lower bound: the newest release has no date that lockrot trusts, so the years run to the newest dated release above the installed one. */
+    public static function atLeast(float $years): self
+    {
+        return new self($years, null, true);
     }
 
     /** @param string $reason one of {@see Libyears::REASONS} */
@@ -40,6 +48,11 @@ final class LibyearsMeasurement
     public function years(): ?float
     {
         return $this->years;
+    }
+
+    public function isAtLeast(): bool
+    {
+        return $this->atLeast;
     }
 
     /** One of {@see Libyears::REASONS}, null when measured, also for zero years. */

@@ -488,7 +488,7 @@ final class Analyzer
             $note,
             $package->isDev(),
             array_keys($graph->chainsTo($package->name())),
-            Libyears::measure($package, $meta),
+            Libyears::measure($package, $meta, $facts->metadataStatus()),
             $package->origin(),
             AbandonedRule::replacementNamedBy($facts),
             AdvisoryRule::legacy($facts)[1]

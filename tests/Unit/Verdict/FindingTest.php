@@ -274,7 +274,7 @@ final class FindingTest extends TestCase
     public function testTheLibyearsAreWrittenToTwoDecimals(): void
     {
         self::assertSame(1.24, (new FindingBuilder())->withLibyears(LibyearsMeasurement::of(1.236))->build()->libyearsRounded());
-        self::assertNull((new FindingBuilder())->withLibyears(LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE))->build()->libyearsRounded());
+        self::assertNull((new FindingBuilder())->withLibyears(LibyearsMeasurement::unmeasured(Libyears::UNDATED_RELEASES))->build()->libyearsRounded());
     }
 
     public function testAFindingWithoutFlagsHasNoFlagSet(): void
@@ -469,7 +469,8 @@ final class FindingTest extends TestCase
         $array = $finding->toArray();
         self::assertSame(
             ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'activity', 'allowlist',
-                'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'direct', 'dev', 'reach', 'chain', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears'],
+                'abandoned_ignored', 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'libyears_at_least', 'direct', 'dev', 'reach', 'chain', 'depth', 'depth_unmeasured',
+                'named_in', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears', 'age'],
             array_keys($array)
         );
         self::assertSame('low', $array['priority'], 'the alias of the grade');
@@ -530,8 +531,9 @@ final class FindingTest extends TestCase
         $bare = (new FindingBuilder())->build();
 
         self::assertNull($bare->libyears());
-        self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->libyearsUnmeasured());
-        self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->toArray()['libyears_unmeasured']);
+        self::assertSame(Libyears::UNDATED_RELEASES, $bare->libyearsUnmeasured());
+        self::assertSame(Libyears::UNDATED_RELEASES, $bare->toArray()['libyears_unmeasured']);
+        self::assertFalse($bare->toArray()['libyears_at_least']);
     }
 
     /** Nothing was asked about a package outside every Composer repository, the first reason it goes unmeasured. */
@@ -547,7 +549,7 @@ final class FindingTest extends TestCase
     public static function measurementsAgainstTheFlag(): iterable
     {
         yield 'not asked, on a finding from a repository' => [LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), true];
-        yield 'another reason, on a finding from no repository' => [LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE), false];
+        yield 'another reason, on a finding from no repository' => [LibyearsMeasurement::unmeasured(Libyears::UNDATED_RELEASES), false];
         yield 'measured, on a finding from no repository' => [LibyearsMeasurement::of(1.0), false];
     }
 

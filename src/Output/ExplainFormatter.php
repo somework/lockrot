@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
-use Lockrot\Analyzer\Libyears;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\RepositoryUrl;
@@ -89,7 +88,7 @@ final class ExplainFormatter
         // After the note, which is usually the reason when libyears are not measured.
         $libyears = $finding->libyears();
         $lines[] = self::INDENT.self::escape($libyears === null
-            ? 'libyears not measured: '.Libyears::reasonWords($finding)
+            ? 'libyears not measured: '.CauseWords::of((string) $finding->libyearsUnmeasured())
             : \sprintf('libyears %.1F behind the newest stable release', $libyears));
 
         return $lines;

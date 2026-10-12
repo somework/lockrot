@@ -163,6 +163,6 @@ final class SplitPackageDatesTest extends TestCase
         self::assertEqualsWithDelta($expected, $withParent->libyears(), 0.0001);
         self::assertEqualsWithDelta(3.75, $withParent->libyears(), 0.005);
         self::assertNull($withoutParent->libyears(), 'without a parent the lock\'s date is all there is, and it is the shared commit\'s');
-        self::assertSame('no release date lockrot trusts', Libyears::reasonWords($withoutParent));
+        self::assertSame(Libyears::SHARED_COMMIT, $withoutParent->libyearsUnmeasured());
     }
 }
