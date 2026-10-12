@@ -759,6 +759,24 @@
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 1,
+   "packages_not_asked": 0,
+   "other_repositories": 1,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 1,
+     "records": 5
+    }
+   ]
   }
  },
  "activity_cache_oldest_at": null,
@@ -897,15 +915,45 @@
   "max_fan_in": 8
  },
  "unattributed": [],
+ "rot_depth": {
+  "flagged": 1,
+  "measured": 1,
+  "unmeasured": {
+   "unreached": 0,
+   "no_composer_json": 0
+  },
+  "by_reach": {
+   "direct": 1,
+   "transitive": 0,
+   "unreached": 0
+  },
+  "not_in_composer_json": 0,
+  "require_dev_not_walked": 0,
+  "production": 1,
+  "development": 0,
+  "by_depth": [
+   {
+    "depth": 0,
+    "flagged": 1
+   }
+  ],
+  "max_depth": 0,
+  "deepest": []
+ },
  "libyears": {
   "total": null,
   "direct_requirements": null,
   "measured": 0,
+  "at_least_count": 0,
   "unmeasured": {
-   "branch_snapshot": 0,
-   "no_stable_release_date": 0,
    "not_from_composer_repository": 1,
-   "metadata_unavailable": 0
+   "unavailable": 0,
+   "not_found": 0,
+   "branch_snapshot": 0,
+   "shared_commit": 0,
+   "undated": 0,
+   "no_stable_release": 0,
+   "undated_releases": 0
   },
   "furthest_behind": null,
   "packages": 1
@@ -1157,6 +1205,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 5,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 5,
+      "reason": null
+     }
+    ],
     "worst": "high",
     "counts": {
      "critical": 0,
@@ -1210,6 +1268,7 @@
     "cached_at": null
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": false,
    "origin": {
     "kind": "path",
@@ -1221,11 +1280,17 @@
    "replacement_url": null,
    "note": "not from a Composer repository, not checked",
    "libyears_unmeasured": "not_from_composer_repository",
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "mautic/core-lib"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "mautic/core-lib"
@@ -2909,6 +2974,16 @@
    "allowlist_reason": null,
    "data_date": null,
    "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "branch_snapshot",
+    "release": null,
+    "release_unmeasured": "not_from_composer_repository",
+    "branch_release": null,
+    "branch_release_unmeasured": "not_from_composer_repository",
+    "push": null,
+    "push_unmeasured": "not_from_composer_repository"
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,

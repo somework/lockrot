@@ -147,9 +147,9 @@ defs['years']['description'] = ('Years elapsed on the run clock (`Clock::yearsSi
                                 'The one-decimal rule is stated, not encoded: `multipleOf: 0.1` has no exact binary form and standard validators (ajv, '
                                 'python-jsonschema) reject a third of all tenths with it (attack round 1); only `multipleOf: 0.5` is used, which is exact.')
 defs['years'].pop('multipleOf', None)
-defs['advisoriesNotCheckedReason'] = open_set(['offline', 'composer_too_old', 'install_time_budget'],
+defs['advisoriesNotCheckedReason'] = open_set(['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed'],
     "Why security advisories were not checked (§5.1): `offline` (`--offline`; advisories are never served from a cache), `composer_too_old` "
-    "(Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out). "
+    "(Composer below 2.4 has no advisory API), `install_time_budget` (the install-time budget ran out), `lookup_failed` (a repository threw). "
     "An open set: read a reason you do not know as another reason.")
 defs['flag'] = closed(FLAGS, 'A flag id (§2.1), in the frozen flag order `abandoned silent pinned left-behind old-promise stale vulnerable`. Closed: a new flag is a report-3 event (§3.7, §8.2).')
 defs['maintenanceFlag'] = closed(MAINT, 'A maintenance flag id: the flag order without `vulnerable` (§2.1). The same closed set as `flag`, restricted; the values `lead`, an accepted flag and a baseline entry can name.')
@@ -531,6 +531,12 @@ SEC_COMMON = {
                                                                                   'not_from_composer_repository', 'unparseable_version', 'no_feed']}),
     'ignored': arr("The advisories Composer's audit policy ignores (§5.1; round 4 moves them here from S9).", ref('ignoredAdvisory')),
     'ignored_count': d('The length of `ignored` (I21).', INT0),
+    'records': nul(("The distinct advisories that every answering feed holds for this name, for all versions, before the ignore lists and attribution (C75). "
+                    "At least the counted advisories plus `ignored_count`. Null when no feed answered. Evidence only: no score, gate or flag reads it."), dict(INT0)),
+    'feeds': arr(("One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order (C75). "
+                  "A repository with no feed is left out. So is a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 "
+                  "or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none."),
+                 ref('advisoryFeed')),
 }
 defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advisory counts, even on a partial lookup. `vulnerable`'s facts live here and in the S9 rows (§2.1).", dict({
     'status': closed(['vulnerable'], 'The discriminator (closed, §8.2): an advisory counts.'),
@@ -544,6 +550,7 @@ defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advi
     'complete': SEC_COMMON['complete'],
     'unchecked_reason': nul("Why the lookup did not complete: `install_time_budget` or `lookup_failed`, an open set; null on a complete lookup.",
                             {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['install_time_budget', 'lookup_failed']}),
+    'records': SEC_COMMON['records'], 'feeds': SEC_COMMON['feeds'],
     'worst': d("The worst counted severity; severity gates and the pill tone read it (§5.4).", ref('severity')),
     'counts': obj('Counted advisories per severity, every severity present.', {k: d(f'Counted `{k}` advisories.', INT0) for k in SEVERITIES}),
     'ignored': SEC_COMMON['ignored'], 'ignored_count': SEC_COMMON['ignored_count'],
@@ -581,6 +588,7 @@ defs['securityClear'] = obj("`status: clear` (§7.6): nothing counts and the loo
     'check': d('Always `complete` on this shape (I21).', {'type': 'string', 'enum': ['complete']}),
     'complete': d('Always true on this shape.', {'type': 'boolean', 'enum': [True]}),
     'unchecked_reason': d('Always null on this shape.', {'type': 'null'}),
+    'records': SEC_COMMON['records'], 'feeds': SEC_COMMON['feeds'],
     'ignored': SEC_COMMON['ignored'], 'ignored_count': SEC_COMMON['ignored_count'],
 })
 defs['securityUnchecked'] = obj("`status: unchecked` (§7.6, round 4): nothing counts and the lookup did not complete, so nothing is promised clear.", {
@@ -589,6 +597,7 @@ defs['securityUnchecked'] = obj("`status: unchecked` (§7.6, round 4): nothing c
     'check': open_set(['partial', 'not_run'], ("How the advisory lookup went: `partial` or `not_run`; a complete lookup with nothing counted is `clear`. "
                       "An open set.")),
     'complete': SEC_COMMON['complete'], 'unchecked_reason': SEC_COMMON['unchecked_reason'],
+    'records': SEC_COMMON['records'], 'feeds': SEC_COMMON['feeds'],
     'ignored': SEC_COMMON['ignored'], 'ignored_count': SEC_COMMON['ignored_count'],
 })
 defs['security'] = d("The finding's advisories (§5.3, §7.6), told apart by `status` (closed: `vulnerable clear unchecked`). Two shapes: `vulnerable` carries the counts, the fix and the move pointer; `clear` and `unchecked` share the short shape.",
@@ -645,12 +654,13 @@ defs['findingFlag'] = obj("A fired flag (§2.1, §7.6): facts only, no weight or
 # checks
 # two lists: one shared entry would give each field the union of both vocabularies
 defs['checkMissing'] = obj("A check that did not run and raised S10 (S10's `unchecked[]` entry, restated as `checks_missing[]`; `--fail-on=unchecked` reads it).", {
-    'check': open_set(['repository_activity', 'release_dates', 'releases', 'release_metadata'], ("S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's "
-                      "age, dated only by a shared commit), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2, S8: a package from a vcs "
-                      "or an unknown origin, whose release metadata no Composer repository serves). An open set.")),
+    'check': open_set(['repository_activity', 'release_dates', 'advisories', 'releases', 'release_metadata'], ("S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's "
+                      "age, dated only by a shared commit), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), "
+                      "`release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.")),
     'reason': open_set(['no_token', 'anonymous_budget', 'install_time_budget', 'rate_limit', 'fetch_failed', 'offline', 'undated_releases', 'releases_unknown',
-                        'host_not_supported', 'not_from_composer_repository'],
-                       ('Why it did not run (§2.3, §7.9 page vocabulary): `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), '
+                        'composer_too_old', 'lookup_failed', 'host_not_supported', 'no_feed', 'not_from_composer_repository'],
+                       ('Why it did not run (§2.3, §7.9 page vocabulary): `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). '
+                        '`no_feed`: no Composer repository of the run publishes advisories (S9). '
                         '`not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or '
                         'package origin, the same gaps are skips. An open set: read an unknown reason as another reason.')),
     'blocks': arr('The signals that could not be read without it.', ref('signalId'), minItems=1, uniqueItems=True),
@@ -912,6 +922,135 @@ defs['activity']['allOf'] = [
      'anyOf': [{'properties': {'reason': {'not': {'enum': ['host_not_supported']}}}}, {'properties': {'host': {'type': 'string'}, 'forge': _N}}]},
 ]
 
+# the measurements and the reasons they are null (C72, C77, W12)
+UNMEASURED = ['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'unreached', 'no_composer_json', 'shared_commit', 'undated',
+              'no_stable_release', 'undated_releases', 'no_branch_row', 'above_listed_releases', 'allowlisted', 'no_repository', 'offline', 'rate_limit',
+              'fetch_failed', 'anonymous_budget', 'install_time_budget', 'no_token', 'repository_not_found', 'host_not_supported']
+_UN_INTRO = ("Each `*_unmeasured` key has its own known list (C77). An id means the same cause in every reason set, and one words table words them all. ")
+_UN_OPEN = " An open set: read an unknown reason as another reason."
+UNMEASURED_BY_KEY = {
+    'installedUnmeasured': (['branch_snapshot', 'shared_commit', 'undated'],
+                            "Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), "
+                            "or a lock entry with no date (`undated`)."),
+    'releaseUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'no_stable_release', 'undated_releases'],
+                          "Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release, or no dated stable release."),
+    'branchReleaseUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'no_branch_row', 'undated_releases', 'above_listed_releases'],
+                                "Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). "
+                                "Or a snapshot names no line, the installed branch has no release, its releases have no date, or the installed version is above every listed release."),
+    'pushUnmeasured': (ACT_REASONS + ['undated'], "Why `age.push` is null: `activity.reason` when the activity was not read, or `undated` when the answer carried no date."),
+    'libyearsUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'shared_commit', 'undated', 'no_stable_release', 'undated_releases'],
+                           "Why `libyears` is null. The metadata was not read (the `metadata.status` value). Or the installed end has no date that lockrot trusts "
+                           "(the id of `age.installed_unmeasured`). Or the release end has none (the id of `age.release_unmeasured`)."),
+    'depthUnmeasured': (['unreached', 'no_composer_json'], "Why `depth` is null: no path from the requirements that the run walked (`unreached`), or the run read no composer.json (`no_composer_json`)."),
+}
+assert sorted({v for vals, _ in UNMEASURED_BY_KEY.values() for v in vals}) == sorted(UNMEASURED), 'the per-key lists cover the words table ids'
+for _name, (_vals, _what) in UNMEASURED_BY_KEY.items():
+    defs[_name] = open_set(_vals, _UN_INTRO + _what + _UN_OPEN)
+defs['ageLevel'] = nul(("The threshold of `run.thresholds` that the reading passes (`warn` or `high`), from the exact ratio, as the signal decides it. Null below the warn "
+                        "threshold. Closed. It is not a flag: `signals[]` says whether a signal fired."), closed(['warn', 'high']))
+_AT = lambda what: d(what, ref('dateTime'))
+_Y = d('Years from `at` to `generated_at`: integer tenths on the run clock (a years field, §2.1).', ref('years'))
+_DB = lambda what: nul(what, ref('packageName'))
+defs['ageInstalled'] = obj(("The date that lockrot trusts for the installed release: the lock's `time`, or the tag of the same version on the monorepo parent. "
+                            "No threshold applies."), {
+    'at': _AT('The release date.'), 'years': _Y, 'dated_by': _DB('The monorepo parent that dates it. Null when the lock dates it.')})
+defs['ageRelease'] = obj(("The newest tag of the package by date, pre-releases counted. S2 judges this reading against the `release-*` thresholds, and S2's data "
+                          "quotes it when S2 fires."), {
+    'version': d('The tag.', {'type': 'string', 'minLength': 1}), 'at': _AT('Its date.'), 'years': _Y, 'level': ref('ageLevel'),
+    'dated_by': _DB('The monorepo parent that dates it. Null when its own tag dates it.')})
+defs['ageBranchRelease'] = obj(("The newest dated stable release on the installed branch (`finding.branch`), dated as S8 dates it. S8 judges it against the `release-*` "
+                                "thresholds, and S8's data quotes it when S8 fires. S8 also needs a living higher branch."), {
+    'version': d('The release.', {'type': 'string', 'minLength': 1}), 'at': _AT('Its date.'), 'years': _Y, 'level': ref('ageLevel'),
+    'dated_by': _DB('The monorepo parent that dates it. Null when its own tag dates it.')})
+defs['agePush'] = obj(("The last push (GitHub) or the last commit (GitLab, Bitbucket) of the repository. S4 judges this reading against the `push-*` thresholds. "
+                       "`activity.event` says which event it dates."), {
+    'at': _AT('The date that the host reported.'), 'years': _Y, 'level': ref('ageLevel')})
+_UN_REF = {'installed': 'installedUnmeasured', 'release': 'releaseUnmeasured', 'branch_release': 'branchReleaseUnmeasured', 'push': 'pushUnmeasured'}
+_UN = lambda k: nul(f"Why `{k}` is null (C77). Null when lockrot took the reading.", ref(_UN_REF[k]))
+defs['age'] = obj(("How old four dates are on the run clock (C72): the installed release, the newest release of the package, the newest release of the installed "
+                   "branch, and the last push or commit. No score, gate, sort or baseline reads them. A reading that lockrot could not take is null, with its reason beside it."), {
+    'installed': nul('The installed release. Null when not measured.', ref('ageInstalled')), 'installed_unmeasured': _UN('installed'),
+    'release': nul('The newest release of the package. Null when not measured.', ref('ageRelease')), 'release_unmeasured': _UN('release'),
+    'branch_release': nul(("The newest dated release of the installed branch. For a branch-alias snapshot (`5.4.x-dev`), the newest one of its own line. "
+                           "Null when not measured."), ref('ageBranchRelease')), 'branch_release_unmeasured': _UN('branch_release'),
+    'push': nul('The last push or commit of the repository. Null when not measured.', ref('agePush')), 'push_unmeasured': _UN('push'),
+}, allOf=[{'description': f'`{k}` is null exactly when `{k}_unmeasured` is set.',
+           'anyOf': [{'properties': {k: {'type': 'object'}, k + '_unmeasured': _N}}, {'properties': {k: _N, k + '_unmeasured': {'type': 'string'}}}]}
+          for k in ('installed', 'release', 'branch_release', 'push')])
+AI_BY = open_set(['policy.abandoned', 'audit.ignore-abandoned'], ("The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, "
+                 "Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting."), DOTTED)
+defs['abandonedIgnored'] = nul(("Composer's abandoned ignore list (the audit operation) matched this package. So lockrot did not raise its abandoned marking (S1), "
+                                "and the marking does not count. An archived repository (S3) and the liveness dates still count (C69). Null when no rule removed S1."),
+    obj('The ignored marking.', {
+        'by': AI_BY,
+        'rules': arr('Every pattern of the list that matches the package name, in config order.', obj('One matching pattern.', {
+            'pattern': d('The pattern as written. `*` is a wildcard.', {'type': 'string', 'minLength': 1}),
+            'reason': nul(("The reason of the pattern as Composer merges it, joined with `; `. The project's words: data, never inside a machine string. "
+                           "Null when the pattern gives none."), {'type': 'string'}),
+            'constraints': arr('The constraints written on the audit rules of the pattern. Neither composer audit nor lockrot applies them.',
+                               {'type': 'string', 'minLength': 1}, uniqueItems=True),
+        }), minItems=1),
+        'marking': d("The marking that lockrot did not raise: S1's data.", ref('s1')),
+    }))
+defs['composerJsonSection'] = closed(['require', 'require-dev'], 'A composer.json section whose keys name packages. Closed.')
+defs['depth'] = nul(("The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one (W12). "
+                     "No score, gate, sort or baseline reads it."), dict(INT0))
+REGISTRY = {'type': 'string', 'pattern': '^[a-z0-9][a-z0-9.-]*$', 'x-known-values': ['packagist.org', 'repo.packagist.com', 'wp-packages.org', 'packages.drupal.org']}
+defs['advisoryFeed'] = obj("What one advisory-capable Composer repository did for the name of this package (C75), in `run.advisory_lookup.repositories` order.", {
+    'composer_repository': d(("The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes."),
+                             {'type': 'string', 'minLength': 1}),
+    'registry': nul('The registry host for display, as `origin.registry` writes it. Null for another repository. An open set.', dict(REGISTRY)),
+    'answer': closed(['answered', 'failed', 'not_asked'], 'What this feed did for this name. Closed.'),
+    'records': nul('The distinct advisories that this feed holds for the name, for every version, before the ignore lists. Set on `answered`.', dict(INT0)),
+    'reason': nul('Why it did not answer: `lookup_failed` on `failed`, `not_from_composer_repository` on `not_asked`. Null on `answered`. An open set.',
+                  {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['lookup_failed', 'not_from_composer_repository']}),
+}, anyOf=[{'description': '`answered`: a count, no reason.', 'properties': {'answer': {'enum': ['answered']}, 'records': {'type': 'integer'}, 'reason': _N}},
+          {'description': '`failed`, `not_asked`: no count, a reason.', 'properties': {'answer': {'enum': ['failed', 'not_asked']}, 'records': _N, 'reason': {'type': 'string'}}}])
+defs['advisoryRepository'] = obj("One advisory-capable Composer repository of the run and what it did (C75), in configured order.", {
+    'composer_repository': d('The name that Composer gives the repository, credentials stripped (the join key).', {'type': 'string', 'minLength': 1}),
+    'registry': nul('The registry host for display. Null for another repository. An open set.', dict(REGISTRY)),
+    'outcome': closed(['answered', 'failed', 'not_asked', 'no_feed'], 'What the repository did in this run. `no_feed`: it publishes no advisories. Closed.'),
+    'reason': nul(("Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the "
+                   "composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set."),
+                  {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['offline', 'composer_too_old', 'install_time_budget', 'not_from_composer_repository',
+                                                                        'transport', 'invalid_response']}),
+    'message': nul('The first line of what the repository threw, credentials stripped. Foreign text, not contract. Set on `failed`.', {'type': 'string'}),
+    'packages_with_records': nul('Asked names with at least one record. Set on `answered`.', dict(INT0)),
+    'records': nul('Distinct records for all asked names. Set on `answered`.', dict(INT0)),
+}, anyOf=[
+    {'description': '`answered`: counts, no reason, no message.', 'properties': {'outcome': {'enum': ['answered']}, 'reason': _N, 'message': _N, 'packages_with_records': {'type': 'integer'}, 'records': {'type': 'integer'}}},
+    {'description': '`no_feed`: nothing to count, no reason.', 'properties': {'outcome': {'enum': ['no_feed']}, 'reason': _N, 'message': _N, 'packages_with_records': _N, 'records': _N}},
+    {'description': '`failed`: a reason and a message.', 'properties': {'outcome': {'enum': ['failed']}, 'reason': {'type': 'string'}, 'message': {'type': 'string'}, 'packages_with_records': _N, 'records': _N}},
+    {'description': '`not_asked`: a reason, no message.', 'properties': {'outcome': {'enum': ['not_asked']}, 'reason': {'type': 'string'}, 'message': _N, 'packages_with_records': _N, 'records': _N}},
+])
+defs['advisoryLookup'] = obj("How the one advisory lookup of the run went (C75): its scope, the packages it asked, and the outcome of each advisory-capable repository.", {
+    'scope': closed(['all', 'composer-repositories'], ("`extra.lockrot.advisory-lookup` as config-2 spells it: `all` (every locked package, the default) or "
+                                                       "`composer-repositories`. Closed.")),
+    'scope_source': closed(['config', 'default'], 'Where `scope` came from. Closed.'),
+    'packages_asked': d('Findings whose name went to at least one feed. Plus `packages_not_asked`, it is `packages_checked`.', INT0),
+    'packages_not_asked': d('Findings whose name went to no feed.', INT0),
+    'other_repositories': d('Configured repositories that publish no advisory API (vcs, path, artifact). lockrot counts them and never names them.', INT0),
+    'repositories': arr('Every advisory-capable repository, in configured order.', ref('advisoryRepository')),
+})
+defs['rotDepth'] = obj(("Where the graded findings sit below composer.json (W12): counts over graded findings. `flagged` equals `packages_flagged`. "
+                        "No score, gate or baseline reads it."), {
+    'flagged': d('Graded findings.', INT0),
+    'measured': d('Graded findings with a `depth`. Plus every `unmeasured` count, it is `flagged`.', INT0),
+    'unmeasured': obj('Graded findings without a depth, by `depth_unmeasured`. Every key is written.', {
+        'unreached': d('No path from the requirements that the run walked.', INT0), 'no_composer_json': d('The run read no composer.json.', INT0)}),
+    'by_reach': obj('Graded findings by `reach`. The three add up to `flagged`.', {k: d(f'Graded findings whose `reach` is `{k}`.', INT0) for k in ('direct', 'transitive', 'unreached')}),
+    'not_in_composer_json': d(("Graded findings with `named_in` empty in a run that read composer.json. A run that read none counts them in `unmeasured.no_composer_json` "
+                               "instead. `by_reach.direct` + `require_dev_not_walked` + `not_in_composer_json` + `unmeasured.no_composer_json` = `flagged`."), INT0),
+    'require_dev_not_walked': d('Graded findings that composer.json names only in require-dev and that are not direct, reached or unreached. 0 with --dev.', INT0),
+    'production': d('Graded findings in packages (`dev` false).', INT0),
+    'development': d('Graded findings in packages-dev (`dev` true). 0 without --dev.', INT0),
+    'by_depth': arr('One row per depth from 0 to `max_depth`, zero rows included, ascending. Empty when `max_depth` is null.', obj('One depth.', {
+        'depth': d('The depth.', INT0), 'flagged': d('Graded findings at this depth.', INT0)})),
+    'max_depth': nul('The largest `depth` of a graded finding. Null when no graded finding has a depth.', dict(INT0)),
+    'deepest': arr(("The graded findings at `max_depth`, by package name (bytewise), each with its own chain. Empty when `max_depth` is null or 0."), obj('One deepest finding.', {
+        'package': ref('packageName'), 'chain': arr('The `chain` of the finding.', ref('packageName'), minItems=2)})),
+})
+
 # finding
 FINDING = {
     'package': ref('packageName'),
@@ -945,17 +1084,26 @@ FINDING = {
     'metadata': ref('metadata'),
     'activity': ref('activity'),
     'allowlist': ref('allowlist'),
+    'abandoned_ignored': ref('abandonedIgnored'),
     'from_composer_repository': d("The lock entry carries a Composer notification-url (report-1): true exactly when `origin.kind` is `packagist` or `composer`.", {'type': 'boolean'}),
     'origin': copy.deepcopy(R1['definitions']['finding']['properties']['origin']),
     'replacement': nul(("0.13's successor (report-1's key, §5.6): S1's replacement when it is a package name other than the package itself, on a finding whose `abandoned` counts; "
                         "equals `next_step.replacement.package` on every `replace` move, null elsewhere (I21)."), ref('packageName')),
     'replacement_url': nul("packagist.org's page for `replacement` (report-1); null when `replacement` is null or another registry named it.", {'type': 'string', 'pattern': '^https?:\\/\\/'}),
     'note': nul(rendered('The rendering of `metadata` (§7.6, §7.11); null when there is nothing to say.', ['metadata'])['description'], {'type': 'string'}),
-    'libyears_unmeasured': copy.deepcopy(R1['definitions']['finding']['properties']['libyears_unmeasured']),
+    'libyears_unmeasured': nul(("Why `libyears` is null: the key of the root `libyears.unmeasured` that this finding counts under (C77). "
+                                "Set exactly when `libyears` is null."), ref('libyearsUnmeasured')),
+    'libyears_at_least': d(("Whether `libyears` is a lower bound: the newest release has no date that lockrot trusts, so the value runs to the newest dated "
+                            "release above the installed one (C77). False when `libyears` is null."), {'type': 'boolean'}),
     'direct': d('A direct requirement of the run.', {'type': 'boolean'}),
     'dev': d('Listed under packages-dev in the lock.', {'type': 'boolean'}),
     'reach': closed(['direct', 'transitive', 'unreached'], '`unreached` = not direct, with an empty `chain` (§7.6). Closed (§8.2).'),
     'chain': arr('From the direct requirement down to this package; one element when direct; empty when no direct requirement reaches it (report-1).', ref('packageName')),
+    'depth': ref('depth'),
+    'depth_unmeasured': nul('Why `depth` is null (C77). Set exactly when `depth` is null.', ref('depthUnmeasured')),
+    'named_in': arr(("The composer.json sections whose keys name this package, or name a package that it replaces or provides (W12), `require` first. "
+                     "lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). "
+                     "Not a reach fact: a run without --dev reaches a require-dev package through others."), ref('composerJsonSection'), uniqueItems=True, maxItems=2),
     'direct_dependents': arr('The direct requirements that reach it (report-1); a transitive move names them (§5.6).', ref('packageName')),
     'signals': arr('S1–S10 that fired, as report-1 orders them (§7.6).', ref('signal')),
     'evidence': rendered("The join of the counted flags' `flags[].summary` (a flag counts when a `score.terms[].flag` names it) as `<id>: <summary>` in flag order; kept for jq (§7.6). "
@@ -964,13 +1112,12 @@ FINDING = {
                              "when no entry applies. Not an alias of `allowlist.reason` (attack round 1): read that for every entry."), {'type': 'string'}),
     'data_date': nul('The time of the newest repository data the finding read (report-1); null when lockrot read none.', ref('dateTime')),
     'libyears': copy.deepcopy(R1['definitions']['finding']['properties']['libyears']),
+    'age': ref('age'),
     'baseline': ref('findingBaseline'),
     'gate': ref('findingGate'),
 }
 FINDING['note']['x-rendered-from'] = ['metadata']
 FINDING['origin']['description'] = "Where the lock entry came from (report-1's `packageOrigin`, unchanged; §8.2 \"unchanged … origin\")."
-FINDING['libyears_unmeasured']['description'] = FINDING['libyears_unmeasured']['description'].replace(
-    ' Optional: documents written before 0.13.0 do not carry it; from 0.13.0 on every finding does, as a string or null.', '')
 FINDING['libyears']['description'] = "Years between the installed release and the newest stable release, two decimals, at least 0; null when not measured (report-1, unchanged)."
 defs['finding'] = obj("One locked package judged (§7.6 field reference): every key always written, nulls explicit; `spec_flags_r3.py` `KEYS['finding']`.", FINDING)
 defs['packageOrigin'] = copy.deepcopy(R1['definitions']['packageOrigin'])
@@ -1143,6 +1290,7 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'fix_model': d("The fix classification's id (§8.3); baselines compare fixes only under equal fix models.", INT1),
     'text_grammar': d('The version of the sentence grammars: MoveText, GateText, FlagSentence, SignalSentence, NoteSentence, the suffix and the command renderings (§7.11, round 4). ScoreText is versioned apart, by `score_model.score_text_grammar`.', INT1),
     'score_model': ref('scoreModel'),
+    'advisory_lookup': ref('advisoryLookup'),
     'score_rules_used': {'description': ("Rule id → the number of findings on which the rule changed or decided a number (each count's predicate is a field test: "
                                          "graded findings; score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for "
                                          "`sort`. Keyed by `score_model.rules[].id`; an id absent from it shows no count. Keys follow the rule-id grammar, so a later id validates "
@@ -1177,10 +1325,11 @@ defs['rootFlagVulnerable'] = obj("`vulnerable`'s root counts (§7.6): it has no 
 NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 'advisory_ignore_unreadable', 'advisories_disabled_by_policy',
               'advisories_unavailable', 'advisories_not_checked', 'repository_activity_not_checked', 'repository_activity_anonymous_cap',
               'repository_activity_rate_limited', 'repository_activity_unreachable', 'repository_activity_not_found', 'repository_activity_host_not_supported',
-              'not_from_composer_repository']
+              'not_from_composer_repository', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
-    if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported'):
+    if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
+             'abandoned_ignore_unreadable'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
@@ -1191,6 +1340,24 @@ defs['noteAdvisoriesDisabledByPolicy'] = obj(("`advisories_disabled_by_policy` (
     'policy_key': open_set(['policy', 'policy.advisories', 'policy.advisories.audit', 'COMPOSER_POLICY'],
                            'The full Composer config key, or the environment variable `COMPOSER_POLICY`. Open.', POLICY_KEY),
     'value': d('Its value as configured (`false`, `"ignore"`, `"0"`).', {'type': ['boolean', 'string']}),
+})
+defs['noteAbandonedMarkingsIgnored'] = obj(("`abandoned_markings_ignored`: Composer's abandoned ignore list removed the abandoned marking (S1) of these packages. "
+                                            "Each of their findings carries `abandoned_ignored`."), {
+    'by': AI_BY,
+    'count': d('The number of packages: the length of `packages`.', INT1),
+    'packages': arr('The packages, in report order.', obj('One package and the patterns that matched it.', {
+        'package': ref('packageName'),
+        'patterns': arr('The matching patterns, as written.', {'type': 'string', 'minLength': 1}, minItems=1, uniqueItems=True),
+    }), minItems=1),
+})
+defs['noteAbandonedNotAuditedByComposer'] = obj(("`abandoned_not_audited_by_composer`: Composer's audit is set not to report abandoned packages. lockrot still counts "
+                                                 "the marking: the setting changes what composer audit prints, not the ignore list."), {
+    'policy_key': open_set(['policy', 'policy.abandoned', 'policy.abandoned.audit', 'audit.abandoned', 'COMPOSER_AUDIT_ABANDONED'],
+                           'The setting that says so: a config key, or the environment variable. An open set.', '^[A-Za-z][A-Za-z0-9_.-]*$'),
+    'value': d('Its value as configured (`ignore`, `false`).', {'type': ['boolean', 'string']}),
+})
+defs['noteAbandonedIgnoreUnreadable'] = obj("`abandoned_ignore_unreadable`: Composer rejected the abandoned ignore list, so every abandoned marking counts.", {
+    'message': d("The first line of Composer's message, as written. Foreign text, not contract.", {'type': 'string'}),
 })
 defs['noteRepositoryActivityHostNotSupported'] = obj(("`repository_activity_host_not_supported`: packages whose repository is on a host lockrot cannot ask. Each of their findings "
                                                       "carries `activity.reason` `host_not_supported`."), {
@@ -1212,8 +1379,13 @@ defs['noteDetail']['properties']['sets_network_failures']['description'] = ("Whe
 defs['noteDetail']['anyOf'] = [{'properties': {'code': {'enum': [c]}, 'data': ref(NOTE_DEFS[c])}} for c in NOTE_CODES] + [{
     'description': 'A note whose code this schema does not list, from a later release or not from lockrot: its data is any object.',
     'not': {'properties': {'code': {'enum': NOTE_CODES}}}}]
+defs['noteNotFromComposerRepository']['required'] = ['package_count', 'advisories_asked']
+defs['noteNotFromComposerRepository']['properties']['advisories_asked'] = d(
+    "Whether the run asked the advisory feeds about these packages by name: a copy of `run.advisory_lookup.scope` == `all`, so the sentence reads its own data.",
+    {'type': 'boolean'})
 defs['noteNotFromComposerRepository']['description'] = ("`not_from_composer_repository`: `package_count` packages carry no Composer notification-url, "
-    "so lockrot read no release metadata and no repository activity for them. Equal to the report's `not_from_composer_repository`.")
+    "so lockrot read no release metadata and no repository activity for them. It asked their advisories by name exactly when `advisories_asked` is true. "
+    "Equal to the report's `not_from_composer_repository`.")
 defs['baselineComparison'] = copy.deepcopy(R1['definitions']['baselineComparison'])
 defs['baselineComparison']['description'] = 'How the run compared with the baseline file (report-1, unchanged): the counts of findings by standing and the stale entries.'
 defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding counts the `gate:` line prints (§7.6).", {
@@ -1245,11 +1417,31 @@ defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8
 LIBY = copy.deepcopy(R1['properties']['libyears'])
 LIBY['required'] = LIBY['required'] + ['packages']
 LIBY['properties']['packages'] = d('The number of findings in the document (`packages_checked`): `measured` plus the `unmeasured` counts (all 108 generated documents; attack round 1 corrected this description).', INT0)
-LIBY['description'] = LIBY['description'].replace(' Absent from documents written before 0.11.0.', '') + ' report-2 adds `packages`.'
+LIBY['description'] = LIBY['description'].replace(' Absent from documents written before 0.11.0.', '') + (' report-2 adds `packages` and `at_least_count`. '
+    'It splits `metadata_unavailable` into `unavailable` and `not_found`, and it replaces `no_stable_release_date` with the ids that `age` gives the same cause.')
 # report-2 sums the published values, so a total row equals the column above it (report-1 summed the unrounded ones)
 _old_rule = ("`total` is the sum of the unrounded per-finding values (so the sum of the printed two-decimal values agrees with it to within 0.005 per "
              "measured finding), `direct_requirements` the same over `direct: true`")
 assert _old_rule in LIBY['description'], 'report-1 libyears wording changed'
+LIBY['required'] = ['total', 'direct_requirements', 'measured', 'at_least_count', 'unmeasured', 'furthest_behind', 'packages']
+LIBY['properties'] = {k: LIBY['properties'][k] for k in ('total', 'direct_requirements', 'measured')} | {
+    'at_least_count': d(("Findings whose `libyears_at_least` is true. Above 0, `total` is a lower bound, and so is `direct_requirements` when a direct finding "
+                         "is among them."), INT0),
+    'unmeasured': obj(("Findings with `libyears: null`, by `libyears_unmeasured`. Every key that report-2 writes is required, zeros included. A later minor release "
+                       "can add a key: an extra key is a count. `measured` plus every count is `packages`."), {
+        'not_from_composer_repository': d('No metadata was asked for: the lock entry carries no Composer notification-url.', INT0),
+        'unavailable': d('Metadata was asked for and did not come (`metadata.status` `unavailable`).', INT0),
+        'not_found': d('The Composer repository does not list the package (`metadata.status` `not_found`).', INT0),
+        'branch_snapshot': d('A dev pin (`dev-main`, `2.x-dev`): a commit date, not a release date.', INT0),
+        'shared_commit': d('A commit that other tags share dates the installed tag, and no parent tag dates it (`age.installed_unmeasured` `shared_commit`).', INT0),
+        'undated': d('The installed release has no date at all (`age.installed_unmeasured` `undated`).', INT0),
+        'no_stable_release': d('No stable release to measure to (`age.release_unmeasured` `no_stable_release`).', INT0),
+        'undated_releases': d('No dated release to measure to (`age.release_unmeasured` `undated_releases`).', INT0),
+    }, additionalProperties=INT0),
+    'furthest_behind': LIBY['properties']['furthest_behind'], 'packages': LIBY['properties']['packages']}
+_fb = LIBY['properties']['furthest_behind']['oneOf'][0]
+_fb['required'] = ['package', 'version', 'libyears', 'at_least']
+_fb['properties']['at_least'] = d("The `libyears_at_least` of the named finding: its value is a lower bound.", {'type': 'boolean'})
 LIBY['description'] = LIBY['description'].replace(_old_rule, ("`total` is the sum of the published two-decimal per-finding values, rounded to two decimals (report-1 summed the "
                                                               "unrounded values, so its total could differ from the sum of its own rows by up to 0.005 per finding), "
                                                               "`direct_requirements` the same over `direct: true`"))
@@ -1286,6 +1478,7 @@ ROOT = {
                         obj('An unattributed package.', {'package': ref('packageName'), 'verdict': ref('grade'), 'lead': nul('Its lead (jq: read `.lead`, §8.4).', ref('maintenanceFlag')),
                                                          'flag_ids': arr('Its counted flag ids.', ref('flag'), minItems=1, uniqueItems=True),
                                                          'fan_in': d('How many direct requirements reach it.', INT1)})),
+    'rot_depth': ref('rotDepth'),
     'libyears': LIBY,
     'baseline': nul("How the run compared with the baseline file: non-null whenever the run read one (report-1's rule), its counts from the findings' `baseline.status` "
                      "(zeros allowed: a run whose remaining findings all score 0 still names the file and its stale entries); null when no baseline file was read.",
@@ -1483,7 +1676,48 @@ def add_relations_activity(defs):
            [P(origin=P(kind=NOT('path', 'artifact', 'package'))), P(checks_missing=NONE(nfcr))])
 
 
+def add_relations_measurements(defs):
+    """The relations of the measurements, the ignored marking and the advisory feeds that draft-04 can state (C69, C72, C75, C77, W12)."""
+    import build_other_schemas as BO
+    P, E, NOT, NULL, STR, OBJ, MIN1, CONTAINS, NONE, relate = (BO.P, BO.E, BO.NOT, BO.NULL, BO.STR, BO.OBJ, BO.MIN1, BO.CONTAINS, BO.NONE, BO.relate)
+    num = {'type': 'number'}
+    meta = ['not_from_composer_repository', 'unavailable', 'not_found']
+    lacks = lambda sid: NONE(P(id=E(sid)))
+    relate(defs['finding'], ['`libyears` is null exactly when `libyears_unmeasured` is set (C77).',
+                             '`libyears_at_least` is true only on a measured `libyears`.',
+                             'Metadata that lockrot did not read gives its status as the libyears reason. Read metadata never gives one of those ids (C77).',
+                             '`depth` is null exactly when `depth_unmeasured` is set.',
+                             'A package that composer.json names in `require` is direct.',
+                             ('An ignored marking is not a signal. With `abandoned_ignored` set, `signals[]` holds no S1, `replacement` is null, and `abandoned` '
+                              'carries only the `archived` reason (C69).'),
+                             'S4 fired only beside a push reading at a level (C72: the signal quotes its reading).',
+                             'S2 fired only beside a release reading at a level.',
+                             'S8 fired only beside a branch_release reading at a level.',
+                             'Metadata that lockrot did not read gives its status as the release reasons of `age`. Read metadata never gives one of those ids (C77).',
+                             'An activity that lockrot did not read gives its reason as `age.push_unmeasured`. A reason that this schema does not list is not constrained.'],
+           [P(libyears=num, libyears_unmeasured=NULL), P(libyears=NULL, libyears_unmeasured=STR)],
+           [P(libyears_at_least=E(False)), P(libyears=num)],
+           [P(metadata=P(status=E('read')), libyears_unmeasured=NOT(*meta))] + [P(metadata=P(status=E(m)), libyears_unmeasured=E(m)) for m in meta]
+           + [P(metadata=P(status=NOT('read', *meta)))],
+           [P(depth={'type': 'integer'}, depth_unmeasured=NULL), P(depth=NULL, depth_unmeasured=STR)],
+           [P(named_in=NONE(E('require'))), P(reach=E('direct'))],
+           [P(abandoned_ignored=NULL), P(abandoned_ignored=OBJ, replacement=NULL, replacement_url=NULL, signals=lacks('S1'),
+                                         flags={'items': {'anyOf': [P(id=NOT('abandoned')), P(degree=P(reasons={'items': E('archived')}))]}})],
+           [P(signals=lacks('S4')), P(age=P(push=P(level=STR)))],
+           [P(signals=lacks('S2')), P(age=P(release=P(level=STR)))],
+           [P(signals=lacks('S8')), P(age=P(branch_release=P(level=STR)))],
+           [P(metadata=P(status=E('read')), age=P(release_unmeasured=NOT(*meta), branch_release_unmeasured=NOT(*meta)))]
+           + [P(metadata=P(status=E(m)), age=P(release_unmeasured=E(m), branch_release_unmeasured=E(m))) for m in meta]
+           + [P(metadata=P(status=NOT('read', *meta)))],
+           [P(activity=P(status=E('read')))] + [P(activity=P(reason=E(r)), age=P(push_unmeasured=E(r))) for r in ACT_REASONS] + [P(activity=P(reason=NOT(*ACT_REASONS)))])
+    for name in ('securityVulnerable', 'securityClear', 'securityUnchecked'):
+        relate(defs[name], ['A complete lookup has every feed answered, and a record count (C75).', '`records` is null exactly when no feed answered.'],
+               [P(check=E('complete'), feeds=dict(MIN1, items=P(answer=E('answered'))), records={'type': 'integer'}), P(check=NOT('complete'))],
+               [P(records={'type': 'integer'}, feeds=CONTAINS(P(answer=E('answered')))), P(records=NULL, feeds=NONE(P(answer=E('answered'))))])
+
+
 add_relations_activity(defs)
+add_relations_measurements(defs)
 
 
 ROOT_RELATIONS = [

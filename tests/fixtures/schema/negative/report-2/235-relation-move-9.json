@@ -763,6 +763,24 @@
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 1,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 0,
+     "records": 0
+    }
+   ]
   }
  },
  "activity_cache_oldest_at": "2026-10-01T16:05:49+00:00",
@@ -896,20 +914,63 @@
   "max_fan_in": 8
  },
  "unattributed": [],
+ "rot_depth": {
+  "flagged": 1,
+  "measured": 1,
+  "unmeasured": {
+   "unreached": 0,
+   "no_composer_json": 0
+  },
+  "by_reach": {
+   "direct": 0,
+   "transitive": 1,
+   "unreached": 0
+  },
+  "not_in_composer_json": 1,
+  "require_dev_not_walked": 0,
+  "production": 0,
+  "development": 1,
+  "by_depth": [
+   {
+    "depth": 0,
+    "flagged": 0
+   },
+   {
+    "depth": 1,
+    "flagged": 1
+   }
+  ],
+  "max_depth": 1,
+  "deepest": [
+   {
+    "package": "jfcherng/php-color-output",
+    "chain": [
+     "jfcherng/php-diff",
+     "jfcherng/php-color-output"
+    ]
+   }
+  ]
+ },
  "libyears": {
   "total": 1,
   "direct_requirements": 0,
   "measured": 1,
+  "at_least_count": 0,
   "unmeasured": {
-   "branch_snapshot": 0,
-   "no_stable_release_date": 0,
    "not_from_composer_repository": 0,
-   "metadata_unavailable": 0
+   "unavailable": 0,
+   "not_found": 0,
+   "branch_snapshot": 0,
+   "shared_commit": 0,
+   "undated": 0,
+   "no_stable_release": 0,
+   "undated_releases": 0
   },
   "furthest_behind": {
    "package": "jfcherng/php-color-output",
    "version": "2.0.2",
-   "libyears": 1
+   "libyears": 1,
+   "at_least": false
   },
   "packages": 1
  },
@@ -1177,6 +1238,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
     "ignored": [],
     "ignored_count": 0
    },
@@ -1200,6 +1271,7 @@
     "cached_at": "2026-10-01T16:05:49+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -1211,6 +1283,7 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": false,
    "dev": true,
    "reach": "transitive",
@@ -1218,6 +1291,9 @@
     "jfcherng/php-diff",
     "jfcherng/php-color-output"
    ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
    "direct_dependents": [
     "jfcherng/php-diff"
    ],
@@ -1251,6 +1327,36 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:33+00:00",
    "libyears": 1,
+   "age": {
+    "installed": {
+     "at": "2020-05-27T19:24:44+00:00",
+     "years": 6.3,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "3.0.0",
+     "at": "2021-05-27T02:45:54+00:00",
+     "years": 5.3,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "2.0.2",
+     "at": "2020-05-27T19:24:44+00:00",
+     "years": 6.3,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-08-08T09:54:48+00:00",
+     "years": 0.1,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": false,

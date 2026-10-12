@@ -67,7 +67,8 @@ LIBYEARS_013_KEYS = ['branch_snapshot', 'no_stable_release_date', 'not_from_comp
 # The base documents make_negatives.py mutates, by file stem.
 NEGATIVE_BASES = ['composite', 'A', 'A-baselined-dagger', 'A-blocked-dagger', 'B-baselined-dagger', 'B-dev-dagger', 'C-baselined-dagger', 'D-partial-dagger',
                   'E-ignored-dagger', 'baseline-read-score0', 'composite-generate-baseline', 'ok-unchecked', 'partial-op-dagger', 'psr-log', 'rounded-dev-dagger',
-                  'routing', 'scope-registries-dagger', 'stale-only', 'unknown', 'host-unsupported', 'not-found-dagger', 'gitlab-anon-dagger', 'local-path-advisory']
+                  'routing', 'scope-registries-dagger', 'stale-only', 'unknown', 'host-unsupported', 'not-found-dagger', 'gitlab-anon-dagger', 'local-path-advisory',
+                  'ignored-marking-archived-dagger', 'ignored-marking-stale-dagger', 'no-feed-dagger']
 
 
 class Projection:
@@ -110,8 +111,19 @@ def s10_words(entry, f):
         cause = 'lockrot cannot tell which repository serves it' if f['origin']['kind'] == 'unknown' else 'not installed from a Composer repository'
         what, blocks = {'release_metadata': ('release metadata', 'S2 and S8'), 'repository_activity': ('repository activity', 'S3 and S4')}[entry['check']]
         return '%s not checked (%s), so %s could not be read' % (what, cause, blocks)
+    if entry['check'] == 'advisories' and entry['reason'] in ADVISORY_CAUSES:
+        return 'security advisories not checked (%s), so S9 could not be read' % ADVISORY_CAUSES[entry['reason']]
     return None
 
+
+# NotCheckedRule's cause words for an advisories entry.
+ADVISORY_CAUSES = {
+    'offline': 'the run is offline',
+    'composer_too_old': 'Composer is older than 2.4',
+    'install_time_budget': 'the install-time budget ran out',
+    'lookup_failed': 'an advisory repository failed',
+    'no_feed': 'no configured repository publishes advisories',
+}
 
 # NotCheckedRule writes the origin and activity entries before the others.
 S10_FIRST = ['release_metadata', 'repository_activity']

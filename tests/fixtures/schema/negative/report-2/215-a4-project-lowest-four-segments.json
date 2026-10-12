@@ -763,6 +763,24 @@
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 1,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 1,
+     "records": 26
+    }
+   ]
   }
  },
  "activity_cache_oldest_at": "2026-10-01T16:05:47+00:00",
@@ -896,20 +914,51 @@
   "max_fan_in": 8
  },
  "unattributed": [],
+ "rot_depth": {
+  "flagged": 1,
+  "measured": 1,
+  "unmeasured": {
+   "unreached": 0,
+   "no_composer_json": 0
+  },
+  "by_reach": {
+   "direct": 1,
+   "transitive": 0,
+   "unreached": 0
+  },
+  "not_in_composer_json": 0,
+  "require_dev_not_walked": 0,
+  "production": 1,
+  "development": 0,
+  "by_depth": [
+   {
+    "depth": 0,
+    "flagged": 1
+   }
+  ],
+  "max_depth": 0,
+  "deepest": []
+ },
  "libyears": {
   "total": 2.04,
   "direct_requirements": 2.04,
   "measured": 1,
+  "at_least_count": 0,
   "unmeasured": {
-   "branch_snapshot": 0,
-   "no_stable_release_date": 0,
    "not_from_composer_repository": 0,
-   "metadata_unavailable": 0
+   "unavailable": 0,
+   "not_found": 0,
+   "branch_snapshot": 0,
+   "shared_commit": 0,
+   "undated": 0,
+   "no_stable_release": 0,
+   "undated_releases": 0
   },
   "furthest_behind": {
    "package": "twig/twig",
    "version": "v2.16.1",
-   "libyears": 2.04
+   "libyears": 2.04,
+   "at_least": false
   },
   "packages": 1
  },
@@ -1225,6 +1274,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 26,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 26,
+      "reason": null
+     }
+    ],
     "worst": "critical",
     "counts": {
      "critical": 1,
@@ -1270,6 +1329,7 @@
     "cached_at": "2026-10-01T16:05:47+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -1281,11 +1341,17 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "twig/twig"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "symfony/twig-bridge",
@@ -2133,6 +2199,36 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:20+00:00",
    "libyears": 2.04,
+   "age": {
+    "installed": {
+     "at": "2024-09-09T17:53:56+00:00",
+     "years": 2.1,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v3.30.0",
+     "at": "2026-09-25T13:20:01+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v2.16.1",
+     "at": "2024-09-09T17:53:56+00:00",
+     "years": 2.1,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-30T20:43:40+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,

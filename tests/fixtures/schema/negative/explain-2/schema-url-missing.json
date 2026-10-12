@@ -254,6 +254,16 @@
    "check": "complete",
    "complete": true,
    "unchecked_reason": null,
+   "records": 1,
+   "feeds": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "answer": "answered",
+     "records": 1,
+     "reason": null
+    }
+   ],
    "worst": "high",
    "counts": {
     "critical": 0,
@@ -310,6 +320,7 @@
    "cached_at": "2026-10-01T16:03:43+00:00"
   },
   "allowlist": null,
+  "abandoned_ignored": null,
   "from_composer_repository": true,
   "origin": {
    "kind": "packagist",
@@ -321,11 +332,17 @@
   "replacement_url": null,
   "note": null,
   "libyears_unmeasured": null,
+  "libyears_at_least": false,
   "direct": true,
   "dev": false,
   "reach": "direct",
   "chain": [
    "symfony/monolog-bridge"
+  ],
+  "depth": 0,
+  "depth_unmeasured": null,
+  "named_in": [
+   "require"
   ],
   "direct_dependents": [
    "symfony/monolog-bridge"
@@ -423,6 +440,36 @@
   "allowlist_reason": null,
   "data_date": "2026-10-01T17:39:31+00:00",
   "libyears": 10.62,
+  "age": {
+   "installed": {
+    "at": "2016-01-14T10:11:35+00:00",
+    "years": 10.7,
+    "dated_by": "symfony/symfony"
+   },
+   "installed_unmeasured": null,
+   "release": {
+    "version": "v6.4.45",
+    "at": "2026-08-30T01:18:12+00:00",
+    "years": 0.1,
+    "level": null,
+    "dated_by": null
+   },
+   "release_unmeasured": null,
+   "branch_release": {
+    "version": "v2.8.52",
+    "at": "2019-11-13T08:36:42+00:00",
+    "years": 6.9,
+    "level": "high",
+    "dated_by": "symfony/symfony"
+   },
+   "branch_release_unmeasured": null,
+   "push": {
+    "at": "2026-09-23T14:28:05+00:00",
+    "years": 0,
+    "level": null
+   },
+   "push_unmeasured": null
+  },
   "baseline": null,
   "gate": {
    "reaches_fail_on": true,
@@ -1461,6 +1508,24 @@
     }
    ],
    "docs": "https://lockrot.dev/verdicts/model-1/"
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 1,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 1,
+     "records": 1
+    }
+   ]
   }
  },
  "legacy": {

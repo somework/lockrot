@@ -759,6 +759,24 @@
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 1,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 1,
+     "records": 2
+    }
+   ]
   }
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:36+00:00",
@@ -897,20 +915,51 @@
   "max_fan_in": 8
  },
  "unattributed": [],
+ "rot_depth": {
+  "flagged": 1,
+  "measured": 1,
+  "unmeasured": {
+   "unreached": 0,
+   "no_composer_json": 0
+  },
+  "by_reach": {
+   "direct": 1,
+   "transitive": 0,
+   "unreached": 0
+  },
+  "not_in_composer_json": 0,
+  "require_dev_not_walked": 0,
+  "production": 1,
+  "development": 0,
+  "by_depth": [
+   {
+    "depth": 0,
+    "flagged": 1
+   }
+  ],
+  "max_depth": 0,
+  "deepest": []
+ },
  "libyears": {
   "total": 9.45,
   "direct_requirements": 9.45,
   "measured": 1,
+  "at_least_count": 0,
   "unmeasured": {
-   "branch_snapshot": 0,
-   "no_stable_release_date": 0,
    "not_from_composer_repository": 0,
-   "metadata_unavailable": 0
+   "unavailable": 0,
+   "not_found": 0,
+   "branch_snapshot": 0,
+   "shared_commit": 0,
+   "undated": 0,
+   "no_stable_release": 0,
+   "undated_releases": 0
   },
   "furthest_behind": {
    "package": "geoip2/geoip2",
    "version": "v2.4.5",
-   "libyears": 9.45
+   "libyears": 9.45,
+   "at_least": false
   },
   "packages": 1
  },
@@ -1225,6 +1274,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 2,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 2,
+      "reason": null
+     }
+    ],
     "worst": "high",
     "counts": {
      "critical": 0,
@@ -1318,6 +1377,7 @@
     "cached_at": "2026-10-01T16:04:36+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -1329,11 +1389,17 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "geoip2/geoip2"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "geoip2/geoip2"
@@ -1465,6 +1531,36 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:40:36+00:00",
    "libyears": 9.45,
+   "age": {
+    "installed": {
+     "at": "2017-01-31T17:28:48+00:00",
+     "years": 9.7,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v3.4.0",
+     "at": "2026-07-16T22:11:20+00:00",
+     "years": 0.2,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v2.13.0",
+     "at": "2022-08-05T20:32:58+00:00",
+     "years": 4.2,
+     "level": "warn",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-28T16:14:09+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,
