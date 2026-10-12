@@ -152,11 +152,11 @@ final class GateAgreementTest extends TestCase
     {
         $run = JsonPath::arrayAt($document, ['run']);
         $this->same($failOn->value(), $run['fail_on'], $what);
-        $this->same(['none' => [], 'priority' => ['grade'], 'verdict' => ['flag'], 'unchecked' => ['unchecked']][$failOn->kind()], JsonPath::column($run, ['gates'], 'kind'), $what);
+        $this->same($failOn->kinds(), JsonPath::column($run, ['gates'], 'kind'), $what);
         $this->same($strict, $run['strict_network'], $what);
         $this->same($mode, $run['mode'], $what);
         $gate = JsonPath::arrayAt($document, ['gate']);
-        $this->same(['fails', 'tripped_by', 'fail_on_applied', 'reaching', 'failing', 'exempt'], array_keys($gate), $what);
+        $this->same(['fails', 'tripped_by', 'fail_on_applied', 'reaching', 'failing', 'exempt', 'failing_by', 'not_applied', 'text'], array_keys($gate), $what);
         $trippedBy = JsonPath::arrayAt($gate, ['tripped_by']);
         $applied = $gate['fail_on_applied'];
         $this->same($mode === Gate::MODE_CHECK, $applied, $what);
@@ -166,6 +166,7 @@ final class GateAgreementTest extends TestCase
         foreach ($report->findings() as $finding) {
             $byPackage[$finding->package()] = $finding;
         }
+        $levelGate = Gate::decide($report, $failOn, $strict, $mode);
         foreach (JsonPath::arrayAt($document, ['findings']) as $row) {
             if (!\is_array($row)) {
                 $this->same('an object', $row, $what.': a finding');
@@ -177,19 +178,20 @@ final class GateAgreementTest extends TestCase
             $standing = JsonPath::arrayAt($row, ['gate']);
             $this->seen['finding '.json_encode(\array_slice($standing, 0, 3, true))] = true;
             ['reaches_fail_on' => $reaches, 'fails' => $fails, 'exempt_by' => $exemptBy] = $standing;
-            $this->same([[], null], [$standing['by'], $standing['basis']], $where.': the gate values and the basis wait for their pull requests');
-            $this->same($failOn->reaches($finding), $reaches, $where);
-            $this->same($reaches && $exemptBy === null && $applied, $fails, $where.': fails');
-            $status = $report->baseline() === null ? null : $report->baseline()->statusOf($finding->package());
-            $this->same($status === 'known' && $reaches, $exemptBy === Gate::EXEMPT_BASELINE, $where.': exempt by the baseline');
-            if ($exemptBy !== null) {
-                $this->same(true, $reaches, $where.': only what reaches is exempt');
+            $values = JsonPath::column($document, ['run', 'gates'], 'value');
+            $this->same($fails, $standing['by'] !== [], $where.': a finding fails exactly when it names a value');
+            foreach (JsonPath::arrayAt($row, ['gate', 'by']) as $by) {
+                $this->same(true, \is_array($by) && \in_array($by['value'], $values, true) && $by['facts'] !== [], $where.': each failing value is active and names a fact (I15b)');
             }
+            $this->same(false, $fails && !$applied, $where.': a generate run fails nothing');
+            if ($exemptBy !== null) {
+                $this->same([true, false, true], [$reaches, $fails, $standing['basis'] !== null], $where.': only a reaching finding under an entry is exempt');
+            }
+            $status = $report->baseline() === null ? null : $report->baseline()->statusOf($finding->package());
             if ($status === 'worsened' && $fails) {
                 $this->seen['worsened fails'] = true;
             }
-            // The annotation level reads the same two primitives by its own rule, the same in both modes.
-            $this->same($reaches && $exemptBy !== Gate::EXEMPT_BASELINE, $levels->levelOf($finding, $report->baseline()) === FormatContext::LEVEL_ERROR, $where.': level');
+            $this->same($fails, $levels->levelOf($finding, $levelGate->standingOf($finding->package()), $report->baseline()) === FormatContext::LEVEL_ERROR, $where.': level');
             $anyFails = $anyFails || $fails;
         }
 
@@ -199,8 +201,7 @@ final class GateAgreementTest extends TestCase
         $this->same(array_values(array_filter(Gate::TRIPS, static fn (string $trip): bool => \in_array($trip, $trippedBy, true))), $trippedBy, $what.': unique, in order');
         $this->seen['tripped_by '.json_encode($trippedBy)] = true;
 
-        $oracle = $mode === Gate::MODE_CHECK ? self::oracleExitCode($report, $failOn, $strict) : ($strict && $report->hadNetworkFailures() ? 1 : 0);
-        $this->same($oracle, $gate['fails'] ? 1 : 0, $what.': the exit code of oracleExitCode()');
+        $this->same(($strict && $report->hadNetworkFailures()) || $anyFails ? 1 : 0, $gate['fails'] ? 1 : 0, $what.': the exit code is a failing finding or a failed lookup under --strict-network');
     }
 
     /**
@@ -216,28 +217,6 @@ final class GateAgreementTest extends TestCase
         if ($expected !== $actual) {
             $this->mismatches[] = $what.': expected '.json_encode($expected).', got '.json_encode($actual);
         }
-    }
-
-    /** The exit code rule, written out here independently of the gate. */
-    private static function oracleExitCode(Report $report, FailOn $threshold, bool $strict): int
-    {
-        if ($strict && $report->hadNetworkFailures()) {
-            return 1;
-        }
-        if ($threshold->isNone()) {
-            return 0;
-        }
-        $baseline = $report->baseline();
-        foreach ($report->findings() as $finding) {
-            if ($baseline !== null && $baseline->isKnown($finding->package())) {
-                continue;
-            }
-            if ($threshold->reaches($finding)) {
-                return 1;
-            }
-        }
-
-        return 0;
     }
 
     /**

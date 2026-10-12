@@ -29,10 +29,11 @@ use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/** A package whose only fact is an advisory is not written into a baseline-1 file, and is not new on the next run.
+/** A package whose only fact is an advisory gets an entry without flags in baseline-2, and is known on the next run.
  *
  * @coversNothing
  *
@@ -95,7 +96,7 @@ final class BaselineRegressionTest extends TestCase
         rmdir($this->dir);
     }
 
-    public function testAGeneratedBaselineIsBaseline1AndTheVulnerableOnlyPackageIsNotNewOnTheNextRun(): void
+    public function testAnAdvisoryOnlyPackageIsWrittenAsAnAdvisoryEntryAndIsKnownOnTheNextRun(): void
     {
         $report = $this->jsonRun(['--format' => 'json', '--target-php' => '8.4']);
         self::assertNull(self::finding($report, self::SEEDED)['lead'], 'no maintenance flag: report-1 called the seeded package ok');
@@ -107,12 +108,13 @@ final class BaselineRegressionTest extends TestCase
         $generate = $this->tester();
         self::assertSame(0, $generate->execute(['--generate-baseline' => true, '--target-php' => '8.4']));
         $baseline = (string) file_get_contents($this->dir.'/lockrot-baseline.json');
-        $this->assertValid(Schemas::BASELINE, $baseline, 'the generated baseline', false, 1);
-        $this->assertValid(Schemas::BASELINE, $baseline, 'the generated baseline', true, 1);
+        $this->assertValid(Schemas::BASELINE, $baseline, 'the generated baseline', false, 2);
+        $this->assertValid(Schemas::BASELINE, $baseline, 'the generated baseline', true, 2);
         $written = json_decode($baseline, true, 512, \JSON_THROW_ON_ERROR);
         self::assertIsArray($written);
         self::assertIsArray($written['findings']);
-        self::assertArrayNotHasKey(self::SEEDED, $written['findings']);
+        self::assertSame(['PKSA-seeded-1'], array_keys(JsonPath::arrayAt($written, ['findings', self::SEEDED, 'advisories'])));
+        self::assertArrayNotHasKey('flags', JsonPath::arrayAt($written, ['findings', self::SEEDED]));
 
         $next = $this->tester();
         self::assertSame(0, $next->execute(['--format' => 'json', '--fail-on' => 'low', '--target-php' => '8.4']), $next->getDisplay());
@@ -120,7 +122,7 @@ final class BaselineRegressionTest extends TestCase
         self::assertIsArray($read);
         self::assertIsArray($read['baseline']);
         self::assertSame(0, $read['baseline']['new']);
-        self::assertNull(self::finding($read, self::SEEDED)['baseline']);
+        self::assertSame('known', JsonPath::stringAt(self::finding($read, self::SEEDED), ['baseline', 'status']));
     }
 
     /**

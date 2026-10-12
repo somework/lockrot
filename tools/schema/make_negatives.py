@@ -778,6 +778,47 @@ def _(d): d['rot_depth']['deepest'][0]['chain'] = d['rot_depth']['deepest'][0]['
 @case('w12-rot-depth-null', 'composite', 'rot_depth')
 def _(d): d['rot_depth'] = None
 
+# the gate line facts
+@case('c67-failing-by-missing', 'composite', 'gate.failing_by')
+def _(d): del d['gate']['failing_by']
+@case('c67-text-empty', 'composite', 'gate.text')
+def _(d): d['gate']['text'] = ''
+@case('c67-failing-by-in-a-none-run', 'B-gate-none', '(root)')
+def _(d): d['gate']['failing_by'] = [dict(value='high', failing=0)]
+@case('c67-failing-in-generate-mode', 'composite-generate-baseline', '(root)')
+def _(d): d['gate']['failing_by'][0]['failing'] = 5
+@case('c67-not-applied-zero-packages', 'scope-registries-dagger', 'gate.not_applied[0].packages')
+def _(d): d['gate']['not_applied'][0]['packages'] = 0
+# accept-unchecked as data: the finding's unchecked_accepted[], its accepted_by_config skip, the root count
+@case('o9-unchecked-accepted-missing', 'host-accepted-dagger', 'findings[0].unchecked_accepted')
+def _(d): del d['findings'][0]['unchecked_accepted']
+@case('o9-unchecked-accepted-null', 'host-unsupported', 'findings[0].unchecked_accepted')
+def _(d): d['findings'][0]['unchecked_accepted'] = None
+@case('o9-accepted-without-its-skip', 'host-accepted-dagger', 'findings[0]')
+def _(d): next(c for c in d['findings'][0]['checks_skipped'] if c['reason'] == 'accepted_by_config')['reason'] = 'host_not_supported'
+@case('o9-skip-without-its-accepted-entry', 'host-accepted-dagger', 'findings[0]')
+def _(d): d['findings'][0]['unchecked_accepted'] = []
+@case('o9-scope-url', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0].accepted_by.scope')
+def _(d): d['findings'][0]['unchecked_accepted'][0]['accepted_by']['scope'] = 'url'
+@case('o9-accepted-by-reason-empty', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0].accepted_by.reason')
+def _(d): d['findings'][0]['unchecked_accepted'][0]['accepted_by']['reason'] = ''
+@case('o9-accepted-by-expires-not-a-date', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0].accepted_by.expires')
+def _(d): d['findings'][0]['unchecked_accepted'][0]['accepted_by']['expires'] = '31.03.2027'
+@case('o9-accepted-by-without-value', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0].accepted_by.value')
+def _(d): del d['findings'][0]['unchecked_accepted'][0]['accepted_by']['value']
+@case('o9-blocks-of-another-check', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0]')
+def _(d): d['findings'][0]['unchecked_accepted'][0]['blocks'] = ['S9']
+@case('o9-reason-of-another-check', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0]')
+def _(d): d['findings'][0]['unchecked_accepted'][0]['reason'] = 'no_feed'
+@case('o9-root-count-zero', 'host-accepted-dagger', '(root)')
+def _(d): d['packages_unchecked_accepted'] = 0
+@case('o9-root-count-without-accepted', 'host-unsupported', '(root)')
+def _(d): d['packages_unchecked_accepted'] = 1
+@case('o9-root-count-missing', 'composite', 'packages_unchecked_accepted')
+def _(d): del d['packages_unchecked_accepted']
+@case('strict-o9-accepted-reason-a-rerun-closes', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0].reason', strict=True)
+def _(d): d['findings'][0]['unchecked_accepted'][0]['reason'] = 'rate_limit'  # open set: a later reason validates as published
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for old in glob.glob(os.path.join(OUT, '*.json')):

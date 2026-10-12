@@ -795,6 +795,7 @@
  "packages_multi_flag": 0,
  "include_dev": false,
  "not_from_composer_repository": 0,
+ "packages_unchecked_accepted": 0,
  "network_failures": true,
  "counts": {
   "critical": 0,
@@ -971,7 +972,21 @@
   "failing": 0,
   "exempt": {
    "baseline": 0
-  }
+  },
+  "failing_by": [
+   {
+    "value": "high",
+    "failing": 0
+   }
+  ],
+  "not_applied": [
+   {
+    "check": "advisories",
+    "packages": 1,
+    "reason": "lookup_failed"
+   }
+  ],
+  "text": "gate: passes · --fail-on=high · no finding fails it · advisories not applied to 1 package: not checked (a repository failed) · target php 8.4 (config.platform.php)"
  },
  "security": {
   "check": "partial",
@@ -1078,6 +1093,7 @@
     }
    ],
    "checks_skipped": [],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",

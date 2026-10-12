@@ -786,6 +786,7 @@
  "packages_multi_flag": 1,
  "include_dev": false,
  "not_from_composer_repository": 1,
+ "packages_unchecked_accepted": 0,
  "network_failures": false,
  "counts": {
   "critical": 1,
@@ -969,7 +970,15 @@
   "failing": 1,
   "exempt": {
    "baseline": 0
-  }
+  },
+  "failing_by": [
+   {
+    "value": "high",
+    "failing": 1
+   }
+  ],
+  "not_applied": [],
+  "text": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)"
  },
  "security": {
   "check": "complete",
@@ -1250,6 +1259,7 @@
      ]
     }
    ],
+   "unchecked_accepted": [],
    "maintenance_judged": false,
    "metadata": {
     "status": "not_from_composer_repository",

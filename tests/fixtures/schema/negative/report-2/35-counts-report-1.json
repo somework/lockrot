@@ -790,6 +790,7 @@
  "packages_multi_flag": 4,
  "include_dev": false,
  "not_from_composer_repository": 0,
+ "packages_unchecked_accepted": 0,
  "network_failures": false,
  "counts": {
   "abandoned": 0,
@@ -1002,7 +1003,15 @@
   "failing": 5,
   "exempt": {
    "baseline": 0
-  }
+  },
+  "failing_by": [
+   {
+    "value": "high",
+    "failing": 5
+   }
+  ],
+  "not_applied": [],
+  "text": "gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)"
  },
  "security": {
   "check": "complete",
@@ -1348,6 +1357,7 @@
    },
    "checks_missing": [],
    "checks_skipped": [],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",
@@ -2583,6 +2593,7 @@
    },
    "checks_missing": [],
    "checks_skipped": [],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",
@@ -2978,6 +2989,7 @@
    },
    "checks_missing": [],
    "checks_skipped": [],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",
@@ -3343,6 +3355,7 @@
      ]
     }
    ],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",
@@ -3673,6 +3686,7 @@
    },
    "checks_missing": [],
    "checks_skipped": [],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",
@@ -4035,6 +4049,7 @@
    },
    "checks_missing": [],
    "checks_skipped": [],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",
@@ -4444,6 +4459,7 @@
      ]
     }
    ],
+   "unchecked_accepted": [],
    "maintenance_judged": true,
    "metadata": {
     "status": "read",

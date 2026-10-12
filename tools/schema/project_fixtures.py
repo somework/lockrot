@@ -73,7 +73,8 @@ COVERAGE_VARIANTS = ['lookup-not-run-lookup-failed', 'feed-invalid-response', 'c
 NEGATIVE_BASES = ['composite', 'A', 'A-baselined-dagger', 'A-blocked-dagger', 'B-baselined-dagger', 'B-dev-dagger', 'C-baselined-dagger', 'D-partial-dagger',
                   'E-ignored-dagger', 'baseline-read-score0', 'composite-generate-baseline', 'ok-unchecked', 'partial-op-dagger', 'psr-log', 'rounded-dev-dagger',
                   'routing', 'scope-registries-dagger', 'stale-only', 'unknown', 'host-unsupported', 'not-found-dagger', 'gitlab-anon-dagger', 'local-path-advisory',
-                  'ignored-marking-archived-dagger', 'ignored-marking-stale-dagger', 'no-feed-dagger']
+                  'ignored-marking-archived-dagger', 'ignored-marking-stale-dagger', 'no-feed-dagger',
+                  'B-gate-none', 'host-accepted-dagger']
 
 
 class Projection:
