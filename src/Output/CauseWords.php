@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 /**
- * One id means one cause in every reason set that lists it, so one table words them all. The
- * rendering bundle records this table as `contract/en/cause-words.json`: change both together.
+ * One id means one cause in every reason set that lists it, so one table words them all.
  *
  * @internal
  */

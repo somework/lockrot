@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal;
 
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Signal\Data\AbandonedData;
 
 /**
@@ -19,13 +20,13 @@ final class AbandonedIgnored implements \JsonSerializable
     public const MARKED_BY_LOCK = 'lock';
 
     private string $by;
-    /** @var list<array{pattern: string, reason: ?string, constraints: list<string>}> */
+    /** @var list<AbandonedIgnoreRule> */
     private array $rules;
     private string $markedBy;
     private ?string $replacement;
     private ?string $replacementUrl;
 
-    /** @param list<array{pattern: string, reason: ?string, constraints: list<string>}> $rules */
+    /** @param list<AbandonedIgnoreRule> $rules */
     public function __construct(string $by, array $rules, string $markedBy, ?string $replacement, ?string $replacementUrl)
     {
         $this->by = $by;
@@ -40,7 +41,7 @@ final class AbandonedIgnored implements \JsonSerializable
         return $this->by;
     }
 
-    /** @return list<array{pattern: string, reason: ?string, constraints: list<string>}> */
+    /** @return list<AbandonedIgnoreRule> */
     public function rules(): array
     {
         return $this->rules;
@@ -65,7 +66,7 @@ final class AbandonedIgnored implements \JsonSerializable
     /**
      * report-2's `finding.abandoned_ignored`, whose `marking` is S1's data.
      *
-     * @return array{by: string, rules: list<array{pattern: string, reason: ?string, constraints: list<string>}>, marking: AbandonedData}
+     * @return array{by: string, rules: list<AbandonedIgnoreRule>, marking: AbandonedData}
      */
     public function jsonSerialize(): array
     {

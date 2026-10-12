@@ -845,7 +845,7 @@
             ]
         },
         "age": {
-            "description": "How old four dates are on the run clock: the installed release, the newest release of the package, the newest release of the installed branch, and the last push or commit. No score, gate, sort or baseline reads them. A reading that lockrot could not take is null, with its reason beside it.",
+            "description": "How old four dates are on the run clock. The dates are the installed release, the newest release of the package, the newest release of the installed branch, and the last push or commit. No score, gate, sort or baseline reads them. A reading that lockrot could not take is null, with its reason beside it.",
             "type": "object",
             "required": [
                 "installed",
@@ -2895,7 +2895,7 @@
             "minLength": 1
         },
         "branchReleaseUnmeasured": {
-            "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or a snapshot names no line, the installed branch has no release, its releases have no date, or the installed version is above every listed release. An open set: read an unknown reason as another reason.",
+            "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. Or the installed version is above every listed release. An open set: read an unknown reason as another reason.",
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$",
             "x-known-values": [
@@ -18888,7 +18888,7 @@
                     "minimum": 0
                 },
                 "feeds": {
-                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. A repository with no feed is left out. So is a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/advisoryFeed"
@@ -19149,7 +19149,7 @@
                     "minimum": 0
                 },
                 "feeds": {
-                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. A repository with no feed is left out. So is a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/advisoryFeed"
@@ -19412,7 +19412,7 @@
                     "minimum": 0
                 },
                 "feeds": {
-                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. A repository with no feed is left out. So is a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+                    "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/advisoryFeed"

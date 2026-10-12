@@ -681,7 +681,6 @@ def _(d):
 @case('o12-registry-package-with-s10', 'composite', f)
 def _(d): d['findings'][m]['checks_missing'].append(dict(check='repository_activity', reason='not_from_composer_repository', blocks=['S3', 'S4']))
 
-# C72 age: a reading or null, with its reason beside it
 @case('c72-age-reading-and-reason', 'composite', f + '.age')
 def _(d): d['findings'][m]['age']['installed_unmeasured'] = 'undated'
 @case('c72-age-null-without-reason', 'composite', f + '.age')
@@ -708,7 +707,6 @@ def _(d): d['findings'][DEBUG]['age']['push']['level'] = None
 def _(d): d['findings'][DEBUG]['age']['release']['level'] = None
 @case('c72-release-reason-beside-metadata-read', 'composite', f)
 def _(d): d['findings'][m]['age'].update(release=None, release_unmeasured='not_found')
-# C69 abandoned_ignored
 @case('c69-ignored-beside-s1', 'ignored-marking-archived-dagger', 'findings[0]')
 def _(d):
     d['findings'][0]['signals'].insert(0, dict(id='S1', level='high', summary='marked abandoned by its repository, replacement: symfony/error-handler',
@@ -723,7 +721,6 @@ def _(d): d['findings'][0]['abandoned_ignored']['rules'] = []
 def _(d): del d['findings'][0]['abandoned_ignored']['rules'][0]['constraints']
 @case('c69-note-count-zero', 'ignored-marking-stale-dagger', 'note_details[0]')
 def _(d): d['note_details'][0]['data']['count'] = 0
-# C75 the feeds and the advisory lookup of the run
 @case('c75-answered-records-null', 'composite', f + '.security')
 def _(d): d['findings'][m]['security']['feeds'][0]['records'] = None
 @case('c75-failed-without-reason', 'composite', f + '.security')
@@ -742,7 +739,6 @@ def _(d): d['run']['advisory_lookup']['repositories'][0]['records'] = 3
 def _(d): del d['run']['advisory_lookup']
 @case('c75-note-without-advisories-asked', 'scope-registries-dagger', 'note_details[0]')
 def _(d): del d['note_details'][0]['data']['advisories_asked']
-# C77 the unmeasured reasons and the libyears lower bound
 @case('c77-libyears-beside-a-reason', 'composite', f)
 def _(d): d['findings'][m]['libyears_unmeasured'] = 'branch_snapshot'
 @case('c77-libyears-null-without-a-reason', 'composite', f)
@@ -755,7 +751,6 @@ def _(d): d['findings'][m].update(libyears=None, libyears_unmeasured='not_found'
 def _(d): d['findings'][0]['libyears_unmeasured'] = 'branch_snapshot'
 @case('c77-root-at-least-count-missing', 'composite', 'libyears')
 def _(d): del d['libyears']['at_least_count']
-# W12 depth, named_in, rot_depth
 @case('w12-depth-0-transitive', 'composite', 'findings[%d]' % POLY)
 def _(d): d['findings'][POLY]['depth'] = 0
 @case('w12-depth-2-direct', 'composite', f)

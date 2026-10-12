@@ -173,7 +173,6 @@ final class ProjectConfig
         return $names;
     }
 
-    /** Whether the run read a composer.json. */
     public function isRead(): bool
     {
         return $this->read;

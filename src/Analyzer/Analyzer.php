@@ -9,6 +9,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
@@ -464,7 +465,7 @@ final class Analyzer
             $ignored = $finding->details()->abandonedIgnored();
             if ($ignored !== null) {
                 $by = $ignored->by();
-                $patterns[$finding->package()] = array_map(static fn (array $rule): string => $rule['pattern'], $ignored->rules());
+                $patterns[$finding->package()] = array_map(static fn (AbandonedIgnoreRule $rule): string => $rule->pattern(), $ignored->rules());
             }
             $marked = $marked || $finding->signalData(AbandonedData::class) !== null;
         }
@@ -473,7 +474,7 @@ final class Analyzer
         }
         $notAudited = $this->abandonedIgnore->notAuditedBy();
         if ($notAudited !== null && $marked) {
-            $notes[] = RunNote::abandonedNotAuditedByComposer($notAudited['policy_key'], $notAudited['value']);
+            $notes[] = RunNote::abandonedNotAuditedByComposer($notAudited->policyKey(), $notAudited->value());
         }
         $unreadable = $this->abandonedIgnore->whyUnreadable();
         if ($unreadable !== null) {

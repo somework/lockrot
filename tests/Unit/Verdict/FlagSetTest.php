@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Verdict;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Rule\AbandonedRule;
@@ -179,7 +180,7 @@ final class FlagSetTest extends TestCase
     #[DataProvider('ignoredMarking')]
     public function testAnIgnoredMarkingIsNoS1(bool $listed, bool $archived, string $released, string $pushed, ?array $entryFlags, array $fired, array $reasons, array $accepted): void
     {
-        $match = $listed ? new AbandonedIgnoreMatch(AbandonedIgnoreMatch::BY_POLICY, [['pattern' => 'vendor/*', 'reason' => 'migration planned', 'constraints' => []]]) : null;
+        $match = $listed ? new AbandonedIgnoreMatch(AbandonedIgnoreMatch::BY_POLICY, [new AbandonedIgnoreRule('vendor/*', 'migration planned', [])]) : null;
         $facts = new PackageFacts(F::package(), F::metadata([['1.0.0', $released]], true, 'other/pkg'), F::activity($archived, $pushed), [], null, $match);
         $clock = Clock::fixed(F::NOW);
         $signals = [];

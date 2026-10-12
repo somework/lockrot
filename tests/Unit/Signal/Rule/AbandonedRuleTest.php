@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
 use Lockrot\Signal\AbandonedIgnored;
@@ -68,7 +69,7 @@ final class AbandonedRuleTest extends TestCase
 
     private static function listed(LockedPackage $package, ?PackageMetadata $metadata = null): PackageFacts
     {
-        return new PackageFacts($package, $metadata, null, [], null, new AbandonedIgnoreMatch(AbandonedIgnoreMatch::BY_POLICY, [['pattern' => 'vendor/*', 'reason' => 'migration planned', 'constraints' => ['^1.0']]]));
+        return new PackageFacts($package, $metadata, null, [], null, new AbandonedIgnoreMatch(AbandonedIgnoreMatch::BY_POLICY, [new AbandonedIgnoreRule('vendor/*', 'migration planned', ['^1.0'])]));
     }
 
     public function testAListedNameRaisesNoS1FromTheMetadataOrTheLock(): void
@@ -90,7 +91,7 @@ final class AbandonedRuleTest extends TestCase
 
         self::assertNotNull($record);
         self::assertSame(AbandonedIgnoreMatch::BY_POLICY, $record->by());
-        self::assertSame([['pattern' => 'vendor/*', 'reason' => 'migration planned', 'constraints' => ['^1.0']]], $record->rules());
+        self::assertSame([['pattern' => 'vendor/*', 'reason' => 'migration planned', 'constraints' => ['^1.0']]], JsonPath::decoded($record->rules()));
         self::assertSame(AbandonedIgnored::MARKED_BY_REPOSITORY, $record->markedBy());
         self::assertSame('other/pkg', $record->replacement());
         self::assertSame('https://packagist.org/packages/other/pkg', $record->replacementUrl());

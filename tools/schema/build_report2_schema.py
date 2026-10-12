@@ -534,8 +534,8 @@ SEC_COMMON = {
     'records': nul(("The distinct advisories that every answering feed holds for this name, for all versions, before the ignore lists and attribution (C75). "
                     "At least the counted advisories plus `ignored_count`. Null when no feed answered. Evidence only: no score, gate or flag reads it."), dict(INT0)),
     'feeds': arr(("One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order (C75). "
-                  "A repository with no feed is left out. So is a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 "
-                  "or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none."),
+                  "lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, "
+                  "Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none."),
                  ref('advisoryFeed')),
 }
 defs['securityVulnerable'] = obj("`status: vulnerable` (§7.6): whenever an advisory counts, even on a partial lookup. `vulnerable`'s facts live here and in the S9 rows (§2.1).", dict({
@@ -922,7 +922,6 @@ defs['activity']['allOf'] = [
      'anyOf': [{'properties': {'reason': {'not': {'enum': ['host_not_supported']}}}}, {'properties': {'host': {'type': 'string'}, 'forge': _N}}]},
 ]
 
-# the measurements and the reasons they are null (C72, C77, W12)
 UNMEASURED = ['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'unreached', 'no_composer_json', 'shared_commit', 'undated',
               'no_stable_release', 'undated_releases', 'no_branch_row', 'above_listed_releases', 'allowlisted', 'no_repository', 'offline', 'rate_limit',
               'fetch_failed', 'anonymous_budget', 'install_time_budget', 'no_token', 'repository_not_found', 'host_not_supported']
@@ -936,7 +935,8 @@ UNMEASURED_BY_KEY = {
                           "Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release, or no dated stable release."),
     'branchReleaseUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'no_branch_row', 'undated_releases', 'above_listed_releases'],
                                 "Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). "
-                                "Or a snapshot names no line, the installed branch has no release, its releases have no date, or the installed version is above every listed release."),
+                                "Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. "
+                                "Or the installed version is above every listed release."),
     'pushUnmeasured': (ACT_REASONS + ['undated'], "Why `age.push` is null: `activity.reason` when the activity was not read, or `undated` when the answer carried no date."),
     'libyearsUnmeasured': (['not_from_composer_repository', 'unavailable', 'not_found', 'branch_snapshot', 'shared_commit', 'undated', 'no_stable_release', 'undated_releases'],
                            "Why `libyears` is null. The metadata was not read (the `metadata.status` value). Or the installed end has no date that lockrot trusts "
@@ -967,8 +967,8 @@ defs['agePush'] = obj(("The last push (GitHub) or the last commit (GitLab, Bitbu
     'at': _AT('The date that the host reported.'), 'years': _Y, 'level': ref('ageLevel')})
 _UN_REF = {'installed': 'installedUnmeasured', 'release': 'releaseUnmeasured', 'branch_release': 'branchReleaseUnmeasured', 'push': 'pushUnmeasured'}
 _UN = lambda k: nul(f"Why `{k}` is null (C77). Null when lockrot took the reading.", ref(_UN_REF[k]))
-defs['age'] = obj(("How old four dates are on the run clock (C72): the installed release, the newest release of the package, the newest release of the installed "
-                   "branch, and the last push or commit. No score, gate, sort or baseline reads them. A reading that lockrot could not take is null, with its reason beside it."), {
+defs['age'] = obj(("How old four dates are on the run clock (C72). The dates are the installed release, the newest release of the package, the newest release "
+                   "of the installed branch, and the last push or commit. No score, gate, sort or baseline reads them. A reading that lockrot could not take is null, with its reason beside it."), {
     'installed': nul('The installed release. Null when not measured.', ref('ageInstalled')), 'installed_unmeasured': _UN('installed'),
     'release': nul('The newest release of the package. Null when not measured.', ref('ageRelease')), 'release_unmeasured': _UN('release'),
     'branch_release': nul(("The newest dated release of the installed branch. For a branch-alias snapshot (`5.4.x-dev`), the newest one of its own line. "
@@ -1429,8 +1429,8 @@ LIBY['properties'] = {k: LIBY['properties'][k] for k in ('total', 'direct_requir
                          "is among them."), INT0),
     'unmeasured': obj(("Findings with `libyears: null`, by `libyears_unmeasured`. Every key that report-2 writes is required, zeros included. A later minor release "
                        "can add a key: an extra key is a count. `measured` plus every count is `packages`."), {
-        'not_from_composer_repository': d('No metadata was asked for: the lock entry carries no Composer notification-url.', INT0),
-        'unavailable': d('Metadata was asked for and did not come (`metadata.status` `unavailable`).', INT0),
+        'not_from_composer_repository': d('lockrot asked for no metadata: the lock entry carries no Composer notification-url.', INT0),
+        'unavailable': d('lockrot asked for the metadata, and it did not come (`metadata.status` `unavailable`).', INT0),
         'not_found': d('The Composer repository does not list the package (`metadata.status` `not_found`).', INT0),
         'branch_snapshot': d('A dev pin (`dev-main`, `2.x-dev`): a commit date, not a release date.', INT0),
         'shared_commit': d('A commit that other tags share dates the installed tag, and no parent tag dates it (`age.installed_unmeasured` `shared_commit`).', INT0),
