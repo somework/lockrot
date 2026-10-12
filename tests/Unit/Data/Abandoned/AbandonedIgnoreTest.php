@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Data\Abandoned;
 
 use Composer\Config;
+use Composer\Util\Platform;
 use Composer\Policy\AbandonedPolicyConfig;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
@@ -96,6 +97,40 @@ final class AbandonedIgnoreTest extends TestCase
         self::assertNotNull($match);
         self::assertSame(AbandonedIgnoreMatch::BY_POLICY, $match->by());
         self::assertNull($ignoreList->whyUnreadable());
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, ?array{policy_key: string, value: bool|string}}> */
+    public static function auditSettings(): iterable
+    {
+        yield 'no setting' => [[], null];
+        yield 'the policy off' => [['policy' => false], ['policy_key' => 'policy', 'value' => false]];
+        yield 'the abandoned policy off' => [['policy' => ['abandoned' => false]], ['policy_key' => 'policy.abandoned', 'value' => false]];
+        yield 'the abandoned audit ignored' => [['policy' => ['abandoned' => ['audit' => 'ignore']]], ['policy_key' => 'policy.abandoned.audit', 'value' => 'ignore']];
+        yield 'the abandoned audit failing' => [['policy' => ['abandoned' => ['audit' => 'fail']]], null];
+        yield 'the legacy audit ignored' => [['audit' => ['abandoned' => 'ignore']], ['policy_key' => 'audit.abandoned', 'value' => 'ignore']];
+        yield 'the legacy audit reported' => [['audit' => ['abandoned' => 'report']], null];
+    }
+
+    /**
+     * @param array<string, mixed>                                  $config
+     * @param ?array{policy_key: string, value: bool|string}        $expected
+     *
+     * @dataProvider auditSettings
+     */
+    #[DataProvider('auditSettings')]
+    public function testTheSettingThatStopsTheAbandonedAuditIsNamed(array $config, ?array $expected): void
+    {
+        self::assertSame($expected, self::read($config)->notAuditedBy());
+    }
+
+    public function testTheEnvironmentVariableWinsOverTheConfig(): void
+    {
+        Platform::putEnv('COMPOSER_AUDIT_ABANDONED', 'ignore');
+        try {
+            self::assertSame(['policy_key' => 'COMPOSER_AUDIT_ABANDONED', 'value' => 'ignore'], self::read(['policy' => false])->notAuditedBy());
+        } finally {
+            Platform::clearEnv('COMPOSER_AUDIT_ABANDONED');
+        }
     }
 
     public function testARuleOnlyForBlockingIsNotApplied(): void

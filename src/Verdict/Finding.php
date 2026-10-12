@@ -739,6 +739,7 @@ final class Finding
             'metadata' => $details->metadata(),
             'activity' => $details->activity(),
             'allowlist' => $entry === null ? null : $entry->toArray(),
+            'abandoned_ignored' => $details->abandonedIgnored(),
             'from_composer_repository' => $this->isFromComposerRepository(),
             'origin' => $this->origin->toArray(),
             'replacement' => $successor,

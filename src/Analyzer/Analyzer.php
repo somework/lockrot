@@ -11,6 +11,7 @@ use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityBatch;
@@ -37,6 +38,7 @@ use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\BranchRow;
+use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AbandonedRule;
@@ -204,8 +206,9 @@ final class Analyzer
             }
         }
         if ($notInRepository > 0) {
-            $notes[] = RunNote::notFromComposerRepository($notInRepository);
+            $notes[] = RunNote::notFromComposerRepository($notInRepository, $advisories->coverage()->scope() === AdvisoryCoverage::SCOPE_ALL);
         }
+        $notes = array_merge($notes, $this->abandonedNotes($findings));
         $findings = TransitiveExposure::attach($findings, $graph);
         $graded = [];
         foreach ($findings as $finding) {
@@ -444,6 +447,40 @@ final class Analyzer
         }
 
         return [$batch, $notes];
+    }
+
+    /**
+     * @param list<Finding> $findings
+     *
+     * @return list<RunNote> what Composer's abandoned ignore list and audit setting did in this run
+     */
+    private function abandonedNotes(array $findings): array
+    {
+        $notes = [];
+        $patterns = [];
+        $by = null;
+        $marked = false;
+        foreach ($findings as $finding) {
+            $ignored = $finding->details()->abandonedIgnored();
+            if ($ignored !== null) {
+                $by = $ignored->by();
+                $patterns[$finding->package()] = array_map(static fn (array $rule): string => $rule['pattern'], $ignored->rules());
+            }
+            $marked = $marked || $finding->signalData(AbandonedData::class) !== null;
+        }
+        if ($by !== null) {
+            $notes[] = RunNote::abandonedMarkingsIgnored($by, $patterns);
+        }
+        $notAudited = $this->abandonedIgnore->notAuditedBy();
+        if ($notAudited !== null && $marked) {
+            $notes[] = RunNote::abandonedNotAuditedByComposer($notAudited['policy_key'], $notAudited['value']);
+        }
+        $unreadable = $this->abandonedIgnore->whyUnreadable();
+        if ($unreadable !== null) {
+            $notes[] = RunNote::abandonedIgnoreUnreadable($unreadable);
+        }
+
+        return $notes;
     }
 
     /**

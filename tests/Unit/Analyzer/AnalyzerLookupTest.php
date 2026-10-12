@@ -194,6 +194,31 @@ final class AnalyzerLookupTest extends TestCase
         self::assertSame(Verdict::ABANDONED, $finding->verdict());
     }
 
+    /** The finding keeps the marking that the list removed, and one run note names the package. */
+    public function testAnIgnoredMarkingIsWrittenOnTheFindingAndInANote(): void
+    {
+        $metadata = ['vendor/pkg' => self::metadata(true, '2026-08-01T00:00:00+00:00')];
+
+        $report = self::analyzeOne(self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::ARCHIVED]], new \ArrayObject()), false, new Allowlist([]), self::listed()));
+        $written = JsonPath::decoded(self::finding($report)->toArray());
+
+        self::assertSame(
+            ['by' => 'policy.abandoned', 'rules' => [['pattern' => 'vendor/pkg', 'reason' => 'migration planned', 'constraints' => []]], 'marking' => ['marked_by' => 'repository', 'replacement' => null, 'replacement_url' => null]],
+            $written['abandoned_ignored']
+        );
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::ABANDONED_MARKINGS_IGNORED));
+        self::assertCount(1, $notes);
+        self::assertSame(['by' => 'policy.abandoned', 'count' => 1, 'packages' => [['package' => 'vendor/pkg', 'patterns' => ['vendor/pkg']]]], $notes[0]->data());
+    }
+
+    public function testANotListedPackageWritesNoIgnoredMarking(): void
+    {
+        $report = self::analyzeOne(self::analyzer(self::loader(['vendor/pkg' => self::metadata(true, '2026-08-01T00:00:00+00:00')]), self::http([self::GITHUB => [200, self::ARCHIVED]], new \ArrayObject()), false, new Allowlist([])));
+
+        self::assertNull(JsonPath::decoded(self::finding($report)->toArray())['abandoned_ignored']);
+        self::assertSame([], array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::ABANDONED_MARKINGS_IGNORED));
+    }
+
     public function testAnIgnoredMarkingOnALiveRepositoryLeavesNoAbandonment(): void
     {
         /** @var \ArrayObject<int, string> $requested */

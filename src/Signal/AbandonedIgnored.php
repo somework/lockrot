@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal;
 
+use Lockrot\Signal\Data\AbandonedData;
+
 /**
  * Composer's abandoned ignore list removed this package's S1. The record keeps the list's match and
  * the marking that S1 carries without the list, so the fact is still shown, from one place
@@ -11,7 +13,7 @@ namespace Lockrot\Signal;
  *
  * @internal
  */
-final class AbandonedIgnored
+final class AbandonedIgnored implements \JsonSerializable
 {
     public const MARKED_BY_REPOSITORY = 'repository';
     public const MARKED_BY_LOCK = 'lock';
@@ -58,5 +60,11 @@ final class AbandonedIgnored
     public function replacementUrl(): ?string
     {
         return $this->replacementUrl;
+    }
+
+    /** report-2's `finding.abandoned_ignored`, whose `marking` is S1's data. */
+    public function jsonSerialize(): array
+    {
+        return ['by' => $this->by, 'rules' => $this->rules, 'marking' => new AbandonedData($this->markedBy, $this->replacement, $this->replacementUrl)];
     }
 }

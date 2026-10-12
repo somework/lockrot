@@ -16,11 +16,13 @@ use Lockrot\Security\Fix;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\Severity;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
@@ -51,6 +53,7 @@ final class FindingDetails
     private ?Check $releasesUnchecked = null;
     private Age $age;
     private ?AdvisoryNameCoverage $lookup;
+    private ?AbandonedIgnored $abandonedIgnored;
     private ?Moves $moves = null;
     private ActivityLookup $activity;
 
@@ -59,8 +62,9 @@ final class FindingDetails
      * @param array{requires: ?string, target_runs: ?bool, project_allows: ?bool} $installedPhp
      * @param list<IgnoredAdvisory>                                         $ignored
      */
-    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age, ?AdvisoryNameCoverage $lookup = null)
+    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age, ?AdvisoryNameCoverage $lookup = null, ?AbandonedIgnored $abandonedIgnored = null)
     {
+        $this->abandonedIgnored = $abandonedIgnored;
         $this->activity = $activity;
         $this->age = $age;
         $this->lookup = $lookup;
@@ -105,7 +109,8 @@ final class FindingDetails
             $facts->fixes(),
             $facts->activityLookup(),
             $age,
-            $coverage
+            $coverage,
+            AbandonedRule::ignored($facts)
         );
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
 
@@ -115,6 +120,12 @@ final class FindingDetails
     public function age(): Age
     {
         return $this->age;
+    }
+
+    /** The marking that Composer's abandoned ignore list kept out of S1, null when it kept none. */
+    public function abandonedIgnored(): ?AbandonedIgnored
+    {
+        return $this->abandonedIgnored;
     }
 
     /** What the advisory lookup did for the package, null when the run had no lookup. */

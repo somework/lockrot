@@ -34,6 +34,9 @@ final class RunNote
     public const REPOSITORY_ACTIVITY_NOT_FOUND = 'repository_activity_not_found';
     public const REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED = 'repository_activity_host_not_supported';
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
+    public const ABANDONED_MARKINGS_IGNORED = 'abandoned_markings_ignored';
+    public const ABANDONED_NOT_AUDITED_BY_COMPOSER = 'abandoned_not_audited_by_composer';
+    public const ABANDONED_IGNORE_UNREADABLE = 'abandoned_ignore_unreadable';
     /**
      * The codes that lockrot writes, as the schemas list them in `x-known-values`, in the order of
      * the analyzer's passes. In a report, the notes of two repository hosts can interleave.
@@ -53,6 +56,9 @@ final class RunNote
         self::REPOSITORY_ACTIVITY_NOT_FOUND,
         self::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED,
         self::NOT_FROM_COMPOSER_REPOSITORY,
+        self::ABANDONED_MARKINGS_IGNORED,
+        self::ABANDONED_NOT_AUDITED_BY_COMPOSER,
+        self::ABANDONED_IGNORE_UNREADABLE,
     ];
 
     /** Each code has a section on the site at its own id. Never move one without a stub. */
@@ -324,16 +330,65 @@ final class RunNote
         return self::of(self::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED, $text, false, ['hosts' => $hosts]);
     }
 
-    public static function notFromComposerRepository(int $count): self
+    /** @param bool $advisoriesAsked the run's advisory lookup asked their names (`run.advisory_lookup.scope` is `all`) */
+    public static function notFromComposerRepository(int $count, bool $advisoriesAsked): self
     {
         if ($count < 1) {
             throw new \InvalidArgumentException('A note about packages outside every Composer repository counts at least one.');
         }
+        $what = $advisoriesAsked ? 'release metadata and repository activity' : 'release metadata, repository activity and advisories';
         $text = $count === 1
-            ? '1 package is not from a Composer repository and was not checked'
-            : \sprintf('%d packages are not from a Composer repository and were not checked', $count);
+            ? \sprintf('1 package is not from a Composer repository: its %s were not read', $what)
+            : \sprintf('%d packages are not from a Composer repository: their %s were not read', $count, $what);
 
-        return self::of(self::NOT_FROM_COMPOSER_REPOSITORY, $text, false, ['package_count' => $count]);
+        return self::of(self::NOT_FROM_COMPOSER_REPOSITORY, $text, false, ['package_count' => $count, 'advisories_asked' => $advisoriesAsked]);
+    }
+
+    /**
+     * @param string                      $by       the Composer setting that holds the list, {@see \Lockrot\Data\Abandoned\AbandonedIgnoreMatch::BY_POLICY} or `BY_AUDIT`
+     * @param array<string, list<string>> $patterns each package whose marking the list removed, in report order, with the patterns that matched it
+     */
+    public static function abandonedMarkingsIgnored(string $by, array $patterns): self
+    {
+        if ($patterns === []) {
+            throw new \InvalidArgumentException('A note about ignored markings names at least one package.');
+        }
+        $packages = [];
+        foreach ($patterns as $package => $matched) {
+            $packages[] = ['package' => (string) $package, 'patterns' => $matched];
+        }
+        $count = \count($packages);
+        $text = \sprintf(
+            "Composer's abandoned ignore list (config.%s) covers the abandoned marking of %d %s: %s. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            $by === 'policy.abandoned' ? 'policy.abandoned.ignore' : $by,
+            $count,
+            $count === 1 ? 'package' : 'packages',
+            implode(', ', array_keys($patterns))
+        );
+
+        return self::of(self::ABANDONED_MARKINGS_IGNORED, $text, false, ['by' => $by, 'count' => $count, 'packages' => $packages]);
+    }
+
+    /**
+     * Information only: the setting changes what `composer audit` prints, and lockrot still counts the marking.
+     *
+     * @param string      $policyKey the setting: a config key, or the environment variable `COMPOSER_AUDIT_ABANDONED`
+     * @param bool|string $value     its value
+     */
+    public static function abandonedNotAuditedByComposer(string $policyKey, $value): self
+    {
+        return self::of(
+            self::ABANDONED_NOT_AUDITED_BY_COMPOSER,
+            \sprintf("Composer's audit is set not to report abandoned packages (%s: %s); lockrot still counts the abandoned marking. To stop counting it for one package, list the package in config.policy.abandoned.ignore.", $policyKey, \is_bool($value) ? var_export($value, true) : $value),
+            false,
+            ['policy_key' => $policyKey, 'value' => $value]
+        );
+    }
+
+    /** @param string $message the first line of what Composer rejected the list with, possibly empty */
+    public static function abandonedIgnoreUnreadable(string $message): self
+    {
+        return self::of(self::ABANDONED_IGNORE_UNREADABLE, \sprintf("Composer rejected the project's abandoned ignore list (%s), so every abandoned marking counts.", $message), false, ['message' => $message]);
     }
 
     /**

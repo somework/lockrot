@@ -503,8 +503,8 @@ final class ReportTest extends TestCase
     public function testTheNotesTheirDetailsAndTheNetworkFlagComeFromOneList(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $quiet = [RunNote::offline(), RunNote::notFromComposerRepository(2)];
-        $failing = [RunNote::offline(), RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503')), RunNote::notFromComposerRepository(2)];
+        $quiet = [RunNote::offline(), RunNote::notFromComposerRepository(2, true)];
+        $failing = [RunNote::offline(), RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503')), RunNote::notFromComposerRepository(2, true)];
 
         self::assertFalse((new Report([], [], $at, 0, 0))->hadNetworkFailures());
         self::assertFalse((new Report([], $quiet, $at, 0, 2))->hadNetworkFailures());
@@ -514,7 +514,7 @@ final class ReportTest extends TestCase
         self::assertSame([
             "offline: repository metadata served from Composer's cache",
             'security advisories unavailable from packagist.org: HTTP 503',
-            '2 packages are not from a Composer repository and were not checked',
+            '2 packages are not from a Composer repository: their release metadata and repository activity were not read',
         ], $report->notes());
 
         $array = $report->toArray();

@@ -6,6 +6,7 @@ namespace Lockrot\Data\Abandoned;
 
 use Composer\Config;
 use Composer\Package\BasePackage;
+use Composer\Util\Platform;
 
 /**
  * Composer's abandoned ignore list, read and matched as `composer audit` reads and matches it
@@ -19,6 +20,8 @@ final class AbandonedIgnore
     /** @var list<array{pattern: string, reason: ?string, constraints: list<string>}> */
     private array $rules;
     private ?string $whyUnreadable;
+    /** @var array{policy_key: string, value: bool|string}|null */
+    private ?array $notAuditedBy = null;
 
     /** @param list<array{pattern: string, reason: ?string, constraints: list<string>}> $rules */
     private function __construct(string $by, array $rules, ?string $whyUnreadable)
@@ -45,7 +48,19 @@ final class AbandonedIgnore
      */
     public static function fromConfig(Config $config, ?AbandonedPolicyReader $reader = null): self
     {
-        $reader ??= new ComposerAbandonedPolicyReader();
+        $ignore = clone self::listOf($config, $reader ?? new ComposerAbandonedPolicyReader());
+        try {
+            $ignore->notAuditedBy = self::notAudited($config);
+        } catch (\Throwable $e) {
+            // The list read the same config and holds why Composer rejected it.
+            $ignore->notAuditedBy = null;
+        }
+
+        return $ignore;
+    }
+
+    private static function listOf(Config $config, AbandonedPolicyReader $reader): self
+    {
         try {
             switch ($reader->api()) {
                 case AbandonedPolicyReader::POLICY:
@@ -58,6 +73,33 @@ final class AbandonedIgnore
         } catch (\Throwable $e) {
             return new self(AbandonedIgnoreMatch::BY_POLICY, [], (string) strtok($e->getMessage(), "\r\n"));
         }
+    }
+
+    /**
+     * The first setting that turns the abandoned audit off: Composer's environment variable over its
+     * config, and the policy over the legacy `audit.abandoned`.
+     *
+     * @return array{policy_key: string, value: bool|string}|null
+     */
+    private static function notAudited(Config $config): ?array
+    {
+        if (Platform::getEnv('COMPOSER_AUDIT_ABANDONED') === 'ignore') {
+            return ['policy_key' => 'COMPOSER_AUDIT_ABANDONED', 'value' => 'ignore'];
+        }
+        $policy = $config->get('policy');
+        if ($policy === false) {
+            return ['policy_key' => 'policy', 'value' => false];
+        }
+        $abandoned = \is_array($policy) ? ($policy['abandoned'] ?? null) : null;
+        if ($abandoned === false) {
+            return ['policy_key' => 'policy.abandoned', 'value' => false];
+        }
+        if (\is_array($abandoned) && ($abandoned['audit'] ?? null) === 'ignore') {
+            return ['policy_key' => 'policy.abandoned.audit', 'value' => 'ignore'];
+        }
+        $audit = $config->get('audit');
+
+        return \is_array($audit) && ($audit['abandoned'] ?? null) === 'ignore' ? ['policy_key' => 'audit.abandoned', 'value' => 'ignore'] : null;
     }
 
     /**
@@ -105,6 +147,17 @@ final class AbandonedIgnore
         $matched = array_values(array_filter($this->rules, static fn (array $rule): bool => preg_match(BasePackage::packageNameToRegexp($rule['pattern']), $name) === 1));
 
         return $matched === [] ? null : new AbandonedIgnoreMatch($this->by, $matched);
+    }
+
+    /**
+     * The Composer setting that stops `composer audit` reporting abandoned packages, with its value.
+     * Null when none does. It changes what `composer audit` prints, never the list.
+     *
+     * @return array{policy_key: string, value: bool|string}|null
+     */
+    public function notAuditedBy(): ?array
+    {
+        return $this->notAuditedBy;
     }
 
     /** Why Composer rejected the list, possibly empty. Null when it was read. */
