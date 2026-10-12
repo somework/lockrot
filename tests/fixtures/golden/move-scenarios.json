@@ -1,0 +1,4501 @@
+{
+    "pinned from a local path": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "local_package",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "pinned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move: it is installed from a local path (your own package)"
+        }
+    },
+    "pinned with its releases unread": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "metadata_not_read",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "pinned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move: lockrot did not read its releases, so it names none; review the snapshot"
+        }
+    },
+    "pinned with no stable release": {
+        "next_step": {
+            "kind": "no-tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "pinned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no tagged release to move to; review the snapshot, or replace it"
+        }
+    },
+    "pinned on a v-prefixed tag": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "v2.3.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v2.3.0",
+                "released": "2026-06-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2019-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v2.3.0 (2026-06-01); 2.x needs php >=7.2, which require.php allows; old-promise stays"
+        }
+    },
+    "pinned on a tag before the ga": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "v1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v1.0.0",
+                "released": "2019-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "same",
+                "snapshot_time": "2019-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 18,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v1.0.0 (2019-01-01); 1.x needs php >=7.2, which require.php allows; old-promise, stale stay"
+        }
+    },
+    "pinned on a tag with no php": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "v1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v1.0.0",
+                "released": "2019-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "same",
+                "snapshot_time": "2019-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": null,
+                "project_allows": null,
+                "target_runs": null,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 18,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v1.0.0 (2019-01-01); old-promise, stale stay"
+        }
+    },
+    "pinned on a 0.x branch alias": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "0.3.x",
+            "version": "0.3.5",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "0.3.5",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2019-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_not_releasing"
+                }
+            ],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^0.3.5"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 0.3.5 (2020-01-01); 0.3.x needs php >=7.2, which require.php allows; that line no longer releases while a higher line does, so left-behind would count; old-promise stays"
+        }
+    },
+    "three dependents": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major",
+                "transitive"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "d/one",
+                    "2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "d/three",
+                    "2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "d/two",
+                    "2.0.0"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "d/one",
+                    "installed_version": "1.0.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.0.0",
+                        "released": "2026-01-01T00:00:00+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                },
+                {
+                    "package": "d/three",
+                    "installed_version": "1.0.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.0.0",
+                        "released": "2026-01-01T00:00:00+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                },
+                {
+                    "package": "d/two",
+                    "installed_version": "1.0.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.0.0",
+                        "released": "2026-01-01T00:00:00+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                }
+            ],
+            "also": [],
+            "text": "raise require.php to >=8.1, then move a/b to ^2.3 through d/one, d/three, d/two \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of d/one (2.0.0), d/three (2.0.0) and d/two (2.0.0) no longer require it"
+        }
+    },
+    "four dependents that dropped it": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major",
+                "transitive"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "d/four",
+                    "2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "d/one",
+                    "2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "d/three",
+                    "2.0.0"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "d/two",
+                    "2.0.0"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "d/four",
+                    "installed_version": "1.0.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.0.0",
+                        "released": "2026-01-01T00:00:00+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                },
+                {
+                    "package": "d/one",
+                    "installed_version": "1.0.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.0.0",
+                        "released": "2026-01-01T00:00:00+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                },
+                {
+                    "package": "d/three",
+                    "installed_version": "1.0.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.0.0",
+                        "released": "2026-01-01T00:00:00+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                },
+                {
+                    "package": "d/two",
+                    "installed_version": "1.0.0",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "2.0.0",
+                        "released": "2026-01-01T00:00:00+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                }
+            ],
+            "also": [],
+            "text": "raise require.php to >=8.1, then move a/b to ^2.3 through d/four, d/one, d/three and 1 more \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of d/four (2.0.0), d/one (2.0.0), d/three (2.0.0) and 1 more no longer require it"
+        }
+    },
+    "holders that are graded": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "h/old",
+                    "version": "1.0.0",
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": {
+                        "verdict": "low",
+                        "lead": "stale",
+                        "flag_ids": [
+                            "stale"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "h/pin",
+                    "version": "dev-master",
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": {
+                        "verdict": "medium",
+                        "lead": "pinned",
+                        "flag_ids": [
+                            "pinned"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "holders",
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0) and h/old 1.0.0 (requires ^1.0; itself stale) and h/pin dev-master (requires ^1.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "a replacement that the registry names": {
+        "next_step": {
+            "kind": "replace",
+            "source": "abandoned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": {
+                "package": "acme/new-lib",
+                "suggestion": "acme/new-lib",
+                "url": null,
+                "named_by": "repository",
+                "finding": null
+            },
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "abandoned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "replace with acme/new-lib (named by its registry)"
+        }
+    },
+    "a newer release than the installed one": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.2.0",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4"
+        }
+    },
+    "a line with no php": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": null,
+                "project_allows": null,
+                "target_runs": null,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a/b ^2.3 \u2014 clears left-behind and old-promise; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "a lower line that releases": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "a line released at the warn-years edge": {
+        "next_step": {
+            "kind": "blocked",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "3.x",
+            "version": null,
+            "newest": "3.0.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=9.0",
+                "project_allows": false,
+                "target_runs": false,
+                "raise_to": ">=9.0",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move runs on the target: 3.x needs php >=9.0 and the target php 8.4 does not run it"
+        }
+    },
+    "a line with an undated newest release": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "reason": "undated"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "a lowest release on the ga day": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.0.0",
+            "newest": "2.0.1",
+            "constraint": "^2.0",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a/b ^2.0 \u2014 clears left-behind; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; old-promise stays; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "old-promise with an update the target cannot run": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.5.0",
+                "released": "2025-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4"
+        }
+    },
+    "old-promise with a lower line after the ga": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "0.9.0",
+                "released": "2025-03-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4"
+        }
+    },
+    "old-promise with an undated release": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.0.0",
+                "released": "2019-01-01T00:00:00+00:00",
+                "is_installed": true,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4 \u2014 1.0.0 is its newest release"
+        }
+    },
+    "old-promise with a release on the ga day": {
+        "next_step": {
+            "kind": "test",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.5.0",
+                "released": "2020-11-26T00:00:00+00:00",
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": null
+            },
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "test it on PHP 8.4"
+        }
+    },
+    "an advisory on the move's lower releases": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.5",
+            "newest": "2.3.5",
+            "constraint": "^2.3.5",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3.5"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3.5 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "an advisory on the move's newest release": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.5",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "a maintenance lead merged with a higher fix": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [
+                "vulnerable"
+            ],
+            "fix_kind": "raise-php",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.4",
+            "newest": "2.3.4",
+            "constraint": "^2.3.4",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3.4"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3.4 \u2014 clears left-behind, old-promise and the advisory; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "raise-php",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "a security lead merged with a higher maintenance move": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [
+                "vulnerable"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind, old-promise and the advisory; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "a security move in also": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 2,
+                "verdict": "low",
+                "lead": null,
+                "deciding_advisory": "PKSA-1",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [
+                {
+                    "kind": "raise-php",
+                    "source": "vulnerable",
+                    "merged": [],
+                    "fix_kind": "raise-php",
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": "3.x",
+                    "version": "3.0.0",
+                    "newest": "3.0.0",
+                    "constraint": "^3.0.0",
+                    "latest": null,
+                    "php_check": {
+                        "requires": ">=8.1",
+                        "project_allows": false,
+                        "target_runs": true,
+                        "raise_to": ">=8.1",
+                        "raise_size": "major"
+                    },
+                    "crosses_major": true,
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "require",
+                            "constraint": "^1.0",
+                            "holder": null
+                        }
+                    ],
+                    "clears": [
+                        {
+                            "kind": "flag",
+                            "id": "left-behind",
+                            "basis": "branch_releasing"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "old-promise",
+                            "basis": "released_after_ga"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [],
+                    "clears_all": true,
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "lead": null,
+                        "deciding_advisory": null,
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold",
+                            "composer_resolves"
+                        ]
+                    },
+                    "composer_moves_because": [
+                        "crosses_major"
+                    ],
+                    "commands": [
+                        [
+                            "composer",
+                            "require",
+                            "php:>=8.1",
+                            "--no-update"
+                        ],
+                        [
+                            "composer",
+                            "require",
+                            "a/b:^3.0.0"
+                        ]
+                    ],
+                    "text": "raise require.php to >=8.1, then require a/b ^3.0.0 \u2014 clears left-behind, old-promise and the advisory; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+                }
+            ],
+            "text": "require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; 1 advisory stays; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "raise-php",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "also",
+        "partial": null
+    },
+    "a top line that fixes nothing": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.5.0",
+            "newest": "1.5.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "a/b"
+                ]
+            ],
+            "through": [],
+            "also": [
+                {
+                    "kind": "raise-php",
+                    "source": "left-behind",
+                    "merged": [],
+                    "fix_kind": null,
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": "2.x",
+                    "version": "2.3.0",
+                    "newest": "2.3.0",
+                    "constraint": "^2.3",
+                    "latest": null,
+                    "php_check": {
+                        "requires": ">=8.1",
+                        "project_allows": false,
+                        "target_runs": true,
+                        "raise_to": ">=8.1",
+                        "raise_size": "major"
+                    },
+                    "crosses_major": true,
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "require",
+                            "constraint": "^1.0",
+                            "holder": null
+                        }
+                    ],
+                    "clears": [
+                        {
+                            "kind": "flag",
+                            "id": "left-behind",
+                            "basis": "branch_releasing"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "old-promise",
+                            "basis": "released_after_ga"
+                        }
+                    ],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": {
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": null,
+                        "deciding_advisory": "PKSA-1",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold",
+                            "composer_resolves"
+                        ]
+                    },
+                    "composer_moves_because": [
+                        "crosses_major"
+                    ],
+                    "commands": [
+                        [
+                            "composer",
+                            "require",
+                            "php:>=8.1",
+                            "--no-update"
+                        ],
+                        [
+                            "composer",
+                            "require",
+                            "a/b:^2.3"
+                        ]
+                    ],
+                    "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; 1 advisory stays; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+                }
+            ],
+            "text": "composer update a/b (gets 1.5.0) \u2014 clears the advisory; left-behind, old-promise stay"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "1.5.0",
+            "newest": "1.5.0",
+            "held_by": [],
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "a lead update to the partial release": {
+        "next_step": {
+            "kind": "update",
+            "source": "old-promise",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.5.0",
+            "newest": "1.5.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-a",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-b"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 12,
+                "verdict": "medium",
+                "lead": "stale",
+                "deciding_advisory": "PKSA-b",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "a/b"
+                ]
+            ],
+            "through": [],
+            "also": [
+                {
+                    "kind": "no-single-fix",
+                    "source": "vulnerable",
+                    "merged": [],
+                    "fix_kind": "none",
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": null,
+                    "version": null,
+                    "newest": null,
+                    "constraint": null,
+                    "latest": null,
+                    "php_check": null,
+                    "crosses_major": null,
+                    "held_by": [],
+                    "clears": [],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "stale"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-b"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-a"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": null,
+                    "composer_moves_because": [],
+                    "commands": [],
+                    "text": "no single release fixes every advisory; see each advisory"
+                }
+            ],
+            "text": "composer update a/b (gets 1.5.0) \u2014 clears old-promise and the advisory; stale, 1 advisory stay"
+        },
+        "fix_kind": "none",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 2,
+            "fix_kind": "update",
+            "lowest": "1.5.0",
+            "newest": "1.5.0",
+            "held_by": [],
+            "if_applied": {
+                "total": 12,
+                "verdict": "medium",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        },
+        "move_in": "also",
+        "partial": null
+    },
+    "a partial fix offline": {
+        "next_step": {
+            "kind": "no-single-fix",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "none",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-b"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-a"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [
+                {
+                    "kind": "test",
+                    "source": "old-promise",
+                    "merged": [],
+                    "fix_kind": null,
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": null,
+                    "version": null,
+                    "newest": null,
+                    "constraint": null,
+                    "latest": {
+                        "version": "1.5.0",
+                        "released": "2020-01-01T00:00:00+00:00",
+                        "is_installed": false,
+                        "relation": null,
+                        "snapshot_time": null
+                    },
+                    "php_check": null,
+                    "crosses_major": null,
+                    "held_by": [],
+                    "clears": [],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "stale"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-b"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-a"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": null,
+                    "composer_moves_because": [],
+                    "commands": [],
+                    "text": "test it on PHP 8.4"
+                }
+            ],
+            "text": "no single release fixes every advisory; see each advisory"
+        },
+        "fix_kind": "none",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 2,
+            "fix_kind": "update",
+            "lowest": "1.5.0",
+            "newest": "1.5.0",
+            "held_by": [],
+            "if_applied": {
+                "total": 50,
+                "verdict": "critical",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "no_new_advisories"
+                ]
+            }
+        },
+        "move_in": "next_step",
+        "partial": {
+            "version": "1.5.0",
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-a",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 50,
+                "verdict": "critical",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "no_new_advisories"
+                ]
+            }
+        }
+    },
+    "two advisories with no release data": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "unknown",
+            "reason": "releases_unknown",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-2"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [
+                {
+                    "kind": "test",
+                    "source": "old-promise",
+                    "merged": [],
+                    "fix_kind": null,
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": null,
+                    "version": null,
+                    "newest": null,
+                    "constraint": null,
+                    "latest": {
+                        "version": "1.0.0",
+                        "released": "2019-01-01T00:00:00+00:00",
+                        "is_installed": true,
+                        "relation": null,
+                        "snapshot_time": null
+                    },
+                    "php_check": null,
+                    "crosses_major": null,
+                    "held_by": [],
+                    "clears": [],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-2"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": null,
+                    "composer_moves_because": [],
+                    "commands": [],
+                    "text": "test it on PHP 8.4 \u2014 1.0.0 is its newest release"
+                }
+            ],
+            "text": "no move: lockrot could not read its releases, so it names no fix"
+        },
+        "fix_kind": "unknown",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 2,
+            "of": 2,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": null,
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "two advisories that stay": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": "2.3.0",
+            "constraint": "^2.3",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-2"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 4,
+                "verdict": "low",
+                "lead": null,
+                "deciding_advisory": "PKSA-1",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3"
+                ]
+            ],
+            "through": [],
+            "also": [
+                {
+                    "kind": "no-fix",
+                    "source": "vulnerable",
+                    "merged": [],
+                    "fix_kind": "none",
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": null,
+                    "version": null,
+                    "newest": null,
+                    "constraint": null,
+                    "latest": null,
+                    "php_check": null,
+                    "crosses_major": null,
+                    "held_by": [],
+                    "clears": [],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "flag",
+                            "id": "left-behind"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-2"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": null,
+                    "composer_moves_because": [],
+                    "commands": [],
+                    "text": "no release fixes it"
+                }
+            ],
+            "text": "raise require.php to >=8.1, then require a/b ^2.3 \u2014 clears left-behind and old-promise; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; 2 advisories stay; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "none",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 2,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "also",
+        "partial": null
+    },
+    "an accepted flag that the move settles": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [
+                "old-promise"
+            ],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.0.0",
+            "newest": "2.0.0",
+            "constraint": "^2.0.0",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a/b ^2.0.0 \u2014 clears old-promise and the advisory; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "a target php that does not parse": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "v2.3.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v2.3.0",
+                "released": "2026-06-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2019-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": null,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "no_new_advisories"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is v2.3.0 (2026-06-01); 2.x needs php >=7.2, which require.php allows"
+        }
+    },
+    "a snapshot on the line that the fix needs": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "2.3.0",
+                "released": "2026-06-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2019-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 32,
+                "verdict": "critical",
+                "lead": "old-promise",
+                "deciding_advisory": "PKSA-1",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3.0"
+                ]
+            ],
+            "through": [],
+            "also": [
+                {
+                    "kind": "require",
+                    "source": "vulnerable",
+                    "merged": [],
+                    "fix_kind": "upgrade",
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": "2.x",
+                    "version": "2.3.0",
+                    "newest": "2.3.0",
+                    "constraint": "^2.3.0",
+                    "latest": null,
+                    "php_check": {
+                        "requires": ">=7.2",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "crosses_major": false,
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "require",
+                            "constraint": "^1.0",
+                            "holder": null
+                        }
+                    ],
+                    "clears": [
+                        {
+                            "kind": "flag",
+                            "id": "old-promise",
+                            "basis": "released_after_ga"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "flag",
+                            "id": "pinned"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": {
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": "pinned",
+                        "deciding_advisory": null,
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold",
+                            "composer_resolves"
+                        ]
+                    },
+                    "composer_moves_because": [],
+                    "commands": [
+                        [
+                            "composer",
+                            "require",
+                            "a/b:^2.3.0"
+                        ]
+                    ],
+                    "text": "require a/b ^2.3.0 \u2014 clears old-promise and the advisory; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; pinned stays; held by composer.json (requires ^1.0)"
+                }
+            ],
+            "text": "require a tag \u2014 the newest on its own line is 2.3.0 (2026-06-01); 2.x needs php >=7.2, which require.php allows; old-promise, 1 advisory stay"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": null,
+        "move_in": "also",
+        "partial": null
+    },
+    "a maintenance lead that clears the advisory on another line": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": "raise-php",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "3.x",
+            "version": "3.0.0",
+            "newest": "3.0.0",
+            "constraint": "^3.0",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^3.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^3.0 \u2014 clears left-behind, old-promise and the advisory; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "raise-php",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "a replacement given as a url": {
+        "next_step": {
+            "kind": "replace",
+            "source": "abandoned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": {
+                "package": null,
+                "suggestion": "https://github.com/acme/fork",
+                "url": "https://github.com/acme/fork",
+                "named_by": "repository",
+                "finding": null
+            },
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "abandoned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "replace it: its registry suggests \"https://github.com/acme/fork\""
+        }
+    },
+    "pinned on a tag the target cannot run": {
+        "next_step": {
+            "kind": "blocked",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": null,
+            "newest": "v2.3.0",
+            "constraint": null,
+            "latest": {
+                "version": "v2.3.0",
+                "released": "2026-06-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2019-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=9.0",
+                "project_allows": false,
+                "target_runs": false,
+                "raise_to": ">=9.0",
+                "raise_size": "major"
+            },
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "pinned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move runs on the target: the newest tag, v2.3.0, needs php >=9.0 and the target php 8.4 does not run it; replace it"
+        }
+    },
+    "pinned on an undated tag": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "v1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "v1.0.0",
+                "released": null,
+                "is_installed": false,
+                "relation": null,
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "reason": "undated"
+                }
+            ],
+            "adds": [],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is v1.0.0; 1.x needs php >=7.2, which require.php allows; not checked: old-promise"
+        }
+    },
+    "a fix below the newest release of its line": {
+        "next_step": {
+            "kind": "require",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "upgrade",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.0.0",
+            "newest": "2.3.0",
+            "constraint": "^2.0.0",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a/b ^2.0.0 \u2014 clears the advisory; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.0.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "pinned on a line older than the snapshot": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.9.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.9.0",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
+                },
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_not_releasing"
+                }
+            ],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.9.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 1.9.0 (2020-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; it was released before your target PHP's major, so old-promise would count; that line no longer releases while a higher line does, so left-behind would count"
+        }
+    },
+    "pinned on a line released at the snapshot": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.9.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.9.0",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "same",
+                "snapshot_time": "2020-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_not_releasing"
+                }
+            ],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.9.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 1.9.0 (2020-01-01); 1.x needs php >=7.2, which require.php allows; that line no longer releases while a higher line does, so left-behind would count; old-promise stays"
+        }
+    },
+    "pinned on a line with no release": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.3.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "2.3.0",
+                "released": "2026-06-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "newer",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.3.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest is 2.3.0 (2026-06-01); 2.x needs php >=7.2, which require.php allows; a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "pinned on a line below one that releases": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "2.0.0",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
+                }
+            ],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 2.0.0 (2020-01-01), older than your snapshot (2026-01-01); review, or replace; 2.x needs php >=7.2, which require.php allows; it was released before your target PHP's major, so old-promise would count"
+        }
+    },
+    "pinned on a line below one that stopped": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.0.0",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
+                }
+            ],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 18,
+                "verdict": "high",
+                "lead": "old-promise",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 1.0.0 (2020-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; it was released before your target PHP's major, so old-promise would count; stale stays"
+        }
+    },
+    "pinned on a line below an undated one": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.0.0",
+                "released": "2020-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "reason": "undated"
+                }
+            ],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
+                }
+            ],
+            "leaves": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": true,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 1.0.0 (2020-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; it was released before your target PHP's major, so old-promise would count; not checked: left-behind"
+        }
+    },
+    "pinned on a tag that adds two flags": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.0.0",
+                "released": "2019-01-01T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
+                },
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_not_releasing"
+                }
+            ],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 1.0.0 (2019-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; it was released before your target PHP's major, so old-promise would count; that line no longer releases while a higher line does, so left-behind would count"
+        }
+    },
+    "an undated line below the newest one": {
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "3.x",
+            "version": "3.0.0",
+            "newest": "3.0.0",
+            "constraint": "^3.0",
+            "latest": null,
+            "php_check": {
+                "requires": ">=8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "a/b:^3.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require a/b ^3.0 \u2014 clears left-behind and old-promise; 3.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        }
+    },
+    "a replacement that is graded itself": {
+        "next_step": {
+            "kind": "replace",
+            "source": "abandoned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": {
+                "package": "h/old",
+                "suggestion": "h/old",
+                "url": null,
+                "named_by": "repository",
+                "finding": {
+                    "verdict": "low",
+                    "lead": "stale",
+                    "flag_ids": [
+                        "stale"
+                    ]
+                }
+            },
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "abandoned"
+                },
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "replace with h/old (named by its registry; itself low: stale)"
+        }
+    },
+    "two advisories that no single release fixes": {
+        "next_step": {
+            "kind": "require",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.0.0",
+            "newest": "2.0.0",
+            "constraint": "^2.0",
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": null
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-2",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 16,
+                "verdict": "high",
+                "lead": null,
+                "deciding_advisory": "PKSA-1",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^2.0"
+                ]
+            ],
+            "through": [],
+            "also": [
+                {
+                    "kind": "no-single-fix",
+                    "source": "vulnerable",
+                    "merged": [],
+                    "fix_kind": "upgrade",
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": null,
+                    "version": null,
+                    "newest": null,
+                    "constraint": null,
+                    "latest": null,
+                    "php_check": null,
+                    "crosses_major": null,
+                    "held_by": [],
+                    "clears": [],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "flag",
+                            "id": "left-behind"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-2"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": null,
+                    "composer_moves_because": [],
+                    "commands": [],
+                    "text": "no single release fixes every advisory; see each advisory"
+                }
+            ],
+            "text": "require a/b ^2.0 \u2014 clears left-behind, old-promise and the advisory; 2.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; 1 advisory stays; held by composer.json (requires ^1.0); a new major brings its own requirements, which lockrot does not solve"
+        },
+        "fix_kind": "upgrade",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 2,
+            "fix_kind": "update",
+            "lowest": "1.5.0",
+            "newest": "1.5.0",
+            "held_by": [],
+            "if_applied": {
+                "total": 36,
+                "verdict": "critical",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        },
+        "move_in": "also",
+        "partial": {
+            "version": "1.5.0",
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "clears_all": false,
+            "if_applied": {
+                "total": 36,
+                "verdict": "critical",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        }
+    },
+    "pinned on a tag from the ga day": {
+        "next_step": {
+            "kind": "tag",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.0.0",
+            "newest": null,
+            "constraint": null,
+            "latest": {
+                "version": "1.0.0",
+                "released": "2020-11-26T00:00:00+00:00",
+                "is_installed": false,
+                "relation": "older",
+                "snapshot_time": "2026-01-01T00:00:00+00:00"
+            },
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "pinned",
+                    "basis": "tags_only"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "stale",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "a/b:^1.0.0"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "require a tag \u2014 the newest on its own line is 1.0.0 (2020-11-26), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; stale stays"
+        }
+    },
+    "a security update merged with a later update": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [
+                "old-promise"
+            ],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "1.9.0",
+            "newest": "1.9.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "old-promise",
+                    "basis": "released_after_ga"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "stale"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 8,
+                "verdict": "medium",
+                "lead": "stale",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "a/b"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update a/b (gets 1.9.0) \u2014 clears old-promise and the advisory; stale stays"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "1.5.0",
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": {
+                "total": 18,
+                "verdict": "high",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "a blocked move beside an advisory": {
+        "next_step": {
+            "kind": "no-fix",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "none",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [
+                {
+                    "kind": "blocked",
+                    "source": "left-behind",
+                    "merged": [],
+                    "fix_kind": null,
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": "2.x",
+                    "version": null,
+                    "newest": "2.3.0",
+                    "constraint": null,
+                    "latest": null,
+                    "php_check": {
+                        "requires": ">=9.0",
+                        "project_allows": false,
+                        "target_runs": false,
+                        "raise_to": ">=9.0",
+                        "raise_size": "major"
+                    },
+                    "crosses_major": true,
+                    "held_by": [],
+                    "clears": [],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [
+                        {
+                            "kind": "flag",
+                            "id": "left-behind"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "old-promise"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1"
+                        }
+                    ],
+                    "clears_all": false,
+                    "if_applied": null,
+                    "composer_moves_because": [],
+                    "commands": [],
+                    "text": "no move runs on the target: 2.x needs php >=9.0 and the target php 8.4 does not run it"
+                }
+            ],
+            "text": "no release fixes it"
+        },
+        "fix_kind": "none",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "1.9.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
+    "two 0.x lines": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "0.3.x",
+            "version": "0.3.5",
+            "newest": "0.3.5",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-1",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind"
+                },
+                {
+                    "kind": "flag",
+                    "id": "old-promise"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "lead": "left-behind",
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "a/b"
+                ]
+            ],
+            "through": [],
+            "also": [
+                {
+                    "kind": "require",
+                    "source": "left-behind",
+                    "merged": [],
+                    "fix_kind": null,
+                    "reason": null,
+                    "replacement": null,
+                    "quiet_years": null,
+                    "to_branch": "0.4.x",
+                    "version": "0.4.0",
+                    "newest": "0.4.0",
+                    "constraint": "^0.4.0",
+                    "latest": null,
+                    "php_check": {
+                        "requires": ">=7.2",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "crosses_major": true,
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "require",
+                            "constraint": "^0.3",
+                            "holder": null
+                        }
+                    ],
+                    "clears": [
+                        {
+                            "kind": "flag",
+                            "id": "left-behind",
+                            "basis": "branch_releasing"
+                        },
+                        {
+                            "kind": "flag",
+                            "id": "old-promise",
+                            "basis": "released_after_ga"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-1",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "unverified": [],
+                    "adds": [],
+                    "leaves": [],
+                    "clears_all": true,
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "lead": null,
+                        "deciding_advisory": null,
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold",
+                            "composer_resolves"
+                        ]
+                    },
+                    "composer_moves_because": [
+                        "crosses_major"
+                    ],
+                    "commands": [
+                        [
+                            "composer",
+                            "require",
+                            "a/b:^0.4.0"
+                        ]
+                    ],
+                    "text": "require a/b ^0.4.0 \u2014 clears left-behind, old-promise and the advisory; 0.4.x needs php >=7.2, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.3); a new 0.x line (Composer treats 0.x minors as breaking) brings its own requirements, which lockrot does not solve"
+                }
+            ],
+            "text": "composer update a/b (gets 0.3.5) \u2014 clears the advisory; left-behind, old-promise stay"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "0.3.5",
+            "newest": "0.3.5",
+            "held_by": [],
+            "if_applied": {
+                "total": 20,
+                "verdict": "high",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    }
+}

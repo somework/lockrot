@@ -369,6 +369,10 @@ If lockrot cannot reach a repository for advisories, the run gets a
 lockrot asks for the advisories of every package that the run checks, whatever its origin, unless
 `extra.lockrot.advisory-lookup` is `composer-repositories`.
 
+### The move {#move}
+
+A graded finding's `next_step` names one move, what it clears, and the score after it.
+
 ## The score {#score}
 
 The reach of a package decides whether the score halves it as `unreached`, and a required name

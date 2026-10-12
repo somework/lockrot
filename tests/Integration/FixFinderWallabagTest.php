@@ -31,13 +31,21 @@ use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\Golden;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * The release scan over the recorded wallabag fixture, whose advisories are recorded too: the
  * invariants on every vulnerable package, and each package's classes in a golden
  * file. Re-record the answers with `bin/record-fixtures tests/fixtures/apps/wallabag_wallabag`.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class FixFinderWallabagTest extends TestCase
 {
     private const FIXTURE = __DIR__.'/../fixtures/apps/wallabag_wallabag';

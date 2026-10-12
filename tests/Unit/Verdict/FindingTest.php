@@ -34,6 +34,11 @@ use PHPUnit\Framework\TestCase;
 
 final class FindingTest extends TestCase
 {
+    public function testAFindingBuiltWithoutItsDetailsHasNoNextStep(): void
+    {
+        self::assertNull((new FindingBuilder())->withoutFlags()->build()->nextStep());
+    }
+
     /** An S9 advisory row no listed release fixes, as {@see \Lockrot\Signal\Rule\AdvisoryRule} writes it. */
     private const OPEN = ['id' => 'PKSA-open', 'fixed_by' => null, 'fixed_on_branch' => false];
 

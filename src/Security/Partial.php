@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Lockrot\Verdict\GradedPackage;
+
 /**
  * The `update` release on the installed branch that clears some, not all, counted advisories,
  * when the security move is not an `update` (`security.partial`). The engine
@@ -22,6 +24,12 @@ final class Partial
     {
         $this->release = $release;
         $this->clears = $clears;
+    }
+
+    /** @param array<string, GradedPackage> $findings by package name */
+    public function withFindings(array $findings): self
+    {
+        return new self($this->release->withFindings($findings), $this->clears);
     }
 
     public function version(): string

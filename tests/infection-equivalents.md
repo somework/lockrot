@@ -22,6 +22,7 @@ start the reason with `in method():`.
 
 ## src/Analyzer
 
+- `src/Analyzer/Analyzer.php` ReturnRemoval `return Moves::none();` — in moves(): a speed guard that skips the release scan and the move rules for a finding that is not graded. Without it, `NextStep::plan()` finds no lead and no counted advisory, and names no move either.
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return [$metadata, []];` — in dateSplitPackages(): with no package to date, the rest of the method finds no candidate and makes no request.
 - `src/Analyzer/Libyears.php` GreaterThan `if ($newest === null || $release['at'] > $newest) {` — on a tie the two dates are the same instant, and nothing reads which release gave it.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.

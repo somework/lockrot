@@ -25,6 +25,8 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,7 +36,13 @@ use PHPUnit\Framework\TestCase;
  * gate. Each case also runs with a baseline of its own findings, which exempts them. One more
  * document holds the facts that no case has.
  * AppRootRecountTest checks the fixture apps.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class RootRecountTest extends TestCase
 {
     private const FAIL_ON = ['low', 'abandoned', 'unchecked'];

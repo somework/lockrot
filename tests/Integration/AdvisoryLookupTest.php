@@ -24,13 +24,21 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * The one advisory lookup of a run, counted on the recorded wallabag fixture: one POST per
  * advisory-capable repository, every package the run checks by name, packages-dev only with
  * `--dev`. Re-record the answer with `bin/record-fixtures tests/fixtures/apps/wallabag_wallabag`.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class AdvisoryLookupTest extends TestCase
 {
     private const FIXTURE = __DIR__.'/../fixtures/apps/wallabag_wallabag';

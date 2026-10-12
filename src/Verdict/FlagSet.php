@@ -141,6 +141,15 @@ final class FlagSet
         return new self($this->signals, $this->acceptSet, array_values(array_filter($this->advisories, static fn (CountedAdvisory $advisory): bool => $advisory->id() !== $id)));
     }
 
+    /**
+     * The facts with the signal that raises $flag, for a flag that one signal raises: what a move
+     * adds. Their points do not read the level.
+     */
+    public function raising(string $flag): self
+    {
+        return new self($this->signals + [ScoreModel::RAISED_BY[$flag][0] => Signal::LEVEL_WARN], $this->acceptSet, $this->advisories);
+    }
+
     /** The same facts with $flag counted, not accepted: what the flag adds if counted. */
     public function counting(string $flag): self
     {

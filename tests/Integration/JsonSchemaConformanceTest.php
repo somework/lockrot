@@ -54,6 +54,11 @@ use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Move;
+use Lockrot\Verdict\MoveFact;
+use Lockrot\Verdict\Moves;
+use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\AssertionFailedError;
@@ -293,7 +298,8 @@ final class JsonSchemaConformanceTest extends TestCase
         $stale = [new Signal(Signal::LEVEL_WARN, 'no release for 3.0 years', SignalDataStub::of(Signal::S2, ['last_release' => '2023-09-14T00:00:00+00:00', 'last_version' => '1.0.0', 'years' => 3.0, 'dated_by' => null]))];
         foreach (array_merge(['vendor/shared', 'vendor/leaf'], array_keys($roots)) as $package) {
             $verdict = strpos($package, 'vendor/') === 0 ? Verdict::STALE : Verdict::OK;
-            $findings[] = (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withSignals($verdict === Verdict::STALE ? $stale : [])->withChain($graph->shortestChain($package))->withDataDate($at)->withDirectDependents(array_keys($graph->chainsTo($package)))->build();
+            $finding = (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withSignals($verdict === Verdict::STALE ? $stale : [])->withChain($graph->shortestChain($package))->withDataDate($at)->withDirectDependents(array_keys($graph->chainsTo($package)))->build();
+            $findings[] = $verdict === Verdict::STALE ? $finding->withMoves(new Moves(self::staleMove($finding), null, null, null, [])) : $finding;
         }
         $report = new Report(TransitiveExposure::attach($findings, $graph), [], $at, \count($findings), 0);
 
@@ -1533,5 +1539,13 @@ final class JsonSchemaConformanceTest extends TestCase
         $number = \is_array($lockrot) ? ($lockrot['schema'] ?? null) : null;
 
         return \is_int($number) ? [$shape, $number] : null;
+    }
+
+    /** A stale package's move: it released nothing within release-warn-years, so none. */
+    private static function staleMove(Finding $finding): Move
+    {
+        $subject = new MoveSubject($finding->package(), $finding->version(), $finding->isDirect(), $finding->directDependents(), '8.4', null);
+
+        return (new Move(Move::NO_MOVE, FlagSet::STALE, [], null, 'package_quiet', null, null, null, null, null, null, null, null, null, [], [], [], [], [MoveFact::left(MoveFact::FLAG, FlagSet::STALE)], null, [], [], $subject))->asLead([], []);
     }
 }

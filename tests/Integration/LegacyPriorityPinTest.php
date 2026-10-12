@@ -24,14 +24,22 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Report-1's `priority` and `no_fix_expected` of every finding over the fixture apps, against the
  * values that v0.13.0 computed from the same recorded answers. The file is never rewritten from
  * this tree: `tools/fixtures/record-legacy-priority.php` records it on a v0.13.0 checkout.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
  */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class LegacyPriorityPinTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures';

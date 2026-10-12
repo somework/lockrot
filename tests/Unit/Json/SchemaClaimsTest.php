@@ -122,12 +122,6 @@ final class SchemaClaimsTest extends TestCase
     private const PLACEHOLDERS = [
         'findingGate.by' => ['PR 6a: gate.by names the values a failing finding fails', 'names the values it fails'],
         'findingGate.exempt_by' => ['PR 5: exempt_by baseline only under a baseline entry', '`exempt_by: baseline` only there'],
-        'finding.next_step' => ['PR 4c: a graded finding has a move', 'and `next_step` agree'],
-        'heldBy.holder' => ['PR 4c: the holder object, filled in a second pass', null],
-        'branchFixes.lowest' => ['PR 4c: the easiest release of the window (P2b)', null],
-        'branchFixes.if_applied' => ['PR 4c: the score after a move to the candidate', null],
-        'securityVulnerable.fix_kind' => ['PR 4c: the fix_kind of the move that move_in names', null],
-        'rootSecurity.update_now' => ['PR 4c: counted from the move fix_kind', null],
     ];
 
     /** The claims that a relation of another definition encodes. */
@@ -160,9 +154,6 @@ final class SchemaClaimsTest extends TestCase
         foreach (self::PLACEHOLDERS as $key => [$restoredBy, $strict]) {
             [$definition, $property] = explode('.', $key);
             self::assertTrue(JsonPath::has($schema, ['definitions', $definition, 'properties', $property]), $key.' is a property of the schema');
-            if ($strict === null) {
-                continue;
-            }
             foreach ($relations as $relation) {
                 self::assertStringNotContainsString($strict, $relation, $key.' is encoded: take it off PLACEHOLDERS ('.$restoredBy.')');
             }

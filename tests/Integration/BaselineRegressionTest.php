@@ -27,10 +27,19 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/** A package whose only fact is an advisory is not written into a baseline-1 file, and is not new on the next run. */
+/** A package whose only fact is an advisory is not written into a baseline-1 file, and is not new on the next run.
+ *
+ * @coversNothing
+ *
+ * @group covers-nothing
+ */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class BaselineRegressionTest extends TestCase
 {
     use ValidatesJsonSchemas;

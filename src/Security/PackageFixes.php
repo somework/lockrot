@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Lockrot\Verdict\GradedPackage;
+
 /**
  * What the release scan found for one package: a fix per
  * counted advisory, a row per release branch, what `composer update` gets, the security move and a
@@ -32,6 +34,23 @@ final class PackageFixes
         $this->gets = $gets;
         $this->move = $move;
         $this->partial = $partial;
+    }
+
+    /**
+     * The holders of every candidate, each with its own finding: the report fills them once every
+     * finding is graded.
+     *
+     * @param array<string, GradedPackage> $findings by package name
+     */
+    public function withFindings(array $findings): self
+    {
+        return new self(
+            array_map(static fn (Fix $fix): Fix => $fix->withFindings($findings), $this->fixes),
+            array_map(static fn (BranchFixes $row): BranchFixes => $row->withFindings($findings), $this->branches),
+            $this->gets,
+            $this->move === null ? null : $this->move->withFindings($findings),
+            $this->partial === null ? null : $this->partial->withFindings($findings)
+        );
     }
 
     /** @return array<string, Fix> */

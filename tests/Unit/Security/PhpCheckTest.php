@@ -20,7 +20,7 @@ final class PhpCheckTest extends TestCase
     {
         $check = PhpCheck::of($releasePhp, new PhpFloor('8.4', $requirePhp));
 
-        self::assertSame([$raiseTo, $raiseSize], [$check->toArray()['raise_to'], $check->toArray()['raise_size']]);
+        self::assertSame([$raiseTo, $raiseSize], [$check->jsonSerialize()['raise_to'], $check->jsonSerialize()['raise_size']]);
     }
 
     /** @return iterable<string, array{?string, string, ?string, ?string}> */
@@ -42,7 +42,7 @@ final class PhpCheckTest extends TestCase
 
     public function testAStarRequirePhpAllowsTheReleaseAndAsksNoRaise(): void
     {
-        $check = PhpCheck::of('>=8.1.0', new PhpFloor('8.4', '*'))->toArray();
+        $check = PhpCheck::of('>=8.1.0', new PhpFloor('8.4', '*'))->jsonSerialize();
 
         self::assertSame(['requires' => '>=8.1.0', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null], $check);
     }

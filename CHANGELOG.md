@@ -60,6 +60,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **json:** a graded finding's `next_step` names one move with its kind, constraint and commands.
+  It says what the move clears, what holds it, and the score after it (`if_applied`).
+  Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
+  through a dependency, `through[]` says whether that dependency's newest release requires it.
+  `--fail-on` and the exit code do not read `next_step`. ([The move](docs/verdicts.md#move))
 - **All formats:** the run note `advisories_disabled_by_policy` names the Composer setting
   (`config.policy: false`, `policy.advisories: false`, `policy.advisories.audit: ignore` or
   `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and

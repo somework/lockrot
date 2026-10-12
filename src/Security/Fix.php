@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Lockrot\Verdict\GradedPackage;
+
 /**
  * The fix of one advisory: an S9 row's `fix`. A fix of kind `unknown` or `none`
  * names no release, so its branch, versions, php and {@see onInstalledBranch()} are null together
@@ -82,6 +84,15 @@ final class Fix implements \JsonSerializable
             default:
                 return 4;
         }
+    }
+
+    /** @param array<string, GradedPackage> $findings by package name */
+    public function withFindings(array $findings): self
+    {
+        $clone = clone $this;
+        $clone->candidate = $this->candidate === null ? null : $this->candidate->withFindings($findings);
+
+        return $clone;
     }
 
     /** @return self::UPDATE|self::UPGRADE|self::RAISE_PHP|self::BLOCKED|self::UNKNOWN|self::NONE */

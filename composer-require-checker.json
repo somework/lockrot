@@ -45,6 +45,7 @@
         "Composer\\Semver\\Constraint\\Constraint",
         "Composer\\Semver\\Constraint\\ConstraintInterface",
         "Composer\\Semver\\Constraint\\MatchAllConstraint",
+        "Composer\\Semver\\Constraint\\MultiConstraint",
         "Composer\\Semver\\Intervals",
         "Composer\\Semver\\VersionParser",
         "Composer\\Util\\Bitbucket",

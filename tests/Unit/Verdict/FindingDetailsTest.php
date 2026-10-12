@@ -158,7 +158,7 @@ final class FindingDetailsTest extends TestCase
             'php_check' => ['requires' => '>=8.1', 'project_allows' => true, 'target_runs' => true, 'raise_to' => null, 'raise_size' => null],
             'clears' => [['kind' => 'advisory', 'id' => 'PKSA-a', 'basis' => 'outside_range']],
             'clears_all' => false,
-        ], $security['gets']);
+        ], JsonPath::decoded($security['gets']));
     }
 
     /** Without the scan, the S9 rows give the branch row: each row on the branch is fixed, each without a kind is not known. */

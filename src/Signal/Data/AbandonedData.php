@@ -36,6 +36,11 @@ final class AbandonedData implements SignalData
         return $this->replacement;
     }
 
+    public function replacementUrl(): ?string
+    {
+        return $this->replacementUrl;
+    }
+
     /** @return array{marked_by: string, replacement: ?string, replacement_url: ?string} */
     public function jsonSerialize(): array
     {

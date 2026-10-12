@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Security;
 
+use Lockrot\Verdict\GradedPackage;
+
 /**
  * One link of the lock that excludes a candidate release: a `held_by[]` entry. A root link names no
- * package there, because the holder is composer.json. `holder` stays null until the report fills it
- * from the holder's own finding.
+ * package there, because the holder is composer.json. `holder` is the holder's own finding, which the
+ * report fills once every finding is graded ({@see filled()}).
  *
  * @internal
  */
@@ -27,6 +29,7 @@ final class Holder implements \JsonSerializable
     /** @var self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT */
     private string $link;
     private string $constraint;
+    private ?GradedPackage $finding = null;
 
     /**
      * @param self::ROOT|self::PACKAGE                     $source
@@ -70,7 +73,31 @@ final class Holder implements \JsonSerializable
         return $this->constraint;
     }
 
-    /** @return array{source: string, package: ?string, version: ?string, link: string, constraint: string, holder: null} */
+    public function finding(): ?GradedPackage
+    {
+        return $this->finding;
+    }
+
+    private function withFinding(?GradedPackage $finding): self
+    {
+        $clone = clone $this;
+        $clone->finding = $finding;
+
+        return $clone;
+    }
+
+    /**
+     * @param list<self>                   $holders
+     * @param array<string, GradedPackage> $findings by package name
+     *
+     * @return list<self>
+     */
+    public static function filled(array $holders, array $findings): array
+    {
+        return array_map(static fn (self $holder): self => $holder->package === null ? $holder : $holder->withFinding($findings[$holder->package] ?? null), $holders);
+    }
+
+    /** @return array{source: string, package: ?string, version: ?string, link: string, constraint: string, holder: ?GradedPackage} */
     public function jsonSerialize(): array
     {
         $root = $this->source === self::ROOT;
@@ -81,7 +108,7 @@ final class Holder implements \JsonSerializable
             'version' => $root ? null : $this->version,
             'link' => $this->link,
             'constraint' => $this->constraint,
-            'holder' => null,
+            'holder' => $root ? null : $this->finding,
         ];
     }
 }

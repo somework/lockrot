@@ -229,6 +229,48 @@ final class Finding
         return $ids;
     }
 
+    /** Whether lockrot read the release metadata, so S2 and S8 ran. */
+    public function isMaintenanceJudged(): bool
+    {
+        return $this->maintenanceJudged;
+    }
+
+    /** The move `next_step` publishes, null at score 0 and for a finding built without its details. */
+    public function nextStep(): ?Move
+    {
+        return $this->details === null ? null : $this->details->moves()->nextStep();
+    }
+
+    /** @throws \LogicException for a finding built without its details */
+    public function withMoves(Moves $moves): self
+    {
+        $clone = clone $this;
+        $clone->details = $this->details()->withMoves($moves);
+
+        return $clone;
+    }
+
+    /**
+     * A copy whose holders and replacement name their own findings, as S7 joins once every
+     * finding is graded ({@see withSignals()}).
+     *
+     * @param array<string, GradedPackage> $findings by package name
+     *
+     * @throws \LogicException for a finding built without its details
+     */
+    public function withHolders(array $findings): self
+    {
+        $clone = clone $this;
+        $clone->details = $this->details()->withFindings($findings);
+        $clone->signals = array_map(static function (Signal $signal) use ($findings): Signal {
+            $data = $signal->data();
+
+            return $data instanceof AdvisoryData ? new Signal($signal->level(), $signal->summary(), $data->withFindings($findings)) : $signal;
+        }, $this->signals);
+
+        return $clone;
+    }
+
     /** @throws \LogicException for a finding built without its flags */
     public function isGraded(): bool
     {
@@ -627,7 +669,7 @@ final class Finding
             'lead' => $this->lead(),
             'flags' => $this->flagsOut($flags, $basis, $signals, $summaries, \count($rows), $context->livenessComplete()),
             'score' => $basis,
-            'next_step' => null,
+            'next_step' => $details->moves()->nextStep(),
             'security' => $details->toSecurityArray($rows, $branch),
             'checks_missing' => $checksMissing,
             'checks_skipped' => $details->skipped(),
