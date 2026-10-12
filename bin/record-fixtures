@@ -18,6 +18,7 @@ declare(strict_types=1);
 // Anonymously, GitLab leaves `archived` out. The script never writes the token. It records no
 // Bitbucket answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
 // 0 is a transport failure (a timeout or a DNS error), so the script fetches that answer again.
+// It records a GitLab answer only with the status 200 or 404, and it stops on a 429.
 require __DIR__.'/../vendor/autoload.php';
 
 use Composer\Factory;
@@ -189,14 +190,24 @@ foreach ($fixtures as $fixture) {
 }
 foreach ($gitlabRepos as [$ref, $dir]) {
     $token = \is_array($gitlabTokens) ? ($gitlabTokens[$ref->host()] ?? null) : null;
-    $requests = $gitlab->requests($ref, \is_string($token));
+    if ($token !== null && !\is_string($token)) {
+        fwrite(STDERR, \sprintf("gitlab-token for %s is not a string; the project document is not recorded\n", $ref->host()));
+        $token = null;
+    }
+    $requests = $gitlab->requests($ref, $token !== null);
     foreach ($requests as $role => $url) {
         if ($isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
             continue;
         }
         $result = $fetch($url, $gitlab->headers($role === 'project' ? $token : null), null, $role !== 'project');
-        $record($dir, $result, $keep($result->body(), $role === 'commits' ? GITLAB_COMMIT_KEYS : GITLAB_PROJECT_KEYS, $role === 'commits'));
         fwrite(STDERR, \sprintf("gitlab %s %s %d\n", $ref->key(), $role, $result->status()));
+        if ($result->status() === 429) {
+            fwrite(STDERR, "rate limited; wait for the window and re-run\n");
+            exit(1);
+        }
+        if (\in_array($result->status(), [200, 404], true)) {
+            $record($dir, $result, $keep($result->body(), $role === 'commits' ? GITLAB_COMMIT_KEYS : GITLAB_PROJECT_KEYS, $role === 'commits'));
+        }
     }
 }
 foreach ($repos as [$ref, $dir]) {
