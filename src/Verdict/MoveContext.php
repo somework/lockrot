@@ -163,10 +163,7 @@ final class MoveContext
     public function installedBranch(): ?string
     {
         $version = $this->subject->version();
-        $key = ReleaseBranch::of($version);
-        if ($key === null && preg_match('/^v?(\d+)(?:\.(\d+))?\.x-dev$/', $version, $m) === 1) {
-            $key = ReleaseBranch::of($m[1].'.'.($m[2] ?? '0').'.0');
-        }
+        $key = ReleaseBranch::of(MoveText::isBranchAlias($version) ? substr($version, 0, -\strlen('.x-dev')) : $version);
 
         return $key === null ? null : ReleaseBranch::label($key);
     }
@@ -236,7 +233,8 @@ final class MoveContext
         $onRow = [];
         foreach ($this->releases ?? [] as $release) {
             $branch = ReleaseBranch::of($release->normalized());
-            if ($branch !== null && ReleaseBranch::label($branch) === $row->branch() && $admits->matches(new Constraint('==', $release->normalized()))) {
+            $label = $branch === null ? null : ReleaseBranch::label($branch);
+            if ($label === $row->branch() && $admits->matches(new Constraint('==', $release->normalized()))) {
                 $onRow[] = $release;
             }
         }

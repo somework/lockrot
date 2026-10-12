@@ -336,7 +336,7 @@ final class Move implements \JsonSerializable
         return $ids;
     }
 
-    public function text(): string
+    private function text(): string
     {
         return MoveText::render($this);
     }

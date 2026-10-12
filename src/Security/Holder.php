@@ -9,7 +9,7 @@ use Lockrot\Verdict\GradedPackage;
 /**
  * One link of the lock that excludes a candidate release: a `held_by[]` entry. A root link names no
  * package there, because the holder is composer.json. `holder` is the holder's own finding, which the
- * report fills once every finding is graded ({@see withFinding()}).
+ * report fills once every finding is graded ({@see filled()}).
  *
  * @internal
  */
@@ -78,7 +78,7 @@ final class Holder implements \JsonSerializable
         return $this->finding;
     }
 
-    public function withFinding(?GradedPackage $finding): self
+    private function withFinding(?GradedPackage $finding): self
     {
         $clone = clone $this;
         $clone->finding = $finding;

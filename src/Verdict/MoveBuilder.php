@@ -42,11 +42,11 @@ final class MoveBuilder
         $unverified = [];
         $adds = [];
         if ($draft->isRowMove() && $row !== null) {
-            [$clears, $unverified] = self::clearsFor($row, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context, $kind === Move::UPDATE ? $context->updateTarget($row) : $row->highest());
+            [$clears, $unverified] = self::clearsFor($row, $lower, self::countedMaintenance($finding), $context->advisoryIds(), $context);
         }
         $phpCheck = null;
         if ($row !== null && (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED], true) || $draft->source() === FlagSet::PINNED)) {
-            $phpCheck = PhpCheck::of($lower === null || $draft->source() === FlagSet::PINNED ? $row->php() : $lower->php(), $context->floor());
+            $phpCheck = PhpCheck::of($lower === null ? $row->php() : $lower->php(), $context->floor());
         }
         $latest = $draft->latest();
         if ($kind === Move::TAG) {
@@ -56,12 +56,12 @@ final class MoveBuilder
         $cleared = self::keys(array_merge($clears, $unverified));
         $leaves = [];
         foreach (self::countedMaintenance($finding) as $flag) {
-            if (!isset($cleared[MoveFact::FLAG.' '.$flag])) {
+            if (!\in_array(MoveFact::FLAG.' '.$flag, $cleared, true)) {
                 $leaves[] = MoveFact::left(MoveFact::FLAG, $flag);
             }
         }
         foreach ($context->advisoryIds() as $id) {
-            if (!isset($cleared[MoveFact::ADVISORY.' '.$id])) {
+            if (!\in_array(MoveFact::ADVISORY.' '.$id, $cleared, true)) {
                 $leaves[] = MoveFact::left(MoveFact::ADVISORY, $id);
             }
         }
@@ -72,7 +72,7 @@ final class MoveBuilder
         $subject = $context->subject();
         $because = self::because($kind, $crosses, $heldBy, $subject);
         $ifApplied = null;
-        if ($clears !== [] && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
+        if (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
             $assumes = array_merge([IfApplied::CLEARS_HOLD], $because !== [] || $heldBy !== [] ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
             $ifApplied = self::rerun($draft, $clears, $unverified, $adds, $context, $assumes);
         }
@@ -119,11 +119,10 @@ final class MoveBuilder
      *
      * @param list<string> $flags
      * @param list<string> $advisories ids
-     * @param ?string      $newest     the highest release the move admits, the row's newest by default
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */
-    public static function clearsFor(BranchRow $row, ?Candidate $lower, array $flags, array $advisories, MoveContext $context, ?string $newest = null): array
+    public static function clearsFor(BranchRow $row, ?Candidate $lower, array $flags, array $advisories, MoveContext $context): array
     {
         $clears = [];
         $unverified = [];
@@ -140,7 +139,7 @@ final class MoveBuilder
             }
         }
         $ranges = $context->ranges();
-        $newest = $context->release($newest ?? $row->highest());
+        $newest = $context->release($row->highest());
         foreach ($advisories as $id) {
             $range = $ranges[$id] ?? null;
             if ($range === null) {
@@ -220,7 +219,7 @@ final class MoveBuilder
 
     /**
      * The engine rerun on the facts minus what the move clears and the accepted facts it settles,
-     * plus what it adds and every unverified flag that did not fire.
+     * plus what it adds and every unverified flag. A flag that fires stays as it is.
      *
      * @param list<MoveFact> $clears
      * @param list<MoveFact> $unverified
@@ -248,7 +247,7 @@ final class MoveBuilder
         }
         $raised = [];
         foreach (array_merge($adds, $unverified) as $fact) {
-            if ($fact->isFlag() && !\in_array($fact->id(), $flags->fired(), true) && !\in_array($fact->id(), $raised, true)) {
+            if ($fact->isFlag()) {
                 $raised[] = $fact->id();
             }
         }
@@ -290,7 +289,7 @@ final class MoveBuilder
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 $commands = [];
-                if ($kind === Move::RAISE_PHP && $phpCheck !== null && $phpCheck->raiseTo() !== null) {
+                if ($phpCheck !== null && $phpCheck->raiseTo() !== null) {
                     $commands[] = ['composer', 'require', 'php:'.$phpCheck->raiseTo(), '--no-update'];
                 }
                 if ($subject->isDirect() && $constraint !== null) {
@@ -308,16 +307,11 @@ final class MoveBuilder
     /**
      * @param list<MoveFact> $facts
      *
-     * @return array<string, true> `kind id` keys
+     * @return list<string> `kind id` keys
      */
     private static function keys(array $facts): array
     {
-        $keys = [];
-        foreach ($facts as $fact) {
-            $keys[$fact->kind().' '.$fact->id()] = true;
-        }
-
-        return $keys;
+        return array_map(static fn (MoveFact $fact): string => $fact->kind().' '.$fact->id(), $facts);
     }
 
     private static function major(string $branch): string

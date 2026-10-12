@@ -56,7 +56,7 @@ final class MoveText
     }
 
     /** @param list<string> $names */
-    public static function dependents(array $names): string
+    private static function dependents(array $names): string
     {
         if (\count($names) > self::DEPENDENTS_SHOWN) {
             return implode(', ', \array_slice($names, 0, self::DEPENDENTS_SHOWN)).' and '.(\count($names) - self::DEPENDENTS_SHOWN).' more';
@@ -93,7 +93,7 @@ final class MoveText
             case Move::NO_TAG:
                 return 'no tagged release to move to; review the snapshot, or replace it';
             case Move::NO_MOVE:
-                $reason = (string) $move->reason();
+                $reason = $move->reason() ?? '';
 
                 return (self::NO_MOVE[$reason] ?? $reason).($reason === 'metadata_not_read' && $move->source() === FlagSet::PINNED ? '; review the snapshot' : '');
             default:
@@ -146,7 +146,7 @@ final class MoveText
     private static function requirement(Move $move, MoveSubject $subject): string
     {
         $check = $move->phpCheck();
-        $raise = $check !== null && $check->projectAllows() === false && $check->raiseTo() !== null ? 'raise require.php to '.$check->raiseTo().', then ' : '';
+        $raise = $check !== null && $check->raiseTo() !== null ? 'raise require.php to '.$check->raiseTo().', then ' : '';
         if ($subject->isDirect()) {
             $text = $raise.'require '.$subject->package().' '.$move->constraint();
         } else {
@@ -160,7 +160,7 @@ final class MoveText
     private static function blocked(Move $move, MoveSubject $subject): string
     {
         $latest = $move->latest();
-        $where = $move->source() === FlagSet::PINNED && $latest !== null ? 'the newest tag, '.$latest->version().',' : ($move->toBranch() ?? 'the fix');
+        $where = $latest !== null ? 'the newest tag, '.$latest->version().',' : ($move->toBranch() ?? 'the fix');
         $check = $move->phpCheck();
         $requires = $check === null ? null : $check->requires();
         $text = $requires !== null
@@ -180,7 +180,7 @@ final class MoveText
         $text = '; '.$move->toBranch().' needs php '.$requires;
         if ($check->projectAllows() === true) {
             $text .= ', which require.php allows';
-        } elseif ($check->projectAllows() === false && $check->raiseSize() !== null) {
+        } elseif ($check->raiseSize() !== null) {
             $text .= ', require.php allows '.self::php((string) $subject->projectPhpLowest()).' (a '.$check->raiseSize().' raise)';
         }
 
@@ -265,8 +265,8 @@ final class MoveText
     /** @param list<ThroughEntry> $through */
     private static function throughWords(array $through): string
     {
-        $gone = array_values(array_filter($through, static fn (ThroughEntry $entry): bool => $entry->newestRequires() === false));
-        $kept = array_values(array_filter($through, static fn (ThroughEntry $entry): bool => $entry->newestRequires() === true));
+        $gone = array_filter($through, static fn (ThroughEntry $entry): bool => $entry->newestRequires() === false);
+        $kept = array_filter($through, static fn (ThroughEntry $entry): bool => $entry->newestRequires() === true);
         $entries = $gone !== [] ? $gone : $kept;
         if ($entries === []) {
             return '';

@@ -89,7 +89,7 @@ final class MaintenanceMove
         }
         $row = null;
         foreach ($context->rows() as $candidate) {
-            $row = ltrim($candidate->highest(), 'vV') === ltrim($version, 'vV') ? $candidate : $row;
+            $row = $candidate->highest() === $version ? $candidate : $row;
         }
 
         return self::tag($row, new Latest($version, $s6->lastStableRelease(), false, $s6->tagRelation(), $snapshotTime));
@@ -120,8 +120,8 @@ final class MaintenanceMove
         if ($row !== null && $suggested !== null) {
             return self::require(FlagSet::LEFT_BEHIND, $context, $row, $suggested);
         }
-        $above = array_values(array_filter($context->rows(), static fn (BranchRow $row): bool => !$row->installed() && $context->isAbove($row)));
-        $releasing = array_reverse(array_values(array_filter($above, static fn (BranchRow $row): bool => $context->isReleasing($context->releasedAt($row)))));
+        $above = array_filter($context->rows(), static fn (BranchRow $row): bool => !$row->installed() && $context->isAbove($row));
+        $releasing = array_reverse(array_filter($above, static fn (BranchRow $row): bool => $context->isReleasing($context->releasedAt($row))));
         foreach ($releasing as $row) {
             if ($row->admitsTargetPhp() !== false) {
                 return self::require(FlagSet::LEFT_BEHIND, $context, $row, '^'.implode('.', \array_slice(explode('.', ltrim($row->highest(), 'vV')), 0, 2)));

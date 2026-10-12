@@ -87,7 +87,7 @@ final class FixFinder
             $rows,
             $this->gets($onInstalled, $ranged, \count($advisories)),
             $move,
-            self::partial($move, $onInstalled, $ranged, \count($advisories))
+            self::partial($onInstalled, $ranged, \count($advisories))
         );
     }
 
@@ -122,7 +122,15 @@ final class FixFinder
      */
     private function candidates(string $package, array $releases): array
     {
-        return array_values(array_filter(array_map(fn (StableRelease $release): ?Candidate => $this->candidate($package, $release), $releases)));
+        $candidates = [];
+        foreach ($releases as $release) {
+            $candidate = $this->candidate($package, $release);
+            if ($candidate !== null) {
+                $candidates[] = $candidate;
+            }
+        }
+
+        return $candidates;
     }
 
     /** The release with its class: the class reads only PHP, and the links fill the holders. Null off every branch. */
@@ -170,9 +178,9 @@ final class FixFinder
      * $own while a release stays: an advisory on the newest release itself reaches every constraint
      * on the branch, so it moves nothing.
      *
-     * @param list<Candidate>           $candidates one branch, ascending
-     * @param list<ConstraintInterface> $ranges
-     * @param list<ConstraintInterface> $own
+     * @param list<Candidate>            $candidates one branch, ascending
+     * @param array<ConstraintInterface> $ranges
+     * @param list<ConstraintInterface>  $own
      *
      * @return list<Candidate> ascending, empty when the newest release lies inside a range
      */
@@ -185,8 +193,8 @@ final class FixFinder
     }
 
     /**
-     * @param list<Candidate>           $candidates ascending
-     * @param list<ConstraintInterface> $ranges
+     * @param list<Candidate>            $candidates ascending
+     * @param array<ConstraintInterface> $ranges
      *
      * @return list<Candidate> the longest tail of $candidates outside every range
      */
@@ -259,7 +267,7 @@ final class FixFinder
             $candidates = $byBranch[$key] ?? [];
             $top = $candidates === [] ? null : $candidates[\count($candidates) - 1];
             $cleared = $top === null ? [] : self::cleared($top, $ranged);
-            $candidate = $cleared === [] ? null : self::easiestIn(self::window($candidates, array_values(array_intersect_key($ranged, array_flip($cleared))), $own));
+            $candidate = $cleared === [] ? null : self::easiestIn(self::window($candidates, array_intersect_key($ranged, array_flip($cleared)), $own));
             $rows[] = new BranchFixes(ReleaseBranch::label($key), $key === $installedBranch, $of - \count($ranged), $of, $candidate, $newest[$key], $cleared);
         }
 
@@ -305,9 +313,9 @@ final class FixFinder
      * @param list<Candidate>                    $onInstalled ascending
      * @param array<string, ConstraintInterface> $ranged
      */
-    private static function partial(?Candidate $move, array $onInstalled, array $ranged, int $of): ?Partial
+    private static function partial(array $onInstalled, array $ranged, int $of): ?Partial
     {
-        if ($onInstalled === [] || ($move !== null && $move->kind() === Fix::UPDATE && $move->branchKey() === $onInstalled[0]->branchKey())) {
+        if ($onInstalled === []) {
             return null;
         }
         $newest = $onInstalled[\count($onInstalled) - 1];

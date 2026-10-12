@@ -29,7 +29,7 @@ final class NextStep
         $maintenance = MaintenanceMove::draft($context);
         $fixKind = $security === null ? null : $security->fixKind();
         $rows = self::rowsIfApplied($context);
-        $partial = self::partial($context, $security);
+        $partial = self::partial($context);
         [$main, $other] = self::lead($security, $maintenance, $context, $fixKind);
         if ($main === null) {
             return new Moves(null, null, $fixKind, $partial, $rows);
@@ -41,7 +41,7 @@ final class NextStep
             if (version_compare((string) self::lowerOf($other), (string) self::lowerOf($main), '>')) {
                 $lower = $other->lower();
                 $kind = $lower === null ? $main->kind() : MaintenanceMove::kindOf($lower, $mainRow);
-                $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? ($other->constraint() ?? ($lower === null ? null : '^'.ltrim($lower->release()->pretty(), 'vV'))) : null;
+                $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $other->constraint() : null;
                 $main = MoveDraft::of($kind, $main->source())->to($mainRow, $lower, $constraint)->withFixKind($main->fixKind());
             }
             $merged = [$other->source()];
@@ -84,26 +84,22 @@ final class NextStep
     {
         $fixes = $context->fixes();
         $candidate = $fixes === null ? null : $fixes->move();
-        $row = $candidate === null ? null : $context->row($candidate->branch());
-        if ($candidate !== null && $row !== null) {
-            return self::toCandidate($row, $candidate);
+        if ($candidate !== null) {
+            $row = $context->row($candidate->branch());
+            if ($row !== null) {
+                return self::toCandidate($row, $candidate);
+            }
         }
-        $kinds = [];
-        foreach ($fixes === null ? [] : $fixes->fixes() as $fix) {
-            $kinds[$fix->kind()] = true;
-        }
+        $kinds = array_unique(array_map(static fn (Fix $fix): string => $fix->kind(), $fixes === null ? [] : array_values($fixes->fixes())));
         $finding = $context->finding();
-        if (array_keys($kinds) === [Fix::UNKNOWN] || $kinds === []) {
+        if ($kinds === [Fix::UNKNOWN] || $kinds === []) {
             $reason = $finding->origin()->isLocal() ? 'local_package' : ($finding->isFromComposerRepository() ? 'releases_unknown' : 'metadata_not_read');
 
             return MoveDraft::of(Move::NO_MOVE, FlagSet::VULNERABLE)->withReason($reason)->withFixKind(Fix::UNKNOWN);
         }
-        $hardest = 0;
-        foreach (array_keys($kinds) as $kind) {
-            $hardest = max($hardest, (int) array_search($kind, ScoreModel::FIX_KINDS, true));
-        }
+        $hardest = max(array_map(static fn (string $kind): int => (int) array_search($kind, ScoreModel::FIX_KINDS, true), $kinds));
 
-        return MoveDraft::of(array_keys($kinds) === [Fix::NONE] ? Move::NO_FIX : Move::NO_SINGLE_FIX, FlagSet::VULNERABLE)->withFixKind(ScoreModel::FIX_KINDS[$hardest]);
+        return MoveDraft::of($kinds === [Fix::NONE] ? Move::NO_FIX : Move::NO_SINGLE_FIX, FlagSet::VULNERABLE)->withFixKind(ScoreModel::FIX_KINDS[$hardest]);
     }
 
     /** A move to a row's candidate: `composer update` on the installed row, `require ^{lowest}` above it. */
@@ -127,7 +123,7 @@ final class NextStep
         foreach ($fixes === null ? [] : $fixes->branches() as $branch) {
             $candidate = $branch->candidate();
             $row = $context->row($branch->branch());
-            if ($candidate === null || $row === null || $branch->fixed() === 0 || $candidate->kind() === Fix::BLOCKED) {
+            if ($candidate === null || $row === null) {
                 continue;
             }
             $ifApplied = MoveBuilder::build(self::toCandidate($row, $candidate), [], $candidate->kind(), $context)->ifApplied();
@@ -139,16 +135,13 @@ final class NextStep
         return $out;
     }
 
-    /**
-     * `security.partial`, judged as an `update` move to that release. Null beside a security
-     * move that is that update.
-     */
-    private static function partial(MoveContext $context, ?MoveDraft $security): ?SecurityPartial
+    /** `security.partial`, judged as an `update` move to that release. */
+    private static function partial(MoveContext $context): ?SecurityPartial
     {
         $fixes = $context->fixes();
         $partial = $fixes === null ? null : $fixes->partial();
         $installed = $context->installedRow();
-        if ($partial === null || $installed === null || ($security !== null && $security->kind() === Move::UPDATE)) {
+        if ($partial === null || $installed === null) {
             return null;
         }
         $finding = $context->finding();
