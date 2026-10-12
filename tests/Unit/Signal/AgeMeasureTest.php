@@ -268,7 +268,7 @@ final class AgeMeasureTest extends TestCase
 
     public function testAMeasuredReadingNeedsADateAndAnUnmeasuredOneAReason(): void
     {
-        $reading = AgeReading::measured(new \DateTimeImmutable(self::NOW), 69, 6.93, 'v1', 'vendor/parent', Signal::LEVEL_HIGH);
+        $reading = AgeReading::measured(new \DateTimeImmutable(self::NOW), 69, 6.93, 'v1', 'vendor/parent', Signal::LEVEL_HIGH, AgeReading::RELEASE);
 
         self::assertSame(6.9, $reading->years());
         self::assertSame(69, $reading->tenths());

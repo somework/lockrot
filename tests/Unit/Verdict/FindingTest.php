@@ -935,7 +935,7 @@ final class FindingTest extends TestCase
     public function testAJudgementTheDetailsContradictIsRefused(string $status, bool $maintenanceJudged, bool $detailsFirst): void
     {
         $finding = (new FindingBuilder())->withoutFlags()->build();
-        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
         $flags = FlagSet::fromSignals([], null, []);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -1065,7 +1065,7 @@ final class FindingTest extends TestCase
     {
         $finding = (new FindingBuilder())->build();
         $before = $finding->details();
-        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
 
         $copy = $finding->withDetails($details);
 

@@ -84,7 +84,7 @@ final class FindingDetailsTest extends TestCase
     public function testUnreadReleasesGiveTheInstalledBranchARowWithNoFixKnown(): void
     {
         $rows = self::rows([['id' => 'PKSA-a', 'severity' => 'high', 'counted' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null, 'reason' => 'releases_unknown']]]);
-        $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
 
         $security = $details->toSecurityArray($rows, '1.x');
 
@@ -125,7 +125,7 @@ final class FindingDetailsTest extends TestCase
     public function testASnapshotsVulnerableSummaryHasNoBranchClause(): void
     {
         $rows = self::rows([['id' => 'PKSA-a', 'cve' => 'CVE-2026-1', 'title' => 'a title', 'severity' => 'high', 'counted' => true, 'deciding' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null]]]);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
 
         self::assertSame('1 advisory: 1 high; advisory: CVE-2026-1 a title', $details->vulnerableSummary($rows, null, 'high'));
     }
@@ -155,7 +155,7 @@ final class FindingDetailsTest extends TestCase
         $candidate = new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, [$holder]);
         $branch = new BranchFixes('1.x', true, 0, 2, $candidate, '1.3.0', ['PKSA-a']);
         $gets = new Gets('1.3.0', PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=8.1')), ['PKSA-a'], false);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'medium', 'fix' => ['kind' => 'upgrade', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
@@ -178,7 +178,7 @@ final class FindingDetailsTest extends TestCase
     /** Without the scan, the S9 rows give the branch row: each row on the branch is fixed, each without a kind is not known. */
     public function testTheS9RowsCountTheFixedAndTheUnknown(): void
     {
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
@@ -199,7 +199,7 @@ final class FindingDetailsTest extends TestCase
     public function testTheStandingOfCountedRowsIsVulnerableWithTheHardestKind(): void
     {
         $ignored = new IgnoredAdvisory(new Advisory('PKSA-i', null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, 'PKSA-i', null, AdvisoryIgnoreMatch::BY_AUDIT));
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update']],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'raise-php']],
@@ -219,7 +219,7 @@ final class FindingDetailsTest extends TestCase
     /** With no counted row, the lookup decides the status, and nothing is counted or fixed. */
     public function testTheStandingWithNoRowFollowsTheLookup(): void
     {
-        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
+        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
 
         self::assertSame('clear', $details('complete')->standing([])->status());
         self::assertSame('unchecked', $details('partial')->standing([])->status());

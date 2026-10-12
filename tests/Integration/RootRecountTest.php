@@ -115,7 +115,7 @@ final class RootRecountTest extends TestCase
             $abandoned('acme/forgotten', 'Symfony', '2025-06-01T00:00:00+00:00'),
             (new FindingBuilder())->withPackage('acme/kept')->withChain(['acme/kept'])->withFlags(FlagSet::fromSignals([new Signal('warn', 'old promise', SignalDataStub::of('S5', [])), new Signal('warn', 'no release', SignalDataStub::of('S2', []))], $stale, []))->build(),
             (new FindingBuilder())->withPackage('acme/quiet')->withChain(['acme/quiet'])->withFlags(FlagSet::fromSignals([new Signal('warn', 'no release', SignalDataStub::of('S2', []))], $stale, []))->build(),
-            $vulnerable->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [$ignored], null, FindingBuilder::activityOf($vulnerable), FindingBuilder::unmeasuredAge())),
+            $vulnerable->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [$ignored], null, FindingBuilder::activityOf($vulnerable), FindingBuilder::unmeasuredAge(), null, null)),
         ];
     }
 

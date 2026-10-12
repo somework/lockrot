@@ -274,7 +274,7 @@ final class FindingBuilder
 
         $activity = self::activityOf($finding);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity), new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null));
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity), new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null), null);
     }
 
     /**
@@ -295,7 +295,7 @@ final class FindingBuilder
         $snapshot = ReleaseBranch::of($finding->version()) === null;
 
         return new Age(
-            AgeReading::unmeasuredBecause($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::UNDATED),
+            $finding->libyears() !== null ? AgeReading::measured(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), 0, 0.0, null, null, null, AgeReading::INSTALLED) : AgeReading::unmeasuredBecause($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::UNDATED),
             $s2 === null ? AgeReading::unmeasuredBecause($metadataReason ?? AgeMeasure::UNDATED_RELEASES) : $measured($s2->lastRelease(), $s2->years(), $s2->lastVersion(), $s2->datedBy(), $levels[Signal::S2], AgeReading::RELEASE),
             $s8 === null ? AgeReading::unmeasuredBecause($metadataReason ?? ($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::NO_BRANCH_ROW)) : $measured($s8->branchLastRelease(), $s8->years(), $s8->branchLastVersion(), $s8->datedBy(), $levels[Signal::S8], AgeReading::RELEASE),
             $s4 === null ? AgeReading::unmeasuredBecause($activity->reason() ?? AgeMeasure::UNDATED) : $measured($s4->lastPush(), $s4->years(), null, null, $levels[Signal::S4], AgeReading::PUSH)

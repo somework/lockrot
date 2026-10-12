@@ -45,7 +45,7 @@ final class AgeReading implements \JsonSerializable
      * @param ?string $level   {@see Signal::LEVEL_WARN} or {@see Signal::LEVEL_HIGH}, null below every threshold or where none applies
      * @param string  $kind    one of {@see INSTALLED}, {@see RELEASE}, {@see PUSH}
      */
-    public static function measured(\DateTimeImmutable $at, int $tenths, float $ratio, ?string $version, ?string $datedBy, ?string $level, string $kind = self::RELEASE): self
+    public static function measured(\DateTimeImmutable $at, int $tenths, float $ratio, ?string $version, ?string $datedBy, ?string $level, string $kind): self
     {
         return new self($kind, $at, $tenths, $ratio, $version, $datedBy, $level, null);
     }

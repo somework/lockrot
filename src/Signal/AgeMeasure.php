@@ -97,7 +97,7 @@ final class AgeMeasure
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
 
-        return $this->reading($at, $metadata->lastStableVersion(), $metadata->lastStableDatedBy(), [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()]);
+        return $this->reading($at, $metadata->lastStableVersion(), $metadata->lastStableDatedBy(), [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
     }
 
     /**
@@ -131,7 +131,7 @@ final class AgeMeasure
             return AgeReading::unmeasuredBecause(self::ABOVE_LISTED_RELEASES);
         }
 
-        return $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()]);
+        return $this->reading($at, $own['version'], $own['dated_by'] ?? null, [$this->thresholds->releaseWarnYears(), $this->thresholds->releaseHighYears()], AgeReading::RELEASE);
     }
 
     /**
@@ -171,7 +171,7 @@ final class AgeMeasure
     }
 
     /** @param array{int, int}|null $thresholds warn and high years, null where no threshold applies */
-    private function reading(\DateTimeImmutable $at, ?string $version, ?string $datedBy, ?array $thresholds, string $kind = AgeReading::RELEASE): AgeReading
+    private function reading(\DateTimeImmutable $at, ?string $version, ?string $datedBy, ?array $thresholds, string $kind): AgeReading
     {
         $ratio = $this->clock->yearsSince($at);
         $level = $thresholds === null ? null : Thresholds::levelFor($ratio, $thresholds[0], $thresholds[1]);

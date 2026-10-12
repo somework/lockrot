@@ -62,7 +62,7 @@ final class FindingDetails
      * @param array{requires: ?string, target_runs: ?bool, project_allows: ?bool} $installedPhp
      * @param list<IgnoredAdvisory>                                         $ignored
      */
-    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age, ?AdvisoryNameCoverage $lookup = null, ?AbandonedIgnored $abandonedIgnored = null)
+    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age, ?AdvisoryNameCoverage $lookup, ?AbandonedIgnored $abandonedIgnored)
     {
         $this->abandonedIgnored = $abandonedIgnored;
         $this->activity = $activity;

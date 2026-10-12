@@ -229,6 +229,6 @@ final class Report2RootTest extends TestCase
             $list[] = $advisory;
         }
 
-        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, $list, null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge()));
+        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, $list, null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null));
     }
 }

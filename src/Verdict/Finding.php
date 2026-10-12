@@ -92,8 +92,8 @@ final class Finding
     private bool $maintenanceJudged = true;
     private ?FindingDetails $details = null;
     private bool $composerJsonRead = true;
-    /** @var list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> */
-    private array $namedIn = [];
+    /** @var ?list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> null until {@see withComposerJson()} */
+    private ?array $namedIn = null;
 
     /**
      * @param list<Signal> $signals
@@ -316,9 +316,17 @@ final class Finding
         return $this->composerJsonRead ? self::UNREACHED : self::NO_COMPOSER_JSON;
     }
 
-    /** @return list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> */
+    /**
+     * @return list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV>
+     *
+     * @throws \LogicException for a finding built without {@see withComposerJson()}
+     */
     public function namedIn(): array
     {
+        if ($this->namedIn === null) {
+            throw new \LogicException(\sprintf('%s was built without the composer.json sections that name it.', $this->package));
+        }
+
         return $this->namedIn;
     }
 
@@ -753,7 +761,7 @@ final class Finding
             'chain' => $this->chain,
             'depth' => $this->depth(),
             'depth_unmeasured' => $this->depthUnmeasured(),
-            'named_in' => $this->namedIn,
+            'named_in' => $this->namedIn(),
             'direct_dependents' => $this->directDependents,
             'signals' => $signals,
             'evidence' => implode('; ', $evidence),

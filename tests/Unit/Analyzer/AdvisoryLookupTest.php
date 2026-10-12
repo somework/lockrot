@@ -24,7 +24,7 @@ final class AdvisoryLookupTest extends TestCase
         $finding = (new FindingBuilder())->withPackage($package)->build();
         $details = $finding->details();
 
-        return $finding->withDetails(new FindingDetails($details->metadataStatus(), null, null, $details->skipped(), $details->installedPhp(), null, 'complete', null, [], null, $details->activity(), $details->age(), $lookup));
+        return $finding->withDetails(new FindingDetails($details->metadataStatus(), null, null, $details->skipped(), $details->installedPhp(), null, 'complete', null, [], null, $details->activity(), $details->age(), $lookup, null));
     }
 
     public function testAFindingIsAskedWhenAFeedAnsweredOrFailedForIt(): void
