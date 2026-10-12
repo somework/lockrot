@@ -108,7 +108,7 @@ jobs:
     # Keep the cap far above a shard's run time: a slow runner cancels a green shard. The cap only
     # stops a runaway run. Measurements: https://github.com/somework/lockrot/pull/6 and
     # https://github.com/somework/lockrot/pull/10
-    timeout-minutes: 180
+    timeout-minutes: 50
     # A separate job, so a style or type error does not wait for it. One run over the whole src tree
     # is too slow for one job, so each shard mutates a group of src directories. The shards have
     # unequal populations, and one shared min_msi leaves a shard a few mutants from red. So a
