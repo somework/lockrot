@@ -114,6 +114,19 @@ final class ThroughCheckTest extends TestCase
         self::assertSame([null, null, 'no_stable_release'], [$entries[0]['newest_stable'], $entries[0]['newest_requires'], $entries[0]['newest_requires_unmeasured']]);
     }
 
+    /** The dependent's `require` names the package in lower case, whatever case the lock gives it. */
+    public function testAPackageNameIsMatchedInLowerCase(): void
+    {
+        $loaded = (new ArrayLoader())->load(['name' => 'd/x', 'version' => '1.0.0', 'time' => '2024-01-01T00:00:00+00:00', 'require' => ['a/b' => '^1.0']]);
+        self::assertInstanceOf(BasePackage::class, $loaded);
+        $metadata = PackageMetadata::fromPackages('d/x', [$loaded], new \DateTimeImmutable(self::NOW), '1.0.0.0');
+        $lock = LockFile::fromArray(['packages' => [['name' => 'A/B', 'version' => '1.0.0', 'notification-url' => self::PACKAGIST], ['name' => 'd/x', 'version' => '1.0.0', 'notification-url' => self::PACKAGIST]]]);
+
+        $entry = JsonPath::decoded(ThroughCheck::of('A/B', false, ['d/x'], $lock, ['d/x' => $metadata])[0]);
+
+        self::assertSame([true, true], [$entry['installed_requires'], $entry['newest_requires']]);
+    }
+
     public function testADirectPackageHasNoEntries(): void
     {
         self::assertSame([], ThroughCheck::of('a/b', true, ['a/b'], LockFile::fromArray(['packages' => []]), []));

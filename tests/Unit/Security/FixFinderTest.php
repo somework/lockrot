@@ -34,6 +34,13 @@ final class FixFinderTest extends TestCase
         self::assertTrue((new \ReflectionClass(Intervals::class))->hasMethod('haveIntersections'));
     }
 
+    public function testEveryOtherVersionRangeRaisesTheWindow(): void
+    {
+        $counted = self::advisory('A', '<1.2.0');
+
+        self::assertCount(2, FixFinder::otherVersionRanges([$counted], [$counted, self::advisory('B', '>=2.0'), self::advisory('C', '>=3.0')]));
+    }
+
     /**
      * phpBB: the root requires twig ^2.0, and symfony/twig-bridge v3.4.47 requires ^1.41|^2.10.
      * Only 3.x fixes the advisories, and 3.x needs php >=8.1 above the project's 7.2.

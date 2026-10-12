@@ -8,8 +8,13 @@ use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\MultiConstraint;
 use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
+use Lockrot\Security\Holder;
 use Lockrot\Tests\Support\CaseHydrator;
+use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\GradedPackage;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -74,6 +79,104 @@ final class MoveTest extends TestCase
                 self::assertFalse(Intervals::haveIntersections($parser->parseConstraints($range), $span), $id.': '.JsonPath::stringAt($fact, ['id']).' in '.JsonPath::stringAt($move, ['version']).' to '.JsonPath::stringAt($move, ['newest']));
             }
         }
+    }
+
+    /**
+     * The move and the security fields that it sets, for every case with inputs, held in a golden file.
+     * A failure names the case whose output moved.
+     */
+    public function testEveryCaseWritesTheMoveInItsGoldenFile(): void
+    {
+        $golden = [];
+        foreach (CaseHydrator::findings() as $id => $finding) {
+            $security = JsonPath::arrayAt($finding, ['security']);
+            $golden[$id] = ['next_step' => $finding['next_step']] + array_intersect_key($security, array_flip(['fix_kind', 'installed_branch_fixes', 'move_in', 'partial']));
+        }
+        self::assertNotSame([], $golden);
+        ksort($golden);
+
+        Golden::assertMatches('moves.json', $golden, 'testEveryCaseWritesTheMoveInItsGoldenFile');
+    }
+
+    /** The same fields for each lock of {@see scenarios()}, each built to reach one branch of the move rules. */
+    public function testEveryScenarioWritesTheMoveInItsGoldenFile(): void
+    {
+        $golden = [];
+        foreach (self::scenarios() as $name => $over) {
+            $finding = self::analyse($over);
+            $security = JsonPath::arrayAt($finding, ['security']);
+            $golden[$name] = ['next_step' => $finding['next_step']] + array_intersect_key($security, array_flip(['fix_kind', 'installed_branch_fixes', 'move_in', 'partial']));
+        }
+
+        Golden::assertMatches('move-scenarios.json', $golden, 'testEveryScenarioWritesTheMoveInItsGoldenFile');
+    }
+
+    /**
+     * Filling the holders and the replacement writes each one's own finding into a copy, and the
+     * finding that the copy came from keeps what it had. h/old holds the security move, and the
+     * registry names it as the replacement.
+     */
+    public function testFillingTheHoldersLeavesTheOriginalFindingAsItWas(): void
+    {
+        $inputs = self::inputs([
+            'lock' => [[], ['name' => 'h/old', 'version' => '1.0.0', 'require' => ['a/b' => '<1.5']]],
+            'abandoned' => ['by' => 'repository', 'replacement' => 'h/old'],
+            'advisories' => [self::advisory('PKSA-1', 'critical', '<1.9.0')],
+        ]);
+        $finding = null;
+        foreach (CaseHydrator::report(['id' => 'move', 'inputs' => $inputs])->findings() as $each) {
+            $finding = $each->package() === 'a/b' ? $each : $finding;
+        }
+        self::assertInstanceOf(Finding::class, $finding);
+        $before = JsonPath::decoded($finding->toArray());
+        $bare = (new FindingBuilder())->withPackage('a/b')->build();
+
+        $copy = $finding->withHolders(['h/old' => new GradedPackage('critical', null, ['vulnerable'], null, null)]);
+        $filled = JsonPath::decoded($copy->toArray());
+        $moved = $bare->withMoves($finding->details()->moves());
+        $lead = $finding->nextStep();
+        self::assertNotNull($lead);
+        $fixKind = $lead->fixKind();
+        $lead->withFixKind('blocked');
+        $also = $lead->also();
+        self::assertNotSame([], $also);
+        $lead->asLead([], []);
+
+        self::assertSame($before, JsonPath::decoded($finding->toArray()));
+        self::assertSame($fixKind, $lead->fixKind());
+        self::assertSame($also, $lead->also());
+        self::assertNotSame('blocked', $fixKind);
+        self::assertNull($bare->nextStep());
+        self::assertSame($finding->nextStep(), $moved->nextStep());
+        $moves = array_merge([JsonPath::arrayAt($filled, ['next_step'])], JsonPath::arrayAt($filled, ['next_step', 'also']));
+        $replacements = [];
+        $holders = ['the moves' => [], 'the installed branch' => JsonPath::arrayAt($filled, ['security', 'installed_branch_fixes', 'held_by']), 'S9' => []];
+        foreach ($moves as $move) {
+            self::assertIsArray($move);
+            $holders['the moves'] = array_merge($holders['the moves'], JsonPath::arrayAt($move, ['held_by']));
+            $replacements[] = \is_array($move['replacement']) ? $move['replacement']['finding'] : null;
+        }
+        self::assertContains(['verdict' => 'critical', 'lead' => null, 'flag_ids' => ['vulnerable']], $replacements);
+        foreach (JsonPath::arrayAt($filled, ['signals']) as $signal) {
+            self::assertIsArray($signal);
+            foreach ($signal['id'] === 'S9' ? JsonPath::arrayAt($signal, ['data', 'advisories']) : [] as $row) {
+                self::assertIsArray($row);
+                $holders['S9'] = array_merge($holders['S9'], JsonPath::arrayAt($row, ['fix', 'held_by']));
+            }
+        }
+        foreach ($holders as $where => $list) {
+            $own = array_values(array_filter($list, static fn ($holder): bool => \is_array($holder) && $holder['source'] === 'package'));
+            self::assertSame([['verdict' => 'critical', 'lead' => null, 'flag_ids' => ['vulnerable'], 'replacement' => null, 'next_step' => null]], array_column($own, 'holder'), $where);
+        }
+        self::assertStringContainsString('h/old 1.0.0 (requires <1.5; itself critical: vulnerable)', implode("\n", array_map(static fn ($move): string => \is_array($move) ? JsonPath::stringAt($move, ['text']) : '', $moves)));
+        $fixes = $copy->details()->fixes();
+        self::assertNotNull($fixes);
+        $verdicts = [];
+        foreach ($fixes->forAdvisory('PKSA-1')->heldBy() as $each) {
+            $graded = $each->finding();
+            $verdicts[] = $each->source() === Holder::PACKAGE && $graded !== null ? $graded->verdict() : null;
+        }
+        self::assertContains('critical', $verdicts, 'the advisory\'s own fix');
     }
 
     /** monolog-bridge: S8 suggests ^5.4, the advisory fixes 5.x from 5.4.52, so the merged move is ^5.4.52. */
@@ -298,6 +401,16 @@ final class MoveTest extends TestCase
      */
     private static function analyse(array $over): array
     {
+        return self::hydrated(['id' => 'move', 'inputs' => self::inputs($over)]);
+    }
+
+    /**
+     * @param array<string, mixed> $over
+     *
+     * @return array<string, mixed> the `inputs` block of the base lock with $over
+     */
+    private static function inputs(array $over): array
+    {
         $entry = ['name' => 'a/b', 'version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'php' => '>=7.2', 'dev' => false, 'origin' => 'packagist'];
         $others = [];
         $require = ['php' => '>=7.4', 'a/b' => '^1.0'];
@@ -321,14 +434,82 @@ final class MoveTest extends TestCase
                 $rest[$key] = $value;
             }
         }
-        $inputs = ['root' => ['name' => 'acme/app', 'require' => $require], 'lock' => array_merge([$entry], $others)] + $rest;
-
-        return self::hydrated(['id' => 'move', 'inputs' => $inputs]);
+        return ['root' => ['name' => 'acme/app', 'require' => $require], 'lock' => array_merge([$entry], $others)] + $rest;
     }
 
-    /** @return array{version: string, time: string, php: string} */
-    private static function release(string $version, string $date, string $php): array
+    /** @return array{version: string, time: ?string, php: ?string} */
+    private static function release(string $version, ?string $date, ?string $php): array
     {
-        return ['version' => $version, 'time' => $date.'T00:00:00+00:00', 'php' => $php];
+        return ['version' => $version, 'time' => $date === null ? null : $date.'T00:00:00+00:00', 'php' => $php];
+    }
+
+    /** @return array{id: string, severity: string, affected_versions: string} */
+    private static function advisory(string $id, string $severity, string $range): array
+    {
+        return ['id' => $id, 'severity' => $severity, 'affected_versions' => $range];
+    }
+
+    /**
+     * Locks for {@see analyse()}, by name: each changes the base lock to reach one rule. The
+     * target major's GA is 2020-11-26 (PHP 8.0), and a line releases within three years of the run.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private static function scenarios(): array
+    {
+        $one = [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.9.0', '2020-01-01', '>=7.2')];
+        $dependent = [['version' => '1.0.0', 'time' => '2019-01-01T00:00:00+00:00', 'require' => ['a/b' => '*']], ['version' => '2.0.0', 'time' => '2026-01-01T00:00:00+00:00', 'require' => []]];
+        $dependents = static function (int $count) use ($dependent): array {
+            $names = \array_slice(['d/one', 'd/two', 'd/three', 'd/four'], 0, $count);
+            $lock = array_map(static fn (string $name): array => ['name' => $name, 'version' => '1.0.0', 'require' => ['a/b' => '*']], $names);
+
+            return ['root' => ['require' => ['a/b' => null] + array_fill_keys($names, '^1.0')], 'lock' => array_merge([[]], $lock), 'dependents' => array_fill_keys($names, $dependent)];
+        };
+        $holder = ['name' => 'h/old', 'version' => '1.0.0', 'php' => '>=5.3,<7.0', 'require' => ['a/b' => '^1.0'], 'time' => '2015-01-01T00:00:00+00:00'];
+        $offline = ['target_php' => '8.4', 'project_php' => '>=7.4', 'fail_on' => 'high', 'include_dev' => false, 'advisories_unchecked' => 'offline'];
+
+        return [
+            'pinned from a local path' => ['lock' => [['version' => 'dev-master', 'origin' => 'path']], 'releases' => null],
+            'pinned with its releases unread' => ['lock' => [['version' => 'dev-master']], 'releases' => null],
+            'pinned with no stable release' => ['lock' => [['version' => 'dev-master']], 'releases' => []],
+            'pinned on a v-prefixed tag' => ['lock' => [['version' => 'dev-master']], 'releases' => [self::release('v1.0.0', '2019-01-01', '>=7.2'), self::release('v2.3.0', '2026-06-01', '>=7.2')]],
+            'pinned on a tag before the ga' => ['lock' => [['version' => 'dev-master']], 'releases' => [self::release('v1.0.0', '2019-01-01', '>=7.2')]],
+            'pinned on a tag with no php' => ['lock' => [['version' => 'dev-master']], 'releases' => [self::release('v1.0.0', '2019-01-01', null)]],
+            'pinned on a 0.x branch alias' => ['lock' => [['version' => '0.3.x-dev']], 'root' => ['require' => ['a/b' => '0.3.x-dev']], 'releases' => [self::release('0.3.0', '2019-01-01', '>=7.2'), self::release('0.3.5', '2020-01-01', '>=7.2'), self::release('0.4.0', '2026-01-01', '>=7.2')]],
+            'three dependents' => $dependents(3),
+            'four dependents that dropped it' => $dependents(4),
+            'holders that are graded' => ['lock' => [[], $holder, ['name' => 'h/pin', 'version' => 'dev-master', 'require' => ['a/b' => '^1.0']]], 'dependents' => ['h/old' => [['version' => '1.0.0', 'time' => '2015-01-01T00:00:00+00:00', 'require' => ['a/b' => '^1.0'], 'php' => '>=5.3,<7.0']]]],
+            'a replacement that the registry names' => ['abandoned' => ['by' => 'repository', 'replacement' => 'acme/new-lib']],
+            'a newer release than the installed one' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.2.0', '2020-01-01', '>=7.2')]],
+            'a line with no php' => ['releases' => array_merge($one, [self::release('2.0.0', '2026-05-01', null), self::release('2.3.0', '2026-06-01', null)])],
+            'a lower line that releases' => ['releases' => array_merge([self::release('0.9.0', '2026-07-01', '>=7.2')], $one, [self::release('2.0.0', '2026-05-01', '>=8.1'), self::release('2.3.0', '2026-06-01', '>=8.1')])],
+            'a line released at the warn-years edge' => ['releases' => array_merge($one, [self::release('2.3.0', '2023-10-08', '>=8.1'), self::release('3.0.0', '2026-01-01', '>=9.0')])],
+            'a line with an undated newest release' => ['releases' => array_merge($one, [self::release('2.0.0', '2026-01-01', '>=8.1'), self::release('2.3.0', null, '>=8.1')])],
+            'a lowest release on the ga day' => ['releases' => array_merge($one, [self::release('2.0.0', '2020-11-26', '>=7.2'), self::release('2.0.1', '2026-01-01', '>=7.2')])],
+            'old-promise with an update the target cannot run' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2025-01-01', '>=8.5')]],
+            'old-promise with a lower line after the ga' => ['releases' => [self::release('0.9.0', '2025-03-01', '>=7.2'), self::release('1.0.0', '2019-01-01', '>=7.2')]],
+            'old-promise with an undated release' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', null, '>=7.2')]],
+            'old-promise with a release on the ga day' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2020-11-26', '>=7.2')]],
+            'an advisory on the move\'s lower releases' => ['releases' => array_merge($one, [self::release('2.3.0', '2026-03-01', '>=8.1'), self::release('2.3.5', '2026-04-01', '>=8.1')]), 'other_advisories' => [self::advisory('PKSA-own', 'high', '>=2.3.0,<2.3.5')]],
+            'an advisory on the move\'s newest release' => ['releases' => array_merge($one, [self::release('2.3.0', '2026-03-01', '>=8.1'), self::release('2.3.5', '2026-04-01', '>=8.1')]), 'other_advisories' => [self::advisory('PKSA-own', 'high', '>=2.3.5')]],
+            'a maintenance lead merged with a higher fix' => ['releases' => array_merge($one, [self::release('2.3.0', '2026-01-01', '>=7.2'), self::release('2.3.4', '2026-06-01', '>=8.1')]), 'advisories' => [self::advisory('PKSA-1', 'low', '<2.3.4')]],
+            'a security lead merged with a higher maintenance move' => ['releases' => array_merge($one, [self::release('2.0.0', '2026-01-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=8.1')]), 'advisories' => [self::advisory('PKSA-1', 'high', '<2.0.0')]],
+            'a security move in also' => ['releases' => array_merge($one, [self::release('2.0.0', '2026-01-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=7.2'), self::release('3.0.0', '2026-07-01', '>=8.1')]), 'advisories' => [self::advisory('PKSA-1', 'low', '<3.0.0')]],
+            'a top line that fixes nothing' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2020-01-01', '>=7.2'), self::release('2.0.0', '2026-05-01', '>=8.1'), self::release('2.3.0', '2026-06-01', '>=8.1')], 'advisories' => [self::advisory('PKSA-1', 'high', '<1.5.0 || >=2.0.0')]],
+            'a lead update to the partial release' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2021-06-01', '>=7.2')], 'advisories' => [self::advisory('PKSA-a', 'low', '<1.5.0'), self::advisory('PKSA-b', 'low', '<9.0')]],
+            'a partial fix offline' => ['releases' => [self::release('1.0.0', '2019-01-01', '>=7.2'), self::release('1.5.0', '2020-01-01', '>=7.2')], 'advisories' => [self::advisory('PKSA-a', 'high', '<1.5.0'), self::advisory('PKSA-b', 'high', '<9.0')], 'run' => $offline],
+            'two advisories with no release data' => ['releases' => null, 'advisories' => [self::advisory('PKSA-1', 'high', '<1.9.0'), self::advisory('PKSA-2', 'high', '<1.9.0')]],
+            'two advisories that stay' => ['advisories' => [self::advisory('PKSA-1', 'low', '<99.0'), self::advisory('PKSA-2', 'low', '<99.0')]],
+            'an accepted flag that the move settles' => ['accept' => ['left-behind'], 'releases' => array_merge($one, [self::release('2.0.0', '2026-01-01', '>=7.2')]), 'advisories' => [self::advisory('PKSA-1', 'high', '<2.0.0')]],
+            'a target php that does not parse' => ['lock' => [['version' => 'dev-master']], 'releases' => [self::release('v2.3.0', '2026-06-01', '>=7.2')], 'run' => ['target_php' => 'next'] + $offline],
+            'a snapshot on the line that the fix needs' => ['lock' => [['version' => '2.x-dev']], 'releases' => array_merge($one, [self::release('2.0.0', '2026-01-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=7.2')]), 'advisories' => [self::advisory('PKSA-1', 'high', '<2.3.0')]],
+            'a maintenance lead that clears the advisory on another line' => ['releases' => array_merge($one, [self::release('2.0.0', '2021-06-01', '>=7.2'), self::release('3.0.0', '2026-01-01', '>=8.1')]), 'advisories' => [self::advisory('PKSA-1', 'low', '<2.0.0')]],
+            'a replacement given as a url' => ['abandoned' => ['by' => 'repository', 'replacement' => 'https://github.com/acme/fork']],
+            'pinned on a tag the target cannot run' => ['lock' => [['version' => 'dev-master']], 'releases' => [self::release('v2.3.0', '2026-06-01', '>=9.0')]],
+            'pinned on an undated tag' => ['lock' => [['version' => '1.x-dev', 'time' => '2026-01-01T00:00:00+00:00']], 'root' => ['require' => ['a/b' => '1.x-dev']], 'releases' => [self::release('v1.0.0', null, '>=7.2')]],
+            'a fix below the newest release of its line' => ['lock' => [['time' => '2026-01-01T00:00:00+00:00']], 'releases' => [self::release('1.0.0', '2026-01-01', '>=7.2'), self::release('2.0.0', '2026-02-01', '>=7.2'), self::release('2.3.0', '2026-06-01', '>=8.1')], 'advisories' => [self::advisory('PKSA-1', 'high', '<2.0.0')]],
+            'a blocked move beside an advisory' => ['releases' => array_merge($one, [self::release('2.3.0', '2026-06-01', '>=9.0')]), 'advisories' => [self::advisory('PKSA-1', 'high', '<99.0')]],
+            'two 0.x lines' => ['lock' => [['version' => '0.3.1']], 'root' => ['require' => ['a/b' => '^0.3']], 'releases' => [self::release('0.3.1', '2019-01-01', '>=7.2'), self::release('0.3.5', '2020-01-01', '>=7.2'), self::release('0.4.0', '2026-01-01', '>=7.2')], 'advisories' => [self::advisory('PKSA-1', 'high', '<0.3.5')]],
+        ];
     }
 }

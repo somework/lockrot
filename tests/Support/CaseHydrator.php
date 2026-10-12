@@ -7,6 +7,8 @@ namespace Lockrot\Tests\Support;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Semver\VersionParser;
+use Lockrot\Allowlist\Allowlist;
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
@@ -36,7 +38,8 @@ use Lockrot\Verdict\VerdictEngine;
  * writes for it. The loaders answer from the case's `inputs` block, which
  * tools/schema/project_fixtures.py writes (`inputs_of`). Only the case's package and the measured
  * dependents have metadata, and a null `releases` leaves the package without it. A test can add
- * `other_advisories`, the advisories of the package's other versions.
+ * `other_advisories`, the advisories of the package's other versions, and `accept`, the flags that
+ * an allowlist entry for the package accepts.
  */
 final class CaseHydrator
 {
@@ -139,6 +142,11 @@ final class CaseHydrator
             self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []), self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null)
         );
 
+        if (\is_array($inputs['accept'] ?? null)) {
+            $accept = array_values(array_filter($inputs['accept'], 'is_string'));
+            $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(new Allowlist([new AllowlistEntry($package, null, 'accepted by the test', null, AllowlistEntry::BY_PROJECT, $accept)])));
+        }
+
         return $analyzer->analyze($lock, $project, ($run['include_dev'] ?? false) === true);
     }
 
@@ -166,6 +174,9 @@ final class CaseHydrator
             }
             if (\in_array($entry['origin'] ?? 'packagist', ['packagist', 'composer'], true)) {
                 $locked['notification-url'] = self::PACKAGIST;
+            }
+            if (($entry['origin'] ?? null) === 'path') {
+                $locked['dist'] = ['type' => 'path', 'url' => '../'.JsonPath::stringAt($entry, ['name'])];
             }
             if ($i === 0 && $activity !== null) {
                 $locked['source'] = ['type' => 'git', 'url' => 'https://'.JsonPath::stringAt($activity, ['host']).'/'.JsonPath::stringAt($activity, ['repo']).'.git', 'reference' => 'case'];

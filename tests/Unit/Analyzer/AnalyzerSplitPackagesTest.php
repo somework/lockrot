@@ -173,6 +173,10 @@ final class AnalyzerSplitPackagesTest extends TestCase
         self::assertSame([['illuminate/contracts' => '8.83.27.0'], ['laravel/framework' => null]], $this->asked, 'the lock first with its versions, then the parent for its dates only');
         $finding = self::finding($report, 'illuminate/contracts');
         self::assertSame(Verdict::LEFT_BEHIND, $finding->verdict());
+        // The branch summary lists no release, so the move names the line by its constraint and no release.
+        $move = $finding->nextStep();
+        self::assertNotNull($move);
+        self::assertSame(['require', '13.x', null, '^13.24'], [$move->kind(), $move->toBranch(), $move->version(), $move->constraint()]);
         $s8 = self::signal($finding, Signal::S8);
         self::assertNotNull($s8);
         self::assertSame('branch 8.x last released 2024-11-20 (1.8 years ago, dated by laravel/framework); 13.x released v13.24.0 (2026-09-01)', $s8->summary());
