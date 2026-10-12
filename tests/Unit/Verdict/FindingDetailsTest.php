@@ -8,6 +8,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
+use Lockrot\Data\Advisory\AdvisoryFeed;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
@@ -37,11 +38,11 @@ use PHPUnit\Framework\TestCase;
 
 final class FindingDetailsTest extends TestCase
 {
-    /** @return iterable<string, array{list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}>, ?int, ?string, string}> */
+    /** @return iterable<string, array{list<AdvisoryFeed>, ?int, ?string, string}> */
     public static function lookups(): iterable
     {
-        $answered = ['composer_repository' => 'packagist.org', 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => 0];
-        $failed = ['composer_repository' => 'mirror.example.test', 'answer' => AdvisoryCoverage::FAILED, 'reason' => AdvisoryCoverage::TRANSPORT, 'message' => 'HTTP 503', 'records' => null];
+        $answered = AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0);
+        $failed = AdvisoryFeed::failed('composer repo (https://mirror.example.test)', 'HTTP 503');
         yield 'every feed answered' => [[$answered], 0, null, 'complete'];
         yield 'one feed answered, one threw' => [[$answered, $failed], 0, AdvisoryCoverage::LOOKUP_FAILED, 'partial'];
         yield 'no feed answered' => [[$failed], null, AdvisoryCoverage::LOOKUP_FAILED, 'not_run'];
@@ -50,7 +51,7 @@ final class FindingDetailsTest extends TestCase
     /**
      * `security.check` says how far the advisory lookup went for the package, whatever it counted.
      *
-     * @param list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}> $feeds
+     * @param list<AdvisoryFeed> $feeds
      *
      * @dataProvider lookups
      */
@@ -65,6 +66,15 @@ final class FindingDetailsTest extends TestCase
         $security = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge())->toSecurityArray([], null);
 
         self::assertSame($check, $security['check']);
+        self::assertSame($records, $security['records']);
+        self::assertSame($feeds, $security['feeds'], 'the feeds as the lookup gave them');
+    }
+
+    public function testARunWithoutALookupWritesNoFeedAndNoRecords(): void
+    {
+        $security = FindingDetails::of(F::looked(new PackageFacts(F::package(), null, null)), null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge())->toSecurityArray([], null);
+
+        self::assertSame([[], null], [$security['feeds'], $security['records']]);
     }
 
     /**

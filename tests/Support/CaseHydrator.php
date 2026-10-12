@@ -17,8 +17,10 @@ use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\AdvisoryFeed;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -334,10 +336,10 @@ final class CaseHydrator
      */
     private static function advisoryLoader(string $package, array $advisories, array $others, ?string $unchecked): AdvisoryLoaderInterface
     {
-        $feed = $unchecked === null
-            ? ['composer_repository' => 'packagist.org', 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => \count($advisories)]
-            : ['composer_repository' => 'packagist.org', 'answer' => 'not_asked', 'reason' => $unchecked, 'message' => null, 'records' => null];
-        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [], 0, [$package => new AdvisoryNameCoverage([$feed], $feed['records'], $unchecked)]);
+        $repository = 'composer repo (https://repo.packagist.org)';
+        $feeds = $unchecked === null ? [AdvisoryFeed::answered($repository, \count($advisories))] : [];
+        $repositories = [$unchecked === null ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords(\count($advisories), $advisories === [] ? 0 : 1) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)];
+        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, [$package => new AdvisoryNameCoverage($feeds, $unchecked === null ? \count($advisories) : null, $unchecked)]);
         $every = array_merge($advisories, $others);
         $batch = new AdvisoryBatch($advisories === [] ? [] : [$package => $advisories], [], [], $every === [] ? [] : [$package => $every], $coverage, $unchecked === null);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Config\Gate;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Signal\PhpFloor;
@@ -98,10 +99,11 @@ final class RunSettings
      *
      * @param array<string, int|null>|null $scoreRulesUsed
      * @param ?bool                        $includeDev     whether the report analysed packages-dev, which wins over the setting
+     * @param ?AdvisoryLookup              $advisoryLookup the report's, else a lookup that asked nothing
      *
      * @return array<string, mixed>
      */
-    public function toArray(?array $scoreRulesUsed = null, ?bool $includeDev = null): array
+    public function toArray(?array $scoreRulesUsed = null, ?bool $includeDev = null, ?AdvisoryLookup $advisoryLookup = null): array
     {
         return ['project' => $this->project, 'root_package' => $this->rootPackage]
             + $this->php()
@@ -109,6 +111,7 @@ final class RunSettings
             + $this->failOnKeys()
             + ['strict_network' => $this->strictNetwork, 'mode' => $this->mode, 'include_dev' => $includeDev ?? $this->includeDev]
             + $this->toModelArray()
+            + ['advisory_lookup' => $advisoryLookup ?? AdvisoryLookup::of(AdvisoryCoverage::none(), [])]
             + ['score_rules_used' => $scoreRulesUsed ?? ScoreModel::rulesUnused()];
     }
 
@@ -117,9 +120,10 @@ final class RunSettings
      *
      * @return array<string, mixed>
      */
-    public function toExplainArray(): array
+    public function toExplainArray(?AdvisoryLookup $advisoryLookup = null): array
     {
-        return $this->php() + $this->failOnKeys() + ['include_dev' => $this->includeDev] + $this->toModelArray();
+        return $this->php() + $this->failOnKeys() + ['include_dev' => $this->includeDev] + $this->toModelArray()
+            + ['advisory_lookup' => $advisoryLookup ?? AdvisoryLookup::of(AdvisoryCoverage::none(), [])];
     }
 
     /** @return array{target_php: string, target_php_source: string, project_php: ?string, project_php_lowest: ?string} */

@@ -471,7 +471,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'rot_depth', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
             array_keys($array)
         );
         // The literal, not the constant: the document states the value it attributed by.

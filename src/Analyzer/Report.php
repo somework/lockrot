@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
 use Lockrot\Legacy\Compare013;
@@ -38,13 +39,16 @@ final class Report
     private ?\DateTimeImmutable $activityCacheOldestAt;
     private bool $includesDev;
 
+    private AdvisoryCoverage $advisoryCoverage;
+
     /**
      * @param list<Finding> $findings
      * @param list<RunNote> $notes    what the run could not see, in the order that the run noted it
      */
-    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null, bool $includesDev = false)
+    public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null, bool $includesDev = false, ?AdvisoryCoverage $advisoryCoverage = null)
     {
         usort($findings, [self::class, 'compare']);
+        $this->advisoryCoverage = $advisoryCoverage ?? AdvisoryCoverage::none();
         $this->findings = $findings;
         $this->notes = $notes;
         $this->generatedAt = $generatedAt;
@@ -97,7 +101,8 @@ final class Report
             $this->notFromComposerRepository,
             $baseline,
             $this->activityCacheOldestAt,
-            $this->includesDev
+            $this->includesDev,
+            $this->advisoryCoverage
         );
         $copy->run = $this->run;
 
@@ -120,7 +125,8 @@ final class Report
             $this->notFromComposerRepository,
             $this->baseline,
             $this->activityCacheOldestAt,
-            $this->includesDev
+            $this->includesDev,
+            $this->advisoryCoverage
         );
         $copy->run = $run;
 
@@ -425,6 +431,12 @@ final class Report
         return $list;
     }
 
+    /** How the advisory lookup of the run went, counted over the findings that the report writes. */
+    public function advisoryLookup(): AdvisoryLookup
+    {
+        return AdvisoryLookup::of($this->advisoryCoverage, $this->sorted());
+    }
+
     /** The run settings the report was told, null when nothing told it. */
     public function run(): ?RunSettings
     {
@@ -476,7 +488,7 @@ final class Report
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
-            'run' => $run->toArray(ScoreRulesUsed::of($sorted), $this->includesDev),
+            'run' => $run->toArray(ScoreRulesUsed::of($sorted), $this->includesDev, $this->advisoryLookup()),
             'activity_cache_oldest_at' => $oldest === null ? null : $oldest->format(\DATE_ATOM),
             'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),
             'packages_checked' => $this->packagesChecked,

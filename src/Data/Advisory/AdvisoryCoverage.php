@@ -40,15 +40,15 @@ final class AdvisoryCoverage
 
     private string $scope;
     private string $scopeSource;
-    /** @var list<array{composer_repository: string, outcome: string, reason: ?string, message: ?string, records: ?int, packages_with_records: ?int}> */
+    /** @var list<AdvisoryRepository> */
     private array $repositories;
     private int $otherRepositories;
     /** @var array<string, AdvisoryNameCoverage> */
     private array $byName;
 
     /**
-     * @param list<array{composer_repository: string, outcome: string, reason: ?string, message: ?string, records: ?int, packages_with_records: ?int}> $repositories
-     * @param array<string, AdvisoryNameCoverage>                                                                                                     $byName
+     * @param list<AdvisoryRepository>            $repositories
+     * @param array<string, AdvisoryNameCoverage> $byName
      */
     public function __construct(string $scope, string $scopeSource, array $repositories, int $otherRepositories, array $byName)
     {
@@ -76,13 +76,7 @@ final class AdvisoryCoverage
         return $this->scopeSource;
     }
 
-    /**
-     * `composer_repository` is Composer's name for the repository, credentials stripped.
-     * `records` counts the distinct advisory ids returned for every asked name, and
-     * `packages_with_records` the names with at least one. Both are null unless `answered`.
-     *
-     * @return list<array{composer_repository: string, outcome: string, reason: ?string, message: ?string, records: ?int, packages_with_records: ?int}>
-     */
+    /** @return list<AdvisoryRepository> in configured order */
     public function repositories(): array
     {
         return $this->repositories;

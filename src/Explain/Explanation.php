@@ -174,7 +174,7 @@ final class Explanation
             'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
-            'run' => $run->toExplainArray(),
+            'run' => $run->toExplainArray($this->report->advisoryLookup()),
             'legacy' => ['verdict' => $this->finding->verdict(), 'priority' => $basis->priority(), 'basis' => $basis->toArray()],
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),

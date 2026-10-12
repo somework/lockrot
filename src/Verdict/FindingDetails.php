@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Repository\MetadataFailure;
@@ -49,6 +50,7 @@ final class FindingDetails
     private ?PackageFixes $fixes;
     private ?Check $releasesUnchecked = null;
     private Age $age;
+    private ?AdvisoryNameCoverage $lookup;
     private ?Moves $moves = null;
     private ActivityLookup $activity;
 
@@ -57,10 +59,11 @@ final class FindingDetails
      * @param array{requires: ?string, target_runs: ?bool, project_allows: ?bool} $installedPhp
      * @param list<IgnoredAdvisory>                                         $ignored
      */
-    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age)
+    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age, ?AdvisoryNameCoverage $lookup = null)
     {
         $this->activity = $activity;
         $this->age = $age;
+        $this->lookup = $lookup;
         $this->metadataStatus = $metadataStatus;
         $this->metadataReason = $metadataReason;
         $this->metadataMessage = $metadataMessage;
@@ -101,7 +104,8 @@ final class FindingDetails
             $ignored,
             $facts->fixes(),
             $facts->activityLookup(),
-            $age
+            $age,
+            $coverage
         );
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
 
@@ -111,6 +115,12 @@ final class FindingDetails
     public function age(): Age
     {
         return $this->age;
+    }
+
+    /** What the advisory lookup did for the package, null when the run had no lookup. */
+    public function advisoryLookup(): ?AdvisoryNameCoverage
+    {
+        return $this->lookup;
     }
 
     public function withMoves(Moves $moves): self
@@ -244,6 +254,8 @@ final class FindingDetails
             'check' => $this->check,
             'complete' => $this->check === 'complete',
             'unchecked_reason' => $this->uncheckedReason,
+            'records' => $this->lookup === null ? null : $this->lookup->records(),
+            'feeds' => $this->lookup === null ? [] : $this->lookup->feeds(),
         ];
         $ignored = array_map([self::class, 'ignored'], $this->ignored);
         if (!$standing->isVulnerable()) {

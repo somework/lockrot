@@ -214,7 +214,7 @@ final class Analyzer
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
 
         return new Analysis(
-            new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev),
+            new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()),
             $factsByPackage
         );
     }
