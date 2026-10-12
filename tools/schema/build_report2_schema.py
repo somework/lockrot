@@ -1352,7 +1352,7 @@ defs['noteAbandonedMarkingsIgnored'] = obj(("`abandoned_markings_ignored`: Compo
 })
 defs['noteAbandonedNotAuditedByComposer'] = obj(("`abandoned_not_audited_by_composer`: Composer's audit is set not to report abandoned packages. lockrot still counts "
                                                  "the marking: the setting changes what composer audit prints, not the ignore list."), {
-    'policy_key': open_set(['policy', 'policy.abandoned', 'policy.abandoned.audit', 'audit.abandoned', 'COMPOSER_AUDIT_ABANDONED'],
+    'policy_key': open_set(['policy', 'policy.abandoned', 'policy.abandoned.audit', 'audit.abandoned', 'COMPOSER_AUDIT_ABANDONED', 'COMPOSER_POLICY'],
                            'The setting that says so: a config key, or the environment variable. An open set.', '^[A-Za-z][A-Za-z0-9_.-]*$'),
     'value': d('Its value as configured (`ignore`, `false`).', {'type': ['boolean', 'string']}),
 })

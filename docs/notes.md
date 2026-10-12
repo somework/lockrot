@@ -276,6 +276,7 @@ the marking. To stop counting it for one package, list the package in
 | `policy.abandoned.audit` | `ignore` |
 | `audit.abandoned` | `ignore` |
 | `COMPOSER_AUDIT_ABANDONED` | `ignore` |
+| `COMPOSER_POLICY` | `false`: the variable is `0`, `false` or `off` |
 
 ### Abandoned ignore list unreadable {#abandoned_ignore_unreadable}
 

@@ -21013,7 +21013,8 @@
             "policy.abandoned",
             "policy.abandoned.audit",
             "audit.abandoned",
-            "COMPOSER_AUDIT_ABANDONED"
+            "COMPOSER_AUDIT_ABANDONED",
+            "COMPOSER_POLICY"
           ]
         },
         "value": {

@@ -125,11 +125,36 @@ final class AbandonedIgnoreTest extends TestCase
         self::assertSame($expected, $off === null ? null : ['policy_key' => $off->policyKey(), 'value' => $off->value()]);
     }
 
+    public function testComposerPolicyZeroNamesTheVariable(): void
+    {
+        Platform::putEnv('COMPOSER_POLICY', '0');
+        try {
+            $off = self::read([])->notAuditedBy();
+            self::assertNotNull($off);
+            self::assertSame(['COMPOSER_POLICY', false], [$off->policyKey(), $off->value()]);
+        } finally {
+            Platform::clearEnv('COMPOSER_POLICY');
+        }
+    }
+
+    /** Composer's PolicyConfig returns early on `policy: false`, before it reads the audit variable. */
+    public function testThePolicyOffWinsOverTheAuditVariable(): void
+    {
+        Platform::putEnv('COMPOSER_AUDIT_ABANDONED', 'report');
+        try {
+            $off = self::read(['policy' => false])->notAuditedBy();
+            self::assertNotNull($off);
+            self::assertSame(['policy', false], [$off->policyKey(), $off->value()]);
+        } finally {
+            Platform::clearEnv('COMPOSER_AUDIT_ABANDONED');
+        }
+    }
+
     public function testTheEnvironmentVariableWinsOverTheConfig(): void
     {
         Platform::putEnv('COMPOSER_AUDIT_ABANDONED', 'ignore');
         try {
-            $off = self::read(['policy' => false])->notAuditedBy();
+            $off = self::read(['policy' => ['abandoned' => ['audit' => 'fail']]])->notAuditedBy();
             self::assertNotNull($off);
             self::assertSame(['COMPOSER_AUDIT_ABANDONED', 'ignore'], [$off->policyKey(), $off->value()]);
         } finally {

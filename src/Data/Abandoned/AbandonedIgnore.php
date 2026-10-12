@@ -75,19 +75,19 @@ final class AbandonedIgnore
     }
 
     /**
-     * The setting that turns the abandoned audit off, in Composer's precedence: its environment
-     * variable over its config, and the policy, when it names `abandoned`, over the legacy
-     * `audit.abandoned`.
+     * The setting that turns the abandoned audit off, in Composer's precedence: a policy that is off
+     * (`policy: false` or `COMPOSER_POLICY=0`), then the environment variable, then the policy when
+     * it names `abandoned`, then the legacy `audit.abandoned`.
      */
     private static function notAudited(Config $config): ?AbandonedAuditOff
     {
+        $policy = $config->get('policy');
+        if ($policy === false) {
+            return ($config->raw()['config']['policy'] ?? null) === false ? new AbandonedAuditOff('policy', false) : new AbandonedAuditOff('COMPOSER_POLICY', false);
+        }
         $env = Platform::getEnv('COMPOSER_AUDIT_ABANDONED');
         if (\is_string($env) && $env !== '') {
             return $env === 'ignore' ? new AbandonedAuditOff('COMPOSER_AUDIT_ABANDONED', 'ignore') : null;
-        }
-        $policy = $config->get('policy');
-        if ($policy === false) {
-            return new AbandonedAuditOff('policy', false);
         }
         if (\is_array($policy) && \array_key_exists('abandoned', $policy)) {
             $abandoned = $policy['abandoned'];

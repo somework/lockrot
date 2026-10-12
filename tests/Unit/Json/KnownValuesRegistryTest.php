@@ -87,7 +87,7 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/depthUnmeasured' => [[Finding::UNREACHED, Finding::NO_COMPOSER_JSON], 'Finding'],
             '#/definitions/abandonedIgnored/oneOf/0/properties/by' => [[AbandonedIgnoreMatch::BY_POLICY, AbandonedIgnoreMatch::BY_AUDIT], 'AbandonedIgnoreMatch'],
             '#/definitions/noteAbandonedMarkingsIgnored/properties/by' => [[AbandonedIgnoreMatch::BY_POLICY, AbandonedIgnoreMatch::BY_AUDIT], 'AbandonedIgnoreMatch'],
-            '#/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key' => [['policy', 'policy.abandoned', 'policy.abandoned.audit', 'audit.abandoned', 'COMPOSER_AUDIT_ABANDONED'], 'AbandonedIgnore::notAuditedBy()'],
+            '#/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key' => [['policy', 'policy.abandoned', 'policy.abandoned.audit', 'audit.abandoned', 'COMPOSER_AUDIT_ABANDONED', 'COMPOSER_POLICY'], 'AbandonedIgnore::notAuditedBy()'],
             '#/definitions/advisoryFeed/properties/registry/oneOf/0' => [PackageOrigin::REGISTRIES, 'PackageOrigin::registryOfRepository()'],
             '#/definitions/advisoryRepository/properties/registry/oneOf/0' => [PackageOrigin::REGISTRIES, 'PackageOrigin::registryOfRepository()'],
             '#/definitions/advisoryFeed/properties/reason/oneOf/0' => [[AdvisoryCoverage::LOOKUP_FAILED, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY], 'AdvisoryFeed'],
