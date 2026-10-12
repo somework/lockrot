@@ -742,7 +742,8 @@ final class JsonSchemaConformanceTest extends TestCase
         $documents = self::documentsFor('wallabag/rulerz');
         foreach ($documents as $schema => [$decoded, $path]) {
             self::assertSame(Libyears::BRANCH_SNAPSHOT, JsonPath::arrayAt($decoded, $path)['libyears_unmeasured'], $schema.': rulerz is a branch snapshot');
-            foreach (array_merge(Libyears::REASONS, [null]) as $value) {
+            // rulerz's metadata was read: a reason that names a metadata status would contradict it.
+            foreach (array_diff(Libyears::REASONS, [Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::UNAVAILABLE, Libyears::NOT_FOUND]) as $value) {
                 $what = $schema.' '.var_export($value, true);
                 $changed = self::withFindingKey($decoded, $path, 'libyears_unmeasured', $value);
                 $this->assertValid($schema, $changed, $what);
@@ -926,6 +927,9 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
             RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
             RunNote::notFromComposerRepository(2, true),
+            RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),
+            RunNote::abandonedNotAuditedByComposer('policy.abandoned.audit', 'ignore'),
+            RunNote::abandonedIgnoreUnreadable(''),
         ];
         self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
         $decoded['notes'] = array_map(static fn (RunNote $note): string => $note->text(), $notes);

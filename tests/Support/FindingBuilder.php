@@ -6,6 +6,8 @@ namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Data\Advisory\AdvisoryFeed;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
@@ -272,7 +274,7 @@ final class FindingBuilder
 
         $activity = self::activityOf($finding);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity));
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity), new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null));
     }
 
     /**
