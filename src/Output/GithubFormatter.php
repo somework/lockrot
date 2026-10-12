@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
 
@@ -32,9 +33,10 @@ final class GithubFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
+        $gate = $report->gate();
         $lines = [];
         foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
-            $lines[] = $this->annotation($finding, $index->lineOf($finding->package()), $baseline);
+            $lines[] = $this->annotation($finding, $index->lineOf($finding->package()), $baseline, $gate);
         }
         foreach ($this->notes($report) as $note) {
             $lines[] = '::notice title=lockrot::'.self::escapeData($note);
@@ -68,7 +70,7 @@ final class GithubFormatter implements FormatterInterface
         return $notes;
     }
 
-    private function annotation(Finding $finding, ?int $line, ?BaselineComparison $baseline): string
+    private function annotation(Finding $finding, ?int $line, ?BaselineComparison $baseline, ?Gate $gate): string
     {
         $properties = ['file='.self::escapeProperty($this->context->lockName())];
         if ($line !== null) {
@@ -78,15 +80,15 @@ final class GithubFormatter implements FormatterInterface
 
         return \sprintf(
             '::%s %s::%s',
-            $this->command($finding, $baseline),
+            $this->command($finding, $baseline, $gate),
             implode(',', $properties),
             self::escapeData($this->message($finding))
         );
     }
 
-    private function command(Finding $finding, ?BaselineComparison $baseline): string
+    private function command(Finding $finding, ?BaselineComparison $baseline, ?Gate $gate): string
     {
-        $level = $this->context->levelOf($finding, $baseline);
+        $level = $this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline);
 
         return $level === FormatContext::LEVEL_NOTE ? 'notice' : $level;
     }

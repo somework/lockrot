@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\GateStanding;
 use Lockrot\Filesystem\Path;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
@@ -58,7 +59,7 @@ final class FormatContext
      */
     public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH, ?string $projectDirectory = null): self
     {
-        return self::forFailOn($lockPath, FailOn::fromString($failOn), $toolVersion, $terminalWidth, $projectDirectory);
+        return self::forFailOn($lockPath, FailOn::parse($failOn), $toolVersion, $terminalWidth, $projectDirectory);
     }
 
     /**
@@ -108,18 +109,21 @@ final class FormatContext
     }
 
     /**
-     * The level of a finding in every format that marks one:
-     * docs/ci.md#how-each-format-marks-a-finding. GithubFormatter spells `note` as `notice`.
+     * The level of a finding in every format that marks one, from its gate standing:
+     * docs/ci.md#how-each-format-marks-a-finding. `error` when the finding fails the gate, `note`
+     * when the baseline knows it, else `warning` for a flagged finding. GithubFormatter spells
+     * `note` as `notice`.
      *
+     * @param ?GateStanding           $standing the finding's standing, from Report::gate()
      * @param null|BaselineComparison $baseline the run's comparison, from Report::baseline()
      */
-    public function levelOf(Finding $finding, ?BaselineComparison $baseline = null): string
+    public function levelOf(Finding $finding, ?GateStanding $standing, ?BaselineComparison $baseline = null): string
     {
+        if ($standing !== null && $standing->fails()) {
+            return self::LEVEL_ERROR;
+        }
         if ($baseline !== null && $baseline->isKnown($finding->package())) {
             return self::LEVEL_NOTE;
-        }
-        if ($this->failOn->reaches($finding)) {
-            return self::LEVEL_ERROR;
         }
 
         return Verdict::flagged($finding->verdict()) ? self::LEVEL_WARNING : self::LEVEL_NOTE;

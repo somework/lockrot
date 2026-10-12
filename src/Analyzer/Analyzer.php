@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Allowlist\UncheckedAcceptance;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
@@ -41,6 +43,7 @@ use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
+use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AbandonedRule;
@@ -78,6 +81,7 @@ final class Analyzer
     private ?AdvisoryLoaderInterface $advisories;
     private MonorepoParents $parents;
     private AbandonedIgnore $abandonedIgnore;
+    private UncheckedAcceptance $acceptance;
 
     public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null, ?AbandonedIgnore $abandonedIgnore = null)
     {
@@ -94,6 +98,7 @@ final class Analyzer
         $this->parents = $parents ?? MonorepoParents::load();
         $this->abandonedIgnore = $abandonedIgnore ?? AbandonedIgnore::none();
         $this->deadline = Deadline::never();
+        $this->acceptance = UncheckedAcceptance::none();
     }
 
     public function allowlist(): Allowlist
@@ -105,6 +110,15 @@ final class Analyzer
     {
         $clone = clone $this;
         $clone->allowlist = $allowlist;
+
+        return $clone;
+    }
+
+    /** The project's `accept-unchecked` list, which buildFinding() applies after the S10 filter. */
+    public function withUncheckedAcceptance(UncheckedAcceptance $acceptance): self
+    {
+        $clone = clone $this;
+        $clone->acceptance = $acceptance;
 
         return $clone;
     }
@@ -508,6 +522,7 @@ final class Analyzer
         if (($entry !== null && $entry->acceptsAll()) || $this->hasSignal($signals, Signal::S1)) {
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
+        [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
         $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
 
         $note = null;
@@ -539,7 +554,51 @@ final class Analyzer
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts)));
+            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted));
+    }
+
+    /**
+     * After the S10 filter, each S10 entry that the project's `accept-unchecked` list accepts
+     * leaves S10 (docs/configuration.md#accept-unchecked). S10 goes when no entry is left.
+     *
+     * @param list<Signal> $signals
+     *
+     * @return array{list<Signal>, list<AcceptedCheck>}
+     */
+    private function acceptUnchecked(array $signals, PackageFacts $facts): array
+    {
+        if ($this->acceptance->isEmpty()) {
+            return [$signals, []];
+        }
+        $s10 = null;
+        foreach ($signals as $signal) {
+            $data = $signal->data();
+            $s10 = $data instanceof NotCheckedData ? $data : $s10;
+        }
+        if ($s10 === null) {
+            return [$signals, []];
+        }
+        $package = $facts->package();
+        $where = $facts->activityLookup()->where();
+        $ref = $where->ref();
+        $meta = $facts->metadata();
+        $now = $this->clock->now();
+        $kept = [];
+        $accepted = [];
+        foreach ($s10->checks() as $check) {
+            $by = $this->acceptance->acceptedBy($check, $package->name(), $where->host(), $ref === null ? null : $ref->path(), $package->repositoryUrl(), $meta === null ? null : $meta->composerRepositoryUrl(), $now);
+            if ($by === null) {
+                $kept[] = $check;
+                continue;
+            }
+            $accepted[] = new AcceptedCheck($check, $by);
+        }
+        if ($accepted === []) {
+            return [$signals, []];
+        }
+        $host = $where->kind() === LocatedRepository::HOST_NOT_SUPPORTED ? $where->host() : null;
+
+        return [NotCheckedRule::keeping($signals, $kept, $host, $package->origin()->kind()), $accepted];
     }
 
     /**

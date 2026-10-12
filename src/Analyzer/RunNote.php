@@ -37,6 +37,10 @@ final class RunNote
     public const ABANDONED_MARKINGS_IGNORED = 'abandoned_markings_ignored';
     public const ABANDONED_NOT_AUDITED_BY_COMPOSER = 'abandoned_not_audited_by_composer';
     public const ABANDONED_IGNORE_UNREADABLE = 'abandoned_ignore_unreadable';
+    public const VERDICT_RULES_CHANGED = 'verdict_rules_changed';
+    public const BASELINE_TARGET_DIFFERS = 'baseline_target_differs';
+    public const BASELINE_FIX_MODEL_DIFFERS = 'baseline_fix_model_differs';
+    public const IGNORE_DOES_NOT_COVER_ADVISORIES = 'ignore_does_not_cover_advisories';
     /**
      * The codes that lockrot writes, as the schemas list them in `x-known-values`, in the order of
      * the analyzer's passes. In a report, the notes of two repository hosts can interleave.
@@ -56,6 +60,10 @@ final class RunNote
         self::REPOSITORY_ACTIVITY_NOT_FOUND,
         self::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED,
         self::NOT_FROM_COMPOSER_REPOSITORY,
+        self::VERDICT_RULES_CHANGED,
+        self::BASELINE_TARGET_DIFFERS,
+        self::BASELINE_FIX_MODEL_DIFFERS,
+        self::IGNORE_DOES_NOT_COVER_ADVISORIES,
         self::ABANDONED_MARKINGS_IGNORED,
         self::ABANDONED_NOT_AUDITED_BY_COMPOSER,
         self::ABANDONED_IGNORE_UNREADABLE,
@@ -79,6 +87,15 @@ final class RunNote
         self::ADVISORIES_OFFLINE => 'offline: security advisories not checked; a priority they would raise stays one step lower',
         self::ADVISORIES_COMPOSER_TOO_OLD => 'security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower',
         self::INSTALL_TIME_BUDGET => 'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower',
+    ];
+
+    /** The words of each `target_php_source`, as the baseline notes print them. */
+    private const TARGET_SOURCE_WORDS = [
+        RunSettings::SOURCE_OPTION => '--target-php',
+        RunSettings::SOURCE_ENV => 'LOCKROT_TARGET_PHP',
+        RunSettings::SOURCE_CONFIG => 'extra.lockrot.target-php',
+        RunSettings::SOURCE_PLATFORM => 'config.platform.php',
+        RunSettings::SOURCE_RUNTIME => 'the PHP running lockrot',
     ];
 
     /** GitLab's anonymous limit needs no cap, so it has no sentence. */
@@ -389,6 +406,47 @@ final class RunNote
     public static function abandonedIgnoreUnreadable(string $message): self
     {
         return self::of(self::ABANDONED_IGNORE_UNREADABLE, \sprintf("Composer rejected the project's abandoned ignore list (%s), so every abandoned marking counts.", $message), false, ['message' => $message]);
+    }
+
+    /** The baseline file was written for another target PHP: fix changes against it are not compared. */
+    public static function baselineTargetDiffers(string $baselineTargetPhp, string $baselineSource, string $runTargetPhp, string $runSource): self
+    {
+        return self::of(self::BASELINE_TARGET_DIFFERS, \sprintf(
+            'the baseline was written for php %s (%s) and this run targets php %s (%s): fix changes against the baseline are not compared',
+            $baselineTargetPhp,
+            self::TARGET_SOURCE_WORDS[$baselineSource] ?? $baselineSource,
+            $runTargetPhp,
+            self::TARGET_SOURCE_WORDS[$runSource] ?? $runSource
+        ), false, ['baseline_target_php' => $baselineTargetPhp, 'baseline_target_php_source' => $baselineSource, 'run_target_php' => $runTargetPhp, 'run_target_php_source' => $runSource]);
+    }
+
+    /** The baseline file was written under another fix model: fix changes against it are not compared. */
+    public static function baselineFixModelDiffers(int $baselineFixModel, int $runFixModel): self
+    {
+        return self::of(self::BASELINE_FIX_MODEL_DIFFERS, \sprintf(
+            'the baseline was written under fix model %d and this run uses fix model %d: fix changes against the baseline are not compared',
+            $baselineFixModel,
+            $runFixModel
+        ), false, ['baseline_fix_model' => $baselineFixModel, 'run_fix_model' => $runFixModel]);
+    }
+
+    /**
+     * An `ignore[]` entry no longer hides the advisories of its package.
+     *
+     * @param list<array{package: string, pattern: string, advisories: list<string>}> $entries in report order
+     */
+    public static function ignoreDoesNotCoverAdvisories(array $entries): self
+    {
+        if ($entries === []) {
+            throw new \InvalidArgumentException('A note about ignore[] entries names at least one entry.');
+        }
+        $items = [];
+        foreach ($entries as $entry) {
+            $count = \count($entry['advisories']);
+            $items[] = $entry['package'].($entry['pattern'] !== $entry['package'] ? ' (ignore[] '.$entry['pattern'].')' : '').\sprintf(': %d counted %s', $count, $count === 1 ? 'advisory' : 'advisories');
+        }
+
+        return self::of(self::IGNORE_DOES_NOT_COVER_ADVISORIES, "extra.lockrot.ignore[] no longer hides advisories: ".implode('; ', $items)."; accept them in Composer's audit policy if that is the decision", false, ['entries' => $entries]);
     }
 
     /**

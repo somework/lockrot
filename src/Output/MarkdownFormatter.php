@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Verdict\Finding;
 
 /**
@@ -28,6 +29,7 @@ final class MarkdownFormatter implements FormatterInterface
     public function format(Report $report, bool $showAll = false): string
     {
         $baseline = $report->baseline();
+        $gate = $report->gate();
         $rows = $showAll ? $report->findings() : $report->flagged();
 
         $lines = [$this->heading($report)];
@@ -40,7 +42,7 @@ final class MarkdownFormatter implements FormatterInterface
             $lines[] = self::HEADER_ROW;
             $lines[] = self::SEPARATOR_ROW;
             foreach ($rows as $finding) {
-                $lines[] = $this->row($finding, $baseline);
+                $lines[] = $this->row($finding, $baseline, $gate);
             }
         }
 
@@ -82,9 +84,9 @@ final class MarkdownFormatter implements FormatterInterface
         return \sprintf('### lockrot: dependency rot in %d of %d packages', $flagged, $report->packagesChecked());
     }
 
-    private function row(Finding $finding, ?BaselineComparison $baseline): string
+    private function row(Finding $finding, ?BaselineComparison $baseline, ?Gate $gate): string
     {
-        $level = $this->context->levelOf($finding, $baseline);
+        $level = $this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline);
         $verdict = $level === FormatContext::LEVEL_NOTE ? $finding->verdict() : '**'.$finding->verdict().'**';
 
         return '| '.$finding->priority().' | '.self::code($finding->package()).' | '.self::text($finding->version())

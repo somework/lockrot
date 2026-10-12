@@ -24,7 +24,7 @@ final class LockrotConfig
     public const INSTALL_TIME_ON = 'on';
 
     private ?string $project;
-    private string $failOn;
+    private FailOn $failOn;
     private string $targetPhp;
     private bool $includeDev;
     private bool $offline;
@@ -43,7 +43,7 @@ final class LockrotConfig
     /** @var RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_PLATFORM|RunSettings::SOURCE_RUNTIME */
     private string $targetPhpSource = RunSettings::SOURCE_RUNTIME;
 
-    private function __construct(string $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds, ?string $project = null, string $advisoryLookup = AdvisoryCoverage::SCOPE_ALL, string $advisoryLookupSource = AdvisoryCoverage::SOURCE_DEFAULT)
+    private function __construct(FailOn $failOn, string $targetPhp, bool $includeDev, bool $offline, bool $strictNetwork, string $format, ?string $baseline, bool $disabled, bool $installTime, bool $installTimeStrict, int $installTimeBudgetSeconds, Thresholds $thresholds, ?string $project = null, string $advisoryLookup = AdvisoryCoverage::SCOPE_ALL, string $advisoryLookupSource = AdvisoryCoverage::SOURCE_DEFAULT)
     {
         $this->project = $project;
         $this->failOn = $failOn;
@@ -172,11 +172,13 @@ final class LockrotConfig
     }
 
     /**
+     * The first source that sets fail-on replaces the others whole: sources never merge.
+     *
      * @param array<string, mixed> $extra
      * @param array<string, mixed> $env
      * @param array<string, mixed> $cli
      *
-     * @return array{string, RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_DEFAULT} a verdict, a priority or `none`, as {@see FailOn::fromString()} accepts them, and its source
+     * @return array{FailOn, RunSettings::SOURCE_OPTION|RunSettings::SOURCE_ENV|RunSettings::SOURCE_CONFIG|RunSettings::SOURCE_DEFAULT}
      */
     private static function resolveFailOn(array $extra, array $env, array $cli): array
     {
@@ -185,16 +187,45 @@ final class LockrotConfig
         if (($cli['fail-on'] ?? null) === '') {
             throw new ConfigException('--fail-on must not be empty');
         }
-        // Checked whenever it is set, not only when it wins, as extra.lockrot is validated in full
-        // even where an option overrides it.
+        // Each source is checked whenever it is set, not only when it wins, as extra.lockrot is
+        // validated in full even where an option overrides it.
         $fromEnv = $env['LOCKROT_FAIL_ON'] ?? null;
-        if (\is_string($fromEnv) && $fromEnv !== '' && !\in_array($fromEnv, FailOn::allowed(), true)) {
-            throw new ConfigException(\sprintf('LOCKROT_FAIL_ON must be one of %s; got "%s"', implode(', ', FailOn::allowed()), $fromEnv));
+        $env = \is_string($fromEnv) && $fromEnv !== '' ? FailOn::parse($fromEnv, 'LOCKROT_FAIL_ON') : null;
+        $config = self::configFailOn($extra['fail-on'] ?? null);
+        $option = $cli['fail-on'] ?? null;
+        if (\is_string($option)) {
+            return [FailOn::parse($option, '--fail-on'), RunSettings::SOURCE_OPTION];
+        }
+        if ($env !== null) {
+            return [$env, RunSettings::SOURCE_ENV];
         }
 
-        [$value, $source] = self::pickWithSource([RunSettings::SOURCE_OPTION => $cli['fail-on'] ?? null, RunSettings::SOURCE_ENV => $env['LOCKROT_FAIL_ON'] ?? null, RunSettings::SOURCE_CONFIG => $extra['fail-on'] ?? null], self::FAIL_ON_NONE, RunSettings::SOURCE_DEFAULT);
+        return $config === null ? [FailOn::none(), RunSettings::SOURCE_DEFAULT] : [$config, RunSettings::SOURCE_CONFIG];
+    }
 
-        return [FailOn::fromString($value)->value(), $source];
+    /**
+     * config-2 takes the list as a string or as a JSON array.
+     *
+     * @param mixed $value
+     */
+    private static function configFailOn($value): ?FailOn
+    {
+        if (\is_string($value) && $value !== '') {
+            return FailOn::parse($value, 'extra.lockrot.fail-on');
+        }
+        if (\is_array($value) && $value !== []) {
+            $words = [];
+            foreach ($value as $word) {
+                if (!\is_string($word)) {
+                    throw new ConfigException('extra.lockrot.fail-on: every item of the list must be a string');
+                }
+                $words[] = $word;
+            }
+
+            return FailOn::parse($words, 'extra.lockrot.fail-on');
+        }
+
+        return null;
     }
 
     /**
@@ -315,8 +346,8 @@ final class LockrotConfig
         return [$default, $defaultSource];
     }
 
-    /** A verdict, a priority or `none`, as {@see FailOn::fromString()} reads it. */
-    public function failOn(): string
+    /** The parsed list, {@see FailOn::none()} when no source sets it. */
+    public function failOn(): FailOn
     {
         return $this->failOn;
     }

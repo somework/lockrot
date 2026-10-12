@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockLineIndex;
@@ -91,6 +92,7 @@ final class SarifFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
+        $gate = $report->gate();
         $rules = [];
         $ruleIndexes = [];
         $results = [];
@@ -100,7 +102,7 @@ final class SarifFormatter implements FormatterInterface
                 $ruleIndexes[$verdict] = \count($rules);
                 $rules[] = $this->rule($verdict);
             }
-            $results[] = $this->result($finding, $ruleIndexes[$verdict], $index->lineOf($finding->package()), $baseline);
+            $results[] = $this->result($finding, $ruleIndexes[$verdict], $index->lineOf($finding->package()), $baseline, $gate);
         }
 
         $run = [
@@ -138,7 +140,7 @@ final class SarifFormatter implements FormatterInterface
     }
 
     /** @return array<string, mixed> */
-    private function result(Finding $finding, int $ruleIndex, ?int $line, ?BaselineComparison $baseline): array
+    private function result(Finding $finding, int $ruleIndex, ?int $line, ?BaselineComparison $baseline, ?Gate $gate): array
     {
         $artifactLocation = ['uri' => self::relativeUri($this->context->lockName())];
         if ($this->context->lockDirectory() !== null) {
@@ -176,7 +178,7 @@ final class SarifFormatter implements FormatterInterface
         return [
             'ruleId' => 'lockrot/'.$finding->verdict(),
             'ruleIndex' => $ruleIndex,
-            'level' => $this->context->levelOf($finding, $baseline),
+            'level' => $this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline),
             'rank' => Priority013::rank($finding->priority()) * self::RANK_STEP,
             'message' => ['text' => $this->message($finding)],
             'locations' => [['physicalLocation' => $physicalLocation]],

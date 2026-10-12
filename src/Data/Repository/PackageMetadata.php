@@ -33,6 +33,7 @@ final class PackageMetadata
      * The `replace` constraint of a subtree split: the component's `vX.Y.Z` is the monorepo's own.
      * Composer resolves it to an exact version, so only the written form tells it from a range.
      */
+    private ?string $composerRepositoryUrl = null;
     private const SELF_VERSION = 'self.version';
 
     private string $name;
@@ -579,6 +580,24 @@ final class PackageMetadata
     {
         return $this->releaseCount;
     }
+    /**
+     * The URL of the Composer repository that answered for this name, null when none did. Never
+     * written to a report: `accept-unchecked` compares it with a `repository` entry.
+     */
+    public function composerRepositoryUrl(): ?string
+    {
+        return $this->composerRepositoryUrl;
+    }
+
+    /** A copy that knows which Composer repository answered for it. */
+    public function withComposerRepositoryUrl(?string $url): self
+    {
+        $clone = clone $this;
+        $clone->composerRepositoryUrl = $url;
+
+        return $clone;
+    }
+
     public function repositoryUrl(): ?string
     {
         return $this->repositoryUrl;

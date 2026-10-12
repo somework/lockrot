@@ -5,140 +5,103 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Verdict;
 
 use Lockrot\Exception\ConfigException;
-use Lockrot\Legacy\Priority013;
-use Lockrot\Signal\Signal;
-use Lockrot\Tests\Support\FindingBuilder;
-use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
-use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/** SPEC §6.1: the forms, kinds, the canonical `run.fail_on` and the errors of `--fail-on`. */
 final class FailOnTest extends TestCase
 {
-    private const AT = '2026-09-14T00:00:00+00:00';
-
-    /** @param list<string> $chain */
-    private static function finding(string $verdict, array $chain = ['a/pkg'], bool $dev = false): Finding
+    public function testTheAllowedValuesAreNoneThenEachKindInOrder(): void
     {
-        return (new FindingBuilder())->withPackage('a/pkg')->withVerdict($verdict)->withChain($chain)->withDataDate(new \DateTimeImmutable(self::AT))->withDev($dev)->build();
+        self::assertSame(['none', 'critical', 'high', 'medium', 'low', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable', 'vulnerable-medium', 'vulnerable-high', 'vulnerable-critical', 'unchecked'], FailOn::allowed());
     }
 
-    /**
-     * `unchecked` is neither a verdict nor a priority: it fails on a finding whose check did not
-     * run, whatever that finding otherwise says, which is how a pipeline demands a complete run.
-     */
-    public function testUncheckedFailsOnTheFindingsThatCarryS10(): void
+    /** @return iterable<string, array{string, string, string, ?string}> */
+    public static function oneValue(): iterable
     {
-        $threshold = FailOn::fromString(FailOn::UNCHECKED);
-        $notChecked = new Signal(Signal::LEVEL_INFO, 'repository activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [], 'blocks' => ['S3', 'S4']]));
-        $ok = (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->build();
-        $okUnchecked = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([$notChecked])->withChain(['vendor/ok'])->build();
-        $abandoned = (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::LEVEL_HIGH, 'marked abandoned', SignalDataStub::of(Signal::S1, []))])->withChain(['vendor/gone'])->build();
-
-        self::assertTrue($threshold->reaches($okUnchecked), 'the check behind this ok did not run');
-        self::assertFalse($threshold->reaches($ok), 'checked, and nothing was found');
-        self::assertFalse($threshold->reaches($abandoned), 'every check that mattered ran; the verdict thresholds are for this');
-        self::assertFalse(FailOn::fromString(Verdict::STALE)->reaches($okUnchecked), 'a verdict threshold still reads the verdict');
+        yield 'a grade' => ['high', 'high', 'grade', 'high'];
+        yield 'a flag' => ['left-behind', 'left-behind', 'flag', 'left-behind'];
+        yield 'any advisory' => ['vulnerable', 'vulnerable', 'vulnerable', 'low'];
+        yield 'a raw severity' => ['vulnerable-high', 'vulnerable-high', 'vulnerable', 'high'];
+        yield 'unchecked' => ['unchecked', 'unchecked', 'unchecked', null];
+        yield 'upper case, padded' => ['  Critical ', 'critical', 'grade', 'critical'];
     }
 
-    public function testTheAllowedValuesAreNoneTheFlaggedVerdictsAndThePriorities(): void
+    #[DataProvider('oneValue')]
+    public function testEachValueHasItsKindAndThreshold(string $input, string $value, string $kind, ?string $threshold): void
     {
-        self::assertSame(['none', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'critical', 'high', 'medium', 'low', 'unchecked'], FailOn::allowed());
-        foreach (FailOn::allowed() as $value) {
-            self::assertSame($value, FailOn::fromString($value)->value());
-        }
+        $failOn = FailOn::parse($input);
+
+        self::assertSame($value, $failOn->value());
+        self::assertSame([['value' => $value, 'kind' => $kind, 'threshold' => $threshold]], JsonPath::decoded($failOn->values()));
     }
 
-    /**
-     * `kind()` is the partition allowed() lists in: a report writes it beside `fail_on`, so a reader
-     * never has to know which words are verdicts and which are priorities.
-     */
-    public function testEveryAllowedValueHasTheKindItIsListedAs(): void
+    /** @return iterable<string, array{string|list<string>, string}> */
+    public static function lists(): iterable
     {
-        self::assertSame(['none', 'verdict', 'priority', 'unchecked'], FailOn::KINDS);
-        $kinds = [];
-        foreach (FailOn::allowed() as $value) {
-            $kinds[$value] = FailOn::fromString($value)->kind();
-        }
-
-        self::assertSame([
-            'none' => 'none',
-            'abandoned' => 'verdict',
-            'silent' => 'verdict',
-            'pinned' => 'verdict',
-            'left-behind' => 'verdict',
-            'old-promise' => 'verdict',
-            'stale' => 'verdict',
-            'critical' => 'priority',
-            'high' => 'priority',
-            'medium' => 'priority',
-            'low' => 'priority',
-            'unchecked' => 'unchecked',
-        ], $kinds);
-        self::assertSame(FailOn::KIND_NONE, FailOn::none()->kind());
+        yield 'kind order, whatever the input order' => ['vulnerable-high,left-behind', 'left-behind,vulnerable-high'];
+        yield 'whitespace around commas' => ['left-behind, vulnerable-high', 'left-behind,vulnerable-high'];
+        yield 'every kind' => ['unchecked,vulnerable,stale,low', 'low,stale,vulnerable,unchecked'];
+        yield 'a JSON array from config' => [['vulnerable-high', ' left-behind'], 'left-behind,vulnerable-high'];
+        yield 'none' => ['none', 'none'];
     }
 
-    /** @dataProvider rejected */
-    #[DataProvider('rejected')]
-    public function testAnythingElseIsRejectedWithTheFullList(string $value): void
+    /** @param string|list<string> $input */
+    #[DataProvider('lists')]
+    public function testTheCanonicalFormIsTheValuesInKindOrderJoinedByCommas($input, string $canonical): void
     {
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('fail-on must be one of none, abandoned, silent, pinned, left-behind, old-promise, stale, critical, high, medium, low, unchecked; got "'.$value.'"');
-        FailOn::fromString($value);
+        self::assertSame($canonical, FailOn::parse($input)->value());
     }
 
-    /** @return iterable<string, array{string}> */
+    public function testNoneHasNoValueAndNoKind(): void
+    {
+        self::assertTrue(FailOn::parse('none')->isNone());
+        self::assertSame([], FailOn::parse('none')->values());
+        self::assertTrue(FailOn::none()->isNone());
+        self::assertFalse(FailOn::parse('high')->isNone());
+    }
+
+    public function testAKindIsFoundByItsName(): void
+    {
+        $failOn = FailOn::parse('stale,vulnerable-high');
+
+        self::assertSame(['flag', 'vulnerable'], $failOn->kinds());
+        self::assertTrue($failOn->has('flag'));
+        self::assertFalse($failOn->has('grade'));
+    }
+
+    /** @return iterable<string, array{string|list<string>, string}> */
     public static function rejected(): iterable
     {
-        yield 'a made-up word' => ['dead'];
-        yield 'an unflagged verdict' => [Verdict::UNKNOWN];
-        yield 'ok' => [Verdict::OK];
-        yield 'finished' => [Verdict::FINISHED];
-        yield 'the priority none is not a level' => [Priority013::NONE.' '];
-        yield 'empty' => [''];
-        yield 'case matters' => ['High'];
+        yield 'two grades' => ['high,medium', '"high" and "medium" are both grades'];
+        yield 'two flags' => ['stale, left-behind', '"stale" and "left-behind" are both flags'];
+        yield 'two severities' => ['vulnerable,vulnerable-high', '"vulnerable" and "vulnerable-high" are both vulnerable values'];
+        yield 'one value twice' => ['unchecked,unchecked', '"unchecked" is given twice'];
+        yield 'none with another value' => ['none,high', '"none" stands alone'];
+        yield 'an unknown value' => ['dead', 'unknown value "dead"'];
+        yield 'an empty item' => ['high,,stale', 'unknown value ""'];
+        yield 'empty' => ['', 'unknown value ""'];
+        yield 'vulnerable-low' => ['vulnerable-low', 'use "vulnerable": every counted advisory is at least low'];
+        yield 'an array with an unknown value' => [['high', 'dead'], 'unknown value "dead"'];
     }
 
-    public function testNoneReachesNothing(): void
+    /** @param string|list<string> $input */
+    #[DataProvider('rejected')]
+    public function testAnInvalidListIsRejectedWithItsReason($input, string $message): void
     {
-        $none = FailOn::none();
-        self::assertTrue($none->isNone());
-        self::assertSame('none', $none->value());
-        self::assertFalse($none->reaches(self::finding(Verdict::ABANDONED)));
-        self::assertTrue(FailOn::fromString('none')->isNone());
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($message);
+
+        FailOn::parse($input, 'LOCKROT_FAIL_ON');
     }
 
-    public function testAVerdictThresholdIsInclusiveAndIgnoresWhereThePackageSits(): void
+    public function testTheMessageNamesTheSource(): void
     {
-        $silent = FailOn::fromString(Verdict::SILENT);
-        self::assertFalse($silent->isNone());
-        self::assertTrue($silent->reaches(self::finding(Verdict::SILENT)));
-        self::assertTrue($silent->reaches(self::finding(Verdict::ABANDONED)));
-        self::assertTrue($silent->reaches(self::finding(Verdict::ABANDONED, ['a/root', 'a/pkg'], true)), 'a transitive dev package still reaches a verdict threshold');
-        self::assertFalse($silent->reaches(self::finding(Verdict::PINNED)));
-        self::assertFalse($silent->reaches(self::finding(Verdict::OK)));
-        self::assertTrue(FailOn::fromString(Verdict::STALE)->reaches(self::finding(Verdict::STALE)));
-        self::assertFalse(FailOn::fromString(Verdict::STALE)->reaches(self::finding(Verdict::UNKNOWN)));
-    }
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.fail-on: unknown value "dead"');
 
-    public function testAPriorityThresholdIsInclusiveAndReadsThePriority(): void
-    {
-        $high = FailOn::fromString(Priority013::HIGH);
-        self::assertFalse($high->isNone());
-        self::assertTrue($high->reaches(self::finding(Verdict::ABANDONED)), 'critical reaches high');
-        self::assertTrue($high->reaches(self::finding(Verdict::PINNED)), 'high, direct prod');
-        self::assertTrue($high->reaches(self::finding(Verdict::ABANDONED, ['a/root', 'a/pkg'])), 'abandoned, transitive prod: high');
-        self::assertFalse($high->reaches(self::finding(Verdict::ABANDONED, ['a/root', 'a/pkg'], true)), 'abandoned, transitive dev: medium');
-        self::assertFalse($high->reaches(self::finding(Verdict::STALE)), 'stale, direct prod: medium');
-        self::assertFalse($high->reaches(self::finding(Verdict::OK)), 'no priority at all');
-
-        self::assertTrue(FailOn::fromString(Priority013::LOW)->reaches(self::finding(Verdict::STALE, ['a/root', 'a/pkg'], true)));
-        self::assertFalse(FailOn::fromString(Priority013::LOW)->reaches(self::finding(Verdict::FINISHED)));
-        self::assertTrue(FailOn::fromString(Priority013::CRITICAL)->reaches(self::finding(Verdict::SILENT)));
-        self::assertFalse(FailOn::fromString(Priority013::CRITICAL)->reaches(self::finding(Verdict::SILENT, ['a/root', 'a/pkg'])));
-        self::assertTrue(FailOn::fromString(Priority013::MEDIUM)->reaches(self::finding(Verdict::STALE)));
-        self::assertFalse(FailOn::fromString(Priority013::MEDIUM)->reaches(self::finding(Verdict::STALE, ['a/root', 'a/pkg'])));
+        FailOn::parse('dead', 'extra.lockrot.fail-on');
     }
 }

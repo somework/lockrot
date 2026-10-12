@@ -19,6 +19,7 @@ use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\ScoreBasis;
 use Lockrot\Score\ScoreContext;
 use Lockrot\Score\SecurityTerm;
+use Lockrot\Score\Standing;
 use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
@@ -702,16 +703,17 @@ final class Finding
 
     /**
      * report-2's finding object without `rank`, `baseline` and `gate`, which the report writes.
+     * $standing gives each counted flag and each S9 row its state against the baseline entry.
      *
      * @return array<string, mixed>
      *
      * @throws \LogicException for a finding built without its flags
      */
-    public function toArray(): array
+    public function toArray(?Standing $standing = null): array
     {
         $details = $this->details();
         $flags = $this->flags();
-        $signals = $this->writtenSignals();
+        $signals = self::withBaseline($this->writtenSignals(), $standing);
         $checksMissing = self::checksOf($signals);
         $context = $this->context($details, $checksMissing);
         $branchKey = ReleaseBranch::of($this->version);
@@ -737,12 +739,13 @@ final class Finding
             'verdict' => $this->grade(),
             'priority' => $this->gradeOrNone(),
             'lead' => $this->lead(),
-            'flags' => $this->flagsOut($flags, $basis, $signals, $summaries, \count($rows), $context->livenessComplete()),
+            'flags' => $this->flagsOut($flags, $basis, $signals, $summaries, \count($rows), $context->livenessComplete(), $standing),
             'score' => $basis,
             'next_step' => $details->moves()->nextStep(),
             'security' => $details->toSecurityArray($rows, $branch),
             'checks_missing' => $checksMissing,
             'checks_skipped' => $details->skipped(),
+            'unchecked_accepted' => $details->uncheckedAccepted(),
             'maintenance_judged' => $this->maintenanceJudged,
             'metadata' => $details->metadata(),
             'activity' => $details->activity(),
@@ -770,6 +773,18 @@ final class Finding
             'libyears' => $this->libyearsRounded(),
             'age' => $details->age(),
         ];
+    }
+
+    /**
+     * The checks of S10 as report-2 writes them, `checks_missing`.
+     *
+     * @return list<Check>
+     *
+     * @throws \LogicException for a finding built without its details
+     */
+    public function checksMissing(): array
+    {
+        return self::checksOf($this->writtenSignals());
     }
 
     /**
@@ -874,7 +889,7 @@ final class Finding
      *
      * @return list<array<string, mixed>>
      */
-    private function flagsOut(FlagSet $flags, ScoreBasis $basis, array $signals, array $summaries, int $advisories, bool $livenessComplete): array
+    private function flagsOut(FlagSet $flags, ScoreBasis $basis, array $signals, array $summaries, int $advisories, bool $livenessComplete, ?Standing $standing): array
     {
         $roles = [];
         foreach ($basis->maintenanceTerms() as $term) {
@@ -890,7 +905,7 @@ final class Finding
             $out[] = [
                 'id' => $flag,
                 'role' => $roles[$flag] ?? 'accepted',
-                'baseline' => null,
+                'baseline' => $standing === null ? null : $standing->flagState($flag),
                 'signal_ids' => array_values(array_intersect(FlagSentence::SIGNALS[$flag], $fired)),
                 'degree' => $flag === FlagSet::ABANDONED ? ['reasons' => $flags->reasons(), 'liveness_complete' => $livenessComplete] : (\in_array($flag, [FlagSet::SILENT, FlagSet::STALE], true) ? ['liveness_complete' => $livenessComplete] : null),
                 'headline' => self::headline($flag, $flags, $signals),
@@ -954,6 +969,20 @@ final class Finding
         }
 
         return null;
+    }
+
+    /**
+     * @param list<Signal> $signals
+     *
+     * @return list<Signal> the signals with each S9 row's state against the baseline entry
+     */
+    private static function withBaseline(array $signals, ?Standing $standing): array
+    {
+        return array_map(static function (Signal $signal) use ($standing): Signal {
+            $data = $signal->data();
+
+            return $data instanceof AdvisoryData ? new Signal($signal->level(), $signal->summary(), $data->withBaseline($standing)) : $signal;
+        }, $signals);
     }
 
     /**

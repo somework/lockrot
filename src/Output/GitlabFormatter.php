@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
@@ -40,23 +41,24 @@ final class GitlabFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
+        $gate = $report->gate();
         $issues = [];
         foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
-            $issues[] = $this->issue($finding, $index->lineOf($finding->package()), $baseline);
+            $issues[] = $this->issue($finding, $index->lineOf($finding->package()), $baseline, $gate);
         }
 
         return self::encode($issues);
     }
 
     /** @return array<string, mixed> */
-    private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline): array
+    private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline, ?Gate $gate): array
     {
         return [
             'type' => 'issue',
             'check_name' => 'lockrot/'.$finding->verdict(),
             'description' => $this->description($finding),
             'categories' => self::CATEGORIES,
-            'severity' => $this->severity($finding, $baseline),
+            'severity' => $this->severity($finding, $baseline, $gate),
             'fingerprint' => hash('sha256', 'lockrot|'.$finding->package().'|'.$finding->verdict()),
             'location' => [
                 'path' => $this->context->lockName(),
@@ -65,9 +67,9 @@ final class GitlabFormatter implements FormatterInterface
         ];
     }
 
-    private function severity(Finding $finding, ?BaselineComparison $baseline): string
+    private function severity(Finding $finding, ?BaselineComparison $baseline, ?Gate $gate): string
     {
-        switch ($this->context->levelOf($finding, $baseline)) {
+        switch ($this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline)) {
             case FormatContext::LEVEL_ERROR:
                 return 'major';
             case FormatContext::LEVEL_WARNING:

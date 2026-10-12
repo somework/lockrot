@@ -27,6 +27,7 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Output\TerminalText;
+use Lockrot\Version;
 
 /**
  * Runs on InstallerEvents::PRE_OPERATIONS_EXEC and prints the install-time block, see
@@ -149,7 +150,7 @@ final class InstallTimeSummary
         if ($lockrot->installTimeStrict() && $event->isExecutingOperations() && Policy::exitCode($report, $lockrot) === Policy::EXIT_FINDINGS) {
             throw new InstallBlockedException(\sprintf(
                 'lockrot: findings at or above fail-on=%s and install-time-strict is on; run composer lockrot for details',
-                $lockrot->failOn()
+                $lockrot->failOn()->value()
             ));
         }
     }
@@ -183,7 +184,7 @@ final class InstallTimeSummary
      */
     private function withBaseline(Report $report, string $projectDir, LockrotConfig $lockrot, LockFile $lock): Report
     {
-        $file = BaselineFile::resolve($projectDir, $lockrot->baseline());
+        $file = BaselineFile::resolve($projectDir, $lockrot->baseline(), Version::STRING);
         if (!$file->exists()) {
             if ($lockrot->baseline() !== null) {
                 throw new ConfigException($file->displayPath().' not found');

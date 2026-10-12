@@ -83,7 +83,7 @@ final class GateScoreTest extends TestCase
         $gate = GateScore::of(Score::compute(['left-behind', 'stale'], [], 'transitive', true), ['left-behind', 'stale'], []);
         $basis = JsonPath::decoded($gate);
 
-        self::assertSame(['total' => 4, 'exact' => 4.5, 'rounded_down' => true], array_slice(self::map($basis['new']), 0, 3));
+        self::assertSame(['total' => 4, 'exact' => 4.5, 'rounded_down' => true], \array_slice(self::map($basis['new']), 0, 3));
         self::assertSame([
             ['reason' => 'transitive', 'applies_to' => 'maintenance', 'divide_by' => 2, 'before' => 18, 'after' => 9],
             ['reason' => 'dev', 'applies_to' => 'total', 'divide_by' => 2, 'before' => 9, 'after' => 4.5],

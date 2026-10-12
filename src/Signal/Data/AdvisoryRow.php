@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Score\FactState;
 use Lockrot\Security\Fix;
 use Lockrot\Verdict\GradedPackage;
 
@@ -26,6 +27,7 @@ final class AdvisoryRow implements \JsonSerializable
     private int $points;
     private Fix $fix;
     private bool $deciding = false;
+    private ?FactState $baseline = null;
 
     /**
      * @param ?string $reportedAt        an ISO 8601 date and time
@@ -51,6 +53,15 @@ final class AdvisoryRow implements \JsonSerializable
     {
         $clone = clone $this;
         $clone->deciding = $deciding;
+
+        return $clone;
+    }
+
+    /** A copy with its state against the baseline entry, null without an entry. */
+    public function withBaseline(?FactState $baseline): self
+    {
+        $clone = clone $this;
+        $clone->baseline = $baseline;
 
         return $clone;
     }
@@ -99,7 +110,7 @@ final class AdvisoryRow implements \JsonSerializable
         return $this->deciding;
     }
 
-    /** @return array{id: string, cve: ?string, title: ?string, link: ?string, reported_at: ?string, severity: string, severity_published: ?string, affected_versions: ?string, counted: true, points: int, deciding: bool, fix: Fix, baseline: null} */
+    /** @return array{id: string, cve: ?string, title: ?string, link: ?string, reported_at: ?string, severity: string, severity_published: ?string, affected_versions: ?string, counted: true, points: int, deciding: bool, fix: Fix, baseline: ?FactState} */
     public function jsonSerialize(): array
     {
         return [
@@ -115,7 +126,7 @@ final class AdvisoryRow implements \JsonSerializable
             'points' => $this->points,
             'deciding' => $this->deciding,
             'fix' => $this->fix,
-            'baseline' => null,
+            'baseline' => $this->baseline,
         ];
     }
 }

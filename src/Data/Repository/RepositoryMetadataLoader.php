@@ -69,7 +69,10 @@ final class RepositoryMetadataLoader implements MetadataLoaderInterface
                 continue;
             }
             $batch = $this->loadFromRepository($repository, $remaining, $installedByName);
-            $metadata += $batch->metadata();
+            $url = $repository->getRepoConfig()['url'] ?? null;
+            foreach ($batch->metadata() as $name => $meta) {
+                $metadata[$name] ??= $meta->withComposerRepositoryUrl(\is_string($url) ? $url : null);
+            }
             foreach ($batch->failed() as $name => $reason) {
                 $reasons[$name] = $reason;
             }

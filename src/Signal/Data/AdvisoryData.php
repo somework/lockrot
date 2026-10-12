@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Data;
 
+use Lockrot\Score\Standing;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\GradedPackage;
 
@@ -43,6 +44,15 @@ final class AdvisoryData implements SignalData
     {
         $clone = clone $this;
         $clone->rows = array_map(static fn (AdvisoryRow $row): AdvisoryRow => $row->withDeciding($row->id() === $id), $this->rows);
+
+        return $clone;
+    }
+
+    /** A copy with each row's state against the baseline, none without a standing. */
+    public function withBaseline(?Standing $standing): self
+    {
+        $clone = clone $this;
+        $clone->rows = array_map(static fn (AdvisoryRow $row): AdvisoryRow => $row->withBaseline($standing === null ? null : $standing->advisoryState($row->id())), $this->rows);
 
         return $clone;
     }

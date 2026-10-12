@@ -26,23 +26,27 @@ final class BaselineFile
     private string $path;
     private string $displayPath;
     private string $reportedPath;
+    private string $release;
 
-    private function __construct(string $path, string $displayPath, string $reportedPath)
+    private function __construct(string $path, string $displayPath, string $reportedPath, string $release)
     {
         $this->path = $path;
         $this->displayPath = $displayPath;
         $this->reportedPath = $reportedPath;
+        $this->release = $release;
     }
 
     /**
      * @param null|string $configured `extra.lockrot.baseline` or `--baseline`, null for the default
+     * @param string      $release    the running release, `Version::STRING`: the refusal of a
+     *                                baseline-1 file names its major and minor
      */
-    public static function resolve(string $projectDir, ?string $configured): self
+    public static function resolve(string $projectDir, ?string $configured, string $release): self
     {
         $name = ($configured === null || $configured === '') ? self::DEFAULT_NAME : $configured;
         $reported = Path::isAbsolute($name) ? (Path::relativeTo($name, $projectDir) ?? Path::name($name)) : $name;
 
-        return new self(Path::resolve($projectDir, $name), $name, $reported);
+        return new self(Path::resolve($projectDir, $name), $name, $reported, $release);
     }
 
     public function path(): string
@@ -66,12 +70,50 @@ final class BaselineFile
     }
 
     /**
-     * @throws ConfigException when the file is missing, unreadable, not JSON, or does not match
-     *                         resources/lockrot-baseline-1.schema.json
+     * A file whose `lockrot.schema` is the integer 1 is refused before schema validation and before
+     * any gate decision (docs/baseline.md#a-baseline-1-file). No fact of it is read.
+     *
+     * @throws ConfigException when the file is missing, unreadable, not JSON, a baseline-1 file, or does
+     *                         not match resources/lockrot-baseline-2.schema.json
      */
     public function read(): Baseline
     {
-        return Baseline::fromArray(JsonReader::readObject($this->path));
+        $document = JsonReader::readObject($this->path);
+        if (self::numberIn($document) === 1) {
+            throw new ConfigException($this->refusal());
+        }
+
+        return Baseline::fromArray($document);
+    }
+
+    /**
+     * The `lockrot.schema` of the file, read alone. Null when the file is not a JSON object, or the
+     * key is missing or not an integer. `--generate-baseline` reads it to skip a baseline-1 file.
+     */
+    public function schemaNumber(): ?int
+    {
+        try {
+            return self::numberIn(JsonReader::readObject($this->path));
+        } catch (ConfigException $e) {
+            return null;
+        }
+    }
+
+    /** @param array<string, mixed> $document */
+    private static function numberIn(array $document): ?int
+    {
+        $lockrot = $document['lockrot'] ?? null;
+        $number = \is_array($lockrot) ? ($lockrot['schema'] ?? null) : null;
+
+        return \is_int($number) ? $number : null;
+    }
+
+    /** The release's major and minor stay true for every later release that reads baseline-2 only. */
+    private function refusal(): string
+    {
+        $line = preg_match('/^(\d+)\.(\d+)/', $this->release, $m) === 1 ? $m[1].'.'.$m[2] : $this->release;
+
+        return \sprintf('lockrot %s reads baseline-2 only. Review the findings, then run --generate-baseline.', $line);
     }
 
     /**
@@ -91,19 +133,9 @@ final class BaselineFile
         AtomicWriter::write($this->path, $json, $this->displayPath);
     }
 
-    /**
-     * An empty `findings` map must encode as `{}`: `json_encode()` writes the PHP empty array as
-     * `[]`, which resources/lockrot-baseline-1.schema.json rejects.
-     *
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     private static function document(Baseline $baseline): array
     {
-        $document = $baseline->toArray();
-        if ($document['findings'] === []) {
-            $document['findings'] = new \stdClass();
-        }
-
-        return ['$schema' => Schemas::url(Schemas::BASELINE, Baseline::SCHEMA)] + $document;
+        return ['$schema' => Schemas::url(Schemas::BASELINE, Baseline::SCHEMA)] + $baseline->toArray();
     }
 }

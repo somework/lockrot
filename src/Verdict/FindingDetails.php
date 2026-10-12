@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Verdict;
 
+use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
@@ -56,6 +57,8 @@ final class FindingDetails
     private ?AbandonedIgnored $abandonedIgnored;
     private ?Moves $moves = null;
     private ActivityLookup $activity;
+    /** @var list<AcceptedCheck> */
+    private array $uncheckedAccepted = [];
 
     /**
      * @param list<Check>                                                   $skipped
@@ -84,8 +87,9 @@ final class FindingDetails
      * @param list<IgnoredAdvisory> $ignored the advisories Composer's audit ignore lists keep out of S9
      * @param list<Signal>          $signals         the finding's signals: S10 tells a gap from a skip
      * @param ?string               $metadataFailure what the repository that lists the package answered instead of its metadata
+     * @param list<AcceptedCheck>     $accepted        the S10 entries that `accept-unchecked` accepted: each one is a skip
      */
-    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age): self
+    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age, array $accepted = []): self
     {
         $package = $facts->package();
         $status = $facts->metadataStatus();
@@ -100,7 +104,7 @@ final class FindingDetails
             $status,
             $status === PackageFacts::METADATA_UNAVAILABLE && $metadataFailure !== null ? MetadataFailure::reason($metadataFailure) : null,
             $status === PackageFacts::METADATA_UNAVAILABLE ? $metadataFailure : null,
-            self::skippedChecks($facts, $entry, $signals, $reason),
+            self::skippedChecks($facts, $signals, $reason, $accepted),
             ['requires' => $requires, 'target_runs' => $requires === null ? null : $floor->admitsTarget($requires), 'project_allows' => $requires === null ? null : $floor->allowsProject($requires)],
             $entry,
             $check,
@@ -113,6 +117,7 @@ final class FindingDetails
             AbandonedRule::ignored($facts)
         );
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
+        $details->uncheckedAccepted = $accepted;
 
         return $details;
     }
@@ -178,11 +183,12 @@ final class FindingDetails
      * that was not read, unless S10 holds it; S8 on a branch snapshot; the advisories of a package
      * the lookup scope or an unparseable version leaves out.
      *
-     * @param list<Signal> $signals
+     * @param list<Signal>        $signals
+     * @param list<AcceptedCheck> $accepted
      *
      * @return list<Check>
      */
-    private static function skippedChecks(PackageFacts $facts, ?AllowlistEntry $entry, array $signals, ?string $advisoryReason): array
+    private static function skippedChecks(PackageFacts $facts, array $signals, ?string $advisoryReason, array $accepted): array
     {
         $inS10 = [];
         foreach ($signals as $signal) {
@@ -193,26 +199,42 @@ final class FindingDetails
                 }
             }
         }
+        $acceptedSkips = [];
+        foreach ($accepted as $check) {
+            $acceptedSkips[$check->unchecked()->check()] = $check->skip();
+        }
         $skipped = [];
         $lookup = $facts->activityLookup();
-        if ($lookup->status() !== ActivityLookup::READ && !\in_array('repository_activity', $inS10, true)) {
+        if (isset($acceptedSkips['repository_activity'])) {
+            $skipped[] = $acceptedSkips['repository_activity'];
+        } elseif ($lookup->status() !== ActivityLookup::READ && !\in_array('repository_activity', $inS10, true)) {
             $skipped[] = new Check('repository_activity', (string) $lookup->reason(), [Signal::S3, Signal::S4]);
         }
         if ($lookup->archivedUnread() !== null) {
             $skipped[] = new Check('repository_archived', $lookup->archivedUnread(), [Signal::S3]);
         }
-        if ($facts->metadataStatus() !== PackageFacts::METADATA_READ) {
+        if (isset($acceptedSkips['release_metadata'])) {
+            $skipped[] = $acceptedSkips['release_metadata'];
+        } elseif ($facts->metadataStatus() !== PackageFacts::METADATA_READ) {
             if (!\in_array('release_metadata', $inS10, true)) {
                 $skipped[] = new Check('release_metadata', $facts->metadataStatus(), [Signal::S2, Signal::S8]);
             }
         } elseif (ReleaseBranch::of($facts->package()->version()) === null) {
             $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
         }
-        if (\in_array($advisoryReason, ['not_from_composer_repository', 'unparseable_version'], true)) {
+        if (isset($acceptedSkips['advisories'])) {
+            $skipped[] = $acceptedSkips['advisories'];
+        } elseif (\in_array($advisoryReason, ['not_from_composer_repository', 'unparseable_version'], true)) {
             $skipped[] = new Check('advisories', (string) $advisoryReason, [Signal::S9]);
         }
 
         return $skipped;
+    }
+
+    /** @return list<AcceptedCheck> the S10 entries that `accept-unchecked` accepted, in S10's order */
+    public function uncheckedAccepted(): array
+    {
+        return $this->uncheckedAccepted;
     }
 
     public function metadataStatus(): string
@@ -241,6 +263,12 @@ final class FindingDetails
     public function entry(): ?AllowlistEntry
     {
         return $this->entry;
+    }
+
+    /** Why the advisory lookup did not complete for the package, null on a complete lookup. */
+    public function uncheckedReason(): ?string
+    {
+        return $this->uncheckedReason;
     }
 
     /** Whether every advisory feed answered for the package. */

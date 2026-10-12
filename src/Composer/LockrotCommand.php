@@ -39,7 +39,6 @@ use Lockrot\Output\ReportTarget;
 use Lockrot\Output\ReportTargets;
 use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
-use Lockrot\Verdict\FailOn;
 use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -207,7 +206,7 @@ final class LockrotCommand extends BaseCommand
                 throw new ConfigException('--explain prints one package on stdout and --output writes whole-run reports; run them separately');
             }
             // Resolving the path touches nothing, and the files that --output must not name include it.
-            $baselineFile = BaselineFile::resolve(\dirname($composerFile), $lockrot->baseline());
+            $baselineFile = BaselineFile::resolve(\dirname($composerFile), $lockrot->baseline(), Version::STRING);
             // Checked before the analysis, like the baseline: a typo in a path fails before a
             // full repository round.
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
@@ -221,7 +220,7 @@ final class LockrotCommand extends BaseCommand
             // Read before the analysis, so a missing explicit path or an unreadable file fails before
             // a full repository round. A generate run can name a file that does not exist: it creates it.
             $generate = $input->getOption('generate-baseline') === true;
-            $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate);
+            $existingBaseline = $this->readBaseline($baselineFile, $lockrot->baseline() !== null && !$generate, $generate);
             $format = $lockrot->format();
             // Only `html` needs the facts: it draws a release-branch timeline per package.
             $analysis = $format === 'html' || $targets->wants('html')
@@ -230,7 +229,7 @@ final class LockrotCommand extends BaseCommand
             $report = $analysis === null ? $analyzer->analyze($lock, $project, $lockrot->includeDev()) : $analysis->report();
 
             // One threshold for the report's gate and for the annotation formats.
-            $failOn = FailOn::fromString($lockrot->failOn());
+            $failOn = $lockrot->failOn();
             // Before the baseline and any formatter: every document must record the settings that
             // its verdicts were decided against.
             $report = $report->withRun(new RunSettings(
@@ -259,12 +258,7 @@ final class LockrotCommand extends BaseCommand
             // same file on a laptop and on a CI runner.
             $fileContext = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $cwd);
 
-            if ($generate) {
-                // Before the baseline, so an exit 2 from a report never follows a replaced baseline.
-                $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
-
-                return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline);
-            }
+            // A generate run compares with the file it read before it rewrites it, as a check run would.
             if ($existingBaseline !== null) {
                 $report = $report->withBaseline(BaselineComparison::compare(
                     $existingBaseline,
@@ -272,6 +266,12 @@ final class LockrotCommand extends BaseCommand
                     $baselineFile->reportedPath(),
                     self::lockPackageNames($lock)
                 ));
+            }
+            if ($generate) {
+                // Before the baseline, so an exit 2 from a report never follows a replaced baseline.
+                $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
+
+                return $this->generateBaseline($output, $baselineFile, $report, $existingBaseline);
             }
 
             // The annotation formats point back at the lock: an unreadable one throws
@@ -339,7 +339,7 @@ final class LockrotCommand extends BaseCommand
             $lockrot->targetPhp(),
             $lockrot->targetPhpSource(),
             null,
-            FailOn::fromString($lockrot->failOn()),
+            $lockrot->failOn(),
             $lockrot->failOnSource(),
             $lockrot->thresholds(),
             $project->requirePhp(),
@@ -361,15 +361,19 @@ final class LockrotCommand extends BaseCommand
     /**
      * Null when the default baseline file does not exist. A missing explicit path is a
      * configuration error: a typo must not turn a gated build into an ungated one. An unreadable
-     * file is an error too (docs/baseline.md#when-lockrot-cannot-read-the-file).
+     * file is an error too (docs/baseline.md#when-lockrot-cannot-read-the-file). A generate run
+     * never reads a baseline-1 file: it writes a fresh baseline-2 and carries nothing forward.
      */
-    private function readBaseline(BaselineFile $file, bool $explicit): ?Baseline
+    private function readBaseline(BaselineFile $file, bool $explicit, bool $generate): ?Baseline
     {
         if (!$file->exists()) {
             if ($explicit) {
                 throw new ConfigException($file->displayPath().' not found');
             }
 
+            return null;
+        }
+        if ($generate && $file->schemaNumber() === 1) {
             return null;
         }
 
@@ -385,6 +389,15 @@ final class LockrotCommand extends BaseCommand
     {
         $baseline = Baseline::fromReport($report, $existing);
         $file->write($baseline);
+        $carried = $baseline->carriedForward();
+        if ($carried !== []) {
+            $this->writeError($output, \sprintf(
+                'lockrot: the advisory lookup did not complete, so the baseline keeps the recorded advisories of %d %s: %s',
+                \count($carried),
+                \count($carried) === 1 ? 'package' : 'packages',
+                implode(', ', $carried)
+            ));
+        }
         $this->writeError($output, \sprintf(
             'lockrot: baseline written to %s (%d findings)',
             $file->displayPath(),
@@ -434,7 +447,7 @@ final class LockrotCommand extends BaseCommand
 
         return [
             [$baseline->path(), $baselineReason],
-            [BaselineFile::resolve(\dirname($composerFile), \is_string($configured) ? $configured : null)->path(), $baselineReason],
+            [BaselineFile::resolve(\dirname($composerFile), \is_string($configured) ? $configured : null, Version::STRING)->path(), $baselineReason],
             [$cwd.'/composer.json', ReportTargets::COMPOSER_REASON],
             [$cwd.'/composer.lock', ReportTargets::COMPOSER_REASON],
             [$composerFile, 'that is the manifest COMPOSER names, which lockrot never writes'],

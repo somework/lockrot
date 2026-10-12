@@ -149,6 +149,33 @@ final class NotCheckedRule implements SignalRule
     }
 
     /**
+     * The signals with S10 narrowed to $kept, its summary worded again. S10 goes when $kept is empty.
+     *
+     * @param list<Signal> $signals
+     * @param list<Check>  $kept    entries of the S10 of $signals
+     * @param ?string      $host    the host that lockrot cannot ask
+     * @param ?string      $origin  the package's `origin.kind`
+     *
+     * @return list<Signal>
+     */
+    public static function keeping(array $signals, array $kept, ?string $host, ?string $origin): array
+    {
+        $out = [];
+        foreach ($signals as $signal) {
+            if (!$signal->data() instanceof NotCheckedData) {
+                $out[] = $signal;
+                continue;
+            }
+            $rebuilt = self::signalOf($kept, array_map(static fn (Check $entry): string => self::summaryOf($entry, $host, $origin), $kept));
+            if ($rebuilt !== null) {
+                $out[] = $rebuilt;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * @param list<Check>  $unchecked
      * @param list<string> $summaries one per entry
      */

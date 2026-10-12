@@ -10,6 +10,7 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\FailOnValue;
 use Lockrot\Verdict\ScoreModel;
 
 /**
@@ -33,9 +34,6 @@ final class RunSettings
     public const FIX_MODEL = 1;
     /** The version of the sentence grammars. ScoreText has its own, in the score model. */
     public const TEXT_GRAMMAR = 1;
-
-    /** The kind of each report-1 fail-on kind in report-2's `run.gates[]`. */
-    private const GATE_KINDS = [FailOn::KIND_PRIORITY => 'grade', FailOn::KIND_VERDICT => 'flag', FailOn::KIND_UNCHECKED => 'unchecked'];
 
     private ?string $project;
     private ?string $rootPackage;
@@ -80,6 +78,29 @@ final class RunSettings
     public function failOn(): ?FailOn
     {
         return $this->failOn;
+    }
+
+    /** The PHP minor the run judges against, the running PHP's when nothing set it. */
+    public function targetPhp(): string
+    {
+        return PhpReleaseDates::minorOf($this->targetPhp ?? \PHP_VERSION);
+    }
+
+    public function targetPhpSource(): string
+    {
+        return $this->targetPhp === null ? self::SOURCE_RUNTIME : $this->targetPhpSource;
+    }
+
+    /** `run.fail_on`: the canonical list, `none` when nothing set it. */
+    public function failOnValue(): string
+    {
+        return $this->failOn === null ? FailOn::NONE : $this->failOn->value();
+    }
+
+    /** `run.fail_on_source`: `default` when nothing set fail-on. */
+    public function failOnSourceOrDefault(): string
+    {
+        return $this->failOn === null ? self::SOURCE_DEFAULT : $this->failOnSource;
     }
 
     public function strictNetwork(): bool
@@ -129,22 +150,20 @@ final class RunSettings
     private function php(): array
     {
         return [
-            'target_php' => PhpReleaseDates::minorOf($this->targetPhp ?? \PHP_VERSION),
-            'target_php_source' => $this->targetPhp === null ? self::SOURCE_RUNTIME : $this->targetPhpSource,
+            'target_php' => $this->targetPhp(),
+            'target_php_source' => $this->targetPhpSource(),
             'project_php' => $this->projectPhp,
             'project_php_lowest' => (new PhpFloor(null, $this->projectPhp))->lowestAsString(),
         ];
     }
 
-    /** @return array{fail_on: string, fail_on_source: string, gates: list<array{value: string, kind: string, threshold: ?string}>} */
+    /** @return array{fail_on: string, fail_on_source: string, gates: list<FailOnValue>} */
     private function failOnKeys(): array
     {
-        $failOn = $this->failOn === null ? FailOn::fromString('none') : $this->failOn;
-
         return [
-            'fail_on' => $failOn->value(),
-            'fail_on_source' => $this->failOn === null ? self::SOURCE_DEFAULT : $this->failOnSource,
-            'gates' => self::gates($failOn),
+            'fail_on' => $this->failOnValue(),
+            'fail_on_source' => $this->failOnSourceOrDefault(),
+            'gates' => $this->failOn === null ? [] : $this->failOn->values(),
         ];
     }
 
@@ -170,19 +189,4 @@ final class RunSettings
         ];
     }
 
-    /**
-     * One entry for report-1's fail-on value, none for `none`: a grade word is a grade gate and a
-     * report-1 verdict word a flag gate, each its own threshold.
-     *
-     * @return list<array{value: string, kind: string, threshold: ?string}>
-     */
-    private static function gates(FailOn $failOn): array
-    {
-        $kind = self::GATE_KINDS[$failOn->kind()] ?? null;
-        if ($kind === null) {
-            return [];
-        }
-
-        return [['value' => $failOn->value(), 'kind' => $kind, 'threshold' => $kind === 'unchecked' ? null : $failOn->value()]];
-    }
 }

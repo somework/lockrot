@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
-use Lockrot\Config\Gate;
 use Lockrot\Security\Severity;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
@@ -141,30 +140,6 @@ final class Report2Root
             'furthest_behind' => $worst === null ? null : ['package' => $worst->package(), 'version' => $worst->version(), 'libyears' => $worst->libyearsRounded(), 'at_least' => $worst->isLibyearsAtLeast()],
             'packages' => \count($findings),
         ];
-    }
-
-    /**
-     * The report-1 gate with the counts of the findings' standings. Without a gate, no finding
-     * reaches fail-on, and the run applies fail-on in the check mode.
-     *
-     * @param string $mode one of {@see Gate::MODES}
-     *
-     * @return array{fails: bool, tripped_by: list<string>, fail_on_applied: bool, reaching: int, failing: int, exempt: array<string, int>}
-     */
-    public static function toGateArray(?Gate $gate, string $mode): array
-    {
-        $reaching = 0;
-        $failing = 0;
-        $exempt = [Gate::EXEMPT_BASELINE => 0];
-        foreach ($gate === null ? [] : $gate->standings() as $standing) {
-            $reaching += $standing->reachesFailOn() ? 1 : 0;
-            $failing += $standing->fails() ? 1 : 0;
-            $by = $standing->exemptBy();
-            if ($by !== null) {
-                $exempt[$by] = ($exempt[$by] ?? 0) + 1;
-            }
-        }
-        return ($gate === null ? ['fails' => false, 'tripped_by' => [], 'fail_on_applied' => $mode === Gate::MODE_CHECK] : $gate->toArray()) + ['reaching' => $reaching, 'failing' => $failing, 'exempt' => $exempt];
     }
 
     /**
