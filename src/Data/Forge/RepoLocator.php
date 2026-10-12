@@ -24,21 +24,25 @@ final class RepoLocator
     private array $gitlabDomains;
     /** @var list<string> lowercased */
     private array $githubDomains;
+    /** @var list<string> lowercased */
+    private array $forgejoDomains;
 
     /**
      * @param list<string> $gitlabDomains as Composer's `gitlab-domains` lists them
-     * @param list<string> $githubDomains as Composer's `github-domains` lists them: only to name
-     *                                    the setting that lists a host lockrot cannot ask
+     * @param list<string> $githubDomains  as Composer's `github-domains` lists them: only to name
+     *                                     the setting that lists a host lockrot cannot ask
+     * @param list<string> $forgejoDomains as Composer's `forgejo-domains` lists them, for the same purpose
      */
-    public function __construct(array $gitlabDomains = ['gitlab.com'], array $githubDomains = [])
+    public function __construct(array $gitlabDomains = ['gitlab.com'], array $githubDomains = [], array $forgejoDomains = [])
     {
         $this->gitlabDomains = $gitlabDomains;
         $this->githubDomains = array_map('strtolower', $githubDomains);
+        $this->forgejoDomains = array_map('strtolower', $forgejoDomains);
     }
 
     public static function fromConfig(Config $config): self
     {
-        return new self(self::hosts($config->get('gitlab-domains')), self::hosts($config->get('github-domains')));
+        return new self(self::hosts($config->get('gitlab-domains')), self::hosts($config->get('github-domains')), self::hosts($config->get('forgejo-domains')));
     }
 
     /**
@@ -99,7 +103,11 @@ final class RepoLocator
             return LocatedRepository::none($lowerHost);
         }
 
-        return LocatedRepository::unsupported($lowerHost, \in_array($lowerHost, $this->githubDomains, true) ? LocatedRepository::GITHUB_DOMAINS : null);
+        if (\in_array($lowerHost, $this->githubDomains, true)) {
+            return LocatedRepository::unsupported($lowerHost, LocatedRepository::GITHUB_DOMAINS);
+        }
+
+        return LocatedRepository::unsupported($lowerHost, \in_array($lowerHost, $this->forgejoDomains, true) ? LocatedRepository::FORGEJO_DOMAINS : null);
     }
 
     private static function placed(?RepoRef $ref, string $host): LocatedRepository

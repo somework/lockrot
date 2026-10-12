@@ -276,6 +276,14 @@ final class RunNoteTest extends TestCase
         self::assertSame([['host' => '3232235777', 'packages' => 1, 'listed_in' => null]], $note->data()['hosts']);
     }
 
+    public function testTheHostNoteNamesAForgejoHostWithoutTheGitlabHint(): void
+    {
+        $forgejo = RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', LocatedRepository::FORGEJO_DOMAINS)]);
+
+        self::assertSame([['host' => 'codeberg.org', 'packages' => 1, 'listed_in' => 'forgejo-domains']], $forgejo->data()['hosts']);
+        self::assertSame('Repository activity not checked for 1 package on hosts lockrot cannot ask: codeberg.org (1). lockrot does not ask Forgejo hosts (codeberg.org), and listing them in gitlab-domains does not help.', $forgejo->text());
+    }
+
     public function testTheHostNoteNamesAGithubEnterpriseHostWithoutTheGitlabHint(): void
     {
         $enterprise = RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]);

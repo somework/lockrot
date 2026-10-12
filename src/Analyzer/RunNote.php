@@ -300,22 +300,25 @@ final class RunNote
         uksort($count, static fn (string $a, string $b): int => [$count[$b], $a] <=> [$count[$a], $b]);
         $hosts = [];
         $named = [];
-        $enterprise = [];
+        $listed = [LocatedRepository::GITHUB_DOMAINS => [], LocatedRepository::FORGEJO_DOMAINS => []];
         foreach ($count as $host => $packages) {
             $host = (string) $host;
             $hosts[] = ['host' => $host, 'packages' => $packages, 'listed_in' => $listedIn[$host]];
             $named[] = \sprintf('%s (%d)', $host, $packages);
-            if ($listedIn[$host] === LocatedRepository::GITHUB_DOMAINS) {
-                $enterprise[] = $host;
+            if ($listedIn[$host] !== null) {
+                $listed[$listedIn[$host]][] = $host;
             }
         }
         $total = \count($unsupported);
         $text = \sprintf('Repository activity not checked for %d %s on hosts lockrot cannot ask: %s.', $total, $total === 1 ? 'package' : 'packages', implode(', ', $named));
-        if (\count($enterprise) < \count($hosts)) {
+        if (\in_array(null, $listedIn, true)) {
             $text .= " A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.";
         }
-        if ($enterprise !== []) {
-            $text .= \sprintf(' lockrot does not ask GitHub Enterprise hosts (%s).', implode(', ', $enterprise));
+        if ($listed[LocatedRepository::GITHUB_DOMAINS] !== []) {
+            $text .= \sprintf(' lockrot does not ask GitHub Enterprise hosts (%s).', implode(', ', $listed[LocatedRepository::GITHUB_DOMAINS]));
+        }
+        if ($listed[LocatedRepository::FORGEJO_DOMAINS] !== []) {
+            $text .= \sprintf(' lockrot does not ask Forgejo hosts (%s), and listing them in gitlab-domains does not help.', implode(', ', $listed[LocatedRepository::FORGEJO_DOMAINS]));
         }
 
         return self::of(self::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED, $text, false, ['hosts' => $hosts]);

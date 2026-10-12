@@ -229,13 +229,15 @@ and every host in Composer's `gitlab-domains`, and no other host.
 - `data`: `hosts`, one entry per host, the most packages first, then by host name. Each entry has
   `host`, with its port and without userinfo, `packages` and `listed_in`.
 - `packages` counts the findings whose `activity.reason` is `host_not_supported`.
-- `listed_in` is `github-domains` for a GitHub Enterprise host that Composer's config names, else
-  null.
+- `listed_in` names the Composer setting that lists the host, else it is null.
+  `github-domains` lists a GitHub Enterprise host. `forgejo-domains` lists a Forgejo host, which
+  `gitlab-domains` cannot make askable.
 - Findings: S10 `host_not_supported`, whose summary names the host. On a package that raised S1,
   the gap is a `checks_skipped` entry instead.
 - `sets_network_failures`: no.
 
-lockrot cannot tell from a URL which software a host runs. If the host runs GitLab, list it in
+Except for those two settings, lockrot cannot tell from a URL which software a host runs. If the
+host runs GitLab, list it in
 Composer's `gitlab-domains`:
 
 ```sh

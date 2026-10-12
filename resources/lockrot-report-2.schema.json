@@ -18754,13 +18754,14 @@
                 "minimum": 1
               },
               "listed_in": {
-                "description": "The Composer setting that already names the host (`github-domains`: a GitHub Enterprise host lockrot does not ask), or null. An open set.",
+                "description": "The Composer setting that already names the host, or null: `github-domains` (a GitHub Enterprise host lockrot does not ask) or `forgejo-domains` (a Forgejo host lockrot does not ask). An open set.",
                 "oneOf": [
                   {
                     "type": "string",
                     "pattern": "^[a-z][a-z0-9-]*$",
                     "x-known-values": [
-                      "github-domains"
+                      "github-domains",
+                      "forgejo-domains"
                     ]
                   },
                   {

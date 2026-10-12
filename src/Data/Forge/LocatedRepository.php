@@ -16,8 +16,9 @@ final class LocatedRepository
     public const HOST_NOT_SUPPORTED = 'host_not_supported';
     public const NO_REPOSITORY = 'no_repository';
 
-    /** The Composer setting that lists a host lockrot cannot ask. */
+    /** The Composer settings that list a host lockrot cannot ask. */
     public const GITHUB_DOMAINS = 'github-domains';
+    public const FORGEJO_DOMAINS = 'forgejo-domains';
 
     private string $kind;
     private ?string $host;
@@ -37,7 +38,7 @@ final class LocatedRepository
         return new self(self::LOCATED, $ref->host(), $ref, null);
     }
 
-    /** @param ?string $listedIn {@see self::GITHUB_DOMAINS} when Composer's config names the host */
+    /** @param ?string $listedIn {@see self::GITHUB_DOMAINS} or {@see self::FORGEJO_DOMAINS} when Composer's config names the host */
     public static function unsupported(string $host, ?string $listedIn): self
     {
         return new self(self::HOST_NOT_SUPPORTED, $host, null, $listedIn);

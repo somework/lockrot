@@ -205,4 +205,16 @@ final class RepoLocatorTest extends TestCase
         self::assertSame([LocatedRepository::HOST_NOT_SUPPORTED, 'github-domains'], [$where->kind(), $where->listedIn()]);
         self::assertNull(RepoLocator::fromConfig($config)->classify('https://github.com/o/r.git')->listedIn(), 'github.com is asked, not listed');
     }
+
+    /** Composer's default `forgejo-domains` names codeberg.org. */
+    public function testFromConfigReadsForgejoDomainsForTheHostsItNames(): void
+    {
+        $config = new Config(false);
+        $config->merge(['config' => ['forgejo-domains' => ['Codeberg.org', 7]]]);
+
+        $where = RepoLocator::fromConfig($config)->classify('https://codeberg.org/o/r.git');
+
+        self::assertSame([LocatedRepository::HOST_NOT_SUPPORTED, 'forgejo-domains'], [$where->kind(), $where->listedIn()]);
+        self::assertNull(RepoLocator::fromConfig($config)->classify('https://gitea.example.com/o/r.git')->listedIn());
+    }
 }

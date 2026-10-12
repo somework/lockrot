@@ -1197,8 +1197,9 @@ defs['noteRepositoryActivityHostNotSupported'] = obj(("`repository_activity_host
     'hosts': arr('One entry per host, by `packages` (most first), then host name.', obj('A host lockrot cannot ask.', {
         'host': d('The host with its port, without userinfo.', {'type': 'string', 'minLength': 1}),
         'packages': d('Findings on this host whose `activity.reason` is `host_not_supported`.', INT1),
-        'listed_in': nul("The Composer setting that already names the host (`github-domains`: a GitHub Enterprise host lockrot does not ask), or null. An open set.",
-                         {'type': 'string', 'pattern': HYPHEN, 'x-known-values': ['github-domains']}),
+        'listed_in': nul(("The Composer setting that already names the host, or null: `github-domains` (a GitHub Enterprise host lockrot does not ask) or "
+                          "`forgejo-domains` (a Forgejo host lockrot does not ask). An open set."),
+                         {'type': 'string', 'pattern': HYPHEN, 'x-known-values': ['github-domains', 'forgejo-domains']}),
     }), minItems=1),
 })
 defs['noteCode'] = copy.deepcopy(R1['definitions']['noteCode'])
