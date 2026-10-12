@@ -1,0 +1,294 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/config-2.json",
+    "title": "lockrot configuration",
+    "description": "The `extra.lockrot` object in composer.json (config-2, lockrot 0.14). Unknown keys are allowed, and every config-1 document is config-2. The listed keys must have the listed type. config-2 adds the `fail-on` list (a comma-separated string or a JSON array, one value per kind: a grade, a maintenance flag, a raw advisory severity, `unchecked`), `ignore[].flags`, `accept-unchecked` and `advisory-lookup`.",
+    "type": "object",
+    "properties": {
+        "accept-unchecked": {
+            "description": "Checks that lockrot did not run and that the project accepts. Each entry names one check and one scope (`host`, `repository` or `package`), with a reason. It accepts exactly three gaps: a repository on a host that lockrot cannot ask (`host_not_supported`), a run whose Composer repositories publish no advisories (`no_feed`), and a package installed from vcs or from an origin that lockrot cannot tell (`not_from_composer_repository`). Every other unchecked reason stays S10, `undated_releases` included. An accepted check is not S10: `checks_skipped[]` lists it with the reason `accepted_by_config`, report-2 writes the entry in `finding.unchecked_accepted[]`, and `--fail-on=unchecked` does not fail on it. It hides no flag and changes no score. `ignore[]` comes first: a package that it accepts whole has no maintenance S10 left to accept. The first matching entry, in order, is the one that report-2 writes. lockrot 0.13 ignores this key.",
+            "type": "array",
+            "items": {
+                "description": "One accepted check.",
+                "type": "object",
+                "properties": {
+                    "check": {
+                        "description": "The check that lockrot did not run: `repository_activity` (S3 and S4), `release_metadata` (S2 and S8) or `advisories` (S9). For a package outside every Composer repository, an accepted `release_metadata` also accepts the unknown fix of each counted advisory, because the fix scan reads the same releases. Its score can then be lower than with the releases read.",
+                        "type": "string",
+                        "enum": [
+                            "repository_activity",
+                            "release_metadata",
+                            "advisories"
+                        ]
+                    },
+                    "expires": {
+                        "description": "A real calendar date (`YYYY-MM-DD`). The entry accepts through 23:59:59 UTC that day, as an `ignore[]` entry does. lockrot rejects a date that does not exist, and this schema checks the shape. After that day the entry accepts nothing, and the check is S10 again.",
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "host": {
+                        "description": "The host of the repository URL of the package, as `finding.activity.host` writes it (`codeberg.org`, `git.example.com:8443`): lower case, with its port, without a scheme or a path. lockrot does not compare a GitLab path prefix of `activity.host`. Never with `check: advisories`: that gap comes from the Composer repositories, not from a source host.",
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(:[0-9]{1,5})?$"
+                    },
+                    "package": {
+                        "description": "The package name or a case-sensitive shell pattern (`acme/*`), matched with fnmatch as in `ignore[]`.",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "reason": {
+                        "description": "Why the project accepts the check. report-2 shows it verbatim (`finding.unchecked_accepted[].accepted_by.reason`), never inside a machine string. lockrot rejects a reason of whitespace only.",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "repository": {
+                        "description": "The repository that the package is installed from: its vcs URL (`https://github.com/acme/fork.git`, `git@github.com:acme/fork.git`), or the URL of a Composer repository (`https://mirror.acme.internal`). lockrot compares the lower-case host and the case-sensitive path, without the scheme, a trailing `/` or `.git`. A query and a fragment stay significant. A source URL matches on a host that lockrot cannot ask too. A Composer repository matches a package that lockrot attributes to it: by `origin.registry` when lockrot names the registry, else by the URL of the repository that lockrot read the entry from. The report does not write that URL. A package that lockrot cannot attribute to one repository never matches a Composer repository. A scheme URL carries no userinfo (lockrot rejects `https://user:secret@…` and `ssh://git@…`), because report-2 writes the value in `accepted_by.value` and a user name can be a token. Write `ssh://host:2222/path`: it matches the same source URL. Without a scheme lockrot reads only the scp form `user@host:path`. A `file://` URL has no host: accept such a package by `package`.",
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^([a-z][a-z0-9+.-]*:\\/\\/[^\\s\\/?#@]+([\\/?#][^\\s]*)?|[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:[^\\s]+)$"
+                    }
+                },
+                "required": [
+                    "check",
+                    "reason"
+                ],
+                "not": {
+                    "description": "The advisories check is never scoped by host.",
+                    "properties": {
+                        "check": {
+                            "enum": [
+                                "advisories"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "check",
+                        "host"
+                    ]
+                },
+                "oneOf": [
+                    {
+                        "description": "Scoped by host.",
+                        "required": [
+                            "host"
+                        ]
+                    },
+                    {
+                        "description": "Scoped by repository.",
+                        "required": [
+                            "repository"
+                        ]
+                    },
+                    {
+                        "description": "Scoped by package.",
+                        "required": [
+                            "package"
+                        ]
+                    }
+                ]
+            }
+        },
+        "advisory-lookup": {
+            "description": "Which packages lockrot asks the advisory APIs of the Composer repositories about, by name. `all` (the default) asks every locked package, as `composer audit` does, so the name of a package installed from vcs, path or an archive reaches packagist.org. `composer-repositories` asks only the packages installed from a Composer repository, as 0.13 did, and marks every other one `checks_skipped` {check: advisories, reason: not_from_composer_repository}. `--offline` asks none.",
+            "type": "string",
+            "enum": [
+                "all",
+                "composer-repositories"
+            ]
+        },
+        "baseline": {
+            "description": "The baseline file, relative to composer.json. lockrot 0.14 reads baseline-2 only; a baseline-1 file exits 2 until --generate-baseline overwrites it.",
+            "type": "string",
+            "minLength": 1
+        },
+        "fail-on": {
+            "description": "When the run fails. `none` is the default and must stand alone. A grade (`critical high medium low`) fails when the band of the gate score is at or above it. A maintenance flag (`abandoned silent pinned left-behind old-promise stale`) fails on a counted flag at or above it in flag order that the baseline does not cover, as the verdict gate of 0.13 did. A raw advisory severity (`vulnerable`, `vulnerable-medium`, `vulnerable-high`, `vulnerable-critical`) fails on a counted advisory at or above it that the baseline does not know. `vulnerable` means any severity, so `vulnerable-low` is not a value. `unchecked` fails on S10. A list holds at most one value per kind. lockrot trims and lower-cases each value and accepts whitespace around commas. `--fail-on` and `LOCKROT_FAIL_ON` replace this value whole. This schema checks the spelling of each value. Two values of one kind and `none` beside another value are errors of lockrot itself (exit 2), which name the values. `run.fail_on` writes the list in canonical form.",
+            "oneOf": [
+                {
+                    "description": "A comma-separated list in one string: `\"high\"`, `\"left-behind, vulnerable-high\"`.",
+                    "type": "string",
+                    "anyOf": [
+                        {
+                            "description": "One value, as an editor offers it.",
+                            "enum": [
+                                "none",
+                                "critical",
+                                "high",
+                                "medium",
+                                "low",
+                                "abandoned",
+                                "silent",
+                                "pinned",
+                                "left-behind",
+                                "old-promise",
+                                "stale",
+                                "vulnerable",
+                                "vulnerable-medium",
+                                "vulnerable-high",
+                                "vulnerable-critical",
+                                "unchecked"
+                            ]
+                        },
+                        {
+                            "pattern": "^\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*(,\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*)*$"
+                        }
+                    ]
+                },
+                {
+                    "description": "A JSON array, read as the string form is read: `[\"left-behind\", \"vulnerable-high\"]`.",
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "description": "One value.",
+                        "type": "string",
+                        "anyOf": [
+                            {
+                                "description": "As an editor offers it.",
+                                "enum": [
+                                    "none",
+                                    "critical",
+                                    "high",
+                                    "medium",
+                                    "low",
+                                    "abandoned",
+                                    "silent",
+                                    "pinned",
+                                    "left-behind",
+                                    "old-promise",
+                                    "stale",
+                                    "vulnerable",
+                                    "vulnerable-medium",
+                                    "vulnerable-high",
+                                    "vulnerable-critical",
+                                    "unchecked"
+                                ]
+                            },
+                            {
+                                "pattern": "^\\s*([vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[cC][rR][iI][tT][iI][cC][aA][lL]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[mM][eE][dD][iI][uU][mM]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]-[hH][iI][gG][hH]|[lL][eE][fF][tT]-[bB][eE][hH][iI][nN][dD]|[oO][lL][dD]-[pP][rR][oO][mM][iI][sS][eE]|[vV][uU][lL][nN][eE][rR][aA][bB][lL][eE]|[aA][bB][aA][nN][dD][oO][nN][eE][dD]|[uU][nN][cC][hH][eE][cC][kK][eE][dD]|[cC][rR][iI][tT][iI][cC][aA][lL]|[mM][eE][dD][iI][uU][mM]|[sS][iI][lL][eE][nN][tT]|[pP][iI][nN][nN][eE][dD]|[sS][tT][aA][lL][eE]|[nN][oO][nN][eE]|[hH][iI][gG][hH]|[lL][oO][wW])\\s*$"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "format": {
+            "description": "The output format. An open set in this published copy, so an editor holding it accepts a format a later release adds, or a `<vendor>:<name>` one; lockrot itself accepts exactly the formats in `x-known-values` of the copy it ships, and rejects any other as a configuration error.",
+            "type": "string",
+            "pattern": "^([a-z][a-z0-9-]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+            "x-known-values": [
+                "table",
+                "json",
+                "github",
+                "sarif",
+                "gitlab",
+                "markdown",
+                "html"
+            ]
+        },
+        "ignore": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "expires": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                        "description": "The date the entry stops accepting (`YYYY-MM-DD`). An expired entry accepts nothing and its flags count again."
+                    },
+                    "flags": {
+                        "description": "The maintenance flags that this entry accepts. Without it the entry accepts every maintenance flag, as in config-1. The other flags keep counting, and the repository activity lookup still runs unless the entry accepts every flag. A liveness word also accepts the liveness words below it. `vulnerable` is not a value: the allowlist accepts maintenance flags only. report-2 writes it as `finding.allowlist.flag_ids`. lockrot 0.13 reads an entry with `flags` as an entry that accepts the whole package.",
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                            "description": "A maintenance flag id.",
+                            "type": "string",
+                            "enum": [
+                                "abandoned",
+                                "silent",
+                                "pinned",
+                                "left-behind",
+                                "old-promise",
+                                "stale"
+                            ]
+                        }
+                    },
+                    "package": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "The package name or a pattern with `*` wildcards (`symfony/*`)."
+                    },
+                    "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Why the project accepts it. Reports show it verbatim (report-2 `finding.allowlist.reason`, `reason_by: user`), never inside a machine string."
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "One exact version that the entry applies to. Without it the entry applies to every version."
+                    }
+                },
+                "required": [
+                    "package",
+                    "reason"
+                ],
+                "description": "One allowlist entry."
+            },
+            "description": "The allowlist of the project: each entry accepts maintenance flags of the packages it matches, with a reason. An accepted flag is listed, muted, weighs 0 and reaches no gate. An entry never accepts an advisory. Accept advisories in the audit policy of Composer (`config.audit.ignore` on 2.4 to 2.9, `config.policy.advisories` on 2.10 and later), which `composer audit` reads too."
+        },
+        "include-dev": {
+            "description": "Whether packages-dev are analysed (`--dev`).",
+            "type": "boolean"
+        },
+        "install-time": {
+            "description": "Whether the install-time pass runs after `composer install` and `update` (`on`, `off`).",
+            "type": "string",
+            "enum": [
+                "on",
+                "off"
+            ]
+        },
+        "install-time-budget": {
+            "description": "Seconds the install-time pass may take, 1–120 (default 5).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 120
+        },
+        "install-time-strict": {
+            "description": "Apply `fail-on` at install time and stop the transaction (https://lockrot.dev/install-time/#install-time-strict).",
+            "type": "boolean"
+        },
+        "project": {
+            "description": "What a report should call this project, when the manifest's own name is not it — a package inside a monorepo, or a private project named after the client. Defaults to composer.json's own name. It renames the report's `run.project` only: it does not keep composer.json's name out of a report, whose `run.root_package` is always that name.",
+            "type": "string",
+            "minLength": 1
+        },
+        "push-high-years": {
+            "description": "Years without a push or commit at which S4 reaches `high` (default 5).",
+            "type": "integer",
+            "minimum": 1
+        },
+        "push-warn-years": {
+            "description": "Years without a push or commit at which S4 reaches `warn` (default 3).",
+            "type": "integer",
+            "minimum": 1
+        },
+        "release-high-years": {
+            "description": "Years without a stable release at which S2 and S8 reach `high` (default 5).",
+            "type": "integer",
+            "minimum": 1
+        },
+        "release-warn-years": {
+            "description": "Years without a stable release at which S2 (no stable release) and S8 (none on the installed branch) reach `warn` (default 3).",
+            "type": "integer",
+            "minimum": 1
+        },
+        "target-php": {
+            "description": "The PHP minor the project runs on (`8.4`); the third link of the target chain.",
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d+)?$"
+        }
+    }
+}

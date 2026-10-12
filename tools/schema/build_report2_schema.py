@@ -670,14 +670,33 @@ defs['checkSkipped'] = obj("A check lockrot chose not to run (§2.3): a decision
                       "`advisories` (S9), `release_branch` (S8 on a branch snapshot, which has no release branch, attack round 1), `repository_archived` (S3: the host's "
                       "answer did not carry the archived flag, as an anonymous GitLab answer does not). An open set.")),
     'reason': open_set(['allowlisted', 'no_repository', 'not_from_composer_repository', 'offline', 'rate_limit', 'fetch_failed', 'anonymous_budget', 'install_time_budget',
-                        'no_token', 'unavailable', 'not_found', 'branch_snapshot', 'host_not_supported', 'repository_not_found', 'unparseable_version'],
+                        'no_token', 'unavailable', 'not_found', 'branch_snapshot', 'host_not_supported', 'repository_not_found', 'unparseable_version',
+                        'accepted_by_config'],
                        ('Why (§2.3, §7.9 page vocabulary): `repository_not_found` is the host\'s 404 (an answer, not a gap), `host_not_supported` a host lockrot cannot ask '
-                        'on a package whose S10 the filter drops, `unparseable_version` an installed version Composer cannot parse. '
-                        'An open set: read an unknown reason as another reason.')),
+                        'on a package whose S10 the filter drops, `unparseable_version` an installed version Composer cannot parse, `accepted_by_config` an S10 check that the '
+                        "project accepted in `extra.lockrot.accept-unchecked`. The `unchecked_accepted[]` entry of the finding with the same check holds the S10 reason and the "
+                        'entry. An open set: read an unknown reason as another reason.')),
     'blocks': arr('The signals it left unread.', ref('signalId'), minItems=1, uniqueItems=True),
 })
 
 # allowlist, metadata, baseline, gate on a finding
+defs['uncheckedAccepted'] = obj(("An S10 check that the project accepted in `extra.lockrot.accept-unchecked` (config-2): the entry that S10 would hold, and the entry of the "
+                                  "project that accepted it. Its `checks_skipped[]` entry has the same `check` and `blocks` and the reason `accepted_by_config`. An accepted check "
+                                  "hides no flag, changes no score and reaches no `unchecked` gate."), {
+    'check': open_set(['repository_activity', 'release_metadata', 'advisories'], "The S10 check id, as `checks_missing[].check` would write it. An open set."),
+    'reason': open_set(['host_not_supported', 'no_feed', 'not_from_composer_repository'],
+                       ("The S10 reason that was accepted. lockrot accepts only a gap that a rerun cannot close: a host that lockrot cannot ask, no advisory feed, a package "
+                        "from vcs or from an unknown origin. Every other reason stays S10. An open set.")),
+    'blocks': arr('The signals that it left unread, as S10 would list them.', ref('signalId'), minItems=1, uniqueItems=True),
+    'accepted_by': obj("The accept-unchecked entry that accepted it: the first entry, in config order, whose `check` and scope match.", {
+        'scope': closed(['host', 'repository', 'package'], ("The key of the entry that named the package: `host` (the host of its repository URL, `activity.host`), "
+                                                           "`repository` (the repository it was installed from: its vcs URL, or the URL of a Composer repository), "
+                                                           "`package` (a name or a case-sensitive shell pattern, as in ignore[]). Closed: config-2 names these three keys.")),
+        'value': d("The `host`, `repository` or `package` value of the entry, as written.", {'type': 'string', 'minLength': 1}),
+        'reason': d("The reason of the project, as written: data, never inside a machine string.", {'type': 'string', 'minLength': 1}),
+        'expires': nul('The last UTC calendar day that the entry accepts, through 23:59:59 UTC. Null when it does not expire.', ref('date')),
+    }),
+})
 defs['allowlist'] = nul("The allowlist entry that accepts maintenance flags of this package (§6.5, revision 3); null when none does. `allowlist_reason` stays as an alias for report-1 readers.",
     obj('An allowlist entry.', {
         'by': closed(['builtin', 'project', 'type'], "Who accepted: the built-in finished list, the project's `extra.lockrot.ignore[]`, or an entry lockrot makes for a package type. Closed (§8.2); the one vocabulary for who accepted a flag."),
@@ -1078,6 +1097,8 @@ FINDING = {
                            "(the composer-repositories scope, an installed version Composer cannot parse), `release_branch` (a branch snapshot: S8 cannot run). "
                            "No `unchecked` gate reads it."),
                           ref('checkSkipped')),
+    'unchecked_accepted': arr(("The S10 checks that the project accepted in `extra.lockrot.accept-unchecked`, each with the S10 reason and the entry that accepted it. `[]` when "
+                               "none. One per `checks_skipped[]` entry whose reason is `accepted_by_config`."), ref('uncheckedAccepted'), uniqueItems=True),
     'maintenance_judged': d(("True exactly when `metadata.status` is `read`: repository metadata was read, so S2 and S8 ran (schema round). A finding can be graded with it false: "
                              "a package not from a Composer repository is graded on the facts the lock holds (S1 marked in the lock, S5, S6), and its score-0 words (`without[]`, "
                              "`if_counted`, `if_applied`) read `unknown`, never `ok`."), {'type': 'boolean'}),
@@ -1325,11 +1346,12 @@ defs['rootFlagVulnerable'] = obj("`vulnerable`'s root counts (§7.6): it has no 
 NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 'advisory_ignore_unreadable', 'advisories_disabled_by_policy',
               'advisories_unavailable', 'advisories_not_checked', 'repository_activity_not_checked', 'repository_activity_anonymous_cap',
               'repository_activity_rate_limited', 'repository_activity_unreachable', 'repository_activity_not_found', 'repository_activity_host_not_supported',
-              'not_from_composer_repository', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable']
+              'not_from_composer_repository', 'verdict_rules_changed', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories',
+              'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
     if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
-             'abandoned_ignore_unreadable'):
+             'abandoned_ignore_unreadable', 'verdict_rules_changed', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
@@ -1369,6 +1391,41 @@ defs['noteRepositoryActivityHostNotSupported'] = obj(("`repository_activity_host
                          {'type': 'string', 'pattern': HYPHEN, 'x-known-values': ['github-domains', 'forgejo-domains']}),
     }), minItems=1),
 })
+defs['noteVerdictRulesChanged'] = obj(("`verdict_rules_changed`: findings that reached a grade value under the rules of 0.13 and no longer do. The sentence quotes "
+                                        "`score_text` from this data."), {
+    'fail_on': d('The grade value.', {'type': 'string', 'pattern': HYPHEN}),
+    'findings': arr('The findings, by package name, then version.', obj('One finding.', {
+        'package': ref('packageName'),
+        'version': d('The installed version.', {'type': 'string'}),
+        'legacy': obj("The computation of 0.13.", {
+            'verdict': d("The cause word of 0.13.", copy.deepcopy(R1['definitions']['verdict'])),
+            'priority': d("The priority of 0.13.", copy.deepcopy(R1['definitions']['priority'])),
+            'basis': obj("The `priority_basis` of 0.13.", {
+                'base': d('The starting level.', copy.deepcopy(R1['definitions']['priority'])),
+                'steps': arr("The steps, as the `priority_basis.steps` of report-1.", obj('A step.', {
+                    'reason': open_set(['transitive', 'unreached', 'dev', 'no_fix_expected'], 'Why the step was taken (report-1). Open.'),
+                    'from': d('Before.', copy.deepcopy(R1['definitions']['flaggedPriority'])),
+                    'to': d('After.', copy.deepcopy(R1['definitions']['flaggedPriority'])),
+                })),
+            }),
+        }),
+        'verdict': ref('verdict'),
+        'score_total': d('Its `score.total`.', INT0),
+        'score_text': rendered('Its `score.text`, carried in the note so that the note text reads its own data.', ['findings[].score.text']),
+    }), minItems=1),
+})
+TPHP = {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}
+TSRC = ['option', 'env', 'config', 'platform', 'runtime']
+defs['noteBaselineTargetDiffers'] = obj('`baseline_target_differs`: lockrot does not compare fix changes across targets.', {
+    'baseline_target_php': d("The `target_php` of the baseline file (a PHP minor).", TPHP),
+    'baseline_target_php_source': closed(TSRC, "The `target_php_source` of the baseline file."),
+    'run_target_php': d('`run.target_php`.', TPHP),
+    'run_target_php_source': closed(TSRC, '`run.target_php_source`.')})
+defs['noteBaselineFixModelDiffers'] = obj('`baseline_fix_model_differs`: lockrot does not compare fix changes across fix models.', {
+    'baseline_fix_model': d("The `fix_model` of the baseline file.", INT1), 'run_fix_model': d("The `fix_model` of this run (`run.fix_model`).", INT1)})
+defs['noteIgnoreDoesNotCoverAdvisories'] = obj('`ignore_does_not_cover_advisories`: `ignore[]` entries whose package carries a counted advisory.', {
+    'entries': arr('The entries.', obj('One entry.', {'package': ref('packageName'), 'pattern': d('The `ignore[]` pattern.', {'type': 'string'}),
+                                                      'advisories': arr('The counted advisory ids.', ref('advisoryId'), minItems=1)}), minItems=1)})
 defs['noteCode'] = copy.deepcopy(R1['definitions']['noteCode'])
 defs['noteCode']['x-known-values'] = NOTE_CODES
 defs['noteDetail'] = copy.deepcopy(R1['definitions']['noteDetail'])
@@ -1388,6 +1445,16 @@ defs['noteNotFromComposerRepository']['description'] = ("`not_from_composer_repo
     "Equal to the report's `not_from_composer_repository`.")
 defs['baselineComparison'] = copy.deepcopy(R1['definitions']['baselineComparison'])
 defs['baselineComparison']['description'] = 'How the run compared with the baseline file (report-1, unchanged): the counts of findings by standing and the stale entries.'
+defs['gateValueFailing'] = obj('One `run.gates` value and how many findings fail it.', {
+    'value': d('`run.gates[].value`.', {'type': 'string', 'pattern': HYPHEN}),
+    'failing': d("Findings whose `gate.by[]` names this value.", INT0),
+})
+defs['gateNotApplied'] = obj('A check that the gate could not apply, on how many packages, and why: the gap where the gate failed open, as data.', {
+    'check': open_set(['advisories'], "What was not checked (the `check` vocabulary of S10). An open set."),
+    'packages': d('Packages that the gate could not judge on it for this reason: the covered unchecked findings whose `security.unchecked_reason` is `reason`.', INT1),
+    'reason': open_set(['offline', 'composer_too_old', 'install_time_budget', 'lookup_failed', 'no_feed', 'not_from_composer_repository', 'unparseable_version'],
+                       "Why: the `security.unchecked_reason` of the unchecked findings. An open set."),
+})
 defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding counts the `gate:` line prints (§7.6).", {
     'fails': copy.deepcopy(R1['definitions']['gate']['properties']['fails']),
     'tripped_by': copy.deepcopy(R1['definitions']['gate']['properties']['tripped_by']),
@@ -1396,6 +1463,15 @@ defs['rootGate'] = obj("The run's gate (report-1's, §6.2) plus the finding coun
     'failing': COUNT('Findings whose `gate.fails` is true.'),
     'exempt': obj('Findings that reach and are exempt, by `exempt_by` value.', {'baseline': COUNT('Exempt by the baseline.')},
                   additionalProperties=INT0),
+    'failing_by': arr(("One entry per `run.gates` value, in its order: how many findings fail that value (their `gate.by[]` names it). Zero counts are written. "
+                       "`[]` when `run.gates` is `[]`."), ref('gateValueFailing')),
+    'not_applied': arr(("What the gate could not judge, so it failed open: advisories that a grade or vulnerable value could not read because nothing checked them. "
+                        "Written in a check run with a grade or vulnerable value active. With `unchecked` also active, it counts only the packages whose advisories carry no S10 "
+                        "(a skip reason: `not_from_composer_repository`, `unparseable_version`, or a `no_feed` that the project accepted), because the "
+                        "others carry S10 and fail closed. One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the "
+                        "findings covered. `[]` otherwise, and when nothing is missing."), ref('gateNotApplied')),
+    'text': dict(rendered('The `gate:` line of the text formats, `RunGateText` (text grammar 1).', ['gate', 'run.fail_on', 'run.fail_on_source', 'run.gates', 'run.mode',
+                                                                                                  'run.target_php', 'run.target_php_source']), minLength=1),
 })
 defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8.2).", {
     'check': open_set(['complete', 'partial', 'not_run'], ("How the run's advisory lookup went (schema round: counted from the findings): the findings' one `security.check` value "
@@ -1459,6 +1535,7 @@ ROOT = {
     'packages_multi_flag': COUNT('Graded findings with two or more counted flags (the `flags:` line, §7.6).'),
     'include_dev': d('Whether packages-dev were analysed (report-1).', {'type': 'boolean'}),
     'not_from_composer_repository': copy.deepcopy(R1['properties']['not_from_composer_repository']),
+    'packages_unchecked_accepted': COUNT("Findings with at least one check that the project accepted in `extra.lockrot.accept-unchecked` (a non-empty `unchecked_accepted[]`)."),
     'network_failures': d('Whether some note sets it (report-1).', {'type': 'boolean'}),
     'counts': obj('Findings per verdict, all seven required (§8.2; `.counts.<cause>` is null in report-2: read `.flags.<cause>.leading`).', {v: COUNT(f'Findings whose verdict is `{v}`.') for v in VERDICTS}),
     'abandoned': obj("`total` = `flags.abandoned.carrying`; `with_replacement` keeps report-1's meaning (the finding's `replacement` names a package), "
@@ -1639,7 +1716,9 @@ def add_relations_round4(defs):
     relate(defs['branchFixes'], 'A branch that fixes nothing has no class, no candidate, no holder and no score after it; a branch that fixes one or more has a class '
                                 'and a newest release (its candidate can be null: the whole branch fixes them).',
            [P(fixed=E(0), fix_kind=NULL, lowest=NULL, held_by=EMPTY, if_applied=NULL), P(fixed={'minimum': 1}, fix_kind=STR, newest=STR)])
-    relate(defs['branchFixes'], 'A `blocked` branch has no score after it: `if_applied` is null.', [P(fix_kind=NOT('blocked')), P(if_applied=NULL)])
+    relate(defs['branchFixes'], 'The score after a move is null exactly when the branch fixes nothing or its class is `blocked`.',
+           [P(fixed=E(0), if_applied=NULL), P(fixed={'minimum': 1}, fix_kind=E('blocked'), if_applied=NULL),
+            P(fixed={'minimum': 1}, fix_kind=NOT('blocked'), if_applied=OBJ)])
     rec = BO.inner(BO.inner(defs['findingBaseline'])['properties']['recorded'])
     relate(rec, '`lead` is null exactly when `flags` is (an advisory-only entry).', [P(lead=NULL, flags=NULL), P(lead=STR, flags=OBJ)])
     thr = [(g, g) for g in BO.GRADES] + [(m, m) for m in BO.MAINT] + [('vulnerable', 'low')] + [('vulnerable-' + x, x) for x in ('medium', 'high', 'critical')]
@@ -1662,8 +1741,8 @@ def add_relations_activity(defs):
                              'A read whose answer did not carry the archived flag (`activity.archived` null) has the `repository_archived` entry in `checks_skipped`, and only then.',
                              'S3 fired exactly when `activity.archived` is true.',
                              'S4 fired only on a read activity.',
-                             'A package installed from a Composer repository carries no S10 entry with the reason `not_from_composer_repository`.',
-                             'A package installed from path, artifact or package origins carries no S10 entry with the reason `not_from_composer_repository`.'],
+                             'A package installed from a Composer repository carries no S10 and no accepted entry with the reason `not_from_composer_repository`.',
+                             'A package installed from path, artifact or package origins carries no S10 and no accepted entry with the reason `not_from_composer_repository`.'],
            [P(activity=P(status=E('read')), checks_missing=NONE(P(check=E('repository_activity'))), checks_skipped=NONE(P(check=E('repository_activity')))),
             P(activity=P(status=NOT('read')), checks_missing=CONTAINS(P(check=E('repository_activity')))),
             P(activity=P(status=NOT('read')), checks_skipped=CONTAINS(P(check=E('repository_activity'))))],
@@ -1672,8 +1751,19 @@ def add_relations_activity(defs):
             P(activity=P(status=NOT('read')), checks_skipped=NONE(P(check=E('repository_archived'))))],
            [P(signals=has('S3'), activity=P(archived=E(True))), P(signals=lacks('S3'), activity=P(archived=NOT(True)))],
            [P(signals=lacks('S4')), P(activity=P(status=E('read')))],
-           [P(from_composer_repository=E(False)), P(checks_missing=NONE(nfcr))],
-           [P(origin=P(kind=NOT('path', 'artifact', 'package'))), P(checks_missing=NONE(nfcr))])
+           [P(from_composer_repository=E(False)), P(checks_missing=NONE(nfcr), unchecked_accepted=NONE(nfcr))],
+           [P(origin=P(kind=NOT('path', 'artifact', 'package'))), P(checks_missing=NONE(nfcr), unchecked_accepted=NONE(nfcr))])
+    relate(defs['finding'], '`unchecked_accepted` is empty exactly when no `checks_skipped[]` entry has the reason `accepted_by_config`.',
+           [P(unchecked_accepted=BO.EMPTY, checks_skipped=NONE(P(reason=E('accepted_by_config')))),
+            P(unchecked_accepted=BO.MIN1, checks_skipped=CONTAINS(P(reason=E('accepted_by_config'))))])
+    relate(defs['uncheckedAccepted'], ['The check fixes what it blocks: `repository_activity` S3 and S4, `release_metadata` S2 and S8, `advisories` S9. A check that this schema does not list is not constrained.',
+                                       'The reason fits the check: `host_not_supported` on `repository_activity`, `no_feed` on `advisories`, `not_from_composer_repository` on `release_metadata` '
+                                       'or `repository_activity`. A reason that this schema does not list is not constrained.'],
+           [P(check=E('repository_activity'), blocks=E(['S3', 'S4'])), P(check=E('release_metadata'), blocks=E(['S2', 'S8'])), P(check=E('advisories'), blocks=E(['S9'])),
+            P(check=NOT('repository_activity', 'release_metadata', 'advisories'))],
+           [P(reason=E('host_not_supported'), check=E('repository_activity')), P(reason=E('no_feed'), check=E('advisories')),
+            P(reason=E('not_from_composer_repository'), check=E('release_metadata', 'repository_activity')),
+            P(reason=NOT('host_not_supported', 'no_feed', 'not_from_composer_repository'))])
 
 
 def add_relations_measurements(defs):
@@ -1749,6 +1839,15 @@ ROOT_RELATIONS += [
     {'description': "`fail_on` is among `gate.tripped_by` exactly when some finding fails, and `gate.failing` is 0 exactly when none does.",
      'anyOf': [_P(gate=_P(tripped_by={'not': {'items': {'not': _E('fail_on')}}}, failing={'minimum': 1}), findings={'not': {'items': {'not': _FAILS}}}),
                _P(gate=_P(tripped_by={'items': {'not': _E('fail_on')}}, failing=_E(0)), findings={'items': {'not': _FAILS}})]},
+]
+ROOT_RELATIONS += [
+    {'description': "`packages_unchecked_accepted` is 0 exactly when no finding has an accepted check.",
+     'anyOf': [_P(packages_unchecked_accepted=_E(0), findings={'items': _P(unchecked_accepted={'maxItems': 0})}),
+               _P(packages_unchecked_accepted={'minimum': 1}, findings={'not': {'items': {'not': _P(unchecked_accepted={'minItems': 1})}}})]},
+    {'description': "`gate.failing_by` is empty exactly when `run.gates` is (one entry per value).",
+     'anyOf': [_P(run=_P(gates={'maxItems': 0}), gate=_P(failing_by={'maxItems': 0})), _P(run=_P(gates={'minItems': 1}), gate=_P(failing_by={'minItems': 1}))]},
+    {'description': "Where fail-on is not applied, no value of `gate.failing_by` counts a failing finding.",
+     'anyOf': [_P(gate=_P(fail_on_applied=_E(True))), _P(gate=_P(failing_by={'items': _P(failing=_E(0))}))]},
 ]
 schema = {
     '$schema': 'http://json-schema.org/draft-04/schema#',
