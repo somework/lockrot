@@ -30,9 +30,18 @@ use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversNothing
+ *
+ * @group covers-nothing
+ */
+#[CoversNothing]
+#[Group('covers-nothing')]
 final class AcceptanceTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';

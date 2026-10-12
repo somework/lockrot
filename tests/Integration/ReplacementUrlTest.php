@@ -31,6 +31,7 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,8 +41,11 @@ use PHPUnit\Framework\TestCase;
  * each pair once from packagist.org and once from Private Packagist.
  *
  * @coversNothing
+ *
+ * @group covers-nothing
  */
 #[CoversNothing]
+#[Group('covers-nothing')]
 final class ReplacementUrlTest extends TestCase
 {
     use ValidatesJsonSchemas;
