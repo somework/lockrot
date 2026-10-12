@@ -106,6 +106,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **All formats:** Symfony's extension polyfills keep their place on the built-in finished list
   under their own reason, because "intentionally frozen" was false for them.
+- **CLI:** `--explain` prints "archived flag not read" for a repository whose host did not send the
+  flag, such as gitlab.com without a token. It printed "not archived".
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
 
 ## [0.13.0] - 2026-10-01
 
