@@ -80,7 +80,7 @@ final class GithubFormatterTest extends TestCase
 
         return new Report([
             (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', [])), new Signal('high', 'no push for 9 years', SignalDataStub::of('S4', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/absent')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['acme/absent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
@@ -97,7 +97,7 @@ final class GithubFormatterTest extends TestCase
         $lines = explode("\n", trim($out));
 
         self::assertSame('::error file=composer.lock,line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: marked abandoned by its repository', $lines[0]);
-        self::assertSame('::error file=composer.lock,line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
+        self::assertSame('::error file=composer.lock,line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago); no push for 9 years (via a/parent)', $lines[1]);
         self::assertSame('::warning file=composer.lock,title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
         self::assertSame('::notice file=composer.lock,title=lockrot%3A ok (none)::acme/fine 4.0.0', $lines[3]);
     }
@@ -234,7 +234,7 @@ final class GithubFormatterTest extends TestCase
         $lines = explode("\n", trim($this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath, 2))->format($this->report(), true)));
 
         self::assertSame('::error file='.$name.',line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: marked abandoned by its repository', $lines[0]);
-        self::assertSame('::error file='.$name.',line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
+        self::assertSame('::error file='.$name.',line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago); no push for 9 years (via a/parent)', $lines[1]);
         self::assertSame('::warning file='.$name.',title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
     }
 

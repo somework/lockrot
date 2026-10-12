@@ -29,7 +29,7 @@ final class MarkdownFormatter implements FormatterInterface
     public function format(Report $report, bool $showAll = false): string
     {
         $baseline = $report->baseline();
-        $gate = $report->gate();
+        $gate = $this->context->gateOf($report);
         $rows = $showAll ? $report->findings() : $report->flagged();
 
         $lines = [$this->heading($report)];

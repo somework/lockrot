@@ -92,7 +92,7 @@ final class SarifFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
-        $gate = $report->gate();
+        $gate = $this->context->gateOf($report);
         $rules = [];
         $ruleIndexes = [];
         $results = [];

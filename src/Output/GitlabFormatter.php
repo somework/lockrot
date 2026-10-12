@@ -41,7 +41,7 @@ final class GitlabFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
-        $gate = $report->gate();
+        $gate = $this->context->gateOf($report);
         $issues = [];
         foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
             $issues[] = $this->issue($finding, $index->lineOf($finding->package()), $baseline, $gate);

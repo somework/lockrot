@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
+use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Config\GateStanding;
 use Lockrot\Filesystem\Path;
 use Lockrot\Verdict\FailOn;
@@ -106,6 +108,15 @@ final class FormatContext
     public function terminalWidth(): int
     {
         return $this->terminalWidth;
+    }
+
+    /**
+     * The run's gate, which a report with run settings decides itself. A report without them, which
+     * only a test or a caller outside the command builds, is judged on this context's fail-on.
+     */
+    public function gateOf(Report $report): Gate
+    {
+        return $report->gate() ?? Gate::decide($report, $this->failOn, false, Gate::MODE_CHECK);
     }
 
     /**

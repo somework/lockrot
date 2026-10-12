@@ -33,7 +33,7 @@ final class GithubFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
-        $gate = $report->gate();
+        $gate = $this->context->gateOf($report);
         $lines = [];
         foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
             $lines[] = $this->annotation($finding, $index->lineOf($finding->package()), $baseline, $gate);

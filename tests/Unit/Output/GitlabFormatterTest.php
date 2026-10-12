@@ -76,7 +76,7 @@ final class GitlabFormatterTest extends TestCase
 
         return new Report([
             (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', [])), new Signal('high', 'no push for 9 years', SignalDataStub::of('S4', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/absent')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['acme/absent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
@@ -115,7 +115,7 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame(4, JsonPath::intAt($first, ['location', 'lines', 'begin']));
 
         $second = $issues[1];
-        self::assertSame('acme/silent 2.0.8 — silent (high): last release 2015-11-16 (10.8 years ago) (via a/parent)', $second['description']);
+        self::assertSame('acme/silent 2.0.8 — silent (high): last release 2015-11-16 (10.8 years ago); no push for 9 years (via a/parent)', $second['description']);
         self::assertSame(8, JsonPath::intAt($second, ['location', 'lines', 'begin']));
     }
 
