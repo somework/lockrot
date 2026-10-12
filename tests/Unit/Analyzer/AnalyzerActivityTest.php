@@ -333,6 +333,23 @@ final class AnalyzerActivityTest extends TestCase
         self::assertSame($recorded['activity'], $finding['activity']);
         self::assertSame($recorded['checks_missing'], $finding['checks_missing']);
         self::assertSame(self::origin($recorded), self::origin($finding));
+        self::assertSame(self::s10($recorded), self::s10($finding));
+    }
+
+    /**
+     * @param array<mixed, mixed> $finding
+     *
+     * @return mixed the S10 data of the finding, or null
+     */
+    private static function s10(array $finding)
+    {
+        foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
+            if (\is_array($signal) && $signal['id'] === 'S10') {
+                return $signal['data'];
+            }
+        }
+
+        return null;
     }
 
     /** @return iterable<string, array{string}> */

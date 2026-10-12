@@ -964,7 +964,7 @@ final class FindingTest extends TestCase
         $releases = ['check' => 'releases', 'reason' => 'releases_unknown', 'blocks' => ['S9']];
         self::assertSame(Signal::S10, $s10['id']);
         self::assertCount(1, $written, 'one S10');
-        self::assertSame($withS10 ? ['unchecked' => [$activity, $releases], 'blocks' => ['S9', 'S3', 'S4']] : ['unchecked' => [$releases], 'blocks' => ['S9']], $s10['data']);
+        self::assertSame($withS10 ? ['unchecked' => [$activity, $releases], 'blocks' => ['S3', 'S4', 'S9']] : ['unchecked' => [$releases], 'blocks' => ['S9']], $s10['data']);
         self::assertSame($withS10 ? 'activity not checked; '.NotCheckedRule::RELEASES_WORDS : NotCheckedRule::RELEASES_WORDS, $s10['summary']);
     }
 
@@ -1174,7 +1174,7 @@ final class FindingTest extends TestCase
     {
         $s6 = new Signal(Signal::LEVEL_WARN, 'pinned', SignalDataStub::of(Signal::S6, ['reason' => 'no_stable_release', 'version' => '1.0.0']));
         $gaps = [['check' => 'a', 'reason' => 'no_token', 'blocks' => ['S9']], ['check' => 'b', 'reason' => 'no_token', 'blocks' => ['S9', 'S4']]];
-        yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']]))], ['S9', 'S4']];
+        yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']]))], ['S4', 'S9']];
         yield 'with no S10' => [[$s6], ['S9']];
     }
 }

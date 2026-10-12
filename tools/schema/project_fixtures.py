@@ -167,9 +167,7 @@ def project_s10(f, proj):
     f['checks_missing'] = [e for e, _ in kept]
     signals = [s for s in f['signals'] if s['id'] != 'S10']
     if kept:
-        blocks = []
-        for e, _ in kept:
-            blocks += [b for b in e['blocks'] if b not in blocks]
+        blocks = sorted({b for e, _ in kept for b in e['blocks']}, key=lambda b: int(b[1:]))
         words = [w for _, w in kept]
         s10 = copy.deepcopy(s10) if s10 is not None else {'id': 'S10', 'level': 'info', 'summary': '', 'data': {}}
         s10['data'] = {'unchecked': [e for e, _ in kept], 'blocks': blocks}

@@ -179,7 +179,7 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), self::undated(), null, [], NotCheckedRule::OFFLINE));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S3, Signal::S4, Signal::S2, Signal::S8], JsonPath::decoded($signal->data())['blocks']);
+        self::assertSame([Signal::S2, Signal::S3, Signal::S4, Signal::S8], JsonPath::decoded($signal->data())['blocks'], 'in signal order');
         $unchecked = JsonPath::decoded($signal->data())['unchecked'];
         self::assertIsArray($unchecked);
         self::assertCount(2, $unchecked);
