@@ -181,7 +181,7 @@ final class ScoreBasis implements \JsonSerializable
     }
 
     /** @return list<Modifier> */
-    private static function modifiersOf(Score $score): array
+    public static function modifiersOf(Score $score): array
     {
         $modifiers = [];
         if ($score->reach() !== Score::DIRECT) {

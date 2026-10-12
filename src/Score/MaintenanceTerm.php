@@ -63,6 +63,11 @@ final class MaintenanceTerm implements Term
         return $this->points;
     }
 
+    public function contributionHalves(): int
+    {
+        return $this->contributionHalves;
+    }
+
     /** @return Shape */
     public function jsonSerialize(): array
     {
