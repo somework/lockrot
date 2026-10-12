@@ -22,7 +22,7 @@ start the reason with `in method():`.
 
 ## src/Analyzer
 
-- `src/Analyzer/Analyzer.php` ReturnRemoval `return Moves::none();` — in moves(): a finding with no counted fact has no lead and no advisory, so `NextStep::plan()` names no move either.
+- `src/Analyzer/Analyzer.php` ReturnRemoval `return Moves::none();` — in moves(): a speed guard that skips the release scan and the move rules for a finding that is not graded. Without it, `NextStep::plan()` finds no lead and no counted advisory, and names no move either.
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return [$metadata, []];` — in dateSplitPackages(): with no package to date, the rest of the method finds no candidate and makes no request.
 - `src/Analyzer/Libyears.php` GreaterThan `if ($newest === null || $release['at'] > $newest) {` — on a tie the two dates are the same instant, and nothing reads which release gave it.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.
@@ -131,7 +131,6 @@ start the reason with `in method():`.
 ## src/Security
 
 - `src/Security/FixFinder.php` CastString `$newest[(string) $key] = $branch['highest']['pretty'];` — PHP stores a decimal string key such as `"1"` as an int, so the cast changes no key. The cast is for the type.
-- `src/Security/Holder.php` CastString `return array_map(static fn (self $holder): self => $holder->source === self::ROOT ? $holder : $holder->withFinding($findings[(string) $holder->package] ?? null), $holders);` — only a root holder has no package name, and the root branch returns it first. The cast is for the type.
 - `src/Security/LinkIndex.php` TrueValue `$locked[$package->name()] = true;` — a set. Only `isset()` reads it.
 
 ## src/SelfUpdate
@@ -154,9 +153,3 @@ start the reason with `in method():`.
 - `src/Verdict/FindingDetails.php` DecrementInteger `$hardest = 0;` — `standing()` returns before the loop when no row counts, and every kind has an index of 0 or more, so the maximum is the same.
 - `src/Verdict/FlagSentence.php` DecrementInteger `if (($counts[$severity] ?? 0) > 0) {` — a missing severity reads as -1, which is not above 0 either.
 - `src/Verdict/FlagSentence.php` GreaterThan `$label = $fixed > 0 && $kind !== null && $kind !== Fix::UPDATE ? ' ('.self::FIX_LABEL[$kind].')' : '';` — with no advisory fixed, the "none fixed" clause carries no label.
-- `src/Verdict/MaintenanceMove.php` ReturnRemoval `return null;` — in draft(): a finding with no lead counts no maintenance flag. The security move then covers every fact of the draft that the fall-through names, so `NextStep::plan()` drops it.
-- `src/Verdict/MaintenanceMove.php` LogicalAnd `if ($row !== null && $suggested !== null) {` — S8 names a reachable branch with its suggested constraint, and the branch has a row, so the two are null together.
-- `src/Verdict/MoveBuilder.php` LogicalAnd x2 `if ($draft->isRowMove() && $row !== null && $flags->accepted() !== []) {` — a tag is the one move that reruns and is no row move. S8 never fires on a snapshot, and old-promise stays unverified without a lower release, so a tag settles no accepted flag.
-- `src/Verdict/MoveBuilder.php` LogicalOr `if ($lower === null || $newest === null) {` — both are null exactly when lockrot read no release above the installed one: then no row move names a lower release, and no newest release is known.
-- `src/Verdict/MoveText.php` CastString `return $parts === [] ? (string) $last : implode(', ', $parts).' and '.$last;` — every caller passes a list with an item, so `array_pop()` returns a string. The cast is for the type.
-- `src/Verdict/NextStep.php` Coalesce `return [$security ?? $maintenance, null];` — one of the two is null here, so either order gives the other.

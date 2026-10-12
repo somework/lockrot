@@ -94,7 +94,7 @@ final class Holder implements \JsonSerializable
      */
     public static function filled(array $holders, array $findings): array
     {
-        return array_map(static fn (self $holder): self => $holder->source === self::ROOT ? $holder : $holder->withFinding($findings[(string) $holder->package] ?? null), $holders);
+        return array_map(static fn (self $holder): self => $holder->package === null ? $holder : $holder->withFinding($findings[$holder->package] ?? null), $holders);
     }
 
     /** @return array{source: string, package: ?string, version: ?string, link: string, constraint: string, holder: ?GradedPackage} */

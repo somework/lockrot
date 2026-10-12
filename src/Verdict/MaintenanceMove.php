@@ -20,13 +20,10 @@ use Lockrot\Signal\Data\PinnedData;
  */
 final class MaintenanceMove
 {
-    public static function draft(MoveContext $context): ?MoveDraft
+    public static function draft(MoveContext $context, string $lead): MoveDraft
     {
         $finding = $context->finding();
-        $lead = $finding->lead();
         switch ($lead) {
-            case null:
-                return null;
             case FlagSet::ABANDONED:
                 return self::abandoned($finding);
             case FlagSet::SILENT:
@@ -111,9 +108,9 @@ final class MaintenanceMove
     {
         $s8 = $context->finding()->signalData(LeftBehindData::class);
         $reachable = $s8 === null ? null : $s8->reachable();
-        $row = $reachable === null ? null : $context->row($reachable->branch());
         $suggested = $reachable === null ? null : $reachable->suggestedConstraint();
-        if ($row !== null && $suggested !== null) {
+        $row = $suggested === null ? null : $context->row($reachable->branch());
+        if ($row !== null) {
             return self::require(FlagSet::LEFT_BEHIND, $context, $row, $suggested);
         }
         $above = array_filter($context->rows(), static fn (BranchRow $row): bool => !$row->installed() && $context->isAbove($row));

@@ -139,13 +139,13 @@ final class MoveBuilder
             }
         }
         $ranges = $context->ranges();
-        $newest = $context->release($row->highest());
+        $newest = $lower === null ? null : $context->release($row->highest());
         foreach ($advisories as $id) {
             $range = $ranges[$id] ?? null;
             if ($range === null) {
                 continue;
             }
-            if ($lower === null || $newest === null) {
+            if ($newest === null) {
                 $unverified[] = MoveFact::unchecked(MoveFact::ADVISORY, $id, MoveFact::NO_RELEASE_DATA);
             } elseif (!MoveContext::reaches($range, $lower->release()->normalized(), $newest->normalized())) {
                 $clears[] = MoveFact::on(MoveFact::ADVISORY, $id, MoveFact::OUTSIDE_RANGE);
@@ -238,7 +238,7 @@ final class MoveBuilder
             }
         }
         $row = $draft->row();
-        if ($draft->isRowMove() && $row !== null && $flags->accepted() !== []) {
+        if ($row !== null) {
             foreach (self::clearsFor($row, $draft->lower(), $flags->accepted(), [], $context)[0] as $settled) {
                 $removed[] = $settled->id();
             }

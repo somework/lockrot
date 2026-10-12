@@ -268,11 +268,11 @@ final class MoveText
         $gone = array_filter($through, static fn (ThroughEntry $entry): bool => $entry->newestRequires() === false);
         $kept = array_filter($through, static fn (ThroughEntry $entry): bool => $entry->newestRequires() === true);
         $entries = $gone !== [] ? $gone : $kept;
-        if ($entries === []) {
+        $names = array_map(static fn (ThroughEntry $entry): string => $entry->package().' ('.$entry->newestVersion().')', \array_slice($entries, 0, self::DEPENDENTS_SHOWN));
+        if ($names === []) {
             return '';
         }
         $one = \count($entries) === 1;
-        $names = array_map(static fn (ThroughEntry $entry): string => $entry->package().' ('.$entry->newestVersion().')', \array_slice($entries, 0, self::DEPENDENTS_SHOWN));
         $more = \count($entries) - self::DEPENDENTS_SHOWN;
         $list = $more > 0 ? implode(', ', $names).' and '.$more.' more' : self::join($names);
         $verb = $gone !== [] ? ($one ? 'no longer requires' : 'no longer require') : ($one ? 'still requires' : 'still require');
@@ -291,12 +291,12 @@ final class MoveText
         return $by;
     }
 
-    /** @param list<string> $parts */
+    /** @param non-empty-list<string> $parts */
     private static function join(array $parts): string
     {
         $last = array_pop($parts);
 
-        return $parts === [] ? (string) $last : implode(', ', $parts).' and '.$last;
+        return $parts === [] ? $last : implode(', ', $parts).' and '.$last;
     }
 
     private static function years(?float $years): string

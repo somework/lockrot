@@ -26,7 +26,7 @@ final class NextStep
         $finding = $context->finding();
         $score = $finding->score();
         $security = $score->deciding() === null ? null : self::securityDraft($context);
-        $maintenance = MaintenanceMove::draft($context);
+        $maintenance = $finding->lead() === null ? null : MaintenanceMove::draft($context, $finding->lead());
         $fixKind = $security === null ? null : $security->fixKind();
         $rows = self::rowsIfApplied($context);
         $partial = self::partial($context);
@@ -167,7 +167,7 @@ final class NextStep
     private static function lead(?MoveDraft $security, ?MoveDraft $maintenance, MoveContext $context, ?string $fixKind): array
     {
         if ($security === null || $maintenance === null) {
-            return [$security ?? $maintenance, null];
+            return [$security === null ? $maintenance : $security, null];
         }
         if ($security->kind() === Move::UPDATE) {
             return [$security, $maintenance];
