@@ -13,11 +13,11 @@ declare(strict_types=1);
 // fixture with its own `http` directory keeps its answers there (p2, github, gitlab, advisories),
 // so they move no other fixture's results. Its packages.drupal.org entries' p2 answers go to
 // <fixtureDir>/http/p2. In such a fixture, a repository on a --gitlab-domain host gets its commits
-// answer, asked anonymously, in <fixtureDir>/http/gitlab. Its project document is recorded only with a gitlab-token that Composer's config (auth.json or
-// COMPOSER_AUTH) holds for that host: anonymously GitLab leaves `archived` out. The token is never
-// written. Bitbucket answers are not recorded. It reuses an envelope on disk only when its recorded
-// `status` is not 0: status 0 is a transport failure (a timeout or a DNS error), so the script
-// fetches that answer again.
+// answer, asked anonymously, in <fixtureDir>/http/gitlab. The script records its project document
+// only with a gitlab-token for that host from Composer's config (auth.json or COMPOSER_AUTH).
+// Anonymously, GitLab leaves `archived` out. The script never writes the token. It records no
+// Bitbucket answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
+// 0 is a transport failure (a timeout or a DNS error), so the script fetches that answer again.
 require __DIR__.'/../vendor/autoload.php';
 
 use Composer\Factory;
@@ -64,8 +64,8 @@ foreach ([$p2Dir, $ghDir, $advisoryDir] as $dir) {
         mkdir($dir, 0777, true);
     }
 }
-// PHP's http wrapper sends the headers again to the host that a redirect names: a request with a token
-// does not follow one.
+// PHP's http wrapper sends the headers again to the host that a redirect names. So a request with a
+// token follows no redirect.
 $fetch = static function (string $url, array $headers, ?string $post = null, bool $follow = true): HttpResult {
     $http = ['method' => $post === null ? 'GET' : 'POST', 'header' => implode("\r\n", array_merge(['User-Agent: lockrot-recorder'], $headers)), 'ignore_errors' => true, 'timeout' => 30, 'follow_location' => $follow ? 1 : 0];
     if ($post !== null) {
