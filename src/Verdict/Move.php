@@ -138,7 +138,7 @@ final class Move implements \JsonSerializable
 
     /**
      * The lead move: its `through[]` entries, the `composer why-not` command of each dependent whose newest
-     * release no longer requires the package, and the other part's move.
+     * release does not require the package, and the other part's move.
      *
      * @param list<ThroughEntry> $through
      * @param list<self>         $also

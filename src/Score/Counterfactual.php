@@ -17,7 +17,7 @@ final class Counterfactual
 {
     /**
      * The score after a move. The verdict at 0 reads the flags that still fire: a removed accepted
-     * flag no longer makes the finding `finished`.
+     * flag does not make the finding `finished`.
      *
      * @param list<string> $removed           the flags that the move clears or settles: their signals go
      * @param list<string> $clearedAdvisories the advisory ids that the move clears
