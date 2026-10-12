@@ -69,6 +69,8 @@ jobs:
           python3 tools/schema/build_other_schemas.py
           python3 tools/schema/make_negatives.py
           python3 tools/schema/make_negatives_other.py explain-2
+          python3 tools/schema/make_negatives_other.py baseline-2
+          python3 tools/schema/make_negatives_other.py config-2
           git add --intent-to-add tests/fixtures/schema/negative
           git diff --exit-code -- resources/lockrot-report-2.schema.json resources/lockrot-explain-2.schema.json tests/fixtures/schema/negative
       - name: composer-require-checker

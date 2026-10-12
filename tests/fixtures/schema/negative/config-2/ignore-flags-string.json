@@ -1,0 +1,9 @@
+{
+ "ignore": [
+  {
+   "package": "acme/fork",
+   "flags": "stale",
+   "reason": "x"
+  }
+ ]
+}

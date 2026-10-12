@@ -1,0 +1,11 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "repository_activity",
+   "host": "codeberg.org",
+   "repository": "https://codeberg.org/acme/x",
+   "package": "acme/x",
+   "reason": "x"
+  }
+ ]
+}

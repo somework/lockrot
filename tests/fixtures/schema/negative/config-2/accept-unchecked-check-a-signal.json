@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "S10",
+   "package": "acme/*",
+   "reason": "x"
+  }
+ ]
+}

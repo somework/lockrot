@@ -1,0 +1,10 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "advisories",
+   "package": "acme/*",
+   "reason": "x",
+   "expires": "31.03.2027"
+  }
+ ]
+}

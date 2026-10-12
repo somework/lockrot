@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "repository_activity",
+   "host": "codeberg.org/acme",
+   "reason": "x"
+  }
+ ]
+}

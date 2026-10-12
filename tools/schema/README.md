@@ -18,14 +18,18 @@ python3 tools/schema/build_report2_schema.py
 python3 tools/schema/build_other_schemas.py
 python3 tools/schema/make_negatives.py
 python3 tools/schema/make_negatives_other.py explain-2
+python3 tools/schema/make_negatives_other.py baseline-2
+python3 tools/schema/make_negatives_other.py config-2
 ```
 
 | Script | Reads | Writes |
 |---|---|---|
 | `build_report2_schema.py` | `inputs/` | `resources/lockrot-report-2.schema.json` |
-| `build_other_schemas.py` | `inputs/`, `resources/lockrot-report-2.schema.json` | `resources/lockrot-explain-2.schema.json` |
+| `build_other_schemas.py` | `inputs/`, `resources/lockrot-report-2.schema.json` | `resources/lockrot-explain-2.schema.json`, `lockrot-baseline-2.schema.json`, `lockrot-config-2.schema.json` |
 | `make_negatives.py` | `tests/fixtures/schema/documents/cases/` | `tests/fixtures/schema/negative/report-2/` |
 | `make_negatives_other.py explain-2` | `tests/fixtures/schema/documents/explain/B.json` | `tests/fixtures/schema/negative/explain-2/` |
+| `make_negatives_other.py baseline-2` | `tests/fixtures/schema/documents/baseline/corpus/matomo-v4.json` | `tests/fixtures/schema/negative/baseline-2/` |
+| `make_negatives_other.py config-2` | none: each fixture is written whole | `tests/fixtures/schema/negative/config-2/` |
 | `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/` |
 | `project_fixtures.py` | the reference model's `cases.json` and `docs/` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/` |
 

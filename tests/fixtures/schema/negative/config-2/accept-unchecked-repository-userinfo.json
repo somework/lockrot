@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "advisories",
+   "repository": "https://deploy:s3cr3t@mirror.acme.internal",
+   "reason": "x"
+  }
+ ]
+}

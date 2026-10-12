@@ -111,7 +111,117 @@ def explain_negatives():
     return write_negatives('explain-2', items)
 
 
-GENERATORS = {'explain-2': explain_negatives}
+class _Delete:
+    pass
+
+
+DELETE = _Delete()
+
+
+def baseline_negatives():
+    base = json.load(open(os.path.join(DOCS, 'baseline', 'corpus', 'matomo-v4.json')))
+    pkg = 'symfony/monolog-bridge'
+    adv = next(iter(base['findings'][pkg]['advisories']))
+
+    def setp(path, value):
+        def fn(d):
+            cur = d
+            for k in path[:-1]:
+                cur = cur[k]
+            if value is DELETE:
+                del cur[path[-1]]
+            else:
+                cur[path[-1]] = value
+        return fn
+    E = ['findings', pkg]
+    items = {
+        'schema-number-1': (mutate(base, setp(['lockrot', 'schema'], 1)), 'lockrot.schema'),
+        'schema-url-baseline-1': (mutate(base, setp(['$schema'], 'https://lockrot.dev/schema/baseline-1.json')), '$schema'),
+        'target-php-missing': (mutate(base, setp(['target_php'], DELETE)), 'target_php'),
+        'target-php-object-revision-3': (mutate(base, setp(['target_php'], {'version': '8.4', 'source': 'option'})), 'target_php'),
+        'target-php-source-unknown': (mutate(base, setp(['target_php_source'], 'cli')), 'target_php_source'),
+        'score-model-old-name': (mutate(base, lambda d: (d.pop('score_model_id'), d.__setitem__('score_model', 1))), 'score_model_id'),
+        'fix-model-zero': (mutate(base, setp(['fix_model'], 0)), 'fix_model'),
+        'findings-array': (mutate(base, setp(['findings'], [])), 'findings'),
+        'flag-vulnerable-stored': (mutate(base, setp(E + ['flags', 'vulnerable'], {'known_since': '2026-10-01'})), 'flags'),
+        'flag-unknown-id': (mutate(base, setp(E + ['flags', 'outdated'], {'known_since': '2026-10-01'})), 'flags'),
+        'flag-known-since-not-a-date': (mutate(base, setp(E + ['flags', 'left-behind', 'known_since'], '2026/10/01')), 'known_since'),
+        'flag-known-since-null': (mutate(base, setp(E + ['flags', 'left-behind', 'known_since'], None)), 'known_since'),
+        'advisory-severity-moderate': (mutate(base, setp(E + ['advisories', adv, 'severity'], 'moderate')), 'severity'),
+        'advisory-fix-old-name': (mutate(base, lambda d: d['findings'][pkg]['advisories'][adv].__setitem__('fix', d['findings'][pkg]['advisories'][adv].pop('fix_kind'))), 'fix_kind'),
+        'advisory-fix-kind-not-a-token': (mutate(base, setp(E + ['advisories', adv, 'fix_kind'], 'raise PHP')), 'fix_kind'),
+        'entry-first-seen-missing': (mutate(base, setp(E + ['first_seen'], DELETE)), 'first_seen'),
+        'entry-verdict-only-baseline-1-shape': (mutate(base, setp(E, {'version': 'v2.6.13', 'verdict': 'left-behind', 'first_seen': '2026-09-14'})), 'flags'),
+        'generated-at-not-a-datetime': (mutate(base, setp(['generated_at'], 'yesterday')), 'generated_at'),
+        'schema-url-missing': (mutate(base, setp(['$schema'], DELETE)), '$schema'),
+        'findings-key-not-a-package-name': (mutate(base, setp(['findings', 'symfony'], base['findings'][pkg])), 'findings'),
+        # the writer never writes an entry with no fact
+        'entry-stores-no-fact': (mutate(base, setp(E, {'version': 'v2.6.13', 'first_seen': '2026-09-14', 'flags': {}, 'advisories': {}})), 'findings.symfony/monolog-bridge'),
+        # r3 attack round 1: an empty map is never written (the key is left out), so `{}` beside a non-empty map is rejected too
+        'entry-advisories-empty-map': (mutate(base, setp(E + ['advisories'], {})), 'advisories'),
+        'entry-no-fact-key': (mutate(base, setp(E, {'version': 'v2.6.13', 'first_seen': '2026-09-14'})), 'findings.symfony/monolog-bridge'),
+    }
+    items['flag-headline-stored.strict'] = (mutate(base, setp(E + ['flags', 'left-behind', 'headline'], {'unit': 'years', 'value': 6.9, 'source': 'branch'})), 'headline')
+    return write_negatives('baseline-2', items)
+
+
+class _Delete:
+    pass
+
+
+DELETE = _Delete()
+
+
+def config_negatives():
+    items = {
+        'fail-on-vulnerable-low': ({'fail-on': 'vulnerable-low'}, 'fail-on'),
+        'fail-on-unknown-value': ({'fail-on': 'warn'}, 'fail-on'),
+        'fail-on-empty-string': ({'fail-on': ''}, 'fail-on'),
+        'fail-on-empty-array': ({'fail-on': []}, 'fail-on'),
+        'fail-on-list-inside-an-array-item': ({'fail-on': ['left-behind,high']}, 'fail-on'),
+        'fail-on-semicolon': ({'fail-on': 'high;medium'}, 'fail-on'),
+        'fail-on-trailing-comma': ({'fail-on': 'high,'}, 'fail-on'),
+        'fail-on-number': ({'fail-on': 1}, 'fail-on'),
+        'fail-on-array-duplicate': ({'fail-on': ['high', 'high']}, 'fail-on'),
+        'fail-on-security-prefix-spec-md': ({'fail-on': 'security-high'}, 'fail-on'),
+        'ignore-flags-vulnerable': ({'ignore': [{'package': 'acme/fork', 'flags': ['vulnerable'], 'reason': 'internal fork'}]}, 'ignore[0].flags[0]'),
+        'ignore-flags-unknown': ({'ignore': [{'package': 'acme/fork', 'flags': ['outdated'], 'reason': 'x'}]}, 'ignore[0].flags[0]'),
+        'ignore-flags-empty': ({'ignore': [{'package': 'acme/fork', 'flags': [], 'reason': 'x'}]}, 'ignore[0].flags'),
+        'ignore-flags-string': ({'ignore': [{'package': 'acme/fork', 'flags': 'stale', 'reason': 'x'}]}, 'ignore[0].flags'),
+        'ignore-flags-duplicate': ({'ignore': [{'package': 'acme/fork', 'flags': ['stale', 'stale'], 'reason': 'x'}]}, 'ignore[0].flags'),
+        'ignore-flags-upper-case': ({'ignore': [{'package': 'acme/fork', 'flags': ['Stale'], 'reason': 'x'}]}, 'ignore[0].flags[0]'),
+        'ignore-missing-reason': ({'ignore': [{'package': 'acme/fork', 'flags': ['stale']}]}, 'ignore[0].reason'),
+        'ignore-expires-not-a-date': ({'ignore': [{'package': 'acme/fork', 'reason': 'x', 'expires': '31.03.2027'}]}, 'ignore[0].expires'),
+        'format-unknown.strict': ({'format': 'checkstyle'}, 'format'),
+        # accept-unchecked
+        'accept-unchecked-object': ({'accept-unchecked': {'check': 'advisories', 'package': 'acme/*', 'reason': 'x'}}, 'accept-unchecked'),
+        'accept-unchecked-no-scope': ({'accept-unchecked': [{'check': 'advisories', 'reason': 'x'}]}, 'accept-unchecked[0]'),
+        'accept-unchecked-two-scopes': ({'accept-unchecked': [{'check': 'repository_activity', 'host': 'codeberg.org', 'package': 'acme/*', 'reason': 'x'}]},
+                                        'accept-unchecked[0]'),
+        'accept-unchecked-three-scopes': ({'accept-unchecked': [{'check': 'repository_activity', 'host': 'codeberg.org', 'repository': 'https://codeberg.org/acme/x',
+                                                                 'package': 'acme/x', 'reason': 'x'}]}, 'accept-unchecked[0]'),
+        'accept-unchecked-missing-reason': ({'accept-unchecked': [{'check': 'advisories', 'package': 'acme/*'}]}, 'accept-unchecked[0].reason'),
+        'accept-unchecked-empty-reason': ({'accept-unchecked': [{'check': 'advisories', 'package': 'acme/*', 'reason': ''}]}, 'accept-unchecked[0].reason'),
+        'accept-unchecked-missing-check': ({'accept-unchecked': [{'host': 'codeberg.org', 'reason': 'x'}]}, 'accept-unchecked[0].check'),
+        'accept-unchecked-check-releases': ({'accept-unchecked': [{'check': 'releases', 'package': 'acme/*', 'reason': 'x'}]}, 'accept-unchecked[0].check'),
+        'accept-unchecked-check-a-reason': ({'accept-unchecked': [{'check': 'host_not_supported', 'host': 'codeberg.org', 'reason': 'x'}]}, 'accept-unchecked[0].check'),
+        'accept-unchecked-check-a-signal': ({'accept-unchecked': [{'check': 'S10', 'package': 'acme/*', 'reason': 'x'}]}, 'accept-unchecked[0].check'),
+        'accept-unchecked-host-with-scheme': ({'accept-unchecked': [{'check': 'repository_activity', 'host': 'https://codeberg.org', 'reason': 'x'}]}, 'accept-unchecked[0].host'),
+        'accept-unchecked-host-upper-case': ({'accept-unchecked': [{'check': 'repository_activity', 'host': 'Codeberg.org', 'reason': 'x'}]}, 'accept-unchecked[0].host'),
+        'accept-unchecked-host-with-path': ({'accept-unchecked': [{'check': 'repository_activity', 'host': 'codeberg.org/acme', 'reason': 'x'}]}, 'accept-unchecked[0].host'),
+        'accept-unchecked-repository-not-a-url': ({'accept-unchecked': [{'check': 'release_metadata', 'repository': 'acme/fork', 'reason': 'x'}]}, 'accept-unchecked[0].repository'),
+        # no userinfo in a scheme URL, and the advisories check is never scoped by host
+        'accept-unchecked-repository-userinfo': ({'accept-unchecked': [{'check': 'advisories', 'repository': 'https://deploy:s3cr3t@mirror.acme.internal', 'reason': 'x'}]},
+                                                 'accept-unchecked[0].repository'),
+        'accept-unchecked-advisories-by-host': ({'accept-unchecked': [{'check': 'advisories', 'host': 'mirror.acme.internal', 'reason': 'x'}]}, 'accept-unchecked[0]'),
+        'accept-unchecked-package-empty': ({'accept-unchecked': [{'check': 'release_metadata', 'package': '', 'reason': 'x'}]}, 'accept-unchecked[0].package'),
+        'accept-unchecked-expires-not-a-date': ({'accept-unchecked': [{'check': 'advisories', 'package': 'acme/*', 'reason': 'x', 'expires': '31.03.2027'}]},
+                                                'accept-unchecked[0].expires'),
+    }
+    return write_negatives('config-2', items)
+
+
+GENERATORS = {'explain-2': explain_negatives, 'baseline-2': baseline_negatives, 'config-2': config_negatives}
 
 
 def main(argv):

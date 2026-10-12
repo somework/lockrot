@@ -34,3 +34,8 @@
 /.python-version export-ignore
 /lockrot-release-key.asc export-ignore
 /lockrot-selfupdate-key.pub export-ignore
+# tools/schema/project_fixtures.py and make_negatives*.py write these from the reference model: GitHub folds them in a pull request.
+/tests/fixtures/schema/documents/** linguist-generated
+/tests/fixtures/schema/negative/** linguist-generated
+# tools/score/sweep.py --axis gate --sample writes it.
+/tests/fixtures/score/gate-rows.sample.txt linguist-generated

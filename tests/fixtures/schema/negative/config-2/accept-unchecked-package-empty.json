@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "release_metadata",
+   "package": "",
+   "reason": "x"
+  }
+ ]
+}

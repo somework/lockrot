@@ -1,0 +1,8 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "advisories",
+   "reason": "x"
+  }
+ ]
+}

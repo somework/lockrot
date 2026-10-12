@@ -1,0 +1,11 @@
+{
+ "ignore": [
+  {
+   "package": "acme/fork",
+   "flags": [
+    "vulnerable"
+   ],
+   "reason": "internal fork"
+  }
+ ]
+}

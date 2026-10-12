@@ -1,0 +1,9 @@
+{
+ "ignore": [
+  {
+   "package": "acme/fork",
+   "reason": "x",
+   "expires": "31.03.2027"
+  }
+ ]
+}
