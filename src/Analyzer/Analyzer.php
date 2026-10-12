@@ -420,15 +420,20 @@ final class Analyzer
             $notes[] = RunNote::repositoryActivityAnonymousCap($forge, $plan->checkedPackages($forge), $plan->skippedNoToken($forge), $plan->skippedBudget($forge));
         }
         foreach (RepoRef::FORGES as $forge) {
-            $failed = [[], []];
+            $limited = [];
+            $unreachable = [];
             foreach ($batch->failedOn($forge) as $key => $message) {
-                $failed[(int) $batch->rateLimited($repoByKey[$key]->host())][] = [$repoByKey[$key], $message];
+                if ($batch->rateLimited($repoByKey[$key]->host())) {
+                    $limited[] = [$repoByKey[$key], $message];
+                } else {
+                    $unreachable[] = [$repoByKey[$key], $message];
+                }
             }
-            if ($failed[1] !== []) {
-                $notes[] = RunNote::repositoryActivityRateLimited($forge, $failed[1]);
+            if ($limited !== []) {
+                $notes[] = RunNote::repositoryActivityRateLimited($forge, $limited);
             }
-            if ($failed[0] !== []) {
-                $notes[] = RunNote::repositoryActivityUnreachable($forge, $failed[0]);
+            if ($unreachable !== []) {
+                $notes[] = RunNote::repositoryActivityUnreachable($forge, $unreachable);
             }
             $notFound = array_map(static fn (string $key): RepoRef => $repoByKey[$key], $batch->notFoundOn($forge));
             if ($notFound !== []) {
