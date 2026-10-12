@@ -43,6 +43,9 @@ use PHPUnit\Framework\TestCase;
  */
 final class AnalyzerActivityTest extends TestCase
 {
+    /** @var list<string> the URLs that the fake HTTP client of the last run was asked */
+    private array $asked = [];
+
     private const GH = 'https://api.github.com/repos/vendor/pkg';
     private const GH_OTHER = 'https://api.github.com/repos/vendor/other';
     private const GL_COMMITS = 'https://gitlab.com/api/v4/projects/group%2Fpkg/repository/commits?all=true&per_page=1';
@@ -63,6 +66,7 @@ final class AnalyzerActivityTest extends TestCase
         );
         self::assertSame([], self::checks($finding, 'repository_activity'));
         self::assertSame([], self::checks($finding, 'repository_archived'));
+        self::assertSame([self::GH], $this->asked);
     }
 
     public function testAnAnonymousGitlabReadLeavesTheArchivedFlagUnreadForWantOfAToken(): void
@@ -130,6 +134,7 @@ final class AnalyzerActivityTest extends TestCase
         $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === 'repository_activity_host_not_supported'));
         self::assertCount(1, $notes);
         self::assertSame([['host' => 'gitea.example.com:3000', 'packages' => 1, 'listed_in' => null]], JsonPath::arrayAt(JsonPath::decoded($notes[0]->toArray()), ['data', 'hosts']));
+        self::assertSame([], $this->asked, 'lockrot sends no request to a host it cannot ask');
     }
 
     public function testAnUnsupportedHostOnARegistryAbandonedPackageIsASkip(): void
@@ -161,6 +166,7 @@ final class AnalyzerActivityTest extends TestCase
         $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://github.com/vendor/pkg.git')], [], true, $allowlist);
 
         self::assertSame(['allowlisted', 'github', 'github.com', 'vendor/pkg'], [JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['host'], JsonPath::arrayAt($finding, ['activity'])['repo']]);
+        self::assertSame([], $this->asked, 'an allowlisted package is not asked');
     }
 
     public function testAPackageWithNoRepositoryUrlIsNoRepository(): void
@@ -169,6 +175,7 @@ final class AnalyzerActivityTest extends TestCase
 
         self::assertSame(['not_read', 'no_repository', null, null], [JsonPath::arrayAt($finding, ['activity'])['status'], JsonPath::arrayAt($finding, ['activity'])['reason'], JsonPath::arrayAt($finding, ['activity'])['forge'], JsonPath::arrayAt($finding, ['activity'])['host']]);
         self::assertSame([['check' => 'repository_activity', 'reason' => 'no_repository', 'blocks' => ['S3', 'S4']]], self::checks($finding, 'repository_activity'));
+        self::assertSame([], $this->asked);
     }
 
     /**
@@ -488,20 +495,30 @@ final class AnalyzerActivityTest extends TestCase
     /** @param array<string, array{int, string}> $map url => [status, body]; any other URL answers 500 */
     private function http(array $map): HttpClientInterface
     {
-        return new class ($map) implements HttpClientInterface {
+        $this->asked = [];
+        $asked = &$this->asked;
+
+        return new class ($map, $asked) implements HttpClientInterface {
             /** @var array<string, array{int, string}> */
             private array $map;
+            /** @var list<string> */
+            private array $asked;
 
-            /** @param array<string, array{int, string}> $map */
-            public function __construct(array $map)
+            /**
+             * @param array<string, array{int, string}> $map
+             * @param list<string>                      $asked
+             */
+            public function __construct(array $map, array &$asked)
             {
                 $this->map = $map;
+                $this->asked = &$asked;
             }
 
             public function fetchAll(array $urls, array $headers = []): array
             {
                 $out = [];
                 foreach ($urls as $url) {
+                    $this->asked[] = $url;
                     [$status, $body] = $this->map[$url] ?? [500, ''];
                     $out[$url] = new HttpResult($url, $status, $body, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
                 }
