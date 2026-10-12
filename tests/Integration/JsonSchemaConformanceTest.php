@@ -95,7 +95,7 @@ final class JsonSchemaConformanceTest extends TestCase
     private const DOCS = __DIR__.'/../../docs/';
     private const RESOURCES = __DIR__.'/../../resources/';
     /** The schema numbers each document ships a file for. */
-    private const NUMBERS = [Schemas::REPORT => [1, 2], Schemas::EXPLAIN => [1, 2], Schemas::BASELINE => [1], Schemas::CONFIG => [1]];
+    private const NUMBERS = [Schemas::REPORT => [1, 2], Schemas::EXPLAIN => [1, 2], Schemas::BASELINE => [1, 2], Schemas::CONFIG => [1, 2]];
     /** The negative fixtures: one directory per document and number ({@see NegativeFixtures}). */
     private const NEGATIVE = self::FIXTURES.'schema/negative';
     /** The runner's own fixtures, which prove it can fail. */
@@ -927,6 +927,10 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
             RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
             RunNote::notFromComposerRepository(2, true),
+            RunNote::verdictRulesChanged('high', [['package' => 'symfony/yaml', 'version' => 'v3.4.47', 'legacy' => ['verdict' => 'left-behind', 'priority' => 'critical', 'basis' => ['base' => 'high', 'steps' => [['reason' => 'no_fix_expected', 'from' => 'high', 'to' => 'critical']]]], 'verdict' => 'medium', 'score_total' => 14, 'score_text' => '14 = left-behind 12 + vulnerable 2 [low advisory]']]),
+            RunNote::baselineTargetDiffers('8.3', 'option', '8.4', 'runtime'),
+            RunNote::baselineFixModelDiffers(2, 1),
+            RunNote::ignoreDoesNotCoverAdvisories([['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['PKSA-1']]]),
             RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),
             RunNote::abandonedNotAuditedByComposer('policy.abandoned.audit', 'ignore'),
             RunNote::abandonedIgnoreUnreadable(''),
@@ -1141,11 +1145,11 @@ final class JsonSchemaConformanceTest extends TestCase
                 $file->write(Baseline::fromReport(self::analysis($fixture)->report()));
                 $json = (string) file_get_contents($file->path());
 
-                self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/baseline-1.json\",\n", $json);
+                self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/baseline-2.json\",\n", $json);
                 $this->assertValid(Schemas::BASELINE, $json, $fixture);
                 $this->assertValid(Schemas::BASELINE, $json, $fixture, true);
                 // And what lockrot wrote, lockrot reads back through the same schema.
-                self::assertSame(\count(self::analysis($fixture)->report()->flagged()), $file->read()->count(), $fixture);
+                self::assertSame(\count(self::analysis($fixture)->report()->graded()), $file->read()->count(), $fixture);
             }
         } finally {
             array_map('unlink', glob($dir.'/*') ?: []);
@@ -1305,7 +1309,7 @@ final class JsonSchemaConformanceTest extends TestCase
         yield 'a report by its shape' => [['lockrot' => ['schema' => 1], 'findings' => $findingsList], [Schemas::REPORT, 1]];
         yield 'a baseline by its shape' => [['lockrot' => ['schema' => 2], 'findings' => $findingsMap], [Schemas::BASELINE, 2]];
         yield 'an explanation by its shape' => [['lockrot' => ['schema' => 1], 'finding' => [], 'lock' => []], [Schemas::EXPLAIN, 1]];
-        yield 'composer.json' => [['extra' => ['lockrot' => ['format' => 'json']]], [Schemas::CONFIG, 1]];
+        yield 'composer.json' => [['extra' => ['lockrot' => ['format' => 'json']]], [Schemas::CONFIG, 2]];
         yield 'an envelope fragment' => [['lockrot' => ['schema' => 1]], null];
         yield 'no number' => [['lockrot' => ['version' => '0.13.0'], 'findings' => $findingsList], null];
         yield 'another schema' => [['$schema' => 'https://json.schemastore.org/sarif-2.1.0.json'], null];

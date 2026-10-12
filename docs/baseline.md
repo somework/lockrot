@@ -48,17 +48,25 @@ Every later run (plugin or PHAR) reads `lockrot-baseline.json`, or the file `--b
 
 ```json
 {
-    "$schema": "https://lockrot.dev/schema/baseline-1.json",
+    "$schema": "https://lockrot.dev/schema/baseline-2.json",
     "lockrot": {
         "version": "x.y.z",
-        "schema": 1
+        "schema": 2
     },
     "generated_at": "2026-09-14T00:00:00+00:00",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "score_model_id": 1,
+    "fix_model": 1,
     "findings": {
         "behat/transliterator": {
             "version": "v1.5.0",
-            "verdict": "abandoned",
-            "first_seen": "2026-09-14"
+            "first_seen": "2026-09-14",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2026-09-14"
+                }
+            }
         }
     }
 }
@@ -70,9 +78,12 @@ Every later run (plugin or PHAR) reads `lockrot-baseline.json`, or the file `--b
 | `lockrot.version` | The lockrot release that wrote the file |
 | `lockrot.schema` | The file's schema number |
 | `generated_at` | The timestamp of the run that wrote it |
+| `target_php`, `target_php_source` | The target PHP the file was written for. lockrot compares fixes only when the run targets the same PHP |
+| `score_model_id`, `fix_model` | The score model and the fix model of the run that wrote it |
 | `findings` | One entry per package, sorted by name so the diff stays reviewable |
 | `findings.<package>.version` | The installed version when lockrot wrote the entry. Matching ignores it |
-| `findings.<package>.verdict` | The verdict accepted |
+| `findings.<package>.flags` | The counted maintenance flags, each with `known_since`. The first one in flag order covers every flag after it |
+| `findings.<package>.advisories` | The counted advisories by id, each with `known_since`, `severity` and `fix_kind` |
 | `findings.<package>.first_seen` | The date the package first entered the baseline, kept across regenerations |
 
 ## Accept a new finding or drop a fixed one {#accept-a-new-finding-or-drop-a-fixed-one}
