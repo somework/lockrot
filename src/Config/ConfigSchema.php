@@ -24,7 +24,7 @@ use Lockrot\Json\Schemas;
 final class ConfigSchema
 {
     /** A config document carries no number of its own, so this constant selects the schema file. */
-    public const NUMBER = 1;
+    public const NUMBER = 2;
 
     private static ?object $schema = null;
 

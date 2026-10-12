@@ -32,13 +32,13 @@ final class UncheckedAcceptance
     }
 
     /**
-     * @param array<string, mixed> $lockrotExtra `extra.lockrot` of composer.json
+     * @param mixed $rows `extra.lockrot.accept-unchecked` of composer.json, null when it is not set
      *
      * @throws ConfigException for a list that is not an array, or for any invalid entry
      */
-    public static function fromExtra(array $lockrotExtra): self
+    public static function fromConfig($rows): self
     {
-        $rows = $lockrotExtra['accept-unchecked'] ?? [];
+        $rows ??= [];
         if (!\is_array($rows) || ($rows !== [] && array_keys($rows) !== range(0, \count($rows) - 1))) {
             throw new ConfigException('extra.lockrot.accept-unchecked must be an array');
         }

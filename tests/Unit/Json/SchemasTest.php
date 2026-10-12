@@ -28,7 +28,7 @@ final class SchemasTest extends TestCase
     #[DataProvider('documents')]
     public function testEachDocumentShipsNumberOneUnderItsNumberedName(string $document): void
     {
-        self::assertSame(\in_array($document, [Schemas::REPORT, Schemas::EXPLAIN], true) ? [1, 2] : [1], Schemas::numbers($document));
+        self::assertSame([1, 2], Schemas::numbers($document));
         self::assertSame('lockrot-'.$document.'-1.schema.json', Schemas::fileName($document, 1));
 
         $path = Schemas::path($document, 1);

@@ -117,6 +117,7 @@ final class SchemaClaimsTest extends TestCase
         'advisoryRepository.registry' => 'a host derived from the repository URL, outside the document',
         'advisoryLookup.other_repositories' => 'the configured repositories are outside the document',
         'rotDepth.require_dev_not_walked' => 'a count over findings (RotDepthTest)',
+        'rootGate.not_applied' => 'a count over findings per reason (GateTest)',
     ];
 
     /**
@@ -124,10 +125,7 @@ final class SchemaClaimsTest extends TestCase
      * rule, and the text of the strict relation that the schema leaves out until then (null when
      * no relation says it).
      */
-    private const PLACEHOLDERS = [
-        'findingGate.by' => ['PR 6a: gate.by names the values a failing finding fails', 'names the values it fails'],
-        'findingGate.exempt_by' => ['PR 5: exempt_by baseline only under a baseline entry', '`exempt_by: baseline` only there'],
-    ];
+    private const PLACEHOLDERS = [];
 
     /** The claims that a relation of another definition encodes. */
     private const ENCODED_AT = [

@@ -356,4 +356,12 @@ final class UnknownKeysTest extends TestCase
         yield 'a string' => ['acme/legacy'];
         yield 'a list of strings' => [['acme/legacy']];
     }
+
+    public function testAMisspeltExpiryOfAnAcceptUncheckedEntryNamesTheKnownKey(): void
+    {
+        self::assertSame(
+            ['unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you mean expires?)'],
+            UnknownKeys::warnings(['accept-unchecked' => [['check' => 'repository_activity', 'host' => 'codeberg.org', 'reason' => 'by hand', 'expire' => '2026-12-31']]])
+        );
+    }
 }

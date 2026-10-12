@@ -42,7 +42,7 @@ final class ConfigSchemaTest extends TestCase
         self::assertIsArray($properties);
         $failOn = $properties['fail-on'] ?? null;
         self::assertIsArray($failOn);
-        self::assertSame(FailOn::allowed(), $failOn['enum'] ?? null);
+        self::assertSame(FailOn::allowed(), JsonPath::arrayAt($failOn, ['oneOf', 0, 'anyOf', 0, 'enum']));
     }
 
     public function testFullValidConfigIsValid(): void
@@ -138,7 +138,7 @@ final class ConfigSchemaTest extends TestCase
         yield 'an empty format' => [['format' => '']];
         yield 'a vendor-named format' => [['format' => 'acme:csv']];
         yield 'a format that is not a string' => [['format' => 5]];
-        yield 'a bad format beside a bad fail-on' => [['format' => 'xml', 'fail-on' => 'dead']];
+        yield 'a bad format beside a bad include-dev' => [['format' => 'xml', 'include-dev' => 'yes']];
     }
 
     /**
@@ -198,8 +198,18 @@ final class ConfigSchemaTest extends TestCase
         self::assertSame($keys, UnknownKeys::KNOWN_IN_IGNORE);
     }
 
-    /** The warning walks one level down, into `ignore` entries: a second nested object goes unchecked. */
-    public function testIgnoreIsTheOnlyNestedObjectInTheSchema(): void
+    public function testTheKnownAcceptUncheckedKeysAreExactlyTheItemProperties(): void
+    {
+        $accept = self::schemaProperties()['accept-unchecked'] ?? null;
+        self::assertIsArray($accept);
+        $keys = array_keys(JsonPath::arrayAt($accept, ['items', 'properties']));
+        sort($keys);
+
+        self::assertSame($keys, UnknownKeys::KNOWN_IN_ACCEPT_UNCHECKED);
+    }
+
+    /** The warning walks one level down, into `ignore` and `accept-unchecked` entries: a third nested object goes unchecked. */
+    public function testIgnoreAndAcceptUncheckedAreTheOnlyNestedObjectsInTheSchema(): void
     {
         $nested = [];
         foreach (self::schemaProperties() as $name => $property) {
@@ -211,7 +221,7 @@ final class ConfigSchemaTest extends TestCase
             }
         }
 
-        self::assertSame(['ignore'], $nested);
+        self::assertSame(['accept-unchecked', 'ignore'], $nested);
     }
 
     private const RELEASED_WITH_THE_ENUM = __DIR__.'/../../fixtures/schema-evolution/schemas/0.12.0/lockrot-config.schema.json';
@@ -319,7 +329,6 @@ final class ConfigSchemaTest extends TestCase
     /** @return iterable<string, array{array<string, mixed>, string}> */
     public static function invalidConfigs(): iterable
     {
-        yield 'fail-on not in enum' => [['fail-on' => 'dead'], 'fail-on'];
         yield 'target-php bad pattern' => [['target-php' => 'v8.4'], 'target-php'];
         yield 'format not in enum' => [['format' => 'xml'], 'format'];
         yield 'include-dev wrong type' => [['include-dev' => 'yes'], 'include-dev'];

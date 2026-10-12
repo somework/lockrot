@@ -140,7 +140,7 @@ final class Baseline
         }
         $entries = [];
         foreach ($findings as $package => $entry) {
-            if (!\is_string($package) || !\is_array($entry)) {
+            if (!\is_string($package)) {
                 throw new ConfigException('baseline file is invalid: findings must map package names to objects');
             }
             $entries[] = self::entryFromArray($package, $entry);
@@ -151,9 +151,9 @@ final class Baseline
             self::text($data, 'generated_at'),
             self::text($data, 'target_php'),
             self::text($data, 'target_php_source'),
-            self::toolVersionOf($data),
-            self::integer($data, 'score_model_id'),
-            self::integer($data, 'fix_model')
+            self::toolVersionOf($data['lockrot'] ?? null),
+            self::integer($data['score_model_id'] ?? null, 'score_model_id'),
+            self::integer($data['fix_model'] ?? null, 'fix_model')
         );
     }
 
@@ -161,31 +161,22 @@ final class Baseline
      * Advisory ids are read without JsonReader::stringKeyed(): `json_decode(…, true)` turns the key
      * `"123"` into an integer, which stringKeyed() drops. Each key is cast back to a string.
      *
-     * @param array<mixed, mixed> $entry
+     * @param mixed $entry
      */
-    private static function entryFromArray(string $package, array $entry): BaselineEntry
+    private static function entryFromArray(string $package, $entry): BaselineEntry
     {
+        $entry = self::object($entry);
         $flags = [];
-        foreach (self::map($entry, 'flags') as $flag => $fact) {
+        foreach (self::object($entry['flags'] ?? []) as $flag => $fact) {
             $flags[(string) $flag] = self::text(self::object($fact), 'known_since');
         }
         $advisories = [];
-        foreach (self::map($entry, 'advisories') as $id => $fact) {
+        foreach (self::object($entry['advisories'] ?? []) as $id => $fact) {
             $fact = self::object($fact);
             $advisories[] = new RecordedAdvisory((string) $id, self::text($fact, 'known_since'), self::text($fact, 'severity'), self::text($fact, 'fix_kind'));
         }
 
         return new BaselineEntry($package, self::text($entry, 'version'), self::text($entry, 'first_seen'), $flags, $advisories);
-    }
-
-    /**
-     * @param array<mixed, mixed> $data
-     *
-     * @return array<mixed, mixed> the object under $key, empty when the key is missing
-     */
-    private static function map(array $data, string $key): array
-    {
-        return self::object($data[$key] ?? []);
     }
 
     /**
@@ -213,10 +204,9 @@ final class Baseline
         return $value;
     }
 
-    /** @param array<mixed, mixed> $data */
-    private static function integer(array $data, string $key): int
+    /** @param mixed $value */
+    private static function integer($value, string $key): int
     {
-        $value = $data[$key] ?? null;
         if (!\is_int($value)) {
             throw new ConfigException('baseline file is invalid: '.$key.' must be an integer');
         }
@@ -224,10 +214,9 @@ final class Baseline
         return $value;
     }
 
-    /** @param array<string, mixed> $data */
-    private static function toolVersionOf(array $data): string
+    /** @param mixed $lockrot the `lockrot` object of the file */
+    private static function toolVersionOf($lockrot): string
     {
-        $lockrot = $data['lockrot'] ?? null;
         $version = \is_array($lockrot) ? (JsonReader::stringKeyed($lockrot)['version'] ?? null) : null;
 
         return \is_string($version) ? $version : '';

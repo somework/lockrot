@@ -42,6 +42,6 @@ final class AnalyzerBootstrap
 
         return $analyzer
             ->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())))
-            ->withUncheckedAcceptance(UncheckedAcceptance::fromExtra($project->lockrotExtra()));
+            ->withUncheckedAcceptance(UncheckedAcceptance::fromConfig($project->lockrotExtra()['accept-unchecked'] ?? null));
     }
 }

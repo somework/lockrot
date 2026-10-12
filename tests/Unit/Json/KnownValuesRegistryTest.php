@@ -31,6 +31,10 @@ use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Lockrot\Allowlist\UncheckedAcceptanceEntry;
+use Lockrot\Output\MarkedFact;
+use Lockrot\Verdict\FailOn;
+use Lockrot\Config\LockrotConfig;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -105,15 +109,21 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/checkMissing/properties/check' => [['repository_activity', 'release_dates', 'advisories', 'releases', 'release_metadata'], 'NotCheckedRule'],
             '#/definitions/checkMissing/properties/reason' => [[NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::OFFLINE, AgeMeasure::UNDATED_RELEASES, Fix::RELEASES_UNKNOWN, AdvisoryCoverage::COMPOSER_TOO_OLD, AdvisoryCoverage::LOOKUP_FAILED, NotCheckedRule::HOST_NOT_SUPPORTED, AdvisoryCoverage::NO_FEED, NotCheckedRule::NOT_FROM_COMPOSER_REPOSITORY], 'NotCheckedRule'],
             '#/definitions/checkSkipped/properties/check' => [['repository_activity', 'release_metadata', 'advisories', 'release_branch', 'repository_archived'], 'FindingDetails'],
-            '#/definitions/checkSkipped/properties/reason' => [[AgeMeasure::ALLOWLISTED, AgeMeasure::NO_REPOSITORY, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, NotCheckedRule::OFFLINE, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::NO_TOKEN, 'unavailable', 'not_found', PinnedRule::REASON_BRANCH_SNAPSHOT, ActivityLookup::HOST_NOT_SUPPORTED, ActivityLookup::REPOSITORY_NOT_FOUND, AdvisoryCoverage::UNPARSEABLE_VERSION], 'FindingDetails'],
+            '#/definitions/checkSkipped/properties/reason' => [[AgeMeasure::ALLOWLISTED, AgeMeasure::NO_REPOSITORY, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, NotCheckedRule::OFFLINE, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::NO_TOKEN, 'unavailable', 'not_found', PinnedRule::REASON_BRANCH_SNAPSHOT, ActivityLookup::HOST_NOT_SUPPORTED, ActivityLookup::REPOSITORY_NOT_FOUND, AdvisoryCoverage::UNPARSEABLE_VERSION, 'accepted_by_config'], 'FindingDetails'],
             '#/definitions/activityReason' => [[ActivityLookup::ALLOWLISTED, ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, ActivityLookup::NO_REPOSITORY, ActivityLookup::HOST_NOT_SUPPORTED, ActivityLookup::REPOSITORY_NOT_FOUND, NotCheckedRule::OFFLINE, NotCheckedRule::BUDGET, NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED], 'Analyzer'],
             '#/definitions/noteRepositoryActivityHostNotSupported/properties/hosts/items/properties/listed_in/oneOf/0' => [[LocatedRepository::GITHUB_DOMAINS, LocatedRepository::FORGEJO_DOMAINS], 'RepoLocator'],
             '#/definitions/run/properties/mode' => [Gate::MODES, 'Gate'],
+            '#/properties/format' => [LockrotConfig::FORMATS, 'LockrotConfig'],
             '#/definitions/rootGate/properties/tripped_by/items' => [Gate::TRIPS, 'Gate'],
             '#/definitions/findingGate/properties/exempt_by/oneOf/0' => [Gate::EXEMPTIONS, 'Gate'],
-            '#/definitions/gateValue/properties/kind' => [['grade', 'flag', 'vulnerable', 'unchecked'], 'RunSettings writes grade, flag and unchecked, and the vulnerable gate value is a later pull request'],
-            '#/definitions/findingGate/properties/by/items/properties/kind' => [['grade', 'flag', 'vulnerable', 'unchecked'], self::LATER],
-            '#/definitions/gateFact/properties/kind' => [['flag', 'advisory', 'signal'], self::LATER],
+            '#/definitions/gateValue/properties/kind' => [FailOn::KINDS, 'FailOn'],
+            '#/definitions/uncheckedAccepted/properties/check' => [UncheckedAcceptanceEntry::CHECKS, 'UncheckedAcceptanceEntry'],
+            '#/definitions/uncheckedAccepted/properties/reason' => [UncheckedAcceptanceEntry::ACCEPTABLE_REASONS, 'UncheckedAcceptanceEntry'],
+            '#/definitions/noteVerdictRulesChanged/properties/findings/items/properties/legacy/properties/basis/properties/steps/items/properties/reason' => [PriorityBasis013::STEPS, 'Priority013'],
+            '#/definitions/gateNotApplied/properties/check' => [['advisories'], 'Gate'],
+            '#/definitions/gateNotApplied/properties/reason' => [[AdvisoryCoverage::OFFLINE, AdvisoryCoverage::COMPOSER_TOO_OLD, AdvisoryCoverage::INSTALL_TIME_BUDGET, AdvisoryCoverage::LOOKUP_FAILED, AdvisoryCoverage::NO_FEED, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, AdvisoryCoverage::UNPARSEABLE_VERSION], 'Gate'],
+            '#/definitions/findingGate/properties/by/items/properties/kind' => [FailOn::KINDS, 'RecordMarks'],
+            '#/definitions/gateFact/properties/kind' => [[MarkedFact::FLAG, MarkedFact::ADVISORY, MarkedFact::SIGNAL], 'RecordMarks'],
             '#/definitions/termMaintenance/properties/role' => [$roles, 'Score'],
             '#/definitions/termMaintenance/properties/divisor' => [[1, 4], 'ScoreModel'],
             '#/definitions/termSecurity/properties/role' => [['security'], 'Finding'],

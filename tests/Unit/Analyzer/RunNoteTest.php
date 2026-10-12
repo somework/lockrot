@@ -226,6 +226,27 @@ final class RunNoteTest extends TestCase
             false,
             ['package_count' => 3, 'advisories_asked' => false],
         ];
+        yield 'a baseline written for another target PHP' => [
+            static fn (): RunNote => RunNote::baselineTargetDiffers('8.3', 'option', '8.4', 'runtime'),
+            'baseline_target_differs',
+            'the baseline was written for php 8.3 (--target-php) and this run targets php 8.4 (the PHP running lockrot): fix changes against the baseline are not compared',
+            false,
+            ['baseline_target_php' => '8.3', 'baseline_target_php_source' => 'option', 'run_target_php' => '8.4', 'run_target_php_source' => 'runtime'],
+        ];
+        yield 'a baseline written under another fix model' => [
+            static fn (): RunNote => RunNote::baselineFixModelDiffers(2, 1),
+            'baseline_fix_model_differs',
+            'the baseline was written under fix model 2 and this run uses fix model 1: fix changes against the baseline are not compared',
+            false,
+            ['baseline_fix_model' => 2, 'run_fix_model' => 1],
+        ];
+        yield 'an ignore[] entry beside counted advisories' => [
+            static fn (): RunNote => RunNote::ignoreDoesNotCoverAdvisories([['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['A1', 'A2', 'A3']]]),
+            'ignore_does_not_cover_advisories',
+            "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision",
+            false,
+            ['entries' => [['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['A1', 'A2', 'A3']]]],
+        ];
         yield 'markings that Composer\'s list ignores' => [
             static fn (): RunNote => RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),
             'abandoned_markings_ignored',
@@ -353,6 +374,10 @@ final class RunNoteTest extends TestCase
             'repository_activity_not_found',
             'repository_activity_host_not_supported',
             'not_from_composer_repository',
+            'verdict_rules_changed',
+            'baseline_target_differs',
+            'baseline_fix_model_differs',
+            'ignore_does_not_cover_advisories',
             'abandoned_markings_ignored',
             'abandoned_not_audited_by_composer',
             'abandoned_ignore_unreadable',

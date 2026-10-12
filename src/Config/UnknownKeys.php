@@ -18,10 +18,11 @@ use Lockrot\Output\TerminalText;
 final class UnknownKeys
 {
     /**
-     * The properties of resources/lockrot-config-1.schema.json, in alphabetical order: the first of
+     * The properties of resources/lockrot-config-2.schema.json, in alphabetical order: the first of
      * two equally near keys is the suggestion. ConfigSchemaTest pins the list to the schema.
      */
     public const KNOWN = [
+        'accept-unchecked',
         'advisory-lookup',
         'baseline',
         'fail-on',
@@ -40,7 +41,13 @@ final class UnknownKeys
     ];
 
     /** The properties of one `ignore` entry, in alphabetical order, pinned the same way. */
-    public const KNOWN_IN_IGNORE = ['expires', 'package', 'reason', 'version'];
+    public const KNOWN_IN_IGNORE = ['expires', 'flags', 'package', 'reason', 'version'];
+
+    /**
+     * The properties of one `accept-unchecked` entry, pinned the same way. A misspelt `expires` would
+     * otherwise be a silent permanent acceptance.
+     */
+    public const KNOWN_IN_ACCEPT_UNCHECKED = ['check', 'expires', 'host', 'package', 'reason', 'repository'];
 
     /** Reserved at the top level for extensions, see docs/compatibility.md#names-reserved-for-extensions. */
     public const EXTENSIONS = 'extensions';
@@ -76,7 +83,9 @@ final class UnknownKeys
             // A JSON key like "5" arrives as the integer 5.
             $key = (string) $key;
             if ($key === 'ignore') {
-                $warnings = array_merge($warnings, self::inIgnore($value));
+                $warnings = array_merge($warnings, self::inEntries('ignore', $value, self::KNOWN_IN_IGNORE));
+            } elseif ($key === 'accept-unchecked') {
+                $warnings = array_merge($warnings, self::inEntries('accept-unchecked', $value, self::KNOWN_IN_ACCEPT_UNCHECKED));
             } elseif ($key !== self::EXTENSIONS && !\in_array($key, self::KNOWN, true) && !self::isReserved($key)) {
                 $warnings[] = self::message('extra.lockrot.', $key, self::nearest($key, self::KNOWN));
             }
@@ -86,20 +95,21 @@ final class UnknownKeys
     }
 
     /**
-     * @param mixed $ignore a list of objects once the schema accepts it
+     * @param mixed        $entries a list of objects once the schema accepts it
+     * @param list<string> $known   the keys of one entry
      *
      * @return list<string>
      */
-    private static function inIgnore($ignore): array
+    private static function inEntries(string $list, $entries, array $known): array
     {
         $warnings = [];
-        foreach (\is_array($ignore) ? $ignore : [] as $index => $entry) {
+        foreach (\is_array($entries) ? $entries : [] as $index => $entry) {
             foreach (\is_array($entry) ? array_keys($entry) : [] as $key) {
                 // A JSON key like "5" arrives as the integer 5.
                 $key = (string) $key;
-                if (!\in_array($key, self::KNOWN_IN_IGNORE, true) && !self::isReserved($key)) {
-                    // The index is the project's text too: `ignore` can be an object in a config the schema refused.
-                    $warnings[] = self::message('extra.lockrot.ignore['.TerminalText::escape((string) $index, self::LONGEST_KEY).'].', $key, self::nearest($key, self::KNOWN_IN_IGNORE));
+                if (!\in_array($key, $known, true) && !self::isReserved($key)) {
+                    // The index is the project's text too: the list can be an object in a config the schema refused.
+                    $warnings[] = self::message('extra.lockrot.'.$list.'['.TerminalText::escape((string) $index, self::LONGEST_KEY).'].', $key, self::nearest($key, $known));
                 }
             }
         }

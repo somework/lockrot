@@ -79,7 +79,7 @@ final class BaselineFile
     public function read(): Baseline
     {
         $document = JsonReader::readObject($this->path);
-        if (self::numberIn($document) === 1) {
+        if (self::numberIn($document['lockrot'] ?? null) === 1) {
             throw new ConfigException($this->refusal());
         }
 
@@ -93,16 +93,15 @@ final class BaselineFile
     public function schemaNumber(): ?int
     {
         try {
-            return self::numberIn(JsonReader::readObject($this->path));
+            return self::numberIn(JsonReader::readObject($this->path)['lockrot'] ?? null);
         } catch (ConfigException $e) {
             return null;
         }
     }
 
-    /** @param array<string, mixed> $document */
-    private static function numberIn(array $document): ?int
+    /** @param mixed $lockrot the `lockrot` object of the file */
+    private static function numberIn($lockrot): ?int
     {
-        $lockrot = $document['lockrot'] ?? null;
         $number = \is_array($lockrot) ? ($lockrot['schema'] ?? null) : null;
 
         return \is_int($number) ? $number : null;
