@@ -29,7 +29,7 @@ final class Analysis
     /** Null for a package the run did not analyse. */
     public function facts(string $package): ?PackageFacts
     {
-        return ($this->facts[$package] ?? null);
+        return $this->facts[$package] ?? null;
     }
 
     /** Null for a package the run did not analyse. */

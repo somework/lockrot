@@ -44,7 +44,7 @@ final class GateStanding
     {
         return [
             'reaches_fail_on' => $this->reachesFailOn,
-            'fails' => ($this->fails),
+            'fails' => $this->fails,
             'exempt_by' => $this->exemptBy,
         ];
     }

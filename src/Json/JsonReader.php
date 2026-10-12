@@ -35,7 +35,7 @@ final class JsonReader
             throw new ConfigException('Cannot read '.$path.': '.$e->getMessage(), 0, $e);
         }
 
-        if ((!\is_array($data)) || self::isList($data)) {
+        if (!\is_array($data) || self::isList($data)) {
             throw new ConfigException($path.' must contain a JSON object');
         }
 
