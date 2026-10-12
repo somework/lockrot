@@ -38,17 +38,21 @@ final class RotDepthTest extends TestCase
      * A graded finding by default: `stale` scores above 0.
      *
      * @param list<string> $chain
-     * @param list<string> $namedIn
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $namedIn
      */
     private static function finding(string $package, array $chain, array $namedIn, bool $dev = false, string $verdict = Verdict::STALE, bool $composerJsonRead = true): Finding
     {
         return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain($chain)->withNamedIn($namedIn)->withDev($dev)->withComposerJsonRead($composerJsonRead)->build();
     }
 
-    /** @param list<Finding> $findings */
+    /**
+     * @param list<Finding> $findings
+     *
+     * @return array{flagged: int, measured: int, unmeasured: array<string, int>, by_reach: array<string, int>, not_in_composer_json: int, require_dev_not_walked: int, production: int, development: int, by_depth: list<array{depth: int, flagged: int}>, max_depth: ?int, deepest: list<array{package: string, chain: list<string>}>}
+     */
     private static function block(array $findings): array
     {
-        return JsonPath::decoded(RotDepth::of($findings));
+        return RotDepth::of($findings)->jsonSerialize();
     }
 
     public function testNoGradedFindingGivesTheZeroBlock(): void

@@ -10,6 +10,7 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
@@ -512,7 +513,7 @@ final class FindingTest extends TestCase
         self::assertSame([$shallow->score()->total(), $shallow->grade()], [$deep->score()->total(), $deep->grade()]);
     }
 
-    /** @return iterable<string, array{list<string>}> */
+    /** @return iterable<string, array{list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV>}> */
     public static function sections(): iterable
     {
         yield 'require only' => [['require']];
@@ -522,7 +523,7 @@ final class FindingTest extends TestCase
     }
 
     /**
-     * @param list<string> $sections
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $sections
      *
      * @dataProvider sections
      */

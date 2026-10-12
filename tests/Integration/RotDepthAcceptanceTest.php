@@ -58,7 +58,7 @@ final class RotDepthAcceptanceTest extends TestCase
         $requireDevNotWalked = 0;
         foreach ($graded as $row) {
             self::assertIsArray($row['chain']);
-            ++$reach[$row['reach']];
+            ++$reach[JsonPath::stringAt($row, ['reach'])];
             if ($row['chain'] !== []) {
                 $byDepth[\count($row['chain']) - 1] = ($byDepth[\count($row['chain']) - 1] ?? 0) + 1;
             }
@@ -69,7 +69,10 @@ final class RotDepthAcceptanceTest extends TestCase
                 ++$requireDevNotWalked;
             }
         }
-        $max = max(array_keys($byDepth));
+        $max = 0;
+        foreach (array_keys($byDepth) as $depth) {
+            $max = max($max, $depth);
+        }
         $rows = [];
         for ($depth = 0; $depth <= $max; ++$depth) {
             $rows[] = ['depth' => $depth, 'flagged' => $byDepth[$depth] ?? 0];

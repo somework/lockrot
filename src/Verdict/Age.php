@@ -57,7 +57,7 @@ final class Age implements \JsonSerializable
         return $this->push;
     }
 
-    /** @return array<string, ?AgeReading|?string> */
+    /** @return array<string, AgeReading|string|null> */
     public function jsonSerialize(): array
     {
         $out = [];

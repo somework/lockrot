@@ -56,7 +56,7 @@ final class FindingBuilder
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private bool $unscored = false;
-    /** @var ?list<string> */
+    /** @var ?list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> */
     private ?array $namedIn = null;
     private bool $composerJsonRead = true;
 
@@ -193,7 +193,7 @@ final class FindingBuilder
      * The composer.json sections that name the package. Without a call, a direct finding is named in
      * `require` (`require-dev` for a packages-dev one), and any other in none.
      *
-     * @param list<string> $namedIn
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $namedIn
      */
     public function withNamedIn(array $namedIn): self
     {

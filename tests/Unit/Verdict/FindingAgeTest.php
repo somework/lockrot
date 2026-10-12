@@ -21,6 +21,7 @@ final class FindingAgeTest extends TestCase
 {
     private const LONG_AGO = '2020-09-14T00:00:00+00:00';
 
+    /** @return array<mixed> */
     private static function age(PackageFacts $facts): array
     {
         return JsonPath::decoded(Age::of(new AgeMeasure(Clock::fixed(F::NOW), new Thresholds()), $facts));

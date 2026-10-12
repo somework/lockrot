@@ -134,7 +134,7 @@ final class AnalyzerActivityTest extends TestCase
             self::assertIsArray($flag);
             $headline = JsonPath::arrayAt($flag, ['headline']);
             if ($headline['unit'] === 'years' && $headline['source'] !== null) {
-                self::assertSame(JsonPath::arrayAt($age, [$readings[$headline['source']]])['years'], $headline['value']);
+                self::assertSame(JsonPath::arrayAt($age, [$readings[JsonPath::stringAt($headline, ['source'])]])['years'], $headline['value']);
                 ++$restated;
             }
         }

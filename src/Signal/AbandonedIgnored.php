@@ -62,7 +62,11 @@ final class AbandonedIgnored implements \JsonSerializable
         return $this->replacementUrl;
     }
 
-    /** report-2's `finding.abandoned_ignored`, whose `marking` is S1's data. */
+    /**
+     * report-2's `finding.abandoned_ignored`, whose `marking` is S1's data.
+     *
+     * @return array{by: string, rules: list<array{pattern: string, reason: ?string, constraints: list<string>}>, marking: AbandonedData}
+     */
     public function jsonSerialize(): array
     {
         return ['by' => $this->by, 'rules' => $this->rules, 'marking' => new AbandonedData($this->markedBy, $this->replacement, $this->replacementUrl)];

@@ -925,7 +925,7 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityUnreachable(RepoRef::GITLAB, [[$repo, 'curl error 7']]),
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
             RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
-            RunNote::notFromComposerRepository(2),
+            RunNote::notFromComposerRepository(2, true),
         ];
         self::assertSame(RunNote::CODES, array_map(static fn (RunNote $note): string => $note->code(), $notes), 'one of each');
         $decoded['notes'] = array_map(static fn (RunNote $note): string => $note->text(), $notes);

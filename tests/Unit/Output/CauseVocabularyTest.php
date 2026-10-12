@@ -43,10 +43,26 @@ final class CauseVocabularyTest extends TestCase
     #[DataProvider('sets')]
     public function testEveryIdOfTheSetHasWords(string $set): void
     {
-        $known = JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 2)), array_merge(self::SETS[$set], ['x-known-values']));
+        $known = self::ids(self::SETS[$set]);
 
         self::assertNotSame([], $known, $set.' lists its ids');
         self::assertSame([], array_values(array_diff($known, array_keys(CauseWords::WORDS))), $set.': ids without words');
+    }
+
+    /**
+     * @param list<int|string> $path
+     *
+     * @return list<string> the `x-known-values` of the reason set at $path
+     */
+    private static function ids(array $path): array
+    {
+        $ids = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 2)), array_merge($path, ['x-known-values'])) as $id) {
+            self::assertIsString($id);
+            $ids[] = $id;
+        }
+
+        return $ids;
     }
 
     public function testNoTwoIdsShareTheirWords(): void
@@ -56,10 +72,9 @@ final class CauseVocabularyTest extends TestCase
 
     public function testTheTableWordsNoIdThatNoSetLists(): void
     {
-        $schema = JsonPath::decodeFile(Schemas::path(Schemas::REPORT, 2));
         $listed = [];
         foreach (self::SETS as $path) {
-            $listed = array_merge($listed, JsonPath::arrayAt($schema, array_merge($path, ['x-known-values'])));
+            $listed = array_merge($listed, self::ids($path));
         }
 
         self::assertSame([], array_values(array_diff(array_keys(CauseWords::WORDS), $listed)));
@@ -80,6 +95,7 @@ final class CauseVocabularyTest extends TestCase
         $cases = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../../fixtures/flags/cases.json'), ['cases']);
         $checked = 0;
         foreach ($cases as $case) {
+            self::assertIsArray($case);
             $finding = JsonPath::arrayAt($case, ['finding']);
             if (!JsonPath::has($finding, ['age'])) {
                 continue;

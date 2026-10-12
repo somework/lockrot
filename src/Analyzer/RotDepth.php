@@ -18,9 +18,9 @@ final class RotDepth implements \JsonSerializable
 {
     private int $flagged = 0;
     private int $measured = 0;
-    /** @var array{unreached: int, no_composer_json: int} */
+    /** @var array<string, int> `unreached` and `no_composer_json` */
     private array $unmeasured = [Finding::UNREACHED => 0, Finding::NO_COMPOSER_JSON => 0];
-    /** @var array{direct: int, transitive: int, unreached: int} */
+    /** @var array<string, int> `direct`, `transitive` and `unreached` */
     private array $byReach = [Score::DIRECT => 0, Score::TRANSITIVE => 0, Score::UNREACHED => 0];
     private int $notInComposerJson = 0;
     private int $requireDevNotWalked = 0;
@@ -88,7 +88,7 @@ final class RotDepth implements \JsonSerializable
         return $this->deepest;
     }
 
-    /** @return array{flagged: int, measured: int, unmeasured: array{unreached: int, no_composer_json: int}, by_reach: array{direct: int, transitive: int, unreached: int}, not_in_composer_json: int, require_dev_not_walked: int, production: int, development: int, by_depth: list<array{depth: int, flagged: int}>, max_depth: ?int, deepest: list<array{package: string, chain: list<string>}>} */
+    /** @return array{flagged: int, measured: int, unmeasured: array<string, int>, by_reach: array<string, int>, not_in_composer_json: int, require_dev_not_walked: int, production: int, development: int, by_depth: list<array{depth: int, flagged: int}>, max_depth: ?int, deepest: list<array{package: string, chain: list<string>}>} */
     public function jsonSerialize(): array
     {
         $max = $this->maxDepth();
