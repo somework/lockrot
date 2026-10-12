@@ -28,27 +28,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.
   ([The score](docs/verdicts.md#score))
-- **Breaking:** **CLI:** `--fail-on=unchecked` also fails on two S10 reasons. `host_not_supported`
-  is a repository on a host that lockrot cannot ask. `not_from_composer_repository` is a package
-  from vcs or an unknown origin. Path, artifact and package origins stay skips. S10 adds no flag.
-  Action: list a GitLab host in Composer's `gitlab-domains`, or accept it in `accept-unchecked`.
-  ([What was not checked](docs/verdicts.md#what-was-not-checked))
-- **Breaking:** **CLI:** `--fail-on=unchecked` also fails when the advisory lookup did not complete
-  for a package: S10 `{check: advisories}` with `offline`, `composer_too_old`,
-  `install_time_budget`, `lookup_failed` or `no_feed`. A package outside the `composer-repositories`
-  scope and a version that Composer cannot parse stay skips. Action: on Composer below 2.4, upgrade
-  Composer or run the PHAR. ([What was not checked](docs/verdicts.md#what-was-not-checked))
-- **All formats:** lockrot reads Composer's abandoned ignore list (`config.policy.abandoned.ignore`
-  on Composer 2.10+, `config.audit.ignore-abandoned` on 2.9), as `composer audit` does. A listed
-  package's abandoned marking no longer counts, and an archived repository still does. The finding
-  carries `abandoned_ignored`. ([Abandoned](docs/verdicts.md#abandoned))
+- **Breaking:** **CLI:** `--fail-on=unchecked` also fails when advisories or an advisory's release
+  data were not read, when a repository host cannot be asked, and on a package from vcs or an
+  unknown origin. A path package and a package outside the `composer-repositories` scope are skips.
+  Action: list a GitLab host in `gitlab-domains`. On Composer below 2.4, upgrade Composer or run
+  the PHAR: that gap cannot be accepted. ([What was not checked](docs/verdicts.md#what-was-not-checked))
 - **All formats:** a package installed from vcs or a path can now be `vulnerable`, because its name
   is asked for advisories (see Security), so `--fail-on` can fail where 0.13 passed. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
   ([Which advisories count](docs/verdicts.md#which-advisories-count))
 - **All formats:** lockrot reads Composer's abandoned ignore list (`config.policy.abandoned.ignore`
   on Composer 2.10+, else `config.audit.ignore-abandoned` from 2.9), as `composer audit` does: a
-  listed package's abandoned marking no longer counts. An archived repository still does.
+  listed package's abandoned marking no longer counts, and the finding carries `abandoned_ignored`.
+  An archived repository still counts. `--fail-on=abandoned` and a grade gate can pass on it.
   ([Abandoned](docs/verdicts.md#abandoned))
 - **All formats:** a package marked abandoned only in `composer.lock` no longer carries S10 for its
   repository activity: S1 decides it, as for a package that its repository marks. So
