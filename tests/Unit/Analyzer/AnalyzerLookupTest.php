@@ -229,7 +229,7 @@ final class AnalyzerLookupTest extends TestCase
         $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::ABANDONED_MARKINGS_IGNORED));
 
         self::assertCount(1, $notes);
-        self::assertSame(['z/old', 'a/new'], array_column($notes[0]->data()['packages'], 'package'));
+        self::assertSame(['z/old', 'a/new'], array_column(JsonPath::arrayAt($notes[0]->data(), ['packages']), 'package'));
     }
 
     /** @return iterable<string, array{array<string, mixed>, bool, ?string}> the config, whether the package is marked, and the note that the run writes */
