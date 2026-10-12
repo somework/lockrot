@@ -6,7 +6,9 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -95,7 +97,13 @@ final class MoveContractTest extends TestCase
      * @param array<mixed, mixed> $finding
      *
      * @dataProvider findings
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
      */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     #[DataProvider('findings')]
     public function testEveryMovePartitionsTheCountedFacts(array $finding): void
     {
@@ -158,7 +166,13 @@ final class MoveContractTest extends TestCase
      * @param array<mixed, mixed> $finding
      *
      * @dataProvider findings
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
      */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     #[DataProvider('findings')]
     public function testEveryMoveHasTheShapeOfItsKind(array $finding): void
     {
@@ -198,7 +212,13 @@ final class MoveContractTest extends TestCase
      * @param array<mixed, mixed> $finding
      *
      * @dataProvider findings
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
      */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     #[DataProvider('findings')]
     public function testTheSecurityMoveIsPublishedOnceAndAgreesWithItsRow(array $finding): void
     {
@@ -238,7 +258,13 @@ final class MoveContractTest extends TestCase
      * the fields {@see DIFFERENCES} names with its reason.
      *
      * @dataProvider casesWithInputs
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
      */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     #[DataProvider('casesWithInputs')]
     public function testTheAnalyzerWritesTheMoveTheCaseRecords(string $id): void
     {

@@ -46,13 +46,16 @@ final class CaseHydrator
 
     /** @var array<string, array<mixed, mixed>>|null */
     private static ?array $findings = null;
+    /** @var array<mixed, mixed>|null the committed cases, read once per process */
+    private static ?array $cases = null;
 
     /**
      * @return array<mixed, mixed> the case with that id
      */
     public static function case(string $id): array
     {
-        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::CASES), ['cases']) as $case) {
+        self::$cases ??= JsonPath::arrayAt(JsonPath::decodeFile(self::CASES), ['cases']);
+        foreach (self::$cases as $case) {
             if (\is_array($case) && ($case['id'] ?? null) === $id) {
                 return $case;
             }

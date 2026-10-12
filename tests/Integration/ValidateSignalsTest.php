@@ -6,7 +6,9 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -54,7 +56,13 @@ final class ValidateSignalsTest extends TestCase
      * @param array<mixed, mixed> $finding
      *
      * @dataProvider findings
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
      */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     #[DataProvider('findings')]
     public function testEverySignalHasExactlyItsDataKeys(array $finding): void
     {
@@ -77,7 +85,13 @@ final class ValidateSignalsTest extends TestCase
      * @param array<mixed, mixed> $finding
      *
      * @dataProvider findings
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
      */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     #[DataProvider('findings')]
     public function testS7NamesGradedPackagesAndS10BlocksTheUnionOfItsEntries(array $finding): void
     {

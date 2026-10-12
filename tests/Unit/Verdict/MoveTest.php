@@ -10,7 +10,9 @@ use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,7 +42,13 @@ final class MoveTest extends TestCase
      * from its `version` up to its `newest`.
      *
      * @dataProvider casesWithInputs
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
      */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     #[DataProvider('casesWithInputs')]
     public function testEveryClearedAdvisoryLiesOutsideItsRangeForEveryAdmittedRelease(string $id): void
     {

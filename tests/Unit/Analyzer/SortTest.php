@@ -17,7 +17,9 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -148,7 +150,16 @@ final class SortTest extends TestCase
         self::assertSame(array_column($findings, 'package'), array_column($resorted, 'package'));
     }
 
-    /** With moves in place, one finding of each package of the hydrated cases, in one report, stands in the published order. */
+    /**
+     * With moves in place, one finding of each package of the hydrated cases, in one report, stands
+     * in the published order.
+     *
+     * @coversNothing
+     *
+     * @group covers-nothing
+     */
+    #[CoversNothing]
+    #[Group('covers-nothing')]
     public function testTheFindingsWithTheirMovesStandInThePublishedOrder(): void
     {
         $findings = [];
