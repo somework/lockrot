@@ -86,24 +86,36 @@ jobs:
           vendor/bin/phpunit -c phpunit.core-coverage.xml.dist --coverage-clover build/clover-core.xml
           composer global require --no-interaction "rregeer/phpunit-coverage-check:^0.3"
           $(composer global config bin-dir --absolute)/coverage-check build/clover-core.xml 94
-  # The full run collects coverage once for all shards. Keep its --exclude-group list equal to
-  # testFrameworkOptions in infection.json5: each shard reads this coverage as its own run's. A pull
-  # request does not use it: most of its shards mutate nothing.
+  # This job collects coverage once for all shards, on a push and on a pull request. Keep its
+  # --exclude-group list equal to testFrameworkOptions in infection.json5: each shard reads this
+  # coverage as its own run's. A pull request that adds, changes or renames no PHP file under src
+  # mutates nothing, so the job skips its test run there.
   mutation-coverage:
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
+        with: {fetch-depth: "${{ github.event_name == 'pull_request' && '0' || '1' }}"}
+      - name: Does this run mutate src
+        id: scope
+        env: {EVENT: '${{ github.event_name }}', BASE_REF: '${{ github.base_ref }}'}
+        run: |
+          if [ "$EVENT" = pull_request ] && ! git diff --name-only --diff-filter=AMR "origin/$BASE_REF...HEAD" -- src | grep -q '\.php$'; then
+            echo "mutate=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "mutate=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.scope.outputs.mutate == 'true'
+        uses: shivammathur/setup-php@v2
         with: {php-version: '8.4', coverage: pcov, extensions: pcntl}
-      - run: composer install --no-interaction
-      - run: vendor/bin/phpunit --exclude-group=e2e --exclude-group=network --exclude-group=sweep --exclude-group=covers-nothing --coverage-xml=build/coverage/coverage-xml --log-junit=build/coverage/junit.xml
-      - uses: actions/upload-artifact@v7
+      - if: steps.scope.outputs.mutate == 'true'
+        run: composer install --no-interaction
+      - if: steps.scope.outputs.mutate == 'true'
+        run: vendor/bin/phpunit --exclude-group=e2e --exclude-group=network --exclude-group=sweep --exclude-group=covers-nothing --coverage-xml=build/coverage/coverage-xml --log-junit=build/coverage/junit.xml
+      - if: steps.scope.outputs.mutate == 'true'
+        uses: actions/upload-artifact@v7
         with: {name: mutation-coverage, path: build/coverage, retention-days: 1}
   mutation:
     needs: mutation-coverage
-    # Without this condition, a skipped coverage job (a pull request) skips this job too.
-    if: ${{ !cancelled() && needs.mutation-coverage.result != 'failure' }}
     runs-on: ubuntu-latest
     # Keep the cap far above a shard's run time: a slow runner cancels a green shard. The cap only
     # stops a runaway run. Measurements: https://github.com/somework/lockrot/pull/6 and
@@ -176,7 +188,7 @@ jobs:
       # --only-covering-test-cases: a mutant runs only the test methods that cover its line. A test that
       # never runs the line cannot kill the mutant. Without the option, a surviving mutant runs every
       # slow method of each class that covers it. Measurements: https://github.com/somework/lockrot/pull/65
-      - if: steps.scope.outputs.mode == 'full'
+      - if: steps.scope.outputs.mode != 'none'
         uses: actions/download-artifact@v8
         with: {name: mutation-coverage, path: build/coverage}
       - name: Mutate the shard (full run)
@@ -189,13 +201,13 @@ jobs:
       - name: Mutate whole the root and renamed files the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.files != ''
         run: |
-          $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --min-msi=0 --min-covered-msi=0 ${{ steps.scope.outputs.files }}
+          $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --min-msi=0 --min-covered-msi=0 ${{ steps.scope.outputs.files }}
           if [ -f build/infection.log ]; then mv build/infection.log build/infection-files.log; fi
       - name: Mutate the lines the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.diff == 'true'
         run: |
           python3 tools/mutation/shard_config.py infection.json5 ${{ steps.scope.outputs.dirs }} > infection.shard.json5
-          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --git-diff-lines --git-diff-base=${{ steps.scope.outputs.base }} --min-msi=0 --min-covered-msi=0
+          $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --git-diff-lines --git-diff-base=${{ steps.scope.outputs.base }} --min-msi=0 --min-covered-msi=0
       - name: Escapes against tests/infection-equivalents.md
         if: steps.scope.outputs.mode == 'diff'
         run: |
