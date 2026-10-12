@@ -496,29 +496,31 @@ final class AnalyzerActivityTest extends TestCase
     private function http(array $map): HttpClientInterface
     {
         $this->asked = [];
-        $asked = &$this->asked;
+        $ask = function (string $url): void {
+            $this->asked[] = $url;
+        };
 
-        return new class ($map, $asked) implements HttpClientInterface {
+        return new class ($map, $ask) implements HttpClientInterface {
             /** @var array<string, array{int, string}> */
             private array $map;
-            /** @var list<string> */
-            private array $asked;
+            /** @var callable(string): void */
+            private $ask;
 
             /**
              * @param array<string, array{int, string}> $map
-             * @param list<string>                      $asked
+             * @param callable(string): void            $ask
              */
-            public function __construct(array $map, array &$asked)
+            public function __construct(array $map, callable $ask)
             {
                 $this->map = $map;
-                $this->asked = &$asked;
+                $this->ask = $ask;
             }
 
             public function fetchAll(array $urls, array $headers = []): array
             {
                 $out = [];
                 foreach ($urls as $url) {
-                    $this->asked[] = $url;
+                    ($this->ask)($url);
                     [$status, $body] = $this->map[$url] ?? [500, ''];
                     $out[$url] = new HttpResult($url, $status, $body, new \DateTimeImmutable('2026-09-14T06:00:00+00:00'));
                 }
