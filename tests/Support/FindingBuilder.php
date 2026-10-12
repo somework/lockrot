@@ -15,8 +15,13 @@ use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Data\ArchivedData;
 use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\AgeReading;
+use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\NoPushData;
+use Lockrot\Signal\Data\NoReleaseData;
 use Lockrot\Signal\Signal;
+use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -237,7 +242,40 @@ final class FindingBuilder
         $reason = $finding->allowlistReason();
         $entry = $reason === null ? null : new AllowlistEntry($finding->package(), null, $reason, null, AllowlistEntry::BY_PROJECT);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, self::activityOf($finding));
+        $activity = self::activityOf($finding);
+
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity));
+    }
+
+    /**
+     * The age readings that the finding's S2, S4 and S8 quote, at the signal's level. A reading that
+     * no signal quotes is unmeasured, for the reason that the metadata status or the activity gives.
+     */
+    public static function ageOf(Finding $finding, string $metadataStatus, ActivityLookup $activity): Age
+    {
+        $levels = [];
+        foreach ($finding->signals() as $signal) {
+            $levels[$signal->id()] = $signal->level();
+        }
+        $measured = static fn (string $at, ?float $years, ?string $version, ?string $datedBy, ?string $level, string $kind): AgeReading => AgeReading::measured(new \DateTimeImmutable($at), (int) round(($years ?? 0.0) * 10), $years ?? 0.0, $version, $datedBy, $level, $kind);
+        $metadataReason = $metadataStatus === 'read' ? null : $metadataStatus;
+        $s2 = $finding->signalData(NoReleaseData::class);
+        $s4 = $finding->signalData(NoPushData::class);
+        $s8 = $finding->signalData(LeftBehindData::class);
+        $snapshot = ReleaseBranch::of($finding->version()) === null;
+
+        return new Age(
+            AgeReading::unmeasuredBecause($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::UNDATED),
+            $s2 === null ? AgeReading::unmeasuredBecause($metadataReason ?? AgeMeasure::UNDATED_RELEASES) : $measured($s2->lastRelease(), $s2->years(), $s2->lastVersion(), $s2->datedBy(), $levels[Signal::S2], AgeReading::RELEASE),
+            $s8 === null ? AgeReading::unmeasuredBecause($metadataReason ?? ($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::NO_BRANCH_ROW)) : $measured($s8->branchLastRelease(), $s8->years(), $s8->branchLastVersion(), $s8->datedBy(), $levels[Signal::S8], AgeReading::RELEASE),
+            $s4 === null ? AgeReading::unmeasuredBecause($activity->reason() ?? AgeMeasure::UNDATED) : $measured($s4->lastPush(), $s4->years(), null, null, $levels[Signal::S4], AgeReading::PUSH)
+        );
+    }
+
+    /** No reading taken, for details whose test reads no age. */
+    public static function unmeasuredAge(): Age
+    {
+        return new Age(AgeReading::unmeasuredBecause(AgeMeasure::UNDATED), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES), AgeReading::unmeasuredBecause(AgeMeasure::NO_BRANCH_ROW), AgeReading::unmeasuredBecause(AgeMeasure::NO_REPOSITORY));
     }
 
     /** The lookup of a package with no repository URL, for details whose test reads no activity. */

@@ -44,6 +44,8 @@ use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Signal\AgeMeasure;
+use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -496,7 +498,7 @@ final class Analyzer
 
         return $finding
             ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null));
+            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts)));
     }
 
     /**

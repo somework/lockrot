@@ -171,7 +171,7 @@ final class AgeMeasureTest extends TestCase
         $releases = [['2.0.0', self::ago(86400)], ['1.2.0', self::ago(4 * Clock::SECONDS_PER_YEAR)]];
 
         self::assertUnmeasured(AgeMeasure::BRANCH_SNAPSHOT, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => 'dev-main']), FactsBuilder::metadata($releases))));
-        self::assertUnmeasured(AgeMeasure::BRANCH_SNAPSHOT, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.x-dev']), FactsBuilder::metadata($releases))));
+        self::assertSame('1.2.0', $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '1.x-dev']), FactsBuilder::metadata($releases)))->version(), 'a branch-alias snapshot reads its own line');
         self::assertUnmeasured(AgeMeasure::NO_BRANCH_ROW, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => '3.0.0']), FactsBuilder::metadata($releases))));
         self::assertUnmeasured(AgeMeasure::NO_BRANCH_ROW, $measure->branchRelease(FactsBuilder::facts(FactsBuilder::package(['version' => 'not a version']), FactsBuilder::metadata($releases))));
     }

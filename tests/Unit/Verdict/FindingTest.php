@@ -876,7 +876,7 @@ final class FindingTest extends TestCase
     public function testAJudgementTheDetailsContradictIsRefused(string $status, bool $maintenanceJudged, bool $detailsFirst): void
     {
         $finding = (new FindingBuilder())->withoutFlags()->build();
-        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
+        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
         $flags = FlagSet::fromSignals([], null, []);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -959,7 +959,7 @@ final class FindingTest extends TestCase
         $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S9', 'S3', 'S4']];
         $signals = $withS10 ? [new Signal(Signal::LEVEL_INFO, 'activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [$activity], 'blocks' => ['S9', 'S3', 'S4']]))] : [];
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
-            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
+            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503', FindingBuilder::unmeasuredAge()));
 
         $written = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['signals']);
         $s10 = JsonPath::arrayAt($written, [0]);
@@ -1006,7 +1006,7 @@ final class FindingTest extends TestCase
     {
         $finding = (new FindingBuilder())->build();
         $before = $finding->details();
-        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
+        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
 
         $copy = $finding->withDetails($details);
 
@@ -1164,7 +1164,7 @@ final class FindingTest extends TestCase
         self::assertNotNull($package);
         $facts = FactsBuilder::looked(new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true));
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
-            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
+            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503', FindingBuilder::unmeasuredAge()));
 
         $written = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['signals']);
 

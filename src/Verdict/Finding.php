@@ -700,6 +700,7 @@ final class Finding
             'allowlist_reason' => $entry !== null && $entry->acceptsAll() ? $entry->reason() : null,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
             'libyears' => $this->libyearsRounded(),
+            'age' => $details->age(),
         ];
     }
 

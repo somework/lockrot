@@ -33,6 +33,11 @@ final class NoReleaseData implements SignalData
         return $this->lastRelease;
     }
 
+    public function lastVersion(): ?string
+    {
+        return $this->lastVersion;
+    }
+
     public function years(): ?float
     {
         return $this->years;

@@ -106,6 +106,40 @@ final class AnalyzerActivityTest extends TestCase
         self::assertSame([], self::checks($finding, 'repository_archived'));
     }
 
+    /** The push reading takes the reason of the activity entry that blocks S4, and dates a read. */
+    public function testThePushReadingTakesTheReasonOfTheActivityThatWasNotRead(): void
+    {
+        $packages = [self::packagist('vendor/pkg'), self::packagist('vendor/other'), self::packagist('vendor/hosted')];
+        $metadata = ['vendor/pkg' => self::meta('vendor/pkg', 'https://github.com/vendor/pkg.git'), 'vendor/other' => self::meta('vendor/other', 'https://github.com/vendor/other.git'), 'vendor/hosted' => self::meta('vendor/hosted', self::GITEA)];
+
+        $byName = $this->findings($packages, $metadata, [self::GH => [200, self::LIVE], self::GH_OTHER => [404, '']], true);
+
+        self::assertSame([['at' => '2026-08-01T00:00:00+00:00', 'years' => 0.1, 'level' => null], null], [JsonPath::arrayAt($byName['vendor/pkg'], ['age'])['push'], JsonPath::arrayAt($byName['vendor/pkg'], ['age'])['push_unmeasured']]);
+        self::assertSame([null, 'repository_not_found'], [JsonPath::arrayAt($byName['vendor/other'], ['age'])['push'], JsonPath::arrayAt($byName['vendor/other'], ['age'])['push_unmeasured']]);
+        self::assertSame([null, 'host_not_supported'], [JsonPath::arrayAt($byName['vendor/hosted'], ['age'])['push'], JsonPath::arrayAt($byName['vendor/hosted'], ['age'])['push_unmeasured']]);
+    }
+
+    /** A flag's headline years and the move's quiet years restate the age reading that they read. */
+    public function testTheHeadlineAndTheQuietYearsRestateTheirAgeReading(): void
+    {
+        $old = '{"archived":false,"pushed_at":"2019-08-01T00:00:00Z"}';
+        $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://github.com/vendor/pkg.git', '2020-03-01T00:00:00+00:00')], [self::GH => [200, $old]], true);
+        $age = JsonPath::arrayAt($finding, ['age']);
+        $readings = ['release' => 'release', 'push' => 'push', 'branch' => 'branch_release'];
+        $restated = 0;
+        foreach (JsonPath::arrayAt($finding, ['flags']) as $flag) {
+            self::assertIsArray($flag);
+            $headline = JsonPath::arrayAt($flag, ['headline']);
+            if ($headline['unit'] === 'years' && $headline['source'] !== null) {
+                self::assertSame(JsonPath::arrayAt($age, [$readings[$headline['source']]])['years'], $headline['value']);
+                ++$restated;
+            }
+        }
+
+        self::assertSame(1, $restated, 'the silent headline names its source');
+        self::assertSame(JsonPath::arrayAt($age, ['release'])['years'], JsonPath::arrayAt($finding, ['next_step'])['quiet_years']);
+    }
+
     public function testA404IsAnAnswerThatSkipsTheActivityChecks(): void
     {
         $finding = $this->one([self::packagist('vendor/pkg')], ['vendor/pkg' => self::meta('vendor/pkg', 'https://github.com/vendor/pkg.git')], [self::GH => [404, '']], true);

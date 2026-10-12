@@ -76,7 +76,7 @@ final class AgeMeasure
             return AgeReading::unmeasuredBecause($installed->kind() === InstalledRelease::SHARED_COMMIT ? self::SHARED_COMMIT : self::UNDATED);
         }
 
-        return $this->reading($at, null, $installed->datedBy(), null);
+        return $this->reading($at, null, $installed->datedBy(), null, AgeReading::INSTALLED);
     }
 
     /**
@@ -114,10 +114,11 @@ final class AgeMeasure
             return AgeReading::unmeasuredBecause(self::metadataReason($facts, $metadataStatus));
         }
         $version = $facts->package()->version();
-        if ($facts->package()->isBranchSnapshot()) {
+        $aliasLine = ReleaseBranch::aliasLine($version);
+        if ($facts->package()->isBranchSnapshot() && $aliasLine === null) {
             return AgeReading::unmeasuredBecause(self::BRANCH_SNAPSHOT);
         }
-        $branch = ReleaseBranch::of($version);
+        $branch = $aliasLine ?? ReleaseBranch::of($version);
         $own = $branch === null ? null : ($metadata->latestStableByBranch()[$branch] ?? null);
         if ($own === null) {
             return AgeReading::unmeasuredBecause(self::NO_BRANCH_ROW);
@@ -126,7 +127,7 @@ final class AgeMeasure
         if ($at === null || $own['highest']['at'] === null) {
             return AgeReading::unmeasuredBecause(self::UNDATED_RELEASES);
         }
-        if ($this->isAhead($version, $own['highest']['normalized'])) {
+        if ($aliasLine === null && $this->isAhead($version, $own['highest']['normalized'])) {
             return AgeReading::unmeasuredBecause(self::ABOVE_LISTED_RELEASES);
         }
 
@@ -166,16 +167,16 @@ final class AgeMeasure
 
         return $at === null
             ? AgeReading::unmeasuredBecause(self::UNDATED)
-            : $this->reading($at, null, null, [$this->thresholds->pushWarnYears(), $this->thresholds->pushHighYears()]);
+            : $this->reading($at, null, null, [$this->thresholds->pushWarnYears(), $this->thresholds->pushHighYears()], AgeReading::PUSH);
     }
 
     /** @param array{int, int}|null $thresholds warn and high years, null where no threshold applies */
-    private function reading(\DateTimeImmutable $at, ?string $version, ?string $datedBy, ?array $thresholds): AgeReading
+    private function reading(\DateTimeImmutable $at, ?string $version, ?string $datedBy, ?array $thresholds, string $kind = AgeReading::RELEASE): AgeReading
     {
         $ratio = $this->clock->yearsSince($at);
         $level = $thresholds === null ? null : Thresholds::levelFor($ratio, $thresholds[0], $thresholds[1]);
 
-        return AgeReading::measured($at, $this->clock->tenthsSince($at), $ratio, $version, $datedBy, $level);
+        return AgeReading::measured($at, $this->clock->tenthsSince($at), $ratio, $version, $datedBy, $level, $kind);
     }
 
     private static function metadataReason(PackageFacts $facts, ?string $metadataStatus): string

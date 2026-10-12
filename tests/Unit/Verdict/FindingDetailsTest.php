@@ -62,7 +62,7 @@ final class FindingDetailsTest extends TestCase
         self::assertNotNull($package);
         $facts = F::looked(new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage($feeds, $records, $reason)));
 
-        $security = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->toSecurityArray([], null);
+        $security = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge())->toSecurityArray([], null);
 
         self::assertSame($check, $security['check']);
     }
@@ -74,7 +74,7 @@ final class FindingDetailsTest extends TestCase
     public function testUnreadReleasesGiveTheInstalledBranchARowWithNoFixKnown(): void
     {
         $rows = self::rows([['id' => 'PKSA-a', 'severity' => 'high', 'counted' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null, 'reason' => 'releases_unknown']]]);
-        $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null), FindingBuilder::unread());
+        $details = new FindingDetails('unavailable', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes(['PKSA-a' => Fix::unknown(Fix::RELEASES_UNKNOWN)], [], null, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
 
         $security = $details->toSecurityArray($rows, '1.x');
 
@@ -94,7 +94,7 @@ final class FindingDetailsTest extends TestCase
         self::assertNotNull($package);
         $facts = F::looked(new PackageFacts($package, null, null, [], null, null, null));
 
-        $installed = FindingDetails::of($facts, null, new PhpFloor('8.4', '*'), [], [], null)->installedPhp();
+        $installed = FindingDetails::of($facts, null, new PhpFloor('8.4', '*'), [], [], null, FindingBuilder::unmeasuredAge())->installedPhp();
 
         self::assertSame(['requires' => '>=7.1.3', 'target_runs' => true, 'project_allows' => true], $installed);
     }
@@ -107,7 +107,7 @@ final class FindingDetailsTest extends TestCase
         self::assertNotNull($package);
         $facts = F::looked(new PackageFacts($package, null, null, [], null, null, new AdvisoryNameCoverage([], null, 'unparseable_version')));
 
-        $skipped = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null)->skipped();
+        $skipped = FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], null, FindingBuilder::unmeasuredAge())->skipped();
 
         self::assertContains(['check' => 'advisories', 'reason' => 'unparseable_version', 'blocks' => ['S9']], JsonPath::decoded($skipped));
     }
@@ -115,7 +115,7 @@ final class FindingDetailsTest extends TestCase
     public function testASnapshotsVulnerableSummaryHasNoBranchClause(): void
     {
         $rows = self::rows([['id' => 'PKSA-a', 'cve' => 'CVE-2026-1', 'title' => 'a title', 'severity' => 'high', 'counted' => true, 'deciding' => true, 'fix' => ['kind' => 'unknown', 'on_installed_branch' => null]]]);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
 
         self::assertSame('1 advisory: 1 high; advisory: CVE-2026-1 a title', $details->vulnerableSummary($rows, null, 'high'));
     }
@@ -129,7 +129,7 @@ final class FindingDetailsTest extends TestCase
         $package = $lock->find('vendor/a');
         self::assertNotNull($package);
 
-        $security = FindingDetails::of(F::looked(new PackageFacts($package, null, null, [])), null, new PhpFloor('8.4', null), [$ignored], [], null)->toSecurityArray([], null);
+        $security = FindingDetails::of(F::looked(new PackageFacts($package, null, null, [])), null, new PhpFloor('8.4', null), [$ignored], [], null, FindingBuilder::unmeasuredAge())->toSecurityArray([], null);
 
         self::assertSame(1, $security['ignored_count']);
         self::assertSame(
@@ -145,7 +145,7 @@ final class FindingDetailsTest extends TestCase
         $candidate = new Candidate(new StableRelease('1.2.0.0', '1.2.0', null, '>=8.1', false), '1', Fix::UPGRADE, [$holder]);
         $branch = new BranchFixes('1.x', true, 0, 2, $candidate, '1.3.0', ['PKSA-a']);
         $gets = new Gets('1.3.0', PhpCheck::of('>=8.1', new PhpFloor('8.4', '>=8.1')), ['PKSA-a'], false);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null), FindingBuilder::unread());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$branch], $gets, null, null), FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'medium', 'fix' => ['kind' => 'upgrade', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
@@ -168,7 +168,7 @@ final class FindingDetailsTest extends TestCase
     /** Without the scan, the S9 rows give the branch row: each row on the branch is fixed, each without a kind is not known. */
     public function testTheS9RowsCountTheFixedAndTheUnknown(): void
     {
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'update', 'on_installed_branch' => true]],
@@ -189,7 +189,7 @@ final class FindingDetailsTest extends TestCase
     public function testTheStandingOfCountedRowsIsVulnerableWithTheHardestKind(): void
     {
         $ignored = new IgnoredAdvisory(new Advisory('PKSA-i', null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, 'PKSA-i', null, AdvisoryIgnoreMatch::BY_AUDIT));
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null, FindingBuilder::unread());
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'partial', 'lookup_failed', [$ignored], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
         $rows = self::rows([
             ['id' => 'PKSA-a', 'severity' => 'acme:severe', 'fix' => ['kind' => 'update']],
             ['id' => 'PKSA-b', 'severity' => 'low', 'fix' => ['kind' => 'raise-php']],
@@ -209,7 +209,7 @@ final class FindingDetailsTest extends TestCase
     /** With no counted row, the lookup decides the status, and nothing is counted or fixed. */
     public function testTheStandingWithNoRowFollowsTheLookup(): void
     {
-        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null, FindingBuilder::unread());
+        $details = static fn (string $check): FindingDetails => new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge());
 
         self::assertSame('clear', $details('complete')->standing([])->status());
         self::assertSame('unchecked', $details('partial')->standing([])->status());
@@ -231,7 +231,7 @@ final class FindingDetailsTest extends TestCase
     #[DataProvider('metadataAnswers')]
     public function testTheMetadataReasonExplainsAnUnavailableAnswerOnly(PackageFacts $facts, ?string $failure, array $metadata): void
     {
-        self::assertSame($metadata, FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], $failure)->metadata());
+        self::assertSame($metadata, FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], [], $failure, FindingBuilder::unmeasuredAge())->metadata());
     }
 
     /** @return iterable<string, array{PackageFacts, ?string, array{status: string, reason: ?string, message: ?string}}> */
@@ -256,7 +256,7 @@ final class FindingDetailsTest extends TestCase
     #[DataProvider('skips')]
     public function testEachCheckThatDidNotRunIsSkippedWithItsReason(PackageFacts $facts, ?AllowlistEntry $entry, array $signals, array $skipped): void
     {
-        self::assertSame($skipped, JsonPath::decoded(FindingDetails::of($facts, $entry, new PhpFloor('8.4', null), [], $signals, null)->skipped()));
+        self::assertSame($skipped, JsonPath::decoded(FindingDetails::of($facts, $entry, new PhpFloor('8.4', null), [], $signals, null, FindingBuilder::unmeasuredAge())->skipped()));
     }
 
     /** @return iterable<string, array{PackageFacts, ?AllowlistEntry, list<Signal>, list<array{check: string, reason: string, blocks: list<string>}>}> */

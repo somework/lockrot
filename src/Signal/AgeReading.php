@@ -9,8 +9,14 @@ namespace Lockrot\Signal;
  *
  * @internal
  */
-final class AgeReading
+final class AgeReading implements \JsonSerializable
 {
+    /** What a reading dates, which decides the keys that report-2 writes for it. */
+    public const INSTALLED = 'installed';
+    public const RELEASE = 'release';
+    public const PUSH = 'push';
+
+    private string $kind;
     private ?\DateTimeImmutable $at;
     private ?int $tenths;
     private ?float $ratio;
@@ -19,8 +25,9 @@ final class AgeReading
     private ?string $level;
     private ?string $unmeasured;
 
-    private function __construct(?\DateTimeImmutable $at, ?int $tenths, ?float $ratio, ?string $version, ?string $datedBy, ?string $level, ?string $unmeasured)
+    private function __construct(string $kind, ?\DateTimeImmutable $at, ?int $tenths, ?float $ratio, ?string $version, ?string $datedBy, ?string $level, ?string $unmeasured)
     {
+        $this->kind = $kind;
         $this->at = $at;
         $this->tenths = $tenths;
         $this->ratio = $ratio;
@@ -36,16 +43,17 @@ final class AgeReading
      * @param ?string $version the release dated, null for a reading that dates no release (the last push, the installed release)
      * @param ?string $datedBy the monorepo parent whose tag dates it, null when the date is the package's own
      * @param ?string $level   {@see Signal::LEVEL_WARN} or {@see Signal::LEVEL_HIGH}, null below every threshold or where none applies
+     * @param string  $kind    one of {@see INSTALLED}, {@see RELEASE}, {@see PUSH}
      */
-    public static function measured(\DateTimeImmutable $at, int $tenths, float $ratio, ?string $version, ?string $datedBy, ?string $level): self
+    public static function measured(\DateTimeImmutable $at, int $tenths, float $ratio, ?string $version, ?string $datedBy, ?string $level, string $kind = self::RELEASE): self
     {
-        return new self($at, $tenths, $ratio, $version, $datedBy, $level, null);
+        return new self($kind, $at, $tenths, $ratio, $version, $datedBy, $level, null);
     }
 
     /** No reading, and the reason id why ({@see AgeMeasure}'s constants, or an activity reason). */
     public static function unmeasuredBecause(string $reason): self
     {
-        return new self(null, null, null, null, null, null, $reason);
+        return new self(self::RELEASE, null, null, null, null, null, null, $reason);
     }
 
     public function isMeasured(): bool
@@ -109,5 +117,23 @@ final class AgeReading
     public function unmeasured(): ?string
     {
         return $this->unmeasured;
+    }
+
+    /**
+     * @return array<string, float|string|null>
+     *
+     * @throws \LogicException on an unmeasured reading, which report-2 writes as null
+     */
+    public function jsonSerialize(): array
+    {
+        $at = $this->measuredAt()->format(\DATE_ATOM);
+        switch ($this->kind) {
+            case self::INSTALLED:
+                return ['at' => $at, 'years' => $this->years(), 'dated_by' => $this->datedBy];
+            case self::PUSH:
+                return ['at' => $at, 'years' => $this->years(), 'level' => $this->level];
+            default:
+                return ['version' => $this->version, 'at' => $at, 'years' => $this->years(), 'level' => $this->level, 'dated_by' => $this->datedBy];
+        }
     }
 }

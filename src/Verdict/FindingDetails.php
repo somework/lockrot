@@ -48,6 +48,7 @@ final class FindingDetails
     private array $ignored;
     private ?PackageFixes $fixes;
     private ?Check $releasesUnchecked = null;
+    private Age $age;
     private ?Moves $moves = null;
     private ActivityLookup $activity;
 
@@ -56,9 +57,10 @@ final class FindingDetails
      * @param array{requires: ?string, target_runs: ?bool, project_allows: ?bool} $installedPhp
      * @param list<IgnoredAdvisory>                                         $ignored
      */
-    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity)
+    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age)
     {
         $this->activity = $activity;
+        $this->age = $age;
         $this->metadataStatus = $metadataStatus;
         $this->metadataReason = $metadataReason;
         $this->metadataMessage = $metadataMessage;
@@ -76,7 +78,7 @@ final class FindingDetails
      * @param list<Signal>          $signals         the finding's signals: S10 tells a gap from a skip
      * @param ?string               $metadataFailure what the repository that lists the package answered instead of its metadata
      */
-    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure): self
+    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age): self
     {
         $package = $facts->package();
         $status = $facts->metadataStatus();
@@ -98,11 +100,17 @@ final class FindingDetails
             $reason,
             $ignored,
             $facts->fixes(),
-            $facts->activityLookup()
+            $facts->activityLookup(),
+            $age
         );
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
 
         return $details;
+    }
+
+    public function age(): Age
+    {
+        return $this->age;
     }
 
     public function withMoves(Moves $moves): self

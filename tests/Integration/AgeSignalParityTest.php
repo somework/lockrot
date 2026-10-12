@@ -30,8 +30,10 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\Golden;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder;
+use Lockrot\Verdict\Age;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
@@ -41,7 +43,7 @@ use PHPUnit\Framework\TestCase;
  * A signal quotes the reading it judged: S2, S4 and S8 take their date,
  * version, years, `dated_by` and level from {@see AgeMeasure}, so S2 fires exactly when the release
  * reading has a level, S4 exactly when the push reading has one, and S8 only when the branch
- * reading has one.
+ * reading has one. The written `finding.age` is the same readings.
  *
  * It covers nothing: its sweep over every fixture app pushes the lines it covers past the timeout
  * of a mutation run. The unit tests of each age rule kill those mutants.
@@ -149,6 +151,7 @@ final class AgeSignalParityTest extends TestCase
                     }
                     $what = basename($dir).' '.$finding->package();
                     self::assertParity($measure, $facts, $signals, $what);
+                    self::assertSame(JsonPath::decoded(Age::of($measure, $facts)), JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['age']), $what.': the written age is the readings');
                     foreach ($finding->signals() as $published) {
                         if (\in_array($published->id(), [Signal::S2, Signal::S4, Signal::S8], true)) {
                             $fired[basename($dir)][$finding->package()] = trim(($fired[basename($dir)][$finding->package()] ?? '').' '.$published->id());
