@@ -6,7 +6,7 @@
   "composer.lock"
  ],
  "recorded": "2026-10-12",
- "recorder": "GITHUB_TOKEN=$(gh auth token) bin/record-fixtures --gitlab-domain=git.drupalcode.org tests/fixtures/apps/drupal-site",
+ "recorder": "GITHUB_TOKEN=$(gh auth token) bin/record-fixtures --gitlab-domain=git.drupalcode.org tests/fixtures/sites/drupal-site",
  "recordings": {
   "http/p2": "the p2 answers of packages.drupal.org and of the packagist.org packages that tests/fixtures/http/p2 lacks",
   "http/github": "the GitHub answers that tests/fixtures/http/github lacks",

@@ -30,13 +30,13 @@ use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
- * One recorded Drupal site lock (tests/fixtures/apps/drupal-site, provenance.json names its commit):
+ * One recorded Drupal site lock (tests/fixtures/sites/drupal-site, provenance.json names its commit):
  * its git.drupalcode.org packages without and with Composer's `gitlab-domains` recipe.
  */
 final class DrupalSiteTest extends TestCase
 {
     private const FIXTURES = __DIR__.'/../fixtures/';
-    private const SITE = self::FIXTURES.'apps/drupal-site/';
+    private const SITE = self::FIXTURES.'sites/drupal-site/';
     private const DRUPALCODE = 'git.drupalcode.org';
     private const NOW = '2026-10-12T00:00:00+00:00';
 

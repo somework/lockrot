@@ -32,6 +32,9 @@ Packagist/GitHub data moves over time. The per-package results over these fixtur
 
 - `mini/` — a hand-written lock and its composer.json, shared by `LockFileTest`,
   `DependencyGraphTest`, `ProjectConfigTest` and `AnalyzerTest`.
+- `sites/drupal-site/` — one Drupal site lock for `DrupalSiteTest`, with its own recorded answers
+  in its `http/` directory. Its `provenance.json` names the commit and the recorder command. It is
+  not under `apps/`, because the tests that read every app serve only the shared `http/` answers.
 - `baseline/` — valid and invalid baseline documents for `BaselineFileTest`.
 - `sarif/` — the pinned SARIF 2.1.0 schema the SARIF output is validated against.
 - `phar/` — a minimal PHP archive for the self-update tests. See its own README.
