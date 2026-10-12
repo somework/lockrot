@@ -698,6 +698,14 @@ def _(d): d['findings'][m]['age']['push'] = None; d['findings'][m]['age']['push_
 def _(d): d['findings'][m]['age']['libyears'] = 1.5
 @case('c72-s8-fired-without-a-branch-level', 'composite', f)
 def _(d): d['findings'][m]['age']['branch_release']['level'] = None
+@case('c72-release-null-without-reason', 'composite', f + '.age')
+def _(d): d['findings'][m]['age']['release'] = None
+@case('c72-branch-release-reason-beside-reading', 'composite', f + '.age')
+def _(d): d['findings'][m]['age']['branch_release_unmeasured'] = 'no_branch_row'
+@case('c72-s4-without-a-push-level', 'composite', 'findings[%d]' % DEBUG)
+def _(d): d['findings'][DEBUG]['age']['push']['level'] = None
+@case('c72-s2-without-a-release-level', 'composite', 'findings[%d]' % DEBUG)
+def _(d): d['findings'][DEBUG]['age']['release']['level'] = None
 @case('c72-release-reason-beside-metadata-read', 'composite', f)
 def _(d): d['findings'][m]['age'].update(release=None, release_unmeasured='not_found')
 # C69 abandoned_ignored
