@@ -63,10 +63,10 @@ final class SecurityTotals implements \JsonSerializable
             }
             $kind = $standing->fixKind();
             foreach ($standing->counts() as $severity => $count) {
-                $severities[$severity] = ($severities[$severity] ?? 0) + $count;
+                $severities[$severity] += $count;
                 $advisories['counted'] += $count;
             }
-            $fixes[$kind] = ($fixes[$kind] ?? 0) + 1;
+            ++$fixes[$kind];
         }
 
         return new self(\count($checks) === 1 ? reset($checks) : ($checks === [] ? 'complete' : 'partial'), $packages, $advisories['counted'], $advisories['ignored'], $severities, $fixes, Report2Root::updateNow($findings));
