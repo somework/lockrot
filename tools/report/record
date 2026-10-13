@@ -1,0 +1,153 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+// Records the rendering contract bundle of lockrot (SPEC-0.14.md §7.11) into tests/fixtures/contract/.
+//
+//   tools/report/record          records the bundle twice, each time in a new process, and writes it
+//                                only when the two recordings are byte-identical
+//
+// The bundle is lockrot's own output for the cases of tests/fixtures/flags/cases.json, hydrated with
+// the clock of tests/fixtures/flags/provenance.json and no network. Before it writes, it compares
+// the strings that the PHP grammars own with the model's goldens and stops on a difference. Every
+// file carries the tool version 0.14.0 (Lockrot\Tests\Support\VersionMask).
+require __DIR__.'/../../vendor/autoload.php';
+
+use Lockrot\Analyzer\RunSettings;
+use Lockrot\Json\JsonWriter;
+use Lockrot\Tests\Support\Contract\ContractBundle;
+use Lockrot\Tests\Support\Contract\GoldenMismatch;
+use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\VersionMask;
+use Lockrot\Verdict\ScoreModel;
+
+const FIXTURES = __DIR__.'/../../tests/fixtures/';
+/** The directories and files of tests/fixtures/contract/ that a recording replaces whole. */
+const RECORDED = ['report-2', 'explain-2', 'baseline-2', 'sarif', 'gitlab', 'text', 'goldens', 'score-lines.json', 'en/years-phrases.json', 'en/commands.json', 'en/reason-words.json', 'en/gate-words.json', 'en/sort-words.json', 'en/halving-words.json', 'en/activity-words.json', 'en/age-words.json'];
+const INPUTS = ['flags/cases.json', 'flags/composite.json', 'flags/provenance.json'];
+
+ini_set('memory_limit', '2G');
+
+$argv = $_SERVER['argv'];
+if (($argv[1] ?? null) === '--emit') {
+    $dir = $argv[2] ?? '';
+    try {
+        $recorded = ContractBundle::record();
+    } catch (GoldenMismatch $mismatch) {
+        fwrite(STDERR, JsonWriter::encode($mismatch->mismatches(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n".$mismatch->getMessage()."\n");
+        exit(1);
+    }
+    foreach ($recorded['files'] as $path => $contents) {
+        write($dir.'/'.$path, $contents);
+    }
+    write($dir.'/.meta.json', (string) json_encode(['without_inputs' => $recorded['without_inputs'], 'goldens' => $recorded['goldens']]));
+    exit(0);
+}
+if (\count($argv) > 1) {
+    fwrite(STDERR, "usage: tools/report/record\n");
+    exit(2);
+}
+
+$runs = [];
+foreach ([1, 2] as $run) {
+    $dir = sys_get_temp_dir().'/lockrot-contract-'.bin2hex(random_bytes(8));
+    passthru(escapeshellarg(PHP_BINARY).' -d memory_limit=2G '.escapeshellarg(__FILE__).' --emit '.escapeshellarg($dir), $exit);
+    if ($exit !== 0) {
+        fwrite(STDERR, "record: recording $run failed\n");
+        exit(1);
+    }
+    $runs[] = $dir;
+}
+$first = tree($runs[0]);
+$second = tree($runs[1]);
+if ($first !== $second) {
+    $differ = array_keys(array_diff_assoc($first, $second) + array_diff_assoc($second, $first));
+    fwrite(STDERR, 'record: two recordings differ: '.implode(', ', \array_slice($differ, 0, 20))."\n");
+    exit(1);
+}
+$meta = json_decode($first['.meta.json'], true);
+unset($first['.meta.json']);
+array_map('removeTree', $runs);
+
+$contract = FIXTURES.'contract/';
+foreach (RECORDED as $path) {
+    removeTree($contract.$path);
+}
+foreach ($first as $path => $contents) {
+    write($contract.$path, $contents);
+}
+
+$inputs = [];
+foreach (INPUTS as $input) {
+    $inputs['tests/fixtures/'.$input] = hash_file('sha256', FIXTURES.$input);
+}
+$provenance = [
+    'recorded_by' => 'tools/report/record',
+    'clock' => JsonPath::stringAt(JsonPath::decodeFile(FIXTURES.'flags/provenance.json'), ['source', 'model_run_date']).'T00:00:00+00:00',
+    'inputs' => $inputs,
+    'version_mask' => ['paths' => VersionMask::PATHS, 'value' => VersionMask::VALUE],
+    'text_grammar' => RunSettings::TEXT_GRAMMAR,
+    'score_text_grammar' => ScoreModel::SCORE_TEXT_GRAMMAR,
+    'formats' => ['json', 'table', 'markdown', 'github', 'gitlab', 'sarif'],
+    'format_options' => ['--all'],
+    'cases_without_inputs' => $meta['without_inputs'],
+    'model_goldens' => $meta['goldens'],
+    'bundle_sha256' => 'sha256 of the lines "<sha256>  <path>", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json',
+];
+write($contract.'provenance.json', JsonWriter::encode($provenance, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n");
+write($contract.'bundle_sha256', ContractBundle::sha256(bundleFiles())."\n");
+fwrite(STDOUT, \sprintf("record: %d files, bundle_sha256 %s", \count($first), trim((string) file_get_contents($contract.'bundle_sha256')))."\n");
+
+/** @return array<string, string> the files that bundle_sha256 covers, by path below tests/fixtures/ */
+function bundleFiles(): array
+{
+    $files = [];
+    foreach (tree(FIXTURES.'contract') as $path => $contents) {
+        if (strpos($path, 'cache/') !== 0 && !\in_array($path, ['provenance.json', 'bundle_sha256'], true)) {
+            $files['contract/'.$path] = $contents;
+        }
+    }
+    foreach (glob(FIXTURES.'baselined/*/check/report.bundle.json') ?: [] as $bundle) {
+        $files[substr($bundle, \strlen(FIXTURES))] = (string) file_get_contents($bundle);
+    }
+
+    return $files;
+}
+
+/** @return array<string, string> every file below $root by its relative path, sorted */
+function tree(string $root): array
+{
+    $files = [];
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)) as $file) {
+        $files[substr($file->getPathname(), \strlen($root) + 1)] = (string) file_get_contents($file->getPathname());
+    }
+    ksort($files);
+
+    return $files;
+}
+
+function write(string $path, string $contents): void
+{
+    if (!is_dir(\dirname($path)) && !mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+        throw new RuntimeException('cannot create '.\dirname($path));
+    }
+    if (file_put_contents($path, $contents) === false) {
+        throw new RuntimeException('cannot write '.$path);
+    }
+}
+
+function removeTree(string $path): void
+{
+    if (is_file($path)) {
+        unlink($path);
+
+        return;
+    }
+    if (!is_dir($path)) {
+        return;
+    }
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+        $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+    }
+    rmdir($path);
+}

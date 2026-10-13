@@ -27,7 +27,7 @@ final class VersionMaskTest extends TestCase
      * explain and html documents read `Version::STRING`, so their second copy has the version set
      * as a newer release would write it.
      *
-     * @return iterable<string, array{string, string, list<string>}> the document, its copy, the paths that print the version
+     * @return iterable<string, array{string, string, non-empty-list<string>}> the document, its copy, the paths that print the version
      */
     public static function documents(): iterable
     {
@@ -53,7 +53,7 @@ final class VersionMaskTest extends TestCase
     }
 
     /**
-     * @param list<string> $path
+     * @param non-empty-list<string> $path
      *
      * @dataProvider documents
      */
@@ -85,18 +85,34 @@ final class VersionMaskTest extends TestCase
         return new Report([$finding], [], new \DateTimeImmutable('2026-10-14T00:00:00+00:00'), 1, 0);
     }
 
-    /** @param list<string> $path */
+    /** @param non-empty-list<string> $path */
     private static function rewritten(string $json, array $path, string $version = self::OTHER): string
     {
         $data = json_decode($json, true);
         self::assertIsArray($data);
-        $node = &$data;
-        foreach ($path as $key) {
-            $node = &$node[$key];
-        }
-        $node = $version;
-        unset($node);
 
-        return JsonWriter::encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION).(substr($json, -1) === "\n" ? "\n" : '');
+        return JsonWriter::encode(self::replaced($data, $path, $version), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION).(substr($json, -1) === "\n" ? "\n" : '');
+    }
+
+    /**
+     * @param array<mixed, mixed>    $data
+     * @param non-empty-list<string> $path
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function replaced(array $data, array $path, string $version): array
+    {
+        $key = $path[0];
+        $rest = \array_slice($path, 1);
+        if ($rest === []) {
+            $data[$key] = $version;
+
+            return $data;
+        }
+        $node = $data[$key] ?? null;
+        self::assertIsArray($node);
+        $data[$key] = self::replaced($node, $rest, $version);
+
+        return $data;
     }
 }
