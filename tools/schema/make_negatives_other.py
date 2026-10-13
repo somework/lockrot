@@ -103,7 +103,13 @@ def explain_negatives():
         'gates-hold-none': (f(lambda d: d['run'].__setitem__('gates', [{'value': 'none', 'kind': 'grade', 'threshold': None}])), 'run.gates'),
         'schema-url-missing': (f(lambda d: d.pop('$schema')), '$schema'),
         'finding-activity-missing': (f(lambda d: d['finding'].pop('activity')), 'finding.activity'),
+        'explain-1-activity-at-the-top.strict': (f(lambda d: d.__setitem__('activity', {'forge': 'GitHub', 'repository': 'symfony/monolog-bridge', 'archived': False,
+                                                                                       'pushed_at': None, 'fetched_at': None, 'from_cache': False})), 'activity'),
+        'run-without-advisory-lookup': (f(lambda d: d['run'].pop('advisory_lookup')), 'run.advisory_lookup'),
+        'finding-without-age': (f(lambda d: d['finding'].pop('age')), 'finding.age'),
+        'finding-without-unchecked-accepted': (f(lambda d: d['finding'].pop('unchecked_accepted')), 'finding.unchecked_accepted'),
         'branch-row-fixes-without-if-applied': (f(lambda d: d['metadata']['branches'][0]['fixes'].pop('if_applied')), 'metadata.branches[0].fixes'),
+        'branch-row-blocked-with-if-applied': (f(lambda d: d['metadata']['branches'][0]['fixes'].update(fix_kind='blocked')), 'metadata.branches[0].fixes'),
         'branch-row-fixing-nothing-held': (f(lambda d: d['metadata']['branches'][-1]['fixes'].update(
             held_by=[dict(source='root', package=None, version=None, link='require', constraint='^2.6', holder=None)])),
             'metadata.branches[%d].fixes' % (len(base['metadata']['branches']) - 1)),

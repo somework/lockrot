@@ -237,6 +237,8 @@ def _(d): d['findings'][m]['reach'] = 'transitive'
 def _(d): d['findings'][m]['next_step']['reason'] = 'package_quiet'  # reason only on no-move
 @case('relation-clears-all-false-with-nothing-left', 'composite', f + '.next_step.clears_all: Does not have a value in the enumeration [true]')
 def _(d): d['findings'][m]['next_step']['clears_all'] = False
+@case('relation-fails-without-a-value', 'composite', f + '.gate.by: There must be a minimum of 1 items')
+def _(d): d['findings'][m]['gate']['by'] = []
 @case('relation-builtin-entry-without-reason-id', 'composite', 'findings[%d].allowlist.reason_id: NULL value found, but a string is required' % POLY)
 def _(d): d['findings'][POLY]['allowlist']['reason_id'] = None  # a lockrot-authored reason has an id
 
@@ -307,6 +309,8 @@ def _(d): next(x for x in d['findings'][0]['score']['modifiers'] if x['reason'] 
 def _(d): d['findings'][0]['allowlist_reason'] = 'a single-file minifier, finished'  # a partial entry: report-1's key stays null
 @case('a2-accepted-flag-without-an-entry', 'composite', f)
 def _(d): next(x for x in d['findings'][m]['flags'] if x['id'] == 'old-promise')['role'] = 'accepted'
+@case('a2-exempt-by-baseline-without-an-entry', 'composite', f)
+def _(d): d['findings'][m]['gate'].update(fails=False, by=[], exempt_by='baseline')
 @case('a2-gate-basis-without-an-entry', 'composite', f)
 def _(d):
     t = d['findings'][m]['score']

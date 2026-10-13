@@ -9390,7 +9390,7 @@
                     ]
                 },
                 {
-                    "description": "S4 fired only on a read activity.",
+                    "description": "S4 fired only on a read activity, with a push reading at a level.",
                     "anyOf": [
                         {
                             "properties": {
@@ -9417,6 +9417,17 @@
                                             "enum": [
                                                 "read"
                                             ]
+                                        }
+                                    }
+                                },
+                                "age": {
+                                    "properties": {
+                                        "push": {
+                                            "properties": {
+                                                "level": {
+                                                    "type": "string"
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -9828,43 +9839,6 @@
                                                 }
                                             }
                                         ]
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "description": "S4 fired only beside a push reading at a level.",
-                    "anyOf": [
-                        {
-                            "properties": {
-                                "signals": {
-                                    "items": {
-                                        "not": {
-                                            "properties": {
-                                                "id": {
-                                                    "enum": [
-                                                        "S4"
-                                                    ]
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "properties": {
-                                "age": {
-                                    "properties": {
-                                        "push": {
-                                            "properties": {
-                                                "level": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
                                     }
                                 }
                             }
@@ -14684,7 +14658,6 @@
                 "metadata_unavailable",
                 "monorepo_parent_unavailable",
                 "advisory_ignore_unreadable",
-                "advisories_disabled_by_policy",
                 "advisories_unavailable",
                 "advisories_not_checked",
                 "repository_activity_not_checked",
@@ -14692,15 +14665,16 @@
                 "repository_activity_rate_limited",
                 "repository_activity_unreachable",
                 "repository_activity_not_found",
-                "repository_activity_host_not_supported",
                 "not_from_composer_repository",
                 "verdict_rules_changed",
                 "baseline_target_differs",
                 "baseline_fix_model_differs",
                 "ignore_does_not_cover_advisories",
+                "advisories_disabled_by_policy",
                 "abandoned_markings_ignored",
                 "abandoned_not_audited_by_composer",
-                "abandoned_ignore_unreadable"
+                "abandoned_ignore_unreadable",
+                "repository_activity_host_not_supported"
             ]
         },
         "noteDetail": {
@@ -14793,18 +14767,6 @@
                     "properties": {
                         "code": {
                             "enum": [
-                                "advisories_disabled_by_policy"
-                            ]
-                        },
-                        "data": {
-                            "$ref": "#/definitions/noteAdvisoriesDisabledByPolicy"
-                        }
-                    }
-                },
-                {
-                    "properties": {
-                        "code": {
-                            "enum": [
                                 "advisories_unavailable"
                             ]
                         },
@@ -14889,18 +14851,6 @@
                     "properties": {
                         "code": {
                             "enum": [
-                                "repository_activity_host_not_supported"
-                            ]
-                        },
-                        "data": {
-                            "$ref": "#/definitions/noteRepositoryActivityHostNotSupported"
-                        }
-                    }
-                },
-                {
-                    "properties": {
-                        "code": {
-                            "enum": [
                                 "not_from_composer_repository"
                             ]
                         },
@@ -14961,6 +14911,18 @@
                     "properties": {
                         "code": {
                             "enum": [
+                                "advisories_disabled_by_policy"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteAdvisoriesDisabledByPolicy"
+                        }
+                    }
+                },
+                {
+                    "properties": {
+                        "code": {
+                            "enum": [
                                 "abandoned_markings_ignored"
                             ]
                         },
@@ -14994,6 +14956,18 @@
                     }
                 },
                 {
+                    "properties": {
+                        "code": {
+                            "enum": [
+                                "repository_activity_host_not_supported"
+                            ]
+                        },
+                        "data": {
+                            "$ref": "#/definitions/noteRepositoryActivityHostNotSupported"
+                        }
+                    }
+                },
+                {
                     "description": "A note whose code this schema does not list, from a later release or not from lockrot: its data is any object.",
                     "not": {
                         "properties": {
@@ -15003,7 +14977,6 @@
                                     "metadata_unavailable",
                                     "monorepo_parent_unavailable",
                                     "advisory_ignore_unreadable",
-                                    "advisories_disabled_by_policy",
                                     "advisories_unavailable",
                                     "advisories_not_checked",
                                     "repository_activity_not_checked",
@@ -15011,15 +14984,16 @@
                                     "repository_activity_rate_limited",
                                     "repository_activity_unreachable",
                                     "repository_activity_not_found",
-                                    "repository_activity_host_not_supported",
                                     "not_from_composer_repository",
                                     "verdict_rules_changed",
                                     "baseline_target_differs",
                                     "baseline_fix_model_differs",
                                     "ignore_does_not_cover_advisories",
+                                    "advisories_disabled_by_policy",
                                     "abandoned_markings_ignored",
                                     "abandoned_not_audited_by_composer",
-                                    "abandoned_ignore_unreadable"
+                                    "abandoned_ignore_unreadable",
+                                    "repository_activity_host_not_supported"
                                 ]
                             }
                         }

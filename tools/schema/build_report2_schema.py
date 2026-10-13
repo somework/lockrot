@@ -1065,7 +1065,7 @@ defs['rotDepth'] = obj(("Where the graded findings sit below composer.json (W12)
     'development': d('Graded findings in packages-dev (`dev` true). 0 without --dev.', INT0),
     'by_depth': arr('One row per depth from 0 to `max_depth`, zero rows included, ascending. Empty when `max_depth` is null.', obj('One depth.', {
         'depth': d('The depth.', INT0), 'flagged': d('Graded findings at this depth.', INT0)})),
-    'max_depth': nul('The largest `depth` of a graded finding. Null when no graded finding has a depth.', dict(INT0)),
+    'max_depth': ref('depth'),
     'deepest': arr(("The graded findings at `max_depth`, by package name (bytewise), each with its own chain. Empty when `max_depth` is null or 0."), obj('One deepest finding.', {
         'package': ref('packageName'), 'chain': arr('The `chain` of the finding.', ref('packageName'), minItems=2)})),
 })
@@ -1343,11 +1343,11 @@ defs['rootFlagVulnerable'] = obj("`vulnerable`'s root counts (§7.6): it has no 
     'accepted': d('Always null: advisories are accepted in Composer\'s audit policy, never by the allowlist (§6.5).', {'type': 'null'}),
     'by_verdict': obj('`carrying` split by grade.', {g: COUNT(f'Carrying findings graded `{g}`.') for g in GRADES}),
 })
-NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 'advisory_ignore_unreadable', 'advisories_disabled_by_policy',
-              'advisories_unavailable', 'advisories_not_checked', 'repository_activity_not_checked', 'repository_activity_anonymous_cap',
-              'repository_activity_rate_limited', 'repository_activity_unreachable', 'repository_activity_not_found', 'repository_activity_host_not_supported',
-              'not_from_composer_repository', 'verdict_rules_changed', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories',
-              'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable']
+NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 'advisory_ignore_unreadable', 'advisories_unavailable', 'advisories_not_checked',
+              'repository_activity_not_checked', 'repository_activity_anonymous_cap', 'repository_activity_rate_limited', 'repository_activity_unreachable',
+              'repository_activity_not_found', 'not_from_composer_repository', 'verdict_rules_changed', 'baseline_target_differs',
+              'baseline_fix_model_differs', 'ignore_does_not_cover_advisories', 'advisories_disabled_by_policy',
+              'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable', 'repository_activity_host_not_supported']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
     if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
@@ -1740,7 +1740,7 @@ def add_relations_activity(defs):
     relate(defs['finding'], ['An activity that was not read has its one `repository_activity` entry in `checks_missing` or `checks_skipped`. A read one has none (C73).',
                              'A read whose answer did not carry the archived flag (`activity.archived` null) has the `repository_archived` entry in `checks_skipped`, and only then.',
                              'S3 fired exactly when `activity.archived` is true.',
-                             'S4 fired only on a read activity.',
+                             'S4 fired only on a read activity, with a push reading at a level (C72: the signal quotes its reading).',
                              'A package installed from a Composer repository carries no S10 and no accepted entry with the reason `not_from_composer_repository`.',
                              'A package installed from path, artifact or package origins carries no S10 and no accepted entry with the reason `not_from_composer_repository`.'],
            [P(activity=P(status=E('read')), checks_missing=NONE(P(check=E('repository_activity'))), checks_skipped=NONE(P(check=E('repository_activity')))),
@@ -1750,7 +1750,7 @@ def add_relations_activity(defs):
             P(activity=P(archived={'type': 'boolean'}), checks_skipped=NONE(P(check=E('repository_archived')))),
             P(activity=P(status=NOT('read')), checks_skipped=NONE(P(check=E('repository_archived'))))],
            [P(signals=has('S3'), activity=P(archived=E(True))), P(signals=lacks('S3'), activity=P(archived=NOT(True)))],
-           [P(signals=lacks('S4')), P(activity=P(status=E('read')))],
+           [P(signals=lacks('S4')), P(activity=P(status=E('read')), age=P(push=P(level={'type': 'string'})))],
            [P(from_composer_repository=E(False)), P(checks_missing=NONE(nfcr), unchecked_accepted=NONE(nfcr))],
            [P(origin=P(kind=NOT('path', 'artifact', 'package'))), P(checks_missing=NONE(nfcr), unchecked_accepted=NONE(nfcr))])
     relate(defs['finding'], '`unchecked_accepted` is empty exactly when no `checks_skipped[]` entry has the reason `accepted_by_config`.',
@@ -1780,7 +1780,6 @@ def add_relations_measurements(defs):
                              'A package that composer.json names in `require` is direct.',
                              ('An ignored marking is not a signal. With `abandoned_ignored` set, `signals[]` holds no S1, `replacement` is null, and `abandoned` '
                               'carries only the `archived` reason (C69).'),
-                             'S4 fired only beside a push reading at a level (C72: the signal quotes its reading).',
                              'S2 fired only beside a release reading at a level.',
                              'S8 fired only beside a branch_release reading at a level.',
                              'Metadata that lockrot did not read gives its status as the release reasons of `age`. Read metadata never gives one of those ids (C77).',
@@ -1793,7 +1792,6 @@ def add_relations_measurements(defs):
            [P(named_in=NONE(E('require'))), P(reach=E('direct'))],
            [P(abandoned_ignored=NULL), P(abandoned_ignored=OBJ, replacement=NULL, replacement_url=NULL, signals=lacks('S1'),
                                          flags={'items': {'anyOf': [P(id=NOT('abandoned')), P(degree=P(reasons={'items': E('archived')}))]}})],
-           [P(signals=lacks('S4')), P(age=P(push=P(level=STR)))],
            [P(signals=lacks('S2')), P(age=P(release=P(level=STR)))],
            [P(signals=lacks('S8')), P(age=P(branch_release=P(level=STR)))],
            [P(metadata=P(status=E('read')), age=P(release_unmeasured=NOT(*meta), branch_release_unmeasured=NOT(*meta)))]
