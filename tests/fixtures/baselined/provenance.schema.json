@@ -1,0 +1,227 @@
+{
+ "$schema": "http://json-schema.org/draft-04/schema#",
+ "title": "lockrot test fixture: the provenance of a baselined scenario",
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "scenario",
+  "project",
+  "recorded_by",
+  "before",
+  "after",
+  "clocks",
+  "options",
+  "runs",
+  "as_of",
+  "explain",
+  "version_mask",
+  "server_mask",
+  "files"
+ ],
+ "properties": {
+  "scenario": {
+   "type": "string",
+   "pattern": "^[a-z0-9.-]+$"
+  },
+  "project": {
+   "type": "string",
+   "pattern": "^[^/]+/[^/]+$"
+  },
+  "recorded_by": {
+   "type": "string"
+  },
+  "before": {
+   "$ref": "#/definitions/side"
+  },
+  "after": {
+   "$ref": "#/definitions/side"
+  },
+  "clocks": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "t0",
+    "t1"
+   ],
+   "properties": {
+    "t0": {
+     "type": "string"
+    },
+    "t1": {
+     "type": "string"
+    }
+   }
+  },
+  "options": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "runs": {
+   "type": "array",
+   "minItems": 4,
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "step",
+     "argv",
+     "exit"
+    ],
+    "properties": {
+     "step": {
+      "enum": [
+       "generate",
+       "check",
+       "regenerate",
+       "recheck"
+      ]
+     },
+     "argv": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "exit": {
+      "enum": [
+       0,
+       1
+      ]
+     }
+    }
+   }
+  },
+  "as_of": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "removed",
+    "entries_removed",
+    "later_than_t0"
+   ],
+   "properties": {
+    "removed": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "package",
+       "id",
+       "reported_at"
+      ],
+      "properties": {
+       "package": {
+        "type": "string"
+       },
+       "id": {
+        "type": "string"
+       },
+       "reported_at": {
+        "type": "string"
+       }
+      }
+     }
+    },
+    "entries_removed": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "later_than_t0": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "package",
+       "reading",
+       "at"
+      ],
+      "properties": {
+       "package": {
+        "type": "string"
+       },
+       "reading": {
+        "type": "string"
+       },
+       "at": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  },
+  "explain": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "version_mask": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "paths",
+    "value"
+   ],
+   "properties": {
+    "paths": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "value": {
+     "type": "string"
+    }
+   }
+  },
+  "server_mask": {
+   "type": "string"
+  },
+  "files": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string",
+    "pattern": "^[0-9a-f]{64}$"
+   }
+  }
+ },
+ "definitions": {
+  "side": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "ref",
+    "ref_kind",
+    "lock_sha256",
+    "manifest_sha256"
+   ],
+   "properties": {
+    "ref": {
+     "type": "string"
+    },
+    "ref_kind": {
+     "enum": [
+      "commit",
+      "tag",
+      "fixture"
+     ]
+    },
+    "lock_sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    },
+    "manifest_sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    }
+   }
+  }
+ }
+}

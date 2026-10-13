@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Baseline\BaselineFile;
+use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Tests\Support\Contract\BaselinedFloors;
 use Lockrot\Tests\Support\Contract\BaselinedScenario;
@@ -65,6 +66,10 @@ final class BaselinedProjectTest extends TestCase
             self::assertSame((string) @file_get_contents($dir.$path), $contents, $scenario.'/'.$path.': re-record with tools/report/record --baselined '.$scenario);
         }
         self::assertSame([], BaselinedFloors::missed($scenario, $files));
+        $provenance = json_decode($files['provenance.json']);
+        $validator = new Validator();
+        $validator->validate($provenance, json_decode((string) file_get_contents(BaselinedScenario::FIXTURES.'baselined/provenance.schema.json')));
+        self::assertTrue($validator->isValid(), (string) json_encode($validator->getErrors()));
         $check = JsonPath::decoded(json_decode($files['check/report.json'], true));
         self::assertRootCountsAreTheFindingsCounts($check);
         self::assertRecordedValuesAreSet($check);

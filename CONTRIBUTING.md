@@ -129,6 +129,10 @@ The canonical list of what lockrot reads, writes and contacts is
 - Never hand-edit a recorded lock or response: take a new snapshot of the lock from its project,
   and re-record the responses. When a re-recording moves an acceptance assertion, compare that
   package's signals and verdict before you change the expected value.
+- `tools/report/record` records the rendering contract bundle into `tests/fixtures/contract/`, and
+  `tools/report/record --all-baselined` records the real baselined projects
+  (`tests/fixtures/baselined/README.md`). Both run twice and write only identical results. Review the
+  diff of a re-recording like a snapshot: lockrot-report pins `contract/bundle_sha256`.
 - `bin/record-demo` records the README demo, `docs/assets/lockrot-demo.gif`, from a real run with
   asciinema and agg. Its header lists what to export. Re-record it when the table output changes
   shape.

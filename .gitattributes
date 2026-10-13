@@ -45,3 +45,11 @@
 /tools/schema/ts/known-map.json linguist-generated
 /tools/schema/ts/probes.generated.ts linguist-generated
 /tests/fixtures/bundle.generated.ts linguist-generated
+# tools/report/record writes these: the contract bundle and the real baselined projects.
+/tests/fixtures/contract/** linguist-generated
+/tests/fixtures/baselined/*/t0/** linguist-generated
+/tests/fixtures/baselined/*/check/** linguist-generated
+/tests/fixtures/baselined/*/regenerate/** linguist-generated
+/tests/fixtures/baselined/*/http/** linguist-generated
+/tests/fixtures/baselined/*/lockrot-baseline.json linguist-generated
+/tests/fixtures/baselined/*/provenance.json linguist-generated
