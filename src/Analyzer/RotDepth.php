@@ -44,8 +44,10 @@ final class RotDepth implements \JsonSerializable
             }
         }
         $max = $block->maxDepth();
-        $block->deepest = array_values(array_filter($findings, static fn (Finding $finding): bool => $finding->isGraded() && $max !== null && $max > 0 && $finding->depth() === $max));
-        usort($block->deepest, static fn (Finding $a, Finding $b): int => strcmp($a->package(), $b->package()));
+        // At depth 0 the graded findings are the direct ones, and a chain of one names no path.
+        $deepest = $max === null || $max === 0 ? [] : array_filter($findings, static fn (Finding $finding): bool => $finding->isGraded() && $finding->depth() === $max);
+        usort($deepest, static fn (Finding $a, Finding $b): int => strcmp($a->package(), $b->package()));
+        $block->deepest = $deepest;
 
         return $block;
     }
@@ -54,10 +56,12 @@ final class RotDepth implements \JsonSerializable
     {
         ++$this->flagged;
         ++$this->byReach[$finding->reach()];
-        $this->development += $finding->isDev() ? 1 : 0;
+        if ($finding->isDev()) {
+            ++$this->development;
+        }
         $depth = $finding->depth();
         if ($depth === null) {
-            ++$this->unmeasured[(string) $finding->depthUnmeasured()];
+            ++$this->unmeasured[$finding->isComposerJsonRead() ? Finding::UNREACHED : Finding::NO_COMPOSER_JSON];
         } else {
             ++$this->measured;
             $this->byDepth[$depth] = ($this->byDepth[$depth] ?? 0) + 1;
@@ -77,7 +81,7 @@ final class RotDepth implements \JsonSerializable
         return $this->flagged;
     }
 
-    public function maxDepth(): ?int
+    private function maxDepth(): ?int
     {
         return $this->byDepth === [] ? null : max(array_keys($this->byDepth));
     }

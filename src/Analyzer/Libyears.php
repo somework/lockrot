@@ -162,7 +162,9 @@ final class Libyears
                 throw new \LogicException(\sprintf('%s has neither libyears nor a reason it has none.', $finding->package()));
             }
             ++$measured;
-            $atLeast += $finding->isLibyearsAtLeast() ? 1 : 0;
+            if ($finding->isLibyearsAtLeast()) {
+                ++$atLeast;
+            }
             $total += $behind;
             if ($finding->isDirect()) {
                 $direct += $behind;

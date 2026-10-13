@@ -131,6 +131,13 @@ final class RotDepthTest extends TestCase
         self::assertSame([['package' => 'B/deep', 'chain' => ['r/two', 'y/y', 'B/deep']], ['package' => 'a/deep', 'chain' => ['r/one', 'z/z', 'a/deep']], ['package' => 'b/deep', 'chain' => ['r/one', 'x/x', 'b/deep']]], $block['deepest']);
     }
 
+    public function testUnreachedFindingsAloneHaveNoDeepest(): void
+    {
+        $block = self::block([self::finding('lost/one', [], []), self::finding('lost/two', [], [], true)]);
+
+        self::assertSame([null, [], [], 1], [$block['max_depth'], $block['deepest'], $block['by_depth'], $block['development']]);
+    }
+
     public function testOnlyGradedFindingsCount(): void
     {
         $block = self::block([

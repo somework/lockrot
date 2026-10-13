@@ -118,7 +118,7 @@ final class AgeMeasure
         if ($facts->package()->isBranchSnapshot() && $aliasLine === null) {
             return AgeReading::unmeasuredBecause(self::BRANCH_SNAPSHOT);
         }
-        $branch = $aliasLine ?? ReleaseBranch::of($version);
+        $branch = $facts->package()->isBranchSnapshot() ? $aliasLine : ReleaseBranch::of($version);
         $own = $branch === null ? null : ($metadata->latestStableByBranch()[$branch] ?? null);
         if ($own === null) {
             return AgeReading::unmeasuredBecause(self::NO_BRANCH_ROW);

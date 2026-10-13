@@ -355,7 +355,7 @@ final class RunNote
         }
         $packages = [];
         foreach ($patterns as $package => $matched) {
-            $packages[] = ['package' => (string) $package, 'patterns' => $matched];
+            $packages[] = ['package' => $package, 'patterns' => $matched];
         }
         $count = \count($packages);
         $text = \sprintf(

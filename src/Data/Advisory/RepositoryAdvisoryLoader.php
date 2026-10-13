@@ -104,10 +104,10 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         $repositories = [];
         // Below Composer 2.4 no repository is advisory-capable. A Composer repository still names
         // the feed that a newer Composer asks, and naming it starts no I/O.
-        $tooOld = $reason === AdvisoryCoverage::COMPOSER_TOO_OLD;
+        $capable = interface_exists(AdvisoryProviderInterface::class) ? AdvisoryProviderInterface::class : ComposerRepository::class;
         foreach ($this->repositories as $repository) {
             $inner = $repository instanceof FilterRepository ? $repository->getRepository() : $repository;
-            if (self::isAdvisoryCapable($repository) || ($tooOld && $inner instanceof ComposerRepository)) {
+            if ($inner instanceof $capable) {
                 $repositories[] = AdvisoryRepository::of($repository->getRepoName(), AdvisoryCoverage::NOT_ASKED, $reason);
             }
         }
