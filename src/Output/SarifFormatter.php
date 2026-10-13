@@ -96,7 +96,7 @@ final class SarifFormatter implements FormatterInterface
         $rules = [];
         $ruleIndexes = [];
         $results = [];
-        foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
+        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
             $verdict = $finding->verdict();
             if (!isset($ruleIndexes[$verdict])) {
                 $ruleIndexes[$verdict] = \count($rules);

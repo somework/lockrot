@@ -43,8 +43,20 @@ final class GitlabFormatter implements FormatterInterface
         $baseline = $report->baseline();
         $gate = $this->context->gateOf($report);
         $issues = [];
-        foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
+        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
             $issues[] = $this->issue($finding, $index->lineOf($finding->package()), $baseline, $gate);
+        }
+        $gap = $this->context->advisoriesNotCheckedLevel($report);
+        if ($gap !== null) {
+            $issues[] = [
+                'type' => 'issue',
+                'check_name' => 'lockrot/advisories-not-checked',
+                'description' => 'advisories not checked: the gate could not read the advisories of every package',
+                'categories' => self::CATEGORIES,
+                'severity' => $gap === FormatContext::LEVEL_ERROR ? 'major' : 'minor',
+                'fingerprint' => hash('sha256', 'lockrot|advisories-not-checked'),
+                'location' => ['path' => $this->context->lockName(), 'lines' => ['begin' => self::FALLBACK_LINE]],
+            ];
         }
 
         return self::encode($issues);

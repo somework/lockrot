@@ -35,8 +35,12 @@ final class GithubFormatter implements FormatterInterface
         $baseline = $report->baseline();
         $gate = $this->context->gateOf($report);
         $lines = [];
-        foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
+        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
             $lines[] = $this->annotation($finding, $index->lineOf($finding->package()), $baseline, $gate);
+        }
+        $gap = $this->context->advisoriesNotCheckedLevel($report);
+        if ($gap !== null) {
+            $lines[] = '::'.$gap.' title=lockrot::'.self::escapeData('advisories not checked: the gate could not read the advisories of every package');
         }
         foreach ($this->notes($report) as $note) {
             $lines[] = '::notice title=lockrot::'.self::escapeData($note);

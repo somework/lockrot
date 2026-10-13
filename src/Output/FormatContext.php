@@ -11,6 +11,7 @@ use Lockrot\Config\GateStanding;
 use Lockrot\Filesystem\Path;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\SecurityStanding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 
@@ -108,6 +109,54 @@ final class FormatContext
     public function terminalWidth(): int
     {
         return $this->terminalWidth;
+    }
+
+    /**
+     * The findings that get a record: the flagged ones, or all under `--all`. With `unchecked` active,
+     * a finding that carries S10 and no counted fact gets one too, so the gate's failure has a record.
+     *
+     * @return list<Finding>
+     */
+    public function recordFindings(Report $report, bool $showAll): array
+    {
+        if ($showAll) {
+            return $report->findings();
+        }
+        $flagged = $report->flagged();
+        if (!$this->failOn->has(FailOn::KIND_UNCHECKED)) {
+            return $flagged;
+        }
+        $out = [];
+        foreach ($report->findings() as $finding) {
+            if (\in_array($finding, $flagged, true) || $finding->checksMissing() !== []) {
+                $out[] = $finding;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * The level of the run-level `advisories not checked` record, null when every lookup ran. It is
+     * `error` only when `unchecked` is active and a finding carries S10 for its advisories: the gate
+     * then fails on that gap. A skip or an accepted gap is a `warning` (SPEC §6.2).
+     */
+    public function advisoriesNotCheckedLevel(Report $report): ?string
+    {
+        $gap = false;
+        foreach ($report->findings() as $finding) {
+            if ($finding->securityStanding()->status() !== SecurityStanding::UNCHECKED) {
+                continue;
+            }
+            $gap = true;
+            foreach ($finding->checksMissing() as $check) {
+                if ($check->check() === 'advisories' && $this->failOn->has(FailOn::KIND_UNCHECKED)) {
+                    return self::LEVEL_ERROR;
+                }
+            }
+        }
+
+        return $gap ? self::LEVEL_WARNING : null;
     }
 
     /**

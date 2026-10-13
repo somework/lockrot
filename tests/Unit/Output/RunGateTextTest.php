@@ -104,6 +104,6 @@ final class RunGateTextTest extends TestCase
         $finding = (new FindingBuilder())->withPackage($package)->withSignals([new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([new Check('advisories', $reason, ['S9'])]))])->withChain([$package])->build();
         $activity = FindingBuilder::activityOf($finding);
 
-        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'not_run', $reason, [], null, $activity, FindingBuilder::ageOf($finding, 'read', $activity)));
+        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'not_run', $reason, [], null, $activity, FindingBuilder::ageOf($finding, 'read', $activity), null, null));
     }
 }
