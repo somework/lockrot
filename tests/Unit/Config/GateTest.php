@@ -17,7 +17,6 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -111,8 +110,8 @@ final class GateTest extends TestCase
 
     public function testAdvisoriesThatNothingCheckedAreNotAppliedForAGradeValue(): void
     {
-        $offline = self::unchecked('a/offline', 'offline', true);
-        $skipped = self::unchecked('a/skipped', 'not_from_composer_repository', false);
+        $offline = FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true);
+        $skipped = FindingBuilder::advisoriesUnchecked('a/skipped', 'not_from_composer_repository', false);
         $report = self::report($offline, $skipped);
 
         self::assertSame([['check' => 'advisories', 'packages' => 1, 'reason' => 'not_from_composer_repository'], ['check' => 'advisories', 'packages' => 1, 'reason' => 'offline']], JsonPath::decoded(self::gate($report, 'high')->notAppliedEntries()));
@@ -155,12 +154,4 @@ final class GateTest extends TestCase
         return new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([new Check($check, $reason, $blocks)]));
     }
 
-    /** A finding whose advisory lookup did not run, with S10 for it unless the reason is a skip. */
-    private static function unchecked(string $package, string $reason, bool $inS10): Finding
-    {
-        $finding = (new FindingBuilder())->withPackage($package)->withSignals($inS10 ? [self::s10('advisories', $reason, ['S9'])] : [])->withChain([$package])->build();
-        $activity = FindingBuilder::activityOf($finding);
-
-        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'not_run', $reason, [], null, $activity, FindingBuilder::ageOf($finding, 'read', $activity), null, null));
-    }
 }

@@ -401,4 +401,39 @@ final class GithubFormatterTest extends TestCase
 
         self::assertSame('pulled in by: evil/root injected 1', $lines[1]);
     }
+
+    /** SPEC §6.2: one run-level annotation, `error` only when `unchecked` fails on the advisories gap. */
+    public function testTheRunLevelAdvisoriesAnnotationIsAnErrorOnlyWhenUncheckedFailsOnTheGap(): void
+    {
+        $line = '::%s title=lockrot::advisories not checked: the gate could not read the advisories of every package';
+
+        self::assertStringContainsString(\sprintf($line, 'error'), $this->formatter('unchecked', null)->format(self::uncheckedReport()));
+        self::assertStringContainsString(\sprintf($line, 'warning'), $this->formatter('high', null)->format(self::uncheckedReport()));
+        self::assertStringContainsString(\sprintf($line, 'warning'), $this->formatter('unchecked', null)->format(self::skippedReport()));
+        self::assertStringNotContainsString('advisories not checked:', $this->formatter('unchecked', null)->format($this->report()));
+    }
+
+    /** SPEC §7.3: a finding with S10 and no counted fact gets its own annotation while `unchecked` is active. */
+    public function testAFindingWithS10AndNoCountedFactIsAnnotatedWhileUncheckedIsActive(): void
+    {
+        self::assertStringContainsString('::acme/offline 1.0.0', $this->formatter('unchecked', null)->format(self::uncheckedReport()));
+        self::assertStringStartsWith('::error ', $this->formatter('unchecked', null)->format(self::uncheckedReport()));
+        self::assertStringNotContainsString('::acme/offline', $this->formatter('high', null)->format(self::uncheckedReport()));
+    }
+
+    /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
+    private static function uncheckedReport(): Report
+    {
+        $at = new \DateTimeImmutable(self::AT);
+
+        return new Report([
+            FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true),
+            FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false),
+        ], [], $at, 2, 0);
+    }
+
+    private static function skippedReport(): Report
+    {
+        return new Report([FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false)], [], new \DateTimeImmutable(self::AT), 1, 0);
+    }
 }

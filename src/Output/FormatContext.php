@@ -137,6 +137,18 @@ final class FormatContext
     }
 
     /**
+     * Whether the finding's record is its own `lockrot/unchecked` one: `unchecked` is active, and the
+     * finding carries a missing check and no counted fact (SPEC §7.10, §7.11).
+     */
+    public function isUncheckedRecord(Finding $finding): bool
+    {
+        return $this->failOn->has(FailOn::KIND_UNCHECKED)
+            && $finding->flags()->countedMaintenance() === []
+            && $finding->flags()->advisories() === []
+            && $finding->checksMissing() !== [];
+    }
+
+    /**
      * The level of the run-level `advisories not checked` record, null when every lookup ran. It is
      * `error` only when `unchecked` is active and a finding carries S10 for its advisories: the gate
      * then fails on that gap. A skip or an accepted gap is a `warning` (SPEC §6.2).

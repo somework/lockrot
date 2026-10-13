@@ -630,4 +630,60 @@ final class SarifFormatterTest extends TestCase
         self::assertStringStartsNotWith('file:////', $uri);
         self::assertStringEndsWith('/lockrot-sarif-c:/drive-'.$suffix.'/', $uri);
     }
+
+    /**
+     * SPEC §6.2: one run-level `advisories not checked` result. It is `error` only when `unchecked`
+     * is active and a finding carries S10 for its advisories.
+     */
+    public function testTheRunLevelAdvisoriesResultIsAnErrorOnlyWhenUncheckedFailsOnTheGap(): void
+    {
+        $failing = $this->runLevel($this->formatter('unchecked', null)->format(self::uncheckedReport()));
+        $passing = $this->runLevel($this->formatter('high', null)->format(self::uncheckedReport()));
+        $skipped = $this->runLevel($this->formatter('unchecked', null)->format(self::skippedReport()));
+
+        self::assertSame(['lockrot/advisories-not-checked', 'error'], [$failing['ruleId'] ?? null, $failing['level'] ?? null]);
+        self::assertSame('warning', $passing['level'] ?? null);
+        self::assertSame('warning', $skipped['level'] ?? null, 'a skip is a gap that the gate does not fail on');
+        self::assertSame([], $this->runLevel($this->formatter('unchecked', null)->format($this->report())), 'every lookup ran');
+        $this->assertValidSarif($this->formatter('unchecked', null)->format(self::uncheckedReport()));
+    }
+
+    /** SPEC §7.11: a finding with S10 and no counted fact gets its own `lockrot/unchecked` result while `unchecked` is active. */
+    public function testAFindingWithS10AndNoCountedFactGetsAnUncheckedResult(): void
+    {
+        $results = JsonPath::arrayAt($this->singleRun($this->formatter('unchecked', null)->format(self::uncheckedReport())), ['results']);
+        $byRule = array_column($results, 'level', 'ruleId');
+
+        self::assertSame('error', $byRule['lockrot/unchecked'] ?? null);
+        self::assertSame('acme/offline', JsonPath::stringAt($results, [0, 'properties', 'package']));
+        self::assertArrayNotHasKey('lockrot/unchecked', array_column(JsonPath::arrayAt($this->singleRun($this->formatter('high', null)->format(self::uncheckedReport())), ['results']), 'level', 'ruleId'));
+    }
+
+    /** @return array<mixed, mixed> the run-level result, or [] when the run has none */
+    private function runLevel(string $sarif): array
+    {
+        foreach (JsonPath::arrayAt($this->singleRun($sarif), ['results']) as $result) {
+            if (\is_array($result) && ($result['ruleId'] ?? null) === 'lockrot/advisories-not-checked') {
+                return $result;
+            }
+        }
+
+        return [];
+    }
+
+    /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
+    private static function uncheckedReport(): Report
+    {
+        $at = new \DateTimeImmutable(self::AT);
+
+        return new Report([
+            FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true),
+            FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false),
+        ], [], $at, 2, 0);
+    }
+
+    private static function skippedReport(): Report
+    {
+        return new Report([FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false)], [], new \DateTimeImmutable(self::AT), 1, 0);
+    }
 }

@@ -13,6 +13,8 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Clock;
 use Lockrot\Config\Gate;
+use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -26,7 +28,10 @@ use Lockrot\Json\Schemas;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\FormatContext;
+use Lockrot\Output\GithubFormatter;
+use Lockrot\Output\GitlabFormatter;
 use Lockrot\Output\JsonFormatter;
+use Lockrot\Output\SarifFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\BaselineEntries;
@@ -117,6 +122,35 @@ final class GateAgreementTest extends TestCase
         }
     }
 
+    /**
+     * SPEC §6.2: an `--offline` run at `--fail-on=unchecked` fails on the advisories gap, and each
+     * format writes the run-level record at `error` beside the failing findings' records.
+     *
+     * @runInSeparateProcess
+     */
+    #[RunInSeparateProcess]
+    public function testAnOfflineRunFailsUncheckedWithARunLevelErrorRecord(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);
+        $server->start();
+        try {
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW));
+            $analysed = $this->analyse($loader, 'mini', new RepositoryAdvisoryLoader($server->repositories(), true));
+        } finally {
+            $server->stop();
+        }
+        $failOn = FailOn::parse('unchecked');
+        $report = $analysed->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, $failOn, RunSettings::SOURCE_OPTION, new Thresholds()));
+        $this->recorded($report, FormatContext::create(null, 'unchecked'), 'mini offline fail-on=unchecked');
+
+        self::assertSame([], $this->mismatches);
+        self::assertNotNull($report->gate());
+        self::assertTrue($report->gate()->fails());
+        foreach (['github', 'gitlab', 'sarif'] as $format) {
+            self::assertArrayHasKey($format.' run-level error', $this->seen);
+        }
+    }
+
     private function agree(Report $analysed, string $dir): void
     {
         foreach ([false, true] as $networkFailures) {
@@ -131,6 +165,9 @@ final class GateAgreementTest extends TestCase
                             $what = \sprintf('%s fail-on=%s strict=%d network_failures=%d baseline=%d %s', $dir, $value, $strict, $networkFailures, $baseline !== null, $mode);
                             $withRun = $compared->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, $failOn, RunSettings::SOURCE_OPTION, new Thresholds(), null, $strict, $mode));
                             $this->holds($withRun->toArray(), $compared, $levels, $failOn, $strict, $mode, $what);
+                            if (!$strict && $mode === Gate::MODE_CHECK) {
+                                $this->recorded($withRun, $levels, $what);
+                            }
                             // One document per lock and mode through both schemas: the fields' shape
                             // does not depend on the threshold, and validating every document is slow.
                             if ($value === 'medium' && $strict && $networkFailures && ($baseline !== null) === ($mode === Gate::MODE_CHECK)) {
@@ -205,6 +242,78 @@ final class GateAgreementTest extends TestCase
     }
 
     /**
+     * I15b in the records that github, gitlab and sarif write: a finding has an `error` record
+     * exactly when it fails the gate, and a run-level `error` record only beside a failing gate.
+     * `--strict-network` is excluded: a failed lookup fails the run with no finding to record.
+     */
+    private function recorded(Report $report, FormatContext $context, string $what): void
+    {
+        $gate = $report->gate();
+        self::assertNotNull($gate);
+        $failing = [];
+        foreach ($report->findings() as $finding) {
+            $standing = $gate->standingOf($finding->package());
+            if ($standing !== null && $standing->fails()) {
+                $failing[] = $finding->package();
+            }
+        }
+        sort($failing);
+        foreach (self::errorRecords($report, $context) as $format => [$packages, $runLevel]) {
+            sort($packages);
+            $this->same($failing, array_values(array_unique($packages)), $what.' '.$format.': the error records name the failing findings');
+            $this->same(false, $runLevel && !$gate->fails(), $what.' '.$format.': a run-level error record fails the gate');
+            $this->seen[$format.' run-level '.($runLevel ? 'error' : 'none or warning')] = true;
+        }
+    }
+
+    /**
+     * The packages that each format gives an `error` record, and whether its run-level record is an error.
+     *
+     * @return array<string, array{list<string>, bool}>
+     */
+    private static function errorRecords(Report $report, FormatContext $context): array
+    {
+        $github = [[], false];
+        foreach (explode("\n", (new GithubFormatter($context))->format($report)) as $line) {
+            if (strncmp($line, '::error ', 8) !== 0) {
+                continue;
+            }
+            $message = (string) substr($line, (int) strpos($line, '::', 2) + 2);
+            if (strncmp($message, 'advisories not checked:', 23) === 0) {
+                $github[1] = true;
+            } else {
+                $github[0][] = explode(' ', $message)[0];
+            }
+        }
+        $gitlab = [[], false];
+        foreach (JsonPath::decoded(json_decode((new GitlabFormatter($context))->format($report), true)) as $issue) {
+            if (!\is_array($issue) || $issue['severity'] !== 'major') {
+                continue;
+            }
+            if ($issue['check_name'] === 'lockrot/advisories-not-checked') {
+                $gitlab[1] = true;
+            } else {
+                $gitlab[0][] = explode(' ', JsonPath::stringAt($issue, ['description']))[0];
+            }
+        }
+        $sarif = [[], false];
+        $document = json_decode((new SarifFormatter($context))->format($report), true);
+        self::assertIsArray($document);
+        foreach (JsonPath::arrayAt($document, ['runs', 0, 'results']) as $result) {
+            if (!\is_array($result) || $result['level'] !== FormatContext::LEVEL_ERROR) {
+                continue;
+            }
+            if ($result['ruleId'] === 'lockrot/advisories-not-checked') {
+                $sarif[1] = true;
+            } else {
+                $sarif[0][] = JsonPath::stringAt($result, ['properties', 'package']);
+            }
+        }
+
+        return ['github' => $github, 'gitlab' => $gitlab, 'sarif' => $sarif];
+    }
+
+    /**
      * One comparison of the sweep, kept out of PHPUnit's count: PHPUnit 10 (PHP 8.1) records an event
      * per assertion and ships them all back from the child process, which millions of them crash.
      *
@@ -257,7 +366,7 @@ final class GateAgreementTest extends TestCase
         return new Report($report->findings(), $notes, $report->generatedAt(), $report->packagesChecked(), $report->notFromComposerRepository(), null, $report->activityCacheOldestAt(), $report->includesDev());
     }
 
-    private function analyse(MetadataLoaderInterface $loader, string $dir): Report
+    private function analyse(MetadataLoaderInterface $loader, string $dir, ?AdvisoryLoaderInterface $advisories = null): Report
     {
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
@@ -270,7 +379,8 @@ final class GateAgreementTest extends TestCase
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
             $clock,
-            true
+            true,
+            $advisories
         );
         $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
 

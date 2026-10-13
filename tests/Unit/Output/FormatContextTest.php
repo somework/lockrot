@@ -162,4 +162,27 @@ final class FormatContextTest extends TestCase
             FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, 3)->terminalWidth()
         );
     }
+
+    /** SPEC §6.2: the run-level record's level, from the gap and the active values. */
+    public function testTheAdvisoriesRecordLevelFollowsTheGapAndTheActiveValues(): void
+    {
+        $offline = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
+        $skipped = $this->report(FindingBuilder::advisoriesUnchecked('a/vcs', 'not_from_composer_repository', false));
+
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($offline));
+        self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'high')->advisoriesNotCheckedLevel($offline));
+        self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($skipped));
+        self::assertNull(FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($this->report($this->finding('a/fine', Verdict::OK))));
+    }
+
+    /** I15b: the record set holds every flagged finding, every failing one, and with `unchecked` active every one with a missing check. */
+    public function testTheRecordSetHoldsEveryFindingThatTheGateCanFail(): void
+    {
+        $report = $this->report($this->finding('a/stale', Verdict::STALE), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true), $this->finding('a/fine', Verdict::OK));
+        $names = static fn (array $findings): array => array_map(static fn (Finding $f): string => $f->package(), $findings);
+
+        self::assertSame(['a/stale', 'a/offline'], $names(FormatContext::create(null, 'unchecked')->recordFindings($report, false)));
+        self::assertSame(['a/stale'], $names(FormatContext::create(null, 'high')->recordFindings($report, false)));
+        self::assertSame($names($report->findings()), $names(FormatContext::create(null, 'high')->recordFindings($report, true)), 'under --all, every finding');
+    }
 }

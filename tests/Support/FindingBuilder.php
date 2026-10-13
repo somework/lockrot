@@ -23,6 +23,7 @@ use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\NoPushData;
 use Lockrot\Signal\Data\NoReleaseData;
+use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
@@ -300,6 +301,19 @@ final class FindingBuilder
             $s8 === null ? AgeReading::unmeasuredBecause($metadataReason ?? ($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::NO_BRANCH_ROW)) : $measured($s8->branchLastRelease(), $s8->years(), $s8->branchLastVersion(), $s8->datedBy(), $levels[Signal::S8], AgeReading::RELEASE),
             $s4 === null ? AgeReading::unmeasuredBecause($activity->reason() ?? AgeMeasure::UNDATED) : $measured($s4->lastPush(), $s4->years(), null, null, $levels[Signal::S4], AgeReading::PUSH)
         );
+    }
+
+    /**
+     * A finding whose advisory lookup did not run for $reason, with S10 for it unless the reason
+     * is a skip ($inS10 false).
+     */
+    public static function advisoriesUnchecked(string $package, string $reason, bool $inS10): Finding
+    {
+        $signals = $inS10 ? [new Signal(Signal::LEVEL_INFO, 'security advisories not checked', new NotCheckedData([new Check('advisories', $reason, [Signal::S9])]))] : [];
+        $finding = (new self())->withPackage($package)->withSignals($signals)->withChain([$package])->build();
+        $activity = self::activityOf($finding);
+
+        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'not_run', $reason, [], null, $activity, self::ageOf($finding, 'read', $activity), null, null));
     }
 
     /** No reading taken, for details whose test reads no age. */

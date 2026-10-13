@@ -65,13 +65,15 @@ final class GitlabFormatter implements FormatterInterface
     /** @return array<string, mixed> */
     private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline, ?Gate $gate): array
     {
+        $check = $this->context->isUncheckedRecord($finding) ? 'unchecked' : $finding->verdict();
+
         return [
             'type' => 'issue',
-            'check_name' => 'lockrot/'.$finding->verdict(),
+            'check_name' => 'lockrot/'.$check,
             'description' => $this->description($finding),
             'categories' => self::CATEGORIES,
             'severity' => $this->severity($finding, $baseline, $gate),
-            'fingerprint' => hash('sha256', 'lockrot|'.$finding->package().'|'.$finding->verdict()),
+            'fingerprint' => hash('sha256', 'lockrot|'.$finding->package().'|'.$check),
             'location' => [
                 'path' => $this->context->lockName(),
                 'lines' => ['begin' => $line ?? self::FALLBACK_LINE],

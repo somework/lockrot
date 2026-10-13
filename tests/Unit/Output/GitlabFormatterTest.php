@@ -398,4 +398,42 @@ final class GitlabFormatterTest extends TestCase
         self::assertStringContainsString('"acme/abandoned 1.0.0', $json);
         self::assertStringNotContainsString('\/', $json);
     }
+
+    /** SPEC §6.2: one run-level issue, `major` only when `unchecked` fails on the advisories gap. */
+    public function testTheRunLevelAdvisoriesIssueIsMajorOnlyWhenUncheckedFailsOnTheGap(): void
+    {
+        $severity = fn (string $failOn, Report $report): ?string => array_column($this->decode($this->formatter($failOn, null)->format($report)), 'severity', 'check_name')['lockrot/advisories-not-checked'] ?? null;
+
+        self::assertSame('major', $severity('unchecked', self::uncheckedReport()));
+        self::assertSame('minor', $severity('high', self::uncheckedReport()));
+        self::assertSame('minor', $severity('unchecked', self::skippedReport()));
+        self::assertNull($severity('unchecked', $this->report()));
+    }
+
+    /** SPEC §7.10: a finding with S10 and no counted fact gets one `lockrot/unchecked` issue while `unchecked` is active. */
+    public function testAFindingWithS10AndNoCountedFactGetsAnUncheckedIssue(): void
+    {
+        $issues = $this->decode($this->formatter('unchecked', null)->format(self::uncheckedReport()));
+
+        self::assertSame('lockrot/unchecked', $issues[0]['check_name'] ?? null);
+        self::assertSame('major', $issues[0]['severity'] ?? null);
+        self::assertSame(hash('sha256', 'lockrot|acme/offline|unchecked'), $issues[0]['fingerprint'] ?? null);
+        self::assertNotContains('lockrot/unchecked', array_column($this->decode($this->formatter('high', null)->format(self::uncheckedReport())), 'check_name'));
+    }
+
+    /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
+    private static function uncheckedReport(): Report
+    {
+        $at = new \DateTimeImmutable(self::AT);
+
+        return new Report([
+            FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true),
+            FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false),
+        ], [], $at, 2, 0);
+    }
+
+    private static function skippedReport(): Report
+    {
+        return new Report([FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false)], [], new \DateTimeImmutable(self::AT), 1, 0);
+    }
 }
