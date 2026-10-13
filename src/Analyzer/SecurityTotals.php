@@ -63,7 +63,7 @@ final class SecurityTotals implements \JsonSerializable
             }
             $kind = $standing->fixKind();
             foreach ($standing->counts() as $severity => $count) {
-                $severities[$severity] += $count;
+                $severities[$severity] = ($severities[$severity] ?? 0) + $count;
                 $advisories['counted'] += $count;
             }
             ++$fixes[$kind];
