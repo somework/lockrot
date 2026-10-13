@@ -430,7 +430,7 @@ final class ExplanationTest extends TestCase
         $two = new BranchFixes('2.x', false, 0, 1, null, '2.1.0', ['PKSA-a']);
         $one = new BranchFixes('1.x', true, 0, 1, null, '1.5.0', []);
         $finding = $this->finding('1.4.0', Verdict::LEFT_BEHIND);
-        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$two, $one], null, null, null), FindingBuilder::activityOf($finding));
+        $details = new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], new PackageFixes([], [$two, $one], null, null, null), FindingBuilder::activityOf($finding), FindingBuilder::unmeasuredAge(), null, null);
         $finding = $finding->withDetails($details);
         $metadata = F::metadata([['3.0.0', '2026-01-01T00:00:00+00:00'], ['2.1.0', '2024-01-01T00:00:00+00:00'], ['1.5.0', '2021-06-01T00:00:00+00:00'], ['1.4.0', '2020-01-01T00:00:00+00:00']]);
 
@@ -455,7 +455,7 @@ final class ExplanationTest extends TestCase
         self::assertSame(1, JsonPath::intAt($array, ['finding', 'rank']), "the report's row of the finding");
         $keys = array_keys(JsonPath::arrayAt($array, ['run']));
         sort($keys);
-        self::assertSame(['fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
+        self::assertSame(['advisory_lookup', 'fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
         self::assertSame(['verdict', 'priority', 'basis'], array_keys(JsonPath::arrayAt($array, ['legacy'])));
     }
 }

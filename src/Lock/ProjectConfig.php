@@ -29,6 +29,7 @@ final class ProjectConfig
     private ConfiguredRepositories $repositories;
     /** @var array<string, array<string, string>> section => lowercased package name => constraint */
     private array $constraints = [];
+    private bool $read = true;
 
     /**
      * @param list<string> $requires
@@ -46,9 +47,13 @@ final class ProjectConfig
         $this->repositories = $repositories ?? ConfiguredRepositories::none();
     }
 
+    /** No composer.json: a lock-only run. {@see isRead()} is false. */
     public static function empty(): self
     {
-        return new self([], [], [], null);
+        $config = new self([], [], [], null);
+        $config->read = false;
+
+        return $config;
     }
 
     /**
@@ -166,6 +171,11 @@ final class ProjectConfig
         }
 
         return $names;
+    }
+
+    public function isRead(): bool
+    {
+        return $this->read;
     }
 
     /** @return list<string> */

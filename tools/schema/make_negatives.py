@@ -681,6 +681,103 @@ def _(d):
 @case('o12-registry-package-with-s10', 'composite', f)
 def _(d): d['findings'][m]['checks_missing'].append(dict(check='repository_activity', reason='not_from_composer_repository', blocks=['S3', 'S4']))
 
+@case('c72-age-reading-and-reason', 'composite', f + '.age')
+def _(d): d['findings'][m]['age']['installed_unmeasured'] = 'undated'
+@case('c72-age-null-without-reason', 'composite', f + '.age')
+def _(d): d['findings'][m]['age']['installed'] = None
+@case('c72-age-level-info', 'composite', f + '.age.branch_release')
+def _(d): d['findings'][m]['age']['branch_release']['level'] = 'info'
+@case('c72-age-years-negative', 'composite', f + '.age.installed')
+def _(d): d['findings'][m]['age']['installed']['years'] = -0.1
+@case('c72-age-push-missing', 'composite', f + '.age')
+def _(d): del d['findings'][m]['age']['push']
+@case('c72-age-reading-and-reason-both-null', 'composite', f + '.age')
+def _(d): d['findings'][m]['age']['push'] = None; d['findings'][m]['age']['push_unmeasured'] = None
+@case('strict-c72-age-fifth-reading', 'composite', f + '.age', strict=True)
+def _(d): d['findings'][m]['age']['libyears'] = 1.5
+@case('c72-s8-fired-without-a-branch-level', 'composite', f)
+def _(d): d['findings'][m]['age']['branch_release']['level'] = None
+@case('c72-release-null-without-reason', 'composite', f + '.age')
+def _(d): d['findings'][m]['age']['release'] = None
+@case('c72-branch-release-reason-beside-reading', 'composite', f + '.age')
+def _(d): d['findings'][m]['age']['branch_release_unmeasured'] = 'no_branch_row'
+@case('c72-s4-without-a-push-level', 'composite', 'findings[%d]' % DEBUG)
+def _(d): d['findings'][DEBUG]['age']['push']['level'] = None
+@case('c72-s2-without-a-release-level', 'composite', 'findings[%d]' % DEBUG)
+def _(d): d['findings'][DEBUG]['age']['release']['level'] = None
+@case('c72-release-reason-beside-metadata-read', 'composite', f)
+def _(d): d['findings'][m]['age'].update(release=None, release_unmeasured='not_found')
+@case('c69-ignored-beside-s1', 'ignored-marking-archived-dagger', 'findings[0]')
+def _(d):
+    d['findings'][0]['signals'].insert(0, dict(id='S1', level='high', summary='marked abandoned by its repository, replacement: symfony/error-handler',
+                                              data=dict(marked_by='repository', replacement='symfony/error-handler', replacement_url=None)))
+@case('c69-ignored-with-the-marked-reason', 'ignored-marking-archived-dagger', 'findings[0]')
+def _(d): d['findings'][0]['flags'][0]['degree']['reasons'] = ['marked', 'archived']
+@case('c69-ignored-with-a-replacement', 'ignored-marking-archived-dagger', 'findings[0]')
+def _(d): d['findings'][0]['replacement'] = 'symfony/error-handler'
+@case('c69-rules-empty', 'ignored-marking-archived-dagger', 'findings[0].abandoned_ignored')
+def _(d): d['findings'][0]['abandoned_ignored']['rules'] = []
+@case('c69-rule-without-constraints', 'ignored-marking-archived-dagger', 'findings[0].abandoned_ignored')
+def _(d): del d['findings'][0]['abandoned_ignored']['rules'][0]['constraints']
+@case('c69-note-count-zero', 'ignored-marking-stale-dagger', 'note_details[0]')
+def _(d): d['note_details'][0]['data']['count'] = 0
+@case('c75-answered-records-null', 'composite', f + '.security')
+def _(d): d['findings'][m]['security']['feeds'][0]['records'] = None
+@case('c75-failed-without-reason', 'composite', f + '.security')
+def _(d): d['findings'][m]['security']['feeds'][0].update(answer='failed', records=None, reason=None)
+@case('c75-not-asked-records-zero', 'scope-registries-dagger', 'findings[0].security')
+def _(d): d['findings'][0]['security']['feeds'][0]['records'] = 0
+@case('c75-complete-with-a-failed-feed', 'composite', f + '.security')
+def _(d): d['findings'][m]['security']['feeds'][0].update(answer='failed', records=None, reason='lookup_failed')
+@case('c75-records-null-beside-an-answer', 'composite', f + '.security')
+def _(d): d['findings'][m]['security']['records'] = None
+@case('c75-scope-underscore', 'composite', 'run.advisory_lookup.scope')
+def _(d): d['run']['advisory_lookup']['scope'] = 'composer_repositories'
+@case('c75-no-feed-with-records', 'no-feed-dagger', 'run.advisory_lookup.repositories[0]')
+def _(d): d['run']['advisory_lookup']['repositories'][0]['records'] = 3
+@case('c75-run-without-advisory-lookup', 'composite', 'run.advisory_lookup')
+def _(d): del d['run']['advisory_lookup']
+@case('c75-note-without-advisories-asked', 'scope-registries-dagger', 'note_details[0]')
+def _(d): del d['note_details'][0]['data']['advisories_asked']
+@case('c77-libyears-beside-a-reason', 'composite', f)
+def _(d): d['findings'][m]['libyears_unmeasured'] = 'branch_snapshot'
+@case('c77-libyears-null-without-a-reason', 'composite', f)
+def _(d): d['findings'][m]['libyears'] = None
+@case('c77-at-least-on-null', 'host-unsupported', 'findings[0]')
+def _(d): d['findings'][0].update(libyears=None, libyears_unmeasured='branch_snapshot', libyears_at_least=True)
+@case('c77-metadata-read-with-not-found', 'composite', f)
+def _(d): d['findings'][m].update(libyears=None, libyears_unmeasured='not_found')
+@case('c77-metadata-unavailable-with-branch-snapshot', 'scope-registries-dagger', 'findings[0]')
+def _(d): d['findings'][0]['libyears_unmeasured'] = 'branch_snapshot'
+@case('c77-root-at-least-count-missing', 'composite', 'libyears')
+def _(d): del d['libyears']['at_least_count']
+@case('w12-depth-0-transitive', 'composite', 'findings[%d]' % POLY)
+def _(d): d['findings'][POLY]['depth'] = 0
+@case('w12-depth-2-direct', 'composite', f)
+def _(d): d['findings'][m]['depth'] = 2
+@case('w12-depth-null-transitive', 'composite', 'findings[%d]' % POLY)
+def _(d): d['findings'][POLY].update(depth=None, depth_unmeasured='unreached')
+@case('w12-named-in-empty-direct', 'composite', f)
+def _(d): d['findings'][m]['named_in'] = []
+@case('w12-named-in-duplicate', 'composite', f + '.named_in')
+def _(d): d['findings'][m]['named_in'] = ['require', 'require']
+@case('w12-named-in-require-transitive', 'composite', 'findings[%d]' % POLY)
+def _(d): d['findings'][POLY]['named_in'] = ['require']
+@case('w12-named-in-dev', 'composite', f + '.named_in')
+def _(d): d['findings'][m]['named_in'] = ['dev']
+@case('w12-depth-unmeasured-beside-a-depth', 'composite', f)
+def _(d): d['findings'][m]['depth_unmeasured'] = 'unreached'
+@case('w12-transitive-chain-of-one', 'composite', 'findings[%d]' % POLY)
+def _(d): d['findings'][POLY]['chain'] = d['findings'][POLY]['chain'][-1:]
+@case('w12-rot-depth-by-reach-without-unreached', 'composite', 'rot_depth.by_reach')
+def _(d): del d['rot_depth']['by_reach']['unreached']
+@case('w12-rot-depth-negative-depth', 'composite', 'rot_depth.by_depth[0].depth')
+def _(d): d['rot_depth']['by_depth'][0]['depth'] = -1
+@case('w12-rot-depth-deepest-chain-of-one', 'composite', 'rot_depth.deepest[0].chain')
+def _(d): d['rot_depth']['deepest'][0]['chain'] = d['rot_depth']['deepest'][0]['chain'][-1:]
+@case('w12-rot-depth-null', 'composite', 'rot_depth')
+def _(d): d['rot_depth'] = None
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for old in glob.glob(os.path.join(OUT, '*.json')):

@@ -10,6 +10,7 @@ use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
@@ -274,7 +275,7 @@ final class FindingTest extends TestCase
     public function testTheLibyearsAreWrittenToTwoDecimals(): void
     {
         self::assertSame(1.24, (new FindingBuilder())->withLibyears(LibyearsMeasurement::of(1.236))->build()->libyearsRounded());
-        self::assertNull((new FindingBuilder())->withLibyears(LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE))->build()->libyearsRounded());
+        self::assertNull((new FindingBuilder())->withLibyears(LibyearsMeasurement::unmeasured(Libyears::UNDATED_RELEASES))->build()->libyearsRounded());
     }
 
     public function testAFindingWithoutFlagsHasNoFlagSet(): void
@@ -469,12 +470,71 @@ final class FindingTest extends TestCase
         $array = $finding->toArray();
         self::assertSame(
             ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'activity', 'allowlist',
-                'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'direct', 'dev', 'reach', 'chain', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears'],
+                'abandoned_ignored', 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'libyears_at_least', 'direct', 'dev', 'reach', 'chain', 'depth', 'depth_unmeasured',
+                'named_in', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears', 'age'],
             array_keys($array)
         );
         self::assertSame('low', $array['priority'], 'the alias of the grade');
         self::assertFalse($array['direct']);
         self::assertTrue($array['dev']);
+    }
+
+    /** @return iterable<string, array{list<string>, bool, ?int, ?string}> the chain, whether the run read composer.json, the depth and its reason */
+    public static function depths(): iterable
+    {
+        yield 'direct' => [['vendor/pkg'], true, 0, null];
+        yield 'two hops below a requirement' => [['vendor/root', 'vendor/mid', 'vendor/pkg'], true, 2, null];
+        yield 'unreached' => [[], true, null, 'unreached'];
+        yield 'a run that read no composer.json' => [[], false, null, 'no_composer_json'];
+    }
+
+    /**
+     * @param list<string> $chain
+     *
+     * @dataProvider depths
+     */
+    #[DataProvider('depths')]
+    public function testTheDepthIsTheChainLessOneOrItsReason(array $chain, bool $composerJsonRead, ?int $depth, ?string $reason): void
+    {
+        $finding = (new FindingBuilder())->withChain($chain)->withNamedIn([])->withComposerJsonRead($composerJsonRead)->build();
+
+        self::assertSame([$depth, $reason], [$finding->depth(), $finding->depthUnmeasured()]);
+        self::assertSame([$depth, $reason], [$finding->toArray()['depth'], $finding->toArray()['depth_unmeasured']]);
+    }
+
+    /** The depth is context: two transitive findings that differ only in depth score the same. */
+    public function testTheDepthChangesNoScore(): void
+    {
+        $signals = [new Signal(Signal::LEVEL_HIGH, 'branch 1.x last released', SignalDataStub::of(Signal::S8, [])), new Signal(Signal::LEVEL_WARN, 'php promise', SignalDataStub::of(Signal::S5, []))];
+        $shallow = (new FindingBuilder())->withSignals($signals)->withChain(['vendor/root', 'vendor/pkg'])->build();
+        $deep = (new FindingBuilder())->withSignals($signals)->withChain(['vendor/root', 'vendor/a', 'vendor/b', 'vendor/c', 'vendor/pkg'])->build();
+
+        self::assertSame([1, 4], [$shallow->depth(), $deep->depth()]);
+        self::assertSame([$shallow->score()->total(), $shallow->grade()], [$deep->score()->total(), $deep->grade()]);
+    }
+
+    /** @return iterable<string, array{list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV>}> */
+    public static function sections(): iterable
+    {
+        yield 'require only' => [['require']];
+        yield 'require-dev only' => [['require-dev']];
+        yield 'both' => [['require', 'require-dev']];
+        yield 'none' => [[]];
+    }
+
+    /**
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $sections
+     *
+     * @dataProvider sections
+     */
+    #[DataProvider('sections')]
+    public function testNamedInIsTheSectionsTheAnalyzerFound(array $sections): void
+    {
+        $finding = (new FindingBuilder())->withNamedIn($sections)->build();
+        $finding->withComposerJson(false, [ProjectConfig::REQUIRE_DEV]);
+
+        self::assertSame($sections, $finding->namedIn());
+        self::assertSame($sections, $finding->toArray()['named_in']);
     }
 
     public function testAFindingIsFromAComposerRepositoryUnlessItSaysOtherwise(): void
@@ -530,8 +590,9 @@ final class FindingTest extends TestCase
         $bare = (new FindingBuilder())->build();
 
         self::assertNull($bare->libyears());
-        self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->libyearsUnmeasured());
-        self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $bare->toArray()['libyears_unmeasured']);
+        self::assertSame(Libyears::UNDATED_RELEASES, $bare->libyearsUnmeasured());
+        self::assertSame(Libyears::UNDATED_RELEASES, $bare->toArray()['libyears_unmeasured']);
+        self::assertFalse($bare->toArray()['libyears_at_least']);
     }
 
     /** Nothing was asked about a package outside every Composer repository, the first reason it goes unmeasured. */
@@ -547,7 +608,7 @@ final class FindingTest extends TestCase
     public static function measurementsAgainstTheFlag(): iterable
     {
         yield 'not asked, on a finding from a repository' => [LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), true];
-        yield 'another reason, on a finding from no repository' => [LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE), false];
+        yield 'another reason, on a finding from no repository' => [LibyearsMeasurement::unmeasured(Libyears::UNDATED_RELEASES), false];
         yield 'measured, on a finding from no repository' => [LibyearsMeasurement::of(1.0), false];
     }
 
@@ -874,7 +935,7 @@ final class FindingTest extends TestCase
     public function testAJudgementTheDetailsContradictIsRefused(string $status, bool $maintenanceJudged, bool $detailsFirst): void
     {
         $finding = (new FindingBuilder())->withoutFlags()->build();
-        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
+        $details = new FindingDetails($status, null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
         $flags = FlagSet::fromSignals([], null, []);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -957,7 +1018,7 @@ final class FindingTest extends TestCase
         $activity = ['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S9', 'S3', 'S4']];
         $signals = $withS10 ? [new Signal(Signal::LEVEL_INFO, 'activity not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [$activity], 'blocks' => ['S9', 'S3', 'S4']]))] : [];
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
-            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
+            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503', FindingBuilder::unmeasuredAge()));
 
         $written = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['signals']);
         $s10 = JsonPath::arrayAt($written, [0]);
@@ -1004,7 +1065,7 @@ final class FindingTest extends TestCase
     {
         $finding = (new FindingBuilder())->build();
         $before = $finding->details();
-        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread());
+        $details = new FindingDetails('read', null, null, [], ['requires' => '>=8.1', 'target_runs' => true, 'project_allows' => null], null, 'complete', null, [], null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null);
 
         $copy = $finding->withDetails($details);
 
@@ -1162,7 +1223,7 @@ final class FindingTest extends TestCase
         self::assertNotNull($package);
         $facts = FactsBuilder::looked(new PackageFacts($package, null, null, [new Advisory('PKSA-1', null, null, null, 'high', null)], null, null, null, true));
         $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withSignals($signals)->build()
-            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503'));
+            ->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, 'HTTP 503', FindingBuilder::unmeasuredAge()));
 
         $written = JsonPath::arrayAt(JsonPath::decoded($finding->toArray()), ['signals']);
 

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Composer\Config;
+use Composer\Policy\AbandonedPolicyConfig;
+use Composer\Util\Platform;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Analyzer;
@@ -12,6 +15,8 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
+use Lockrot\Data\Abandoned\AbandonedPolicyReader;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
@@ -37,6 +42,7 @@ use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -151,7 +157,7 @@ final class AnalyzerLookupTest extends TestCase
 
     private static function listed(): AbandonedIgnore
     {
-        return AbandonedIgnore::of(AbandonedIgnoreMatch::BY_POLICY, [['pattern' => 'vendor/pkg', 'reason' => 'migration planned', 'constraints' => []]]);
+        return AbandonedIgnore::of(AbandonedIgnoreMatch::BY_POLICY, [new AbandonedIgnoreRule('vendor/pkg', 'migration planned', [])]);
     }
 
     /** An entry that accepts `stale` only cannot hide an archived repository: the lookup runs. */
@@ -192,6 +198,124 @@ final class AnalyzerLookupTest extends TestCase
         self::assertNotContains(Signal::S1, self::ids($finding));
         self::assertContains(Signal::S3, self::ids($finding), 'the archived repository still counts');
         self::assertSame(Verdict::ABANDONED, $finding->verdict());
+    }
+
+    /** The finding keeps the marking that the list removed, and one run note names the package. */
+    public function testAnIgnoredMarkingIsWrittenOnTheFindingAndInANote(): void
+    {
+        $metadata = ['vendor/pkg' => self::metadata(true, '2026-08-01T00:00:00+00:00')];
+
+        $report = self::analyzeOne(self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::ARCHIVED]], new \ArrayObject()), false, new Allowlist([]), self::listed()));
+        $written = JsonPath::decoded(self::finding($report)->toArray());
+
+        self::assertSame(
+            ['by' => 'policy.abandoned', 'rules' => [['pattern' => 'vendor/pkg', 'reason' => 'migration planned', 'constraints' => []]], 'marking' => ['marked_by' => 'repository', 'replacement' => null, 'replacement_url' => null]],
+            $written['abandoned_ignored']
+        );
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::ABANDONED_MARKINGS_IGNORED));
+        self::assertCount(1, $notes);
+        self::assertSame(['by' => 'policy.abandoned', 'count' => 1, 'packages' => [['package' => 'vendor/pkg', 'patterns' => ['vendor/pkg']]]], $notes[0]->data());
+    }
+
+    /** The note names the packages in report order: the graded one first, whatever the lock order. */
+    public function testTheIgnoredMarkingsNoteFollowsTheReportOrder(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'a/new', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'z/old', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $metadata = ['a/new' => self::metadata(true, '2026-08-01T00:00:00+00:00'), 'z/old' => self::metadata(true, '2015-01-01T00:00:00+00:00')];
+        $everything = AbandonedIgnore::of(AbandonedIgnoreMatch::BY_POLICY, [new AbandonedIgnoreRule('*', null, [])]);
+
+        $report = self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::LIVE]], new \ArrayObject()), true, new Allowlist([]), $everything)->analyze($lock, ProjectConfig::empty(), false);
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::ABANDONED_MARKINGS_IGNORED));
+
+        self::assertCount(1, $notes);
+        self::assertSame(['z/old', 'a/new'], array_column(JsonPath::arrayAt($notes[0]->data(), ['packages']), 'package'));
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, bool, ?string}> the config, whether the package is marked, and the note that the run writes */
+    public static function abandonedSettings(): iterable
+    {
+        yield 'the audit set to ignore, beside a raised S1' => [['policy' => ['abandoned' => ['audit' => 'ignore']]], true, RunNote::ABANDONED_NOT_AUDITED_BY_COMPOSER];
+        yield 'the audit set to ignore, no S1' => [['policy' => ['abandoned' => ['audit' => 'ignore']]], false, null];
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     *
+     * @dataProvider abandonedSettings
+     */
+    #[DataProvider('abandonedSettings')]
+    public function testTheAuditSettingIsNotedOnlyBesideARaisedS1(array $config, bool $marked, ?string $note): void
+    {
+        $composer = new Config(false);
+        $composer->merge(['config' => $config]);
+        $report = self::analyzeOne(self::analyzer(self::loader(['vendor/pkg' => self::metadata($marked, '2026-08-01T00:00:00+00:00')]), self::http([self::GITHUB => [200, self::LIVE]], new \ArrayObject()), true, new Allowlist([]), AbandonedIgnore::fromConfig($composer)));
+        $codes = array_map(static fn (RunNote $n): string => $n->code(), $report->runNotes());
+
+        self::assertSame($note !== null, \in_array(RunNote::ABANDONED_NOT_AUDITED_BY_COMPOSER, $codes, true));
+    }
+
+    /** A run where the list removes one marking and Composer's audit is off writes both notes. */
+    public function testTheIgnoredMarkingsNoteAndTheAuditNoteAreWrittenTogether(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'a/listed', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'z/marked', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $metadata = ['a/listed' => self::metadata(true, '2026-08-01T00:00:00+00:00'), 'z/marked' => self::metadata(true, '2026-08-01T00:00:00+00:00')];
+        $composer = new Config(false);
+        $composer->merge(['config' => ['audit' => ['abandoned' => 'ignore']]]);
+        $reader = new class () implements AbandonedPolicyReader {
+            public function api(): string
+            {
+                return self::AUDIT_CONFIG;
+            }
+
+            public function policyRules(array $policy, array $audit): array
+            {
+                return [];
+            }
+
+            public function auditConfigList(Config $config): array
+            {
+                return ['a/listed' => 'migration planned'];
+            }
+        };
+
+        $report = self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::LIVE]], new \ArrayObject()), true, new Allowlist([]), AbandonedIgnore::fromConfig($composer, $reader))->analyze($lock, ProjectConfig::empty(), false);
+        $codes = array_map(static fn (RunNote $n): string => $n->code(), $report->runNotes());
+
+        self::assertSame(
+            [RunNote::ABANDONED_MARKINGS_IGNORED, RunNote::ABANDONED_NOT_AUDITED_BY_COMPOSER],
+            array_values(array_intersect($codes, [RunNote::ABANDONED_MARKINGS_IGNORED, RunNote::ABANDONED_NOT_AUDITED_BY_COMPOSER, RunNote::ABANDONED_IGNORE_UNREADABLE])),
+            implode(', ', $codes)
+        );
+    }
+
+    public function testAnUnreadableListIsNoted(): void
+    {
+        if (!class_exists(AbandonedPolicyConfig::class)) {
+            self::markTestSkipped('Composer without the policy API (2.10 and later)');
+        }
+        Platform::putEnv('COMPOSER_POLICY', 'maybe');
+        try {
+            $ignore = AbandonedIgnore::fromConfig(new Config(false));
+        } finally {
+            Platform::clearEnv('COMPOSER_POLICY');
+        }
+        $report = self::analyzeOne(self::analyzer(self::loader(['vendor/pkg' => self::metadata(true, '2026-08-01T00:00:00+00:00')]), self::http([self::GITHUB => [200, self::LIVE]], new \ArrayObject()), true, new Allowlist([]), $ignore));
+
+        self::assertContains(RunNote::ABANDONED_IGNORE_UNREADABLE, array_map(static fn (RunNote $n): string => $n->code(), $report->runNotes()));
+    }
+
+    public function testANotListedPackageWritesNoIgnoredMarking(): void
+    {
+        $report = self::analyzeOne(self::analyzer(self::loader(['vendor/pkg' => self::metadata(true, '2026-08-01T00:00:00+00:00')]), self::http([self::GITHUB => [200, self::ARCHIVED]], new \ArrayObject()), false, new Allowlist([])));
+
+        self::assertNull(JsonPath::decoded(self::finding($report)->toArray())['abandoned_ignored']);
+        self::assertSame([], array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::ABANDONED_MARKINGS_IGNORED));
     }
 
     public function testAnIgnoredMarkingOnALiveRepositoryLeavesNoAbandonment(): void

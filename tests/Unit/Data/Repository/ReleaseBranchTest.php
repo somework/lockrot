@@ -51,4 +51,13 @@ final class ReleaseBranchTest extends TestCase
         self::assertFalse(ReleaseBranch::isAbove('1', '1'));
         self::assertFalse(ReleaseBranch::isAbove('0.3', '1'));
     }
+
+    public function testABranchAliasSnapshotNamesItsOwnLine(): void
+    {
+        self::assertSame(['5', '1', '0.3'], [ReleaseBranch::aliasLine('5.4.x-dev'), ReleaseBranch::aliasLine('1.x-dev'), ReleaseBranch::aliasLine('0.3.x-dev')]);
+        self::assertNull(ReleaseBranch::aliasLine('0.x-dev'), 'major 0 names no line');
+        self::assertNull(ReleaseBranch::aliasLine('0.0.x-dev'), 'a 0.0 line is one release wide');
+        self::assertNull(ReleaseBranch::aliasLine('dev-main'));
+        self::assertNull(ReleaseBranch::aliasLine('1.2.0'));
+    }
 }

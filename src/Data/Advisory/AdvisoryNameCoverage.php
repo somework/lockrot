@@ -13,12 +13,12 @@ namespace Lockrot\Data\Advisory;
  */
 final class AdvisoryNameCoverage
 {
-    /** @var list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}> */
+    /** @var list<AdvisoryFeed> */
     private array $feeds;
     private ?int $records;
     private ?string $reason;
 
-    /** @param list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}> $feeds in configured order */
+    /** @param list<AdvisoryFeed> $feeds in configured order */
     public function __construct(array $feeds, ?int $records, ?string $reason)
     {
         $this->feeds = $feeds;
@@ -26,13 +26,7 @@ final class AdvisoryNameCoverage
         $this->reason = $reason;
     }
 
-    /**
-     * `answer` is `answered`, `failed` or `not_asked`. `records` counts the distinct advisory ids
-     * the feed returned for the name, for every version, before the ignore lists. It is null
-     * unless `answered`. `reason` and `message` say why a feed failed or was not asked.
-     *
-     * @return list<array{composer_repository: string, answer: string, reason: ?string, message: ?string, records: ?int}>
-     */
+    /** @return list<AdvisoryFeed> */
     public function feeds(): array
     {
         return $this->feeds;

@@ -104,12 +104,12 @@ final class Report2Root
     }
 
     /**
-     * report-1's block with `packages`, its sums over the written two-decimal values. The sums add
-     * whole hundredths, so the float error of a long sum stays out of the written number.
+     * The sums add the written two-decimal values in whole hundredths, so the float error of a long
+     * sum stays out of the written number.
      *
      * @param list<Finding> $findings
      *
-     * @return array{total: ?float, direct_requirements: ?float, measured: int, unmeasured: array<string, int>, furthest_behind: ?array{package: string, version: string, libyears: ?float}, packages: int}
+     * @return array{total: ?float, direct_requirements: ?float, measured: int, at_least_count: int, unmeasured: array<string, int>, furthest_behind: ?array{package: string, version: string, libyears: ?float, at_least: bool}, packages: int}
      */
     public static function toLibyearsArray(Libyears $libyears, array $findings): array
     {
@@ -136,8 +136,9 @@ final class Report2Root
             'total' => $total === null ? null : $total / 100.0,
             'direct_requirements' => $direct === null ? null : $direct / 100.0,
             'measured' => $libyears->measured(),
+            'at_least_count' => $libyears->atLeastCount(),
             'unmeasured' => $libyears->unmeasured(),
-            'furthest_behind' => $worst === null ? null : ['package' => $worst->package(), 'version' => $worst->version(), 'libyears' => $worst->libyearsRounded()],
+            'furthest_behind' => $worst === null ? null : ['package' => $worst->package(), 'version' => $worst->version(), 'libyears' => $worst->libyearsRounded(), 'at_least' => $worst->isLibyearsAtLeast()],
             'packages' => \count($findings),
         ];
     }

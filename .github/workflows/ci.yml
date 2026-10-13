@@ -191,9 +191,12 @@ jobs:
       - if: steps.scope.outputs.mode != 'none'
         uses: actions/download-artifact@v8
         with: {name: mutation-coverage, path: build/coverage}
+      # ulimit caps each process of the mutation steps. A mutant that loops without end then dies
+      # in a fatal error that Infection counts, not in an OOM that kills the runner. The memory_limit
+      # of phpunit.xml.dist (-1) wins over php -d, because PHPUnit applies its <ini> at run time.
       - name: Mutate the shard (full run)
         if: steps.scope.outputs.mode == 'full'
-        run: $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} ${{ matrix.shard.filter }}
+        run: ulimit -v 4194304 && $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --min-msi=${{ matrix.shard.min_msi }} --min-covered-msi=${{ matrix.shard.min_msi }} ${{ matrix.shard.filter }}
       # Infection refuses positional paths with --git-diff-lines and reads changed lines only under its
       # configured source directories, so the shard's directories become a copy of the configuration.
       # A file at the root of src cannot be one. When the pull request changes it, it is mutated whole.
@@ -201,12 +204,14 @@ jobs:
       - name: Mutate whole the root and renamed files the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.files != ''
         run: |
+          ulimit -v 4194304
           $(composer global config bin-dir --absolute)/infection --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --min-msi=0 --min-covered-msi=0 ${{ steps.scope.outputs.files }}
           if [ -f build/infection.log ]; then mv build/infection.log build/infection-files.log; fi
       - name: Mutate the lines the pull request changes
         if: steps.scope.outputs.mode == 'diff' && steps.scope.outputs.diff == 'true'
         run: |
           python3 tools/mutation/shard_config.py infection.json5 ${{ steps.scope.outputs.dirs }} > infection.shard.json5
+          ulimit -v 4194304
           $(composer global config bin-dir --absolute)/infection --configuration=infection.shard.json5 --threads=max --only-covering-test-cases --coverage=build/coverage --skip-initial-tests --git-diff-lines --git-diff-base=${{ steps.scope.outputs.base }} --min-msi=0 --min-covered-msi=0
       - name: Escapes against tests/infection-equivalents.md
         if: steps.scope.outputs.mode == 'diff'

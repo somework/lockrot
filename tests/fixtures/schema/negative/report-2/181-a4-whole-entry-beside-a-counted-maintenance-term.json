@@ -763,6 +763,24 @@
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 7,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 4,
+     "records": 33
+    }
+   ]
   }
  },
  "activity_cache_oldest_at": "2026-10-01T16:03:43+00:00",
@@ -911,20 +929,63 @@
    "fan_in": 9
   }
  ],
+ "rot_depth": {
+  "flagged": 7,
+  "measured": 7,
+  "unmeasured": {
+   "unreached": 0,
+   "no_composer_json": 0
+  },
+  "by_reach": {
+   "direct": 6,
+   "transitive": 1,
+   "unreached": 0
+  },
+  "not_in_composer_json": 1,
+  "require_dev_not_walked": 0,
+  "production": 7,
+  "development": 0,
+  "by_depth": [
+   {
+    "depth": 0,
+    "flagged": 6
+   },
+   {
+    "depth": 1,
+    "flagged": 1
+   }
+  ],
+  "max_depth": 1,
+  "deepest": [
+   {
+    "package": "symfony/polyfill-intl-idn",
+    "chain": [
+     "guzzlehttp/guzzle",
+     "symfony/polyfill-intl-idn"
+    ]
+   }
+  ]
+ },
  "libyears": {
   "total": 17.85,
   "direct_requirements": 17.85,
   "measured": 5,
+  "at_least_count": 0,
   "unmeasured": {
-   "branch_snapshot": 1,
-   "no_stable_release_date": 1,
    "not_from_composer_repository": 0,
-   "metadata_unavailable": 0
+   "unavailable": 0,
+   "not_found": 0,
+   "branch_snapshot": 1,
+   "shared_commit": 1,
+   "undated": 0,
+   "no_stable_release": 0,
+   "undated_releases": 0
   },
   "furthest_behind": {
    "package": "symfony/monolog-bridge",
    "version": "v2.6.13",
-   "libyears": 10.62
+   "libyears": 10.62,
+   "at_least": false
   },
   "packages": 7
  },
@@ -1248,6 +1309,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 26,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 26,
+      "reason": null
+     }
+    ],
     "worst": "critical",
     "counts": {
      "critical": 1,
@@ -1293,6 +1364,7 @@
     "cached_at": "2026-10-01T16:05:47+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -1304,11 +1376,17 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "twig/twig"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "symfony/twig-bridge",
@@ -2156,6 +2234,36 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:20+00:00",
    "libyears": 2.04,
+   "age": {
+    "installed": {
+     "at": "2024-09-09T17:53:56+00:00",
+     "years": 2.1,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v3.30.0",
+     "at": "2026-09-25T13:20:01+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v2.16.1",
+     "at": "2024-09-09T17:53:56+00:00",
+     "years": 2.1,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-30T20:43:40+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,
@@ -2425,6 +2533,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 1,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 1,
+      "reason": null
+     }
+    ],
     "worst": "high",
     "counts": {
      "critical": 0,
@@ -2481,6 +2599,7 @@
     "cached_at": "2026-10-01T16:03:43+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -2492,11 +2611,17 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "symfony/monolog-bridge"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "symfony/monolog-bridge"
@@ -2594,6 +2719,36 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:31+00:00",
    "libyears": 10.62,
+   "age": {
+    "installed": {
+     "at": "2016-01-14T10:11:35+00:00",
+     "years": 10.7,
+     "dated_by": "symfony/symfony"
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v6.4.45",
+     "at": "2026-08-30T01:18:12+00:00",
+     "years": 0.1,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v2.8.52",
+     "at": "2019-11-13T08:36:42+00:00",
+     "years": 6.9,
+     "level": "high",
+     "dated_by": "symfony/symfony"
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-09-23T14:28:05+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,
@@ -2806,6 +2961,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
     "ignored": [],
     "ignored_count": 0
    },
@@ -2838,6 +3003,7 @@
     "expires": null,
     "flag_ids": null
    },
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -2849,11 +3015,17 @@
    "replacement_url": "https://packagist.org/packages/symfony/error-handler",
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "symfony/debug"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "symfony/console",
@@ -2923,6 +3095,36 @@
    "allowlist_reason": "kept on purpose",
    "data_date": "2026-10-01T17:41:20+00:00",
    "libyears": 1.76,
+   "age": {
+    "installed": {
+     "at": "2020-10-24T10:57:07+00:00",
+     "years": 5.9,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v4.4.44",
+     "at": "2022-07-28T16:29:46+00:00",
+     "years": 4.2,
+     "level": "warn",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v3.4.47",
+     "at": "2020-10-24T10:57:07+00:00",
+     "years": 5.9,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2022-07-29T12:25:06+00:00",
+     "years": 4.2,
+     "level": "warn"
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,
@@ -3125,6 +3327,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
     "ignored": [],
     "ignored_count": 0
    },
@@ -3156,6 +3368,7 @@
     "cached_at": "2026-10-01T16:04:02+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -3167,11 +3380,17 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": "branch_snapshot",
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "friendsofsymfony/oauth-server-bundle"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "friendsofsymfony/oauth-server-bundle"
@@ -3230,6 +3449,26 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:39:46+00:00",
    "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "branch_snapshot",
+    "release": {
+     "version": "1.6.2",
+     "at": "2019-01-23T15:23:04+00:00",
+     "years": 7.7,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": null,
+    "branch_release_unmeasured": "branch_snapshot",
+    "push": {
+     "at": "2024-01-12T10:27:37+00:00",
+     "years": 2.7,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,
@@ -3426,6 +3665,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
     "ignored": [],
     "ignored_count": 0
    },
@@ -3449,6 +3698,7 @@
     "cached_at": "2026-10-01T16:04:08+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -3460,11 +3710,17 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "tubalmartin/cssmin"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "tubalmartin/cssmin"
@@ -3499,6 +3755,36 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:40:04+00:00",
    "libyears": 0,
+   "age": {
+    "installed": {
+     "at": "2018-01-15T15:26:51+00:00",
+     "years": 8.7,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v4.1.1",
+     "at": "2018-01-15T15:26:51+00:00",
+     "years": 8.7,
+     "level": "high",
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v4.1.1",
+     "at": "2018-01-15T15:26:51+00:00",
+     "years": 8.7,
+     "level": "high",
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2023-12-22T23:56:28+00:00",
+     "years": 2.8,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,
@@ -3685,6 +3971,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 5,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 5,
+      "reason": null
+     }
+    ],
     "worst": "low",
     "counts": {
      "critical": 0,
@@ -3764,6 +4060,7 @@
     "cached_at": "2026-10-01T16:05:49+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -3775,11 +4072,17 @@
    "replacement_url": null,
    "note": null,
    "libyears_unmeasured": null,
+   "libyears_at_least": false,
    "direct": true,
    "dev": false,
    "reach": "direct",
    "chain": [
     "symfony/yaml"
+   ],
+   "depth": 0,
+   "depth_unmeasured": null,
+   "named_in": [
+    "require"
    ],
    "direct_dependents": [
     "symfony/yaml"
@@ -3873,6 +4176,36 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:41:33+00:00",
    "libyears": 3.43,
+   "age": {
+    "installed": {
+     "at": "2023-04-23T19:33:36+00:00",
+     "years": 3.4,
+     "dated_by": null
+    },
+    "installed_unmeasured": null,
+    "release": {
+     "version": "v8.1.8",
+     "at": "2026-09-26T06:33:49+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v5.4.53",
+     "at": "2026-05-20T17:13:41+00:00",
+     "years": 0.4,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": {
+     "at": "2026-10-01T12:53:29+00:00",
+     "years": 0,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": false,
@@ -4048,6 +4381,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 1,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 1,
+      "reason": null
+     }
+    ],
     "worst": "low",
     "counts": {
      "critical": 0,
@@ -4135,6 +4478,7 @@
     "expires": null,
     "flag_ids": null
    },
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -4145,7 +4489,8 @@
    "replacement": null,
    "replacement_url": null,
    "note": null,
-   "libyears_unmeasured": "no_stable_release_date",
+   "libyears_unmeasured": "shared_commit",
+   "libyears_at_least": false,
    "direct": false,
    "dev": false,
    "reach": "transitive",
@@ -4153,6 +4498,9 @@
     "guzzlehttp/guzzle",
     "symfony/polyfill-intl-idn"
    ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
    "direct_dependents": [
     "guzzlehttp/guzzle"
    ],
@@ -4197,6 +4545,28 @@
    "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
    "data_date": "2026-10-01T17:41:20+00:00",
    "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "shared_commit",
+    "release": {
+     "version": "v1.43.0",
+     "at": "2026-09-23T14:40:04+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "release_unmeasured": null,
+    "branch_release": {
+     "version": "v1.43.0",
+     "at": "2026-09-23T14:40:04+00:00",
+     "years": 0,
+     "level": null,
+     "dated_by": null
+    },
+    "branch_release_unmeasured": null,
+    "push": null,
+    "push_unmeasured": "allowlisted"
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": false,

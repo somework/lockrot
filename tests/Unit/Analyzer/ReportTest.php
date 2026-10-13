@@ -447,7 +447,7 @@ final class ReportTest extends TestCase
         self::assertSame(4.0, $block->direct());
         self::assertSame(2, $block->measured());
         self::assertSame(1, $block->unmeasured()[Libyears::BRANCH_SNAPSHOT]);
-        self::assertSame(['measured' => 2, 'unmeasured' => $block->unmeasured(), 'furthest_behind' => ['package' => 'vendor/direct', 'version' => '1.0.0', 'libyears' => 4.0]], array_diff_key(JsonPath::arrayAt($report->toArray(), ['libyears']), ['total' => true, 'direct_requirements' => true, 'packages' => true]));
+        self::assertSame(['measured' => 2, 'at_least_count' => 0, 'unmeasured' => $block->unmeasured(), 'furthest_behind' => ['package' => 'vendor/direct', 'version' => '1.0.0', 'libyears' => 4.0, 'at_least' => false]], array_diff_key(JsonPath::arrayAt($report->toArray(), ['libyears']), ['total' => true, 'direct_requirements' => true, 'packages' => true]));
         // and the block a consumer reads is recomputable from the findings it reads
         $sum = 0.0;
         foreach (JsonPath::arrayAt($report->toArray(), ['findings']) as $finding) {
@@ -471,7 +471,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'rot_depth', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
             array_keys($array)
         );
         // The literal, not the constant: the document states the value it attributed by.
@@ -503,8 +503,8 @@ final class ReportTest extends TestCase
     public function testTheNotesTheirDetailsAndTheNetworkFlagComeFromOneList(): void
     {
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $quiet = [RunNote::offline(), RunNote::notFromComposerRepository(2)];
-        $failing = [RunNote::offline(), RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503')), RunNote::notFromComposerRepository(2)];
+        $quiet = [RunNote::offline(), RunNote::notFromComposerRepository(2, true)];
+        $failing = [RunNote::offline(), RunNote::advisoriesUnavailable('packagist.org', new TransportException('HTTP 503')), RunNote::notFromComposerRepository(2, true)];
 
         self::assertFalse((new Report([], [], $at, 0, 0))->hadNetworkFailures());
         self::assertFalse((new Report([], $quiet, $at, 0, 2))->hadNetworkFailures());
@@ -514,7 +514,7 @@ final class ReportTest extends TestCase
         self::assertSame([
             "offline: repository metadata served from Composer's cache",
             'security advisories unavailable from packagist.org: HTTP 503',
-            '2 packages are not from a Composer repository and were not checked',
+            '2 packages are not from a Composer repository: their release metadata and repository activity were not read',
         ], $report->notes());
 
         $array = $report->toArray();
@@ -523,7 +523,7 @@ final class ReportTest extends TestCase
         self::assertSame($array['notes'], array_column($details, 'text'));
         self::assertSame(['offline', 'advisories_unavailable', 'not_from_composer_repository'], array_column($details, 'code'));
         self::assertSame('{}', json_encode(JsonPath::arrayAt($details, [0])['data']), 'no parameters is an empty object, never a list');
-        self::assertSame('{"package_count":2}', json_encode(JsonPath::arrayAt($details, [2])['data']));
+        self::assertSame('{"package_count":2,"advisories_asked":true}', json_encode(JsonPath::arrayAt($details, [2])['data']));
         self::assertSame([], (new Report([], [], $at, 0, 0))->toArray()['note_details']);
 
         $withRun = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::none(), RunSettings::SOURCE_OPTION, new Thresholds()));

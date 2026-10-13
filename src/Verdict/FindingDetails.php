@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Repository\MetadataFailure;
@@ -15,11 +16,13 @@ use Lockrot\Security\Fix;
 use Lockrot\Security\Holder;
 use Lockrot\Security\PackageFixes;
 use Lockrot\Security\Severity;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
+use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
@@ -48,6 +51,9 @@ final class FindingDetails
     private array $ignored;
     private ?PackageFixes $fixes;
     private ?Check $releasesUnchecked = null;
+    private Age $age;
+    private ?AdvisoryNameCoverage $lookup;
+    private ?AbandonedIgnored $abandonedIgnored;
     private ?Moves $moves = null;
     private ActivityLookup $activity;
 
@@ -56,9 +62,12 @@ final class FindingDetails
      * @param array{requires: ?string, target_runs: ?bool, project_allows: ?bool} $installedPhp
      * @param list<IgnoredAdvisory>                                         $ignored
      */
-    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity)
+    public function __construct(string $metadataStatus, ?string $metadataReason, ?string $metadataMessage, array $skipped, array $installedPhp, ?AllowlistEntry $entry, string $check, ?string $uncheckedReason, array $ignored, ?PackageFixes $fixes, ActivityLookup $activity, Age $age, ?AdvisoryNameCoverage $lookup, ?AbandonedIgnored $abandonedIgnored)
     {
+        $this->abandonedIgnored = $abandonedIgnored;
         $this->activity = $activity;
+        $this->age = $age;
+        $this->lookup = $lookup;
         $this->metadataStatus = $metadataStatus;
         $this->metadataReason = $metadataReason;
         $this->metadataMessage = $metadataMessage;
@@ -76,7 +85,7 @@ final class FindingDetails
      * @param list<Signal>          $signals         the finding's signals: S10 tells a gap from a skip
      * @param ?string               $metadataFailure what the repository that lists the package answered instead of its metadata
      */
-    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure): self
+    public static function of(PackageFacts $facts, ?AllowlistEntry $entry, PhpFloor $floor, array $ignored, array $signals, ?string $metadataFailure, Age $age): self
     {
         $package = $facts->package();
         $status = $facts->metadataStatus();
@@ -98,11 +107,31 @@ final class FindingDetails
             $reason,
             $ignored,
             $facts->fixes(),
-            $facts->activityLookup()
+            $facts->activityLookup(),
+            $age,
+            $coverage,
+            AbandonedRule::ignored($facts)
         );
         $details->releasesUnchecked = NotCheckedRule::releasesUnchecked($facts);
 
         return $details;
+    }
+
+    public function age(): Age
+    {
+        return $this->age;
+    }
+
+    /** The marking that Composer's abandoned ignore list kept out of S1, null when it kept none. */
+    public function abandonedIgnored(): ?AbandonedIgnored
+    {
+        return $this->abandonedIgnored;
+    }
+
+    /** What the advisory lookup did for the package, null when the run had no lookup. */
+    public function advisoryLookup(): ?AdvisoryNameCoverage
+    {
+        return $this->lookup;
     }
 
     public function withMoves(Moves $moves): self
@@ -236,6 +265,8 @@ final class FindingDetails
             'check' => $this->check,
             'complete' => $this->check === 'complete',
             'unchecked_reason' => $this->uncheckedReason,
+            'records' => $this->lookup === null ? null : $this->lookup->records(),
+            'feeds' => $this->lookup === null ? [] : $this->lookup->feeds(),
         ];
         $ignored = array_map([self::class, 'ignored'], $this->ignored);
         if (!$standing->isVulnerable()) {

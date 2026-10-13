@@ -10,6 +10,9 @@ use Lockrot\Clock;
 use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Origins;
 use Lockrot\Verdict\Finding;
@@ -42,22 +45,30 @@ final class LibyearsTest extends TestCase
         return (new FindingBuilder())->withPackage($package)->withVersion($version)->withChain($direct ? [$package] : ['vendor/root', $package])->withNote($note)->withLibyears($libyears)->withOrigin(Origins::of($note !== Finding::NOTE_NOT_IN_REPOSITORY, $package))->build();
     }
 
-    /** @return iterable<string, array{LockedPackage, ?PackageMetadata, ?float, ?string}> the package, its metadata, the years and the reason */
+    /** @return iterable<string, array{LockedPackage, ?PackageMetadata, ?string, ?float, ?string, bool}> the package, its metadata, why the metadata was not read, the years, the reason and the lower-bound mark */
     public static function measurements(): iterable
     {
         $latest = self::metadata('2026-01-24T13:26:10+00:00');
-        yield 'a path entry' => [self::package('v5.13.2', self::LOCKED_AT, false), $latest, null, Libyears::NOT_FROM_COMPOSER_REPOSITORY];
-        yield 'a path entry on a branch: not asked outranks a snapshot' => [self::package('dev-main', self::LOCKED_AT, false), $latest, null, Libyears::NOT_FROM_COMPOSER_REPOSITORY];
-        yield 'a path entry without metadata: not asked outranks not answered' => [self::package('v5.13.2', self::LOCKED_AT, false), null, null, Libyears::NOT_FROM_COMPOSER_REPOSITORY];
-        yield 'no metadata' => [self::package(), null, null, Libyears::METADATA_UNAVAILABLE];
-        yield 'no metadata for a branch: not answered outranks a snapshot' => [self::package('dev-main'), null, null, Libyears::METADATA_UNAVAILABLE];
-        yield 'a branch with metadata' => [self::package('dev-main'), $latest, null, Libyears::BRANCH_SNAPSHOT];
-        yield 'a branch the lock does not date' => [self::package('2.x-dev', null), $latest, null, Libyears::BRANCH_SNAPSHOT];
-        yield 'the installed tag on a shared commit' => [self::package(), self::splitPackage([], null), null, Libyears::NO_STABLE_RELEASE_DATE];
-        yield 'a lock entry without a time' => [self::package('v5.13.2', null), $latest, null, Libyears::NO_STABLE_RELEASE_DATE];
-        yield 'no newest date and nothing dated above' => [self::package(), self::metadata(null), null, Libyears::NO_STABLE_RELEASE_DATE];
-        yield 'a lower bound, from the newest dated release above' => [self::package(), self::metadata(null, ['8' => ['v8.6.1', '2026-01-24T13:26:10+00:00'], '5' => ['v5.13.2', self::LOCKED_AT]]), 4.06, null];
-        yield 'ahead of the last stable release, clamped to zero' => [self::package(), self::metadata('2019-01-23T15:23:04+00:00'), 0.0, null];
+        yield 'a path entry' => [self::package('v5.13.2', self::LOCKED_AT, false), $latest, null, null, Libyears::NOT_FROM_COMPOSER_REPOSITORY, false];
+        yield 'a path entry on a branch: not asked outranks a snapshot' => [self::package('dev-main', self::LOCKED_AT, false), $latest, null, null, Libyears::NOT_FROM_COMPOSER_REPOSITORY, false];
+        yield 'a path entry without metadata: not asked outranks not answered' => [self::package('v5.13.2', self::LOCKED_AT, false), null, null, null, Libyears::NOT_FROM_COMPOSER_REPOSITORY, false];
+        yield 'no metadata' => [self::package(), null, null, null, Libyears::UNAVAILABLE, false];
+        yield 'no metadata, as the repository failed' => [self::package(), null, Libyears::UNAVAILABLE, null, Libyears::UNAVAILABLE, false];
+        yield 'no metadata, as the repository does not list it' => [self::package(), null, Libyears::NOT_FOUND, null, Libyears::NOT_FOUND, false];
+        yield 'no metadata for a branch: not answered outranks a snapshot' => [self::package('dev-main'), null, Libyears::NOT_FOUND, null, Libyears::NOT_FOUND, false];
+        yield 'a branch with metadata' => [self::package('dev-main'), $latest, null, null, Libyears::BRANCH_SNAPSHOT, false];
+        yield 'a branch the lock does not date' => [self::package('2.x-dev', null), $latest, null, null, Libyears::BRANCH_SNAPSHOT, false];
+        yield 'the installed tag on a shared commit' => [self::package(), self::splitPackage([], null), null, null, Libyears::SHARED_COMMIT, false];
+        yield 'a lock entry without a time' => [self::package('v5.13.2', null), $latest, null, null, Libyears::UNDATED, false];
+        yield 'stable releases, none dated, and nothing dated above' => [self::package(), self::metadata(null), null, null, Libyears::UNDATED_RELEASES, false];
+        yield 'only pre-releases, installed at a dated one' => [self::package('1.0.0-beta3'), self::preReleasesOnly(), null, null, Libyears::NO_STABLE_RELEASE, false];
+        yield 'a lower bound, from the newest dated release above' => [self::package(), self::metadata(null, ['8' => ['v8.6.1', '2026-01-24T13:26:10+00:00'], '5' => ['v5.13.2', self::LOCKED_AT]]), null, 4.06, null, true];
+        yield 'ahead of the last stable release, clamped to zero' => [self::package(), self::metadata('2019-01-23T15:23:04+00:00'), null, 0.0, null, false];
+    }
+
+    private static function preReleasesOnly(): PackageMetadata
+    {
+        return new PackageMetadata('scheb/2fa-bundle', false, null, false, null, null, 3, null, 'library', new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), []);
     }
 
     /**
@@ -66,16 +77,40 @@ final class LibyearsTest extends TestCase
      * @dataProvider measurements
      */
     #[DataProvider('measurements')]
-    public function testEveryExitOfTheRuleSaysWhy(LockedPackage $package, ?PackageMetadata $metadata, ?float $years, ?string $reason): void
+    public function testEveryExitOfTheRuleSaysWhy(LockedPackage $package, ?PackageMetadata $metadata, ?string $whyNoMetadata, ?float $years, ?string $reason, bool $atLeast): void
     {
-        $measurement = Libyears::measure($package, $metadata);
+        $measurement = Libyears::measure($package, $metadata, $whyNoMetadata);
 
         self::assertSame($reason, $measurement->unmeasuredReason());
+        self::assertSame($atLeast, $measurement->isAtLeast(), 'a lower bound only on the newest trusted date above');
         self::assertSame($years === null, $measurement->years() === null, 'measured exactly when no reason is given');
         self::assertNotSame($measurement->years() === null, $measurement->unmeasuredReason() === null, 'one of the two, never both');
         if ($years !== null) {
             self::assertEqualsWithDelta($years, $measurement->years(), 0.005);
         }
+    }
+
+    /**
+     * One cause, one id: an unmeasured end takes the id of the age reading of that end.
+     *
+     * @dataProvider measurements
+     */
+    #[DataProvider('measurements')]
+    public function testAnUnmeasuredEndTakesTheIdOfItsAgeReading(LockedPackage $package, ?PackageMetadata $metadata, ?string $whyNoMetadata, ?float $years, ?string $reason, bool $atLeast): void
+    {
+        // The analyzer asks no repository about a package from outside every one of them.
+        $facts = new PackageFacts($package, $package->isFromComposerRepository() ? $metadata : null, null);
+        $age = new AgeMeasure(Clock::fixed('2026-10-01T00:00:00+00:00'), new Thresholds());
+        $installed = $age->installed($facts)->unmeasured();
+        $release = $age->release($facts, $whyNoMetadata)->unmeasured();
+
+        if (\in_array($reason, [Libyears::BRANCH_SNAPSHOT, Libyears::SHARED_COMMIT, Libyears::UNDATED], true)) {
+            self::assertSame($installed, $reason, 'the installed end');
+        }
+        if (\in_array($reason, [Libyears::NO_STABLE_RELEASE, Libyears::UNDATED_RELEASES, Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::UNAVAILABLE, Libyears::NOT_FOUND], true)) {
+            self::assertSame($release, $reason, 'the release end, or the metadata');
+        }
+        self::assertTrue($reason !== null || $years !== null);
     }
 
     public function testAMeasurementHoldsItsYearsOrItsReason(): void
@@ -86,6 +121,9 @@ final class LibyearsTest extends TestCase
         self::assertSame(1.5, $measured->years());
         self::assertNull($measured->unmeasuredReason());
         self::assertSame(0.0, $zero->years(), 'zero is a measurement');
+        self::assertFalse($measured->isAtLeast());
+        self::assertTrue(LibyearsMeasurement::atLeast(1.5)->isAtLeast());
+        self::assertSame(1.5, LibyearsMeasurement::atLeast(1.5)->years());
         self::assertNull($zero->unmeasuredReason());
         foreach (Libyears::REASONS as $reason) {
             self::assertSame($reason, LibyearsMeasurement::unmeasured($reason)->unmeasuredReason());
@@ -101,24 +139,15 @@ final class LibyearsTest extends TestCase
         LibyearsMeasurement::unmeasured('bogus');
     }
 
-    public function testAMeasuredFindingHasNoReasonToPutIntoWords(): void
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('a/a');
-
-        Libyears::reasonWords(self::finding('a/a', LibyearsMeasurement::of(1.0)));
-    }
-
     /** A finding with metadata, a note and a tag on a shared commit counts under the missing date, not under the note. */
     public function testTheReasonIsTheRulesNotTheNotes(): void
     {
         $measurement = Libyears::measure(self::package(), self::splitPackage([], null));
         $finding = self::finding('illuminate/macroable', $measurement, true, 'v5.13.2', 'a note that is no reason');
 
-        self::assertSame(Libyears::NO_STABLE_RELEASE_DATE, $finding->libyearsUnmeasured());
-        self::assertSame(1, Libyears::fromFindings([$finding])->unmeasured()[Libyears::NO_STABLE_RELEASE_DATE]);
-        self::assertSame(0, Libyears::fromFindings([$finding])->unmeasured()[Libyears::METADATA_UNAVAILABLE]);
-        self::assertSame('no release date lockrot trusts', Libyears::reasonWords($finding));
+        self::assertSame(Libyears::SHARED_COMMIT, $finding->libyearsUnmeasured());
+        self::assertSame(1, Libyears::fromFindings([$finding])->unmeasured()[Libyears::SHARED_COMMIT]);
+        self::assertSame(0, Libyears::fromFindings([$finding])->unmeasured()[Libyears::UNAVAILABLE]);
     }
 
     public function testTheBlockIsTheFindingsReasonsCounted(): void
@@ -128,7 +157,7 @@ final class LibyearsTest extends TestCase
             self::finding('measured/zero', LibyearsMeasurement::of(0.0)),
             self::finding('pinned/one', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-main'),
             self::finding('pinned/two', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), false, '2.x-dev'),
-            self::finding('gone/one', LibyearsMeasurement::unmeasured(Libyears::METADATA_UNAVAILABLE), true, '1.0.0', 'not found in the repository'),
+            self::finding('gone/one', LibyearsMeasurement::unmeasured(Libyears::NOT_FOUND), true, '1.0.0', 'not found in the repository'),
         ];
         $reasons = [];
         foreach ($findings as $finding) {
@@ -141,7 +170,7 @@ final class LibyearsTest extends TestCase
         $block = Libyears::fromFindings($findings);
 
         self::assertSame(array_merge(array_fill_keys(Libyears::REASONS, 0), array_count_values($reasons)), $block->unmeasured());
-        self::assertSame([Libyears::BRANCH_SNAPSHOT => 2, Libyears::NO_STABLE_RELEASE_DATE => 0, Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0, Libyears::METADATA_UNAVAILABLE => 1], $block->unmeasured());
+        self::assertSame(['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 1, 'branch_snapshot' => 2, 'shared_commit' => 0, 'undated' => 0, 'no_stable_release' => 0, 'undated_releases' => 0], $block->unmeasured());
         self::assertSame(2, $block->measured());
     }
 
@@ -380,28 +409,29 @@ final class LibyearsTest extends TestCase
         $block = Libyears::fromFindings([
             self::finding('measured/one', LibyearsMeasurement::of(1.0)),
             self::finding('path/local', LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), true, 'dev-main', Finding::NOTE_NOT_IN_REPOSITORY),
-            self::finding('gone/missing', LibyearsMeasurement::unmeasured(Libyears::METADATA_UNAVAILABLE), true, '1.0.0', 'not found in the repository'),
-            self::finding('gone/failed', LibyearsMeasurement::unmeasured(Libyears::METADATA_UNAVAILABLE), true, '1.0.0', 'Repository metadata unavailable: timeout'),
+            self::finding('gone/missing', LibyearsMeasurement::unmeasured(Libyears::NOT_FOUND), true, '1.0.0', 'not found in the repository'),
+            self::finding('gone/failed', LibyearsMeasurement::unmeasured(Libyears::UNAVAILABLE), true, '1.0.0', 'Repository metadata unavailable: timeout'),
             self::finding('pinned/main', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-main'),
             self::finding('pinned/branch', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, '2.x-dev'),
-            self::finding('undated/split', LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE), true, 'v1.37.0'),
+            self::finding('undated/split', LibyearsMeasurement::unmeasured(Libyears::SHARED_COMMIT), true, 'v1.37.0'),
+            self::finding('undated/lock', LibyearsMeasurement::unmeasured(Libyears::UNDATED), true, 'v1.0.0'),
+            self::finding('undated/releases', LibyearsMeasurement::unmeasured(Libyears::UNDATED_RELEASES), true, 'v1.0.0'),
+            self::finding('beta/only', LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE), true, '1.0.0-beta3'),
+            self::finding('bound/lower', LibyearsMeasurement::atLeast(2.0)),
         ]);
 
         self::assertSame([
-            Libyears::BRANCH_SNAPSHOT => 2,
-            Libyears::NO_STABLE_RELEASE_DATE => 1,
             Libyears::NOT_FROM_COMPOSER_REPOSITORY => 1,
-            Libyears::METADATA_UNAVAILABLE => 2,
+            Libyears::UNAVAILABLE => 1,
+            Libyears::NOT_FOUND => 1,
+            Libyears::BRANCH_SNAPSHOT => 2,
+            Libyears::SHARED_COMMIT => 1,
+            Libyears::UNDATED => 1,
+            Libyears::NO_STABLE_RELEASE => 1,
+            Libyears::UNDATED_RELEASES => 1,
         ], $block->unmeasured());
-        self::assertSame(1, $block->measured());
-    }
-
-    public function testEveryReasonHasWordsOfItsOwn(): void
-    {
-        self::assertSame('branch snapshot', Libyears::reasonWords(self::finding('pinned/main', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-main')));
-        self::assertSame('no release date lockrot trusts', Libyears::reasonWords(self::finding('undated/split', LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE), true, 'v1.37.0')));
-        self::assertSame('not from a Composer repository', Libyears::reasonWords(self::finding('path/local', LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY), true, 'dev-main', Finding::NOTE_NOT_IN_REPOSITORY)));
-        self::assertSame('metadata unavailable', Libyears::reasonWords(self::finding('gone/failed', LibyearsMeasurement::unmeasured(Libyears::METADATA_UNAVAILABLE), true, '1.0.0', 'Repository metadata unavailable: timeout')));
+        self::assertSame(2, $block->measured());
+        self::assertSame(1, $block->atLeastCount());
     }
 
     public function testTheWorstIsTheMaximumWithTiesGoingToTheFirstName(): void
@@ -454,7 +484,7 @@ final class LibyearsTest extends TestCase
     {
         $unmeasurable = Libyears::fromFindings([
             self::finding('pinned/main', LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT), true, 'dev-main'),
-            self::finding('gone/missing', LibyearsMeasurement::unmeasured(Libyears::METADATA_UNAVAILABLE), true, '1.0.0', 'not found in the repository'),
+            self::finding('gone/missing', LibyearsMeasurement::unmeasured(Libyears::NOT_FOUND), true, '1.0.0', 'not found in the repository'),
         ]);
         $measuredAndCurrent = Libyears::fromFindings([
             self::finding('a/a', LibyearsMeasurement::of(0.0)),

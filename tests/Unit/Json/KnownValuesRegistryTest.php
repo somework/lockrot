@@ -8,6 +8,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Config\Gate;
+use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Forge\ActivityLookup;
@@ -25,6 +26,7 @@ use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Rule\PinnedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
@@ -77,7 +79,19 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/s6/properties/tag_relation/oneOf/0' => [['older', 'newer', 'same'], 'PinnedRule'],
             '#/definitions/s8/properties/floor_source/oneOf/0' => [$floors, 'PhpFloor'],
             '#/definitions/s9fix/properties/reason/oneOf/0' => [$fixReasons, 'Fix'],
-            '#/definitions/finding/properties/libyears_unmeasured/oneOf/0' => [Libyears::REASONS, 'Libyears'],
+            '#/definitions/libyearsUnmeasured' => [Libyears::REASONS, 'Libyears'],
+            '#/definitions/installedUnmeasured' => [[AgeMeasure::BRANCH_SNAPSHOT, AgeMeasure::SHARED_COMMIT, AgeMeasure::UNDATED], 'AgeMeasure'],
+            '#/definitions/releaseUnmeasured' => [[AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY, AgeMeasure::UNAVAILABLE, AgeMeasure::NOT_FOUND, AgeMeasure::NO_STABLE_RELEASE, AgeMeasure::UNDATED_RELEASES], 'AgeMeasure'],
+            '#/definitions/branchReleaseUnmeasured' => [[AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY, AgeMeasure::UNAVAILABLE, AgeMeasure::NOT_FOUND, AgeMeasure::BRANCH_SNAPSHOT, AgeMeasure::NO_BRANCH_ROW, AgeMeasure::UNDATED_RELEASES, AgeMeasure::ABOVE_LISTED_RELEASES], 'AgeMeasure'],
+            '#/definitions/pushUnmeasured' => [[ActivityLookup::ALLOWLISTED, ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, ActivityLookup::NO_REPOSITORY, ActivityLookup::HOST_NOT_SUPPORTED, ActivityLookup::REPOSITORY_NOT_FOUND, NotCheckedRule::OFFLINE, NotCheckedRule::BUDGET, NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, AgeMeasure::UNDATED], 'AgeMeasure'],
+            '#/definitions/depthUnmeasured' => [[Finding::UNREACHED, Finding::NO_COMPOSER_JSON], 'Finding'],
+            '#/definitions/abandonedIgnored/oneOf/0/properties/by' => [[AbandonedIgnoreMatch::BY_POLICY, AbandonedIgnoreMatch::BY_AUDIT], 'AbandonedIgnoreMatch'],
+            '#/definitions/noteAbandonedMarkingsIgnored/properties/by' => [[AbandonedIgnoreMatch::BY_POLICY, AbandonedIgnoreMatch::BY_AUDIT], 'AbandonedIgnoreMatch'],
+            '#/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key' => [['policy', 'policy.abandoned', 'policy.abandoned.audit', 'audit.abandoned', 'COMPOSER_AUDIT_ABANDONED', 'COMPOSER_POLICY'], 'AbandonedIgnore::notAuditedBy()'],
+            '#/definitions/advisoryFeed/properties/registry/oneOf/0' => [PackageOrigin::REGISTRIES, 'PackageOrigin::registryOfRepository()'],
+            '#/definitions/advisoryRepository/properties/registry/oneOf/0' => [PackageOrigin::REGISTRIES, 'PackageOrigin::registryOfRepository()'],
+            '#/definitions/advisoryFeed/properties/reason/oneOf/0' => [[AdvisoryCoverage::LOOKUP_FAILED, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY], 'AdvisoryFeed'],
+            '#/definitions/advisoryRepository/properties/reason/oneOf/0' => [[AdvisoryCoverage::OFFLINE, AdvisoryCoverage::COMPOSER_TOO_OLD, AdvisoryCoverage::INSTALL_TIME_BUDGET, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, AdvisoryCoverage::TRANSPORT, AdvisoryCoverage::INVALID_RESPONSE], 'RepositoryAdvisoryLoader'],
             '#/definitions/headline/anyOf/2/properties/value' => [[FlagSet::ARCHIVED, 'marked', PinnedRule::REASON_BRANCH_SNAPSHOT, PinnedRule::REASON_NO_STABLE_RELEASE], 'Finding'],
             '#/definitions/replacement/oneOf/0/properties/named_by' => [[AbandonedIgnored::MARKED_BY_REPOSITORY, AbandonedIgnored::MARKED_BY_LOCK], 'AbandonedIgnored'],
             '#/definitions/allowlist/oneOf/0/properties/reason_id/oneOf/0' => [BuiltinAllowlist::reasonIds(), 'BuiltinAllowlist'],
@@ -88,8 +102,8 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/securityUnchecked/properties/check' => [['partial', 'not_run'], 'FindingDetails'],
             '#/definitions/securityUnchecked/properties/unchecked_reason/oneOf/0' => [[AdvisoryCoverage::OFFLINE, AdvisoryCoverage::COMPOSER_TOO_OLD, AdvisoryCoverage::INSTALL_TIME_BUDGET, AdvisoryCoverage::LOOKUP_FAILED, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, AdvisoryCoverage::UNPARSEABLE_VERSION, AdvisoryCoverage::NO_FEED], 'AdvisoryCoverage'],
             '#/definitions/rootSecurity/properties/check' => [['complete', 'partial', 'not_run'], 'Report2Root'],
-            '#/definitions/checkMissing/properties/check' => [['repository_activity', 'release_dates', 'releases', 'release_metadata'], 'NotCheckedRule'],
-            '#/definitions/checkMissing/properties/reason' => [[NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::OFFLINE, AgeMeasure::UNDATED_RELEASES, Fix::RELEASES_UNKNOWN, NotCheckedRule::HOST_NOT_SUPPORTED, NotCheckedRule::NOT_FROM_COMPOSER_REPOSITORY], 'NotCheckedRule'],
+            '#/definitions/checkMissing/properties/check' => [['repository_activity', 'release_dates', 'advisories', 'releases', 'release_metadata'], 'NotCheckedRule'],
+            '#/definitions/checkMissing/properties/reason' => [[NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::OFFLINE, AgeMeasure::UNDATED_RELEASES, Fix::RELEASES_UNKNOWN, AdvisoryCoverage::COMPOSER_TOO_OLD, AdvisoryCoverage::LOOKUP_FAILED, NotCheckedRule::HOST_NOT_SUPPORTED, AdvisoryCoverage::NO_FEED, NotCheckedRule::NOT_FROM_COMPOSER_REPOSITORY], 'NotCheckedRule'],
             '#/definitions/checkSkipped/properties/check' => [['repository_activity', 'release_metadata', 'advisories', 'release_branch', 'repository_archived'], 'FindingDetails'],
             '#/definitions/checkSkipped/properties/reason' => [[AgeMeasure::ALLOWLISTED, AgeMeasure::NO_REPOSITORY, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, NotCheckedRule::OFFLINE, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED, NotCheckedRule::RATE_BUDGET, NotCheckedRule::BUDGET, NotCheckedRule::NO_TOKEN, 'unavailable', 'not_found', PinnedRule::REASON_BRANCH_SNAPSHOT, ActivityLookup::HOST_NOT_SUPPORTED, ActivityLookup::REPOSITORY_NOT_FOUND, AdvisoryCoverage::UNPARSEABLE_VERSION], 'FindingDetails'],
             '#/definitions/activityReason' => [[ActivityLookup::ALLOWLISTED, ActivityLookup::NOT_FROM_COMPOSER_REPOSITORY, ActivityLookup::NO_REPOSITORY, ActivityLookup::HOST_NOT_SUPPORTED, ActivityLookup::REPOSITORY_NOT_FOUND, NotCheckedRule::OFFLINE, NotCheckedRule::BUDGET, NotCheckedRule::NO_TOKEN, NotCheckedRule::RATE_BUDGET, NotCheckedRule::RATE_LIMIT, NotCheckedRule::FETCH_FAILED], 'Analyzer'],

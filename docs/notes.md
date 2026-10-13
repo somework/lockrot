@@ -246,6 +246,46 @@ composer config gitlab-domains <host>
 
 lockrot cannot ask other repository host software, such as Forgejo or Gitea, or a Subversion host.
 
+## Composer's abandoned ignore list
+
+### Abandoned markings ignored {#abandoned_markings_ignored}
+
+Composer's abandoned ignore list matched these packages, so lockrot did not count their abandoned
+marking (S1). An archived repository and the release and push dates still count.
+
+- `data`: `by`, the Composer setting that holds the list (`policy.abandoned` or
+  `audit.ignore-abandoned`), `count`, and `packages`, each with the `patterns` that matched it.
+- Findings: each one carries `abandoned_ignored`.
+- `sets_network_failures`: no.
+
+### Abandoned not audited by Composer {#abandoned_not_audited_by_composer}
+
+A Composer setting stops `composer audit` from reporting abandoned packages, and some finding raised
+S1. The setting changes what `composer audit` prints, not the ignore list, so lockrot still counts
+the marking. To stop counting it for one package, list the package in
+`config.policy.abandoned.ignore`.
+
+- `data`: `policy_key`, the setting, and `value`, its value.
+- Findings: no change.
+- `sets_network_failures`: no.
+
+| `policy_key` | `value` |
+|---|---|
+| `policy` | `false` |
+| `policy.abandoned` | `false` |
+| `policy.abandoned.audit` | `ignore` |
+| `audit.abandoned` | `ignore` |
+| `COMPOSER_AUDIT_ABANDONED` | `ignore` |
+| `COMPOSER_POLICY` | `false`: the variable is `0`, `false` or `off` |
+
+### Abandoned ignore list unreadable {#abandoned_ignore_unreadable}
+
+Composer rejected the project's abandoned ignore list, so every abandoned marking counts.
+
+- `data`: `message`, the first line of what Composer said. It can be empty.
+- Findings: no change.
+- `sets_network_failures`: no.
+
 ## The lock
 
 ### Not from a Composer repository {#not_from_composer_repository}
@@ -255,7 +295,9 @@ Such an entry is a `path`, `vcs`, `artifact` or inline `package` one, or comes f
 `type: composer` repository that advertises no notify URL. The project cannot add the URL. The
 operator of such a repository can make it advertise one.
 
-- `data`: `package_count`, equal to the report's `not_from_composer_repository`.
+- `data`: `package_count`, equal to the report's `not_from_composer_repository`, and
+  `advisories_asked`: true when `run.advisory_lookup.scope` is `all`. The text names the advisories
+  only when lockrot did not ask them.
 - Findings: `from_composer_repository` is false, and `origin.kind` says what lockrot could tell
   about where the package came from
   ([where a package came from](schema.md#where-a-package-came-from)).

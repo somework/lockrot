@@ -19,8 +19,10 @@ use Lockrot\Signal\Rule\NoReleaseRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder;
+use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -64,6 +66,23 @@ final class YearsOnTheRunClockTest extends TestCase
 
         foreach ([$measure->installed($facts), $measure->release($facts), $measure->branchRelease($facts), $measure->push($facts)] as $reading) {
             self::assertSame($years, $reading->years());
+        }
+    }
+
+    /**
+     * The four years fields of `finding.age` publish the tenths of their reading.
+     *
+     * @dataProvider rows
+     */
+    #[DataProvider('rows')]
+    public function testEveryAgeYearsFieldPublishesTenths(int $secondsAgo, float $years): void
+    {
+        $at = self::ago($secondsAgo);
+        $facts = FactsBuilder::facts(FactsBuilder::package(['version' => '1.0.0', 'time' => $at]), FactsBuilder::metadata([['1.0.0', $at]]), FactsBuilder::activity(false, $at));
+        $age = JsonPath::decoded(Age::of(new AgeMeasure(Clock::fixed(self::NOW), new Thresholds()), $facts));
+
+        foreach (['installed', 'release', 'branch_release', 'push'] as $reading) {
+            self::assertEquals($years, JsonPath::arrayAt($age, [$reading])['years'], $reading);
         }
     }
 

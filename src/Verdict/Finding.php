@@ -14,6 +14,7 @@ use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\ScoreBasis;
 use Lockrot\Score\ScoreContext;
@@ -40,6 +41,10 @@ final class Finding
      * a branch snapshot or an open php constraint says nothing about a coming fix.
      */
     public const NO_FIX_VERDICTS = [Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND];
+
+    /** Why a finding has no depth: no path from the requirements that the run walked, or no composer.json read. */
+    public const UNREACHED = 'unreached';
+    public const NO_COMPOSER_JSON = 'no_composer_json';
 
     /** The note for a lock entry with no notification-url: no repository was asked. */
     public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
@@ -86,6 +91,9 @@ final class Finding
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private ?FindingDetails $details = null;
+    private bool $composerJsonRead = true;
+    /** @var ?list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> null until {@see withComposerJson()} */
+    private ?array $namedIn = null;
 
     /**
      * @param list<Signal> $signals
@@ -111,7 +119,7 @@ final class Finding
         $this->dev = $dev;
         $this->directDependents = $directDependents;
         // No measurement means no dates were compared, or no repository was asked.
-        $libyears = $libyears ?? LibyearsMeasurement::unmeasured($fromComposerRepository ? Libyears::NO_STABLE_RELEASE_DATE : Libyears::NOT_FROM_COMPOSER_REPOSITORY);
+        $libyears = $libyears ?? LibyearsMeasurement::unmeasured($fromComposerRepository ? Libyears::UNDATED_RELEASES : Libyears::NOT_FROM_COMPOSER_REPOSITORY);
         // Libyears::measure() reads the flag first, so its first reason and the flag always agree.
         $unmeasuredAsNotAsked = $libyears->unmeasuredReason() === Libyears::NOT_FROM_COMPOSER_REPOSITORY;
         if ($unmeasuredAsNotAsked === $fromComposerRepository) {
@@ -271,6 +279,62 @@ final class Finding
         return $clone;
     }
 
+    /**
+     * A copy that knows whether the run read composer.json, and the sections of it that name the
+     * package ({@see \Lockrot\Graph\DependencyGraph::namedIn()}).
+     *
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $namedIn
+     */
+    public function withComposerJson(bool $read, array $namedIn): self
+    {
+        $clone = clone $this;
+        $clone->composerJsonRead = $read;
+        $clone->namedIn = $namedIn;
+
+        return $clone;
+    }
+
+    /** `direct`, `transitive` or `unreached`, from the chain. */
+    public function reach(): string
+    {
+        return self::reachOf($this->chain);
+    }
+
+    /** The fewest hops from a composer.json requirement that the run walked, null when the chain is empty. */
+    public function depth(): ?int
+    {
+        return $this->chain === [] ? null : \count($this->chain) - 1;
+    }
+
+    /** Why {@see depth()} is null, null when it is not. */
+    public function depthUnmeasured(): ?string
+    {
+        if ($this->chain !== []) {
+            return null;
+        }
+
+        return $this->composerJsonRead ? self::UNREACHED : self::NO_COMPOSER_JSON;
+    }
+
+    /**
+     * @return list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV>
+     *
+     * @throws \LogicException for a finding built without {@see withComposerJson()}
+     */
+    public function namedIn(): array
+    {
+        if ($this->namedIn === null) {
+            throw new \LogicException(\sprintf('%s was built without the composer.json sections that name it.', $this->package));
+        }
+
+        return $this->namedIn;
+    }
+
+    public function isComposerJsonRead(): bool
+    {
+        return $this->composerJsonRead;
+    }
+
     /** @throws \LogicException for a finding built without its flags */
     public function isGraded(): bool
     {
@@ -402,6 +466,12 @@ final class Finding
     public function libyearsUnmeasured(): ?string
     {
         return $this->libyears->unmeasuredReason();
+    }
+
+    /** Whether {@see libyears()} is a lower bound. False when it is null. */
+    public function isLibyearsAtLeast(): bool
+    {
+        return $this->libyears->isAtLeast();
     }
 
     /**
@@ -677,22 +747,28 @@ final class Finding
             'metadata' => $details->metadata(),
             'activity' => $details->activity(),
             'allowlist' => $entry === null ? null : $entry->toArray(),
+            'abandoned_ignored' => $details->abandonedIgnored(),
             'from_composer_repository' => $this->isFromComposerRepository(),
             'origin' => $this->origin->toArray(),
             'replacement' => $successor,
             'replacement_url' => $successor === null ? null : PackageOrigin::replacementPage($this->replacementNamedBy, $successor),
             'note' => $this->note,
             'libyears_unmeasured' => $this->libyears->unmeasuredReason(),
+            'libyears_at_least' => $this->libyears->isAtLeast(),
             'direct' => $this->isDirect(),
             'dev' => $this->dev,
-            'reach' => self::reachOf($this->chain),
+            'reach' => $this->reach(),
             'chain' => $this->chain,
+            'depth' => $this->depth(),
+            'depth_unmeasured' => $this->depthUnmeasured(),
+            'named_in' => $this->namedIn(),
             'direct_dependents' => $this->directDependents,
             'signals' => $signals,
             'evidence' => implode('; ', $evidence),
             'allowlist_reason' => $entry !== null && $entry->acceptsAll() ? $entry->reason() : null,
             'data_date' => $this->dataDate === null ? null : $this->dataDate->format(\DATE_ATOM),
             'libyears' => $this->libyearsRounded(),
+            'age' => $details->age(),
         ];
     }
 

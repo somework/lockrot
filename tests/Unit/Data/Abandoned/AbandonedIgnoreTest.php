@@ -6,9 +6,11 @@ namespace Lockrot\Tests\Unit\Data\Abandoned;
 
 use Composer\Config;
 use Composer\Policy\AbandonedPolicyConfig;
+use Composer\Util\Platform;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Abandoned\AbandonedPolicyReader;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -43,12 +45,12 @@ final class AbandonedIgnoreTest extends TestCase
         return AbandonedIgnore::fromConfig($composer);
     }
 
-    /** @return list<array{pattern: string, reason: ?string, constraints: list<string>}>|null */
+    /** @return array<mixed>|null each matching rule as the report writes it */
     private static function rules(AbandonedIgnore $ignore, string $name): ?array
     {
         $match = $ignore->match($name);
 
-        return $match === null ? null : $match->rules();
+        return $match === null ? null : JsonPath::decoded($match->rules());
     }
 
     /**
@@ -98,6 +100,69 @@ final class AbandonedIgnoreTest extends TestCase
         self::assertNull($ignoreList->whyUnreadable());
     }
 
+    /** @return iterable<string, array{array<string, mixed>, ?array{policy_key: string, value: bool|string}}> */
+    public static function auditSettings(): iterable
+    {
+        yield 'no setting' => [[], null];
+        yield 'the policy off' => [['policy' => false], ['policy_key' => 'policy', 'value' => false]];
+        yield 'the abandoned policy off' => [['policy' => ['abandoned' => false]], ['policy_key' => 'policy.abandoned', 'value' => false]];
+        yield 'the abandoned audit ignored' => [['policy' => ['abandoned' => ['audit' => 'ignore']]], ['policy_key' => 'policy.abandoned.audit', 'value' => 'ignore']];
+        yield 'the abandoned audit failing' => [['policy' => ['abandoned' => ['audit' => 'fail']]], null];
+        yield 'the legacy audit ignored' => [['audit' => ['abandoned' => 'ignore']], ['policy_key' => 'audit.abandoned', 'value' => 'ignore']];
+        yield 'the legacy audit reported' => [['audit' => ['abandoned' => 'report']], null];
+    }
+
+    /**
+     * @param array<string, mixed>                                  $config
+     * @param ?array{policy_key: string, value: bool|string}        $expected
+     *
+     * @dataProvider auditSettings
+     */
+    #[DataProvider('auditSettings')]
+    public function testTheSettingThatStopsTheAbandonedAuditIsNamed(array $config, ?array $expected): void
+    {
+        $off = self::read($config)->notAuditedBy();
+        self::assertSame($expected, $off === null ? null : ['policy_key' => $off->policyKey(), 'value' => $off->value()]);
+    }
+
+    public function testComposerPolicyZeroNamesTheVariable(): void
+    {
+        self::needsPolicyApi();
+        Platform::putEnv('COMPOSER_POLICY', '0');
+        try {
+            $off = self::read([])->notAuditedBy();
+            self::assertNotNull($off);
+            self::assertSame(['COMPOSER_POLICY', false], [$off->policyKey(), $off->value()]);
+        } finally {
+            Platform::clearEnv('COMPOSER_POLICY');
+        }
+    }
+
+    /** Composer's PolicyConfig returns early on `policy: false`, before it reads the audit variable. */
+    public function testThePolicyOffWinsOverTheAuditVariable(): void
+    {
+        Platform::putEnv('COMPOSER_AUDIT_ABANDONED', 'report');
+        try {
+            $off = self::read(['policy' => false])->notAuditedBy();
+            self::assertNotNull($off);
+            self::assertSame(['policy', false], [$off->policyKey(), $off->value()]);
+        } finally {
+            Platform::clearEnv('COMPOSER_AUDIT_ABANDONED');
+        }
+    }
+
+    public function testTheEnvironmentVariableWinsOverTheConfig(): void
+    {
+        Platform::putEnv('COMPOSER_AUDIT_ABANDONED', 'ignore');
+        try {
+            $off = self::read(['policy' => ['abandoned' => ['audit' => 'fail']]])->notAuditedBy();
+            self::assertNotNull($off);
+            self::assertSame(['COMPOSER_AUDIT_ABANDONED', 'ignore'], [$off->policyKey(), $off->value()]);
+        } finally {
+            Platform::clearEnv('COMPOSER_AUDIT_ABANDONED');
+        }
+    }
+
     public function testARuleOnlyForBlockingIsNotApplied(): void
     {
         self::needsPolicyApi();
@@ -127,7 +192,7 @@ final class AbandonedIgnoreTest extends TestCase
         $match = $ignore->match('a/plain');
         self::assertNotNull($match);
         self::assertSame(AbandonedIgnoreMatch::BY_AUDIT, $match->by());
-        self::assertSame([['pattern' => 'a/plain', 'reason' => 'legacy reason', 'constraints' => []]], $match->rules());
+        self::assertSame([['pattern' => 'a/plain', 'reason' => 'legacy reason', 'constraints' => []]], JsonPath::decoded($match->rules()));
         self::assertNull($ignore->match('a/block'));
         self::assertSame([['pattern' => 'a/audit', 'reason' => 'audit only', 'constraints' => []]], self::rules($ignore, 'a/audit'));
     }
@@ -285,7 +350,7 @@ final class AbandonedIgnoreTest extends TestCase
         $match = $ignore->match('b/other');
         self::assertNotNull($match);
         self::assertSame(AbandonedIgnoreMatch::BY_AUDIT, $match->by());
-        self::assertSame([['pattern' => 'b/*', 'reason' => null, 'constraints' => []]], $match->rules());
+        self::assertSame([['pattern' => 'b/*', 'reason' => null, 'constraints' => []]], JsonPath::decoded($match->rules()));
         self::assertSame([['pattern' => 'a/pkg', 'reason' => null, 'constraints' => []]], self::rules($ignore, 'a/pkg'));
         self::assertNull($ignore->match('c/pkg'));
     }

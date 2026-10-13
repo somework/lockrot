@@ -74,6 +74,23 @@ final class PackageOrigin
     }
 
     /**
+     * The registry of an advisory repository, as {@see registryOf()} names it, from Composer's name
+     * for the repository (`composer repo (https://repo.packagist.org)`). packagist.org serves its
+     * metadata and its advisories from `repo.packagist.org`.
+     */
+    public static function registryOfRepository(string $composerRepository): ?string
+    {
+        if (preg_match('/\((https?:\/\/[^)\s]+)\)/', $composerRepository, $m) !== 1) {
+            return null;
+        }
+        $host = parse_url($m[1], \PHP_URL_HOST);
+        $host = \is_string($host) ? strtolower($host) : null;
+        $host = $host === 'repo.packagist.org' ? 'packagist.org' : $host;
+
+        return \in_array($host, self::REGISTRIES, true) ? $host : null;
+    }
+
+    /**
      * The replacement's page on the registry that named it, or null. Only packagist.org: WP Packages
      * never marks a package abandoned, and Private Packagist keeps no public page.
      */

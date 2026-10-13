@@ -38,6 +38,19 @@ final class ReleaseBranch
         return $m[2] === '0' ? '0.0.'.$m[3] : '0.'.$m[2];
     }
 
+    /** The branch key of a branch-alias snapshot's own line (`5` for `5.4.x-dev`), null for any other version. */
+    public static function aliasLine(string $version): ?string
+    {
+        if (preg_match('/^v?(\d+(?:\.\d+)?)\.x-dev$/', $version, $m) !== 1 || self::of($version) !== null) {
+            return null;
+        }
+
+        $key = self::of($m[1]);
+
+        // A 0.0.n key is one release wide, so `0.x-dev` and `0.0.x-dev` name no line.
+        return $key === null || substr_count($key, '.') === 2 ? null : $key;
+    }
+
     /**
      * `1.x` for key `1`, `0.3.x` for key `0.3`: how a branch is named in evidence. A `0.0.3` branch is
      * one release wide and is named by it.

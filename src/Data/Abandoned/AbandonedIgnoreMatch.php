@@ -16,10 +16,10 @@ final class AbandonedIgnoreMatch
     public const BY_AUDIT = 'audit.ignore-abandoned';
 
     private string $by;
-    /** @var list<array{pattern: string, reason: ?string, constraints: list<string>}> */
+    /** @var list<AbandonedIgnoreRule> */
     private array $rules;
 
-    /** @param list<array{pattern: string, reason: ?string, constraints: list<string>}> $rules in config order */
+    /** @param list<AbandonedIgnoreRule> $rules in config order */
     public function __construct(string $by, array $rules)
     {
         $this->by = $by;
@@ -35,7 +35,7 @@ final class AbandonedIgnoreMatch
      * `reason` as Composer merges a pattern's reasons for audit. `constraints` are those written on
      * the pattern's audit rules: `composer audit` does not apply them, and neither does lockrot.
      *
-     * @return list<array{pattern: string, reason: ?string, constraints: list<string>}>
+     * @return list<AbandonedIgnoreRule>
      */
     public function rules(): array
     {

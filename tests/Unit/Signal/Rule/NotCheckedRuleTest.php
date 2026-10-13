@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
 use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Repository\PackageMetadata;
@@ -227,6 +228,46 @@ final class NotCheckedRuleTest extends TestCase
         self::assertNull($this->rule()->evaluate(new PackageFacts(F::package(), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), [])));
     }
 
+    /** @return iterable<string, array{string, string}> each advisories reason that raises S10, with its words */
+    public static function advisoryGaps(): iterable
+    {
+        yield 'offline' => ['offline', 'the run is offline'];
+        yield 'Composer below 2.4' => ['composer_too_old', 'Composer is older than 2.4'];
+        yield 'the install-time budget' => ['install_time_budget', 'the install-time budget ran out'];
+        yield 'a repository that threw' => ['lookup_failed', 'an advisory repository failed'];
+        yield 'no feed' => ['no_feed', 'no configured repository publishes advisories'];
+    }
+
+    /** @dataProvider advisoryGaps */
+    #[DataProvider('advisoryGaps')]
+    public function testAnAdvisoryLookupThatDidNotCompleteIsAnS10Entry(string $reason, string $cause): void
+    {
+        $facts = new PackageFacts(F::package(), self::dated(), F::activity(false, '2026-09-01T00:00:00+00:00'), [], null, null, new AdvisoryNameCoverage([], null, $reason));
+
+        $s10 = $this->rule()->evaluate($facts);
+
+        self::assertNotNull($s10);
+        self::assertEquals(new NotCheckedData([new Check('advisories', $reason, [Signal::S9])]), $s10->data());
+        self::assertSame('security advisories not checked ('.$cause.'), so S9 could not be read', $s10->summary());
+    }
+
+    /** @return iterable<string, array{?string}> */
+    public static function advisorySkips(): iterable
+    {
+        yield 'outside the composer-repositories scope' => ['not_from_composer_repository'];
+        yield 'a version Composer cannot parse' => ['unparseable_version'];
+        yield 'a complete lookup' => [null];
+    }
+
+    /** @dataProvider advisorySkips */
+    #[DataProvider('advisorySkips')]
+    public function testASkippedOrCompleteAdvisoryLookupRaisesNoS10(?string $reason): void
+    {
+        $facts = new PackageFacts(F::package(), self::dated(), F::activity(false, '2026-09-01T00:00:00+00:00'), [], null, null, new AdvisoryNameCoverage([], null, $reason));
+
+        self::assertNull($this->rule()->evaluate($facts));
+    }
+
     /** A raised S1 makes the upkeep gaps moot, never another check: that entry keeps its own words. */
     public function testDroppingTheMaintenanceGapsKeepsAnyOtherEntryWithItsSummary(): void
     {
@@ -239,7 +280,7 @@ final class NotCheckedRuleTest extends TestCase
         $kept = NotCheckedRule::withoutMaintenanceGaps([$s10]);
 
         self::assertCount(1, $kept);
-        self::assertSame('advisories not checked (offline), so S9 could not be read', $kept[0]->summary());
+        self::assertSame('security advisories not checked (the run is offline), so S9 could not be read', $kept[0]->summary(), 'the entry is worded again, never split out of the joined summary');
         $data = $kept[0]->data();
         self::assertInstanceOf(NotCheckedData::class, $data);
         self::assertSame([$advisories], $data->checks());

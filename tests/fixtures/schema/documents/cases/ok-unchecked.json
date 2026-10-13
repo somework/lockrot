@@ -764,6 +764,24 @@
    "sort": null,
    "gate-bounded-new": 0,
    "baseline-cover": 0
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 1,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 0,
+     "records": 0
+    }
+   ]
   }
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:29+00:00",
@@ -897,15 +915,40 @@
   "max_fan_in": 8
  },
  "unattributed": [],
+ "rot_depth": {
+  "flagged": 0,
+  "measured": 0,
+  "unmeasured": {
+   "unreached": 0,
+   "no_composer_json": 0
+  },
+  "by_reach": {
+   "direct": 0,
+   "transitive": 0,
+   "unreached": 0
+  },
+  "not_in_composer_json": 0,
+  "require_dev_not_walked": 0,
+  "production": 0,
+  "development": 0,
+  "by_depth": [],
+  "max_depth": null,
+  "deepest": []
+ },
  "libyears": {
   "total": null,
   "direct_requirements": null,
   "measured": 0,
+  "at_least_count": 0,
   "unmeasured": {
-   "branch_snapshot": 0,
-   "no_stable_release_date": 1,
    "not_from_composer_repository": 0,
-   "metadata_unavailable": 0
+   "unavailable": 0,
+   "not_found": 0,
+   "branch_snapshot": 0,
+   "shared_commit": 1,
+   "undated": 0,
+   "no_stable_release": 0,
+   "undated_releases": 0
   },
   "furthest_behind": null,
   "packages": 1
@@ -985,6 +1028,16 @@
     "check": "complete",
     "complete": true,
     "unchecked_reason": null,
+    "records": 0,
+    "feeds": [
+     {
+      "composer_repository": "composer repo (https://repo.packagist.org)",
+      "registry": "packagist.org",
+      "answer": "answered",
+      "records": 0,
+      "reason": null
+     }
+    ],
     "ignored": [],
     "ignored_count": 0
    },
@@ -1017,6 +1070,7 @@
     "cached_at": "2026-10-01T16:04:29+00:00"
    },
    "allowlist": null,
+   "abandoned_ignored": null,
    "from_composer_repository": true,
    "origin": {
     "kind": "packagist",
@@ -1027,7 +1081,8 @@
    "replacement": null,
    "replacement_url": null,
    "note": null,
-   "libyears_unmeasured": "no_stable_release_date",
+   "libyears_unmeasured": "shared_commit",
+   "libyears_at_least": false,
    "direct": false,
    "dev": false,
    "reach": "transitive",
@@ -1035,6 +1090,9 @@
     "pimcore/pimcore",
     "scheb/2fa-google-authenticator"
    ],
+   "depth": 1,
+   "depth_unmeasured": null,
+   "named_in": [],
    "direct_dependents": [
     "pimcore/pimcore",
     "pimcore/quill-bundle",
@@ -1068,6 +1126,20 @@
    "allowlist_reason": null,
    "data_date": "2026-10-01T17:40:21+00:00",
    "libyears": null,
+   "age": {
+    "installed": null,
+    "installed_unmeasured": "shared_commit",
+    "release": null,
+    "release_unmeasured": "undated_releases",
+    "branch_release": null,
+    "branch_release_unmeasured": "undated_releases",
+    "push": {
+     "at": "2026-07-10T18:36:02+00:00",
+     "years": 0.2,
+     "level": null
+    },
+    "push_unmeasured": null
+   },
    "baseline": null,
    "gate": {
     "reaches_fail_on": true,

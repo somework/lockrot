@@ -205,19 +205,61 @@ final class RunNoteTest extends TestCase
             false,
             ['forge_id' => 'bitbucket', 'repositories' => [['host' => 'bitbucket.org', 'repo' => 'workspace/one'], ['host' => 'bitbucket.org', 'repo' => 'workspace/two']]],
         ];
-        yield 'one package not from a Composer repository' => [
-            static fn (): RunNote => RunNote::notFromComposerRepository(1),
+        yield 'one package not from a Composer repository, its advisories asked' => [
+            static fn (): RunNote => RunNote::notFromComposerRepository(1, true),
             'not_from_composer_repository',
-            '1 package is not from a Composer repository and was not checked',
+            '1 package is not from a Composer repository: its release metadata and repository activity were not read',
             false,
-            ['package_count' => 1],
+            ['package_count' => 1, 'advisories_asked' => true],
         ];
-        yield 'several packages not from a Composer repository' => [
-            static fn (): RunNote => RunNote::notFromComposerRepository(2),
+        yield 'several packages not from a Composer repository, their advisories asked' => [
+            static fn (): RunNote => RunNote::notFromComposerRepository(4, true),
             'not_from_composer_repository',
-            '2 packages are not from a Composer repository and were not checked',
+            '4 packages are not from a Composer repository: their release metadata and repository activity were not read',
             false,
-            ['package_count' => 2],
+            ['package_count' => 4, 'advisories_asked' => true],
+        ];
+        yield 'several packages not from a Composer repository, their advisories not asked' => [
+            static fn (): RunNote => RunNote::notFromComposerRepository(3, false),
+            'not_from_composer_repository',
+            '3 packages are not from a Composer repository: their release metadata, repository activity and advisories were not read',
+            false,
+            ['package_count' => 3, 'advisories_asked' => false],
+        ];
+        yield 'markings that Composer\'s list ignores' => [
+            static fn (): RunNote => RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),
+            'abandoned_markings_ignored',
+            "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            false,
+            ['by' => 'policy.abandoned', 'count' => 1, 'packages' => [['package' => 'doctrine/cache', 'patterns' => ['doctrine/*']]]],
+        ];
+        yield 'markings that the legacy list ignores' => [
+            static fn (): RunNote => RunNote::abandonedMarkingsIgnored('audit.ignore-abandoned', ['a/one' => ['a/*'], 'b/two' => ['b/two', 'b/*']]),
+            'abandoned_markings_ignored',
+            "Composer's abandoned ignore list (config.audit.ignore-abandoned) covers the abandoned marking of 2 packages: a/one, b/two. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            false,
+            ['by' => 'audit.ignore-abandoned', 'count' => 2, 'packages' => [['package' => 'a/one', 'patterns' => ['a/*']], ['package' => 'b/two', 'patterns' => ['b/two', 'b/*']]]],
+        ];
+        yield 'an abandoned audit that Composer ignores' => [
+            static fn (): RunNote => RunNote::abandonedNotAuditedByComposer('policy.abandoned.audit', 'ignore'),
+            'abandoned_not_audited_by_composer',
+            "Composer's audit is set not to report abandoned packages (policy.abandoned.audit: ignore); lockrot still counts the abandoned marking. To stop counting it for one package, list the package in config.policy.abandoned.ignore.",
+            false,
+            ['policy_key' => 'policy.abandoned.audit', 'value' => 'ignore'],
+        ];
+        yield 'an abandoned list that Composer disables' => [
+            static fn (): RunNote => RunNote::abandonedNotAuditedByComposer('policy', false),
+            'abandoned_not_audited_by_composer',
+            "Composer's audit is set not to report abandoned packages (policy: false); lockrot still counts the abandoned marking. To stop counting it for one package, list the package in config.policy.abandoned.ignore.",
+            false,
+            ['policy_key' => 'policy', 'value' => false],
+        ];
+        yield 'an abandoned list that Composer rejects' => [
+            static fn (): RunNote => RunNote::abandonedIgnoreUnreadable('Invalid constraint "nope"'),
+            'abandoned_ignore_unreadable',
+            "Composer rejected the project's abandoned ignore list (Invalid constraint \"nope\"), so every abandoned marking counts.",
+            false,
+            ['message' => 'Invalid constraint "nope"'],
         ];
     }
 
@@ -311,6 +353,9 @@ final class RunNoteTest extends TestCase
             'repository_activity_not_found',
             'repository_activity_host_not_supported',
             'not_from_composer_repository',
+            'abandoned_markings_ignored',
+            'abandoned_not_audited_by_composer',
+            'abandoned_ignore_unreadable',
         ], RunNote::CODES);
         self::assertSame(['offline', 'composer_too_old', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);
@@ -321,7 +366,8 @@ final class RunNoteTest extends TestCase
     {
         $refused = [
             'no failed package' => static fn () => RunNote::metadataUnavailable([]),
-            'no package outside a repository' => static fn () => RunNote::notFromComposerRepository(0),
+            'no package outside a repository' => static fn () => RunNote::notFromComposerRepository(0, true),
+            'no marking ignored' => static fn () => RunNote::abandonedMarkingsIgnored('policy.abandoned', []),
             'no unreachable repository' => static fn () => RunNote::repositoryActivityUnreachable(RepoRef::GITHUB, []),
             'no repository not found' => static fn () => RunNote::repositoryActivityNotFound(RepoRef::GITHUB, []),
             'no host lockrot cannot ask' => static fn () => RunNote::repositoryActivityHostNotSupported([]),

@@ -9,8 +9,10 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityBatch;
@@ -36,7 +38,9 @@ use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Security\PackageFixes;
+use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\BranchRow;
+use Lockrot\Signal\Data\AbandonedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AbandonedRule;
@@ -44,6 +48,7 @@ use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -195,15 +200,16 @@ final class Analyzer
                 ->withActivityLookup($lookups[$package->name()]);
             $factsByPackage[$package->name()] = $facts;
             $every = $advisories->every($package->name());
-            $finding = $this->buildFinding($facts, $entry, $graph, $batch, $fixes, $advisories->ignored($package->name()), $every);
+            $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $fixes, $advisories->ignored($package->name()), $every);
             $findings[] = $finding->withMoves($this->moves($finding, $facts, $finder, $lock, $metadata, $every));
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
         }
         if ($notInRepository > 0) {
-            $notes[] = RunNote::notFromComposerRepository($notInRepository);
+            $notes[] = RunNote::notFromComposerRepository($notInRepository, $advisories->coverage()->scope() === AdvisoryCoverage::SCOPE_ALL);
         }
+        $notes = array_merge($notes, $this->abandonedNotes($findings));
         $findings = TransitiveExposure::attach($findings, $graph);
         $graded = [];
         foreach ($findings as $finding) {
@@ -212,7 +218,7 @@ final class Analyzer
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
 
         return new Analysis(
-            new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev),
+            new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()),
             $factsByPackage
         );
     }
@@ -445,10 +451,46 @@ final class Analyzer
     }
 
     /**
+     * @param list<Finding> $findings
+     *
+     * @return list<RunNote> what Composer's abandoned ignore list and audit setting did in this run
+     */
+    private function abandonedNotes(array $findings): array
+    {
+        $notes = [];
+        $patterns = [];
+        $by = null;
+        $marked = false;
+        // The note names the packages in the order that the report writes them.
+        usort($findings, [Report::class, 'compareGraded']);
+        foreach ($findings as $finding) {
+            $ignored = $finding->details()->abandonedIgnored();
+            if ($ignored !== null) {
+                $by = $ignored->by();
+                $patterns[$finding->package()] = array_map(static fn (AbandonedIgnoreRule $rule): string => $rule->pattern(), $ignored->rules());
+            }
+            $marked = $marked || $finding->signalData(AbandonedData::class) !== null;
+        }
+        if ($by !== null) {
+            $notes[] = RunNote::abandonedMarkingsIgnored($by, $patterns);
+        }
+        $notAudited = $this->abandonedIgnore->notAuditedBy();
+        if ($notAudited !== null && $marked) {
+            $notes[] = RunNote::abandonedNotAuditedByComposer($notAudited->policyKey(), $notAudited->value());
+        }
+        $unreadable = $this->abandonedIgnore->whyUnreadable();
+        if ($unreadable !== null) {
+            $notes[] = RunNote::abandonedIgnoreUnreadable($unreadable);
+        }
+
+        return $notes;
+    }
+
+    /**
      * @param list<IgnoredAdvisory> $ignored
      * @param list<Advisory>        $every   every advisory of the package on any version
      */
-    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every): Finding
+    private function buildFinding(PackageFacts $facts, ?AllowlistEntry $entry, DependencyGraph $graph, bool $composerJsonRead, MetadataBatch $batch, ?FixFinder $fixes, array $ignored, array $every): Finding
     {
         $counted = [];
         if ($fixes !== null && $facts->advisories() !== []) {
@@ -488,15 +530,16 @@ final class Analyzer
             $note,
             $package->isDev(),
             array_keys($graph->chainsTo($package->name())),
-            Libyears::measure($package, $meta),
+            Libyears::measure($package, $meta, $facts->metadataStatus()),
             $package->origin(),
             AbandonedRule::replacementNamedBy($facts),
             AdvisoryRule::legacy($facts)[1]
         );
 
         return $finding
+            ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
             ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null));
+            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts)));
     }
 
     /**

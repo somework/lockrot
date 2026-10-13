@@ -233,7 +233,7 @@ final class AnalyzerTest extends TestCase
         self::assertSame(Verdict::ABANDONED, $finding->verdict());
         self::assertSame(Priority013::CRITICAL, $finding->priority());
         self::assertSame('marked abandoned by its repository; 1 security advisory affects 1.0.0 (CVE-2024-0001); no fix expected', $finding->evidence());
-        self::assertSame(['1 package is not from a Composer repository and was not checked'], $report->notes(), 'no advisory note on a complete answer');
+        self::assertSame(['1 package is not from a Composer repository: its release metadata and repository activity were not read'], $report->notes(), 'no advisory note on a complete answer');
         self::assertFalse($report->hadNetworkFailures());
     }
 
@@ -417,8 +417,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame('Repository metadata unavailable: HTTP 503', $report->findings()[0]->evidence());
         self::assertTrue($report->findings()[0]->isFromComposerRepository(), 'a note, and still a package a repository was asked about');
         self::assertNull($report->findings()[0]->libyears());
-        self::assertSame(Libyears::METADATA_UNAVAILABLE, $report->findings()[0]->libyearsUnmeasured());
-        self::assertSame(1, $report->libyears()->unmeasured()[Libyears::METADATA_UNAVAILABLE]);
+        self::assertSame(Libyears::UNAVAILABLE, $report->findings()[0]->libyearsUnmeasured());
+        self::assertSame(1, $report->libyears()->unmeasured()[Libyears::UNAVAILABLE]);
     }
 
     public function testTwoFailedPackagesAreCountedInThePlural(): void
@@ -709,11 +709,11 @@ final class AnalyzerTest extends TestCase
 
         self::assertSame([], $this->analyzeLock([], $this->loader(), $this->http([]), true)->notes());
         self::assertSame(
-            ['1 package is not from a Composer repository and was not checked'],
+            ['1 package is not from a Composer repository: its release metadata and repository activity were not read'],
             $this->analyzeLock([$one], $this->loader(), $this->http([]), true)->notes()
         );
         $report = $this->analyzeLock([$one, $two], $this->loader(), $this->http([]), true);
-        self::assertSame(['2 packages are not from a Composer repository and were not checked'], $report->notes());
+        self::assertSame(['2 packages are not from a Composer repository: their release metadata and repository activity were not read'], $report->notes());
         self::assertSame(2, $report->notFromComposerRepository());
     }
 

@@ -11,9 +11,11 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\AdvisoryFeed;
 use Lockrot\Data\Advisory\AdvisoryIgnore;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Deadline;
@@ -381,7 +383,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
             self::assertSame(['reason' => 'composer_too_old', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
             self::assertSame([], $batch->byName());
             self::assertSame(AdvisoryCoverage::COMPOSER_TOO_OLD, self::nameCoverage($batch, 'doctrine/cache')->reason());
-            self::assertSame([], $batch->coverage()->repositories(), 'Composer 2.2 names no repository advisory-capable');
+            self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::COMPOSER_TOO_OLD]], self::outcomes($batch), 'Composer 2.2 names each Composer repository as not asked');
         }
     }
 
@@ -423,7 +425,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $feed = $coverage->feeds()[$index] ?? null;
         self::assertNotNull($feed, $name.' has feed '.$index);
 
-        return ['answer' => $feed['answer'], 'reason' => $feed['reason'], 'records' => $feed['records']];
+        return ['answer' => $feed->answer(), 'reason' => $feed->reason(), 'records' => $feed->records()];
     }
 
     private static function nameCoverage(AdvisoryBatch $batch, string $name): AdvisoryNameCoverage
@@ -437,7 +439,16 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     /** @return list<array{string, ?string}> each repository's outcome and reason, in configured order */
     private static function outcomes(AdvisoryBatch $batch): array
     {
-        return array_map(static fn (array $repository): array => [$repository['outcome'], $repository['reason']], $batch->coverage()->repositories());
+        return array_map(static fn (AdvisoryRepository $repository): array => [$repository->outcome(), $repository->reason()], $batch->coverage()->repositories());
+    }
+
+    /** A feed that lists one advisory twice for a name holds one record of it. */
+    public function testAFeedCountsEachAdvisoryOfANameOnce(): void
+    {
+        $server = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '<2.0', []), self::record('PKSA-cache-1', '<2.0', [])]]);
+        $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['doctrine/cache' => '2.2.0']);
+
+        self::assertSame(1, self::feed($batch, 'doctrine/cache', 0)['records']);
     }
 
     public function testOneRequestPerRepositoryAsksEveryNameForEveryVersion(): void
@@ -450,18 +461,18 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame(['doctrine/cache', 'doctrine/annotations', 'acme/unknown'], $server->advisoryRequests()[0]);
         self::assertSame(['PKSA-cache-1'], array_map(static fn (Advisory $a): string => $a->id(), $batch->for('doctrine/cache')), 'attributed to the installed version here');
         self::assertSame(['PKSA-cache-1', 'PKSA-cache-2'], array_map(static fn (Advisory $a): string => $a->id(), $batch->every('doctrine/cache')), 'every version is kept');
-        self::assertSame([['composer_repository' => $server->repositories()[0]->getRepoName(), 'answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'message' => null, 'records' => 2]], self::nameCoverage($batch, 'doctrine/cache')->feeds());
+        self::assertEquals([AdvisoryFeed::answered($server->repositories()[0]->getRepoName(), 2)], self::nameCoverage($batch, 'doctrine/cache')->feeds());
         self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'doctrine/annotations', 0), 'a known name echoed with []');
         self::assertSame(['answer' => AdvisoryCoverage::ANSWERED, 'reason' => null, 'records' => 0], self::feed($batch, 'acme/unknown', 0), 'an unknown name the answer leaves out');
         self::assertSame(2, self::nameCoverage($batch, 'doctrine/cache')->records());
         self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertTrue($batch->complete());
         $repository = $batch->coverage()->repositories()[0];
-        self::assertSame($server->repositories()[0]->getRepoName(), $repository['composer_repository']);
-        self::assertSame([AdvisoryCoverage::ANSWERED, null, null, 2, 1], [$repository['outcome'], $repository['reason'], $repository['message'], $repository['records'], $repository['packages_with_records']]);
+        self::assertSame($server->repositories()[0]->getRepoName(), $repository->composerRepository());
+        self::assertSame([AdvisoryCoverage::ANSWERED, null, null, 2, 1], [$repository->outcome(), $repository->reason(), $repository->message(), $repository->records(), $repository->packagesWithRecords()]);
         $two = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '*', [])], 'doctrine/annotations' => [self::record('PKSA-annotations-1', '*', [])]]);
         $both = (new RepositoryAdvisoryLoader($two->repositories()))->load(['doctrine/cache' => '2.2.0', 'doctrine/annotations' => '2.0.2']);
-        self::assertSame([2, 2], [$both->coverage()->repositories()[0]['records'], $both->coverage()->repositories()[0]['packages_with_records']]);
+        self::assertSame([2, 2], [$both->coverage()->repositories()[0]->records(), $both->coverage()->repositories()[0]->packagesWithRecords()]);
         self::assertSame(0, $batch->coverage()->otherRepositories());
         self::assertSame([AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT], [$batch->coverage()->scope(), $batch->coverage()->scopeSource()]);
     }
@@ -522,14 +533,14 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = (new RepositoryAdvisoryLoader(array_merge($unreachable->repositories(), $answering->repositories())))->load(['doctrine/cache' => '2.2.0']);
 
         $failed = self::nameCoverage($batch, 'doctrine/cache')->feeds()[0];
-        self::assertSame($batch->coverage()->repositories()[0]['composer_repository'], $failed['composer_repository']);
-        self::assertSame($batch->coverage()->repositories()[0]['message'], $failed['message']);
-        self::assertSame([AdvisoryCoverage::FAILED, AdvisoryCoverage::LOOKUP_FAILED, null], [$failed['answer'], $failed['reason'], $failed['records']]);
+        self::assertSame($batch->coverage()->repositories()[0]->composerRepository(), $failed->composerRepository());
+        self::assertSame($batch->coverage()->repositories()[0]->message(), $failed->message());
+        self::assertSame([AdvisoryCoverage::FAILED, AdvisoryCoverage::LOOKUP_FAILED, null], [$failed->answer(), $failed->reason(), $failed->records()]);
         self::assertSame(AdvisoryCoverage::ANSWERED, self::feed($batch, 'doctrine/cache', 1)['answer']);
         self::assertSame(AdvisoryCoverage::LOOKUP_FAILED, self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertSame(0, self::nameCoverage($batch, 'doctrine/cache')->records(), 'what the other feed returned still counts');
         self::assertSame([[AdvisoryCoverage::FAILED, AdvisoryCoverage::TRANSPORT], [AdvisoryCoverage::ANSWERED, null]], self::outcomes($batch));
-        $message = $batch->coverage()->repositories()[0]['message'];
+        $message = $batch->coverage()->repositories()[0]->message();
         self::assertIsString($message);
         self::assertStringNotContainsString("\n", $message);
         self::assertSame([true], self::networkFailures($batch));
@@ -632,7 +643,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         self::assertSame([RunNote::ADVISORIES_NOT_CHECKED], array_map(static fn (RunNote $note): string => $note->code(), $policyOff->notes()), 'no claim that lockrot checked what it did not ask');
         self::assertSame([[AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE], [AdvisoryCoverage::NOT_ASKED, AdvisoryCoverage::OFFLINE]], self::outcomes($batch));
         self::assertSame([RunNote::ADVISORY_IGNORE_UNREADABLE, RunNote::ADVISORIES_NOT_CHECKED], array_map(static fn (RunNote $note): string => $note->code(), $batch->notes()));
-        self::assertSame('spy repo (https://spy.example/)', $batch->coverage()->repositories()[0]['composer_repository'], 'credentials stripped');
+        self::assertSame('spy repo (https://spy.example/)', $batch->coverage()->repositories()[0]->composerRepository(), 'credentials stripped');
         self::assertSame([], self::nameCoverage($batch, 'doctrine/cache')->feeds());
         self::assertSame(AdvisoryCoverage::OFFLINE, self::nameCoverage($batch, 'doctrine/cache')->reason());
         self::assertNull(self::nameCoverage($batch, 'doctrine/cache')->records());
@@ -778,7 +789,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         $batch = (new RepositoryAdvisoryLoader($server->repositories(), false, null, null, AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG))->load(['acme/fork' => '1.0.0'], ['acme/fork']);
 
         self::assertSame([], $server->advisoryRequests());
-        self::assertSame([['composer_repository' => $server->repositories()[0]->getRepoName(), 'answer' => AdvisoryCoverage::NOT_ASKED, 'reason' => AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, 'message' => null, 'records' => null]], self::nameCoverage($batch, 'acme/fork')->feeds());
+        self::assertEquals([AdvisoryFeed::notAsked($server->repositories()[0]->getRepoName(), AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY)], self::nameCoverage($batch, 'acme/fork')->feeds());
     }
 
     public function testNoNameToAskKeepsTheConfiguredScope(): void
@@ -811,7 +822,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         self::assertSame([['doctrine/cache']], $server->advisoryRequests());
         self::assertSame([], $scoped->for('acme/fork'));
-        self::assertSame([['composer_repository' => $server->repositories()[0]->getRepoName(), 'answer' => AdvisoryCoverage::NOT_ASKED, 'reason' => AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, 'message' => null, 'records' => null]], self::nameCoverage($scoped, 'acme/fork')->feeds());
+        self::assertEquals([AdvisoryFeed::notAsked($server->repositories()[0]->getRepoName(), AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY)], self::nameCoverage($scoped, 'acme/fork')->feeds());
         self::assertSame(AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, self::nameCoverage($scoped, 'acme/fork')->reason());
         self::assertNull(self::nameCoverage($scoped, 'acme/fork')->records());
         self::assertSame([AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG], [$scoped->coverage()->scope(), $scoped->coverage()->scopeSource()]);

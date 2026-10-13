@@ -92,7 +92,7 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
             $server->stop();
         }
 
-        foreach ([Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::BRANCH_SNAPSHOT, Libyears::NO_STABLE_RELEASE_DATE, 'measured', self::LOWER_BOUND] as $code) {
+        foreach ([Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::BRANCH_SNAPSHOT, Libyears::SHARED_COMMIT, 'measured', self::LOWER_BOUND] as $code) {
             self::assertArrayHasKey($code, $this->seen, 'the fixtures give '.$code.', or the agreement proves little: '.json_encode($this->seen));
         }
     }
@@ -121,18 +121,20 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
                 self::assertArrayHasKey($code, $block, $what.': a key of the block');
                 ++$counted[$code];
                 $this->seen[$code] = ($this->seen[$code] ?? 0) + 1;
-                self::assertSame(self::rule012($row), $code, $what.': the reason 0.12 filed it under');
+                self::assertContains($code, self::rule012($row), $what.': the reasons 0.12 filed it under');
             }
 
             $finding = $analysis->finding($package);
             $facts = $analysis->facts($package);
             self::assertNotNull($finding, $what);
             self::assertNotNull($facts, $what);
-            [$reason, $years] = self::fromFacts($facts->package(), $facts->metadata());
+            [$reason, $years] = self::fromFacts($facts->package(), $facts->metadata(), $facts->metadataStatus());
             self::assertSame($reason, $code, $what.': the facts the analysis was decided on');
             self::assertSame($years === null ? null : round($years, 2), $row['libyears'], $what.': the years between the two ends');
             $metadata = $facts->metadata();
-            if ($years !== null && $metadata !== null && $metadata->lastStableReleaseAt() === null) {
+            $lowerBound = $years !== null && $metadata !== null && $metadata->lastStableReleaseAt() === null;
+            self::assertSame($lowerBound, $row['libyears_at_least'], $what.': a lower bound exactly when the newest release is undated');
+            if ($lowerBound) {
                 $this->seen[self::LOWER_BOUND] = ($this->seen[self::LOWER_BOUND] ?? 0) + 1;
             }
             $explained = (new Explanation($finding, $facts, new Thresholds(), '8.4', $report))->toArray();
@@ -152,21 +154,28 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
      *
      * @return array{?string, ?float}
      */
-    private static function fromFacts(LockedPackage $package, ?PackageMetadata $metadata): array
+    private static function fromFacts(LockedPackage $package, ?PackageMetadata $metadata, string $metadataStatus): array
     {
         if (!$package->isFromComposerRepository()) {
             return [Libyears::NOT_FROM_COMPOSER_REPOSITORY, null];
         }
         if ($metadata === null) {
-            return [Libyears::METADATA_UNAVAILABLE, null];
+            return [$metadataStatus, null];
         }
         if ($package->isBranchSnapshot()) {
             return [Libyears::BRANCH_SNAPSHOT, null];
         }
-        $installed = InstalledRelease::of($package, $metadata)->at();
+        $release = InstalledRelease::of($package, $metadata);
+        $installed = $release->at();
+        if ($installed === null) {
+            return [$release->kind() === InstalledRelease::SHARED_COMMIT ? Libyears::SHARED_COMMIT : Libyears::UNDATED, null];
+        }
+        if (!$metadata->hasStableRelease()) {
+            return [Libyears::NO_STABLE_RELEASE, null];
+        }
         $newest = $metadata->lastStableReleaseAt() ?? self::newestDatedAbove($metadata, $package->version());
-        if ($installed === null || $newest === null) {
-            return [Libyears::NO_STABLE_RELEASE_DATE, null];
+        if ($newest === null) {
+            return [Libyears::UNDATED_RELEASES, null];
         }
 
         return [null, max(0.0, ($newest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR)];
@@ -191,22 +200,25 @@ final class LibyearsUnmeasuredAgreementTest extends TestCase
     }
 
     /**
-     * An independent filing of an unmeasured finding off what it says: the note, then the version.
-     * Do not align it with Libyears::measure(): the agreement then proves nothing.
+     * An independent filing of an unmeasured finding off what it says: the note, the metadata
+     * status, then the version. 0.12 filed an undated end under one reason, which report-2 splits
+     * into four. Do not align it with Libyears::measure(): the agreement then proves nothing.
      *
      * @param array<mixed, mixed> $row
+     *
+     * @return list<string>
      */
-    private static function rule012(array $row): string
+    private static function rule012(array $row): array
     {
         if ($row['note'] === Finding::NOTE_NOT_IN_REPOSITORY) {
-            return Libyears::NOT_FROM_COMPOSER_REPOSITORY;
+            return [Libyears::NOT_FROM_COMPOSER_REPOSITORY];
         }
         if ($row['note'] !== null) {
-            return Libyears::METADATA_UNAVAILABLE;
+            return [JsonPath::stringAt($row, ['metadata', 'status'])];
         }
         self::assertIsString($row['version']);
 
-        return VersionParser::parseStability($row['version']) === 'dev' ? Libyears::BRANCH_SNAPSHOT : Libyears::NO_STABLE_RELEASE_DATE;
+        return VersionParser::parseStability($row['version']) === 'dev' ? [Libyears::BRANCH_SNAPSHOT] : [Libyears::SHARED_COMMIT, Libyears::UNDATED, Libyears::NO_STABLE_RELEASE, Libyears::UNDATED_RELEASES];
     }
 
     private function analysis(MetadataLoaderInterface $loader, string $dir): Analysis

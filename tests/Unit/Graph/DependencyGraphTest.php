@@ -41,6 +41,23 @@ final class DependencyGraphTest extends TestCase
         self::assertSame(['vendor/devtool'], $this->graph(true)->shortestChain('vendor/devtool'));
     }
 
+    /** A finding's depth is its chain less one: 0 for a root, 1 for its requirement, the shorter path of a diamond. */
+    public function testTheDepthIsTheShortestPathBelowARoot(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'app/root', 'version' => '1.0.0', 'require' => ['lib/left' => '^1', 'lib/right' => '^1']],
+            ['name' => 'lib/left', 'version' => '1.0.0', 'require' => ['lib/bottom' => '^1']],
+            ['name' => 'lib/right', 'version' => '1.0.0', 'require' => ['lib/middle' => '^1']],
+            ['name' => 'lib/middle', 'version' => '1.0.0', 'require' => ['lib/bottom' => '^1']],
+            ['name' => 'lib/bottom', 'version' => '1.0.0'],
+            ['name' => 'lib/orphan', 'version' => '1.0.0'],
+        ]]);
+        $graph = DependencyGraph::fromLock($lock, ProjectConfig::fromArray(['require' => ['app/root' => '^1']]), false);
+        $depth = static fn (string $package): ?int => $graph->shortestChain($package) === [] ? null : \count($graph->shortestChain($package)) - 1;
+
+        self::assertSame([0, 1, 2, 2, null], [$depth('app/root'), $depth('lib/left'), $depth('lib/middle'), $depth('lib/bottom'), $depth('lib/orphan')]);
+    }
+
     public function testAChainOverWallabagEndsWithThePackage(): void
     {
         $graph = $this->wallabag();

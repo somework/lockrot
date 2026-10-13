@@ -490,11 +490,11 @@ def add_relations(D):
               'word has the score-0 shape, priority `none` and no move (I21).',
            [P(verdict=E(g), priority=E(g), score={'required': ['terms']}, next_step=OBJ) for g in GRADES]
            + [P(verdict=E(*ZERO_WORDS), priority=E('none'), score={'not': {'required': ['terms']}}, next_step=NULL)])
-    relate(f, '`reach` follows `direct` and `chain`: `direct` when composer.json requires it; `transitive` with a chain of two or more; `unreached` with an '
-              'empty one.',
-           [P(direct=E(True), reach=E('direct')),
-            P(direct=E(False), reach=E('transitive'), chain={'minItems': 2}),
-            P(direct=E(False), reach=E('unreached'), chain=EMPTY)])
+    relate(f, ('`reach` follows `direct` and `chain`, and `depth` follows them. `direct`: composer.json requires it, depth 0, and composer.json names it. '
+               '`transitive`: a chain of two or more, depth 1 or more. `unreached`: an empty chain and no depth.'),
+           [P(direct=E(True), reach=E('direct'), depth=E(0), named_in=MIN1),
+            P(direct=E(False), reach=E('transitive'), chain={'minItems': 2}, depth={'type': 'integer', 'minimum': 1}),
+            P(direct=E(False), reach=E('unreached'), chain=EMPTY, depth=NULL)])
     relate(f, 'Maintenance is judged exactly when repository metadata was read.',
            [P(metadata=P(status=E('read')), maintenance_judged=E(True)), P(metadata=P(status=NOT('read')), maintenance_judged=E(False))])
     relate(f, '`security.installed_branch_fixes` is null exactly when `branch` is (a snapshot; I21).',
@@ -595,7 +595,7 @@ def add_relations(D):
 
 
 EXPLAIN_RUN_KEYS = ['target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts',
-                    'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model']
+                    'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model', 'advisory_lookup']
 EXPLAIN_ONLY = ['legacy', 'priority', 'priorityStep', 'flaggedPriority', 'lock', 'repositoryMetadata', 'explainRun']
 
 

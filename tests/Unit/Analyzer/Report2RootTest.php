@@ -152,13 +152,13 @@ final class Report2RootTest extends TestCase
     public function testLibyearsSumsTheWrittenValuesToTwoDecimals(): void
     {
         $finding = static fn (bool $direct, ?float $years): Finding => (new FindingBuilder())->withChain($direct ? ['vendor/pkg'] : ['vendor/root', 'vendor/pkg'])
-            ->withLibyears($years === null ? LibyearsMeasurement::unmeasured(Libyears::NO_STABLE_RELEASE_DATE) : LibyearsMeasurement::of($years))->build();
+            ->withLibyears($years === null ? LibyearsMeasurement::unmeasured(Libyears::UNDATED_RELEASES) : LibyearsMeasurement::of($years))->build();
         $findings = [$finding(true, 1.111), $finding(false, 2.227), $finding(true, 0.5), $finding(false, 1.0), $finding(true, null)];
         $block = Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings);
         $only = static fn (Finding $one): array => array_intersect_key(Report2Root::toLibyearsArray(Libyears::fromFindings([$one]), [$one]), ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]);
 
         self::assertSame(['total' => 4.84, 'direct_requirements' => 1.61, 'packages' => 5], array_intersect_key($block, ['total' => 0, 'direct_requirements' => 0, 'packages' => 0]));
-        self::assertSame(['total', 'direct_requirements', 'measured', 'unmeasured', 'furthest_behind', 'packages'], array_keys($block));
+        self::assertSame(['total', 'direct_requirements', 'measured', 'at_least_count', 'unmeasured', 'furthest_behind', 'packages'], array_keys($block));
         self::assertSame(['total' => 2.23, 'direct_requirements' => 0.0, 'packages' => 1], $only($finding(false, 2.227)));
         self::assertSame(['total' => null, 'direct_requirements' => null, 'packages' => 1], $only($finding(true, null)));
         $pair = [$finding(true, 1.114), $finding(true, 1.114), $finding(false, 1.114), $finding(false, 0.286)];
@@ -180,8 +180,9 @@ final class Report2RootTest extends TestCase
             'total' => 8.08,
             'direct_requirements' => 4.72,
             'measured' => 2,
-            'unmeasured' => [Libyears::BRANCH_SNAPSHOT => 1, Libyears::NO_STABLE_RELEASE_DATE => 0, Libyears::NOT_FROM_COMPOSER_REPOSITORY => 0, Libyears::METADATA_UNAVAILABLE => 0],
-            'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.72],
+            'at_least_count' => 0,
+            'unmeasured' => ['not_from_composer_repository' => 0, 'unavailable' => 0, 'not_found' => 0, 'branch_snapshot' => 1, 'shared_commit' => 0, 'undated' => 0, 'no_stable_release' => 0, 'undated_releases' => 0],
+            'furthest_behind' => ['package' => 'smalot/pdfparser', 'version' => 'v1.1.0', 'libyears' => 4.72, 'at_least' => false],
             'packages' => 3,
         ], Report2Root::toLibyearsArray(Libyears::fromFindings($findings), $findings));
     }
@@ -228,6 +229,6 @@ final class Report2RootTest extends TestCase
             $list[] = $advisory;
         }
 
-        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, $list, null, FindingBuilder::unread()));
+        return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, $check, null, $list, null, FindingBuilder::unread(), FindingBuilder::unmeasuredAge(), null, null));
     }
 }

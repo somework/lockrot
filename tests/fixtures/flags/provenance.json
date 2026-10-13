@@ -1,5 +1,5 @@
 {
- "pr": "4d",
+ "pr": "4f",
  "source": {
   "cases.json": "f90d69c457bdc04e6b31198c59573bb0532c512feac3235753c9ce57ad4a1939",
   "model_run_date": "2026-10-08"
@@ -7,49 +7,15 @@
  "suite": "run_all.sh: 55 of 55 steps pass (the attack-rounds step with its PHP cap raised)",
  "dropped": [
   "(root).packages_unchecked_accepted",
-  "(root).rot_depth",
-  "cases[].finding.abandoned_ignored",
-  "cases[].finding.age",
-  "cases[].finding.depth",
-  "cases[].finding.depth_unmeasured",
-  "cases[].finding.libyears_at_least",
-  "cases[].finding.named_in",
-  "cases[].finding.security.feeds",
-  "cases[].finding.security.records",
   "cases[].finding.unchecked_accepted",
-  "cases[].run.advisory_lookup",
-  "finding.abandoned_ignored",
-  "finding.age",
-  "finding.depth",
-  "finding.depth_unmeasured",
-  "finding.libyears_at_least",
-  "finding.named_in",
-  "finding.security.feeds",
-  "finding.security.records",
   "finding.unchecked_accepted",
-  "findings[].abandoned_ignored",
-  "findings[].age",
-  "findings[].depth",
-  "findings[].depth_unmeasured",
-  "findings[].libyears_at_least",
-  "findings[].named_in",
-  "findings[].security.feeds",
-  "findings[].security.records",
   "findings[].unchecked_accepted",
   "gate.failing_by",
   "gate.not_applied",
-  "gate.text",
-  "libyears.at_least_count",
-  "libyears.furthest_behind.at_least",
-  "note_details[code=not_from_composer_repository].data.advisories_asked",
-  "run.advisory_lookup"
+  "gate.text"
  ],
  "reverted": {
-  "S10 {check: advisories} -> dropped": 7,
-  "checks_skipped accepted_by_config -> the S10 entry it accepted": 4,
-  "libyears_unmeasured shared_commit -> no_stable_release_date": 7,
-  "libyears_unmeasured unavailable -> metadata_unavailable": 1,
-  "note not_from_composer_repository text -> report-1 words": 1
+  "checks_skipped accepted_by_config -> the S10 entry it accepted": 4
  },
  "cases_without_inputs": [
   "psr-log",
@@ -95,6 +61,9 @@
   "host-unsupported",
   "not-found-dagger",
   "gitlab-anon-dagger",
-  "local-path-advisory"
+  "local-path-advisory",
+  "ignored-marking-archived-dagger",
+  "ignored-marking-stale-dagger",
+  "no-feed-dagger"
  ]
 }

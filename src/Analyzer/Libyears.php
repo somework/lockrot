@@ -11,6 +11,7 @@ use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\LockedPackage;
+use Lockrot\Signal\AgeMeasure;
 use Lockrot\Verdict\Finding;
 
 /**
@@ -20,17 +21,25 @@ use Lockrot\Verdict\Finding;
  */
 final class Libyears
 {
-    public const BRANCH_SNAPSHOT = 'branch_snapshot';
-    public const NO_STABLE_RELEASE_DATE = 'no_stable_release_date';
-    public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
-    public const METADATA_UNAVAILABLE = 'metadata_unavailable';
+    public const NOT_FROM_COMPOSER_REPOSITORY = AgeMeasure::NOT_FROM_COMPOSER_REPOSITORY;
+    public const UNAVAILABLE = AgeMeasure::UNAVAILABLE;
+    public const NOT_FOUND = AgeMeasure::NOT_FOUND;
+    public const BRANCH_SNAPSHOT = AgeMeasure::BRANCH_SNAPSHOT;
+    public const SHARED_COMMIT = AgeMeasure::SHARED_COMMIT;
+    public const UNDATED = AgeMeasure::UNDATED;
+    public const NO_STABLE_RELEASE = AgeMeasure::NO_STABLE_RELEASE;
+    public const UNDATED_RELEASES = AgeMeasure::UNDATED_RELEASES;
 
-    /** The block lists the reasons in this order. {@see measure()} checks them in another. */
-    public const REASONS = [self::BRANCH_SNAPSHOT, self::NO_STABLE_RELEASE_DATE, self::NOT_FROM_COMPOSER_REPOSITORY, self::METADATA_UNAVAILABLE];
+    /**
+     * The block lists the reasons in this order. An unmeasured end takes the id of its age reading
+     * ({@see AgeMeasure}), so one cause has one id.
+     */
+    public const REASONS = [self::NOT_FROM_COMPOSER_REPOSITORY, self::UNAVAILABLE, self::NOT_FOUND, self::BRANCH_SNAPSHOT, self::SHARED_COMMIT, self::UNDATED, self::NO_STABLE_RELEASE, self::UNDATED_RELEASES];
 
     private float $total;
     private float $direct;
     private int $measured;
+    private int $atLeast;
     /** @var array<string, int> every key of {@see REASONS}, zero included */
     private array $unmeasured;
     /**
@@ -44,34 +53,48 @@ final class Libyears
      * @param array<string, int>        $unmeasured
      * @param array{Finding, float}|null $worst
      */
-    private function __construct(float $total, float $direct, int $measured, array $unmeasured, ?array $worst)
+    private function __construct(float $total, float $direct, int $measured, int $atLeast, array $unmeasured, ?array $worst)
     {
         $this->total = $total;
         $this->direct = $direct;
         $this->measured = $measured;
+        $this->atLeast = $atLeast;
         $this->unmeasured = $unmeasured;
         $this->worst = $worst;
     }
 
-    public static function measure(LockedPackage $package, ?PackageMetadata $metadata): LibyearsMeasurement
+    /** @param ?string $whyNoMetadata `unavailable` or `not_found` when the caller knows why the metadata is missing, as for {@see AgeMeasure::release()} */
+    public static function measure(LockedPackage $package, ?PackageMetadata $metadata, ?string $whyNoMetadata = null): LibyearsMeasurement
     {
         if (!$package->isFromComposerRepository()) {
             return LibyearsMeasurement::unmeasured(self::NOT_FROM_COMPOSER_REPOSITORY);
         }
         if ($metadata === null) {
-            return LibyearsMeasurement::unmeasured(self::METADATA_UNAVAILABLE);
+            return LibyearsMeasurement::unmeasured($whyNoMetadata ?? self::UNAVAILABLE);
         }
-        // A branch is never dated as a release, with a lock `time` or without one.
-        $installed = InstalledRelease::of($package, $metadata)->at();
+        if ($package->isBranchSnapshot()) {
+            return LibyearsMeasurement::unmeasured(self::BRANCH_SNAPSHOT);
+        }
+        $release = InstalledRelease::of($package, $metadata);
+        $installed = $release->at();
         if ($installed === null) {
-            return LibyearsMeasurement::unmeasured($package->isBranchSnapshot() ? self::BRANCH_SNAPSHOT : self::NO_STABLE_RELEASE_DATE);
+            return LibyearsMeasurement::unmeasured($release->kind() === InstalledRelease::SHARED_COMMIT ? self::SHARED_COMMIT : self::UNDATED);
         }
-        $latest = $metadata->lastStableReleaseAt() ?? self::newestTrustedDateAbove($metadata, $package->version());
-        if ($latest === null) {
-            return LibyearsMeasurement::unmeasured(self::NO_STABLE_RELEASE_DATE);
+        if (!$metadata->hasStableRelease()) {
+            return LibyearsMeasurement::unmeasured(self::NO_STABLE_RELEASE);
         }
+        $newest = $metadata->lastStableReleaseAt();
+        if ($newest !== null) {
+            return LibyearsMeasurement::of(self::yearsBetween($installed, $newest));
+        }
+        $above = self::newestTrustedDateAbove($metadata, $package->version());
 
-        return LibyearsMeasurement::of(max(0.0, ($latest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR));
+        return $above === null ? LibyearsMeasurement::unmeasured(self::UNDATED_RELEASES) : LibyearsMeasurement::atLeast(self::yearsBetween($installed, $above));
+    }
+
+    private static function yearsBetween(\DateTimeImmutable $installed, \DateTimeImmutable $newest): float
+    {
+        return max(0.0, ($newest->getTimestamp() - $installed->getTimestamp()) / Clock::SECONDS_PER_YEAR);
     }
 
     /**
@@ -124,6 +147,7 @@ final class Libyears
         $total = 0.0;
         $direct = 0.0;
         $measured = 0;
+        $atLeast = 0;
         $unmeasured = array_fill_keys(self::REASONS, 0);
         /** @var array{Finding, float}|null $worst */
         $worst = null;
@@ -138,6 +162,9 @@ final class Libyears
                 throw new \LogicException(\sprintf('%s has neither libyears nor a reason it has none.', $finding->package()));
             }
             ++$measured;
+            if ($finding->isLibyearsAtLeast()) {
+                ++$atLeast;
+            }
             $total += $behind;
             if ($finding->isDirect()) {
                 $direct += $behind;
@@ -149,27 +176,7 @@ final class Libyears
             }
         }
 
-        return new self($total, $direct, $measured, $unmeasured, $worst);
-    }
-
-    /**
-     * The words for a finding's {@see Finding::libyearsUnmeasured()} key. The map covers every key
-     * of {@see REASONS}.
-     */
-    public static function reasonWords(Finding $finding): string
-    {
-        $reason = $finding->libyearsUnmeasured();
-        if ($reason === null) {
-            throw new \LogicException(\sprintf('%s was measured, so there is no reason to put into words.', $finding->package()));
-        }
-        $words = [
-            self::BRANCH_SNAPSHOT => 'branch snapshot',
-            self::NO_STABLE_RELEASE_DATE => 'no release date lockrot trusts',
-            self::NOT_FROM_COMPOSER_REPOSITORY => 'not from a Composer repository',
-            self::METADATA_UNAVAILABLE => 'metadata unavailable',
-        ];
-
-        return $words[$reason];
+        return new self($total, $direct, $measured, $atLeast, $unmeasured, $worst);
     }
 
     /**
@@ -193,6 +200,12 @@ final class Libyears
     public function measured(): int
     {
         return $this->measured;
+    }
+
+    /** The measured findings whose value is a lower bound ({@see Finding::isLibyearsAtLeast()}). */
+    public function atLeastCount(): int
+    {
+        return $this->atLeast;
     }
 
     /** @return array<string, int> by reason, every key of {@see REASONS}, zero included */

@@ -6,6 +6,8 @@ namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
+use Lockrot\Data\Advisory\AdvisoryFeed;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
@@ -13,10 +15,16 @@ use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\PackageOrigin;
+use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\Data\ArchivedData;
 use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\NoPushData;
+use Lockrot\Signal\Data\NoReleaseData;
 use Lockrot\Signal\Signal;
+use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -50,6 +58,9 @@ final class FindingBuilder
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private bool $unscored = false;
+    /** @var ?list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> */
+    private ?array $namedIn = null;
+    private bool $composerJsonRead = true;
 
     /**
      * The signals that raise each report-1 verdict word as its flag, for a finding a test builds
@@ -180,6 +191,28 @@ final class FindingBuilder
         return $clone;
     }
 
+    /**
+     * The composer.json sections that name the package. Without a call, a direct finding is named in
+     * `require` (`require-dev` for a packages-dev one), and any other in none.
+     *
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $namedIn
+     */
+    public function withNamedIn(array $namedIn): self
+    {
+        $clone = clone $this;
+        $clone->namedIn = $namedIn;
+
+        return $clone;
+    }
+
+    public function withComposerJsonRead(bool $read): self
+    {
+        $clone = clone $this;
+        $clone->composerJsonRead = $read;
+
+        return $clone;
+    }
+
     public function withFlags(?FlagSet $flags, bool $maintenanceJudged = true): self
     {
         $clone = clone $this;
@@ -205,7 +238,9 @@ final class FindingBuilder
      */
     public function build(): Finding
     {
-        $finding = new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->advisoryFacts013);
+        $namedIn = $this->namedIn ?? (\count($this->chain) === 1 ? [$this->dev ? ProjectConfig::REQUIRE_DEV : ProjectConfig::REQUIRE] : []);
+        $finding = (new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->advisoryFacts013))
+            ->withComposerJson($this->composerJsonRead, $namedIn);
         if ($this->flags !== null) {
             return $finding->withFlags($this->flags, $this->maintenanceJudged)->withDetails(self::detailsOf($finding, $this->maintenanceJudged));
         }
@@ -237,7 +272,40 @@ final class FindingBuilder
         $reason = $finding->allowlistReason();
         $entry = $reason === null ? null : new AllowlistEntry($finding->package(), null, $reason, null, AllowlistEntry::BY_PROJECT);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, self::activityOf($finding));
+        $activity = self::activityOf($finding);
+
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity), new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null), null);
+    }
+
+    /**
+     * The age readings that the finding's S2, S4 and S8 quote, at the signal's level. A reading that
+     * no signal quotes is unmeasured, for the reason that the metadata status or the activity gives.
+     */
+    public static function ageOf(Finding $finding, string $metadataStatus, ActivityLookup $activity): Age
+    {
+        $levels = [];
+        foreach ($finding->signals() as $signal) {
+            $levels[$signal->id()] = $signal->level();
+        }
+        $measured = static fn (string $at, ?float $years, ?string $version, ?string $datedBy, ?string $level, string $kind): AgeReading => AgeReading::measured(new \DateTimeImmutable($at), (int) round(($years ?? 0.0) * 10), $years ?? 0.0, $version, $datedBy, $level, $kind);
+        $metadataReason = $metadataStatus === 'read' ? null : $metadataStatus;
+        $s2 = $finding->signalData(NoReleaseData::class);
+        $s4 = $finding->signalData(NoPushData::class);
+        $s8 = $finding->signalData(LeftBehindData::class);
+        $snapshot = ReleaseBranch::of($finding->version()) === null;
+
+        return new Age(
+            $finding->libyears() !== null ? AgeReading::measured(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), 0, 0.0, null, null, null, AgeReading::INSTALLED) : AgeReading::unmeasuredBecause($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::UNDATED),
+            $s2 === null ? AgeReading::unmeasuredBecause($metadataReason ?? AgeMeasure::UNDATED_RELEASES) : $measured($s2->lastRelease(), $s2->years(), $s2->lastVersion(), $s2->datedBy(), $levels[Signal::S2], AgeReading::RELEASE),
+            $s8 === null ? AgeReading::unmeasuredBecause($metadataReason ?? ($snapshot ? AgeMeasure::BRANCH_SNAPSHOT : AgeMeasure::NO_BRANCH_ROW)) : $measured($s8->branchLastRelease(), $s8->years(), $s8->branchLastVersion(), $s8->datedBy(), $levels[Signal::S8], AgeReading::RELEASE),
+            $s4 === null ? AgeReading::unmeasuredBecause($activity->reason() ?? AgeMeasure::UNDATED) : $measured($s4->lastPush(), $s4->years(), null, null, $levels[Signal::S4], AgeReading::PUSH)
+        );
+    }
+
+    /** No reading taken, for details whose test reads no age. */
+    public static function unmeasuredAge(): Age
+    {
+        return new Age(AgeReading::unmeasuredBecause(AgeMeasure::UNDATED), AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES), AgeReading::unmeasuredBecause(AgeMeasure::NO_BRANCH_ROW), AgeReading::unmeasuredBecause(AgeMeasure::NO_REPOSITORY));
     }
 
     /** The lookup of a package with no repository URL, for details whose test reads no activity. */

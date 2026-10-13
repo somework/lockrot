@@ -24,6 +24,7 @@
     "exposure",
     "exposure_rule",
     "unattributed",
+    "rot_depth",
     "libyears",
     "baseline",
     "gate",
@@ -331,13 +332,17 @@
         }
       }
     },
+    "rot_depth": {
+      "$ref": "#/definitions/rotDepth"
+    },
     "libyears": {
-      "description": "How far behind the lock is, in libyears: for each measured finding, the years (365.25 days) between the installed version's release and the package's newest stable release, never below zero, summed. Derived from `findings`: `total` is the sum of the published two-decimal per-finding values, rounded to two decimals (report-1 summed the unrounded values, so its total could differ from the sum of its own rows by up to 0.005 per finding), `direct_requirements` the same over `direct: true`, `measured` the number of findings whose `libyears` is not null, `unmeasured` the null ones by reason, `furthest_behind` the greatest above zero (ties to the first package name; null when nothing was measured or nothing is behind). Every drift counts, healthy patches included: this is not a measure of rot or of security, and not php-libyear's number, which sums composer.json's direct requirements (require and require-dev) and scores an undated package as zero. report-2 adds `packages`.",
+      "description": "How far behind the lock is, in libyears: for each measured finding, the years (365.25 days) between the installed version's release and the package's newest stable release, never below zero, summed. Derived from `findings`: `total` is the sum of the published two-decimal per-finding values, rounded to two decimals (report-1 summed the unrounded values, so its total could differ from the sum of its own rows by up to 0.005 per finding), `direct_requirements` the same over `direct: true`, `measured` the number of findings whose `libyears` is not null, `unmeasured` the null ones by reason, `furthest_behind` the greatest above zero (ties to the first package name; null when nothing was measured or nothing is behind). Every drift counts, healthy patches included: this is not a measure of rot or of security, and not php-libyear's number, which sums composer.json's direct requirements (require and require-dev) and scores an undated package as zero. report-2 adds `packages` and `at_least_count`. It splits `metadata_unavailable` into `unavailable` and `not_found`, and it replaces `no_stable_release_date` with the ids that `age` gives the same cause.",
       "type": "object",
       "required": [
         "total",
         "direct_requirements",
         "measured",
+        "at_least_count",
         "unmeasured",
         "furthest_behind",
         "packages"
@@ -364,33 +369,62 @@
           "type": "integer",
           "minimum": 0
         },
+        "at_least_count": {
+          "description": "Findings whose `libyears_at_least` is true. Above 0, `total` is a lower bound, and so is `direct_requirements` when a direct finding is among them.",
+          "type": "integer",
+          "minimum": 0
+        },
         "unmeasured": {
-          "description": "Findings with `libyears: null`, by the first reason that applies. Every non-null `libyears_unmeasured` on a finding is one of these keys, and each count is the number of findings carrying it. A later minor release may add a key, always written from then on but never added to `required`, since 0.13 documents would then fail. These keys are not a pattern plus x-known-values set: `required` lists the ones this release writes.",
+          "description": "Findings with `libyears: null`, by `libyears_unmeasured`. Every key that report-2 writes is required, zeros included. A later minor release can add a key: an extra key is a count. `measured` plus every count is `packages`.",
           "type": "object",
           "required": [
-            "branch_snapshot",
-            "no_stable_release_date",
             "not_from_composer_repository",
-            "metadata_unavailable"
+            "unavailable",
+            "not_found",
+            "branch_snapshot",
+            "shared_commit",
+            "undated",
+            "no_stable_release",
+            "undated_releases"
           ],
           "properties": {
+            "not_from_composer_repository": {
+              "description": "lockrot asked for no metadata: the lock entry carries no Composer notification-url.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "unavailable": {
+              "description": "lockrot asked for the metadata, and it did not come (`metadata.status` `unavailable`).",
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_found": {
+              "description": "The Composer repository does not list the package (`metadata.status` `not_found`).",
+              "type": "integer",
+              "minimum": 0
+            },
             "branch_snapshot": {
               "description": "A dev pin (`dev-main`, `2.x-dev`): a commit date, not a release date.",
               "type": "integer",
               "minimum": 0
             },
-            "no_stable_release_date": {
-              "description": "No date to trust for one end: no stable release; the newest one undated with nothing dated above the installed version (when something dated is, its date is used and the value is a lower bound); the installed version dated only by a commit its tags share and not by its monorepo parent either (where the parent lists the version, its date is the installed version's); or the lock entry without a `time`.",
+            "shared_commit": {
+              "description": "A commit that other tags share dates the installed tag, and no parent tag dates it (`age.installed_unmeasured` `shared_commit`).",
               "type": "integer",
               "minimum": 0
             },
-            "not_from_composer_repository": {
-              "description": "No metadata was asked for: the lock entry carries no Composer notification-url — a path, vcs, artifact or inline package entry, or a package from a `type: composer` repository that advertises no notify URL.",
+            "undated": {
+              "description": "The installed release has no date at all (`age.installed_unmeasured` `undated`).",
               "type": "integer",
               "minimum": 0
             },
-            "metadata_unavailable": {
-              "description": "Metadata was asked for and did not come: not listed, offline, budget, transport.",
+            "no_stable_release": {
+              "description": "No stable release to measure to (`age.release_unmeasured` `no_stable_release`).",
+              "type": "integer",
+              "minimum": 0
+            },
+            "undated_releases": {
+              "description": "No dated release to measure to (`age.release_unmeasured` `undated_releases`).",
               "type": "integer",
               "minimum": 0
             }
@@ -408,7 +442,8 @@
               "required": [
                 "package",
                 "version",
-                "libyears"
+                "libyears",
+                "at_least"
               ],
               "properties": {
                 "package": {
@@ -422,6 +457,10 @@
                   "description": "The finding's `libyears`.",
                   "type": "number",
                   "minimum": 0
+                },
+                "at_least": {
+                  "description": "The `libyears_at_least` of the named finding: its value is a lower bound.",
+                  "type": "boolean"
                 }
               }
             },
@@ -6479,6 +6518,8 @@
         "check",
         "complete",
         "unchecked_reason",
+        "records",
+        "feeds",
         "worst",
         "counts",
         "ignored",
@@ -6525,6 +6566,21 @@
               "type": "null"
             }
           ]
+        },
+        "records": {
+          "description": "The distinct advisories that every answering feed holds for this name, for all versions, before the ignore lists and attribution. At least the counted advisories plus `ignored_count`. Null when no feed answered. Evidence only: no score, gate or flag reads it.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "feeds": {
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/advisoryFeed"
+          }
         },
         "worst": {
           "description": "The worst counted severity; severity gates and the pill tone read it.",
@@ -6966,6 +7022,93 @@
               }
             }
           ]
+        },
+        {
+          "description": "A complete lookup has every feed answered, and a record count.",
+          "anyOf": [
+            {
+              "properties": {
+                "check": {
+                  "enum": [
+                    "complete"
+                  ]
+                },
+                "feeds": {
+                  "minItems": 1,
+                  "items": {
+                    "properties": {
+                      "answer": {
+                        "enum": [
+                          "answered"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "records": {
+                  "type": "integer"
+                }
+              }
+            },
+            {
+              "properties": {
+                "check": {
+                  "not": {
+                    "enum": [
+                      "complete"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`records` is null exactly when no feed answered.",
+          "anyOf": [
+            {
+              "properties": {
+                "records": {
+                  "type": "integer"
+                },
+                "feeds": {
+                  "not": {
+                    "items": {
+                      "not": {
+                        "properties": {
+                          "answer": {
+                            "enum": [
+                              "answered"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "records": {
+                  "type": "null"
+                },
+                "feeds": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "answer": {
+                          "enum": [
+                            "answered"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -6977,6 +7120,8 @@
         "check",
         "complete",
         "unchecked_reason",
+        "records",
+        "feeds",
         "ignored",
         "ignored_count"
       ],
@@ -7005,6 +7150,21 @@
         "unchecked_reason": {
           "description": "Always null on this shape.",
           "type": "null"
+        },
+        "records": {
+          "description": "The distinct advisories that every answering feed holds for this name, for all versions, before the ignore lists and attribution. At least the counted advisories plus `ignored_count`. Null when no feed answered. Evidence only: no score, gate or flag reads it.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "feeds": {
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/advisoryFeed"
+          }
         },
         "ignored": {
           "description": "The advisories Composer's audit policy ignores, never in S9.",
@@ -7107,6 +7267,93 @@
               }
             }
           ]
+        },
+        {
+          "description": "A complete lookup has every feed answered, and a record count.",
+          "anyOf": [
+            {
+              "properties": {
+                "check": {
+                  "enum": [
+                    "complete"
+                  ]
+                },
+                "feeds": {
+                  "minItems": 1,
+                  "items": {
+                    "properties": {
+                      "answer": {
+                        "enum": [
+                          "answered"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "records": {
+                  "type": "integer"
+                }
+              }
+            },
+            {
+              "properties": {
+                "check": {
+                  "not": {
+                    "enum": [
+                      "complete"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`records` is null exactly when no feed answered.",
+          "anyOf": [
+            {
+              "properties": {
+                "records": {
+                  "type": "integer"
+                },
+                "feeds": {
+                  "not": {
+                    "items": {
+                      "not": {
+                        "properties": {
+                          "answer": {
+                            "enum": [
+                              "answered"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "records": {
+                  "type": "null"
+                },
+                "feeds": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "answer": {
+                          "enum": [
+                            "answered"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -7118,6 +7365,8 @@
         "check",
         "complete",
         "unchecked_reason",
+        "records",
+        "feeds",
         "ignored",
         "ignored_count"
       ],
@@ -7163,6 +7412,21 @@
             }
           ]
         },
+        "records": {
+          "description": "The distinct advisories that every answering feed holds for this name, for all versions, before the ignore lists and attribution. At least the counted advisories plus `ignored_count`. Null when no feed answered. Evidence only: no score, gate or flag reads it.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "feeds": {
+          "description": "One entry per advisory-capable repository that the run probed for this name, in `run.advisory_lookup.repositories` order. lockrot omits a repository with no feed. It also omits a repository not asked for a cause that is not the package's own: offline, Composer below 2.4 or the install-time budget. A `not_asked` entry appears only with the reason `not_from_composer_repository`. `[]` when the run probed none.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/advisoryFeed"
+          }
+        },
         "ignored": {
           "description": "The advisories Composer's audit policy ignores, never in S9.",
           "type": "array",
@@ -7259,6 +7523,93 @@
                     "enum": [
                       "complete"
                     ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "A complete lookup has every feed answered, and a record count.",
+          "anyOf": [
+            {
+              "properties": {
+                "check": {
+                  "enum": [
+                    "complete"
+                  ]
+                },
+                "feeds": {
+                  "minItems": 1,
+                  "items": {
+                    "properties": {
+                      "answer": {
+                        "enum": [
+                          "answered"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "records": {
+                  "type": "integer"
+                }
+              }
+            },
+            {
+              "properties": {
+                "check": {
+                  "not": {
+                    "enum": [
+                      "complete"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`records` is null exactly when no feed answered.",
+          "anyOf": [
+            {
+              "properties": {
+                "records": {
+                  "type": "integer"
+                },
+                "feeds": {
+                  "not": {
+                    "items": {
+                      "not": {
+                        "properties": {
+                          "answer": {
+                            "enum": [
+                              "answered"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "records": {
+                  "type": "null"
+                },
+                "feeds": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "answer": {
+                          "enum": [
+                            "answered"
+                          ]
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -7996,18 +8347,19 @@
       ],
       "properties": {
         "check": {
-          "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's age, dated only by a shared commit), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.",
+          "description": "S10's check id: `repository_activity` (S3, S4), `release_dates` (the package's age, dated only by a shared commit), `advisories` (S9: the advisory lookup did not complete), `releases` (S9's fix part: releases could not be read), `release_metadata` (S2, S8: a package from a vcs or an unknown origin, whose release metadata no Composer repository serves). An open set.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
             "repository_activity",
             "release_dates",
+            "advisories",
             "releases",
             "release_metadata"
           ]
         },
         "reason": {
-          "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4), `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
+          "description": "Why it did not run: `host_not_supported` is a repository on a host lockrot cannot ask (S3, S4). `no_feed`: no Composer repository of the run publishes advisories (S9). `not_from_composer_repository` a package installed from vcs or from an origin lockrot cannot tell (S2, S3, S4, S8). On a path, artifact or package origin, the same gaps are skips. An open set: read an unknown reason as another reason.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "x-known-values": [
@@ -8019,7 +8371,10 @@
             "offline",
             "undated_releases",
             "releases_unknown",
+            "composer_too_old",
+            "lookup_failed",
             "host_not_supported",
+            "no_feed",
             "not_from_composer_repository"
           ]
         },
@@ -10541,6 +10896,1012 @@
         }
       ]
     },
+    "installedUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), or a lock entry with no date (`undated`). An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "branch_snapshot",
+        "shared_commit",
+        "undated"
+      ]
+    },
+    "releaseUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release, or no dated stable release. An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "not_from_composer_repository",
+        "unavailable",
+        "not_found",
+        "no_stable_release",
+        "undated_releases"
+      ]
+    },
+    "branchReleaseUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. Or the installed version is above every listed release. An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "not_from_composer_repository",
+        "unavailable",
+        "not_found",
+        "branch_snapshot",
+        "no_branch_row",
+        "undated_releases",
+        "above_listed_releases"
+      ]
+    },
+    "pushUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.push` is null: `activity.reason` when the activity was not read, or `undated` when the answer carried no date. An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "allowlisted",
+        "not_from_composer_repository",
+        "no_repository",
+        "host_not_supported",
+        "repository_not_found",
+        "offline",
+        "install_time_budget",
+        "no_token",
+        "anonymous_budget",
+        "rate_limit",
+        "fetch_failed",
+        "undated"
+      ]
+    },
+    "libyearsUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `libyears` is null. The metadata was not read (the `metadata.status` value). Or the installed end has no date that lockrot trusts (the id of `age.installed_unmeasured`). Or the release end has none (the id of `age.release_unmeasured`). An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "not_from_composer_repository",
+        "unavailable",
+        "not_found",
+        "branch_snapshot",
+        "shared_commit",
+        "undated",
+        "no_stable_release",
+        "undated_releases"
+      ]
+    },
+    "depthUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `depth` is null: no path from the requirements that the run walked (`unreached`), or the run read no composer.json (`no_composer_json`). An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "unreached",
+        "no_composer_json"
+      ]
+    },
+    "ageLevel": {
+      "description": "The threshold of `run.thresholds` that the reading passes (`warn` or `high`), from the exact ratio, as the signal decides it. Null below the warn threshold. Closed. It is not a flag: `signals[]` says whether a signal fired.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "warn",
+            "high"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ageInstalled": {
+      "description": "The date that lockrot trusts for the installed release: the lock's `time`, or the tag of the same version on the monorepo parent. No threshold applies.",
+      "type": "object",
+      "required": [
+        "at",
+        "years",
+        "dated_by"
+      ],
+      "properties": {
+        "at": {
+          "description": "The release date.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "dated_by": {
+          "description": "The monorepo parent that dates it. Null when the lock dates it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ageRelease": {
+      "description": "The newest tag of the package by date, pre-releases counted. S2 judges this reading against the `release-*` thresholds, and S2's data quotes it when S2 fires.",
+      "type": "object",
+      "required": [
+        "version",
+        "at",
+        "years",
+        "level",
+        "dated_by"
+      ],
+      "properties": {
+        "version": {
+          "description": "The tag.",
+          "type": "string",
+          "minLength": 1
+        },
+        "at": {
+          "description": "Its date.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "level": {
+          "$ref": "#/definitions/ageLevel"
+        },
+        "dated_by": {
+          "description": "The monorepo parent that dates it. Null when its own tag dates it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ageBranchRelease": {
+      "description": "The newest dated stable release on the installed branch (`finding.branch`), dated as S8 dates it. S8 judges it against the `release-*` thresholds, and S8's data quotes it when S8 fires. S8 also needs a living higher branch.",
+      "type": "object",
+      "required": [
+        "version",
+        "at",
+        "years",
+        "level",
+        "dated_by"
+      ],
+      "properties": {
+        "version": {
+          "description": "The release.",
+          "type": "string",
+          "minLength": 1
+        },
+        "at": {
+          "description": "Its date.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "level": {
+          "$ref": "#/definitions/ageLevel"
+        },
+        "dated_by": {
+          "description": "The monorepo parent that dates it. Null when its own tag dates it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "agePush": {
+      "description": "The last push (GitHub) or the last commit (GitLab, Bitbucket) of the repository. S4 judges this reading against the `push-*` thresholds. `activity.event` says which event it dates.",
+      "type": "object",
+      "required": [
+        "at",
+        "years",
+        "level"
+      ],
+      "properties": {
+        "at": {
+          "description": "The date that the host reported.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "level": {
+          "$ref": "#/definitions/ageLevel"
+        }
+      }
+    },
+    "age": {
+      "description": "How old four dates are on the run clock. The dates are the installed release, the newest release of the package, the newest release of the installed branch, and the last push or commit. No score, gate, sort or baseline reads them. A reading that lockrot could not take is null, with its reason beside it.",
+      "type": "object",
+      "required": [
+        "installed",
+        "installed_unmeasured",
+        "release",
+        "release_unmeasured",
+        "branch_release",
+        "branch_release_unmeasured",
+        "push",
+        "push_unmeasured"
+      ],
+      "properties": {
+        "installed": {
+          "description": "The installed release. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ageInstalled"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "installed_unmeasured": {
+          "description": "Why `installed` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/installedUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "release": {
+          "description": "The newest release of the package. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ageRelease"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "release_unmeasured": {
+          "description": "Why `release` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/releaseUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch_release": {
+          "description": "The newest dated release of the installed branch. For a branch-alias snapshot (`5.4.x-dev`), the newest one of its own line. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ageBranchRelease"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch_release_unmeasured": {
+          "description": "Why `branch_release` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/branchReleaseUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "push": {
+          "description": "The last push or commit of the repository. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/agePush"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "push_unmeasured": {
+          "description": "Why `push` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/pushUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "description": "`installed` is null exactly when `installed_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "installed": {
+                  "type": "object"
+                },
+                "installed_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "installed": {
+                  "type": "null"
+                },
+                "installed_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`release` is null exactly when `release_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "release": {
+                  "type": "object"
+                },
+                "release_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "release": {
+                  "type": "null"
+                },
+                "release_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`branch_release` is null exactly when `branch_release_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "branch_release": {
+                  "type": "object"
+                },
+                "branch_release_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "branch_release": {
+                  "type": "null"
+                },
+                "branch_release_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`push` is null exactly when `push_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "push": {
+                  "type": "object"
+                },
+                "push_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "push": {
+                  "type": "null"
+                },
+                "push_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "abandonedIgnored": {
+      "description": "Composer's abandoned ignore list (the audit operation) matched this package. So lockrot did not raise its abandoned marking (S1), and the marking does not count. An archived repository (S3) and the liveness dates still count. Null when no rule removed S1.",
+      "oneOf": [
+        {
+          "description": "The ignored marking.",
+          "type": "object",
+          "required": [
+            "by",
+            "rules",
+            "marking"
+          ],
+          "properties": {
+            "by": {
+              "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting.",
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]*$",
+              "x-known-values": [
+                "policy.abandoned",
+                "audit.ignore-abandoned"
+              ]
+            },
+            "rules": {
+              "description": "Every pattern of the list that matches the package name, in config order.",
+              "type": "array",
+              "items": {
+                "description": "One matching pattern.",
+                "type": "object",
+                "required": [
+                  "pattern",
+                  "reason",
+                  "constraints"
+                ],
+                "properties": {
+                  "pattern": {
+                    "description": "The pattern as written. `*` is a wildcard.",
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "description": "The reason of the pattern as Composer merges it, joined with `; `. The project's words: data, never inside a machine string. Null when the pattern gives none.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "constraints": {
+                    "description": "The constraints written on the audit rules of the pattern. Neither composer audit nor lockrot applies them.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true
+                  }
+                }
+              },
+              "minItems": 1
+            },
+            "marking": {
+              "description": "The marking that lockrot did not raise: S1's data.",
+              "$ref": "#/definitions/s1"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "composerJsonSection": {
+      "description": "A composer.json section whose keys name packages. Closed.",
+      "type": "string",
+      "enum": [
+        "require",
+        "require-dev"
+      ]
+    },
+    "depth": {
+      "description": "The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one. No score, gate, sort or baseline reads it.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "advisoryFeed": {
+      "description": "What one advisory-capable Composer repository did for the name of this package, in `run.advisory_lookup.repositories` order.",
+      "type": "object",
+      "required": [
+        "composer_repository",
+        "registry",
+        "answer",
+        "records",
+        "reason"
+      ],
+      "properties": {
+        "composer_repository": {
+          "description": "The name that Composer gives the repository, credentials stripped. It joins `run.advisory_lookup.repositories[]` and the notes.",
+          "type": "string",
+          "minLength": 1
+        },
+        "registry": {
+          "description": "The registry host for display, as `origin.registry` writes it. Null for another repository. An open set.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9.-]*$",
+              "x-known-values": [
+                "packagist.org",
+                "repo.packagist.com",
+                "wp-packages.org",
+                "packages.drupal.org"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "answer": {
+          "description": "What this feed did for this name. Closed.",
+          "type": "string",
+          "enum": [
+            "answered",
+            "failed",
+            "not_asked"
+          ]
+        },
+        "records": {
+          "description": "The distinct advisories that this feed holds for the name, for every version, before the ignore lists. Set on `answered`.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "reason": {
+          "description": "Why it did not answer: `lookup_failed` on `failed`, `not_from_composer_repository` on `not_asked`. Null on `answered`. An open set.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "lookup_failed",
+                "not_from_composer_repository"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "description": "`answered`: a count, no reason.",
+          "properties": {
+            "answer": {
+              "enum": [
+                "answered"
+              ]
+            },
+            "records": {
+              "type": "integer"
+            },
+            "reason": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "`failed`, `not_asked`: no count, a reason.",
+          "properties": {
+            "answer": {
+              "enum": [
+                "failed",
+                "not_asked"
+              ]
+            },
+            "records": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "advisoryRepository": {
+      "description": "One advisory-capable Composer repository of the run and what it did, in configured order.",
+      "type": "object",
+      "required": [
+        "composer_repository",
+        "registry",
+        "outcome",
+        "reason",
+        "message",
+        "packages_with_records",
+        "records"
+      ],
+      "properties": {
+        "composer_repository": {
+          "description": "The name that Composer gives the repository, credentials stripped (the join key).",
+          "type": "string",
+          "minLength": 1
+        },
+        "registry": {
+          "description": "The registry host for display. Null for another repository. An open set.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9.-]*$",
+              "x-known-values": [
+                "packagist.org",
+                "repo.packagist.com",
+                "wp-packages.org",
+                "packages.drupal.org"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome": {
+          "description": "What the repository did in this run. `no_feed`: it publishes no advisories. Closed.",
+          "type": "string",
+          "enum": [
+            "answered",
+            "failed",
+            "not_asked",
+            "no_feed"
+          ]
+        },
+        "reason": {
+          "description": "Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "offline",
+                "composer_too_old",
+                "install_time_budget",
+                "not_from_composer_repository",
+                "transport",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "message": {
+          "description": "The first line of what the repository threw, credentials stripped. Foreign text, not contract. Set on `failed`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "packages_with_records": {
+          "description": "Asked names with at least one record. Set on `answered`.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "records": {
+          "description": "Distinct records for all asked names. Set on `answered`.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "anyOf": [
+        {
+          "description": "`answered`: counts, no reason, no message.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "answered"
+              ]
+            },
+            "reason": {
+              "type": "null"
+            },
+            "message": {
+              "type": "null"
+            },
+            "packages_with_records": {
+              "type": "integer"
+            },
+            "records": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "description": "`no_feed`: nothing to count, no reason.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "no_feed"
+              ]
+            },
+            "reason": {
+              "type": "null"
+            },
+            "message": {
+              "type": "null"
+            },
+            "packages_with_records": {
+              "type": "null"
+            },
+            "records": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "`failed`: a reason and a message.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "failed"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "packages_with_records": {
+              "type": "null"
+            },
+            "records": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "`not_asked`: a reason, no message.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "not_asked"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            },
+            "message": {
+              "type": "null"
+            },
+            "packages_with_records": {
+              "type": "null"
+            },
+            "records": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "advisoryLookup": {
+      "description": "How the one advisory lookup of the run went: its scope, the packages it asked, and the outcome of each advisory-capable repository.",
+      "type": "object",
+      "required": [
+        "scope",
+        "scope_source",
+        "packages_asked",
+        "packages_not_asked",
+        "other_repositories",
+        "repositories"
+      ],
+      "properties": {
+        "scope": {
+          "description": "`extra.lockrot.advisory-lookup` as config-2 spells it: `all` (every locked package, the default) or `composer-repositories`. Closed.",
+          "type": "string",
+          "enum": [
+            "all",
+            "composer-repositories"
+          ]
+        },
+        "scope_source": {
+          "description": "Where `scope` came from. Closed.",
+          "type": "string",
+          "enum": [
+            "config",
+            "default"
+          ]
+        },
+        "packages_asked": {
+          "description": "Findings whose name went to at least one feed. Plus `packages_not_asked`, it is `packages_checked`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "packages_not_asked": {
+          "description": "Findings whose name went to no feed.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "other_repositories": {
+          "description": "Configured repositories that publish no advisory API (vcs, path, artifact). lockrot counts them and never names them.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "repositories": {
+          "description": "Every advisory-capable repository, in configured order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/advisoryRepository"
+          }
+        }
+      }
+    },
+    "rotDepth": {
+      "description": "Where the graded findings sit below composer.json: counts over graded findings. `flagged` equals `packages_flagged`. No score, gate or baseline reads it.",
+      "type": "object",
+      "required": [
+        "flagged",
+        "measured",
+        "unmeasured",
+        "by_reach",
+        "not_in_composer_json",
+        "require_dev_not_walked",
+        "production",
+        "development",
+        "by_depth",
+        "max_depth",
+        "deepest"
+      ],
+      "properties": {
+        "flagged": {
+          "description": "Graded findings.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "measured": {
+          "description": "Graded findings with a `depth`. Plus every `unmeasured` count, it is `flagged`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmeasured": {
+          "description": "Graded findings without a depth, by `depth_unmeasured`. Every key is written.",
+          "type": "object",
+          "required": [
+            "unreached",
+            "no_composer_json"
+          ],
+          "properties": {
+            "unreached": {
+              "description": "No path from the requirements that the run walked.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "no_composer_json": {
+              "description": "The run read no composer.json.",
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "by_reach": {
+          "description": "Graded findings by `reach`. The three add up to `flagged`.",
+          "type": "object",
+          "required": [
+            "direct",
+            "transitive",
+            "unreached"
+          ],
+          "properties": {
+            "direct": {
+              "description": "Graded findings whose `reach` is `direct`.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "transitive": {
+              "description": "Graded findings whose `reach` is `transitive`.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "unreached": {
+              "description": "Graded findings whose `reach` is `unreached`.",
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "not_in_composer_json": {
+          "description": "Graded findings with `named_in` empty in a run that read composer.json. A run that read none counts them in `unmeasured.no_composer_json` instead. `by_reach.direct` + `require_dev_not_walked` + `not_in_composer_json` + `unmeasured.no_composer_json` = `flagged`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "require_dev_not_walked": {
+          "description": "Graded findings that composer.json names only in require-dev and that are not direct, reached or unreached. 0 with --dev.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "production": {
+          "description": "Graded findings in packages (`dev` false).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "development": {
+          "description": "Graded findings in packages-dev (`dev` true). 0 without --dev.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_depth": {
+          "description": "One row per depth from 0 to `max_depth`, zero rows included, ascending. Empty when `max_depth` is null.",
+          "type": "array",
+          "items": {
+            "description": "One depth.",
+            "type": "object",
+            "required": [
+              "depth",
+              "flagged"
+            ],
+            "properties": {
+              "depth": {
+                "description": "The depth.",
+                "type": "integer",
+                "minimum": 0
+              },
+              "flagged": {
+                "description": "Graded findings at this depth.",
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "max_depth": {
+          "description": "The largest `depth` of a graded finding. Null when no graded finding has a depth.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "deepest": {
+          "description": "The graded findings at `max_depth`, by package name (bytewise), each with its own chain. Empty when `max_depth` is null or 0.",
+          "type": "array",
+          "items": {
+            "description": "One deepest finding.",
+            "type": "object",
+            "required": [
+              "package",
+              "chain"
+            ],
+            "properties": {
+              "package": {
+                "$ref": "#/definitions/packageName"
+              },
+              "chain": {
+                "description": "The `chain` of the finding.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/packageName"
+                },
+                "minItems": 2
+              }
+            }
+          }
+        }
+      }
+    },
     "finding": {
       "description": "One locked package judged: every key always written, nulls explicit; `spec_flags_r3.py` `KEYS['finding']`.",
       "type": "object",
@@ -10563,22 +11924,28 @@
         "metadata",
         "activity",
         "allowlist",
+        "abandoned_ignored",
         "from_composer_repository",
         "origin",
         "replacement",
         "replacement_url",
         "note",
         "libyears_unmeasured",
+        "libyears_at_least",
         "direct",
         "dev",
         "reach",
         "chain",
+        "depth",
+        "depth_unmeasured",
+        "named_in",
         "direct_dependents",
         "signals",
         "evidence",
         "allowlist_reason",
         "data_date",
         "libyears",
+        "age",
         "baseline",
         "gate"
       ],
@@ -10717,6 +12084,9 @@
         "allowlist": {
           "$ref": "#/definitions/allowlist"
         },
+        "abandoned_ignored": {
+          "$ref": "#/definitions/abandonedIgnored"
+        },
         "from_composer_repository": {
           "description": "The lock entry carries a Composer notification-url (report-1): true exactly when `origin.kind` is `packagist` or `composer`.",
           "type": "boolean"
@@ -10759,22 +12129,19 @@
           ]
         },
         "libyears_unmeasured": {
-          "description": "Why `libyears` is null: the key of the report's `libyears.unmeasured` this finding is counted under. The reason is the first that applies, in this order: 1. not_from_composer_repository (no metadata was asked for: exactly the findings whose `from_composer_repository` is false, the lock entry carrying no Composer notification-url); 2. metadata_unavailable (asked for and did not come); 3. branch_snapshot (the installed version is a branch); 4. no_stable_release_date (no date lockrot trusts for one of the two ends; the code does not say which). The order of `x-known-values` is the block's key order, not this precedence. Null exactly where `libyears` is a number, 0 included. Counting findings by this value gives `libyears.unmeasured` key for key. An open set: a later minor release may add a reason, or split one into narrower ones, which moves findings out of the old code. Read a value you do not know as another reason the package was not measured.",
+          "description": "Why `libyears` is null: the key of the root `libyears.unmeasured` that this finding counts under. Set exactly when `libyears` is null.",
           "oneOf": [
             {
-              "type": "string",
-              "pattern": "^[a-z][a-z0-9_]*$",
-              "x-known-values": [
-                "branch_snapshot",
-                "no_stable_release_date",
-                "not_from_composer_repository",
-                "metadata_unavailable"
-              ]
+              "$ref": "#/definitions/libyearsUnmeasured"
             },
             {
               "type": "null"
             }
           ]
+        },
+        "libyears_at_least": {
+          "description": "Whether `libyears` is a lower bound: the newest release has no date that lockrot trusts, so the value runs to the newest dated release above the installed one. False when `libyears` is null.",
+          "type": "boolean"
         },
         "direct": {
           "description": "A direct requirement of the run.",
@@ -10799,6 +12166,29 @@
           "items": {
             "$ref": "#/definitions/packageName"
           }
+        },
+        "depth": {
+          "$ref": "#/definitions/depth"
+        },
+        "depth_unmeasured": {
+          "description": "Why `depth` is null. Set exactly when `depth` is null.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/depthUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "named_in": {
+          "description": "The composer.json sections whose keys name this package, or name a package that it replaces or provides, `require` first. lockrot reads them whatever --dev says. Empty when no line names it, and in a run that read no composer.json (`depth_unmeasured` says so). Not a reach fact: a run without --dev reaches a require-dev package through others.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/composerJsonSection"
+          },
+          "uniqueItems": true,
+          "maxItems": 2
         },
         "direct_dependents": {
           "description": "The direct requirements that reach it (report-1); a transitive move names them.",
@@ -10847,6 +12237,9 @@
             "null"
           ],
           "minimum": 0
+        },
+        "age": {
+          "$ref": "#/definitions/age"
         },
         "baseline": {
           "$ref": "#/definitions/findingBaseline"
@@ -10976,7 +12369,7 @@
           ]
         },
         {
-          "description": "`reach` follows `direct` and `chain`: `direct` when composer.json requires it; `transitive` with a chain of two or more; `unreached` with an empty one.",
+          "description": "`reach` follows `direct` and `chain`, and `depth` follows them. `direct`: composer.json requires it, depth 0, and composer.json names it. `transitive`: a chain of two or more, depth 1 or more. `unreached`: an empty chain and no depth.",
           "anyOf": [
             {
               "properties": {
@@ -10989,6 +12382,14 @@
                   "enum": [
                     "direct"
                   ]
+                },
+                "depth": {
+                  "enum": [
+                    0
+                  ]
+                },
+                "named_in": {
+                  "minItems": 1
                 }
               }
             },
@@ -11006,6 +12407,10 @@
                 },
                 "chain": {
                   "minItems": 2
+                },
+                "depth": {
+                  "type": "integer",
+                  "minimum": 1
                 }
               }
             },
@@ -11023,6 +12428,9 @@
                 },
                 "chain": {
                   "maxItems": 0
+                },
+                "depth": {
+                  "type": "null"
                 }
               }
             }
@@ -16273,6 +17681,808 @@
               }
             }
           ]
+        },
+        {
+          "description": "`libyears` is null exactly when `libyears_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "libyears": {
+                  "type": "number"
+                },
+                "libyears_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "libyears": {
+                  "type": "null"
+                },
+                "libyears_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`libyears_at_least` is true only on a measured `libyears`.",
+          "anyOf": [
+            {
+              "properties": {
+                "libyears_at_least": {
+                  "enum": [
+                    false
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "libyears": {
+                  "type": "number"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "Metadata that lockrot did not read gives its status as the libyears reason. Read metadata never gives one of those ids.",
+          "anyOf": [
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "read"
+                      ]
+                    }
+                  }
+                },
+                "libyears_unmeasured": {
+                  "not": {
+                    "enum": [
+                      "not_from_composer_repository",
+                      "unavailable",
+                      "not_found"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "not_from_composer_repository"
+                      ]
+                    }
+                  }
+                },
+                "libyears_unmeasured": {
+                  "enum": [
+                    "not_from_composer_repository"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "unavailable"
+                      ]
+                    }
+                  }
+                },
+                "libyears_unmeasured": {
+                  "enum": [
+                    "unavailable"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "not_found"
+                      ]
+                    }
+                  }
+                },
+                "libyears_unmeasured": {
+                  "enum": [
+                    "not_found"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "not": {
+                        "enum": [
+                          "read",
+                          "not_from_composer_repository",
+                          "unavailable",
+                          "not_found"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`depth` is null exactly when `depth_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "depth": {
+                  "type": "integer"
+                },
+                "depth_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "depth": {
+                  "type": "null"
+                },
+                "depth_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "A package that composer.json names in `require` is direct.",
+          "anyOf": [
+            {
+              "properties": {
+                "named_in": {
+                  "items": {
+                    "not": {
+                      "enum": [
+                        "require"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "reach": {
+                  "enum": [
+                    "direct"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "An ignored marking is not a signal. With `abandoned_ignored` set, `signals[]` holds no S1, `replacement` is null, and `abandoned` carries only the `archived` reason.",
+          "anyOf": [
+            {
+              "properties": {
+                "abandoned_ignored": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "abandoned_ignored": {
+                  "type": "object"
+                },
+                "replacement": {
+                  "type": "null"
+                },
+                "replacement_url": {
+                  "type": "null"
+                },
+                "signals": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "id": {
+                          "enum": [
+                            "S1"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "flags": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "id": {
+                            "not": {
+                              "enum": [
+                                "abandoned"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "degree": {
+                            "properties": {
+                              "reasons": {
+                                "items": {
+                                  "enum": [
+                                    "archived"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "S4 fired only beside a push reading at a level.",
+          "anyOf": [
+            {
+              "properties": {
+                "signals": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "id": {
+                          "enum": [
+                            "S4"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "age": {
+                  "properties": {
+                    "push": {
+                      "properties": {
+                        "level": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "S2 fired only beside a release reading at a level.",
+          "anyOf": [
+            {
+              "properties": {
+                "signals": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "id": {
+                          "enum": [
+                            "S2"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "age": {
+                  "properties": {
+                    "release": {
+                      "properties": {
+                        "level": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "S8 fired only beside a branch_release reading at a level.",
+          "anyOf": [
+            {
+              "properties": {
+                "signals": {
+                  "items": {
+                    "not": {
+                      "properties": {
+                        "id": {
+                          "enum": [
+                            "S8"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "age": {
+                  "properties": {
+                    "branch_release": {
+                      "properties": {
+                        "level": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "Metadata that lockrot did not read gives its status as the release reasons of `age`. Read metadata never gives one of those ids.",
+          "anyOf": [
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "read"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "release_unmeasured": {
+                      "not": {
+                        "enum": [
+                          "not_from_composer_repository",
+                          "unavailable",
+                          "not_found"
+                        ]
+                      }
+                    },
+                    "branch_release_unmeasured": {
+                      "not": {
+                        "enum": [
+                          "not_from_composer_repository",
+                          "unavailable",
+                          "not_found"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "not_from_composer_repository"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "release_unmeasured": {
+                      "enum": [
+                        "not_from_composer_repository"
+                      ]
+                    },
+                    "branch_release_unmeasured": {
+                      "enum": [
+                        "not_from_composer_repository"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "unavailable"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "release_unmeasured": {
+                      "enum": [
+                        "unavailable"
+                      ]
+                    },
+                    "branch_release_unmeasured": {
+                      "enum": [
+                        "unavailable"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "not_found"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "release_unmeasured": {
+                      "enum": [
+                        "not_found"
+                      ]
+                    },
+                    "branch_release_unmeasured": {
+                      "enum": [
+                        "not_found"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "metadata": {
+                  "properties": {
+                    "status": {
+                      "not": {
+                        "enum": [
+                          "read",
+                          "not_from_composer_repository",
+                          "unavailable",
+                          "not_found"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "An activity that lockrot did not read gives its reason as `age.push_unmeasured`. A reason that this schema does not list is not constrained.",
+          "anyOf": [
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "read"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "allowlisted"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "allowlisted"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "not_from_composer_repository"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "not_from_composer_repository"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "no_repository"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "no_repository"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "host_not_supported"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "host_not_supported"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "repository_not_found"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "repository_not_found"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "offline"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "offline"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "install_time_budget"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "install_time_budget"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "no_token"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "no_token"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "anonymous_budget"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "anonymous_budget"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "rate_limit"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "rate_limit"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "fetch_failed"
+                      ]
+                    }
+                  }
+                },
+                "age": {
+                  "properties": {
+                    "push_unmeasured": {
+                      "enum": [
+                        "fetch_failed"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "activity": {
+                  "properties": {
+                    "reason": {
+                      "not": {
+                        "enum": [
+                          "allowlisted",
+                          "not_from_composer_repository",
+                          "no_repository",
+                          "host_not_supported",
+                          "repository_not_found",
+                          "offline",
+                          "install_time_budget",
+                          "no_token",
+                          "anonymous_budget",
+                          "rate_limit",
+                          "fetch_failed"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -17912,6 +20122,7 @@
         "fix_model",
         "text_grammar",
         "score_model",
+        "advisory_lookup",
         "score_rules_used"
       ],
       "properties": {
@@ -18100,6 +20311,9 @@
         },
         "score_model": {
           "$ref": "#/definitions/scoreModel"
+        },
+        "advisory_lookup": {
+          "$ref": "#/definitions/advisoryLookup"
         },
         "score_rules_used": {
           "description": "Rule id → the number of findings on which the rule changed or decided a number (each count's predicate is a field test: graded findings; score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for `sort`. Keyed by `score_model.rules[].id`; an id absent from it shows no count. Keys follow the rule-id grammar, so a later id validates and a misspelt one (`corroborating_share`) does not; no property list, so it compiles as a TypeScript index signature. `x-known-keys` names model 1's ids, which a strict reader takes as the only keys.",
@@ -18683,16 +20897,21 @@
       }
     },
     "noteNotFromComposerRepository": {
-      "description": "`not_from_composer_repository`: `package_count` packages carry no Composer notification-url, so lockrot read no release metadata and no repository activity for them. Equal to the report's `not_from_composer_repository`.",
+      "description": "`not_from_composer_repository`: `package_count` packages carry no Composer notification-url, so lockrot read no release metadata and no repository activity for them. It asked their advisories by name exactly when `advisories_asked` is true. Equal to the report's `not_from_composer_repository`.",
       "type": "object",
       "required": [
-        "package_count"
+        "package_count",
+        "advisories_asked"
       ],
       "properties": {
         "package_count": {
           "description": "Packages with no Composer notification-url; equal to the root `not_from_composer_repository`.",
           "type": "integer",
           "minimum": 1
+        },
+        "advisories_asked": {
+          "description": "Whether the run asked the advisory feeds about these packages by name: a copy of `run.advisory_lookup.scope` == `all`, so the sentence reads its own data.",
+          "type": "boolean"
         }
       }
     },
@@ -18721,6 +20940,102 @@
             "boolean",
             "string"
           ]
+        }
+      }
+    },
+    "noteAbandonedMarkingsIgnored": {
+      "description": "`abandoned_markings_ignored`: Composer's abandoned ignore list removed the abandoned marking (S1) of these packages. Each of their findings carries `abandoned_ignored`.",
+      "type": "object",
+      "required": [
+        "by",
+        "count",
+        "packages"
+      ],
+      "properties": {
+        "by": {
+          "description": "The Composer setting that holds the list: `policy.abandoned` (`config.policy.abandoned.ignore`, Composer 2.10 and later) or `audit.ignore-abandoned` (Composer 2.9, and the legacy fallback of 2.10). An open set: read an unknown key as another setting.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]*$",
+          "x-known-values": [
+            "policy.abandoned",
+            "audit.ignore-abandoned"
+          ]
+        },
+        "count": {
+          "description": "The number of packages: the length of `packages`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "packages": {
+          "description": "The packages, in report order.",
+          "type": "array",
+          "items": {
+            "description": "One package and the patterns that matched it.",
+            "type": "object",
+            "required": [
+              "package",
+              "patterns"
+            ],
+            "properties": {
+              "package": {
+                "$ref": "#/definitions/packageName"
+              },
+              "patterns": {
+                "description": "The matching patterns, as written.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "noteAbandonedNotAuditedByComposer": {
+      "description": "`abandoned_not_audited_by_composer`: Composer's audit is set not to report abandoned packages. lockrot still counts the marking: the setting changes what composer audit prints, not the ignore list.",
+      "type": "object",
+      "required": [
+        "policy_key",
+        "value"
+      ],
+      "properties": {
+        "policy_key": {
+          "description": "The setting that says so: a config key, or the environment variable. An open set.",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$",
+          "x-known-values": [
+            "policy",
+            "policy.abandoned",
+            "policy.abandoned.audit",
+            "audit.abandoned",
+            "COMPOSER_AUDIT_ABANDONED",
+            "COMPOSER_POLICY"
+          ]
+        },
+        "value": {
+          "description": "Its value as configured (`ignore`, `false`).",
+          "type": [
+            "boolean",
+            "string"
+          ]
+        }
+      }
+    },
+    "noteAbandonedIgnoreUnreadable": {
+      "description": "`abandoned_ignore_unreadable`: Composer rejected the abandoned ignore list, so every abandoned marking counts.",
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "message": {
+          "description": "The first line of Composer's message, as written. Foreign text, not contract.",
+          "type": "string"
         }
       }
     },
@@ -18793,7 +21108,10 @@
         "repository_activity_unreachable",
         "repository_activity_not_found",
         "repository_activity_host_not_supported",
-        "not_from_composer_repository"
+        "not_from_composer_repository",
+        "abandoned_markings_ignored",
+        "abandoned_not_audited_by_composer",
+        "abandoned_ignore_unreadable"
       ]
     },
     "noteDetail": {
@@ -19003,6 +21321,42 @@
           }
         },
         {
+          "properties": {
+            "code": {
+              "enum": [
+                "abandoned_markings_ignored"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteAbandonedMarkingsIgnored"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "abandoned_not_audited_by_composer"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteAbandonedNotAuditedByComposer"
+            }
+          }
+        },
+        {
+          "properties": {
+            "code": {
+              "enum": [
+                "abandoned_ignore_unreadable"
+              ]
+            },
+            "data": {
+              "$ref": "#/definitions/noteAbandonedIgnoreUnreadable"
+            }
+          }
+        },
+        {
           "description": "A note whose code this schema does not list, from a later release or not from lockrot: its data is any object.",
           "not": {
             "properties": {
@@ -19021,7 +21375,10 @@
                   "repository_activity_unreachable",
                   "repository_activity_not_found",
                   "repository_activity_host_not_supported",
-                  "not_from_composer_repository"
+                  "not_from_composer_repository",
+                  "abandoned_markings_ignored",
+                  "abandoned_not_audited_by_composer",
+                  "abandoned_ignore_unreadable"
                 ]
               }
             }

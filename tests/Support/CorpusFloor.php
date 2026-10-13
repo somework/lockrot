@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Legacy\AdvisoryFacts013;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Severity;
@@ -142,7 +143,8 @@ final class CorpusFloor
         $judged = $finding['verdict'] !== 'unknown';
         $verdict = (new VerdictEngine())->decide($signals, $entry !== null, $judged);
 
-        $built = new Finding($finding['package'], $finding['version'], $verdict, $signals, $finding['chain'], $reason, null, null, $finding['dev'], [], null, null, null, self::legacy($finding));
+        $built = (new Finding($finding['package'], $finding['version'], $verdict, $signals, $finding['chain'], $reason, null, null, $finding['dev'], [], null, null, null, self::legacy($finding)))
+            ->withComposerJson(true, \count($finding['chain']) === 1 ? [$finding['dev'] ? ProjectConfig::REQUIRE_DEV : ProjectConfig::REQUIRE] : []);
 
         return $built->withFlags(FlagSet::fromSignals($signals, $entry, $advisories), $judged)->withDetails(FindingBuilder::detailsOf($built, $judged));
     }

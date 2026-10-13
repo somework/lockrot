@@ -56,7 +56,7 @@ final class AnalyzerRunNotesTest extends TestCase
             ['reason' => 'offline', 'message' => MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, 'package_count' => 1],
             ['reason' => 'fetch_failed', 'message' => 'the file for this package could not be read', 'package_count' => 1],
         ]], $metadata->data(), 'offline, a cache miss is `offline` and a repository that threw is the catch-all');
-        self::assertSame(['package_count' => 1], $report->runNotes()[4]->data());
+        self::assertSame(['package_count' => 1, 'advisories_asked' => true], $report->runNotes()[4]->data());
         self::assertSame(1, $report->notFromComposerRepository());
         self::assertTrue($report->hadNetworkFailures(), 'the metadata note sets it');
         self::assertSame([false, true, false, false, false], array_map(static fn (RunNote $note): bool => $note->setsNetworkFailures(), $report->runNotes()));

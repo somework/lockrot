@@ -313,6 +313,6 @@ final class MoveText
     /** A branch-alias snapshot (`5.4.x-dev`) sits on its own line. */
     public static function isBranchAlias(string $version): bool
     {
-        return preg_match('/^v?\d+(\.\d+)?\.x-dev$/', $version) === 1 && ReleaseBranch::of($version) === null;
+        return ReleaseBranch::aliasLine($version) !== null;
     }
 }

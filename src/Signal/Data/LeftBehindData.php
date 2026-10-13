@@ -81,6 +81,11 @@ final class LeftBehindData implements SignalData
         return $this->branchLastRelease;
     }
 
+    public function branchLastVersion(): ?string
+    {
+        return $this->branchLastVersion;
+    }
+
     public function years(): ?float
     {
         return $this->years;
