@@ -1,0 +1,12 @@
+{
+ "ignore": [
+  {
+   "package": "friendsofsymfony/oauth-server-bundle",
+   "version": "dev-master",
+   "flags": [
+    "pinned"
+   ],
+   "reason": "upstream tags no release that runs on our PHP"
+  }
+ ]
+}

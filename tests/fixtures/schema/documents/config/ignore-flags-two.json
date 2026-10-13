@@ -1,0 +1,12 @@
+{
+ "ignore": [
+  {
+   "package": "symfony/debug",
+   "flags": [
+    "abandoned",
+    "old-promise"
+   ],
+   "reason": "removed in the 7.x upgrade, tracked in OPS-12"
+  }
+ ]
+}

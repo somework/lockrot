@@ -1,0 +1,18 @@
+{
+ "x-ci": {
+  "owner": "platform"
+ },
+ "extensions": {
+  "acme:rules": {
+   "level": 2
+  }
+ },
+ "fail-on": "high",
+ "ignore": [
+  {
+   "package": "psr/log",
+   "reason": "complete",
+   "x-ticket": "OPS-1"
+  }
+ ]
+}

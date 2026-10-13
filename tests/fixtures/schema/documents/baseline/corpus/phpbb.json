@@ -1,0 +1,497 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:41:20+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "bantu/ini-get-wrapper": {
+   "version": "v1.0.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "silent": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "composer/package-versions-deprecated": {
+   "version": "1.11.99.5",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "google/recaptcha": {
+   "version": "1.2.4",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "guzzlehttp/guzzle": {
+   "version": "6.5.8",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-93qv-9n9h-6k6p": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-bbs6-q5q9-f3t4": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-bcdd-5xc7-gwfb": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-cnw1-2ytm-cgr8": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-fy2t-3c5f-827y": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-gcrk-3vtt-1r14": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-k22t-f949-t9g6": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-pwsk-hy21-4gby": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-qxvb-2bpp-dnk6": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "guzzlehttp/promises": {
+   "version": "1.5.3",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "guzzlehttp/psr7": {
+   "version": "1.9.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-7qs6-zvnz-h66r": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-gm5x-j3mz-71n9": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-jj5t-2zs1-dcfm": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-vznr-tgp9-fd7d": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "ocramius/proxy-manager": {
+   "version": "2.2.4",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "s9e/regexp-builder": {
+   "version": "1.4.6",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/config": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/console": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/debug": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/dependency-injection": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/event-dispatcher": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/filesystem": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/finder": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/http-foundation": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-365x-2zjk-pt47": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-b35n-565h-rs4q": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "symfony/http-kernel": {
+   "version": "v3.4.49",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-hr4y-jwk2-1yb9": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "upgrade"
+    }
+   }
+  },
+  "symfony/polyfill-intl-idn": {
+   "version": "v1.37.0",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-dwsq-ppd2-mb1x": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "symfony/process": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-rkkf-636k-qjb3": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-wws7-mr54-jsny": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "symfony/proxy-manager-bridge": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/routing": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-bf7t-jnpz-492k": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-yc7t-91v9-99xs": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "symfony/twig-bridge": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-ztgh-x9c8-k66g": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "upgrade"
+    }
+   }
+  },
+  "symfony/yaml": {
+   "version": "v3.4.47",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-b14r-zh1d-vdrc": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-ft77-7h5f-p3r6": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-v5yj-8nmz-sk2q": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "twig/twig": {
+   "version": "v2.16.1",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-1tmc-rt7x-12w6": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-2wrf-1xmk-1pky": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-3mcc-k66d-pydb": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-8zx5-v2nz-58pb": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-dpx1-78wg-1kqs": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-fbvq-z33h-r2np": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-g9zw-qxh8-pq8w": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-gw7n-z4yx-7xjt": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-h8hf-ytnd-5t9q": {
+     "known_since": "2026-10-01",
+     "severity": "critical",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-kvv6-36cr-fkzb": {
+     "known_since": "2026-10-01",
+     "severity": "unrated",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-n14z-jjjg-g8vd": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-sjvz-tbbr-vwth": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-xx6c-6d96-db2w": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-yd6k-t2gh-1m43": {
+     "known_since": "2026-10-01",
+     "severity": "unrated",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-yhcn-xrg3-68b1": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "zendframework/zend-code": {
+   "version": "3.4.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "zendframework/zend-eventmanager": {
+   "version": "3.2.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  }
+ }
+}

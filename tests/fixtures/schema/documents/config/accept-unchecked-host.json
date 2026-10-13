@@ -1,0 +1,16 @@
+{
+ "fail-on": "high,unchecked",
+ "accept-unchecked": [
+  {
+   "check": "repository_activity",
+   "host": "codeberg.org",
+   "reason": "Forgejo has no API lockrot reads; we watch the repository by hand",
+   "expires": "2027-03-31"
+  },
+  {
+   "check": "repository_activity",
+   "host": "git.example.com:8443",
+   "reason": "our own forge, Gitea"
+  }
+ ]
+}

@@ -1,0 +1,98 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:39:49+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "behat/transliterator": {
+   "version": "v1.5.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "composer/package-versions-deprecated": {
+   "version": "1.11.99.5",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "knplabs/gaufrette": {
+   "version": "v0.11.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "marcj/topsort": {
+   "version": "1.1.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-10-01"
+    },
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "payum/iso4217": {
+   "version": "1.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "php-http/message-factory": {
+   "version": "1.1.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "sylius/registry": {
+   "version": "v1.6.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "willdurand/jsonp-callback-validator": {
+   "version": "v2.0.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "willdurand/negotiation": {
+   "version": "3.1.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,89 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-09-24T17:40:21+00:00",
+ "target_php": "8.4",
+ "target_php_source": "platform",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "defuse/php-encryption": {
+   "version": "v2.4.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "lockrot-fixture/left-the-lock": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "markbaker/complex": {
+   "version": "3.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "markbaker/matrix": {
+   "version": "3.0.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "matthiasmullie/path-converter": {
+   "version": "1.1.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "neitanod/forceutf8": {
+   "version": "v2.0.4",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    },
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "onnov/detect-encoding": {
+   "version": "v2.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "willdurand/jsonp-callback-validator": {
+   "version": "v2.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  }
+ }
+}

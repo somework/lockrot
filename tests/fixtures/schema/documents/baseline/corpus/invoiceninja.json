@@ -1,0 +1,207 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:40:31+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "beganovich/snappdf": {
+   "version": "dev-master",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "pinned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "getbrevo/brevo-php": {
+   "version": "v1.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "halaxa/json-machine": {
+   "version": "0.7.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "hashids/hashids": {
+   "version": "4.1.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "hyvor/php-json-exporter": {
+   "version": "0.0.3",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "intervention/image": {
+   "version": "2.7.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "invoiceninja/einvoice": {
+   "version": "dev-main",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "pinned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "kmukku/php-iso11649": {
+   "version": "1.6",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-10-01"
+    },
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "league/commonmark": {
+   "version": "2.10.1",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-m2dq-1fhr-29b1": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-m4t9-vsgq-8khn": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "league/config": {
+   "version": "v1.2.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "markbaker/complex": {
+   "version": "3.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "markbaker/matrix": {
+   "version": "3.0.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "mpdf/psr-http-message-shim": {
+   "version": "1.0.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "mpdf/psr-log-aware-trait": {
+   "version": "v3.0.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "nelexa/zip": {
+   "version": "4.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "php-jsonpointer/php-jsonpointer": {
+   "version": "v3.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-10-01"
+    },
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "square/square": {
+   "version": "30.0.0.20230816",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "twilio/sdk": {
+   "version": "6.44.4",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "wikimedia/composer-merge-plugin": {
+   "version": "v2.1.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "wildbit/postmark-php": {
+   "version": "v4.0.5",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  }
+ }
+}

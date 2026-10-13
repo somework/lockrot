@@ -1,0 +1,4 @@
+{
+ "include-dev": true,
+ "fail-on": "abandoned,vulnerable,unchecked"
+}

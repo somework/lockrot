@@ -1,0 +1,84 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:41:35+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "guzzlehttp/guzzle": {
+   "version": "7.12.1",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-bbs6-q5q9-f3t4": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-bcdd-5xc7-gwfb": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-cnw1-2ytm-cgr8": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-fy2t-3c5f-827y": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-gcrk-3vtt-1r14": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "update"
+    },
+    "PKSA-pwsk-hy21-4gby": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-qxvb-2bpp-dnk6": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "guzzlehttp/psr7": {
+   "version": "2.12.1",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-vznr-tgp9-fd7d": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "pear/console_getopt": {
+   "version": "v1.4.3",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "silent": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "pear/pear_exception": {
+   "version": "v1.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  }
+ }
+}

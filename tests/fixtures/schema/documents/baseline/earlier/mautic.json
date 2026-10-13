@@ -1,0 +1,239 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-09-24T17:39:56+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "barryvdh/elfinder-flysystem-driver": {
+   "version": "v0.4.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "brick/math": {
+   "version": "0.11.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "composer/composer": {
+   "version": "2.10.2",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-ym19-cy3j-z6df": {
+     "known_since": "2026-09-24",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "composer/package-versions-deprecated": {
+   "version": "1.11.99.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "cweagans/composer-patches": {
+   "version": "1.7.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "doctrine/cache": {
+   "version": "2.2.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "gaufrette/extras": {
+   "version": "v0.1.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "silent": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "geoip2/geoip2": {
+   "version": "v2.13.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "intervention/image": {
+   "version": "2.7.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "ip2location/ip2location-php": {
+   "version": "7.2.5",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "knplabs/gaufrette": {
+   "version": "v0.9.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    },
+    "old-promise": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "league/flysystem": {
+   "version": "3.30.0",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-w9tt-7782-78jx": {
+     "known_since": "2026-09-24",
+     "severity": "low",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "lockrot-fixture/left-the-lock": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "markbaker/complex": {
+   "version": "3.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "markbaker/matrix": {
+   "version": "3.0.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "matthiasmullie/path-converter": {
+   "version": "1.1.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    },
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "maxmind/web-service-common": {
+   "version": "v0.9.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "mustangostang/spyc": {
+   "version": "0.6.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "silent": {
+     "known_since": "2026-09-24"
+    },
+    "old-promise": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "predis/predis": {
+   "version": "v3.0.1",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-z888-whwt-brbj": {
+     "known_since": "2026-09-24",
+     "severity": "high",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "seld/signal-handler": {
+   "version": "2.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "twbs/bootstrap-sass": {
+   "version": "v3.4.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "twilio/sdk": {
+   "version": "5.42.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    },
+    "old-promise": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "willdurand/jsonp-callback-validator": {
+   "version": "v2.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  }
+ }
+}

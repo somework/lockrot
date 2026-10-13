@@ -1,0 +1,20 @@
+{
+ "fail-on": "unchecked",
+ "accept-unchecked": [
+  {
+   "check": "advisories",
+   "repository": "https://mirror.acme.internal",
+   "reason": "the mirror has no advisory feed; composer audit runs against packagist.org in CI"
+  },
+  {
+   "check": "repository_activity",
+   "repository": "git@github.com:acme/fork.git",
+   "reason": "our fork; we follow upstream by hand"
+  },
+  {
+   "check": "release_metadata",
+   "repository": "https://github.com/joomla-backports/json-api-php.git",
+   "reason": "joomla's backport fork"
+  }
+ ]
+}

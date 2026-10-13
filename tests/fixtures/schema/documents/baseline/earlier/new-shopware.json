@@ -1,0 +1,59 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-09-24T17:39:41+00:00",
+ "target_php": "8.4",
+ "target_php_source": "runtime",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "defuse/php-encryption": {
+   "version": "v2.4.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "lockrot-fixture/left-the-lock": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "opis/uri": {
+   "version": "1.1.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "seld/signal-handler": {
+   "version": "2.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "setasign/tfpdf": {
+   "version": "v1.33",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  }
+ }
+}

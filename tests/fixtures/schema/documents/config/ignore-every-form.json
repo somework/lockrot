@@ -1,0 +1,43 @@
+{
+ "ignore": [
+  {
+   "package": "psr/log",
+   "reason": "whole package"
+  },
+  {
+   "package": "symfony/polyfill-*",
+   "reason": "a pattern",
+   "expires": "2027-01-01"
+  },
+  {
+   "package": "paragonie/random_compat",
+   "version": "9.99.100",
+   "reason": "one version"
+  },
+  {
+   "package": "tubalmartin/cssmin",
+   "flags": [
+    "stale"
+   ],
+   "reason": "one flag"
+  },
+  {
+   "package": "hoa/*",
+   "flags": [
+    "abandoned",
+    "silent",
+    "stale"
+   ],
+   "reason": "the liveness words",
+   "version": "1.17.05.02",
+   "expires": "2026-12-31"
+  },
+  {
+   "package": "genealabs/laravel-pivot-events",
+   "flags": [
+    "left-behind"
+   ],
+   "reason": "left-behind only"
+  }
+ ]
+}

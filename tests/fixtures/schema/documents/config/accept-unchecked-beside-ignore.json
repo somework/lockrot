@@ -1,0 +1,24 @@
+{
+ "fail-on": "high,unchecked",
+ "ignore": [
+  {
+   "package": "acme/legacy",
+   "flags": [
+    "pinned"
+   ],
+   "reason": "pinned on purpose"
+  }
+ ],
+ "accept-unchecked": [
+  {
+   "check": "release_metadata",
+   "package": "acme/legacy",
+   "reason": "installed from vcs"
+  },
+  {
+   "check": "repository_activity",
+   "package": "acme/legacy",
+   "reason": "installed from vcs"
+  }
+ ]
+}

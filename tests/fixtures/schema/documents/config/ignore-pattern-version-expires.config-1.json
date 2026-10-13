@@ -1,0 +1,10 @@
+{
+ "ignore": [
+  {
+   "package": "symfony/polyfill-*",
+   "reason": "polyfills our target PHP covers",
+   "version": "v1.37.0",
+   "expires": "2027-03-31"
+  }
+ ]
+}

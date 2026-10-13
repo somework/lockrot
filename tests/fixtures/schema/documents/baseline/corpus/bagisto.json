@@ -1,0 +1,125 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:39:07+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "bacon/bacon-qr-code": {
+   "version": "2.0.8",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "facade/ignition-contracts": {
+   "version": "1.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "khaled.alshamaa/ar-php": {
+   "version": "v6.3.4",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "league/commonmark": {
+   "version": "2.10.1",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-m2dq-1fhr-29b1": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-m4t9-vsgq-8khn": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "league/config": {
+   "version": "v1.2.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "markbaker/complex": {
+   "version": "3.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "markbaker/matrix": {
+   "version": "3.0.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "mpdf/psr-log-aware-trait": {
+   "version": "v3.0.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "php-jsonpointer/php-jsonpointer": {
+   "version": "v3.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-10-01"
+    },
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "phpseclib/phpseclib": {
+   "version": "3.0.55",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-12sz-bcny-pk4m": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "simplesoftwareio/simple-qrcode": {
+   "version": "4.2.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  }
+ }
+}

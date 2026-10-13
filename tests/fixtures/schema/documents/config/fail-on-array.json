@@ -1,0 +1,6 @@
+{
+ "fail-on": [
+  "left-behind",
+  "vulnerable-high"
+ ]
+}

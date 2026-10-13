@@ -1,0 +1,1394 @@
+{
+ "$schema": "https://lockrot.dev/schema/explain-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "package": "composer/composer",
+ "version": "2.9.5",
+ "finding": {
+  "package": "composer/composer",
+  "version": "2.9.5",
+  "branch": "2.x",
+  "installed_php": {
+   "requires": "^7.2.5 || ^8.0",
+   "target_runs": true,
+   "project_allows": true
+  },
+  "verdict": "high",
+  "priority": "high",
+  "lead": null,
+  "rank": 1,
+  "flags": [
+   {
+    "id": "vulnerable",
+    "role": "security",
+    "baseline": null,
+    "signal_ids": [
+     "S9"
+    ],
+    "degree": null,
+    "headline": {
+     "unit": "advisories",
+     "value": 7,
+     "source": null
+    },
+    "summary": "7 advisories: 5 high, 2 medium — all fixed on 2.x; worst: CVE-2026-40176 Command injection via malicious Perforce repository definition"
+   }
+  ],
+  "score": {
+   "model": 1,
+   "total": 16,
+   "exact": 16,
+   "rounded_down": false,
+   "band": {
+    "floor": 16,
+    "next": "critical",
+    "to_next": 16
+   },
+   "decided_by": "security",
+   "parts": {
+    "maintenance": {
+     "status": "none",
+     "contribution": 0,
+     "alone": {
+      "total": 0,
+      "verdict": null
+     }
+    },
+    "security": {
+     "status": "counted",
+     "contribution": 16,
+     "alone": {
+      "total": 16,
+      "verdict": "high"
+     },
+     "of": 7,
+     "tied": [
+      "PKSA-pwvr-3754-v57r",
+      "PKSA-t5r2-p5q9-mtpn",
+      "PKSA-ym19-cy3j-z6df",
+      "PKSA-zcdk-qnhk-hq2g"
+     ]
+    }
+   },
+   "terms": [
+    {
+     "part": "security",
+     "flag": "vulnerable",
+     "role": "security",
+     "advisory": "PKSA-6bp1-9hfj-2cgv",
+     "severity": "high",
+     "fix_kind": "update",
+     "weight": 16,
+     "multiplier": 1,
+     "points": 16,
+     "contribution": 16
+    }
+   ],
+   "modifiers": [],
+   "accepted": [],
+   "without": [
+    {
+     "remove": {
+      "kind": "advisory",
+      "id": "PKSA-6bp1-9hfj-2cgv"
+     },
+     "revealed": [],
+     "total": 16,
+     "verdict": "high",
+     "lead": null,
+     "deciding_advisory": "PKSA-pwvr-3754-v57r",
+     "at_least": false
+    }
+   ],
+   "text": "16 = vulnerable 16 [high advisory]"
+  },
+  "next_step": {
+   "kind": "update",
+   "source": "vulnerable",
+   "merged": [],
+   "fix_kind": "update",
+   "reason": null,
+   "replacement": null,
+   "quiet_years": null,
+   "to_branch": "2.x",
+   "version": "2.10.3",
+   "newest": "2.10.3",
+   "constraint": null,
+   "latest": null,
+   "php_check": {
+    "requires": "^5.3.2 || ^7.0 || ^8.0",
+    "project_allows": true,
+    "target_runs": true,
+    "raise_to": null,
+    "raise_size": null
+   },
+   "crosses_major": false,
+   "held_by": [],
+   "clears": [
+    {
+     "kind": "advisory",
+     "id": "PKSA-ym19-cy3j-z6df",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-zcdk-qnhk-hq2g",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-pwvr-3754-v57r",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-t5r2-p5q9-mtpn",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-6bp1-9hfj-2cgv",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-q3ht-3g42-rg8f",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-4pm6-g63v-5rkr",
+     "basis": "outside_range"
+    }
+   ],
+   "unverified": [],
+   "adds": [],
+   "leaves": [],
+   "clears_all": true,
+   "if_applied": {
+    "total": 0,
+    "verdict": "ok",
+    "lead": null,
+    "deciding_advisory": null,
+    "at_most": false,
+    "assumes": [
+     "clears_hold"
+    ]
+   },
+   "composer_moves_because": [],
+   "commands": [
+    [
+     "composer",
+     "update",
+     "composer/composer"
+    ]
+   ],
+   "through": [],
+   "also": [],
+   "text": "composer update composer/composer (gets 2.10.3) — clears 7 advisories"
+  },
+  "security": {
+   "status": "vulnerable",
+   "check": "complete",
+   "complete": true,
+   "unchecked_reason": null,
+   "records": 17,
+   "feeds": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "answer": "answered",
+     "records": 17,
+     "reason": null
+    }
+   ],
+   "worst": "high",
+   "counts": {
+    "critical": 0,
+    "high": 5,
+    "medium": 2,
+    "unrated": 0,
+    "low": 0
+   },
+   "ignored": [],
+   "ignored_count": 0,
+   "fix_kind": "update",
+   "installed_branch_fixes": {
+    "fixed": 7,
+    "unknown": 0,
+    "of": 7,
+    "fix_kind": "update",
+    "lowest": "2.10.3",
+    "newest": "2.10.3",
+    "held_by": [],
+    "if_applied": {
+     "total": 0,
+     "verdict": "ok",
+     "at_most": false,
+     "assumes": [
+      "clears_hold"
+     ]
+    }
+   },
+   "move_in": "next_step",
+   "gets": {
+    "version": "2.10.3",
+    "php_check": {
+     "requires": "^5.3.2 || ^7.0 || ^8.0",
+     "project_allows": true,
+     "target_runs": true,
+     "raise_to": null,
+     "raise_size": null
+    },
+    "clears": [
+     {
+      "kind": "advisory",
+      "id": "PKSA-ym19-cy3j-z6df",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-zcdk-qnhk-hq2g",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-pwvr-3754-v57r",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-t5r2-p5q9-mtpn",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-6bp1-9hfj-2cgv",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-q3ht-3g42-rg8f",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-4pm6-g63v-5rkr",
+      "basis": "outside_range"
+     }
+    ],
+    "clears_all": true
+   },
+   "partial": null
+  },
+  "checks_missing": [],
+  "checks_skipped": [],
+  "unchecked_accepted": [],
+  "maintenance_judged": true,
+  "metadata": {
+   "status": "read",
+   "reason": null,
+   "message": null
+  },
+  "activity": {
+   "status": "read",
+   "reason": null,
+   "forge": "github",
+   "host": "github.com",
+   "repo": "composer/composer",
+   "event": "push",
+   "archived": false,
+   "fetched_at": "2026-10-01T16:04:08+00:00",
+   "cached_at": "2026-10-01T16:04:08+00:00"
+  },
+  "allowlist": null,
+  "abandoned_ignored": null,
+  "from_composer_repository": true,
+  "origin": {
+   "kind": "packagist",
+   "registry": "packagist.org",
+   "package_url": "https://packagist.org/packages/composer/composer",
+   "local": false
+  },
+  "replacement": null,
+  "replacement_url": null,
+  "note": null,
+  "libyears_unmeasured": null,
+  "libyears_at_least": false,
+  "direct": true,
+  "dev": false,
+  "reach": "direct",
+  "chain": [
+   "composer/composer"
+  ],
+  "depth": 0,
+  "depth_unmeasured": null,
+  "named_in": [
+   "require"
+  ],
+  "direct_dependents": [
+   "composer/composer",
+   "magento/composer",
+   "magento/composer-dependency-version-audit-plugin",
+   "magento/magento-composer-installer"
+  ],
+  "signals": [
+   {
+    "id": "S7",
+    "level": "info",
+    "summary": "pulls in 1 flagged package: seld/signal-handler (stale)",
+    "data": {
+     "flagged": 1,
+     "packages": [
+      {
+       "package": "seld/signal-handler",
+       "chain": [
+        "composer/composer",
+        "seld/signal-handler"
+       ],
+       "verdict": "low",
+       "lead": "stale",
+       "flag_ids": [
+        "stale"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "S9",
+    "level": "high",
+    "summary": "7 advisories: 5 high, 2 medium — all fixed on 2.x; worst: CVE-2026-40176 Command injection via malicious Perforce repository definition",
+    "data": {
+     "advisories": [
+      {
+       "id": "PKSA-6bp1-9hfj-2cgv",
+       "cve": "CVE-2026-40176",
+       "title": "Command injection via malicious Perforce repository definition",
+       "link": "https://github.com/composer/composer/security/advisories/GHSA-wg36-wvj6-r67p",
+       "reported_at": "2026-04-14T09:42:00+00:00",
+       "severity": "high",
+       "severity_published": "high",
+       "affected_versions": ">=2.3,<2.9.6|>=1.0,<2.2.27",
+       "counted": true,
+       "points": 16,
+       "deciding": true,
+       "fix": {
+        "kind": "update",
+        "to_branch": "2.x",
+        "version": "2.9.6",
+        "newest": "2.10.3",
+        "on_installed_branch": true,
+        "php": "^5.3.2 || ^7.0 || ^8.0",
+        "held_by": [],
+        "reason": null
+       },
+       "baseline": null
+      },
+      {
+       "id": "PKSA-pwvr-3754-v57r",
+       "cve": "CVE-2026-45793",
+       "title": "Github Actions issued GITHUB_TOKEN disclosure in GitHub Actions logs",
+       "link": "https://github.com/composer/composer/security/advisories/GHSA-f9f8-rm49-7jv2",
+       "reported_at": "2026-05-13T07:00:00+00:00",
+       "severity": "high",
+       "severity_published": "high",
+       "affected_versions": ">=2.3,<2.9.8|>=2.0.0,<2.2.28|>=1.0,<1.10.28",
+       "counted": true,
+       "points": 16,
+       "deciding": false,
+       "fix": {
+        "kind": "update",
+        "to_branch": "2.x",
+        "version": "2.9.8",
+        "newest": "2.10.3",
+        "on_installed_branch": true,
+        "php": "^5.3.2 || ^7.0 || ^8.0",
+        "held_by": [],
+        "reason": null
+       },
+       "baseline": null
+      },
+      {
+       "id": "PKSA-t5r2-p5q9-mtpn",
+       "cve": "CVE-2026-40261",
+       "title": "Command injection via malicious Perforce source reference/url",
+       "link": "https://github.com/composer/composer/security/advisories/GHSA-gqw4-4w2p-838q",
+       "reported_at": "2026-04-14T09:42:00+00:00",
+       "severity": "high",
+       "severity_published": "high",
+       "affected_versions": ">=2.3,<2.9.6|>=1.0,<2.2.27",
+       "counted": true,
+       "points": 16,
+       "deciding": false,
+       "fix": {
+        "kind": "update",
+        "to_branch": "2.x",
+        "version": "2.9.6",
+        "newest": "2.10.3",
+        "on_installed_branch": true,
+        "php": "^5.3.2 || ^7.0 || ^8.0",
+        "held_by": [],
+        "reason": null
+       },
+       "baseline": null
+      },
+      {
+       "id": "PKSA-ym19-cy3j-z6df",
+       "cve": "CVE-2026-84361",
+       "title": "Composer arbitrary command execution via a malicious package's Perforce source URL",
+       "link": "https://github.com/advisories/GHSA-rvx4-ffvw-m9q3",
+       "reported_at": "2026-09-08T21:25:41+00:00",
+       "severity": "high",
+       "severity_published": "high",
+       "affected_versions": ">=1.0,<2.2.30|>=2.3.0,<2.10.3",
+       "counted": true,
+       "points": 16,
+       "deciding": false,
+       "fix": {
+        "kind": "update",
+        "to_branch": "2.x",
+        "version": "2.10.3",
+        "newest": "2.10.3",
+        "on_installed_branch": true,
+        "php": "^5.3.2 || ^7.0 || ^8.0",
+        "held_by": [],
+        "reason": null
+       },
+       "baseline": null
+      },
+      {
+       "id": "PKSA-zcdk-qnhk-hq2g",
+       "cve": "CVE-2026-59948",
+       "title": "Composer: Arbitrary file write outside vendor via malicious transitive package name",
+       "link": "https://github.com/advisories/GHSA-499r-g7pc-vmp9",
+       "reported_at": "2026-07-20T19:15:29+00:00",
+       "severity": "high",
+       "severity_published": "high",
+       "affected_versions": ">=1.0.0,<2.2.29|>=2.3.0,<2.10.2",
+       "counted": true,
+       "points": 16,
+       "deciding": false,
+       "fix": {
+        "kind": "update",
+        "to_branch": "2.x",
+        "version": "2.10.2",
+        "newest": "2.10.3",
+        "on_installed_branch": true,
+        "php": "^5.3.2 || ^7.0 || ^8.0",
+        "held_by": [],
+        "reason": null
+       },
+       "baseline": null
+      },
+      {
+       "id": "PKSA-4pm6-g63v-5rkr",
+       "cve": "CVE-2026-59947",
+       "title": "Composer: URL-embedded HTTP-Basic username leaks to verbose logs (GitHub PAT exposure)",
+       "link": "https://github.com/advisories/GHSA-g6xq-892h-64w3",
+       "reported_at": "2026-07-20T21:55:05+00:00",
+       "severity": "medium",
+       "severity_published": "medium",
+       "affected_versions": ">=1.0.0,<2.2.29|>=2.3.0,<2.10.2",
+       "counted": true,
+       "points": 8,
+       "deciding": false,
+       "fix": {
+        "kind": "update",
+        "to_branch": "2.x",
+        "version": "2.10.2",
+        "newest": "2.10.3",
+        "on_installed_branch": true,
+        "php": "^5.3.2 || ^7.0 || ^8.0",
+        "held_by": [],
+        "reason": null
+       },
+       "baseline": null
+      },
+      {
+       "id": "PKSA-q3ht-3g42-rg8f",
+       "cve": "CVE-2026-59946",
+       "title": "Composer: Path traversal in package bin field lets dependencies chmod arbitrary host files",
+       "link": "https://github.com/advisories/GHSA-gjfg-22fp-rrxx",
+       "reported_at": "2026-07-20T21:57:40+00:00",
+       "severity": "medium",
+       "severity_published": "medium",
+       "affected_versions": ">=1.0.0,<2.2.29|>=2.3.0,<2.10.2",
+       "counted": true,
+       "points": 8,
+       "deciding": false,
+       "fix": {
+        "kind": "update",
+        "to_branch": "2.x",
+        "version": "2.10.2",
+        "newest": "2.10.3",
+        "on_installed_branch": true,
+        "php": "^5.3.2 || ^7.0 || ^8.0",
+        "held_by": [],
+        "reason": null
+       },
+       "baseline": null
+      }
+     ],
+     "releases_read": true,
+     "complete": true
+    }
+   }
+  ],
+  "evidence": "vulnerable: 7 advisories: 5 high, 2 medium — all fixed on 2.x; worst: CVE-2026-40176 Command injection via malicious Perforce repository definition",
+  "allowlist_reason": null,
+  "data_date": "2026-10-01T17:40:04+00:00",
+  "libyears": 0.58,
+  "age": {
+   "installed": {
+    "at": "2026-01-29T10:40:53+00:00",
+    "years": 0.7,
+    "dated_by": null
+   },
+   "installed_unmeasured": null,
+   "release": {
+    "version": "2.2.30",
+    "at": "2026-08-27T11:34:49+00:00",
+    "years": 0.1,
+    "level": null,
+    "dated_by": null
+   },
+   "release_unmeasured": null,
+   "branch_release": {
+    "version": "2.2.30",
+    "at": "2026-08-27T11:34:49+00:00",
+    "years": 0.1,
+    "level": null,
+    "dated_by": null
+   },
+   "branch_release_unmeasured": null,
+   "push": {
+    "at": "2026-10-01T15:55:26+00:00",
+    "years": 0,
+    "level": null
+   },
+   "push_unmeasured": null
+  },
+  "baseline": null,
+  "gate": {
+   "reaches_fail_on": true,
+   "fails": true,
+   "exempt_by": null,
+   "by": [
+    {
+     "value": "high",
+     "kind": "grade",
+     "facts": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-6bp1-9hfj-2cgv"
+      }
+     ]
+    }
+   ],
+   "basis": null
+  }
+ },
+ "lock": {
+  "php": "^7.2.5 || ^8.0",
+  "released": "2026-01-29T10:40:53+00:00",
+  "repository": "https://github.com/composer/composer.git",
+  "from_composer_repository": true,
+  "dev": false,
+  "branch_snapshot": false,
+  "type": "library"
+ },
+ "metadata": {
+  "abandoned": false,
+  "replacement": null,
+  "releases_listed": 238,
+  "has_stable_release": true,
+  "last_stable_release": "2026-08-27T11:34:49+00:00",
+  "last_stable_version": "2.2.30",
+  "last_stable_dated_by": null,
+  "installed_release": "2026-01-29T10:40:53+00:00",
+  "installed_release_dated_by": null,
+  "repository": "https://github.com/composer/composer.git",
+  "type": "library",
+  "data_date": "2026-10-01T17:40:04+00:00",
+  "installed_branch": "2.x",
+  "branches": []
+ },
+ "run": {
+  "target_php": "8.4",
+  "target_php_source": "config",
+  "project_php": "~8.3.0||~8.4.0||~8.5.0",
+  "project_php_lowest": "8.3.0",
+  "include_dev": false,
+  "thresholds": {
+   "release-warn-years": 3,
+   "release-high-years": 5,
+   "push-warn-years": 3,
+   "push-high-years": 5
+  },
+  "flag_ids": [
+   "abandoned",
+   "silent",
+   "pinned",
+   "left-behind",
+   "old-promise",
+   "stale",
+   "vulnerable"
+  ],
+  "verdicts": [
+   "critical",
+   "high",
+   "medium",
+   "low",
+   "unknown",
+   "finished",
+   "ok"
+  ],
+  "graded_verdicts": [
+   "critical",
+   "high",
+   "medium",
+   "low"
+  ],
+  "signal_ids": [
+   "S1",
+   "S2",
+   "S3",
+   "S4",
+   "S5",
+   "S6",
+   "S7",
+   "S8",
+   "S9",
+   "S10"
+  ],
+  "fail_on": "high",
+  "fail_on_source": "config",
+  "gates": [
+   {
+    "value": "high",
+    "kind": "grade",
+    "threshold": "high"
+   }
+  ],
+  "fix_model": 1,
+  "text_grammar": 1,
+  "score_model": {
+   "id": 1,
+   "score_text_grammar": 1,
+   "flag_order": [
+    "abandoned",
+    "silent",
+    "pinned",
+    "left-behind",
+    "old-promise",
+    "stale",
+    "vulnerable"
+   ],
+   "parts": [
+    {
+     "id": "maintenance",
+     "flag_ids": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale"
+     ],
+     "combine": "lead_plus_share"
+    },
+    {
+     "id": "security",
+     "flag_ids": [
+      "vulnerable"
+     ],
+     "combine": "max"
+    }
+   ],
+   "flags": [
+    {
+     "id": "abandoned",
+     "part": "maintenance",
+     "points": 32,
+     "band": "critical",
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": 40,
+     "max_maintenance_flags": [
+      "abandoned",
+      "left-behind",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S1",
+      "S3"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "critical",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "silent",
+     "part": "maintenance",
+     "points": 32,
+     "band": "critical",
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": 40,
+     "max_maintenance_flags": [
+      "silent",
+      "pinned",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S2",
+      "S4"
+     ],
+     "thresholds": [
+      "release-high-years",
+      "push-high-years"
+     ],
+     "basis": {
+      "v013_base": "critical",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "pinned",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 22,
+     "max_maintenance_flags": [
+      "pinned",
+      "old-promise",
+      "stale"
+     ],
+     "raised_by": [
+      "S6"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "left-behind",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 20,
+     "max_maintenance_flags": [
+      "left-behind",
+      "old-promise"
+     ],
+     "raised_by": [
+      "S8"
+     ],
+     "thresholds": [
+      "release-warn-years"
+     ],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "old-promise",
+     "part": "maintenance",
+     "points": 16,
+     "band": "high",
+     "can_corroborate": true,
+     "corroborating_points": 4,
+     "max_maintenance": 18,
+     "max_maintenance_flags": [
+      "old-promise",
+      "stale"
+     ],
+     "raised_by": [
+      "S5"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": "high",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "stale",
+     "part": "maintenance",
+     "points": 8,
+     "band": "medium",
+     "can_corroborate": true,
+     "corroborating_points": 2,
+     "max_maintenance": 8,
+     "max_maintenance_flags": [
+      "stale"
+     ],
+     "raised_by": [
+      "S2",
+      "S4"
+     ],
+     "thresholds": [
+      "release-warn-years",
+      "push-warn-years"
+     ],
+     "basis": {
+      "v013_base": "medium",
+      "points": "band_floor"
+     },
+     "points_from": null
+    },
+    {
+     "id": "vulnerable",
+     "part": "security",
+     "points": null,
+     "band": null,
+     "can_corroborate": false,
+     "corroborating_points": null,
+     "max_maintenance": null,
+     "max_maintenance_flags": null,
+     "raised_by": [
+      "S9"
+     ],
+     "thresholds": [],
+     "basis": {
+      "v013_base": null,
+      "points": "severities"
+     },
+     "points_from": "severities"
+    }
+   ],
+   "severities": [
+    {
+     "id": "critical",
+     "points": 32,
+     "band": "critical",
+     "points_no_reachable_fix": 64,
+     "band_no_reachable_fix": "critical",
+     "gate_rank": 4,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "high",
+     "points": 16,
+     "band": "high",
+     "points_no_reachable_fix": 32,
+     "band_no_reachable_fix": "critical",
+     "gate_rank": 3,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "medium",
+     "points": 8,
+     "band": "medium",
+     "points_no_reachable_fix": 16,
+     "band_no_reachable_fix": "high",
+     "gate_rank": 2,
+     "counts_as": null,
+     "basis": {
+      "points": "band_floor"
+     }
+    },
+    {
+     "id": "unrated",
+     "points": 8,
+     "band": "medium",
+     "points_no_reachable_fix": 16,
+     "band_no_reachable_fix": "high",
+     "gate_rank": 2,
+     "counts_as": "medium",
+     "basis": {
+      "points": "counts_as"
+     }
+    },
+    {
+     "id": "low",
+     "points": 2,
+     "band": "low",
+     "points_no_reachable_fix": 4,
+     "band_no_reachable_fix": "low",
+     "gate_rank": 1,
+     "counts_as": null,
+     "basis": {
+      "points": "share",
+      "of": "medium",
+      "share": {
+       "num": 1,
+       "den": 4
+      }
+     }
+    }
+   ],
+   "fix_kinds": [
+    {
+     "id": "update",
+     "ease": 1,
+     "doubles": false
+    },
+    {
+     "id": "upgrade",
+     "ease": 2,
+     "doubles": false
+    },
+    {
+     "id": "raise-php",
+     "ease": 3,
+     "doubles": false
+    },
+    {
+     "id": "unknown",
+     "ease": 4,
+     "doubles": false
+    },
+    {
+     "id": "blocked",
+     "ease": 5,
+     "doubles": true
+    },
+    {
+     "id": "none",
+     "ease": 6,
+     "doubles": true
+    }
+   ],
+   "bands": [
+    {
+     "verdict": "critical",
+     "floor": 32
+    },
+    {
+     "verdict": "high",
+     "floor": 16
+    },
+    {
+     "verdict": "medium",
+     "floor": 8
+    },
+    {
+     "verdict": "low",
+     "floor": 1
+    }
+   ],
+   "zero_verdicts": [
+    {
+     "verdict": "finished",
+     "when": "allowlisted"
+    },
+    {
+     "verdict": "unknown",
+     "when": "no_metadata"
+    },
+    {
+     "verdict": "ok",
+     "when": "otherwise"
+    }
+   ],
+   "exact_unit": 0.5,
+   "rounding": "floor_once",
+   "max_total": 104,
+   "bar_max": 64,
+   "bar_overflow": "clip",
+   "exclusive_groups": [
+    {
+     "id": "liveness",
+     "flag_ids": [
+      "abandoned",
+      "silent",
+      "stale"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "branch",
+     "flag_ids": [
+      "pinned",
+      "left-behind"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "release_age",
+     "flag_ids": [
+      "silent",
+      "left-behind"
+     ],
+     "holds_unless": null
+    },
+    {
+     "id": "release_push",
+     "flag_ids": [
+      "left-behind",
+      "stale"
+     ],
+     "holds_unless": {
+      "threshold": "push-warn-years",
+      "below": "release-warn-years"
+     }
+    }
+   ],
+   "sort": [
+    {
+     "key": "verdict",
+     "path": "verdict",
+     "dir": "order",
+     "order": [
+      [
+       "critical"
+      ],
+      [
+       "high"
+      ],
+      [
+       "medium"
+      ],
+      [
+       "low"
+      ],
+      [
+       "unknown"
+      ],
+      [
+       "finished",
+       "ok"
+      ]
+     ],
+     "default": null,
+     "collation": null
+    },
+    {
+     "key": "security",
+     "path": "score.parts.security.contribution",
+     "dir": "desc",
+     "default": 0,
+     "collation": null
+    },
+    {
+     "key": "score",
+     "path": "score.exact",
+     "dir": "desc",
+     "default": 0,
+     "collation": null
+    },
+    {
+     "key": "direct",
+     "path": "direct",
+     "dir": "true_first",
+     "default": null,
+     "collation": null
+    },
+    {
+     "key": "package",
+     "path": "package",
+     "dir": "asc",
+     "collation": "bytes",
+     "default": null
+    }
+   ],
+   "rules": [
+    {
+     "id": "counted",
+     "stage": 1,
+     "kind": "select",
+     "applies_to": "flags",
+     "accept_group": "liveness",
+     "accept_covers": "listed_and_below",
+     "why": "accepted-facts-shown-not-counted",
+     "doc": "score-counted",
+     "illustration": null
+    },
+    {
+     "id": "lead-first",
+     "stage": 2,
+     "kind": "select",
+     "applies_to": "maintenance",
+     "order": "flag_order",
+     "share": {
+      "num": 1,
+      "den": 1
+     },
+     "why": "strongest-fact-in-full",
+     "doc": "score-lead-first",
+     "illustration": null
+    },
+    {
+     "id": "corroborating-share",
+     "stage": 3,
+     "kind": "share",
+     "applies_to": "maintenance",
+     "share": {
+      "num": 1,
+      "den": 4
+     },
+     "why": "correlated-evidence",
+     "doc": "score-corroborating-share",
+     "illustration": {
+      "lead": "left-behind",
+      "flag": "old-promise",
+      "weight": 16,
+      "points": 4
+     }
+    },
+    {
+     "id": "advisory-points",
+     "stage": 4,
+     "kind": "lookup",
+     "applies_to": "security",
+     "table": "severities",
+     "why": "severity-points",
+     "doc": "score-advisory-points",
+     "illustration": null
+    },
+    {
+     "id": "no-reachable-fix-multiplier",
+     "stage": 5,
+     "kind": "multiply",
+     "applies_to": "advisory",
+     "factor": 2,
+     "when_fix": [
+      "none",
+      "blocked"
+     ],
+     "why": "one-band-up",
+     "doc": "score-no-reachable-fix-multiplier",
+     "illustration": {
+      "severity": "high",
+      "before": 16,
+      "after": 32,
+      "band_before": "high",
+      "band_after": "critical"
+     }
+    },
+    {
+     "id": "security-max",
+     "stage": 6,
+     "kind": "max",
+     "applies_to": "security",
+     "tie_break": [
+      {
+       "key": "points",
+       "dir": "desc",
+       "collation": null
+      },
+      {
+       "key": "severity",
+       "dir": "order",
+       "collation": null
+      },
+      {
+       "key": "id",
+       "dir": "asc",
+       "collation": "bytes"
+      }
+     ],
+     "why": "one-number-per-part",
+     "doc": "score-security-max",
+     "illustration": null
+    },
+    {
+     "id": "divide-reach",
+     "stage": 7,
+     "kind": "divide",
+     "applies_to": "maintenance",
+     "by": 2,
+     "when": [
+      "transitive",
+      "unreached"
+     ],
+     "why": "reach-halves-maintenance",
+     "doc": "score-divide-reach",
+     "illustration": {
+      "flag": "abandoned",
+      "before": 32,
+      "after": 16,
+      "band_before": "critical",
+      "band_after": "high"
+     }
+    },
+    {
+     "id": "security-exempt-from-reach",
+     "stage": 8,
+     "kind": "exempt",
+     "applies_to": "security",
+     "of": "divide-reach",
+     "why": "exploitability-independent-of-reach",
+     "doc": "score-security-exempt-from-reach",
+     "illustration": {
+      "severity": "critical",
+      "reach": "transitive",
+      "total": 32
+     }
+    },
+    {
+     "id": "sum",
+     "stage": 9,
+     "kind": "combine",
+     "applies_to": "total",
+     "op": "sum",
+     "ratio_from": "medium",
+     "why": "parts-add",
+     "doc": "score-sum",
+     "illustration": {
+      "maintenance": 16,
+      "security": 16,
+      "total": 32,
+      "band": "critical",
+      "low_maintenance": 4,
+      "low_security": 4,
+      "low_total": 8,
+      "low_band": "medium"
+     }
+    },
+    {
+     "id": "divide-dev",
+     "stage": 10,
+     "kind": "divide",
+     "applies_to": "total",
+     "by": 2,
+     "when": [
+      "dev"
+     ],
+     "why": "dev-halves-total",
+     "doc": "score-divide-dev",
+     "illustration": {
+      "before": 32,
+      "after": 16,
+      "band_before": "critical",
+      "band_after": "high"
+     }
+    },
+    {
+     "id": "floor-once",
+     "stage": 11,
+     "kind": "floor",
+     "applies_to": "total",
+     "why": "integer-band-edges",
+     "doc": "score-floor-once",
+     "illustration": {
+      "exact": 4.5,
+      "total": 4
+     }
+    },
+    {
+     "id": "band-floors",
+     "stage": 12,
+     "kind": "band",
+     "applies_to": "total",
+     "ratio": 2,
+     "ratio_from": "medium",
+     "why": "two-floor-parts-make-next",
+     "doc": "score-band-floors",
+     "illustration": null
+    },
+    {
+     "id": "zero-verdicts",
+     "stage": 13,
+     "kind": "zero",
+     "applies_to": "total",
+     "table": "zero_verdicts",
+     "why": "score-zero-says-why",
+     "doc": "score-zero-verdicts",
+     "illustration": null
+    },
+    {
+     "id": "sort",
+     "stage": 14,
+     "kind": "order",
+     "applies_to": "findings",
+     "why": "advisory-findings-first",
+     "doc": "score-sort",
+     "illustration": null
+    },
+    {
+     "id": "gate-bounded-new",
+     "stage": 15,
+     "kind": "gate",
+     "applies_to": "gate",
+     "cap_multiplier": 2,
+     "why": "new-fact-sets-level",
+     "doc": "score-gate-bounded-new",
+     "illustration": {
+      "score": 36,
+      "new": 16,
+      "gate": 32
+     }
+    },
+    {
+     "id": "baseline-cover",
+     "stage": 16,
+     "kind": "cover",
+     "applies_to": "gate",
+     "order": "flag_order",
+     "covers": "listed_and_below",
+     "why": "recorded-lead-covers-below",
+     "doc": "score-baseline-cover",
+     "illustration": null
+    }
+   ],
+   "docs": "https://lockrot.dev/verdicts/model-1/"
+  },
+  "advisory_lookup": {
+   "scope": "all",
+   "scope_source": "default",
+   "packages_asked": 1,
+   "packages_not_asked": 0,
+   "other_repositories": 0,
+   "repositories": [
+    {
+     "composer_repository": "composer repo (https://repo.packagist.org)",
+     "registry": "packagist.org",
+     "outcome": "answered",
+     "reason": null,
+     "message": null,
+     "packages_with_records": 1,
+     "records": 17
+    }
+   ]
+  }
+ },
+ "legacy": {
+  "verdict": "ok",
+  "priority": "none",
+  "basis": {
+   "base": "none",
+   "steps": []
+  }
+ },
+ "generated_at": "2026-10-01T17:40:04+00:00",
+ "notes": [
+  "Composer is set not to block an install or an update on security advisories (policy: false); lockrot still checks and counts them."
+ ],
+ "note_details": [
+  {
+   "code": "advisories_disabled_by_policy",
+   "text": "Composer is set not to block an install or an update on security advisories (policy: false); lockrot still checks and counts them.",
+   "docs_url": "https://lockrot.dev/notes/#advisories_disabled_by_policy",
+   "sets_network_failures": false,
+   "data": {
+    "policy_key": "policy",
+    "value": false
+   }
+  }
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-09-24T17:39:14+00:00",
+ "target_php": "8.4",
+ "target_php_source": "config",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "league/config": {
+   "version": "v1.2.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "lockrot-fixture/left-the-lock": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  }
+ }
+}

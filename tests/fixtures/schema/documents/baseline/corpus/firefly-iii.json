@@ -1,0 +1,89 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:39:27+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "defuse/php-encryption": {
+   "version": "v2.4.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "facade/ignition-contracts": {
+   "version": "1.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "gdbots/query-parser": {
+   "version": "v3.0.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "jc5/google2fa-laravel": {
+   "version": "dev-main",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "pinned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "jc5/recovery": {
+   "version": "v2.2.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "league/config": {
+   "version": "v1.2.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "pragmarx/random": {
+   "version": "v0.2.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "silent": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "spatie/period": {
+   "version": "2.4.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  }
+ }
+}

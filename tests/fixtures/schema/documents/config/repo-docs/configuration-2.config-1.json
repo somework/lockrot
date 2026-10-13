@@ -1,0 +1,10 @@
+{
+ "ignore": [
+  {
+   "package": "acme/legacy-bridge",
+   "version": "1.2.3",
+   "reason": "internal fork, replacement tracked in ACME-123",
+   "expires": "2027-01-01"
+  }
+ ]
+}

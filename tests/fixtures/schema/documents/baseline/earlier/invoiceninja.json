@@ -1,0 +1,184 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-09-24T17:40:31+00:00",
+ "target_php": "8.4",
+ "target_php_source": "platform",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "beganovich/snappdf": {
+   "version": "dev-master",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "pinned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "getbrevo/brevo-php": {
+   "version": "v1.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "halaxa/json-machine": {
+   "version": "0.7.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "hashids/hashids": {
+   "version": "4.1.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "intervention/image": {
+   "version": "2.7.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "kmukku/php-iso11649": {
+   "version": "1.6",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    },
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "league/commonmark": {
+   "version": "2.10.1",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-m2dq-1fhr-29b1": {
+     "known_since": "2026-09-24",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "league/config": {
+   "version": "v1.2.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "lockrot-fixture/left-the-lock": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "markbaker/complex": {
+   "version": "3.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "markbaker/matrix": {
+   "version": "3.0.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "mpdf/psr-http-message-shim": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "nelexa/zip": {
+   "version": "4.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "php-jsonpointer/php-jsonpointer": {
+   "version": "v3.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    },
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "square/square": {
+   "version": "30.0.0.20230816",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "twilio/sdk": {
+   "version": "6.44.4",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "wikimedia/composer-merge-plugin": {
+   "version": "v2.1.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "wildbit/postmark-php": {
+   "version": "v4.0.5",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  }
+ }
+}
