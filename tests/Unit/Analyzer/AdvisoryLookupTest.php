@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\AdvisoryLookup;
+use Lockrot\Analyzer\Report;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryFeed;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
@@ -52,5 +53,13 @@ final class AdvisoryLookupTest extends TestCase
         $lookup = JsonPath::decoded(AdvisoryLookup::of(AdvisoryCoverage::none(), [self::finding('a/a', null)]));
 
         self::assertSame(['all', 'default', 0, 1, 0, []], [$lookup['scope'], $lookup['scope_source'], $lookup['packages_asked'], $lookup['packages_not_asked'], $lookup['other_repositories'], $lookup['repositories']]);
+    }
+
+    public function testTheReportWritesTheLookupItWasGiven(): void
+    {
+        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_COMPOSER_REPOSITORIES, AdvisoryCoverage::SOURCE_CONFIG, [], 0, []);
+        $report = new Report([self::finding('a/a', null)], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 1, 0, null, null, false, $coverage);
+
+        self::assertSame(['composer-repositories', 'config'], [JsonPath::stringAt(JsonPath::decoded($report->toArray()), ['run', 'advisory_lookup', 'scope']), JsonPath::stringAt(JsonPath::decoded($report->toArray()), ['run', 'advisory_lookup', 'scope_source'])]);
     }
 }
