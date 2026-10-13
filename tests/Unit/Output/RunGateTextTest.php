@@ -8,17 +8,22 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Config\GateNotApplied;
+use Lockrot\Config\GateStanding;
+use Lockrot\Output\FailedValue;
 use Lockrot\Output\RunGateText;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /** The `gate:` line: the grammar and goldens of SPEC §6.2, "RunGateText". */
@@ -114,5 +119,114 @@ final class RunGateTextTest extends TestCase
         $activity = FindingBuilder::activityOf($finding);
 
         return $finding->withDetails(new FindingDetails('read', null, null, [], ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'not_run', $reason, [], null, $activity, FindingBuilder::ageOf($finding, 'read', $activity), null, null));
+    }
+
+    /** @return iterable<string, array{string}> every committed report-2 case and variant document */
+    public static function documents(): iterable
+    {
+        foreach (array_merge(glob(__DIR__.'/../../fixtures/schema/documents/cases/*.json') ?: [], glob(__DIR__.'/../../fixtures/schema/documents/variants/*.json') ?: []) as $path) {
+            yield basename(\dirname($path)).'/'.basename($path) => [$path];
+        }
+    }
+
+    /**
+     * items/C67.md §3.2: the line rendered from a document's root `gate` and `run` is its `gate.text`.
+     *
+     * @dataProvider documents
+     */
+    #[DataProvider('documents')]
+    public function testTheLineOfEachModelDocumentIsItsGateText(string $path): void
+    {
+        $document = JsonPath::decodeFile($path);
+        $run = JsonPath::arrayAt($document, ['run']);
+        $failOn = FailOn::parse(JsonPath::stringAt($run, ['fail_on']));
+        $settings = new RunSettings(null, null, JsonPath::stringAt($run, ['target_php']), self::source($run, 'target_php_source'), null, $failOn, self::source($run, 'fail_on_source'), null, null, JsonPath::boolAt($run, ['strict_network']), JsonPath::stringAt($run, ['mode']));
+
+        self::assertSame(JsonPath::stringAt($document, ['gate', 'text']), RunGateText::render(self::gateOf(JsonPath::arrayAt($document, ['gate']), $failOn), $settings));
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function reasons(): iterable
+    {
+        yield 'offline' => ['offline', 'not checked (offline)'];
+        yield 'composer_too_old' => ['composer_too_old', 'not checked (Composer below 2.4)'];
+        yield 'install_time_budget' => ['install_time_budget', 'not checked (install-time budget spent)'];
+        yield 'lookup_failed' => ['lookup_failed', 'not checked (a repository failed)'];
+        yield 'no_feed' => ['no_feed', 'not checked (no repository publishes advisories)'];
+        yield 'not_from_composer_repository' => ['not_from_composer_repository', 'not asked (advisory-lookup: composer-repositories)'];
+        yield 'unparseable_version' => ['unparseable_version', 'version not readable'];
+        yield 'an unknown reason' => ['future_reason', 'future_reason'];
+    }
+
+    /** @dataProvider reasons */
+    #[DataProvider('reasons')]
+    public function testEachReasonHasItsWords(string $reason, string $words): void
+    {
+        $gate = self::gateOf(['tripped_by' => [], 'fail_on_applied' => true, 'reaching' => 0, 'failing' => 0, 'exempt' => ['baseline' => 0], 'failing_by' => [['value' => 'high', 'failing' => 0]], 'not_applied' => [['check' => 'advisories', 'packages' => 2, 'reason' => $reason]]], FailOn::parse('high'));
+        $settings = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null);
+
+        self::assertSame('gate: passes · --fail-on=high · no finding fails it · advisories not applied to 2 packages: '.$words.' · target php 8.4 (--target-php)', RunGateText::render($gate, $settings));
+    }
+
+    /**
+     * @param array<mixed, mixed> $run
+     *
+     * @return RunSettings::SOURCE_*
+     */
+    private static function source(array $run, string $key): string
+    {
+        $source = JsonPath::stringAt($run, [$key]);
+        foreach ([RunSettings::SOURCE_CONFIG, RunSettings::SOURCE_DEFAULT, RunSettings::SOURCE_ENV, RunSettings::SOURCE_OPTION, RunSettings::SOURCE_PLATFORM, RunSettings::SOURCE_RUNTIME] as $known) {
+            if ($source === $known) {
+                return $known;
+            }
+        }
+        self::fail('an unknown source: '.$source);
+    }
+
+    /**
+     * A gate with the counts of a document's root `gate`: the line reads counts only, so each failing
+     * standing fails the values that `failing_by` counts for it.
+     *
+     * @param array<mixed, mixed> $root
+     */
+    private static function gateOf(array $root, FailOn $failOn): Gate
+    {
+        $values = [];
+        foreach ($failOn->values() as $value) {
+            $values[$value->value()] = $value;
+        }
+        $failingBy = [];
+        foreach (JsonPath::arrayAt($root, ['failing_by']) as $row) {
+            self::assertIsArray($row);
+            $failingBy[JsonPath::stringAt($row, ['value'])] = JsonPath::intAt($row, ['failing']);
+        }
+        $standings = [];
+        for ($i = 0; $i < JsonPath::intAt($root, ['failing']); ++$i) {
+            $by = [];
+            foreach ($failingBy as $value => $count) {
+                if ($i < $count) {
+                    $by[] = new FailedValue($values[$value], []);
+                }
+            }
+            $standings[] = new GateStanding(true, true, null, $by);
+        }
+        for ($i = 0; $i < JsonPath::intAt($root, ['exempt', 'baseline']); ++$i) {
+            $standings[] = new GateStanding(true, false, Gate::EXEMPT_BASELINE);
+        }
+        while (\count($standings) < JsonPath::intAt($root, ['reaching'])) {
+            $standings[] = new GateStanding(true, false, null);
+        }
+        $notApplied = [];
+        foreach (JsonPath::arrayAt($root, ['not_applied']) as $row) {
+            self::assertIsArray($row);
+            $notApplied[] = new GateNotApplied(JsonPath::stringAt($row, ['check']), JsonPath::intAt($row, ['packages']), JsonPath::stringAt($row, ['reason']));
+        }
+        $trippedBy = array_values(array_map(static fn ($trip): string => \is_string($trip) ? $trip : '', JsonPath::arrayAt($root, ['tripped_by'])));
+        $applied = JsonPath::boolAt($root, ['fail_on_applied']);
+        // Gate's constructor is private so that a gate is always decided. Only this test bypasses that.
+        $build = \Closure::bind(static fn (): Gate => new Gate($trippedBy, $applied, $standings, $failOn, $notApplied), null, Gate::class);
+
+        return $build();
     }
 }

@@ -1,7 +1,8 @@
 # This workflow runs the sweep group on one leg. The group compares every score of score model 1
 # with the stream that tools/score/sweep.py prints, and checks the structured basis on every score.
-# The default suite reads a sample only. The paths filter starts it on a pull request that changes
-# the score engine. It has no branches filter: that filter reads the base branch, and a stacked pull
+# The default suite reads a sample only. The group also validates the corpus-scale report-2 documents
+# against the schema. The paths filter starts it on a pull request that changes the score engine or
+# the report-2 schema. It has no branches filter: that filter reads the base branch, and a stacked pull
 # request has another base. GitHub runs schedule on the default branch. workflow_dispatch needs this
 # file on the default branch, and then runs on the branch that you select.
 name: sweep
@@ -19,6 +20,10 @@ on:
       - 'tests/Support/Score*.php'
       - 'tests/Integration/Score*Test.php'
       - 'tests/Integration/SweepDifferentialTest.php'
+      - 'tests/Integration/CorpusSchemaSweepTest.php'
+      - 'resources/lockrot-report-2.schema.json'
+      - 'tools/schema/**'
+      - 'tests/fixtures/schema/documents/**'
       - 'phpunit*.xml.dist'
       - '.github/workflows/sweep.yml'
   schedule:
