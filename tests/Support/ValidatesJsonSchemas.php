@@ -19,6 +19,9 @@ use Lockrot\Json\Schemas;
 trait ValidatesJsonSchemas
 {
     /**
+     * A document that the strict twin accepts, the published schema accepts too
+     * ({@see \Lockrot\Tests\Integration\StrictTwinNarrowsTest}), so a strict call checks both.
+     *
      * @param int|null $number the schema number, for a document that names none itself (a config
      *                         document, or a fragment): {@see schemaFileFor()}
      */
