@@ -16,6 +16,7 @@ use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
+use Lockrot\Data\Abandoned\AbandonedPolicyReader;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
@@ -254,6 +255,43 @@ final class AnalyzerLookupTest extends TestCase
         $codes = array_map(static fn (RunNote $n): string => $n->code(), $report->runNotes());
 
         self::assertSame($note !== null, \in_array(RunNote::ABANDONED_NOT_AUDITED_BY_COMPOSER, $codes, true));
+    }
+
+    /** A run where the list removes one marking and Composer's audit is off writes both notes. */
+    public function testTheIgnoredMarkingsNoteAndTheAuditNoteAreWrittenTogether(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'a/listed', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'z/marked', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $metadata = ['a/listed' => self::metadata(true, '2026-08-01T00:00:00+00:00'), 'z/marked' => self::metadata(true, '2026-08-01T00:00:00+00:00')];
+        $composer = new Config(false);
+        $composer->merge(['config' => ['audit' => ['abandoned' => 'ignore']]]);
+        $reader = new class () implements AbandonedPolicyReader {
+            public function api(): string
+            {
+                return self::AUDIT_CONFIG;
+            }
+
+            public function policyRules(array $policy, array $audit): array
+            {
+                return [];
+            }
+
+            public function auditConfigList(Config $config): array
+            {
+                return ['a/listed' => 'migration planned'];
+            }
+        };
+
+        $report = self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::LIVE]], new \ArrayObject()), true, new Allowlist([]), AbandonedIgnore::fromConfig($composer, $reader))->analyze($lock, ProjectConfig::empty(), false);
+        $codes = array_map(static fn (RunNote $n): string => $n->code(), $report->runNotes());
+
+        self::assertSame(
+            [RunNote::ABANDONED_MARKINGS_IGNORED, RunNote::ABANDONED_NOT_AUDITED_BY_COMPOSER],
+            array_values(array_intersect($codes, [RunNote::ABANDONED_MARKINGS_IGNORED, RunNote::ABANDONED_NOT_AUDITED_BY_COMPOSER, RunNote::ABANDONED_IGNORE_UNREADABLE])),
+            implode(', ', $codes)
+        );
     }
 
     public function testAnUnreadableListIsNoted(): void
