@@ -161,7 +161,7 @@ final class MarkdownFormatter implements FormatterInterface
     {
         $spans = [];
         $name = static function (string $package) use (&$spans): string {
-            $placeholder = "\x00".\count($spans)."\x00";
+            $placeholder = \sprintf("\x00%d\x00", \count($spans));
             $spans[$placeholder] = self::code($package);
 
             return $placeholder;
