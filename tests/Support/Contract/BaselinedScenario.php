@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support\Contract;
 
+use Composer\Console\Application;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
@@ -11,8 +12,11 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
+use Lockrot\Composer\LockrotCommand;
 use Lockrot\Config\Gate;
+use Lockrot\Config\Policy;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -27,6 +31,7 @@ use Lockrot\Explain\Explanation;
 use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
 use Lockrot\Json\JsonWriter;
+use Lockrot\Json\Schemas;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
@@ -36,8 +41,10 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SplitStreamTester;
 use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Version;
 
 /**
  * One real project under a committed baseline-2 (items C78). The earlier lock writes the baseline on
@@ -49,93 +56,171 @@ final class BaselinedScenario
 {
     public const FIXTURES = __DIR__.'/../../fixtures/';
     public const SCENARIOS = [
-        'wallabag-main' => ['before' => 'baselined/wallabag-main/before', 'after' => 'apps/wallabag_wallabag', 'before_ref' => 'c7e57555632f277f6260eb3f7a953500624227a8', 'before_kind' => 'commit', 'after_kind' => 'fixture', 't0' => '2024-05-17T00:00:00+00:00', 'dev' => true, 'targets' => []],
-        'wallabag-2.6' => ['before' => 'baselined/wallabag-2.6/before', 'after' => 'baselined/wallabag-2.6/after', 'before_ref' => '2.6.10', 'before_kind' => 'tag', 'after_kind' => 'tag', 'after_ref' => '2.6.14', 't0' => '2024-11-03T15:02:01+00:00', 'dev' => false, 'targets' => ['8.3']],
+        'wallabag-main' => ['before' => 'baselined/wallabag-main/before', 'after' => 'apps/wallabag_wallabag', 'before_ref' => 'c7e57555632f277f6260eb3f7a953500624227a8', 'before_kind' => 'commit', 'after_kind' => 'fixture', 't0' => '2024-05-17T00:00:00+00:00', 't1' => '2026-10-14T00:00:00+00:00', 'dev' => true, 'targets' => []],
+        'wallabag-2.6' => ['before' => 'baselined/wallabag-2.6/before', 'after' => 'baselined/wallabag-2.6/after', 'before_ref' => '2.6.10', 'before_kind' => 'tag', 'after_kind' => 'tag', 'after_ref' => '2.6.14', 't0' => '2024-11-03T15:02:01+00:00', 't1' => '2026-10-14T00:00:00+00:00', 'dev' => false, 'targets' => ['8.3']],
     ];
     public const TARGET_PHP = '8.4';
     private const PROJECT = 'wallabag/wallabag';
     private const BASELINE = 'lockrot-baseline.json';
     private const SERVER = 'http://127.0.0.1';
     private const GATES = 'left-behind,vulnerable-high';
+    /** The signals whose data holds the dates that R5 lists. */
+    private const DATED_SIGNALS = ['S2', 'S4', 'S8'];
     private const JSON = \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE;
 
     private string $name;
-    /** @var array{before: string, after: string, before_ref: string, before_kind: string, after_kind: string, after_ref?: string, t0: string, dev: bool, targets: list<string>} */
+    /** @var array{before: string, after: string, before_ref: string, before_kind: string, after_kind: string, after_ref?: string, t0: string, t1: string, dev: bool, targets: list<string>} */
     private array $scenario;
-    private string $t1;
+    /** Whether each step's exit code comes from a LockrotCommand run, else from the gate as the command maps it. */
+    private bool $cli;
+    private ?FixtureRepositoryServer $server = null;
+    private string $github = '';
     /** @var array<string, string> each written file by its path below the scenario directory */
     private array $files = [];
     /** @var list<array{step: string, argv: list<string>, exit: int}> */
     private array $runs = [];
 
-    private function __construct(string $name, string $t1)
+    private function __construct(string $name, bool $cli)
     {
         if (!isset(self::SCENARIOS[$name])) {
             throw new \InvalidArgumentException('no baselined scenario '.$name);
         }
         $this->name = $name;
         $this->scenario = self::SCENARIOS[$name];
-        $this->t1 = $t1;
+        $this->cli = $cli;
     }
 
     /**
      * Every file of the scenario, `provenance.json` included, by its path below
      * tests/fixtures/baselined/<scenario>/.
      *
+     * @param bool $cli true to take each step's exit code from a LockrotCommand run of that step
+     *
      * @return array<string, string>
      */
-    public static function record(string $name, string $t1): array
+    public static function record(string $name, bool $cli = false): array
     {
-        $scenario = new self($name, $t1);
-        $server = $scenario->server();
-        $server->start();
-        $github = $scenario->githubAnswers();
+        $scenario = new self($name, $cli);
+        $scenario->server = $scenario->server();
+        $scenario->server->start();
+        $scenario->github = $scenario->githubAnswers();
         try {
-            return $scenario->steps($server, $github);
+            return $scenario->steps();
         } finally {
-            $server->stop();
-            array_map('unlink', glob($github.'/*') ?: []);
-            rmdir($github);
+            $scenario->server->stop();
+            array_map('unlink', glob($scenario->github.'/*') ?: []);
+            rmdir($scenario->github);
         }
     }
 
     /** @return array<string, string> */
-    private function steps(FixtureRepositoryServer $server, string $github): array
+    private function steps(): array
     {
         $options = array_merge(['--target-php='.self::TARGET_PHP], $this->scenario['dev'] ? ['--dev'] : []);
-        $before = $this->analyse($server, $github, (string) $this->scenario['before'], (string) $this->scenario['t0'], self::TARGET_PHP);
-        $t0 = $before->report()->withRun($this->settings(Gate::MODE_GENERATE_BASELINE, 'high', self::TARGET_PHP));
+        $beforeDir = $this->scenario['before'];
+        $afterDir = $this->scenario['after'];
+        $t1 = $this->scenario['t1'];
+        $before = $this->analyse($beforeDir, $this->scenario['t0'], self::TARGET_PHP);
+        $t0 = $before->report()->withRun($this->settings(Gate::MODE_GENERATE_BASELINE, 'high', self::TARGET_PHP, $beforeDir));
         $this->put('t0/report.json', Formatters::for('json')->format($t0));
-        $this->runs[] = ['step' => 'generate', 'argv' => array_merge(['--generate-baseline', '--output=json:t0/report.json'], $options), 'exit' => 0];
+        $this->step('generate', $beforeDir, $this->scenario['t0'], array_merge(['--generate-baseline', '--fail-on=high', '--output=json:t0/report.json'], $options), null, $t0);
         [$baseline, $asOf] = $this->asOf(Baseline::fromReport($t0), $t0);
-        $this->putJson(self::BASELINE, ['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + $baseline->toArray());
+        $this->put(self::BASELINE, ContractBundle::written($baseline));
 
-        $after = $this->analyse($server, $github, (string) $this->scenario['after'], $this->t1, self::TARGET_PHP);
+        $after = $this->analyse($afterDir, $t1, self::TARGET_PHP);
         $check = $this->checked($after->report(), $baseline, 'high', self::TARGET_PHP);
         $this->putFormats('check/report', $check, ['json', 'table', 'markdown', 'github', 'gitlab', 'sarif']);
-        $this->putJson('check/report.bundle.json', (new ReportDocument($check, new PageData($after, new Thresholds(), self::TARGET_PHP, $this->projectPhp(), [2])))->toArray());
-        $this->runs[] = ['step' => 'check', 'argv' => array_merge(['--fail-on=high', '--format=json'], $options), 'exit' => self::exit($check)];
+        $this->putJson('check/report.bundle.json', (new ReportDocument($check, new PageData($after, new Thresholds(), self::TARGET_PHP, self::projectPhp($afterDir), [2])))->toArray());
+        $this->step('check', $afterDir, $t1, array_merge(['--fail-on=high', '--format=json'], $options), $baseline, $check);
         $explained = $this->explain($after, $check);
         $gates = $this->checked($after->report(), $baseline, self::GATES, self::TARGET_PHP);
         $this->putFormats('check/gates-left-behind-vulnerable-high', $gates, ['json', 'sarif']);
-        $this->runs[] = ['step' => 'check', 'argv' => array_merge(['--fail-on='.self::GATES, '--format=json'], $options), 'exit' => self::exit($gates)];
+        $this->step('check', $afterDir, $t1, array_merge(['--fail-on='.self::GATES, '--format=json'], $options), $baseline, $gates);
         foreach ($this->scenario['targets'] as $target) {
-            $other = $this->analyse($server, $github, (string) $this->scenario['after'], $this->t1, (string) $target);
-            $this->putFormats('check/target-'.$target, $this->checked($other->report(), $baseline, 'high', (string) $target), ['json']);
-            $this->runs[] = ['step' => 'check', 'argv' => ['--fail-on=high', '--format=json', '--target-php='.$target], 'exit' => self::exit($this->checked($other->report(), $baseline, 'high', (string) $target))];
+            $other = $this->checked($this->analyse($afterDir, $t1, $target)->report(), $baseline, 'high', $target);
+            $this->putFormats('check/target-'.$target, $other, ['json']);
+            $this->step('check', $afterDir, $t1, array_merge(['--fail-on=high', '--format=json', '--target-php='.$target], $this->scenario['dev'] ? ['--dev'] : []), $baseline, $other);
         }
 
-        $regenerated = Baseline::fromReport($after->report()->withRun($this->settings(Gate::MODE_GENERATE_BASELINE, 'high', self::TARGET_PHP)), $baseline);
-        $this->putJson('regenerate/'.self::BASELINE, ['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + $regenerated->toArray());
-        $this->runs[] = ['step' => 'regenerate', 'argv' => array_merge(['--generate-baseline'], $options), 'exit' => 0];
+        $regenerate = $after->report()->withRun($this->settings(Gate::MODE_GENERATE_BASELINE, 'high', self::TARGET_PHP, $afterDir));
+        $regenerated = Baseline::fromReport($regenerate, $baseline);
+        $this->put('regenerate/'.self::BASELINE, ContractBundle::written($regenerated));
+        $this->step('regenerate', $afterDir, $t1, array_merge(['--generate-baseline', '--fail-on=high'], $options), $baseline, $regenerate);
         $recheck = $this->checked($after->report(), $regenerated, 'high', self::TARGET_PHP);
         $this->putFormats('regenerate/report', $recheck, ['json']);
-        $this->runs[] = ['step' => 'recheck', 'argv' => array_merge(['--fail-on=high', '--format=json'], $options), 'exit' => self::exit($recheck)];
+        $this->step('recheck', $afterDir, $t1, array_merge(['--fail-on=high', '--format=json'], $options), $regenerated, $recheck);
 
-        $this->putJson('provenance.json', $this->provenance($asOf, $explained, $t0, $after->report()));
+        $this->putJson('provenance.json', $this->provenance($asOf, $explained, $before, $t0));
         ksort($this->files);
 
         return $this->files;
+    }
+
+    /**
+     * Records one step of the scenario with its exit code: lockrot's own, when the recording runs
+     * the command, else the gate's as LockrotCommand maps it.
+     *
+     * @param list<string> $argv
+     */
+    private function step(string $step, string $side, string $now, array $argv, ?Baseline $baseline, Report $report): void
+    {
+        $gate = $report->gate();
+        $exit = $gate !== null && $gate->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+        $this->runs[] = ['step' => $step, 'argv' => $argv, 'exit' => $this->cli ? $this->command($side, $now, $argv, $baseline) : $exit];
+    }
+
+    /**
+     * The exit code of LockrotCommand run with $argv in a copy of $side at $now, with $baseline as
+     * its lockrot-baseline.json.
+     *
+     * @param list<string> $argv
+     */
+    private function command(string $side, string $now, array $argv, ?Baseline $baseline): int
+    {
+        $dir = sys_get_temp_dir().'/lockrot-baselined-run-'.bin2hex(random_bytes(8));
+        mkdir($dir);
+        copy(self::FIXTURES.$side.'/composer.json', $dir.'/composer.json');
+        copy(self::FIXTURES.$side.'/composer.lock', $dir.'/composer.lock');
+        // An --output file goes below the directory that lockrot runs in, which must exist.
+        mkdir($dir.'/t0');
+        if ($baseline !== null) {
+            BaselineFile::resolve($dir, self::BASELINE, Version::STRING)->write($baseline);
+        }
+        $factory = fn (): Analyzer => $this->analyzer(Clock::fixed($now), self::argValue($argv, '--target-php'), self::projectPhp($side));
+        $command = new LockrotCommand($factory);
+        $app = new Application();
+        $app->setAutoExit(false);
+        $app->add($command);
+        $command->setApplication($app);
+        $input = [];
+        foreach ($argv as $arg) {
+            $parts = explode('=', $arg, 2);
+            $input[$parts[0]] = $parts[1] ?? true;
+        }
+        $cwd = (string) getcwd();
+        chdir($dir);
+        try {
+            return (new SplitStreamTester($command))->execute($input);
+        } finally {
+            chdir($cwd);
+            /** @var \SplFileInfo $file */
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+                $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+            }
+            rmdir($dir);
+        }
+    }
+
+    /** @param list<string> $argv */
+    private static function argValue(array $argv, string $option): string
+    {
+        foreach ($argv as $arg) {
+            if (strpos($arg, $option.'=') === 0) {
+                return substr($arg, \strlen($option) + 1);
+            }
+        }
+
+        throw new \LogicException('no '.$option.' in the step');
     }
 
     /**
@@ -189,7 +274,7 @@ final class BaselinedScenario
         }
         $data['findings'] = $findings;
 
-        return [Baseline::fromArray(ContractBundle::stringKeys(['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + $data)), ['removed' => $removed, 'entries_removed' => $entriesRemoved]];
+        return [Baseline::fromArray(ContractBundle::stringKeys(['$schema' => Schemas::url(Schemas::BASELINE, Baseline::SCHEMA)] + $data)), ['removed' => $removed, 'entries_removed' => $entriesRemoved]];
     }
 
     /**
@@ -226,45 +311,55 @@ final class BaselinedScenario
             if ($facts === null || $finding === null) {
                 throw new \LogicException('no facts for '.$package);
             }
-            $this->put('check/explain/'.str_replace('/', '--', $package).'.json', (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), self::TARGET_PHP, $check, $this->projectPhp())));
+            $this->put('check/explain/'.str_replace('/', '--', $package).'.json', (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), self::TARGET_PHP, $check, self::projectPhp($this->scenario['after']))));
         }
 
         return $packages;
     }
 
+    /** The check of the later lock against $baseline. Every package of the lock counts against staleness, as LockrotCommand counts. */
     private function checked(Report $report, Baseline $baseline, string $failOn, string $target): Report
     {
-        $names = array_map(static fn ($finding): string => $finding->package(), $report->findings());
-        $withRun = $report->withRun($this->settings(Gate::MODE_CHECK, $failOn, $target));
+        $names = array_map(static fn ($package): string => $package->name(), LockFile::fromFile(self::FIXTURES.$this->scenario['after'].'/composer.lock')->packages(true));
+        $withRun = $report->withRun($this->settings(Gate::MODE_CHECK, $failOn, $target, $this->scenario['after']));
 
-        return $withRun->withBaseline(BaselineComparison::compare($baseline, $withRun, self::BASELINE, $names))->withRun($this->settings(Gate::MODE_CHECK, $failOn, $target));
+        return $withRun->withBaseline(BaselineComparison::compare($baseline, $withRun, self::BASELINE, $names))->withRun($this->settings(Gate::MODE_CHECK, $failOn, $target, $this->scenario['after']));
     }
 
-    private function settings(string $mode, string $failOn, string $target): RunSettings
+    /** The run settings of the project in $side: its own `require.php`. */
+    private function settings(string $mode, string $failOn, string $target, string $side): RunSettings
     {
-        return new RunSettings(self::PROJECT, self::PROJECT, $target, RunSettings::SOURCE_OPTION, 'composer.lock', FailOn::parse($failOn), RunSettings::SOURCE_OPTION, new Thresholds(), $this->projectPhp(), false, $mode, (bool) $this->scenario['dev']);
+        return new RunSettings(self::PROJECT, self::PROJECT, $target, RunSettings::SOURCE_OPTION, 'composer.lock', FailOn::parse($failOn), RunSettings::SOURCE_OPTION, new Thresholds(), self::projectPhp($side), false, $mode, $this->scenario['dev']);
     }
 
-    private function analyse(FixtureRepositoryServer $server, string $github, string $dir, string $now, string $target): Analysis
+    private function analyse(string $dir, string $now, string $target): Analysis
     {
-        $clock = Clock::fixed($now);
-        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
         $project = ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json');
-        $analyzer = new Analyzer(
+        $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
+        $dev = $this->scenario['dev'];
+
+        return $this->analyzer(Clock::fixed($now), $target, $project->requirePhp())->analyzeWithFacts($lock->packages($dev), $lock, $project, $dev);
+    }
+
+    private function analyzer(Clock $clock, string $target, ?string $projectPhp): Analyzer
+    {
+        $server = $this->server;
+        if ($server === null) {
+            throw new \LogicException('the fixture server is not started');
+        }
+        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+
+        return new Analyzer(
             new RepositoryMetadataLoader($server->repositories(), $clock),
-            new ActivityClient(new RecordedHttpClient($github), $auth),
+            new ActivityClient(new RecordedHttpClient($this->github), $auth),
             new ActivityFetchPlanner($auth),
             new RepoLocator(),
             BuiltinAllowlist::load(),
-            SignalSet::default($clock, new Thresholds(), $target, PhpReleaseDates::load(), $project->requirePhp()),
+            SignalSet::default($clock, new Thresholds(), $target, PhpReleaseDates::load(), $projectPhp),
             $clock,
             false,
             new RepositoryAdvisoryLoader($server->repositories())
         );
-        $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
-        $dev = (bool) $this->scenario['dev'];
-
-        return $analyzer->analyzeWithFacts($lock->packages($dev), $lock, $project, $dev);
     }
 
     private function server(): FixtureRepositoryServer
@@ -303,9 +398,9 @@ final class BaselinedScenario
         return $dir;
     }
 
-    private function projectPhp(): ?string
+    private static function projectPhp(string $side): ?string
     {
-        return ProjectConfig::fromFile(self::FIXTURES.$this->scenario['after'].'/composer.json')->requirePhp();
+        return ProjectConfig::fromFile(self::FIXTURES.$side.'/composer.json')->requirePhp();
     }
 
     /** @param list<string> $formats */
@@ -339,20 +434,13 @@ final class BaselinedScenario
         $this->files[$path] = (string) preg_replace('{'.preg_quote(self::SERVER, '}').':\d+}', self::SERVER, VersionMask::apply($contents));
     }
 
-    private static function exit(Report $report): int
-    {
-        $gate = $report->gate();
-
-        return $gate !== null && $gate->fails() ? 1 : 0;
-    }
-
     /**
      * @param array{removed: list<array{package: string, id: string, reported_at: string}>, entries_removed: list<string>} $asOf
      * @param list<string>                                                                                                $explained
      *
      * @return array<string, mixed>
      */
-    private function provenance(array $asOf, array $explained, Report $t0, Report $after): array
+    private function provenance(array $asOf, array $explained, Analysis $before, Report $t0): array
     {
         $side = static function (string $dir, string $ref, string $kind): array {
             $path = self::FIXTURES.$dir;
@@ -370,10 +458,10 @@ final class BaselinedScenario
             'recorded_by' => 'tools/report/record --baselined '.$this->name,
             'before' => $side($this->scenario['before'], $this->scenario['before_ref'], $this->scenario['before_kind']),
             'after' => $side($this->scenario['after'], $this->scenario['after_ref'] ?? 'tests/fixtures/'.$this->scenario['after'], $this->scenario['after_kind']),
-            'clocks' => ['t0' => $this->scenario['t0'], 't1' => $this->t1],
+            'clocks' => ['t0' => $this->scenario['t0'], 't1' => $this->scenario['t1']],
             'options' => array_merge(['--target-php='.self::TARGET_PHP], $this->scenario['dev'] ? ['--dev'] : []),
             'runs' => $this->runs,
-            'as_of' => $asOf + ['later_than_t0' => self::laterThan($t0, (string) $this->scenario['t0'])],
+            'as_of' => $asOf + ['later_than_t0' => $this->laterThan($before, $t0)],
             'explain' => $explained,
             'version_mask' => ['paths' => VersionMask::PATHS, 'value' => VersionMask::VALUE],
             'server_mask' => self::SERVER.':<port> reads '.self::SERVER,
@@ -382,19 +470,48 @@ final class BaselinedScenario
     }
 
     /**
-     * R5: every date that the T0 run read and that is later than T0. Δs is clamped to 0, so no years
-     * value can show it.
+     * R5: every date that the T0 run read and that is later than T0: the age readings, the S2, S4
+     * and S8 dates and the dates of the release-branch rows. Δs is clamped to 0, so no years value
+     * can show it.
      *
      * @return list<array{package: string, reading: string, at: string}>
      */
-    private static function laterThan(Report $report, string $clock): array
+    private function laterThan(Analysis $before, Report $t0): array
     {
-        $limit = new \DateTimeImmutable($clock);
+        $limit = new \DateTimeImmutable($this->scenario['t0']);
         $later = [];
-        foreach (JsonPath::arrayAt(JsonPath::decoded($report->findingRows()), []) as $package => $finding) {
-            foreach (\is_array($finding) && \is_array($finding['age'] ?? null) ? $finding['age'] : [] as $reading => $value) {
-                if (\is_array($value) && \is_string($value['at'] ?? null) && new \DateTimeImmutable($value['at']) > $limit) {
-                    $later[] = ['package' => (string) $package, 'reading' => 'age.'.$reading, 'at' => $value['at']];
+        $add = static function (string $package, string $reading, $at) use ($limit, &$later): void {
+            if ($at instanceof \DateTimeImmutable) {
+                $at = $at->format(\DATE_ATOM);
+            }
+            if (\is_string($at) && new \DateTimeImmutable($at) > $limit) {
+                $later[] = ['package' => $package, 'reading' => $reading, 'at' => $at];
+            }
+        };
+        foreach (JsonPath::arrayAt(JsonPath::decoded($t0->findingRows()), []) as $package => $finding) {
+            if (!\is_array($finding)) {
+                continue;
+            }
+            foreach (\is_array($finding['age'] ?? null) ? $finding['age'] : [] as $reading => $value) {
+                $add((string) $package, 'age.'.$reading.'.at', \is_array($value) ? ($value['at'] ?? null) : null);
+            }
+            foreach (\is_array($finding['signals'] ?? null) ? $finding['signals'] : [] as $signal) {
+                $id = \is_array($signal) && \is_string($signal['id'] ?? null) ? $signal['id'] : '';
+                foreach (\in_array($id, self::DATED_SIGNALS, true) && \is_array($signal['data'] ?? null) ? $signal['data'] : [] as $key => $value) {
+                    if (\is_string($value) && preg_match('{^\d{4}-\d\d-\d\dT}', $value) === 1) {
+                        $add((string) $package, $id.'.data.'.$key, $value);
+                    }
+                }
+            }
+        }
+        foreach ($t0->findings() as $finding) {
+            $facts = $before->facts($finding->package());
+            if ($facts === null) {
+                continue;
+            }
+            foreach ((new Explanation($finding, $facts, new Thresholds(), self::TARGET_PHP, $t0, self::projectPhp($this->scenario['before'])))->branches() as $row) {
+                foreach (['highest_released', 'highest_commit_date', 'newest_dated_released'] as $key) {
+                    $add($finding->package(), 'branches['.$row['branch'].'].'.$key, $row[$key]);
                 }
             }
         }

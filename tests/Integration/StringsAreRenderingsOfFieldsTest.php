@@ -25,6 +25,13 @@ final class StringsAreRenderingsOfFieldsTest extends TestCase
 {
     /** The composite joins the findings of seven projects, so its run holds no require.php of theirs. */
     private const MOVES_OF_ANOTHER_RUN = ['composite'];
+    /** The documents of the real baselined projects beside each bundle directory, by their glob below tests/fixtures/baselined/. */
+    private const BASELINED = [
+        'report-2' => ['*/t0/report.json', '*/check/report.json', '*/check/gates-*.json', '*/check/target-*.json', '*/regenerate/report.json'],
+        'explain-2' => ['*/check/explain/*.json'],
+    ];
+    /** The other formats of a baselined check, which share its stem. */
+    private const OTHER_FORMATS = '{\.(sarif|gitlab|bundle)\.json$}';
 
     public function testEveryStringOfEveryReportIsARenderingOfItsFields(): void
     {
@@ -116,7 +123,10 @@ final class StringsAreRenderingsOfFieldsTest extends TestCase
         }
     }
 
-    /** @return array<string, array<mixed, mixed>> each decoded file of a bundle directory, by its name */
+    /**
+     * @return array<string, array<mixed, mixed>> each decoded file of a bundle directory, by its name, then each
+     *                                            baselined document of its kind, by its path
+     */
     private static function documents(string $directory): array
     {
         $files = glob(ContractBundle::DIRECTORY.'/'.$directory.'/*.json') ?: [];
@@ -125,6 +135,15 @@ final class StringsAreRenderingsOfFieldsTest extends TestCase
         $documents = [];
         foreach ($files as $file) {
             $documents[basename($file, '.json')] = JsonPath::decodeFile($file);
+        }
+        $root = \dirname(ContractBundle::DIRECTORY).'/baselined/';
+        foreach (self::BASELINED[$directory] ?? [] as $pattern) {
+            $baselined = array_filter(glob($root.$pattern) ?: [], static fn (string $file): bool => preg_match(self::OTHER_FORMATS, $file) !== 1);
+            sort($baselined);
+            self::assertNotSame([], $baselined, 'record the baselined scenarios with tools/report/record --all-baselined');
+            foreach ($baselined as $file) {
+                $documents['baselined/'.substr($file, \strlen($root))] = JsonPath::decodeFile($file);
+            }
         }
 
         return $documents;

@@ -43,7 +43,7 @@ final class CaseTextGoldensTest extends TestCase
         }
 
         self::assertSame([], $differ);
-        self::assertGreaterThan(15, $compared, 'the hydrated readings agree with the model on too few cases to pin the grammar');
+        self::assertGreaterThan(20, $compared, 'the hydrated readings agree with the model on too few cases to pin the grammar');
     }
 
     public function testEveryWrittenCommandIsAnArgvListAndEachModelCommandRendersAsItsGoldens(): void

@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support\Contract;
 
 use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineFile;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Output\AgeText;
 use Lockrot\Output\CauseWords;
-use Lockrot\Output\FormatContext;
-use Lockrot\Output\Formatters;
 use Lockrot\Output\RunGateText;
 use Lockrot\Output\ShellCommand;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -18,6 +17,7 @@ use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\ScoreModel;
+use Lockrot\Version;
 
 /**
  * The rendering contract bundle of SPEC-0.14.md §7.11, as lockrot writes it. It holds every case of
@@ -28,24 +28,34 @@ use Lockrot\Verdict\ScoreModel;
 final class ContractBundle
 {
     public const DIRECTORY = __DIR__.'/../../fixtures/contract';
+    /** The files of DIRECTORY that no recording writes: the recorder's own, and a table of PhpFloorTest. */
+    public const NOT_RECORDED = ['bundle_sha256', 'provenance.json', 'en/php-versions.json'];
+    private const FIXTURES = __DIR__.'/../../fixtures/';
 
     /** The text formats, by the suffix of the file each one is written to below `text/`. */
     private const TEXT = ['table' => '.table.txt', 'markdown' => '.md', 'github' => '.github.txt'];
     private const DOCUMENTS = __DIR__.'/../../fixtures/schema/documents/';
     /**
-     * The golden keys that the PHP grammars own (§7.11 item 4), each with the document paths that it
-     * renders from. `0` is the case's finding.
+     * The golden keys that the PHP grammars own (§7.11 item 4), each with the key of its inputs in
+     * ReferenceText::INPUTS, the x-rendered-from list of its string.
      */
     private const RENDERED_FROM = [
-        'score_text' => [['findings', '0', 'score']],
-        'next_step_text' => [['findings', '0', 'next_step'], ['findings', '0', 'package'], ['findings', '0', 'direct'], ['findings', '0', 'direct_dependents'], ['run', 'target_php'], ['run', 'project_php_lowest']],
-        'gate_line' => [['findings', '0', 'gate', 'basis'], ['findings', '0', 'score', 'total']],
-        'run_gate_line' => [['gate'], ['run', 'fail_on'], ['run', 'fail_on_source'], ['run', 'gates'], ['run', 'mode'], ['run', 'target_php'], ['run', 'target_php_source']],
-        'age_line' => [['findings', '0', 'age'], ['findings', '0', 'version'], ['findings', '0', 'branch'], ['findings', '0', 'activity', 'event']],
-        'baseline_suffix' => [['findings', '0', 'baseline'], ['findings', '0', 'flags'], ['findings', '0', 'signals']],
-        'commands_posix' => [['findings', '0', 'next_step', 'commands']],
-        'commands_cmd' => [['findings', '0', 'next_step', 'commands']],
+        'score_text' => 'score.text',
+        'next_step_text' => 'next_step.text',
+        'gate_line' => 'gate_line',
+        'run_gate_line' => 'gate.text',
+        'age_line' => 'age_line',
+        'baseline_suffix' => 'baseline_suffix',
+        'commands_posix' => 'commands',
+        'commands_cmd' => 'commands',
     ];
+    /**
+     * The fewest goldens per key that the recording compares with the model's. A hydrated input that
+     * differs from the model's leaves its golden uncompared, so a lost input fails here.
+     */
+    public const COMPARED_FLOOR = ['age_line' => 61, 'baseline_suffix' => 68, 'commands_cmd' => 87, 'commands_posix' => 87, 'gate_line' => 84, 'next_step_text' => 51, 'run_gate_line' => 86, 'score_text' => 74];
+    /** The inputs of a command list: the move's argv. */
+    private const COMMANDS = ['next_step.commands'];
     /** Up to this many score lines per grammar path of the sweep, as the model's score-lines.json keeps. */
     private const LINES_PER_PATH = 4;
     /** Commands whose quoting differs between the shells, beside the commands that the cases write. */
@@ -72,8 +82,8 @@ final class ContractBundle
     private array $argvs = [];
 
     /**
-     * Every file of the bundle by its path below tests/fixtures/contract/, and the cases recorded
-     * from their committed documents. `provenance.json` and `bundle_sha256` are left out:
+     * Every file of the bundle by its path below tests/fixtures/contract/, and the cases that no
+     * hydration rebuilds: their model documents go to `model-only/`, apart from lockrot's output. `provenance.json` and `bundle_sha256` are left out:
      * tools/report/record writes them.
      *
      * @return array{files: array<string, string>, without_inputs: list<string>, goldens: array{compared: array<string, int>, inputs_differ: array<string, int>}}
@@ -87,6 +97,11 @@ final class ContractBundle
         $bundle->recordTables();
         if ($bundle->mismatches !== []) {
             throw new GoldenMismatch($bundle->mismatches);
+        }
+        foreach (self::COMPARED_FLOOR as $key => $floor) {
+            if (($bundle->compared[$key] ?? 0) < $floor) {
+                throw new \UnexpectedValueException(\sprintf('%d %s goldens compared with the model, the floor is %d', $bundle->compared[$key] ?? 0, $key, $floor));
+            }
         }
         ksort($bundle->files);
 
@@ -111,6 +126,58 @@ final class ContractBundle
         }
 
         return hash('sha256', $lines);
+    }
+
+    /**
+     * The files that `bundle_sha256` covers, by their path below tests/fixtures/: every file of
+     * contract/ but cache/, provenance.json and bundle_sha256, and each baselined scenario's
+     * check/report.bundle.json.
+     *
+     * @return array<string, string>
+     */
+    public static function bundleFiles(): array
+    {
+        $files = [];
+        foreach (self::tree(self::DIRECTORY) as $path => $contents) {
+            if (strpos($path, 'cache/') !== 0 && !\in_array($path, ['provenance.json', 'bundle_sha256'], true)) {
+                $files['contract/'.$path] = $contents;
+            }
+        }
+        foreach (glob(self::FIXTURES.'baselined/*/check/report.bundle.json') ?: [] as $bundle) {
+            $files[substr($bundle, \strlen(self::FIXTURES))] = (string) file_get_contents($bundle);
+        }
+        ksort($files);
+
+        return $files;
+    }
+
+    /** @return array<string, string> every file below $root by its relative path, sorted */
+    public static function tree(string $root): array
+    {
+        $files = [];
+        /** @var \SplFileInfo $file */
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)) as $file) {
+            $files[substr($file->getPathname(), \strlen($root) + 1)] = (string) file_get_contents($file->getPathname());
+        }
+        ksort($files);
+
+        return $files;
+    }
+
+    /** The bytes that BaselineFile::write() gives $baseline. */
+    public static function written(Baseline $baseline): string
+    {
+        $dir = sys_get_temp_dir().'/lockrot-baseline-'.bin2hex(random_bytes(8));
+        mkdir($dir);
+        $file = BaselineFile::resolve($dir, 'lockrot-baseline.json', Version::STRING);
+        try {
+            $file->write($baseline);
+
+            return (string) file_get_contents($file->path());
+        } finally {
+            @unlink($file->path());
+            rmdir($dir);
+        }
     }
 
     /**
@@ -153,7 +220,7 @@ final class ContractBundle
             $name = CaseRecording::fileName($id);
             if (!\is_array($case['inputs'] ?? null)) {
                 $this->withoutInputs[] = $id;
-                $this->putRaw('report-2/'.$name.'.json', (string) file_get_contents(self::DOCUMENTS.'cases/'.$name.'.json'));
+                $this->putRaw('model-only/'.$name.'.json', (string) file_get_contents(self::DOCUMENTS.'cases/'.$name.'.json'));
                 continue;
             }
             $recording = CaseRecording::of($case);
@@ -172,16 +239,12 @@ final class ContractBundle
         $report = CaseHydrator::composite();
         $run = $report->run();
         $failOn = $run === null || $run->failOn() === null ? FailOn::none() : $run->failOn();
-        $context = FormatContext::forFailOn(null, $failOn);
-        $formats = [];
-        foreach (array_keys(CaseRecording::FORMATS) as $format) {
-            $formats[$format] = Formatters::for($format, $context)->format($report, true);
-        }
+        $formats = CaseRecording::formatted($report, $failOn, CaseHydrator::lockJson());
         $this->putFormats('composite', $formats);
         $this->collect($formats['json']);
     }
 
-    /** The baseline-2 files of the gate rows, through lockrot's reader and writer. */
+    /** The baseline-2 files of the model's gate rows, read by Baseline::fromArray() and written by BaselineFile::write(). */
     private function recordGateRows(): void
     {
         $dir = self::DOCUMENTS.'baseline/gate-rows/';
@@ -191,7 +254,7 @@ final class ContractBundle
             throw new \UnexpectedValueException('no gate-row baseline in '.$dir);
         }
         foreach ($files as $file) {
-            $this->put('baseline-2/'.basename($file), ['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + Baseline::fromArray(self::stringKeys(JsonPath::decodeFile($file)))->toArray());
+            $this->putRaw('baseline-2/'.basename($file), self::written(Baseline::fromArray(self::stringKeys(JsonPath::decodeFile($file)))));
         }
     }
 
@@ -276,11 +339,11 @@ final class ContractBundle
         $model = JsonPath::arrayAt($case, ['golden']);
         $theirs = JsonPath::decodeFile(self::DOCUMENTS.'cases/'.CaseRecording::fileName($id).'.json');
         $ours = (array) json_decode($json, true);
-        foreach (self::RENDERED_FROM as $key => $paths) {
+        foreach (self::RENDERED_FROM as $key => $inputs) {
             if (!\array_key_exists($key, $model)) {
                 continue;
             }
-            if (self::inputsOf($theirs, $paths) !== self::inputsOf($ours, $paths)) {
+            if (self::inputsOf($theirs, $inputs) !== self::inputsOf($ours, $inputs)) {
                 $this->skipped[$key] = ($this->skipped[$key] ?? 0) + 1;
                 continue;
             }
@@ -293,35 +356,20 @@ final class ContractBundle
     }
 
     /**
-     * @param array<mixed, mixed> $document
-     * @param list<list<string>>  $paths
+     * The fields of $document that the string of $inputs renders from, every `text` key left out:
+     * the root for the run's gate line, else the case's finding with `run`.
      *
-     * @return list<mixed> the values at the paths, every `text` key left out
-     */
-    private static function inputsOf(array $document, array $paths): array
-    {
-        $values = [];
-        foreach ($paths as $path) {
-            $values[] = JsonPath::has($document, $path) ? self::withoutText(self::at($document, $path)) : null;
-        }
-
-        return $values;
-    }
-
-    /**
      * @param array<mixed, mixed> $document
-     * @param list<string>        $path
      *
-     * @return mixed
+     * @return array<mixed, mixed>
      */
-    private static function at(array $document, array $path)
+    private static function inputsOf(array $document, string $inputs): array
     {
-        $node = $document;
-        foreach ($path as $key) {
-            $node = \is_array($node) ? ($node[$key] ?? null) : null;
-        }
+        $paths = $inputs === 'commands' ? self::COMMANDS : ReferenceText::INPUTS[$inputs];
+        $fields = $inputs === 'gate.text' ? $document : JsonPath::arrayAt($document, ['findings', 0]) + ['run' => JsonPath::arrayAt($document, ['run'])];
+        $kept = self::withoutText(Fields::only($fields, $paths));
 
-        return $node;
+        return \is_array($kept) ? $kept : [];
     }
 
     /**

@@ -93,13 +93,35 @@ final class CaseRecording
     /** @return array<string, string> each format's output, by format */
     public function formats(): array
     {
-        $context = FormatContext::forFailOn(null, $this->failOn());
-        $outputs = [];
-        foreach (array_keys(self::FORMATS) as $format) {
-            $outputs[$format] = Formatters::for($format, $context)->format($this->report, true);
-        }
+        return self::formatted($this->report, $this->failOn(), CaseHydrator::lockJson([JsonPath::stringAt($this->case, ['id'])]));
+    }
 
-        return $outputs;
+    /**
+     * Each format's output of $report, written as lockrot run in the project writes it: beside a
+     * `composer.lock` with $lock, from which SARIF and the annotations take each package's line.
+     *
+     * @return array<string, string> by format
+     */
+    public static function formatted(Report $report, FailOn $failOn, string $lock): array
+    {
+        $dir = sys_get_temp_dir().'/lockrot-case-'.bin2hex(random_bytes(8));
+        mkdir($dir);
+        file_put_contents($dir.'/composer.lock', $lock);
+        $cwd = (string) getcwd();
+        chdir($dir);
+        try {
+            $context = FormatContext::forFailOn('composer.lock', $failOn);
+            $outputs = [];
+            foreach (array_keys(self::FORMATS) as $format) {
+                $outputs[$format] = Formatters::for($format, $context)->format($report, true);
+            }
+
+            return $outputs;
+        } finally {
+            chdir($cwd);
+            unlink($dir.'/composer.lock');
+            rmdir($dir);
+        }
     }
 
     public function explain(): string

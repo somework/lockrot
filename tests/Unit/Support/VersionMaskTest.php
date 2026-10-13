@@ -6,13 +6,17 @@ namespace Lockrot\Tests\Unit\Support;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
+use Lockrot\Explain\Explanation;
 use Lockrot\Html\ReportDocument;
 use Lockrot\Json\JsonWriter;
+use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\JsonFormatter;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\VersionMask;
+use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -34,6 +38,8 @@ final class VersionMaskTest extends TestCase
         $report = self::report();
         $json = (new JsonFormatter())->format($report);
         yield 'report-2' => [$json, self::rewritten($json, ['lockrot', 'version']), ['lockrot', 'version']];
+        $explain = (new ExplainFormatter())->json(new Explanation($report->findings()[0], FactsBuilder::facts(FactsBuilder::package(['name' => 'vendor/pkg', 'version' => '1.4.0'])), new Thresholds(), '8.4', $report));
+        yield 'explain-2' => [$explain, self::rewritten($explain, ['lockrot', 'version']), ['lockrot', 'version']];
         $html = (string) JsonWriter::encode((new ReportDocument($report))->toArray(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
         yield 'html bundle' => [$html, self::rewritten($html, ['report', 'lockrot', 'version']), ['report', 'lockrot', 'version']];
         $baseline = static fn (string $version): string => (string) JsonWriter::encode(Baseline::of([], '2026-10-14', '8.4', 'option', $version)->toArray(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
@@ -63,6 +69,20 @@ final class VersionMaskTest extends TestCase
         $expected = json_decode(self::rewritten($written, $path, VersionMask::VALUE), true);
 
         self::assertSame($expected, json_decode(VersionMask::apply($written), true));
+    }
+
+    public function testANestedLockrotObjectIsLeftAsWritten(): void
+    {
+        $nested = "{\n    \"findings\": [\n        {\n            \"lockrot\": {\n                \"version\": \"9.9.9\"\n            }\n        }\n    ]\n}\n";
+
+        self::assertSame($nested, VersionMask::apply($nested));
+    }
+
+    public function testAVersionPathThatTheMaskCannotReachFails(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        VersionMask::apply("{\n    \"lockrot\": {\n        \"schema\": 2,\n        \"version\": \"9.9.9\"\n    }\n}\n");
     }
 
     public function testATextFormatIsLeftAsWritten(): void

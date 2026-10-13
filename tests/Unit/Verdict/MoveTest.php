@@ -27,6 +27,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class MoveTest extends TestCase
 {
+    /** The day that the scenarios' release dates are set against: "the warn-years edge" is three years before it. */
+    private const CLOCK = '2026-10-14T00:00:00+00:00';
     private const ADVISORY = ['id' => 'PKSA-1', 'severity' => 'high', 'affected_versions' => '<1.9.0'];
 
     /** @return iterable<string, array{string}> */
@@ -127,7 +129,7 @@ final class MoveTest extends TestCase
             'advisories' => [self::advisory('PKSA-1', 'critical', '<1.9.0')],
         ]);
         $finding = null;
-        foreach (CaseHydrator::report(['id' => 'move', 'inputs' => $inputs])->findings() as $each) {
+        foreach (CaseHydrator::report(['id' => 'move', 'clock' => self::CLOCK, 'inputs' => $inputs])->findings() as $each) {
             $finding = $each->package() === 'a/b' ? $each : $finding;
         }
         self::assertInstanceOf(Finding::class, $finding);
@@ -445,7 +447,7 @@ final class MoveTest extends TestCase
      */
     private static function analyse(array $over): array
     {
-        return self::hydrated(['id' => 'move', 'inputs' => self::inputs($over)]);
+        return self::hydrated(['id' => 'move', 'clock' => self::CLOCK, 'inputs' => self::inputs($over)]);
     }
 
     /**

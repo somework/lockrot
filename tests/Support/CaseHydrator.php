@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Support;
 
+use Composer\Json\JsonFile;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Semver\VersionParser;
@@ -36,6 +37,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Verdict\FailOn;
 
 /**
@@ -49,7 +51,8 @@ use Lockrot\Verdict\FailOn;
 final class CaseHydrator
 {
     public const CASES = __DIR__.'/../fixtures/flags/cases.json';
-    private const PROVENANCE = __DIR__.'/../fixtures/flags/provenance.json';
+    private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/cases/';
+    private const COMPOSITE = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
     private const PACKAGIST = 'https://packagist.org/downloads/';
 
     /** @var array<string, array<mixed, mixed>>|null */
@@ -147,7 +150,35 @@ final class CaseHydrator
      */
     public static function composite(): Report
     {
-        return self::ofCases(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
+        return self::ofCases(self::COMPOSITE);
+    }
+
+    /**
+     * The composer.lock that the lock entries of the cases make, laid out as Composer writes it. A
+     * package that an earlier case already holds is left out. The SARIF and annotation formats read
+     * each package's line from it.
+     *
+     * @param list<string> $ids the case ids, the composite's when empty
+     */
+    public static function lockJson(array $ids = []): string
+    {
+        $lock = ['packages' => [], 'packages-dev' => []];
+        $seen = [];
+        foreach ($ids === [] ? self::COMPOSITE : $ids as $id) {
+            $inputs = JsonPath::arrayAt(self::case($id), ['inputs']);
+            $data = self::lockData(JsonPath::arrayAt($inputs, ['lock']), \is_array($inputs['activity'] ?? null) ? $inputs['activity'] : null, \is_array($inputs['abandoned'] ?? null) ? $inputs['abandoned'] : null);
+            foreach ($data as $section => $packages) {
+                foreach ($packages as $package) {
+                    $name = JsonPath::stringAt($package, ['name']);
+                    if (!isset($seen[$name])) {
+                        $seen[$name] = true;
+                        $lock[$section][] = $package;
+                    }
+                }
+            }
+        }
+
+        return JsonFile::encode($lock)."\n";
     }
 
     /**
@@ -237,7 +268,7 @@ final class CaseHydrator
         /** @var array<string, mixed> $root */
         $root = JsonPath::arrayAt($inputs, ['root']);
         $project = ProjectConfig::fromArray($root);
-        $clock = Clock::fixed(JsonPath::stringAt(JsonPath::decodeFile(self::PROVENANCE), ['source', 'model_run_date']).'T00:00:00+00:00');
+        $clock = self::clock($case);
         $locked = $lock->find($package);
         if ($locked === null) {
             throw new \InvalidArgumentException('the lock has no '.$package);
@@ -276,11 +307,39 @@ final class CaseHydrator
     }
 
     /**
+     * The model's clock for $case: the `generated_at` of its case document. PHP then measures every
+     * years value on the model's day, and a new model run on another day moves no value. A case that
+     * a test builds names its own `clock`.
+     *
+     * @param array<mixed, mixed> $case
+     */
+    public static function clock(array $case): Clock
+    {
+        if (\is_string($case['clock'] ?? null)) {
+            return Clock::fixed($case['clock']);
+        }
+
+        return Clock::fixed(JsonPath::stringAt(JsonPath::decodeFile(self::DOCUMENTS.CaseRecording::fileName(JsonPath::stringAt($case, ['id'])).'.json'), ['generated_at']));
+    }
+
+    /**
      * @param array<mixed, mixed>      $entries
      * @param array<mixed, mixed>|null $activity
      * @param array<mixed, mixed>|null $marking  S1's marking: `by` the repository or the lock, and the replacement
      */
     private static function lock(array $entries, ?array $activity, ?array $marking): LockFile
+    {
+        return LockFile::fromArray(self::lockData($entries, $activity, $marking));
+    }
+
+    /**
+     * @param array<mixed, mixed>      $entries
+     * @param array<mixed, mixed>|null $activity
+     * @param array<mixed, mixed>|null $marking
+     *
+     * @return array{packages: list<array<string, mixed>>, packages-dev: list<array<string, mixed>>}
+     */
+    private static function lockData(array $entries, ?array $activity, ?array $marking): array
     {
         $packages = [];
         $dev = [];
@@ -313,7 +372,7 @@ final class CaseHydrator
             }
         }
 
-        return LockFile::fromArray(['packages' => $packages, 'packages-dev' => $dev]);
+        return ['packages' => $packages, 'packages-dev' => $dev];
     }
 
     /**

@@ -10,7 +10,7 @@ declare(strict_types=1);
 //   tools/report/record --all-baselined         records every baselined scenario
 //
 // The bundle is lockrot's own output for the cases of tests/fixtures/flags/cases.json, hydrated with
-// the clock of tests/fixtures/flags/provenance.json and no network. Before it writes, it compares
+// the clock of each case document (`generated_at`) and no network. Before it writes, it compares
 // the strings that the PHP grammars own with the model's goldens and stops on a difference. Every
 // file carries the release that Lockrot\Tests\Support\VersionMask names as the tool version.
 require __DIR__.'/../../vendor/autoload.php';
@@ -21,13 +21,12 @@ use Lockrot\Tests\Support\Contract\BaselinedFloors;
 use Lockrot\Tests\Support\Contract\BaselinedScenario;
 use Lockrot\Tests\Support\Contract\ContractBundle;
 use Lockrot\Tests\Support\Contract\GoldenMismatch;
-use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Verdict\ScoreModel;
 
 const FIXTURES = __DIR__.'/../../tests/fixtures/';
 /** The directories and files of tests/fixtures/contract/ that a recording replaces whole. */
-const RECORDED = ['report-2', 'explain-2', 'baseline-2', 'sarif', 'gitlab', 'text', 'goldens', 'score-lines.json', 'en/years-phrases.json', 'en/commands.json', 'en/reason-words.json', 'en/gate-words.json', 'en/sort-words.json', 'en/halving-words.json', 'en/activity-words.json', 'en/age-words.json'];
+const RECORDED = ['report-2', 'model-only', 'explain-2', 'baseline-2', 'sarif', 'gitlab', 'text', 'goldens', 'score-lines.json', 'en/years-phrases.json', 'en/commands.json', 'en/reason-words.json', 'en/gate-words.json', 'en/sort-words.json', 'en/halving-words.json', 'en/activity-words.json', 'en/age-words.json'];
 const INPUTS = ['flags/cases.json', 'flags/composite.json', 'flags/provenance.json'];
 
 ini_set('memory_limit', '2G');
@@ -40,6 +39,9 @@ if (($argv[1] ?? null) === '--emit') {
     } catch (GoldenMismatch $mismatch) {
         fwrite(STDERR, JsonWriter::encode($mismatch->mismatches(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n".$mismatch->getMessage()."\n");
         exit(1);
+    } catch (UnexpectedValueException $floor) {
+        fwrite(STDERR, $floor->getMessage()."\n");
+        exit(1);
     }
     foreach ($recorded['files'] as $path => $contents) {
         write($dir.'/'.$path, $contents);
@@ -48,16 +50,15 @@ if (($argv[1] ?? null) === '--emit') {
     exit(0);
 }
 if (($argv[1] ?? null) === '--emit-baselined') {
-    foreach (BaselinedScenario::record($argv[2] ?? '', $argv[4] ?? '') as $path => $contents) {
+    foreach (BaselinedScenario::record($argv[2] ?? '', true) as $path => $contents) {
         write(($argv[3] ?? '').'/'.$path, $contents);
     }
     exit(0);
 }
 if (\in_array($argv[1] ?? null, ['--baselined', '--all-baselined'], true)) {
     $scenarios = $argv[1] === '--all-baselined' ? array_keys(BaselinedScenario::SCENARIOS) : [$argv[2] ?? ''];
-    $clock = JsonPath::stringAt(JsonPath::decodeFile(FIXTURES.'flags/provenance.json'), ['source', 'model_run_date']).'T00:00:00+00:00';
     foreach ($scenarios as $scenario) {
-        $files = twice(static fn (string $dir): string => '--emit-baselined '.escapeshellarg($scenario).' '.escapeshellarg($dir).' '.escapeshellarg($clock));
+        $files = twice(static fn (string $dir): string => '--emit-baselined '.escapeshellarg($scenario).' '.escapeshellarg($dir));
         $missed = BaselinedFloors::missed($scenario, $files);
         if ($missed !== []) {
             fwrite(STDERR, "record: $scenario misses the floors: ".implode(', ', $missed)."\n");
@@ -73,7 +74,7 @@ if (\in_array($argv[1] ?? null, ['--baselined', '--all-baselined'], true)) {
         fwrite(STDOUT, \sprintf("record: %s, %d files\n", $scenario, \count($files)));
     }
     // bundle_sha256 covers each scenario's check/report.bundle.json.
-    write(FIXTURES.'contract/bundle_sha256', ContractBundle::sha256(bundleFiles())."\n");
+    write(FIXTURES.'contract/bundle_sha256', ContractBundle::sha256(ContractBundle::bundleFiles())."\n");
     exit(0);
 }
 if (\count($argv) > 1) {
@@ -99,7 +100,7 @@ foreach (INPUTS as $input) {
 }
 $provenance = [
     'recorded_by' => 'tools/report/record',
-    'clock' => JsonPath::stringAt(JsonPath::decodeFile(FIXTURES.'flags/provenance.json'), ['source', 'model_run_date']).'T00:00:00+00:00',
+    'clock' => 'the generated_at of each case document in tests/fixtures/schema/documents/cases/',
     'inputs' => $inputs,
     'version_mask' => ['paths' => VersionMask::PATHS, 'value' => VersionMask::VALUE],
     'text_grammar' => RunSettings::TEXT_GRAMMAR,
@@ -107,11 +108,14 @@ $provenance = [
     'formats' => ['json', 'table', 'markdown', 'github', 'gitlab', 'sarif'],
     'format_options' => ['--all'],
     'cases_without_inputs' => $meta['without_inputs'],
+    'model_only' => 'model-only/ holds the model documents of cases_without_inputs: the hydrator cannot rebuild those cases, so lockrot did not write them',
+    'baseline_2' => 'the gate-row baselines of tests/fixtures/schema/documents/baseline/gate-rows/, read by Baseline::fromArray() and written by BaselineFile::write()',
+    'case_lock' => 'each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out',
     'model_goldens' => $meta['goldens'],
     'bundle_sha256' => 'sha256 of the lines "<sha256>  <path>", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json',
 ];
 write($contract.'provenance.json', JsonWriter::encode($provenance, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n");
-write($contract.'bundle_sha256', ContractBundle::sha256(bundleFiles())."\n");
+write($contract.'bundle_sha256', ContractBundle::sha256(ContractBundle::bundleFiles())."\n");
 fwrite(STDOUT, \sprintf("record: %d files, bundle_sha256 %s", \count($first), trim((string) file_get_contents($contract.'bundle_sha256')))."\n");
 
 /**
@@ -131,7 +135,7 @@ function twice(callable $arguments): array
             fwrite(STDERR, "record: recording $run failed\n");
             exit(1);
         }
-        $trees[] = tree($dir);
+        $trees[] = ContractBundle::tree($dir);
         removeTree($dir);
     }
     if ($trees[0] !== $trees[1]) {
@@ -141,34 +145,6 @@ function twice(callable $arguments): array
     }
 
     return $trees[0];
-}
-
-/** @return array<string, string> the files that bundle_sha256 covers, by path below tests/fixtures/ */
-function bundleFiles(): array
-{
-    $files = [];
-    foreach (tree(FIXTURES.'contract') as $path => $contents) {
-        if (strpos($path, 'cache/') !== 0 && !\in_array($path, ['provenance.json', 'bundle_sha256'], true)) {
-            $files['contract/'.$path] = $contents;
-        }
-    }
-    foreach (glob(FIXTURES.'baselined/*/check/report.bundle.json') ?: [] as $bundle) {
-        $files[substr($bundle, \strlen(FIXTURES))] = (string) file_get_contents($bundle);
-    }
-
-    return $files;
-}
-
-/** @return array<string, string> every file below $root by its relative path, sorted */
-function tree(string $root): array
-{
-    $files = [];
-    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)) as $file) {
-        $files[substr($file->getPathname(), \strlen($root) + 1)] = (string) file_get_contents($file->getPathname());
-    }
-    ksort($files);
-
-    return $files;
 }
 
 function write(string $path, string $contents): void

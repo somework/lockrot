@@ -21,7 +21,6 @@ final class MoveContractTest extends TestCase
     private const VERSION = 'the model leaves `version` null on a move whose constraint comes from S8 : lockrot names the lowest admitted release';
     private const DATED = 'the model dates a branch by its newest release only : a lower release leaves old-promise unverified, where lockrot dates it';
     private const BY_POSITION = 'the model classes a higher branch `upgrade` by its position : no link of the inputs excludes the release, so lockrot classes it `update`';
-    private const CLOCK = 'S2 reads the case run date, not the corpus clock: its years, and `quiet_years` with them, move by a tenth';
     private const SCORE = 'the inputs carry no date that S8 took from another branch: the hydrated score differs, so the move does too';
     private const S9_VERSION = 'the model leaves this S9 `fix.version` null : SPEC §5.3 names the lowest release that fixes the advisory, and lockrot writes it';
     private const LOWEST = 'the model leaves `lowest` null on a row whose only read release is its newest : lockrot names that release';
@@ -39,7 +38,6 @@ final class MoveContractTest extends TestCase
         'flysystem' => [[['fix_kind', 'security.fix_kind', 'rows.fix_kind', 's9.kind'], self::BY_POSITION], [['s9.version'], self::S9_VERSION]],
         'unreached-move' => [[['version', 'clears', 'unverified', 'clears_all', 'if_applied'], self::DATED]],
         'many-dependents' => [[['version'], self::VERSION]],
-        'silent' => [[['quiet_years'], self::CLOCK]],
         'pagerfanta' => [[['next_step'], self::SCORE]],
         'guzzle-5' => [[['fix_kind', 'security.fix_kind', 'rows.fix_kind', 's9.kind'], self::BY_POSITION]],
         'routing' => [[['fix_kind', 'security.fix_kind', 'rows.fix_kind', 's9.kind'], self::BY_POSITION]],
@@ -364,7 +362,8 @@ final class MoveContractTest extends TestCase
     {
         $case = CaseHydrator::case($id);
         $golden = JsonPath::arrayAt($case, ['finding']);
-        $goldenRows = JsonPath::arrayAt($case, ['details', 'metadata', 'branches']);
+        // A package whose releases lockrot does not read has no branch rows.
+        $goldenRows = JsonPath::has($case, ['details', 'metadata', 'branches']) ? JsonPath::arrayAt($case, ['details', 'metadata', 'branches']) : [];
         $lockrot = CaseHydrator::findings()[$id];
         $lockrotRows = CaseHydrator::branchRows()[$id];
         $skipped = [];

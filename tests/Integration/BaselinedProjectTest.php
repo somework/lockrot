@@ -60,13 +60,13 @@ final class BaselinedProjectTest extends TestCase
     public function testTheFourStepsWriteTheCommittedFilesAndMeetTheFloors(string $scenario): void
     {
         $dir = BaselinedScenario::FIXTURES.'baselined/'.$scenario.'/';
-        $t1 = JsonPath::stringAt(JsonPath::decodeFile($dir.'provenance.json'), ['clocks', 't1']);
-        $files = BaselinedScenario::record($scenario, $t1);
+        $files = BaselinedScenario::record($scenario);
 
         // Composer below 2.4 has no advisory API, so lockrot checks no advisory there. The recording ran with one, so on
         // such a Composer the files differ, and only the floors that need no advisory and the invariants below hold.
         $advisories = version_compare(Composer::VERSION, '2.4', '>=');
         if ($advisories) {
+            self::assertSame(self::committed($dir), array_keys($files), $scenario.': the recorder writes every committed file and no other');
             foreach ($files as $path => $contents) {
                 self::assertSame((string) @file_get_contents($dir.$path), $contents, $scenario.'/'.$path.': re-record with tools/report/record --baselined '.$scenario);
             }
@@ -80,7 +80,22 @@ final class BaselinedProjectTest extends TestCase
         $check = JsonPath::decoded(json_decode($files['check/report.json'], true));
         self::assertRootCountsAreTheFindingsCounts($check);
         self::assertRecordedValuesAreSet($check);
-        self::assertTheRegeneratedFileKeepsItsHistory(json_decode($files['lockrot-baseline.json'], true), json_decode($files['regenerate/lockrot-baseline.json'], true), $check, substr($t1, 0, 10));
+        self::assertTheRegeneratedFileKeepsItsHistory(json_decode($files['lockrot-baseline.json'], true), json_decode($files['regenerate/lockrot-baseline.json'], true), $check, substr(BaselinedScenario::SCENARIOS[$scenario]['t1'], 0, 10));
+    }
+
+    /** @return list<string> the recorded files of the scenario directory, by their path below it: its inputs left out */
+    private static function committed(string $dir): array
+    {
+        $paths = ['lockrot-baseline.json', 'provenance.json'];
+        foreach (['t0', 'check', 'regenerate'] as $step) {
+            /** @var \SplFileInfo $file */
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir.$step, \FilesystemIterator::SKIP_DOTS)) as $file) {
+                $paths[] = substr($file->getPathname(), \strlen($dir));
+            }
+        }
+        sort($paths);
+
+        return $paths;
     }
 
     /** @param array<mixed, mixed> $report */
