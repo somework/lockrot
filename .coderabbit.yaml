@@ -72,17 +72,17 @@ reviews:
     - '!types/lockrot-report-2.known.d.ts'
     - '!tools/schema/ts/known-map.json'
     - '!tools/schema/ts/probes.generated.ts'
-    # Written only by tools/report/record: the rendering contract bundle, its words tables included.
+    # Written by tools/report/record: the rendering contract bundle, its words tables included. PhpFloorTest
+    # writes en/php-versions.json as a golden file.
     - '!tests/fixtures/contract/**'
-    # Written only by tools/report/record --all-baselined, and the locks and answers it reads.
+    # Written only by tools/report/record --all-baselined. bin/record-fixtures records the answers in http/.
+    # The locks of before/ and after/ stay in the review: a new lock moves every recorded file.
     - '!tests/fixtures/baselined/*/t0/**'
     - '!tests/fixtures/baselined/*/check/**'
     - '!tests/fixtures/baselined/*/regenerate/**'
     - '!tests/fixtures/baselined/*/lockrot-baseline.json'
     - '!tests/fixtures/baselined/*/provenance.json'
     - '!tests/fixtures/baselined/*/http/**'
-    - '!tests/fixtures/baselined/*/before/composer.*'
-    - '!tests/fixtures/baselined/*/after/composer.*'
     # Written only by tools/schema/node/emit_bundle.js from the recorded bundle. CI rebuilds it and fails on a diff.
     - '!tests/fixtures/bundle.generated.ts'
     # Written only by tools/score/sweep.py --axis gate --sample.

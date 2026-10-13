@@ -8,6 +8,9 @@ on:
   push:
     branches: [main, 'release/**', '!release/full-check-**']
   pull_request:
+# No job of this workflow writes to the repository: the token reads only.
+permissions:
+  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}

@@ -8,19 +8,22 @@ const fs = require('fs');
 const path = require('path');
 const Ajv4 = require('ajv-draft-04');
 const Ajv7 = require('ajv');
-const { REPO, FIXTURES, DOCUMENTS, REPORT2, files, read } = require('./documents');
+const { REPO, FIXTURES, DOCUMENTS, report2, baselined, files, read } = require('./documents');
 
 const DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
 const NEGATIVE = path.join(FIXTURES, 'schema', 'negative');
 const CONTRACT = path.join(FIXTURES, 'contract');
 const SARIF = path.join(FIXTURES, 'sarif');
 
+// The recorded SARIF logs: the bundle's and the baselined scenarios'.
+const SARIF_LOGS = [...files(path.join(CONTRACT, 'sarif')), ...baselined(/\.sarif\.json$/)];
+
 const sets = [
-  { name: 'report-2', schema: path.join(REPO, 'resources', 'lockrot-report-2.schema.json'), documents: REPORT2, negative: path.join(NEGATIVE, 'report-2') },
-  { name: 'explain-2', schema: path.join(REPO, 'resources', 'lockrot-explain-2.schema.json'), documents: [path.join(DOCUMENTS, 'explain'), path.join(CONTRACT, 'explain-2')], negative: path.join(NEGATIVE, 'explain-2') },
-  { name: 'baseline-2', schema: path.join(REPO, 'resources', 'lockrot-baseline-2.schema.json'), documents: [path.join(DOCUMENTS, 'baseline'), path.join(CONTRACT, 'baseline-2')], negative: path.join(NEGATIVE, 'baseline-2'), skip: /regenerate-from-baseline-1/ },
-  { name: 'config-2', schema: path.join(REPO, 'resources', 'lockrot-config-2.schema.json'), documents: [path.join(DOCUMENTS, 'config')], negative: path.join(NEGATIVE, 'config-2') },
-  { name: 'sarif-properties-2', schema: path.join(SARIF, 'lockrot-sarif-properties-2.schema.json'), documents: [path.join(CONTRACT, 'sarif')], negative: path.join(SARIF, 'negative') },
+  { name: 'report-2', schema: path.join(REPO, 'resources', 'lockrot-report-2.schema.json'), documents: report2(), negative: path.join(NEGATIVE, 'report-2') },
+  { name: 'explain-2', schema: path.join(REPO, 'resources', 'lockrot-explain-2.schema.json'), documents: [...files(path.join(DOCUMENTS, 'explain')), ...files(path.join(CONTRACT, 'explain-2')), ...baselined(/^[^/]+\/check\/explain\/[^/]+\.json$/)], negative: path.join(NEGATIVE, 'explain-2') },
+  { name: 'baseline-2', schema: path.join(REPO, 'resources', 'lockrot-baseline-2.schema.json'), documents: [...files(path.join(DOCUMENTS, 'baseline')), ...files(path.join(CONTRACT, 'baseline-2')), ...baselined(/^[^/]+\/(regenerate\/)?lockrot-baseline\.json$/)], negative: path.join(NEGATIVE, 'baseline-2'), skip: /regenerate-from-baseline-1/ },
+  { name: 'config-2', schema: path.join(REPO, 'resources', 'lockrot-config-2.schema.json'), documents: files(path.join(DOCUMENTS, 'config')), negative: path.join(NEGATIVE, 'config-2') },
+  { name: 'sarif-properties-2', schema: path.join(SARIF, 'lockrot-sarif-properties-2.schema.json'), documents: SARIF_LOGS, negative: path.join(SARIF, 'negative') },
 ];
 
 function strictOnly(file, doc) {
@@ -35,7 +38,7 @@ for (const set of sets) {
   ajv.addFormat('date-time', DATE_TIME);
   const validate = ajv.compile(JSON.parse(fs.readFileSync(set.schema, 'utf8')));
   const c = { files: 0, valid: 0 };
-  for (const f of set.documents.flatMap(files)) {
+  for (const f of set.documents) {
     if (set.skip && set.skip.test(f)) continue;
     c.files++;
     if (validate(JSON.parse(read(f)))) c.valid++;
@@ -65,7 +68,7 @@ for (const set of sets) {
   delete sarif.$schema;
   const validate = ajv.compile(sarif);
   const c = { files: 0, valid: 0 };
-  for (const f of files(path.join(CONTRACT, 'sarif'))) {
+  for (const f of SARIF_LOGS) {
     c.files++;
     if (validate(JSON.parse(read(f)))) c.valid++;
     else fail(f, validate.errors.slice(0, 4).map((e) => `${e.instancePath} ${e.message}`));

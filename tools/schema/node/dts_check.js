@@ -3,25 +3,31 @@
 //   2. tests/fixtures/bundle.generated.ts and every report-2 fixture document compile, each written as an object
 //      literal `satisfies Report2`. A literal keeps each string's literal type, so a value outside a closed set fails.
 //      A JSON import widens every string and cannot catch it.
-//   3. three planted regressions fail: a closed set typed `string` in the shapes, a known value dropped from a union,
-//      and a value outside a closed set in a document.
+//   3. four planted regressions fail: a closed set typed `string` in the shapes, a union name that does not exist in
+//      the shapes, a known value dropped from a union, and a value outside a closed set in a document.
 'use strict';
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { REPO, FIXTURES, DOCUMENTS, REPORT2, files, read } = require('./documents');
+const { REPO, FIXTURES, DOCUMENTS, report2, read } = require('./documents');
 
 const TYPES = path.join(REPO, 'types');
 const PROBES = path.join(REPO, 'tools', 'schema', 'ts', 'probes.generated.ts');
 const BUNDLE = path.join(FIXTURES, 'bundle.generated.ts');
 const TSC = path.join(__dirname, 'node_modules', '.bin', 'tsc');
-const OPTS = ['--noEmit', '--strict', '--target', 'es2020', '--skipLibCheck'];
+// No --skipLibCheck: it skips every .d.ts file, the shapes under test included.
+const OPTS = ['--noEmit', '--strict', '--target', 'es2020'];
 const SHARD = 12;
 
+// The errors of one tsc run. A failed run without an `error TS` line is an error too: a crash never reads as clean.
 function tsc(list) {
   try { execFileSync(TSC, [...OPTS, ...list], { encoding: 'utf8', maxBuffer: 64 << 20 }); return []; }
-  catch (e) { return ((e.stdout || '') + (e.stderr || '')).split('\n').filter((l) => /error TS/.test(l)); }
+  catch (e) {
+    const lines = ((e.stdout || '') + (e.stderr || '')).split('\n');
+    const errors = lines.filter((l) => /error TS/.test(l));
+    return errors.length > 0 ? errors : [`tsc failed with status ${e.status}: ${lines.filter(Boolean).slice(0, 3).join(' | ')}`];
+  }
 }
 
 const work = fs.mkdtempSync(path.join(os.tmpdir(), 'lockrot-dts-'));
@@ -36,7 +42,7 @@ try {
     fs.writeFileSync(f, `import type { Report2 } from ${shapes};\nexport const d = ${json.trim()} satisfies Report2;\n`);
     return f;
   };
-  const docs = REPORT2.flatMap(files);
+  const docs = report2();
   const errors = [];
   for (let i = 0; i < docs.length; i += SHARD) {
     const batch = docs.slice(i, i + SHARD).map((f, j) => write(`d${i + j}`, read(f)));
@@ -53,6 +59,9 @@ try {
     const probes = fs.readFileSync(PROBES, 'utf8').replace(/'\.\.\/\.\.\/\.\.\/types\//g, "'./");
     fs.writeFileSync(path.join(work, 'probes.ts'), probes);
     planted.closed_set_typed_string = edited !== dts && tsc([path.join(work, 'lockrot-report-2.d.ts'), path.join(work, 'probes.ts')]).length > 0;
+    const missing = dts.replace(/(\breach: )K\.[A-Za-z0-9]+/, '$1K.NoSuchUnion');
+    fs.writeFileSync(path.join(work, 'lockrot-report-2.d.ts'), missing);
+    planted.union_that_does_not_exist = missing !== dts && tsc([path.join(work, 'lockrot-report-2.d.ts')]).some((e) => /TS2694/.test(e));
   }
   {
     const doc = JSON.parse(read(path.join(DOCUMENTS, 'cases', 'A.json')));
