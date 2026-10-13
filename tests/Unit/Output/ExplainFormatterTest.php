@@ -465,12 +465,6 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString('installed release v10.48.28 (2023-11-14, dated by laravel/framework)', $text);
     }
 
-    /**
-     * A branch snapshot is undated for a reason of its own: the lock's `time` is the commit's,
-     * which the `composer.lock` block says next to `branch snapshot`. The shared-commit
-     * sentence is about a tag, and claiming it of `dev-main` states a fact the data does not
-     * carry.
-     */
     public function testALowerBoundOfLibyearsSaysAtLeast(): void
     {
         $finding = (new FindingBuilder())->withVersion('1.2.0')->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::atLeast(2.0))->build();
@@ -479,6 +473,12 @@ final class ExplainFormatterTest extends TestCase
         self::assertStringContainsString('  libyears at least 2.0 behind the newest stable release', $this->plain($explanation));
     }
 
+    /**
+     * A branch snapshot is undated for a reason of its own: the lock's `time` is the commit's,
+     * which the `composer.lock` block says next to `branch snapshot`. The shared-commit
+     * sentence is about a tag, and claiming it of `dev-main` states a fact the data does not
+     * carry.
+     */
     public function testABranchSnapshotIsNotToldItsTagsShareACommit(): void
     {
         $finding = (new FindingBuilder())->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))->build();
