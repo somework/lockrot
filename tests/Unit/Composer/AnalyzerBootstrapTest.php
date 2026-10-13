@@ -23,6 +23,7 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Deadline;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Verdict\VerdictEngine;
@@ -70,6 +71,19 @@ final class AnalyzerBootstrapTest extends TestCase
         $patterns = array_map(static fn (AllowlistEntry $e): ?string => $e->pattern(), $analyzer->allowlist()->entries());
         self::assertContains('vendor/builtin', $patterns, "the factory-built analyzer's own allowlist entry must survive the merge");
         self::assertContains('vendor/project', $patterns, 'the project ignore list must be merged in');
+    }
+
+    /** `extra.lockrot.accept-unchecked` reaches the analyzer, and an invalid entry stops the run. */
+    public function testCreatePassesTheProjectsUncheckedAcceptanceToTheAnalyzer(): void
+    {
+        $lockrot = LockrotConfig::fromSources([], [], [], '8.4.0', null);
+        $factory = fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, Deadline $deadline): Analyzer => $this->baseAnalyzer($clock, $lockrot);
+        $create = static fn (array $extra): Analyzer => AnalyzerBootstrap::create($factory, new NullIO(), new Config(false, sys_get_temp_dir()), [], ProjectConfig::fromArray(['extra' => ['lockrot' => $extra]]), $lockrot, [], Deadline::never());
+
+        self::assertTrue($create([])->uncheckedAcceptance()->isEmpty());
+        self::assertFalse($create(['accept-unchecked' => [['check' => 'advisories', 'package' => 'acme/*', 'reason' => 'no feed']]])->uncheckedAcceptance()->isEmpty());
+        $this->expectException(ConfigException::class);
+        $create(['accept-unchecked' => [['check' => 'advisories', 'host' => 'codeberg.org', 'reason' => 'a host is no scope for advisories']]]);
     }
 
     /** The project's php requirement is one of the two floors that S8 keeps the branch it names within. */

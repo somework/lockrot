@@ -115,6 +115,11 @@ final class Analyzer
     }
 
     /** The project's `accept-unchecked` list, which buildFinding() applies after the S10 filter. */
+    public function uncheckedAcceptance(): UncheckedAcceptance
+    {
+        return $this->acceptance;
+    }
+
     public function withUncheckedAcceptance(UncheckedAcceptance $acceptance): self
     {
         $clone = clone $this;
@@ -608,10 +613,15 @@ final class Analyzer
         $ref = $where->ref();
         $meta = $facts->metadata();
         $now = $this->clock->now();
+        // A named registry is compared by its name, an unnamed one by the URL that answered. A
+        // package of no Composer repository kind has neither: only its source or its name matches.
+        $origin = $package->origin();
+        $registry = $origin->registry();
+        $composer = !$origin->isComposerRepository() ? null : ($registry !== null ? 'https://'.$registry : ($meta === null ? null : $meta->composerRepositoryUrl()));
         $kept = [];
         $accepted = [];
         foreach ($s10->checks() as $check) {
-            $by = $this->acceptance->acceptedBy($check, $package->name(), $where->host(), $ref === null ? null : $ref->path(), $package->repositoryUrl(), $meta === null ? null : $meta->composerRepositoryUrl(), $now);
+            $by = $this->acceptance->acceptedBy($check, $package->name(), $where->host(), $ref === null ? null : $ref->path(), $package->repositoryUrl(), $composer, $now);
             if ($by === null) {
                 $kept[] = $check;
                 continue;
