@@ -359,9 +359,9 @@ final class GateAgreementTest extends TestCase
     }
 
     /**
-     * The baseline that this report writes, with the first finding more severe than `stale` accepted
-     * only at `stale` (so it is worsened) and the second of the other flagged ones omitted (so it is
-     * new). Every other one is known. Null when the lock has nothing flagged.
+     * The baseline that this report writes, with the first graded finding whose lead is not `stale`
+     * recorded at `stale` (so it is worsened) and the second of the other graded ones omitted (so it
+     * is new). Every other one is known. Null when no finding is graded.
      */
     private static function changedBaseline(Report $report): ?Baseline
     {
