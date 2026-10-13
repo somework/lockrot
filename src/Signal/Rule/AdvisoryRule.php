@@ -8,7 +8,6 @@ use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Repository\ReleaseBranch;
-use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Severity;
 use Lockrot\Signal\Data\AdvisoryData;
@@ -21,8 +20,7 @@ use Lockrot\Verdict\ScoreModel;
 
 /**
  * S9: the counted security advisories on the installed version, each with its fix from the release
- * scan (docs/verdicts.md#security-advisories). The summary and {@see legacy()} keep report-1's
- * reading until its readers move.
+ * scan (docs/verdicts.md#security-advisories).
  *
  * @internal
  */
@@ -40,30 +38,30 @@ final class AdvisoryRule implements SignalRule
         if ($advisories === []) {
             return null;
         }
-        $legacy = self::legacy($facts);
+        [$summary, $releasesRead] = self::summary($facts);
         $rows = self::rows($facts);
         $worst = Severity::worstOf(array_map(static fn (Advisory $advisory): string => Severity::fromComposer($advisory->severity())->bucket(), $advisories));
         $coverage = $facts->advisoryCoverage();
 
-        return new Signal(\in_array($worst, [Severity::CRITICAL, Severity::HIGH], true) ? Signal::LEVEL_HIGH : Signal::LEVEL_WARN, $legacy[0], new AdvisoryData(
+        return new Signal(\in_array($worst, [Severity::CRITICAL, Severity::HIGH], true) ? Signal::LEVEL_HIGH : Signal::LEVEL_WARN, $summary, new AdvisoryData(
             $rows,
-            $legacy[1]->releasesRead(),
+            $releasesRead,
             $coverage !== null && $coverage->reason() === null
         ));
     }
 
     /**
-     * report-1's S9 facts and summary: per advisory the highest tag outside its range, on the
-     * installed branch or in the package.
+     * S9's summary, with the count of advisories that the highest tag outside each range fixes,
+     * and whether the releases were read.
      *
-     * @return array{string, AdvisoryFacts013}
+     * @return array{string, bool}
      */
-    public static function legacy(PackageFacts $facts): array
+    private static function summary(PackageFacts $facts): array
     {
         $advisories = self::worstFirst($facts->advisories());
         $count = \count($advisories);
         if ($count === 0) {
-            return ['', AdvisoryFacts013::none()];
+            return ['', false];
         }
         $labels = array_map(static fn (Advisory $advisory): string => $advisory->label(), \array_slice($advisories, 0, self::NAMED));
         $named = implode(', ', $labels);
@@ -79,27 +77,23 @@ final class AdvisoryRule implements SignalRule
         );
 
         [$onBranch, $inPackage, $read] = self::fixCandidates($facts);
-        $fixes = [];
         $fixedBy = [];
         foreach ($advisories as $advisory) {
             $fixed = null;
-            $onFixBranch = false;
             if ($onBranch !== null && $advisory->affects($onBranch['normalized']) === false) {
                 $fixed = $onBranch['pretty'];
-                $onFixBranch = true;
             } elseif ($inPackage !== null && $advisory->affects($inPackage['normalized']) === false) {
                 $fixed = $inPackage['pretty'];
             }
             if ($fixed !== null) {
                 $fixedBy[$fixed] = ($fixedBy[$fixed] ?? 0) + 1;
             }
-            $fixes[] = [$advisory, $fixed, $onFixBranch];
         }
         if ($fixedBy !== []) {
             $summary .= '; '.self::fixedClause($fixedBy, $count);
         }
 
-        return [$summary, AdvisoryFacts013::of($fixes, $read)];
+        return [$summary, $read];
     }
 
     /**

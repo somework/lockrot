@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\Report2Root;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 
@@ -20,88 +22,122 @@ use Lockrot\Verdict\Verdict;
 final class InstallSummaryFormatter
 {
     public const MAX_LINES = 10;
-    /** Metadata, repository activity and advisories can each leave one note, and the block shows them all. */
-    public const MAX_NOTES = 3;
+    /** The notes the block prints; a later note is counted in the footer. */
+    public const MAX_NOTES = 2;
 
-    /** Header and footer always take one line each, and findings and notes share the rest. */
-    private const FIXED_LINES = 2;
+    /** A finding line is a display line: it is cut at a word boundary past this length. */
+    public const MAX_FINDING_LINE = 160;
 
-    private const FOOTER = 'Run composer lockrot for details.';
+    private const FOOTER = 'Run composer lockrot for details';
 
     /**
-     * @return list<string> Composer IO lines, empty only when nothing is flagged and the report has
-     *                      no network failure
+     * @return list<string> Composer IO lines, empty only when nothing is graded, the report has no
+     *                      network failure and the gate passes
      */
     public function format(Report $report): array
     {
-        $flagged = $report->flagged();
-        if ($flagged === []) {
-            // `unknown` is not flagged, so without this branch an exhausted budget or an unreachable
-            // repository prints nothing and reads as a clean install.
-            return $report->hadNetworkFailures() ? $this->uncheckedLines($report) : [];
+        $graded = $report->graded();
+        $run = $report->run();
+        $gate = $report->gate();
+        $gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;
+        if ($graded === []) {
+            // An exhausted budget or an unreachable repository grades nothing: without this branch
+            // it prints nothing and reads as a clean install.
+            return $report->hadNetworkFailures() || $gateLine !== null ? $this->uncheckedLines($report, $gateLine) : [];
         }
+        $updateNow = Report2Root::updateNow($report->sorted());
+        $notes = self::notes($report, $run);
+        $shownNotes = \array_slice($notes, 0, self::MAX_NOTES);
+        // The header and the footer always print, `update now:` and the gate line when they apply.
+        $slots = self::MAX_LINES - 2 - ($updateNow === [] ? 0 : 1) - ($gateLine === null ? 0 : 1) - \count($shownNotes);
+        $shown = \count($graded) > $slots ? \array_slice($graded, 0, max(0, $slots - 1)) : $graded;
+        $omitted = \count($graded) - \count($shown);
 
-        $notes = \array_slice($report->notes(), 0, self::MAX_NOTES);
-        $slots = self::MAX_LINES - self::FIXED_LINES - \count($notes);
-
-        // When they do not all fit, one slot goes to the "… and N more" line, so one fewer finding fits.
-        $shown = \count($flagged) > $slots ? \array_slice($flagged, 0, $slots - 1) : $flagged;
-        $omitted = \count($flagged) - \count($shown);
-
-        $lines = [$this->header(\count($flagged), $report->packagesChecked())];
+        $lines = [\sprintf('<warning>%s</warning>', self::text(\sprintf('lockrot: %d of %d changed %s flagged — %s', \count($graded), $report->packagesChecked(), $report->packagesChecked() === 1 ? 'package' : 'packages', RunFooter::gradeCounts($report))))];
         foreach ($shown as $finding) {
             $lines[] = $this->findingLine($finding);
         }
         if ($omitted > 0) {
             $lines[] = \sprintf('  … and %d more', $omitted);
         }
-        foreach ($notes as $note) {
+        if ($updateNow !== []) {
+            $hidden = \count(array_diff($updateNow, array_map(static fn (Finding $finding): string => $finding->package(), $shown)));
+            $lines[] = '  update now: '.self::text(RunFooter::updateNow($report).($hidden > 0 ? ' ('.$hidden.' not shown above)' : ''));
+        }
+        if ($gateLine !== null) {
+            $lines[] = $gateLine;
+        }
+        foreach ($shownNotes as $note) {
             $lines[] = '  note: '.self::text($note);
         }
-        $lines[] = self::FOOTER;
+        $more = \count($notes) - \count($shownNotes);
+        $lines[] = self::FOOTER.($more > 0 ? \sprintf('; %d more %s.', $more, $more === 1 ? 'note' : 'notes') : '.');
 
         return $lines;
     }
 
+    /**
+     * The runtime-target note first, then the run notes in their order.
+     *
+     * @return list<string>
+     */
+    private static function notes(Report $report, ?RunSettings $run): array
+    {
+        $notes = $report->notes();
+        if ($run !== null && $report->baseline() !== null && $run->targetPhpSource() === RunSettings::SOURCE_RUNTIME) {
+            array_unshift($notes, 'target php from the running PHP ('.$run->targetPhp().'); fix changes against the baseline not compared');
+        }
+
+        return $notes;
+    }
+
     /** @return list<string> */
-    private function uncheckedLines(Report $report): array
+    private function uncheckedLines(Report $report, ?string $gateLine): array
     {
         $checked = $report->packagesChecked();
-        $unknown = $report->byVerdict()[Verdict::UNKNOWN];
+        $unknown = $report->byGrade()[Verdict::UNKNOWN];
         // Nothing is `unknown` when a later lookup failed (advisories, a repository host), and
         // "0 of 3 could not be checked" contradicts the notes.
         $lines = [$unknown === 0
             ? \sprintf('<warning>lockrot: %d changed %s checked, one check incomplete</warning>', $checked, $checked === 1 ? 'package' : 'packages')
             : \sprintf('<warning>lockrot: %d of %d changed %s could not be checked</warning>', $unknown, $checked, $checked === 1 ? 'package' : 'packages')];
+        if ($gateLine !== null) {
+            $lines[] = $gateLine;
+        }
         foreach (\array_slice($report->notes(), 0, self::MAX_NOTES) as $note) {
             $lines[] = '  note: '.self::text($note);
         }
-        $lines[] = self::FOOTER;
+        $lines[] = self::FOOTER.'.';
 
         return $lines;
     }
 
-    private function header(int $flagged, int $checked): string
-    {
-        return \sprintf(
-            '<warning>lockrot: dependency rot in %d of %d changed %s</warning>',
-            $flagged,
-            $checked,
-            $checked === 1 ? 'package' : 'packages'
-        );
-    }
-
     /**
-     * Omits the other direct requirements and S7: the block is read in passing, and both answer
-     * questions about the full report (docs/install-time.md#at-most-10-lines-always).
+     * `<grade> [<score>] <package> <version>: <counted flags> — <the move>`, cut at
+     * {@see MAX_FINDING_LINE} characters at a word boundary.
      */
     private function findingLine(Finding $finding): string
     {
-        return \sprintf(
-            '  <comment>%-12s</comment>%s',
-            $finding->verdict(),
-            self::text($finding->package().' '.$finding->version().': '.$finding->ownEvidence().Via::suffix($finding, ' > ', false))
-        );
+        $flags = $finding->flagIds();
+        $security = $finding->scoreBasis()->securityTerm();
+        if ($security !== null && \count($flags) === 1) {
+            $count = array_sum($finding->securityStanding()->counts());
+            $flags[0] .= $count > 1 && $security->severity() !== 'low'
+                ? ' ('.$security->severity().' advisory; '.$count.' in all)'
+                : ' ('.$count.' '.$security->severity().' '.($count === 1 ? 'advisory' : 'advisories').')';
+        }
+        $move = FindingBlock::move($finding);
+        $grade = $finding->verdict();
+        $text = \sprintf('%s [%2d] %s %s: %s', str_repeat(' ', 8 - \strlen($grade)), $finding->score()->total(), $finding->package(), $finding->version(), implode(' · ', $flags).($move === null ? '' : ' — '.$move));
+        $limit = self::MAX_FINDING_LINE - 2 - \strlen($grade);
+        if (\strlen($text) > $limit) {
+            $cut = substr($text, 0, $limit);
+            $space = strrpos($cut, ' ');
+            $text = ($space === false ? $cut : substr($cut, 0, $space)).'…';
+        }
+        $colour = FindingBlock::colour($grade);
+
+        return '  '.($colour === null ? $grade : '<fg='.$colour.'>'.$grade.'</fg='.$colour.'>').self::text($text);
     }
 
     /** Text lockrot did not write, as markup that prints it as written and obeys nothing in it. */

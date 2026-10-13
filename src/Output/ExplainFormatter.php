@@ -4,54 +4,64 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
-use Lockrot\Data\Repository\InstalledRelease;
-use Lockrot\Data\Repository\PackageMetadata;
-use Lockrot\Data\Repository\RepositoryUrl;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Explain\Explanation;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Json\Schemas;
-use Lockrot\Legacy\AdvisoryFacts013;
-use Lockrot\Legacy\SignalData013;
+use Lockrot\Lock\ProjectConfig;
+use Lockrot\Score\MaintenanceTerm;
+use Lockrot\Security\Holder;
+use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Verdict;
+use Lockrot\Verdict\Moves;
+use Lockrot\Verdict\ScoreModel;
 
 /**
- * `--explain <package>` as text, or as JSON under `--format=json`
- * (docs/configuration.md#explaining-one-package). The text reads top to bottom: the verdict and
- * the chain, then the signals that fired, then the data they read, in the units the signal used.
- * It is {@see ConsoleMarkup} for {@see ConsoleMarkup::render()}, with all text from the lock and
- * the repository escaped.
+ * `--explain <package>` as text, or as explain-2 JSON under `--format=json`
+ * (docs/configuration.md#explaining-one-package). Each text block is a
+ * rendering of explain-2's fields. It is {@see ConsoleMarkup} for {@see ConsoleMarkup::render()},
+ * with all text from the lock and the repositories escaped.
  *
  * @internal
- *
- * @phpstan-import-type Row013 from AdvisoryFacts013
  */
 final class ExplainFormatter
 {
     public const SCHEMA = JsonFormatter::SCHEMA;
 
     private const INDENT = '  ';
+    /** The label column of a block: `age`, `score`, `do`. */
+    private const LABEL = 10;
+    /** The label column of a line in the flags block. */
+    private const FLAG = 13;
 
-    /** Under a signal's `S8 warn ` line: the data hangs beneath the summary's first character. */
-    private const DATA_INDENT = '           ';
+    private const LOOKUP_WORDS = ['complete' => 'lookup complete', 'partial' => 'lookup partial', 'not_run' => 'not checked'];
+    private const FIX_WORDS = ['update' => 'composer update', 'upgrade' => 'upgrade', 'raise-php' => 'php floor raise', 'unknown' => 'fix unknown', 'blocked' => 'blocked', 'none' => 'no fix'];
+    private const MARKED_BY = ['repository' => 'registry', 'lock' => 'lock'];
+    private const IGNORE_LIST = ['policy.abandoned' => 'config.policy.abandoned.ignore', 'audit.ignore-abandoned' => 'config.audit.ignore-abandoned'];
 
     public function text(Explanation $explanation): string
     {
         $finding = $explanation->finding();
         $lines = array_merge(
-            $this->header($finding),
+            $this->header($finding, $explanation),
             [''],
-            $this->signals($finding),
+            self::block('age', AgeText::block($finding, $explanation->thresholds())),
+            [self::escape('repository '.self::repositoryLine($finding))],
             [''],
-            $this->lock($explanation),
+            $this->score($finding),
             [''],
-            $this->metadata($explanation),
+            $this->move($finding),
             [''],
-            $this->activity($explanation),
+            $this->flags($finding),
             [''],
-            $this->run($explanation)
+            $this->branches($explanation)
         );
+        foreach ($explanation->report()->notes() as $note) {
+            $lines[] = 'note: '.self::escape($note);
+        }
 
         return implode("\n", $lines)."\n";
     }
@@ -67,260 +77,323 @@ final class ExplainFormatter
         return $json."\n";
     }
 
-    /** @return list<string> */
-    private function header(Finding $finding): array
+    /** @return list<string> the header and the reach line */
+    private function header(Finding $finding, Explanation $explanation): array
     {
         $verdict = $finding->verdict();
-        $label = Verdict::flagged($verdict) ? '<fg=yellow>'.self::escape($verdict).'</fg=yellow>' : self::escape($verdict);
-        $lines = [\sprintf('<options=bold>%s %s</> — %s, priority %s', self::escape($finding->package()), self::escape($finding->version()), $label, $finding->priority())];
-        $how = $finding->isDirect() ? 'direct requirement' : 'via '.implode(' > ', $finding->chain());
-        $others = $finding->otherDirectDependents();
-        if ($others !== []) {
-            $how .= '; also reached from '.implode(', ', $others);
-        }
-        $lines[] = self::INDENT.self::escape($how.($finding->isDev() ? ' · packages-dev' : ''));
-        if ($finding->allowlistReason() !== null) {
-            $lines[] = self::INDENT.self::escape('allowlisted: '.$finding->allowlistReason());
-        }
-        if ($finding->note() !== null) {
-            $lines[] = self::INDENT.self::escape('note: '.$finding->note());
-        }
-        // After the note, which is usually the reason when libyears are not measured.
-        $libyears = $finding->libyears();
-        $lines[] = self::INDENT.self::escape($libyears === null
-            ? 'libyears not measured: '.CauseWords::of((string) $finding->libyearsUnmeasured())
-            : \sprintf($finding->isLibyearsAtLeast() ? 'libyears at least %.1F behind the newest stable release' : 'libyears %.1F behind the newest stable release', $libyears));
-
-        return $lines;
+        $colour = FindingBlock::colour($verdict);
+        $label = $colour === null ? self::escape($verdict) : '<fg='.$colour.'>'.self::escape($verdict).'</fg='.$colour.'>';
+        $flags = $finding->flagIds();
+        return [
+            '<options=bold>'.self::escape($finding->package().' '.$finding->version()).'</options=bold> — '.$label.($flags === [] ? '' : ': '.self::escape(implode(' · ', $flags))),
+            self::INDENT.self::escape(self::reachLine($finding, $explanation->report()->includesDev())),
+        ];
     }
 
-    /**
-     * Dates stay as the repository gave them, so a reader can check the arithmetic in the summary.
-     *
-     * @return list<string>
-     */
-    private function signals(Finding $finding): array
+    /** The reach line, from `depth`, `depth_unmeasured`, `named_in` and `chain`. */
+    public static function reachLine(Finding $finding, bool $includeDev): string
     {
-        if ($finding->signals() === []) {
-            return ['signals: none'];
+        $depth = $finding->depth();
+        $namedIn = $finding->namedIn();
+        if ($depth === 0) {
+            return 'direct requirement (composer.json '.($namedIn === [ProjectConfig::REQUIRE_DEV] ? 'require-dev' : 'require').')';
         }
-        $lines = ['signals'];
-        foreach ($finding->signals() as $signal) {
-            $lines[] = \sprintf('%s%s %-4s %s', self::INDENT, $signal->id(), SignalData013::level($signal), self::escape($signal->summary()));
-            foreach ($this->signalData($signal, $finding) as $line) {
-                $lines[] = self::DATA_INDENT.self::escape($line);
+        if ($depth === null) {
+            return $finding->depthUnmeasured() === Finding::NO_COMPOSER_JSON
+                ? 'depth not measured: the run read no composer.json'
+                : 'unreached: lockrot found no path from your '.($includeDev ? 'require or require-dev' : 'require (require-dev counts only with --dev)').' to it';
+        }
+        $via = 'via '.implode(' > ', $finding->chain()).': '.$depth.' '.($depth === 1 ? 'hop' : 'hops');
+        if ($namedIn === [ProjectConfig::REQUIRE_DEV]) {
+            return $via.'; composer.json names it in require-dev, which this run did not walk (pass --dev)';
+        }
+
+        return $via.' from the nearest composer.json line'.($namedIn === [] ? '; no line of composer.json names it' : '');
+    }
+
+    /** The repository line, from `activity` and `age.push`. */
+    public static function repositoryLine(Finding $finding): string
+    {
+        $lookup = $finding->details()->activity();
+        $where = $lookup->where();
+        $ref = $where->ref();
+        $reason = CauseWords::of((string) $lookup->reason());
+        if ($lookup->status() === ActivityLookup::NOT_READ) {
+            if ($lookup->reason() === ActivityLookup::HOST_NOT_SUPPORTED) {
+                return 'lockrot cannot ask '.$where->host().' about repository activity';
+            }
+
+            return $ref === null ? 'repository activity not asked ('.$reason.')' : $ref->host().'/'.$ref->path().': not asked ('.$reason.')';
+        }
+        $name = $ref === null ? $where->host() : $ref->forgeLabel().' '.$ref->host().'/'.$ref->path();
+        if ($lookup->status() === ActivityLookup::NOT_FOUND) {
+            return $name.': the host answered 404 (private, renamed or removed)';
+        }
+        $event = $lookup->event() ?? 'push';
+        $push = $finding->details()->age()->push();
+        $line = $name.': '.($push->isMeasured() ? 'last '.$event.' '.$push->measuredAt()->format('Y-m-d') : 'no '.$event.' reported');
+        $activity = $lookup->activity();
+        if ($activity !== null && $activity->archived() === true) {
+            $line .= ', archived';
+        } elseif ($lookup->archivedUnread() !== null) {
+            $line .= ', archived flag not read ('.CauseWords::of($lookup->archivedUnread()).')';
+        }
+        if ($activity !== null) {
+            $cached = $activity->cachedAt();
+            $line .= ' · fetched '.$activity->fetchedAt()->format('Y-m-d').($cached === null ? '' : ' (cached '.$cached->format('Y-m-d').')');
+        }
+
+        return $line;
+    }
+
+    /** @return list<string> the score block: its line with the band floor, the terms, the reach and the bands */
+    private function score(Finding $finding): array
+    {
+        $basis = $finding->scoreBasis();
+        $verdict = $finding->verdict();
+        $lines = [FindingBlock::scoreLine($finding).($finding->isGraded() ? '     '.$verdict.' from '.ScoreModel::floorOf($verdict) : '')];
+        $maintenance = array_map(static fn (MaintenanceTerm $term): string => $term->flag().' '.$term->points().' ('.($term->isLead() ? 'lead' : '¼ of '.$term->weight()).')', $basis->maintenanceTerms());
+        if ($maintenance !== []) {
+            $lines[] = self::INDENT.'maintenance  '.implode(' · ', $maintenance);
+        }
+        $security = $basis->securityTerm();
+        if ($security !== null) {
+            $lines[] = self::INDENT.'security     vulnerable '.$security->points().' ('.$security->severity().' advisory '.FindingBlock::advisoryName($finding, $security->advisory()).($security->multiplier() === 1 ? '' : '; '.$security->weight().' × '.$security->multiplier().': no reachable fix').')';
+        }
+        $lines[] = self::INDENT.'reach        '.self::reachWords($finding, $maintenance !== []);
+        foreach ($basis->modifiers() as $modifier) {
+            if ($modifier->isDev() && $modifier->changes()) {
+                $lines[] = self::INDENT.'dev          packages-dev: the score ÷ '.$modifier->divideBy();
             }
         }
+        $bands = [];
+        foreach (array_reverse(ScoreModel::BANDS, true) as $band => $floor) {
+            $bands[] = $band.' '.$floor;
+        }
+        $lines[] = self::INDENT.'bands        '.implode(' · ', $bands).' (score model '.ScoreModel::ID.', verdicts.md#score)';
+
+        return array_merge(self::block('score', [$lines[0]]), array_map([self::class, 'escape'], \array_slice($lines, 1)));
+    }
+
+    private static function reachWords(Finding $finding, bool $maintenance): string
+    {
+        if ($finding->isDirect()) {
+            return 'direct requirement: maintenance not halved for reach';
+        }
+        $where = $finding->reach() === 'unreached' ? 'unreached' : 'via '.implode(', ', $finding->directDependents());
+
+        return $where.': maintenance '.($maintenance ? 'halved' : 'would be halved (none counts)').'; security is never halved for reach';
+    }
+
+    /** @return list<string> the do block: the move, each other move and what it clears */
+    private function move(Finding $finding): array
+    {
+        $move = $finding->isGraded() ? $finding->nextStep() : null;
+        if ($move === null) {
+            return self::block('do', ['nothing to do: nothing counts']);
+        }
+        $lines = [$move->text()];
+        $clears = [];
+        foreach ($move->clears() as $fact) {
+            $clears[] = $fact->id();
+        }
+        if ($clears !== []) {
+            $lines[] = 'clears '.implode(', ', $clears);
+        }
+        foreach ($move->also() as $also) {
+            $lines[] = 'also: '.$also->text();
+        }
+
+        return self::block('do', $lines);
+    }
+
+    /** @return list<string> the flags block, the feeds line, the ignored marking, the accepted flags and the checks not run */
+    private function flags(Finding $finding): array
+    {
+        $lines = ['flags'];
+        $summaries = $finding->flagSummaries();
+        $standing = $finding->securityStanding();
+        foreach ($summaries as $flag => $summary) {
+            $signals = [];
+            foreach ($finding->signals() as $signal) {
+                if (\in_array($signal->id(), ScoreModel::RAISED_BY[$flag] ?? [], true)) {
+                    $signals[] = $signal->id().($signal->level() === Signal::LEVEL_HIGH ? ' high' : '');
+                }
+            }
+            $tail = $flag === 'vulnerable' ? ' · '.(self::LOOKUP_WORDS[$standing->check()] ?? $standing->check()) : '';
+            $lines[] = self::flagLine($flag, implode(', ', $signals).' · '.$summary.$tail);
+            if ($flag === 'vulnerable') {
+                foreach (self::advisoryLines($finding) as $line) {
+                    $lines[] = $line;
+                }
+            }
+        }
+        $feeds = self::feedsLine($finding);
+        if ($feeds !== null) {
+            $lines[] = self::flagLine('feeds', $feeds);
+        }
+        $ignored = self::ignoredLine($finding);
+        if ($ignored !== null) {
+            $lines[] = self::flagLine('S1 ignored', $ignored);
+        }
+        $pulls = FindingBlock::pullsIn($finding);
+        if ($pulls !== null) {
+            $lines[] = self::flagLine('pulls in', $pulls);
+        }
+        $accepted = array_map(static fn ($row): string => $row->flag(), $finding->scoreBasis()->accepted());
+        $lines[] = self::flagLine('accepted', $accepted === [] ? 'none' : implode(', ', $accepted));
+        $lines[] = self::flagLine('not checked', self::notChecked($finding));
 
         return $lines;
     }
 
-    /**
-     * S6 skips a null value: its release facts are null when unknown or not applicable, and they
-     * bury the facts a reader wants (docs/verdicts.md#what-s6-carries). S9 prints one line per
-     * report-1 advisory row. The JSON carries every key.
-     *
-     * @return list<string>
-     */
-    private function signalData(Signal $signal, Finding $finding): array
+    private static function flagLine(string $label, string $text): string
     {
-        if ($signal->id() === Signal::S9) {
-            return array_map([self::class, 'advisory'], $finding->advisoryFacts013()->rows());
-        }
-        $scalars = [];
+        return self::INDENT.self::escape(str_pad($label, self::FLAG - 1).' '.$text);
+    }
+
+    /** @return list<string> one entry per counted advisory: severity, CVE and title, then the id, the date, the points and the fix */
+    private static function advisoryLines(Finding $finding): array
+    {
+        $s9 = $finding->signalData(AdvisoryData::class);
         $lines = [];
-        $skipNulls = $signal->id() === Signal::S6;
-        foreach (SignalData013::toReport1Array($signal) as $key => $value) {
-            if ($value === null && $skipNulls) {
-                continue;
-            }
-            if (\is_scalar($value) || $value === null) {
-                $scalars[] = $key.' '.self::scalar($value);
-                continue;
-            }
-            $lines[] = $key.' '.self::encode($value);
-        }
-        if ($scalars !== []) {
-            array_unshift($lines, implode(' · ', $scalars));
+        foreach ($s9 === null ? [] : $s9->rows() as $row) {
+            $lines[] = self::INDENT.self::INDENT.self::escape(str_pad($row->severity(), self::FLAG - 3).' '.($row->cve() ?? $row->id()).'  '.$row->title());
+            $lines[] = self::INDENT.str_repeat(' ', self::FLAG).self::escape(self::advisoryFacts($row));
         }
 
         return $lines;
     }
 
-    /**
-     * An empty text counts as none.
-     *
-     * @param Row013 $row
-     */
-    private static function advisory(array $row): string
+    private static function advisoryFacts(AdvisoryRow $row): string
     {
-        $parts = [];
-        $id = self::nonEmpty($row['id']);
-        $cve = self::nonEmpty($row['cve']);
-        $name = $cve ?? $id ?? '?';
-        if ($cve !== null && $id !== null && $cve !== $id) {
-            $name .= ' ('.$id.')';
-        }
-        $severity = self::nonEmpty($row['severity']);
-        $parts[] = $severity === null ? $name : $name.' '.$severity;
-        $fixedBy = self::nonEmpty($row['fixed_by']);
-        if ($fixedBy === null) {
-            $parts[] = 'no listed release fixes it';
-        } else {
-            $parts[] = 'fixed by '.$fixedBy.($row['fixed_on_branch'] ? '' : ', not on the installed branch');
-        }
-        $reported = self::nonEmpty($row['reported_at']);
+        $fix = $row->fix();
+        $parts = [$row->id()];
+        $reported = $row->reportedAt();
         if ($reported !== null) {
             $parts[] = 'reported '.substr($reported, 0, 10);
         }
-        $link = self::nonEmpty($row['link']);
-        if ($link !== null) {
-            $parts[] = $link;
+        $parts[] = $row->points().' points';
+        $parts[] = 'fix: '.(self::FIX_WORDS[$fix->kind()] ?? $fix->kind()).($fix->toBranch() === null ? '' : ' to '.$fix->toBranch()).($fix->version() === null ? '' : ' from '.$fix->version());
+
+        return implode(' · ', $parts);
+    }
+
+    /**
+     * The feeds line: each feed's answer for this name. The feed with the most records
+     * adds how many affect the version, when no other feed answered or it holds every record.
+     */
+    private static function feedsLine(Finding $finding): ?string
+    {
+        $lookup = $finding->details()->advisoryLookup();
+        if ($lookup === null || $lookup->feeds() === []) {
+            return null;
+        }
+        $answered = 0;
+        $most = null;
+        foreach ($lookup->feeds() as $feed) {
+            if ($feed->answer() === AdvisoryCoverage::ANSWERED) {
+                ++$answered;
+                $most = $most === null || (int) $feed->records() > (int) $most->records() ? $feed : $most;
+            }
+        }
+        $s9 = $finding->signalData(AdvisoryData::class);
+        $affect = ($s9 === null ? 0 : \count($s9->rows())) + $finding->securityStanding()->ignoredCount();
+        $parts = [];
+        foreach ($lookup->feeds() as $feed) {
+            $records = (int) $feed->records();
+            switch ($feed->answer()) {
+                case AdvisoryCoverage::ANSWERED:
+                    $words = $records === 0 ? 'none on record' : $records.' on record';
+                    if ($feed === $most && $records > 0 && ($answered === 1 || $lookup->records() === $records)) {
+                        $words .= ', '.$affect.' '.($affect === 1 ? 'affects' : 'affect').' '.$finding->version();
+                    }
+                    break;
+                case AdvisoryCoverage::NOT_ASKED:
+                    $words = 'not asked ('.FindingBlock::checkWords($finding, (string) $feed->reason()).')';
+                    break;
+                default:
+                    $words = 'lookup failed';
+            }
+            $parts[] = ($feed->registry() ?? $feed->composerRepository()).': '.$words;
         }
 
         return implode(' · ', $parts);
     }
 
-    /** @return list<string> */
-    private function lock(Explanation $explanation): array
+    /** The abandoned marking that Composer's ignore list removed, as the project's list words it. */
+    private static function ignoredLine(Finding $finding): ?string
     {
-        $package = $explanation->facts()->package();
-        $parts = ['version '.$package->version()];
-        $parts[] = $package->requirePhp() === null ? 'no php constraint' : 'php '.$package->requirePhp();
-        $parts[] = $this->lockDate(InstalledRelease::of($package, $explanation->facts()->metadata()));
-        $parts[] = $package->isFromComposerRepository() ? 'from a Composer repository' : 'not from a Composer repository';
-        if ($package->isBranchSnapshot()) {
-            $parts[] = 'branch snapshot';
-        }
-        $lines = ['composer.lock', self::INDENT.self::escape(implode(' · ', $parts))];
-        if (($source = self::source($package->repositoryUrl())) !== null) {
-            $lines[] = self::INDENT.self::escape($source);
-        }
-
-        return $lines;
-    }
-
-    /** @return list<string> */
-    private function metadata(Explanation $explanation): array
-    {
-        $metadata = $explanation->facts()->metadata();
-        if ($metadata === null) {
-            return ['repository metadata', self::INDENT.'none — '.self::escape($explanation->finding()->note() ?? 'not available')];
-        }
-        $lines = ['repository metadata (as of '.$metadata->dataDate()->format('Y-m-d').')'];
-        $parts = [$metadata->releaseCount().' versions listed', $metadata->type()];
-        if ($metadata->isAbandoned()) {
-            $parts[] = $metadata->replacement() === null ? 'abandoned, no replacement named' : 'abandoned, replacement '.$metadata->replacement();
-        } else {
-            $parts[] = 'not abandoned';
-        }
-        $lines[] = self::INDENT.self::escape(implode(' · ', $parts));
-        if (($source = self::source($metadata->repositoryUrl())) !== null) {
-            $lines[] = self::INDENT.self::escape($source);
-        }
-        $lines[] = self::INDENT.self::escape($this->lastRelease($metadata, $explanation));
-        $installed = $this->installedRelease($explanation, $metadata);
-        if ($installed !== null) {
-            $lines[] = self::INDENT.self::escape($installed);
-        }
-        foreach ($this->branchTable($explanation) as $line) {
-            $lines[] = self::INDENT.self::escape($line);
-        }
-
-        return $lines;
-    }
-
-    private function lastRelease(PackageMetadata $metadata, Explanation $explanation): string
-    {
-        if (!$metadata->hasStableRelease()) {
-            return 'no stable release';
-        }
-        $at = $metadata->lastStableReleaseAt();
-        if ($at !== null) {
-            $datedBy = $metadata->lastStableDatedBy();
-
-            return \sprintf('last stable release %s (%s%s)', (string) $metadata->lastStableVersion(), $at->format('Y-m-d'), $datedBy === null ? '' : ', dated by '.$datedBy);
-        }
-        $highest = '';
-        foreach ($explanation->branches() as $row) {
-            $highest = $row['highest'];
-            break;
-        }
-
-        return \sprintf('last stable release unknown: the highest tag%s has no release date, so S2 does not measure the package', $highest === '' ? '' : ' '.$highest);
-    }
-
-    /**
-     * The lock's `time` for the installed version, and what dates it. A branch snapshot's `time` is
-     * its commit's, and a subtree split's tag is dated by a commit its other tags share
-     * ({@see PackageMetadata::SHARED_COMMIT_TAGS}), so neither is a release date. Without metadata,
-     * the lock is read as it reads itself.
-     */
-    private function lockDate(InstalledRelease $installed): string
-    {
-        $time = $installed->lockTime();
-        if ($time === null) {
-            return 'undated';
-        }
-        $day = $time->format('Y-m-d');
-        switch ($installed->kind()) {
-            case InstalledRelease::BRANCH_SNAPSHOT:
-                return 'dated '.$day.' by its commit';
-            case InstalledRelease::SHARED_COMMIT:
-            case InstalledRelease::DATED_BY_PARENT:
-                return 'dated '.$day.' by a commit its tags share';
-            default:
-                return 'released '.$day;
-        }
-    }
-
-    /**
-     * When the installed version released, where the lock's `time` is not the answer: the monorepo
-     * parent's tag dates it, or nothing does. A split package's `time` is the date of a commit its
-     * tags share, and measuring from it adds that artefact to the libyears. Null when the
-     * lock's date is the one read, and for a branch snapshot ({@see InstalledRelease}).
-     */
-    private function installedRelease(Explanation $explanation, PackageMetadata $metadata): ?string
-    {
-        $package = $explanation->facts()->package();
-        $installed = InstalledRelease::of($package, $metadata);
-        $at = $installed->at();
-        $datedBy = $installed->datedBy();
-        // $datedBy names the parent only where its date is the one read, so $at is that date.
-        if ($datedBy !== null && $at !== null) {
-            return \sprintf('installed release %s (%s, dated by %s)', $package->version(), $at->format('Y-m-d'), $datedBy);
-        }
-        $time = $installed->lockTime();
-        if ($installed->kind() !== InstalledRelease::SHARED_COMMIT || $time === null) {
+        $ignored = $finding->details()->abandonedIgnored();
+        if ($ignored === null) {
             return null;
         }
+        $patterns = [];
+        $reasons = [];
+        $constraints = [];
+        foreach ($ignored->rules() as $rule) {
+            $patterns[] = $rule->pattern();
+            if ($rule->reason() !== null) {
+                $reasons[] = $rule->reason();
+            }
+            $constraints = array_merge($constraints, $rule->constraints());
+        }
+        $replacement = $ignored->replacement();
+        $line = 'marked abandoned by its '.(self::MARKED_BY[$ignored->markedBy()] ?? $ignored->markedBy()).($replacement === null ? '' : ' (replacement: '.$replacement.')')
+            .': ignored, '.(self::IGNORE_LIST[$ignored->by()] ?? $ignored->by()).' lists '.implode(', ', $patterns).($reasons === [] ? '' : ' ("'.implode('; ', $reasons).'")').'; not counted.';
+        if ($constraints !== []) {
+            $line .= ' The constraint '.implode(', ', array_unique($constraints)).' on that entry is not applied, as composer audit does not apply it.';
+        }
 
-        return \sprintf('installed release %s undated: the lock dates it %s, a commit its tags share, not a release', $package->version(), $time->format('Y-m-d'));
+        return $line;
     }
 
-    /** @return list<string> */
-    private function branchTable(Explanation $explanation): array
+    /** `checks_missing[]` and `checks_skipped[]` with their words; an accepted check names its entry. */
+    private static function notChecked(Finding $finding): string
     {
+        $parts = [];
+        foreach (array_merge($finding->checksMissing(), $finding->details()->skipped()) as $check) {
+            if ($check->reason() !== 'accepted_by_config') {
+                $parts[] = implode(', ', $check->blocks()).' ('.FindingBlock::checkWords($finding, $check->reason()).')';
+            }
+        }
+        foreach ($finding->details()->uncheckedAccepted() as $accepted) {
+            $entry = $accepted->entry();
+            $check = $accepted->unchecked();
+            $until = $entry->expiresOn() === null ? '' : ', until '.$entry->expiresOn();
+            $parts[] = implode(', ', $check->blocks()).' ('.FindingBlock::checkWords($finding, $check->reason()).'; '.CauseWords::of('accepted_by_config').' ('.$entry->scope().' '.$entry->value().$until.'): '.$entry->reason().')';
+        }
+
+        return $parts === [] ? 'nothing' : implode(' · ', $parts);
+    }
+
+    /**
+     * The repository metadata table: one row per release branch, the installed one marked `*`, and
+     * what each branch fixes of the counted advisories, with its holders and the score after it.
+     *
+     * @return list<string>
+     */
+    private function branches(Explanation $explanation): array
+    {
+        $finding = $explanation->finding();
         $rows = $explanation->branches();
         if ($rows === []) {
-            return [];
+            return ['repository metadata', self::INDENT.self::escape('none — '.($finding->note() ?? 'not available'))];
         }
-        $lines = ['  branch     highest tag        released           newest dated release     php'];
+        $fixes = [];
+        $packageFixes = $finding->details()->fixes();
+        foreach ($packageFixes === null ? [] : $packageFixes->branches() as $branch) {
+            $fixes[$branch->branch()] = $finding->details()->rowFixes($branch);
+        }
+        $moveBranch = self::securityMoveBranch($finding);
+        $lines = ['repository metadata', self::escape(\sprintf('     %-8s %-13s %-12s %-10s %s', 'branch', 'highest tag', 'released', 'php', 'fixes'))];
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
-            if ($row['highest_released'] !== null) {
-                $released = $row['highest_released']->format('Y-m-d');
-            } elseif ($row['highest_commit_date'] !== null) {
-                $released = 'commit '.$row['highest_commit_date']->format('Y-m-d');
-            } else {
-                $released = 'undated';
-            }
-            $newest = $row['newest_dated_released'] === null ? '—' : $row['newest_dated'].' ('.$row['newest_dated_released']->format('Y-m-d').')';
-            // The em dash is three bytes and one column. sprintf and str_pad count bytes, so that cell
-            // is padded to 24 columns by adding the bytes the multibyte characters cost.
-            $lines[] = \sprintf('%s%-10s %-18s %-18s %s %s', $row['installed'] ? '* ' : '  ', $row['branch'], $row['highest'], $released, str_pad($newest, 24 + \strlen($newest) - self::columns($newest)), $row['php'] ?? '—');
+            $released = $row['highest_released'] === null ? ($row['highest_commit_date'] === null ? 'undated' : 'commit '.$row['highest_commit_date']->format('Y-m-d')) : $row['highest_released']->format('Y-m-d');
+            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $row['branch'] === $moveBranch) : '';
+            $lines[] = self::escape(rtrim(\sprintf('   %s %-8s %-13s %-12s %-10s %s', $row['installed'] ? '*' : ' ', $row['branch'], $row['highest'], $released, $row['php'] ?? '—', $cell)));
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
-            $lines[] = \sprintf('  … and %d more', \count($rows) - Explanation::BRANCH_ROWS);
+            $lines[] = \sprintf('     … and %d more', \count($rows) - Explanation::BRANCH_ROWS);
         }
         if ($explanation->installedBranchIsUndated()) {
             $lines[] = '* the installed branch\'s highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch';
@@ -328,84 +401,63 @@ final class ExplainFormatter
         $datedBy = $explanation->branchesDatedBy();
         if ($datedBy !== null) {
             [$parent, $branches] = $datedBy;
-            $lines[] = \sprintf('%s %s dated by %s, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo\'s by their release', \count($branches) === 1 ? 'branch' : 'branches', implode(', ', $branches), $parent);
+            $lines[] = self::escape(\sprintf('%s %s dated by %s, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo\'s by their release', \count($branches) === 1 ? 'branch' : 'branches', implode(', ', $branches), $parent));
         }
 
         return $lines;
     }
 
-    /** Characters in a UTF-8 string, without ext-mbstring: a continuation byte starts none. */
-    private static function columns(string $text): int
+    /** The branch of the security move, where `security.move_in` names it: the next step or its first other move. */
+    private static function securityMoveBranch(Finding $finding): ?string
     {
-        return \strlen((string) preg_replace('/[\x80-\xBF]/', '', $text));
-    }
-
-    /** @return list<string> */
-    private function activity(Explanation $explanation): array
-    {
-        $activity = $explanation->facts()->activity();
-        if ($activity === null) {
-            return ['repository activity', self::INDENT.'not fetched — S3 and S4 have nothing to read; the run\'s notes below say why when a cap or a failure is the cause'];
-        }
-        $parts = [$activity->ref()->forgeLabel().' '.$activity->repo()];
-        $parts[] = $activity->archived() === null ? 'archived flag not read' : ($activity->archived() ? 'archived' : 'not archived');
-        $parts[] = $activity->pushedAt() === null ? 'last push unknown' : 'last push '.$activity->pushedAt()->format('Y-m-d');
-        $parts[] = 'fetched '.$activity->fetchedAt()->format('Y-m-d').($activity->fromCache() ? " (from lockrot's cache)" : '');
-
-        return ['repository activity', self::INDENT.self::escape(implode(' · ', $parts))];
-    }
-
-    /** @return list<string> */
-    private function run(Explanation $explanation): array
-    {
-        $thresholds = $explanation->thresholds();
-        $lines = [\sprintf(
-            'thresholds: release-warn-years %d · release-high-years %d · push-warn-years %d · push-high-years %d · target PHP %s',
-            $thresholds->releaseWarnYears(),
-            $thresholds->releaseHighYears(),
-            $thresholds->pushWarnYears(),
-            $thresholds->pushHighYears(),
-            self::escape($explanation->targetPhp())
-        )];
-        foreach ($explanation->report()->notes() as $note) {
-            $lines[] = 'note: '.self::escape($note);
+        $moves = $finding->details()->moves();
+        $move = $moves->nextStep();
+        if ($move !== null && $moves->moveIn() === Moves::IN_ALSO) {
+            $move = $move->also()[0] ?? null;
         }
 
-        return $lines;
+        return $move === null || $moves->moveIn() === null ? null : $move->toBranch();
     }
 
-    /** @param null|scalar $value */
-    private static function scalar($value): string
+    /**
+     * `{fixed} of {of}`, the fix word, `(lowest fix)` on the move's row, the holders and the score after it.
+     *
+     * @param array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?\Lockrot\Score\IfApplied} $fixes
+     */
+    private static function fixesCell(array $fixes, bool $moveRow): string
     {
-        if ($value === null) {
-            return 'null';
-        }
-        if (\is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        return (string) $value;
-    }
-
-    /** @param mixed $value */
-    private static function encode($value): string
-    {
-        return JsonWriter::encode($value, \JSON_UNESCAPED_SLASHES) ?? '?';
-    }
-
-    private static function nonEmpty(?string $value): ?string
-    {
-        return $value === '' ? null : $value;
-    }
-
-    private static function source(?string $url): ?string
-    {
-        $shown = RepositoryUrl::shown($url);
-        if ($shown === null) {
-            return null;
+        $cell = $fixes['fixed'].' of '.$fixes['of'];
+        if ($fixes['fixed'] > 0) {
+            $cell .= ' · '.(self::FIX_WORDS[(string) $fixes['fix_kind']] ?? $fixes['fix_kind']).($moveRow ? ' (lowest fix)' : '');
+            $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json' : (string) $holder->package(), $fixes['held_by']);
+            if ($holders !== []) {
+                $cell .= '; held by '.implode(' and ', array_unique($holders));
+            }
+            $after = $fixes['if_applied'];
+            if ($after !== null) {
+                $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().', if Composer resolves it';
+            }
         }
 
-        return 'source '.$shown.(RepositoryUrl::isLocal($shown) ? ' (a path on the machine lockrot ran on)' : '');
+        return $cell;
+    }
+
+    /**
+     * Lines under a label: the label in the first {@see LABEL} columns of the first line, the others
+     * aligned beneath. $escaped lines are markup already.
+     *
+     * @param list<string> $lines
+     *
+     * @return list<string>
+     */
+    private static function block(string $label, array $lines, bool $escaped = false): array
+    {
+        $out = [];
+        foreach ($lines as $i => $line) {
+            $out[] = ($i === 0 ? str_pad($label, self::LABEL) : str_repeat(' ', self::LABEL)).($escaped ? $line : self::escape($line));
+        }
+
+        return $out;
     }
 
     private static function escape(string $text): string

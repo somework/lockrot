@@ -26,7 +26,6 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -117,7 +116,6 @@ final class DrupalSiteTest extends TestCase
             new RepoLocator($gitlabDomains),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false
         );

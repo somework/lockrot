@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Lock\LockLineIndex;
@@ -15,15 +14,19 @@ use Lockrot\Verdict\Finding;
  * GitLab Code Quality JSON: docs/ci.md#-formatgitlab. The report format is at
  * https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format
  *
- * The `fingerprint` must not hold the line, the version, the lock's path or the priority, so a
- * Code Quality entry keeps its identity when they change (docs/compatibility.md#finding-identity).
+ * The `fingerprint` hashes the package and the flag only, never the line, the version, the lock's
+ * path or the grade, so an issue keeps its identity when they change (docs/compatibility.md#finding-identity).
  *
  * @internal
+ *
+ * @phpstan-type Issue array{type: string, check_name: string, description: string, categories: list<string>, severity: string, fingerprint: string, location: array{path: string, lines: array{begin: int}}}
  */
 final class GitlabFormatter implements FormatterInterface
 {
     /** GitLab does not require `type` or `categories`. Tools that expect CodeClimate read them. */
     private const CATEGORIES = ['Bug Risk'];
+
+    private const SEVERITY = [FormatContext::LEVEL_ERROR => 'major', FormatContext::LEVEL_WARNING => 'minor', FormatContext::LEVEL_NOTE => 'info'];
 
     /** GitLab requires a line: this one stands in when LockLineIndex finds none. */
     private const FALLBACK_LINE = 1;
@@ -40,11 +43,12 @@ final class GitlabFormatter implements FormatterInterface
         $lockPath = $this->context->lockPath();
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
-        $baseline = $report->baseline();
         $gate = $this->context->gateOf($report);
         $issues = [];
         foreach ($this->context->recordFindings($report, $showAll) as $finding) {
-            $issues[] = $this->issue($finding, $index->lineOf($finding->package()), $baseline, $gate);
+            foreach ($this->issues($finding, $index->lineOf($finding->package()), $report, $gate, $showAll) as $issue) {
+                $issues[] = $issue;
+            }
         }
         $gap = $this->context->advisoriesNotCheckedLevel($report);
         if ($gap !== null) {
@@ -62,52 +66,66 @@ final class GitlabFormatter implements FormatterInterface
         return self::encode($issues);
     }
 
-    /** @return array<string, mixed> */
-    private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline, Gate $gate): array
+    /**
+     * The issues of one finding: one per counted flag, with the fingerprint of the package and the
+     * flag (docs/compatibility.md#finding-identity). Under `--all`, a score-0 finding gets the issue
+     * of its word, and one with a missing check also gets a `lockrot/unchecked` issue.
+     *
+     * @return list<Issue>
+     */
+    private function issues(Finding $finding, ?int $line, Report $report, Gate $gate, bool $showAll): array
     {
-        $check = $this->context->isUncheckedRecord($finding) ? 'unchecked' : $finding->verdict();
+        $marks = new SarifRecords($finding, $gate->standingOf($finding->package()), $report->baseline());
+        $location = ['path' => $this->context->lockName(), 'lines' => ['begin' => $line ?? self::FALLBACK_LINE]];
+        $via = $finding->isDirect() || $finding->directDependents() === [] ? '' : ' (via '.implode(', ', $finding->directDependents()).')';
+        if (!$finding->isGraded()) {
+            $head = $finding->package().' '.$finding->version().' — finding '.$finding->verdict().' ('.FindingBlock::scoreLine($finding).')';
+            $issues = [];
+            if ($showAll) {
+                $issues[] = self::issue($finding->verdict(), $head.'.'.$via, self::CATEGORIES, 'info', $finding->package(), $location);
+            }
+            if ($this->context->isUncheckedRecord($finding, $showAll)) {
+                $major = $marks->errorBy(MarkedFact::SIGNAL, null) !== [];
+                $issues[] = self::issue('unchecked', $head.' — '.FindingBlock::checksMissing($finding).'.'.$via, self::CATEGORIES, $major ? 'major' : 'info', $finding->package(), $location);
+            }
 
+            return $issues;
+        }
+        $head = $finding->package().' '.$finding->version().' — finding '.$finding->verdict().' ('.FindingBlock::scoreLine($finding).') — ';
+        $move = FindingBlock::move($finding);
+        $tail = ($move === null ? '' : ' Do: '.$move.'.').$via;
+        $issues = [];
+        $unchecked = $marks->errorBy(MarkedFact::SIGNAL, null);
+        foreach (FindingBlock::evidence($finding) as $flag => $summary) {
+            $vulnerable = $flag === 'vulnerable';
+            $errorBy = SarifRecords::union($marks->errorBy($vulnerable ? MarkedFact::ADVISORY : MarkedFact::FLAG, $vulnerable ? null : $flag), $issues === [] ? $unchecked : []);
+            $level = $vulnerable && $errorBy === [] && $marks->advisoriesKnown() ? FormatContext::LEVEL_NOTE : $marks->level($errorBy, $vulnerable ? null : $marks->flagState($flag));
+            $issues[] = self::issue($flag, $head.$flag.': '.$summary.'.'.$tail, $vulnerable ? ['Security'] : self::CATEGORIES, self::SEVERITY[$level], $finding->package(), $location);
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @param list<string>                                    $categories
+     * @param array{path: string, lines: array{begin: int}} $location
+     *
+     * @return Issue
+     */
+    private static function issue(string $check, string $description, array $categories, string $severity, string $package, array $location): array
+    {
         return [
             'type' => 'issue',
             'check_name' => 'lockrot/'.$check,
-            'description' => $this->description($finding),
-            'categories' => self::CATEGORIES,
-            'severity' => $this->severity($finding, $baseline, $gate),
-            'fingerprint' => hash('sha256', 'lockrot|'.$finding->package().'|'.$check),
-            'location' => [
-                'path' => $this->context->lockName(),
-                'lines' => ['begin' => $line ?? self::FALLBACK_LINE],
-            ],
+            'description' => $description,
+            'categories' => $categories,
+            'severity' => $severity,
+            'fingerprint' => hash('sha256', 'lockrot|'.$package.'|'.$check),
+            'location' => $location,
         ];
     }
 
-    private function severity(Finding $finding, ?BaselineComparison $baseline, Gate $gate): string
-    {
-        switch ($this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline)) {
-            case FormatContext::LEVEL_ERROR:
-                return 'major';
-            case FormatContext::LEVEL_WARNING:
-                return 'minor';
-            default:
-                return 'info';
-        }
-    }
-
-    private function description(Finding $finding): string
-    {
-        $evidence = $finding->evidenceLine();
-
-        // Code Quality has no title field, so the verdict and the priority go in the description.
-        $message = $finding->package().' '.$finding->version()
-            .' — '.$finding->verdict().' ('.$finding->priority().')';
-        if ($evidence !== '') {
-            $message .= ': '.$evidence;
-        }
-
-        return $message.Via::suffix($finding, ' > ');
-    }
-
-    /** @param list<array<string, mixed>> $issues */
+    /** @param list<Issue> $issues */
     private static function encode(array $issues): string
     {
         $json = JsonWriter::encode($issues, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);

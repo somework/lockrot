@@ -34,7 +34,6 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -67,7 +66,7 @@ final class AnalyzerGradeTest extends TestCase
     {
         $finding = self::named(self::report(), $package);
 
-        self::assertSame($grade, $finding->grade());
+        self::assertSame($grade, $finding->verdict());
         self::assertSame($lead, $finding->lead());
         self::assertSame($total, $finding->score()->total());
     }
@@ -77,9 +76,8 @@ final class AnalyzerGradeTest extends TestCase
     {
         $report = self::report();
 
-        self::assertSame('stale', self::named($report, 'vendor/partly')->verdict());
-        self::assertSame('finished', self::named($report, 'vendor/accepted')->verdict());
-        self::assertContains('vendor/partly', array_map(static fn (Finding $f): string => $f->package(), $report->flagged()));
+        self::assertSame('stale', self::named($report, 'vendor/partly')->lead());
+        self::assertNull(self::named($report, 'vendor/accepted')->lead());
     }
 
     /** An entry that names every flag that fired leaves no record in any format, at any gate. */
@@ -149,7 +147,6 @@ final class AnalyzerGradeTest extends TestCase
                 new AllowlistEntry('vendor/covered', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT, ['stale']),
             ]),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false,
             self::advisories($advisories)

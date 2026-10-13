@@ -33,7 +33,6 @@ use Lockrot\Tests\Support\AssertsNoteDetails;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -202,7 +201,6 @@ final class RunNoteAgreementTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             $offline,
             new RepositoryAdvisoryLoader($server->repositories(), $offline, $deadline)

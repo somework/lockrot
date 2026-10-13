@@ -11,11 +11,12 @@ use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Clock;
+use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
-use Lockrot\Config\Policy;
 use Lockrot\Config\UnknownKeys;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
@@ -26,6 +27,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
+use Lockrot\Output\RunGateText;
 use Lockrot\Output\TerminalText;
 use Lockrot\Version;
 
@@ -135,9 +137,23 @@ final class InstallTimeSummary
         $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $event->getIO(), $config, $repositories, $project, $lockrot, $env, $deadline);
 
         $report = $analyzer->analyzePackages($packages, $lock, $project, $event->isDevMode());
-        // The baseline reaches Policy::exitCode() only: the block still reports everything that this
+        // The baseline reaches the gate only: the block still reports everything that this
         // transaction brings in.
-        $report = $this->withBaseline($report, \dirname($composerFile), $lockrot, $lock);
+        // The run goes first: the baseline comparison reads its target PHP.
+        $report = $this->withBaseline($report->withRun(new RunSettings(
+            $lockrot->project() ?? $project->name(),
+            $project->name(),
+            $lockrot->targetPhp(),
+            $lockrot->targetPhpSource(),
+            $lockPath,
+            $lockrot->failOn(),
+            $lockrot->failOnSource(),
+            $lockrot->thresholds(),
+            $project->requirePhp(),
+            $lockrot->strictNetwork(),
+            Gate::MODE_CHECK,
+            $event->isDevMode()
+        )), \dirname($composerFile), $lockrot, $lock);
         $lines = (new InstallSummaryFormatter())->format($report);
         if ($lines !== []) {
             // Raw, rendered by lockrot: the block quotes the lock, which is not console markup
@@ -147,11 +163,10 @@ final class InstallTimeSummary
         }
 
         // isExecutingOperations() is false for a dry run, which has nothing to block.
-        if ($lockrot->installTimeStrict() && $event->isExecutingOperations() && Policy::exitCode($report, $lockrot) === Policy::EXIT_FINDINGS) {
-            throw new InstallBlockedException(\sprintf(
-                'lockrot: findings at or above fail-on=%s and install-time-strict is on; run composer lockrot for details',
-                $lockrot->failOn()->value()
-            ));
+        $gate = $report->gate();
+        $run = $report->run();
+        if ($lockrot->installTimeStrict() && $event->isExecutingOperations() && $gate !== null && $run !== null && $gate->fails()) {
+            throw new InstallBlockedException('lockrot: install-time-strict stopped the install; '.RunGateText::render($gate, $run).'; run composer lockrot for details');
         }
     }
 

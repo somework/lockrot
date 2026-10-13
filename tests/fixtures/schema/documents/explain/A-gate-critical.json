@@ -2143,14 +2143,6 @@
    ]
   }
  },
- "legacy": {
-  "verdict": "ok",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
-  }
- },
  "generated_at": "2026-10-01T17:41:20+00:00",
  "notes": [],
  "note_details": []

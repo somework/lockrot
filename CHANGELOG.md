@@ -112,8 +112,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `COMPOSER_POLICY=0`) that stops Composer from warning about advisories. lockrot still asks, and
   every advisory still counts. ([Run notes](docs/notes.md#advisories_disabled_by_policy))
 
+- **markdown:** `--markdown-max-bytes` keeps a report written through `--output` within a byte
+  budget. The report ends at a whole row, and a last row counts the rows it left out.
+  ([In CI](docs/ci.md))
+- **sarif:** `invocations[0]` carries `exitCode` and `exitCodeDescription`.
+  ([SARIF exit code](docs/ci.md#sarif-exit-code))
+- **All formats:** a failing run that writes json, sarif, gitlab or html to stdout also prints
+  `lockrot: gate: …` on stderr. Read stdout alone (do not merge `2>&1`).
+  ([Reading the gate line](docs/ci.md#reading-the-gate-line))
+
 ### Changed
 
+- **Breaking:** **gitlab, sarif:** one record per flag, plus one per advisory in SARIF. 0.13
+  identities stay. SARIF `properties.verdict` is the grade, `signals` is `signal_ids`, `baseline` is
+  `baseline_status`. A baseline-covered result carries `suppressions`. Action: guard on
+  `run.properties.lockrot_schema == 2`, then read `properties.lead`.
+  ([Marks](docs/ci.md#how-each-format-marks-a-finding))
+- **Breaking:** **github:** the title reads `lockrot: <verdict> — <flags>`, with `(<severity>
+  advisory)` after `vulnerable`. Action: key on the annotation's file and line, not its title.
+  ([Compatibility](docs/compatibility.md#finding-identity))
+- **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline, prints one
+  upgrade notice on stderr that links the upgrade page. Read stdout alone (do not merge `2>&1`).
+  `-q` also silences the report. ([Upgrading to 0.14](docs/changes/0.14.md))
+- **table, markdown, github, install-time, `--explain`:** each finding prints its flags, its score
+  line, its move and one evidence line per counted flag, under its grade. The footer adds the
+  `flags:`, `depth:`, `security:`, `advisories:` and `gate:` lines. ([In CI](docs/ci.md))
 - **Breaking:** **Self-update, Baseline, Config:** `self-update` from 0.13 lands on 0.14 at once.
   lockrot 0.13 cannot read baseline-2 or config-2. 0.13 reads an `ignore[]` entry with `flags` as an
   entry for the whole package, and warns. Action: upgrade every job, then regenerate the baseline.

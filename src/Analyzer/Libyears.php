@@ -239,7 +239,7 @@ final class Libyears
 
             return $packages === 1 ? 'libyears: the one package could not be measured' : \sprintf('libyears: none of the %d packages could be measured', $packages);
         }
-        $head = \sprintf('libyears: %.1F behind across %s', $this->total, $this->scope($packages));
+        $head = \sprintf('libyears: %s%.1F behind across %s', $this->atLeast > 0 ? 'at least ' : '', $this->total, $this->scope($packages));
         if ($this->worst === null) {
             return $head;
         }
@@ -248,7 +248,7 @@ final class Libyears
         return implode(' · ', [
             $head,
             \sprintf('%.1F from direct requirements', $this->direct),
-            \sprintf('furthest behind %s %s at %.1F', $worst->package(), $worst->version(), $behind),
+            \sprintf('furthest behind %s %s at %.1F%s', $worst->package(), $worst->version(), $behind, $worst->isLibyearsAtLeast() ? ' or more' : ''),
         ]);
     }
 

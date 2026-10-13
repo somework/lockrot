@@ -62,7 +62,7 @@ final class SchemaDescriptionsTest extends TestCase
         yield 'an item id' => ['the C69 note', true];
         yield 'a decision id' => ['as Q7 decided', true];
         yield 'a measured count' => ['79 of 79 findings', true];
-        yield 'an internal PHP symbol' => ['read by Legacy\Priority013', true];
+        yield 'an internal PHP symbol' => ['read by Output\RunFooter', true];
         yield 'a static call' => ['`ReleaseBranch::label`', true];
         yield 'a repository doc path' => ['docs/verdicts.md says', true];
         yield 'a backticked class name' => ['`FixFinder` decides', true];

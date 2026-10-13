@@ -1345,13 +1345,13 @@ defs['rootFlagVulnerable'] = obj("`vulnerable`'s root counts (§7.6): it has no 
 })
 NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 'advisory_ignore_unreadable', 'advisories_unavailable', 'advisories_not_checked',
               'repository_activity_not_checked', 'repository_activity_anonymous_cap', 'repository_activity_rate_limited', 'repository_activity_unreachable',
-              'repository_activity_not_found', 'not_from_composer_repository', 'verdict_rules_changed', 'baseline_target_differs',
+              'repository_activity_not_found', 'not_from_composer_repository', 'baseline_target_differs',
               'baseline_fix_model_differs', 'ignore_does_not_cover_advisories', 'advisories_disabled_by_policy',
               'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable', 'repository_activity_host_not_supported']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
     if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
-             'abandoned_ignore_unreadable', 'verdict_rules_changed', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories'):
+             'abandoned_ignore_unreadable', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
@@ -1389,29 +1389,6 @@ defs['noteRepositoryActivityHostNotSupported'] = obj(("`repository_activity_host
         'listed_in': nul(("The Composer setting that already names the host, or null: `github-domains` (a GitHub Enterprise host lockrot does not ask) or "
                           "`forgejo-domains` (a Forgejo host lockrot does not ask). An open set."),
                          {'type': 'string', 'pattern': HYPHEN, 'x-known-values': ['github-domains', 'forgejo-domains']}),
-    }), minItems=1),
-})
-defs['noteVerdictRulesChanged'] = obj(("`verdict_rules_changed`: findings that reached a grade value under the rules of 0.13 and no longer do. The sentence quotes "
-                                        "`score_text` from this data."), {
-    'fail_on': d('The grade value.', {'type': 'string', 'pattern': HYPHEN}),
-    'findings': arr('The findings, by package name, then version.', obj('One finding.', {
-        'package': ref('packageName'),
-        'version': d('The installed version.', {'type': 'string'}),
-        'legacy': obj("The computation of 0.13.", {
-            'verdict': d("The cause word of 0.13.", copy.deepcopy(R1['definitions']['verdict'])),
-            'priority': d("The priority of 0.13.", copy.deepcopy(R1['definitions']['priority'])),
-            'basis': obj("The `priority_basis` of 0.13.", {
-                'base': d('The starting level.', copy.deepcopy(R1['definitions']['priority'])),
-                'steps': arr("The steps, as the `priority_basis.steps` of report-1.", obj('A step.', {
-                    'reason': open_set(['transitive', 'unreached', 'dev', 'no_fix_expected'], 'Why the step was taken (report-1). Open.'),
-                    'from': d('Before.', copy.deepcopy(R1['definitions']['flaggedPriority'])),
-                    'to': d('After.', copy.deepcopy(R1['definitions']['flaggedPriority'])),
-                })),
-            }),
-        }),
-        'verdict': ref('verdict'),
-        'score_total': d('Its `score.total`.', INT0),
-        'score_text': rendered('Its `score.text`, carried in the note so that the note text reads its own data.', ['findings[].score.text']),
     }), minItems=1),
 })
 TPHP = {'type': 'string', 'pattern': '^[0-9]+\\.[0-9]+$'}

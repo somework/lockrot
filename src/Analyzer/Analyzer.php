@@ -47,7 +47,6 @@ use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AbandonedRule;
-use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
@@ -62,7 +61,6 @@ use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\NextStep;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ThroughCheck;
-use Lockrot\Verdict\VerdictEngine;
 
 /** @internal */
 final class Analyzer
@@ -73,7 +71,6 @@ final class Analyzer
     private RepoLocator $locator;
     private Allowlist $allowlist;
     private SignalSet $signals;
-    private VerdictEngine $engine;
     private Clock $clock;
     private bool $offline;
     private Deadline $deadline;
@@ -83,7 +80,7 @@ final class Analyzer
     private AbandonedIgnore $abandonedIgnore;
     private UncheckedAcceptance $acceptance;
 
-    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null, ?AbandonedIgnore $abandonedIgnore = null)
+    public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null, ?AbandonedIgnore $abandonedIgnore = null)
     {
         $this->metadata = $metadata;
         $this->activity = $activity;
@@ -91,7 +88,6 @@ final class Analyzer
         $this->locator = $locator;
         $this->allowlist = $allowlist;
         $this->signals = $signals;
-        $this->engine = $engine;
         $this->clock = $clock;
         $this->offline = $offline;
         $this->advisories = $advisories;
@@ -529,9 +525,6 @@ final class Analyzer
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
         [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
-        $flags = FlagSet::fromSignals($signals, $entry, $counted);
-        // An entry that accepts every flag that fired accepts the package, as a 0.13 entry did.
-        $verdict = $this->engine->decide($signals, $entry !== null && $flags->countedMaintenance() === [], $meta !== null);
 
         $note = null;
         if (!$package->isFromComposerRepository()) {
@@ -545,7 +538,6 @@ final class Analyzer
         $finding = new Finding(
             $package->name(),
             $package->version(),
-            $verdict,
             $signals,
             $graph->shortestChain($package->name()),
             $entry !== null ? $entry->reason() : null,
@@ -555,8 +547,7 @@ final class Analyzer
             array_keys($graph->chainsTo($package->name())),
             Libyears::measure($package, $meta, $facts->metadataStatus()),
             $package->origin(),
-            AbandonedRule::replacementNamedBy($facts),
-            AdvisoryRule::legacy($facts)[1]
+            AbandonedRule::replacementNamedBy($facts)
         );
 
         return $finding

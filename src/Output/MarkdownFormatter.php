@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Score\Standing;
 use Lockrot\Verdict\Finding;
 
 /**
- * A pull-request comment as Markdown: docs/ci.md#-formatmarkdown.
+ * A pull-request comment or a job summary as Markdown. Every text from the lock, a
+ * repository or an advisory goes through {@see text()} or {@see code()}, so it renders as written.
  *
  * @internal
  */
 final class MarkdownFormatter implements FormatterInterface
 {
-    private const HEADER_ROW = '| Priority | Package | Version | Verdict | Evidence | Via |';
+    private const HEADER_ROW = '| Verdict | Package | Version | Flags | Why | Via |';
     private const SEPARATOR_ROW = '|---|---|---|---|---|---|';
 
     private FormatContext $context;
@@ -26,89 +27,164 @@ final class MarkdownFormatter implements FormatterInterface
         $this->context = $context;
     }
 
+    /**
+     * With the context's markdown budget set (`--markdown-max-bytes`), rows are left out from the
+     * end, whole, until the document fits; a last row counts them.
+     */
     public function format(Report $report, bool $showAll = false): string
     {
-        $baseline = $report->baseline();
         $gate = $this->context->gateOf($report);
-        $rows = $this->context->recordFindings($report, $showAll);
+        $head = [$this->heading($report), '', self::gateLine(RunGateText::render($gate, $this->context->runOf($report)))];
+        $rows = [];
+        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
+            $rows[] = $this->row($finding, $report, $gate);
+        }
+        $footer = $this->footer($report);
+        $budget = $this->context->markdownMaxBytes();
+        $full = self::assemble($head, $rows, $footer, \count($rows));
+        if ($budget === null || \strlen($full) <= $budget) {
+            return $full;
+        }
+        $room = $budget - \strlen(self::assemble($head, [self::more(\count($rows))], $footer, \count($rows)));
+        $shown = [];
+        foreach ($rows as $row) {
+            $room -= \strlen($row) + 1;
+            if ($room < 0) {
+                break;
+            }
+            $shown[] = $row;
+        }
+        $shown[] = self::more(\count($rows) - \count($shown));
 
-        $lines = [$this->heading($report)];
-        if ($baseline !== null) {
-            $lines[] = self::text($baseline->summaryLine());
+        return self::assemble($head, $shown, $footer, \count($rows));
+    }
+
+    /** The last row of a cut document: how many findings it leaves out. */
+    private static function more(int $omitted): string
+    {
+        return '| … | '.$omitted.' more '.($omitted === 1 ? 'finding' : 'findings').': see the JSON report | | | | |';
+    }
+
+    /**
+     * @param list<string> $head
+     * @param list<string> $rows
+     * @param list<string> $footer
+     */
+    private static function assemble(array $head, array $rows, array $footer, int $total): string
+    {
+        $lines = $head;
+        if ($total > 0) {
+            $lines = array_merge($lines, ['', self::HEADER_ROW, self::SEPARATOR_ROW], $rows);
         }
 
-        if ($rows !== []) {
-            $lines[] = '';
-            $lines[] = self::HEADER_ROW;
-            $lines[] = self::SEPARATOR_ROW;
-            foreach ($rows as $finding) {
-                $lines[] = $this->row($finding, $baseline, $gate);
+        return implode("\n", array_merge($lines, [''], $footer))."\n";
+    }
+
+    private function heading(Report $report): string
+    {
+        $flagged = \count($report->graded());
+        if ($flagged === 0) {
+            return \sprintf('### lockrot: nothing flagged in %d %s', $report->packagesChecked(), $report->packagesChecked() === 1 ? 'package' : 'packages');
+        }
+
+        return \sprintf('### lockrot: %d of %d packages flagged — %s', $flagged, $report->packagesChecked(), RunFooter::gradeCounts($report));
+    }
+
+    /** `gate.text` with its first segment in bold. */
+    private static function gateLine(string $text): string
+    {
+        $parts = explode(' · ', $text, 2);
+
+        return '**'.self::text($parts[0]).'**'.(isset($parts[1]) ? ' · '.self::text($parts[1]) : '');
+    }
+
+    private function row(Finding $finding, Report $report, Gate $gate): string
+    {
+        $baseline = $report->baseline();
+        $standing = $baseline === null ? null : $baseline->standingOf($finding->package());
+        $gateStanding = $gate->standingOf($finding->package());
+        $verdict = $finding->verdict();
+        if ($gateStanding !== null && $gateStanding->fails() && ($standing === null || $standing->status() !== Standing::KNOWN)) {
+            $verdict = '**'.$verdict.'**';
+        }
+        $suffix = FindingBlock::baselineSuffix($finding, $standing);
+        $why = [self::code(FindingBlock::scoreLine($finding).($suffix === null ? '' : ' '.$suffix))];
+        $gateLine = FindingBlock::gateLine($finding, $gateStanding);
+        if ($gateLine !== null) {
+            $why[] = self::code($gateLine);
+        }
+        $move = FindingBlock::move($finding);
+        if ($move !== null) {
+            $why[] = '**Do:** '.self::text($move);
+        }
+        foreach (FindingBlock::evidence($finding) as $flag => $summary) {
+            $why[] = '*'.$flag.':* '.self::text($summary);
+        }
+        foreach ([FindingBlock::markingLine($finding), FindingBlock::ageLine($finding), FindingBlock::pullsIn($finding), FindingBlock::checksMissing($finding), FindingBlock::checksAccepted($finding)] as $line) {
+            if ($line !== null) {
+                $why[] = self::labelled($line);
             }
         }
-
-        $lines[] = '';
-        $lines[] = self::text($report->libyears()->line());
-
-        $exposure = $report->exposureSummaryLine();
-        if ($exposure !== '') {
-            $lines[] = '';
-            $lines[] = self::text($exposure);
-        }
-        $unflagged = $report->unflaggedAdvisoriesLine();
-        if ($unflagged !== '') {
-            $lines[] = '';
-            $lines[] = $unflagged;
+        $allowlist = FindingBlock::allowlist($finding);
+        if ($allowlist !== null) {
+            $why[] = '*'.$allowlist[0].':* '.self::text($allowlist[1]);
         }
 
-        $notes = $this->notes($report, $baseline);
+        return '| '.$verdict.' | '.self::code($finding->package()).' | '.self::text($finding->version())
+            .' | '.implode(' · ', FindingBlock::headerFlags($finding, $standing)).' | '.implode('<br>', $why)
+            .' | '.self::text($finding->isDirect() ? 'direct' : implode(', ', $finding->directDependents())).' |';
+    }
+
+    /** The age line and the abandoned-marking line set their label in italics. */
+    private static function labelled(string $line): string
+    {
+        if (strpos($line, 'age: ') === 0) {
+            return '*age:* '.self::text(substr($line, 5));
+        }
+        $marking = 'abandoned marking ignored';
+        if (strpos($line, $marking.' (') === 0) {
+            return '*'.$marking.'*'.self::text(substr($line, \strlen($marking)));
+        }
+
+        return self::text($line);
+    }
+
+    /** @return list<string> the footer lines, in their order */
+    private function footer(Report $report): array
+    {
+        $spans = [];
+        $name = static function (string $package) use (&$spans): string {
+            $spans[] = self::code($package);
+
+            return "\x00".(\count($spans) - 1)."\x00";
+        };
+        $baseline = $report->baseline();
+        $lines = [];
+        foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line(), RunFooter::exposure($report, $name), RunFooter::advisories($report), $baseline === null ? null : $baseline->summaryLine()] as $line) {
+            if ($line !== null) {
+                $lines[] = (string) preg_replace_callback('/\x00(\d+)\x00/', static fn (array $m): string => $spans[(int) $m[1]], self::text($line));
+            }
+        }
+        $updateNow = RunFooter::updateNow($report);
+        if ($updateNow !== null) {
+            $lines[] = '';
+            $lines[] = '**Update now:** '.self::code($updateNow);
+        }
+        $notes = $report->notes();
+        $stale = $baseline === null ? null : $baseline->staleNote();
+        if ($stale !== null) {
+            $notes[] = $stale;
+        }
         if ($notes !== []) {
             $lines[] = '';
             foreach ($notes as $note) {
                 $lines[] = '- note: '.self::text($note);
             }
         }
-
         $lines[] = '';
-        $lines[] = $this->footer($report);
+        $lines[] = '<sub>'.self::text(($report->packagesChecked() === 1 ? '1 package checked' : $report->packagesChecked().' packages checked').' — '.lcfirst(RunFooter::dataAsOf($report))).'. Run `composer lockrot --format=json` for details.</sub>';
 
-        return implode("\n", $lines)."\n";
-    }
-
-    private function heading(Report $report): string
-    {
-        $flagged = \count($report->flagged());
-        if ($flagged === 0) {
-            return \sprintf('### lockrot: no dependency rot found in %d packages', $report->packagesChecked());
-        }
-
-        return \sprintf('### lockrot: dependency rot in %d of %d packages', $flagged, $report->packagesChecked());
-    }
-
-    private function row(Finding $finding, ?BaselineComparison $baseline, Gate $gate): string
-    {
-        $level = $this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline);
-        $verdict = $level === FormatContext::LEVEL_NOTE ? $finding->verdict() : '**'.$finding->verdict().'**';
-
-        return '| '.$finding->priority().' | '.self::code($finding->package()).' | '.self::text($finding->version())
-            .' | '.$verdict.' | '.self::text($finding->evidenceLine()).' | '.self::text(Via::cell($finding, ' › ')).' |';
-    }
-
-    /** @return list<string> */
-    private function notes(Report $report, ?BaselineComparison $baseline): array
-    {
-        $notes = $report->notes();
-        $stale = $baseline === null ? null : $baseline->staleNote();
-        if ($stale !== null) {
-            $notes[] = $stale;
-        }
-
-        return $notes;
-    }
-
-    private function footer(Report $report): string
-    {
-        return '<sub>'.$report->summaryLine().' — data as of '.$report->generatedAt()->format('Y-m-d')
-            .' ('.$report->dataSourcesClause().'). Run `composer lockrot --format=json` for details.</sub>';
+        return $lines;
     }
 
     /**

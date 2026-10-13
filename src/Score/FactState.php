@@ -40,6 +40,11 @@ final class FactState implements \JsonSerializable
         return $this->state;
     }
 
+    public function since(): ?string
+    {
+        return $this->since;
+    }
+
     public function coveredBy(): ?string
     {
         return $this->coveredBy;

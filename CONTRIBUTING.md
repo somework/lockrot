@@ -150,6 +150,8 @@ To change a generated schema:
     python3 tools/schema/build_other_schemas.py
     python3 tools/schema/make_negatives.py
     python3 tools/schema/make_negatives_other.py explain-2
+    python3 tools/schema/build_sarif_properties_schema.py
+    python3 tools/schema/make_negatives_sarif.py
     ```
 
 3. Commit the builder and what it wrote in one commit.

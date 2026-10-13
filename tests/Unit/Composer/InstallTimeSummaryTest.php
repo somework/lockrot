@@ -43,7 +43,6 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
-use Lockrot\Verdict\VerdictEngine;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -294,7 +293,6 @@ final class InstallTimeSummaryTest extends TestCase
                 new RepoLocator(),
                 BuiltinAllowlist::load(),
                 SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
-                new VerdictEngine(),
                 $clock,
                 $lockrot->offline()
             );
@@ -310,7 +308,7 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         $output = $io->getOutput();
-        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $output);
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $output);
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
         self::assertStringContainsString('Run composer lockrot for details.', $output);
         self::assertLessThanOrEqual(10, \count(array_filter(explode("\n", trim($output)))), $output);
@@ -464,8 +462,9 @@ final class InstallTimeSummaryTest extends TestCase
 
         self::assertInstanceOf(InstallBlockedException::class, $thrown);
         self::assertStringContainsString('install-time-strict', $thrown->getMessage());
-        self::assertStringContainsString('fail-on=old-promise', $thrown->getMessage());
-        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
+        self::assertStringStartsWith('lockrot: install-time-strict stopped the install; gate: fails · --fail-on=old-promise (extra.lockrot.fail-on) · 1 finding fails it · target php ', $thrown->getMessage());
+        self::assertStringEndsWith('; run composer lockrot for details', $thrown->getMessage());
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $io->getOutput());
     }
 
     /**
@@ -509,7 +508,7 @@ final class InstallTimeSummaryTest extends TestCase
 
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
-        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $io->getOutput());
     }
 
     /**
@@ -525,7 +524,21 @@ final class InstallTimeSummaryTest extends TestCase
 
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
-        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $io->getOutput());
+    }
+
+    /** No PHP that runs the tests is 7.3, so the baseline matches only the configured target. */
+    public function testTheBaselineIsComparedAgainstTheConfiguredTargetPhp(): void
+    {
+        $dir = $this->project(['target-php' => '7.3']);
+        $this->writeBaseline($dir.'/lockrot-baseline.json', ['phpzip/phpzip' => 'silent'], '7.3');
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $io->getOutput());
+        self::assertStringNotContainsString('the baseline was written for', $io->getOutput());
     }
 
     public function testStrictModeStillBlocksAFindingWorseThanTheBaselinedOne(): void
@@ -555,7 +568,7 @@ final class InstallTimeSummaryTest extends TestCase
 
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
-        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->getOutput());
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $io->getOutput());
     }
 
     /**
@@ -609,7 +622,7 @@ final class InstallTimeSummaryTest extends TestCase
     }
 
     /** @param array<string, string> $verdicts package => verdict */
-    private function writeBaseline(string $path, array $verdicts): void
+    private function writeBaseline(string $path, array $verdicts, string $targetPhp = '8.4'): void
     {
         $findings = [];
         foreach ($verdicts as $package => $verdict) {
@@ -619,7 +632,7 @@ final class InstallTimeSummaryTest extends TestCase
             '$schema' => 'https://lockrot.dev/schema/baseline-2.json',
             'lockrot' => ['version' => '0.14.0', 'schema' => 2],
             'generated_at' => self::FIXED_NOW,
-            'target_php' => '8.4',
+            'target_php' => $targetPhp,
             'target_php_source' => 'option',
             'score_model_id' => 1,
             'fix_model' => 1,
@@ -717,7 +730,7 @@ final class InstallTimeSummaryTest extends TestCase
 
         $output = $io->getOutput();
         self::assertStringNotContainsString('install-time check skipped', $output);
-        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $output);
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $output);
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
     }
 
@@ -732,7 +745,7 @@ final class InstallTimeSummaryTest extends TestCase
 
         self::assertGreaterThan(1, \count($io->errors), implode("\n", $io->errors));
         self::assertSame('lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)', $io->errors[0]);
-        self::assertStringContainsString('lockrot: dependency rot in 1 of 1 changed package', $io->errors[1]);
+        self::assertStringContainsString('lockrot: 1 of 1 changed package flagged', $io->errors[1]);
     }
 
     /** The warning is about the config, not about what the transaction found: a clean one still says it. */
@@ -784,12 +797,12 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         $output = $io->getOutput();
-        self::assertStringStartsWith("lockrot: dependency rot in 1 of 1 changed package\n", $output);
-        self::assertStringContainsString("\n  silent      phpzip/phpzip 2.0.8: ", $output);
+        self::assertStringStartsWith("lockrot: 1 of 1 changed package flagged — critical 1\n", $output);
+        self::assertStringContainsString("\n  critical [36] phpzip/phpzip 2.0.8: silent · old-promise — ", $output);
         self::assertStringNotContainsString('check skipped', $output);
     }
 
-    /** Decorated, the block has the colours of Composer's styles, applied by lockrot: the header in `warning`, the verdict in `comment`. */
+    /** Decorated, the block has colours applied by lockrot: the header in Composer's `warning`, the grade in its colour. */
     public function testTheBlockIsColouredWhenTheOutputIsDecorated(): void
     {
         $this->project();
@@ -799,7 +812,7 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         $output = $io->getOutput();
-        self::assertStringStartsWith("\033[30;43mlockrot: dependency rot in 1 of 1 changed package\033[39;49m\n  \033[33msilent      \033[39mphpzip/phpzip 2.0.8: ", $output);
+        self::assertStringStartsWith("\033[30;43mlockrot: 1 of 1 changed package flagged — critical 1\033[39;49m\n  \033[31mcritical\033[39m [36] phpzip/phpzip 2.0.8: ", $output);
         self::assertStringEndsWith("\nRun composer lockrot for details.\n", $output);
     }
 
@@ -989,8 +1002,7 @@ final class InstallTimeSummaryTest extends TestCase
         (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
 
         $output = $io->getOutput();
-        self::assertStringContainsString('phpzip/phpzip 2.0.8', $output);
-        self::assertStringContainsString('(via vendor/direct-req)', $output);
+        self::assertStringContainsString('  high     [18] phpzip/phpzip 2.0.8: silent · old-promise', $output, 'the chain halves its maintenance: it is transitive');
     }
 
     public function testInstallTimeBudgetComesFromConfig(): void

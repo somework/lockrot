@@ -19,7 +19,7 @@ final class SchemaRebuildTest extends TestCase
     private const STEP = 'The generated schemas and negatives match tools/schema';
     private const REPORT2 = 'resources/lockrot-report-2.schema.json';
     /** What the builders read besides `tools/schema`: the documents the negatives derive from. */
-    private const INPUTS = ['tools/schema', 'tests/fixtures/schema/documents'];
+    private const INPUTS = ['tools/schema', 'tests/fixtures/schema/documents', 'tests/fixtures/sarif/documents'];
 
     private string $dir = '';
 

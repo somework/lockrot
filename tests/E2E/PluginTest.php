@@ -120,10 +120,10 @@ final class PluginTest extends TestCase
         $stdout = $table->getOutput();
         self::assertSame(0, $table->getExitCode(), $table->getErrorOutput().$stdout);
         self::assertMatchesRegularExpression('/^(critical|high|medium|low) \(\d+\)$/m', $stdout, $stdout);
-        self::assertMatchesRegularExpression('/^ {2}(abandoned|silent|pinned|old-promise|stale) +\S+ \S/m', $stdout, $stdout);
+        self::assertMatchesRegularExpression('/^ {2}[a-z0-9_.-]+\/[a-z0-9_.-]+ \S+  (direct|via [^·]+|unreached)  ·  /m', $stdout, $stdout);
         self::assertStringContainsString('phpzip/phpzip', $stdout);
         self::assertMatchesRegularExpression('/\d+ packages checked/', $stdout);
-        self::assertMatchesRegularExpression('/^priority: critical \d+ · high \d+ · medium \d+ · low \d+$/m', $stdout);
+        self::assertMatchesRegularExpression('/^\d+ packages checked · \d+ flagged: /m', $stdout);
         self::assertStringNotContainsString('<fg=', $stdout);
         self::assertStringNotContainsString('<options=', $stdout);
     }
@@ -174,12 +174,12 @@ final class PluginTest extends TestCase
         self::assertSame(0, $require->getExitCode(), $stderr);
         // `composer require phpzip/phpzip` also locks its grandt/* dependencies, and lockrot flags them
         // too, so the counts are not "1 of N".
-        self::assertMatchesRegularExpression('/lockrot: dependency rot in \d+ of \d+ changed packages?/', $stderr);
+        self::assertMatchesRegularExpression('/^lockrot: \d+ of \d+ changed packages? flagged — /m', $stderr);
         self::assertStringContainsString('phpzip/phpzip 2.0.8', $stderr);
         self::assertStringContainsString('Run composer lockrot for details.', $stderr);
         // Composer fires PRE_OPERATIONS_EXEC before printing its own operations list, so the block
         // comes first.
-        $blockAt = strpos($stderr, 'lockrot: dependency rot in');
+        $blockAt = strpos($stderr, ' changed packages flagged — ');
         $operationsAt = strpos($stderr, 'Package operations:');
         self::assertIsInt($blockAt, $stderr);
         self::assertIsInt($operationsAt, $stderr);

@@ -40,8 +40,6 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('6 security advisories affect 1.0.0 (C-1, H-1, H-2 and 3 more)', $signal->summary());
-        self::assertIsArray(AdvisoryRule::legacy($facts)[1]->rows());
-        self::assertSame(['C-1', 'H-1', 'H-2', 'M-1', 'L-1', 'N-1'], array_column(AdvisoryRule::legacy($facts)[1]->rows(), 'id'), 'the JSON list is ordered the same way');
     }
 
     /** A row writes the report date as ISO 8601 and the affected range as the repository wrote it. */
@@ -92,19 +90,6 @@ final class AdvisoryRuleTest extends TestCase
         self::assertSame(Signal::S9, $signal->id());
         self::assertSame(Signal::LEVEL_HIGH, $signal->level(), 'a high advisory');
         self::assertSame('1 security advisory affects v1.2.3 (CVE-2024-0001)', $signal->summary());
-        $legacy = AdvisoryRule::legacy($facts)[1];
-        self::assertFalse($legacy->releasesRead());
-        self::assertSame([[
-            'id' => 'PKSA-1',
-            'cve' => 'CVE-2024-0001',
-            'title' => 'Title of PKSA-1',
-            'link' => 'https://example.test/PKSA-1',
-            'severity' => 'high',
-            'reported_at' => '2024-03-01T12:00:00+00:00',
-            'affected_versions' => null,
-            'fixed_by' => null,
-            'fixed_on_branch' => false,
-        ]], $legacy->rows());
     }
 
     /**
@@ -125,19 +110,9 @@ final class AdvisoryRuleTest extends TestCase
         ] as $case => [$facts, $read]) {
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
-            self::assertSame($read, AdvisoryRule::legacy($facts)[1]->releasesRead(), $case);
-            self::assertNull(self::row($facts, 0)['fixed_by'], $case.': nothing fixes it either way');
         }
     }
 
-    /** @return array<mixed, mixed> */
-    private static function row(PackageFacts $facts, int $i): array
-    {
-        $rows = AdvisoryRule::legacy($facts)[1]->rows();
-        self::assertArrayHasKey($i, $rows);
-
-        return $rows[$i];
-    }
 
     private function ranged(string $id, string $range, ?string $severity = 'high'): Advisory
     {
@@ -159,18 +134,7 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('4 security advisories affect v3.4.18 (CVE-2024-50345, CVE-2025-64500, CVE-2019-18888 and 1 more); 2 fixed by v8.1.7, 1 fixed by v3.4.47', $signal->summary());
-        self::assertIsArray(AdvisoryRule::legacy($facts)[1]->rows());
         $rows = [];
-        foreach (AdvisoryRule::legacy($facts)[1]->rows() as $row) {
-            self::assertIsArray($row);
-            $rows[] = [$row['id'], $row['fixed_by'], $row['fixed_on_branch']];
-        }
-        self::assertSame([
-            ['CVE-2024-50345', 'v8.1.7', false],
-            ['CVE-2025-64500', 'v8.1.7', false],
-            ['CVE-2019-18888', 'v3.4.47', true],
-            ['CVE-2099-1', null, false],
-        ], $rows);
     }
 
     /** One of two fixed: the count stays on the clause, `fixed by` alone is for when every advisory is. */
@@ -195,7 +159,6 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('1 security advisory affects 6.1.3 (CVE-2024-28859); fixed by 6.3.0', $signal->summary());
-        self::assertTrue(self::row($facts, 0)['fixed_on_branch'], 'the branch\'s highest tag is the package\'s: one candidate, named once');
     }
 
     /** Nothing to check against: no metadata, a branch snapshot with no branch, or a range that covers every listed release. */
@@ -212,7 +175,6 @@ final class AdvisoryRuleTest extends TestCase
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
             self::assertSame('1 security advisory affects '.$facts->package()->version().' (CVE-1)', $signal->summary(), $case);
-            self::assertNull(self::row($facts, 0)['fixed_by'], $case);
         }
     }
 
@@ -233,8 +195,6 @@ final class AdvisoryRuleTest extends TestCase
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
             self::assertSame('1 security advisory affects '.$facts->package()->version().' (CVE-1)', $signal->summary(), $case);
-            self::assertNull(self::row($facts, 0)['fixed_by'], $case);
-            self::assertFalse(self::row($facts, 0)['fixed_on_branch'], $case);
         }
     }
 
@@ -248,7 +208,6 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('1 security advisory affects 1.9.5 (CVE-1); fixed by 2.0.0', $signal->summary());
-        self::assertFalse(self::row($facts, 0)['fixed_on_branch'], '1.9.0 spares the range but is below 1.9.5: not the branch\'s fix');
     }
 
     /** A branch snapshot has no branch, but the package's highest tag can still carry the fix. */
@@ -261,7 +220,6 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('1 security advisory affects dev-main (CVE-1); fixed by 2.0.0', $signal->summary());
-        self::assertFalse(self::row($facts, 0)['fixed_on_branch']);
     }
 
     public function testThreeAdvisoriesAreAllNamedAndAnIdStandsInForAMissingCve(): void
@@ -286,8 +244,6 @@ final class AdvisoryRuleTest extends TestCase
 
         self::assertNotNull($signal);
         self::assertSame('5 security advisories affect 1.0.0 (CVE-2024-0001, CVE-2024-0002, CVE-2024-0003 and 2 more)', $signal->summary());
-        self::assertIsArray(AdvisoryRule::legacy($facts)[1]->rows());
-        self::assertCount(5, AdvisoryRule::legacy($facts)[1]->rows());
     }
 
     public function testExactlyThreeAreNotCounted(): void
@@ -422,12 +378,4 @@ final class AdvisoryRuleTest extends TestCase
         yield 'no CVE' => [null, 'a title', 'a title'];
     }
 
-    public function testReport1FactsOfAPackageWithoutAdvisoriesAreEmpty(): void
-    {
-        [$summary, $facts] = AdvisoryRule::legacy(F::facts(F::package()));
-
-        self::assertSame('', $summary);
-        self::assertSame([], $facts->rows());
-        self::assertFalse($facts->releasesRead());
-    }
 }

@@ -258,7 +258,7 @@ final class PharTest extends TestCase
         self::assertSame(0, $process->getExitCode(), $stderr);
         self::assertIsArray(json_decode($process->getOutput(), true), $stderr);
         self::assertSame(
-            "lockrot: unknown key extra.lockrot.<<fg=red>> ignored\nlockrot: unknown key extra.lockrot.<<href=https://example.com>> ignored\n",
+            "lockrot 0.14: the verdict is now a grade, the cause word is in .lead, documents are report-2/baseline-2; see https://lockrot.dev/changes/0.14/\nlockrot: unknown key extra.lockrot.<<fg=red>> ignored\nlockrot: unknown key extra.lockrot.<<href=https://example.com>> ignored\n",
             $stderr
         );
 
@@ -292,8 +292,8 @@ final class PharTest extends TestCase
 
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
         foreach ($names as $name) {
-            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', $process->getOutput());
-            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  direct', (string) file_get_contents($dir.'/r.txt'));
+            self::assertStringContainsString('  '.$name.' 1.0.0  direct  ·  unknown', $process->getOutput());
+            self::assertStringContainsString('  '.$name.' 1.0.0  direct  ·  unknown', (string) file_get_contents($dir.'/r.txt'));
         }
 
         $explained = $this->runPhar(['--offline', '--explain=acme/<<fg=red>>'], $dir);

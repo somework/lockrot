@@ -34,7 +34,6 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder;
 use Lockrot\Verdict\Age;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -165,6 +164,10 @@ final class AgeSignalParityTest extends TestCase
             $server->stop();
         }
         // The parity checks see only the signals that fired: a signal that stops firing shows here.
+        foreach ($fired as $app => $packages) {
+            ksort($packages);
+            $fired[$app] = $packages;
+        }
         Golden::assertMatches('age-signals.json', $fired, 'testOverEveryFixtureAppEverySignalEqualsItsReading');
     }
 
@@ -221,7 +224,6 @@ final class AgeSignalParityTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, $thresholds, self::TARGET_PHP, PhpReleaseDates::load(), $project->requirePhp()),
-            new VerdictEngine(),
             $clock,
             false
         );

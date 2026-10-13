@@ -6,7 +6,6 @@ namespace Lockrot\Tests\Support;
 
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\StableRelease;
-use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Holder;
@@ -186,38 +185,6 @@ final class SignalDataStub
         $candidate = new Candidate(new StableRelease($version.'.0', $version, null, self::opt($d, 'php'), false), $branch, $kind, $holders);
 
         return Fix::to($candidate, self::str($d, 'newest', $version), ($d['on_installed_branch'] ?? false) === true ? $branch : null);
-    }
-
-    /** @param array<string, mixed> $s9 S9's data with report-1's rows, as an earlier report wrote it */
-    public static function legacyOf(array $s9): AdvisoryFacts013
-    {
-        return self::legacy(self::list($s9, 'advisories'), ($s9['releases_read'] ?? false) === true);
-    }
-
-    /**
-     * report-1's advisory facts from rows that set some keys. A key that a row omits is null, and
-     * `fixed_on_branch` is false.
-     *
-     * @param list<array<string, mixed>> $rows
-     */
-    public static function legacy(array $rows, bool $releasesRead = false): AdvisoryFacts013
-    {
-        $full = [];
-        foreach ($rows as $row) {
-            $full[] = [
-                'id' => self::str($row, 'id', 'PKSA-1'),
-                'cve' => self::opt($row, 'cve'),
-                'title' => self::opt($row, 'title'),
-                'link' => self::opt($row, 'link'),
-                'severity' => self::opt($row, 'severity'),
-                'reported_at' => self::opt($row, 'reported_at'),
-                'affected_versions' => self::opt($row, 'affected_versions'),
-                'fixed_by' => self::opt($row, 'fixed_by'),
-                'fixed_on_branch' => ($row['fixed_on_branch'] ?? false) === true,
-            ];
-        }
-
-        return new AdvisoryFacts013($full, $releasesRead);
     }
 
     /** @param array<mixed, mixed> $d */

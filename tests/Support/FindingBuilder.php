@@ -13,7 +13,6 @@ use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\ReleaseBranch;
-use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\AgeMeasure;
@@ -55,7 +54,6 @@ final class FindingBuilder
     private ?LibyearsMeasurement $libyears = null;
     private ?PackageOrigin $origin = null;
     private ?string $replacementNamedBy = null;
-    private ?AdvisoryFacts013 $advisoryFacts013 = null;
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private bool $unscored = false;
@@ -183,15 +181,6 @@ final class FindingBuilder
         return $clone;
     }
 
-    /** report-1's S9 facts, which the priority and the no-fix clause read. */
-    public function withAdvisoryFacts013(AdvisoryFacts013 $facts): self
-    {
-        $clone = clone $this;
-        $clone->advisoryFacts013 = $facts;
-
-        return $clone;
-    }
-
     /**
      * The composer.json sections that name the package. Without a call, a direct finding is named in
      * `require` (`require-dev` for a packages-dev one), and any other in none.
@@ -240,7 +229,7 @@ final class FindingBuilder
     public function build(): Finding
     {
         $namedIn = $this->namedIn ?? (\count($this->chain) === 1 ? [$this->dev ? ProjectConfig::REQUIRE_DEV : ProjectConfig::REQUIRE] : []);
-        $finding = (new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->advisoryFacts013))
+        $finding = (new Finding($this->package, $this->version, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy))
             ->withComposerJson($this->composerJsonRead, $namedIn);
         if ($this->flags !== null) {
             return $finding->withFlags($this->flags, $this->maintenanceJudged)->withDetails(self::detailsOf($finding, $this->maintenanceJudged));

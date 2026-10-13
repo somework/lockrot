@@ -56,7 +56,6 @@ NOTE_CODES = {
     '4d': ['repository_activity_host_not_supported'],
     '4f': ['abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable'],
     '5': ['baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories'],
-    '6a': ['verdict_rules_changed'],
 }
 # The libyears reasons report-1 writes, by the reasons that replace them (pull request 4e).
 LIBYEARS_013 = {

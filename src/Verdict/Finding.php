@@ -8,11 +8,6 @@ use Composer\Package\Loader\ValidatingArrayLoader;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Repository\ReleaseBranch;
-use Lockrot\Legacy\AdvisoryFacts013;
-use Lockrot\Legacy\NoFix013;
-use Lockrot\Legacy\Priority013;
-use Lockrot\Legacy\PriorityBasis013;
-use Lockrot\Legacy\Verdict013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\MaintenanceTerm;
@@ -37,12 +32,6 @@ use Lockrot\Signal\Signal;
 /** @internal */
 final class Finding
 {
-    /**
-     * The verdicts under which nobody fixes an advisory upstream. `pinned` and `old-promise` are absent:
-     * a branch snapshot or an open php constraint says nothing about a coming fix.
-     */
-    public const NO_FIX_VERDICTS = [Verdict::ABANDONED, Verdict::SILENT, Verdict::LEFT_BEHIND];
-
     /** Why a finding has no depth: no path from the requirements that the run walked, or no composer.json read. */
     public const UNREACHED = 'unreached';
     public const NO_COMPOSER_JSON = 'no_composer_json';
@@ -50,19 +39,8 @@ final class Finding
     /** The note for a lock entry with no notification-url: no repository was asked. */
     public const NOTE_NOT_IN_REPOSITORY = 'not from a Composer repository, not checked';
 
-    /** Must match the signals that {@see VerdictEngine} reads for each verdict. */
-    private const DECIDING = [
-        Verdict::ABANDONED => [Signal::S1, Signal::S3],
-        Verdict::SILENT => [Signal::S2, Signal::S4],
-        Verdict::PINNED => [Signal::S6],
-        Verdict::LEFT_BEHIND => [Signal::S8],
-        Verdict::OLD_PROMISE => [Signal::S5],
-        Verdict::STALE => [Signal::S2, Signal::S4],
-    ];
-
     private string $package;
     private string $version;
-    private string $verdict;
     /** @var list<Signal> */
     private array $signals;
     /** @var list<string> */
@@ -85,7 +63,6 @@ final class Finding
     /** The registry that named the replacement, which decides where it is linked. */
     private ?string $replacementNamedBy;
     /** report-1's S9 facts, which the report-1 readers read: S9's data is report-2's. */
-    private AdvisoryFacts013 $advisoryFacts013;
     /** Null for a finding built without its flags. */
     private ?Score $score = null;
     private ?string $grade = null;
@@ -101,7 +78,7 @@ final class Finding
      * @param list<string> $chain
      * @param list<string> $directDependents
      */
-    public function __construct(string $package, string $version, string $verdict, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null, ?AdvisoryFacts013 $advisoryFacts013 = null)
+    public function __construct(string $package, string $version, array $signals, array $chain, ?string $allowlistReason, ?\DateTimeImmutable $dataDate, ?string $note = null, bool $dev = false, array $directDependents = [], ?LibyearsMeasurement $libyears = null, ?PackageOrigin $origin = null, ?string $replacementNamedBy = null)
     {
         $origin ??= PackageOrigin::unattributed();
         $fromComposerRepository = $origin->isComposerRepository();
@@ -111,7 +88,6 @@ final class Finding
         }
         $this->package = $package;
         $this->version = $version;
-        $this->verdict = $verdict;
         $this->signals = $signals;
         $this->chain = $chain;
         $this->allowlistReason = $allowlistReason;
@@ -129,12 +105,6 @@ final class Finding
         $this->libyears = $libyears;
         $this->origin = $origin;
         $this->replacementNamedBy = $replacementNamedBy;
-        $this->advisoryFacts013 = $advisoryFacts013 ?? AdvisoryFacts013::none();
-    }
-
-    public function advisoryFacts013(): AdvisoryFacts013
-    {
-        return $this->advisoryFacts013;
     }
 
     /**
@@ -190,18 +160,12 @@ final class Finding
         return $this->version;
     }
 
-    /** The verdict that report-1 writes. */
-    public function verdict(): string
-    {
-        return $this->verdict;
-    }
-
     /**
      * The verdict of the score: a grade, else `finished`, `unknown` or `ok`.
      *
      * @throws \LogicException for a finding built without its flags
      */
-    public function grade(): string
+    public function verdict(): string
     {
         if ($this->grade === null) {
             throw $this->unscored();
@@ -369,7 +333,7 @@ final class Finding
      */
     public function gradeOrNone(): string
     {
-        return $this->isGraded() ? $this->grade() : 'none';
+        return $this->isGraded() ? $this->verdict() : 'none';
     }
 
     private function unscored(): \LogicException
@@ -488,70 +452,6 @@ final class Finding
         return array_values(array_filter($this->directDependents, static fn (string $name): bool => $name !== $root));
     }
 
-    /** Derived, never stored: the priority is a view of the verdict, the chain, the dev flag and S9. */
-    public function priority(): string
-    {
-        return $this->priorityBasis()->priority();
-    }
-
-    public function priorityBasis(): PriorityBasis013
-    {
-        return Priority013::basis($this->verdict, $this->isDirect(), $this->dev, $this->hasUnfixableAdvisory(), $this->chain !== []);
-    }
-
-    /** Rules: docs/verdicts.md#security-advisories. */
-    public function hasUnfixableAdvisory(): bool
-    {
-        return ($list = $this->noFixExpected()) !== null && $list !== [];
-    }
-
-    /**
-     * Null, empty and non-empty: docs/schema.md#advisories-with-no-fix-expected.
-     *
-     * @return ?list<array{id: string, reason: string}>
-     */
-    public function noFixExpected(): ?array
-    {
-        if (!\in_array($this->verdict, self::NO_FIX_VERDICTS, true) || !Verdict013::flagged($this->verdict)) {
-            return null;
-        }
-
-        return $this->advisoryFacts013->noFixExpected($this->verdict);
-    }
-
-    /** The clause texts: docs/verdicts.md#security-advisories. */
-    private function noFixClause(): ?string
-    {
-        $list = $this->noFixExpected();
-        if ($list === null || $list === []) {
-            return null;
-        }
-        if (\in_array(NoFix013::NOT_ON_INSTALLED_BRANCH, array_column($list, 'reason'), true)) {
-            $branch = ReleaseBranch::of($this->version);
-
-            return $branch === null ? 'no fix expected' : 'no fix expected on '.ReleaseBranch::label($branch);
-        }
-        // The successor, not the raw marker: only a package name is somewhere to migrate to.
-        if (($replacement = $this->successor()) !== null) {
-            return 'no fix expected; migrate to '.$replacement;
-        }
-
-        return 'no fix expected';
-    }
-
-    /**
-     * The repository's replacement is free text: only a Composer package name other than this package's
-     * own counts as a successor. The `migrate to` clause, the JSON `replacement` and the
-     * `with_replacement` count all read it and must agree. See docs/verdicts.md#abandoned-and-where-to.
-     */
-    public function successor(): ?string
-    {
-        if ($this->verdict !== Verdict::ABANDONED) {
-            return null;
-        }
-        return self::successorOf($this->package, $this->replacement());
-    }
-
     /**
      * report-2's `replacement`: the successor, when `abandoned` counts.
      *
@@ -582,89 +482,6 @@ final class Finding
         $replacement = $s1 === null ? null : $s1->replacement();
 
         return $replacement !== null && $replacement !== '' ? $replacement : null;
-    }
-
-    /**
-     * Only a direct requirement gets the clause: a transitive package's parent owns its requirement.
-     * See docs/verdicts.md#left-behind.
-     */
-    private function followClause(): ?string
-    {
-        $s8 = $this->signalData(LeftBehindData::class);
-        $reachable = $s8 === null ? null : $s8->reachable();
-        if ($this->verdict !== Verdict::LEFT_BEHIND || !$this->isDirect() || $reachable === null) {
-            return null;
-        }
-        $constraint = $reachable->suggestedConstraint();
-
-        return $constraint !== null && $constraint !== '' ? 'require '.$constraint.' to follow' : null;
-    }
-
-    /** Every signal but S7, the deciding ones ({@see self::DECIDING}) first. The note when there is none. */
-    public function ownEvidence(): string
-    {
-        $parts = [];
-        foreach ($this->ownSignalsDecidingFirst() as $signal) {
-            $parts[] = $signal->summary();
-            if ($signal->id() === Signal::S8 && ($clause = $this->followClause()) !== null) {
-                $parts[] = $clause;
-            }
-            if ($signal->id() === Signal::S9 && ($clause = $this->noFixClause()) !== null) {
-                $parts[] = $clause;
-            }
-        }
-        if ($parts === []) {
-            return $this->note ?? '';
-        }
-
-        return implode('; ', $parts);
-    }
-
-    /** @return list<Signal> */
-    private function ownSignalsDecidingFirst(): array
-    {
-        $deciding = self::DECIDING[$this->verdict] ?? [];
-        $first = [];
-        $rest = [];
-        foreach ($this->signals as $signal) {
-            if ($signal->id() === Signal::S7) {
-                continue;
-            }
-            if (\in_array($signal->id(), $deciding, true)) {
-                $first[] = $signal;
-            } else {
-                $rest[] = $signal;
-            }
-        }
-
-        return array_merge($first, $rest);
-    }
-
-    /** S7 does not replace the note: a path package can pull in flagged packages and stay unchecked. */
-    public function evidence(): string
-    {
-        $parts = [];
-        $own = $this->ownEvidence();
-        if ($own !== '') {
-            $parts[] = $own;
-        }
-        foreach ($this->signals as $signal) {
-            if ($signal->id() === Signal::S7) {
-                $parts[] = $signal->summary();
-            }
-        }
-
-        return implode('; ', $parts);
-    }
-
-    public function evidenceLine(): string
-    {
-        if ($this->allowlistReason === null) {
-            return $this->evidence();
-        }
-        $evidence = $this->evidence();
-
-        return ($evidence === '' ? '' : $evidence.'; ').'allowlisted: '.$this->allowlistReason;
     }
 
     /**
@@ -720,7 +537,7 @@ final class Finding
         $branch = $branchKey === null ? null : ReleaseBranch::label($branchKey);
         $basis = $this->scoreBasisOf($context);
         $rows = self::rowsOf($signals);
-        $summaries = $this->flagSummaries($flags, $basis, $signals, $rows, $branch);
+        $summaries = $this->summariesOf($flags, $basis, $signals, $rows, $branch);
         $counted = $this->flagIds();
         $evidence = [];
         foreach ($summaries as $flag => $summary) {
@@ -736,7 +553,7 @@ final class Finding
             'version' => $this->version,
             'branch' => $branch,
             'installed_php' => $details->installedPhp(),
-            'verdict' => $this->grade(),
+            'verdict' => $this->verdict(),
             'priority' => $this->gradeOrNone(),
             'lead' => $this->lead(),
             'flags' => $this->flagsOut($flags, $basis, $signals, $summaries, \count($rows), $context->livenessComplete(), $standing),
@@ -785,6 +602,21 @@ final class Finding
     public function checksMissing(): array
     {
         return self::checksOf($this->writtenSignals());
+    }
+
+    /**
+     * `flags[].summary` of each fired flag, in flag order: what the evidence lines print.
+     *
+     * @return array<string, string> flag id => summary
+     *
+     * @throws \LogicException for a finding built without its flags or its details
+     */
+    public function flagSummaries(): array
+    {
+        $signals = $this->writtenSignals();
+        $branchKey = ReleaseBranch::of($this->version);
+
+        return $this->summariesOf($this->flags(), $this->scoreBasis(), $signals, self::rowsOf($signals), $branchKey === null ? null : ReleaseBranch::label($branchKey));
     }
 
     /**
@@ -869,7 +701,7 @@ final class Finding
      *
      * @return array<string, string>
      */
-    private function flagSummaries(FlagSet $flags, ScoreBasis $basis, array $signals, array $rows, ?string $branch): array
+    private function summariesOf(FlagSet $flags, ScoreBasis $basis, array $signals, array $rows, ?string $branch): array
     {
         $data = array_map(static fn (Signal $signal): SignalData => $signal->data(), $signals);
         $security = $basis->securityTerm();

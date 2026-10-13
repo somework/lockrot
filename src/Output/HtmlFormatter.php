@@ -10,7 +10,7 @@ use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
 use Lockrot\Json\JsonReader;
 use Lockrot\Json\JsonWriter;
-use Lockrot\Verdict\Verdict;
+use Lockrot\Verdict\ScoreModel;
 
 /**
  * The report as one self-contained page: docs/ci.md#-formathtml.
@@ -63,22 +63,17 @@ final class HtmlFormatter implements FormatterInterface
 
     private static function description(Report $report): string
     {
-        $flagged = \count($report->flagged());
+        $flagged = \count($report->graded());
         $checked = $report->packagesChecked();
         if ($flagged === 0) {
             return 'lockrot checked '.$checked.' packages in composer.lock and flagged none. Every verdict carries the release dates it was decided on.';
         }
 
-        $counts = [];
-        foreach ($report->byVerdict() as $verdict => $count) {
-            if ($count > 0 && Verdict::flagged($verdict)) {
-                $counts[$verdict] = $count;
-            }
-        }
-        arsort($counts);
         $named = [];
-        foreach (\array_slice($counts, 0, 3, true) as $verdict => $count) {
-            $named[] = $count.' '.$verdict;
+        foreach ($report->byGrade() as $grade => $count) {
+            if ($count > 0 && \in_array($grade, ScoreModel::GRADES, true)) {
+                $named[] = $count.' '.$grade;
+            }
         }
 
         return 'lockrot flagged '.$flagged.' of '.$checked.' packages in composer.lock'
@@ -88,7 +83,7 @@ final class HtmlFormatter implements FormatterInterface
 
     private static function title(Report $report): string
     {
-        $flagged = \count($report->flagged());
+        $flagged = \count($report->graded());
         if ($flagged === 0) {
             return 'lockrot: nothing flagged in '.$report->packagesChecked().' packages';
         }

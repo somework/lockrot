@@ -153,7 +153,7 @@ final class ExplanationTest extends TestCase
 
         $array = $explanation->toArray();
 
-        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'run', 'legacy', 'generated_at', 'notes', 'note_details'], array_keys($array));
+        self::assertSame(['package', 'version', 'finding', 'lock', 'metadata', 'run', 'generated_at', 'notes', 'note_details'], array_keys($array));
         self::assertSame('vendor/pkg', $array['package']);
         $finding = $array['finding'];
         self::assertIsArray($finding);
@@ -183,7 +183,6 @@ final class ExplanationTest extends TestCase
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 3, 'push-high-years' => 5], JsonPath::arrayAt($array, ['run', 'thresholds']));
         self::assertSame('8.3', JsonPath::stringAt($array, ['run', 'target_php']));
         self::assertNull(JsonPath::arrayAt($array, ['run'])['project_php'], 'no project php was given');
-        self::assertSame(['verdict' => 'left-behind', 'priority' => $explanation->finding()->priority()], \array_slice(JsonPath::arrayAt($array, ['legacy']), 0, 2), "report-1's reading");
         self::assertSame(F::NOW, $array['generated_at']);
         self::assertSame(['a note'], $array['notes']);
         self::assertSame(['a note'], array_column(JsonPath::arrayAt($array, ['note_details']), 'text'), 'the same notes, typed');
@@ -456,6 +455,5 @@ final class ExplanationTest extends TestCase
         $keys = array_keys(JsonPath::arrayAt($array, ['run']));
         sort($keys);
         self::assertSame(['advisory_lookup', 'fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
-        self::assertSame(['verdict', 'priority', 'basis'], array_keys(JsonPath::arrayAt($array, ['legacy'])));
     }
 }

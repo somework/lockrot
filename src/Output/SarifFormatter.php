@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Json\JsonWriter;
-use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockLineIndex;
-use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Verdict;
+use Lockrot\Verdict\ScoreModel;
 
 /**
  * SARIF 2.1.0 for GitHub code scanning: docs/ci.md#-formatsarif. The specification is at
@@ -25,69 +23,8 @@ final class SarifFormatter implements FormatterInterface
 {
     private const SCHEMA_URI = 'https://json.schemastore.org/sarif-2.1.0.json';
     private const INFORMATION_URI = 'https://github.com/somework/lockrot';
-    private const HELP_URI = 'https://lockrot.dev/verdicts/';
     private const URI_BASE_ID = '%SRCROOT%';
 
-    /**
-     * SARIF 2.1.0 §3.27.20 types `result.rank` as a number from 0.0 to 100.0. The priorities spread
-     * evenly over it: docs/ci.md#how-each-format-marks-a-finding.
-     */
-    private const RANK_STEP = 25.0;
-
-    /**
-     * The rule text per verdict, as {short, full}, that a code-scanning alert shows. Keep it the
-     * same as docs/verdicts.md#the-nine-verdicts.
-     *
-     * @var array<string, array{0: string, 1: string}>
-     */
-    private const DESCRIPTIONS = [
-        Verdict::ABANDONED => [
-            'Package is marked abandoned by its repository, or its repository is archived',
-            "The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab.",
-        ],
-        Verdict::SILENT => [
-            'No stable release and no repository push for a long time',
-            'No stable release for at least release-high-years (default 5 years) and no repository push for at least push-high-years (default 5 years); an archived repository is reported as abandoned instead.',
-        ],
-        Verdict::PINNED => [
-            'Installed version is a branch snapshot, or the package has no stable release',
-            'The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all.',
-        ],
-        Verdict::LEFT_BEHIND => [
-            'The installed release branch stopped while a newer branch kept releasing',
-            "No stable release on the installed version's branch for at least release-high-years (default 5 years), while a higher branch has released since: the package is alive, the branch installed here gets no fixes.",
-        ],
-        Verdict::OLD_PROMISE => [
-            "Released before the target PHP's GA date with an open-ended php constraint",
-            "The installed version was released before the target PHP's GA date, and its require.php constraint is open-ended (>=N, *) for that target.",
-        ],
-        Verdict::STALE => [
-            'Old release or old push, below the silent thresholds',
-            'Old release or old push, but not old enough — or not on both fronts — for silent.',
-        ],
-        Verdict::UNKNOWN => [
-            'No data could be obtained for this package',
-            'No data could be obtained: the package was not found in any configured Composer repository, or every lookup failed.',
-        ],
-        Verdict::FINISHED => [
-            'Matched the finished-package allowlist',
-            'Matched the built-in or project allowlist — the package is complete by design, not neglected.',
-        ],
-        Verdict::OK => [
-            'None of the other verdicts applied',
-            'None of the other verdicts applied to this package.',
-        ],
-        self::UNCHECKED => [
-            'A check did not run, and nothing else grades the package',
-            'A check that the package needs did not run (S10), and no counted fact grades it. --fail-on=unchecked fails on it.',
-        ],
-        self::ADVISORIES_UNCHECKED => [
-            'The advisories of some packages were not checked',
-            'The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap.',
-        ],
-    ];
-
-    private const UNCHECKED = 'unchecked';
     private const ADVISORIES_UNCHECKED = 'advisories-unchecked';
 
     private FormatContext $context;
@@ -102,111 +39,119 @@ final class SarifFormatter implements FormatterInterface
         $lockPath = $this->context->lockPath();
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
-        $baseline = $report->baseline();
         $gate = $this->context->gateOf($report);
+        $run = $this->context->runOf($report);
+        $document = $report->withRun($run)->toArray();
         $rules = [];
-        $ruleIndexes = [];
         $results = [];
         foreach ($this->context->recordFindings($report, $showAll) as $finding) {
-            $rule = $this->context->isUncheckedRecord($finding) ? self::UNCHECKED : $finding->verdict();
-            if (!isset($ruleIndexes[$rule])) {
-                $ruleIndexes[$rule] = \count($rules);
-                $rules[] = $this->rule($rule);
+            $records = new SarifRecords($finding, $gate->standingOf($finding->package()), $report->baseline());
+            foreach ($records->results($showAll, $this->context->isUncheckedRecord($finding, $showAll)) as $result) {
+                $severity = $result['properties']['severity'] ?? null;
+                $rules[$result['ruleId']] = $rules[$result['ruleId']] ?? SarifRecords::rule($result['ruleId'], \is_string($severity) ? $severity : null);
+                $result['locations'] = [['physicalLocation' => $this->physicalLocation($index->lineOf($finding->package()))]];
+                $results[] = $result;
             }
-            $results[] = $this->result($finding, $rule, $ruleIndexes[$rule], $index->lineOf($finding->package()), $baseline, $gate);
         }
         $gap = $this->context->advisoriesNotCheckedLevel($report);
         if ($gap !== null) {
-            $ruleIndexes[self::ADVISORIES_UNCHECKED] = \count($rules);
-            $rules[] = $this->rule(self::ADVISORIES_UNCHECKED);
+            $rules['lockrot/'.self::ADVISORIES_UNCHECKED] = SarifRecords::rule('lockrot/'.self::ADVISORIES_UNCHECKED, null);
             $results[] = [
                 'ruleId' => 'lockrot/'.self::ADVISORIES_UNCHECKED,
-                'ruleIndex' => $ruleIndexes[self::ADVISORIES_UNCHECKED],
                 'level' => $gap,
                 'message' => ['text' => 'advisories not checked: the gate could not read the advisories of every package'],
                 'locations' => [['physicalLocation' => ['artifactLocation' => $this->artifactLocation()]]],
                 'partialFingerprints' => ['lockrot/run' => self::ADVISORIES_UNCHECKED],
             ];
         }
+        $ruleIndexes = array_flip(array_keys($rules));
+        foreach ($results as $i => $result) {
+            $results[$i] = ['ruleId' => $result['ruleId'], 'ruleIndex' => $ruleIndexes[$result['ruleId']]] + $result;
+        }
+        $runBlock = \is_array($document['run']) ? $document['run'] : [];
 
-        $run = [
+        $sarifRun = [
             'tool' => ['driver' => [
                 'name' => 'lockrot',
                 'version' => $this->context->toolVersion(),
                 'informationUri' => self::INFORMATION_URI,
-                'rules' => $rules,
+                'rules' => array_values($rules),
             ]],
             'columnKind' => 'utf16CodeUnits',
         ];
         $lockDirectory = $this->context->lockDirectory();
         if ($lockDirectory !== null) {
-            $run['originalUriBaseIds'] = [self::URI_BASE_ID => ['uri' => self::directoryUri($lockDirectory)]];
+            $sarifRun['originalUriBaseIds'] = [self::URI_BASE_ID => ['uri' => self::directoryUri($lockDirectory)]];
         }
-        $run['results'] = $results;
-        $run['invocations'] = [$this->invocation($report)];
-
-        return self::encode(['$schema' => self::SCHEMA_URI, 'version' => '2.1.0', 'runs' => [$run]]);
-    }
-
-    /** @return array<string, mixed> */
-    private function rule(string $verdict): array
-    {
-        [$short, $full] = self::DESCRIPTIONS[$verdict] ?? ['Dependency rot', 'A lockrot verdict.'];
-
-        return [
-            'id' => 'lockrot/'.$verdict,
-            'name' => $verdict,
-            'shortDescription' => ['text' => $verdict.': '.$short],
-            'fullDescription' => ['text' => $full],
-            'defaultConfiguration' => ['level' => Verdict::flagged($verdict) ? FormatContext::LEVEL_WARNING : FormatContext::LEVEL_NOTE],
-            'helpUri' => self::HELP_URI,
+        $sarifRun['results'] = $results;
+        $sarifRun['invocations'] = [$this->invocation($report, $gate, $document['gate'], $runBlock)];
+        $sarifRun['properties'] = [
+            'lockrot_schema' => 2,
+            'text_grammar' => $runBlock['text_grammar'] ?? null,
+            'score_text_grammar' => ScoreModel::SCORE_TEXT_GRAMMAR,
+            'score_model_id' => ScoreModel::ID,
+            'fix_model' => $runBlock['fix_model'] ?? null,
+            'advisory_lookup' => $report->advisoryLookup(),
         ];
+
+        return self::encode(['$schema' => self::SCHEMA_URI, 'version' => '2.1.0', 'runs' => [$sarifRun]]);
     }
 
-    /** @return array<string, mixed> */
-    private function result(Finding $finding, string $rule, int $ruleIndex, ?int $line, ?BaselineComparison $baseline, Gate $gate): array
+    /** @return array{artifactLocation: array{uri: string, uriBaseId?: string}, region?: array{startLine: int}} */
+    private function physicalLocation(?int $line): array
     {
-        $physicalLocation = ['artifactLocation' => $this->artifactLocation()];
+        $location = ['artifactLocation' => $this->artifactLocation()];
         if ($line !== null) {
-            $physicalLocation['region'] = ['startLine' => $line];
+            $location['region'] = ['startLine' => $line];
         }
 
-        $signals = [];
-        foreach ($finding->signals() as $signal) {
-            $signals[] = $signal->id();
-        }
-        $dataDate = $finding->dataDate();
+        return $location;
+    }
 
-        $properties = [
-            'package' => $finding->package(),
-            'version' => $finding->version(),
-            'verdict' => $finding->verdict(),
-            'priority' => $finding->priority(),
-            'direct' => $finding->isDirect(),
-            'dev' => $finding->isDev(),
-            'signals' => $signals,
-            'chain' => $finding->chain(),
-            'direct_dependents' => $finding->directDependents(),
-            'data_date' => $dataDate === null ? null : $dataDate->format(\DATE_ATOM),
+    /**
+     * The invocation: the exit code that the gate decides, `gate.text`, the gate and
+     * the run keys of report-2, the run notes, and one warning per failed advisory repository.
+     *
+     * @param mixed                $gateBlock report-2's root `gate`
+     * @param array<mixed, mixed>  $runBlock  report-2's `run`
+     *
+     * @return array<string, mixed>
+     */
+    private function invocation(Report $report, Gate $gate, $gateBlock, array $runBlock): array
+    {
+        $invocation = [
+            'executionSuccessful' => true,
+            'exitCode' => $gate->fails() ? 1 : 0,
+            'exitCodeDescription' => RunGateText::render($gate, $this->context->runOf($report)),
+            'properties' => [
+                'gate' => $gateBlock,
+                'fail_on' => $runBlock['fail_on'] ?? null,
+                'fail_on_source' => $runBlock['fail_on_source'] ?? null,
+                'gates' => $runBlock['gates'] ?? [],
+                'mode' => $runBlock['mode'] ?? null,
+                'strict_network' => $runBlock['strict_network'] ?? false,
+            ],
         ];
-        // Only with a baseline: a null reads as compared and unclassified, not as uncompared.
-        $status = $baseline === null ? null : $baseline->statusOf($finding->package());
-        if ($status !== null) {
-            $properties['baseline'] = $status;
+        $notifications = [];
+        foreach ($report->advisoryLookup()->repositories() as $repository) {
+            if ($repository->outcome() === AdvisoryRepository::FAILED) {
+                $notifications[] = ['level' => FormatContext::LEVEL_WARNING, 'message' => ['text' => RunFooter::repository($repository)]];
+            }
+        }
+        $notes = $report->notes();
+        $baseline = $report->baseline();
+        $stale = $baseline === null ? null : $baseline->staleNote();
+        if ($stale !== null) {
+            $notes[] = $stale;
+        }
+        foreach ($notes as $note) {
+            $notifications[] = ['level' => FormatContext::LEVEL_NOTE, 'message' => ['text' => $note]];
+        }
+        if ($notifications !== []) {
+            $invocation['toolExecutionNotifications'] = $notifications;
         }
 
-        return [
-            'ruleId' => 'lockrot/'.$rule,
-            'ruleIndex' => $ruleIndex,
-            'level' => $this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline),
-            'rank' => Priority013::rank($finding->priority()) * self::RANK_STEP,
-            'message' => ['text' => $this->message($finding)],
-            'locations' => [['physicalLocation' => $physicalLocation]],
-            // The line of an entry moves when the lock changes, so only the package name identifies
-            // a finding across runs.
-            'partialFingerprints' => ['lockrot/package' => $finding->package()],
-            'properties' => $properties,
-        ];
+        return $invocation;
     }
 
     /** @return array{uri: string, uriBaseId?: string} */
@@ -218,39 +163,6 @@ final class SarifFormatter implements FormatterInterface
         }
 
         return $location;
-    }
-
-    /** @return array<string, mixed> */
-    private function invocation(Report $report): array
-    {
-        // A failed lookup shows in the notes and the `unknown` verdict, never as a tool failure.
-        $invocation = ['executionSuccessful' => true];
-
-        $notes = $report->notes();
-        $baseline = $report->baseline();
-        $stale = $baseline === null ? null : $baseline->staleNote();
-        if ($stale !== null) {
-            $notes[] = $stale;
-        }
-
-        $notifications = [];
-        foreach ($notes as $note) {
-            $notifications[] = ['level' => FormatContext::LEVEL_NOTE, 'message' => ['text' => $note]];
-        }
-        if ($notifications !== []) {
-            $invocation['toolExecutionNotifications'] = $notifications;
-        }
-
-        return $invocation;
-    }
-
-    private function message(Finding $finding): string
-    {
-        $evidence = $finding->evidenceLine();
-
-        $message = $finding->package().' '.$finding->version();
-
-        return $evidence === '' ? $message : $message.': '.$evidence;
     }
 
     /**

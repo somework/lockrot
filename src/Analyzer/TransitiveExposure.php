@@ -13,8 +13,8 @@ use Lockrot\Verdict\FlagSet;
 
 /**
  * Signal S7, the parent-side view of transitive exposure (docs/verdicts.md#transitive-exposure).
- * The signal is attached after the verdicts are decided and {@see \Lockrot\Verdict\VerdictEngine}
- * never reads it: priority, exit code and baseline stay untouched.
+ * The signal is attached after the flags are decided and counts toward no flag: the score, the
+ * exit code and the baseline stay untouched.
  *
  * @internal
  */
@@ -97,7 +97,7 @@ final class TransitiveExposure
     private static function byParent(array $findings, DependencyGraph $graph): array
     {
         $flagged = array_filter($findings, [self::class, 'attributable']);
-        usort($flagged, [Report::class, 'compare']);
+        usort($flagged, [Report::class, 'compareGraded']);
         $byParent = [];
         foreach ($flagged as $finding) {
             foreach ($graph->chainsTo($finding->package()) as $parent => $chain) {
@@ -113,7 +113,7 @@ final class TransitiveExposure
     {
         $packages = [];
         foreach ($descendants as [$finding, $chain]) {
-            $packages[] = new ExposedPackage($finding->package(), $chain, $finding->grade(), $finding->lead(), $finding->flagIds());
+            $packages[] = new ExposedPackage($finding->package(), $chain, $finding->verdict(), $finding->lead(), $finding->flagIds());
         }
 
         return new Signal(Signal::LEVEL_INFO, self::summary($packages), new ExposureData($packages));

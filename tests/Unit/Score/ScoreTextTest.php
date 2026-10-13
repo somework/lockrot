@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Score;
 use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Score\ScoreText;
 use Lockrot\Tests\Support\ScoreSweep;
+use Lockrot\Verdict\Score;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -30,6 +31,16 @@ final class ScoreTextTest extends TestCase
 
         self::assertSame($line, ScoreText::render($basis));
         self::assertSame($line, ScoreSweep::decoded($basis)['text']);
+    }
+
+    /** A score that no flag set backs, as the gate basis's `new`, reads the line of its terms, with the halves. */
+    public function testAScoreAloneReadsTheSameLineAndSaysWhenItRoundedDown(): void
+    {
+        $rounded = Score::of(ScoreSweep::flagSet(['axis' => 'base', 'flags' => ['left-behind', 'stale'], 'advisories' => [], 'reach' => 'transitive', 'dev' => true, 'under' => null, 'accepted' => null]), 'transitive', true);
+        $exact = Score::of(ScoreSweep::flagSet(['axis' => 'base', 'flags' => ['old-promise', 'stale'], 'advisories' => [], 'reach' => 'direct', 'dev' => false, 'under' => null, 'accepted' => null]), 'direct', false);
+
+        self::assertSame('4 = ((left-behind 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)', ScoreText::ofScore($rounded));
+        self::assertSame('18 = old-promise 16 + stale 2 [¼ of 8]', ScoreText::ofScore($exact));
     }
 
     /** @return iterable<string, array{list<string>, list<array{string, string}>, string, bool, ?string, string}> */

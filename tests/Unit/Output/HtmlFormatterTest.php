@@ -175,7 +175,7 @@ final class HtmlFormatterTest extends TestCase
         $formatter = new HtmlFormatter(new PageData(new Analysis($report, $facts), new Thresholds(), '8.4'), [JsonFormatter::SCHEMA]);
 
         self::assertSame(['vendor/rotten'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report)), ['details'])));
-        self::assertSame(['vendor/rotten', 'vendor/fine'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report, true)), ['details'])));
+        self::assertSame(['vendor/fine', 'vendor/rotten'], array_keys(J::arrayAt(self::payloadOf($formatter->format($report, true)), ['details'])));
     }
 
     /**
@@ -205,18 +205,16 @@ final class HtmlFormatterTest extends TestCase
         $page = $this->page($report);
 
         self::assertStringNotContainsString('name="robots"', $page);
-        self::assertStringContainsString('lockrot flagged 2 of 40 packages in composer.lock: 1 abandoned, 1 silent.', $page);
+        self::assertMatchesRegularExpression('/lockrot flagged \\d+ of 40 packages in composer\\.lock: \\d+ (critical|high|medium|low)/', $page);
         self::assertStringContainsString('<meta property="og:image" content="https://lockrot.dev/assets/og.png">', $page);
         self::assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $page);
     }
 
     /**
-     * The sentence under the title is what a search result and a Slack unfurl show, and it has room
-     * for three verdicts. Which three is the whole point: the biggest counts, biggest first. A run
-     * with five flagged verdicts names left-behind, old-promise and stale, and says nothing about
-     * the two singletons below them.
+     * The sentence under the title is what a search result and a Slack unfurl show. It counts each
+     * grade in verdict order, and a cause word that the grades replace does not appear in it.
      */
-    public function testTheDescriptionNamesTheThreeBiggestVerdictsInOrder(): void
+    public function testTheDescriptionCountsEachGradeInVerdictOrder(): void
     {
         $findings = [$this->finding('vendor/gone', Verdict::ABANDONED), $this->finding('vendor/quiet', Verdict::SILENT)];
         foreach (range(1, 3) as $i) {
@@ -232,10 +230,10 @@ final class HtmlFormatterTest extends TestCase
         $page = $this->page($this->report($findings, 60));
 
         self::assertStringContainsString(
-            'lockrot flagged 14 of 60 packages in composer.lock: 5 old-promise, 4 stale, 3 left-behind.',
+            'lockrot flagged 14 of 60 packages in composer.lock: 2 high, 8 medium, 4 low.',
             $page
         );
-        self::assertStringNotContainsString('1 abandoned', $page, 'the fourth and fifth verdicts do not fit');
+        self::assertStringNotContainsString('1 abandoned', $page, 'the description counts grades, not flags');
         self::assertStringNotContainsString('1 silent', $page);
     }
 

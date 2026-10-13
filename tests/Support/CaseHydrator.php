@@ -13,6 +13,7 @@ use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
@@ -35,7 +36,7 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
-use Lockrot\Verdict\VerdictEngine;
+use Lockrot\Verdict\FailOn;
 
 /**
  * Turns a case of tests/fixtures/flags/cases.json into the report that the real {@see Analyzer}
@@ -140,6 +141,58 @@ final class CaseHydrator
     }
 
     /**
+     * The seven-package composite of tests/fixtures/flags/composite.json: the case finding of each
+     * of the cases A to G in one report, its advisory lookup summed per repository, at
+     * `--fail-on=high` against target PHP 8.4 (`--target-php`).
+     */
+    public static function composite(): Report
+    {
+        return self::ofCases(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
+    }
+
+    /**
+     * The case finding of every case with an `inputs` block in one report, as {@see composite()}
+     * builds it. A package that an earlier case already holds is left out.
+     */
+    public static function everyCase(): Report
+    {
+        return self::ofCases(array_map('strval', array_keys(self::findings())));
+    }
+
+    /** @param list<string> $ids */
+    private static function ofCases(array $ids): Report
+    {
+        $findings = [];
+        $records = [];
+        $oldest = null;
+        $generatedAt = self::report(self::case('A'))->generatedAt();
+        foreach ($ids as $id) {
+            $case = self::case($id);
+            $report = self::report($case);
+            $package = JsonPath::stringAt($case, ['finding', 'package']);
+            foreach ($report->findings() as $finding) {
+                if ($finding->package() === $package && !isset($findings[$package])) {
+                    $findings[$package] = $finding;
+                }
+            }
+            foreach ($report->advisoryLookup()->repositories() as $repository) {
+                $name = $repository->composerRepository();
+                $records[$name] = [($records[$name][0] ?? 0) + (int) $repository->records(), ($records[$name][1] ?? 0) + (int) $repository->packagesWithRecords()];
+            }
+            $at = $report->activityCacheOldestAt();
+            $oldest = $at !== null && ($oldest === null || $at < $oldest) ? $at : $oldest;
+        }
+        $repositories = [];
+        foreach ($records as $name => [$count, $packages]) {
+            $repositories[] = AdvisoryRepository::of($name, AdvisoryRepository::ANSWERED)->withRecords($count, $packages);
+        }
+        $coverage = new AdvisoryCoverage('all', 'default', $repositories, 0, []);
+        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null);
+
+        return (new Report(array_values($findings), [], $generatedAt, \count($findings), 0, null, $oldest, false, $coverage))->withRun($run);
+    }
+
+    /**
      * @param array<mixed, mixed> $case
      *
      * @throws \InvalidArgumentException for a case without an `inputs` block
@@ -147,6 +200,18 @@ final class CaseHydrator
     public static function report(array $case): Report
     {
         return self::analysis($case)->report();
+    }
+
+    /**
+     * The analysis of the case, its facts included, for a test that explains its package.
+     *
+     * @param array<mixed, mixed> $case
+     *
+     * @throws \InvalidArgumentException for a case without an `inputs` block
+     */
+    public static function analysisOf(array $case): Analysis
+    {
+        return self::analysis($case);
     }
 
     /**
@@ -192,7 +257,6 @@ final class CaseHydrator
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp),
-            new VerdictEngine(),
             $clock,
             false,
             self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []), self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null)

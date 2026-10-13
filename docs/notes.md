@@ -288,18 +288,6 @@ Composer rejected the project's abandoned ignore list, so every abandoned markin
 
 ## Gate and baseline
 
-### Verdict rules changed {#verdict_rules_changed}
-
-A grade value of `--fail-on` is active, and some findings reached it under the rules of lockrot
-0.13 and do not reach it under 0.14's. The sentence names each one with its score and gives why 0.13 placed it
-higher.
-
-- `data`: `fail_on`, the grade value. `findings`, one entry per finding, by package name: `package`,
-  `version`, `legacy` (the `verdict`, `priority` and `basis` of 0.13), `verdict`, `score_total` and
-  `score_text`.
-- Findings: no change.
-- `sets_network_failures`: no.
-
 ### Baseline target differs {#baseline_target_differs}
 
 The baseline file was written for another target PHP. lockrot does not compare fix changes against

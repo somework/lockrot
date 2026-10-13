@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Config\Gate;
-use Lockrot\Config\GateStanding;
 use Lockrot\Filesystem\Path;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\SecurityStanding;
-use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 
 /** @internal */
@@ -38,6 +36,7 @@ final class FormatContext
     private FailOn $failOn;
     private string $toolVersion;
     private int $terminalWidth;
+    private ?int $markdownMaxBytes = null;
 
     private function __construct(?string $lockPath, FailOn $failOn, string $toolVersion, int $terminalWidth, ?string $projectDirectory)
     {
@@ -111,24 +110,39 @@ final class FormatContext
         return $this->terminalWidth;
     }
 
+    /** A copy whose markdown documents keep within $bytes (`--markdown-max-bytes`, files only). */
+    public function withMarkdownMaxBytes(?int $bytes): self
+    {
+        $copy = clone $this;
+        $copy->markdownMaxBytes = $bytes;
+
+        return $copy;
+    }
+
+    /** The byte budget of a markdown document, null for none. */
+    public function markdownMaxBytes(): ?int
+    {
+        return $this->markdownMaxBytes;
+    }
+
     /**
-     * The findings that get a record: the flagged ones, every one that fails the gate (I15b), and
-     * with `unchecked` active every one with a missing check. Under `--all`, every finding.
+     * The findings that get a record, in the report's order: the graded ones, every one that fails
+     * the gate (I15b), and with `unchecked` active every one with a missing check. Under `--all`,
+     * every finding.
      *
      * @return list<Finding>
      */
     public function recordFindings(Report $report, bool $showAll): array
     {
         if ($showAll) {
-            return $report->findings();
+            return $report->sorted();
         }
-        $flagged = $report->flagged();
         $gate = $this->gateOf($report);
         $unchecked = $this->failOn->has(FailOn::KIND_UNCHECKED);
         $out = [];
-        foreach ($report->findings() as $finding) {
+        foreach ($report->sorted() as $finding) {
             $standing = $gate->standingOf($finding->package());
-            if (\in_array($finding, $flagged, true) || ($standing !== null && $standing->fails()) || ($unchecked && $finding->checksMissing() !== [])) {
+            if ($finding->isGraded() || ($standing !== null && $standing->fails()) || ($unchecked && $finding->checksMissing() !== [])) {
                 $out[] = $finding;
             }
         }
@@ -137,12 +151,12 @@ final class FormatContext
     }
 
     /**
-     * Whether the finding's record is its own `lockrot/unchecked` one: `unchecked` is active, and the
-     * finding carries a missing check and no counted fact (SPEC §7.10, §7.11).
+     * Whether the finding gets its own `lockrot/unchecked` record: `unchecked` is active, or the
+     * format lists every finding, and the finding carries a missing check and no counted fact.
      */
-    public function isUncheckedRecord(Finding $finding): bool
+    public function isUncheckedRecord(Finding $finding, bool $showAll = false): bool
     {
-        return $this->failOn->has(FailOn::KIND_UNCHECKED)
+        return ($showAll || $this->failOn->has(FailOn::KIND_UNCHECKED))
             && $finding->flags()->countedMaintenance() === []
             && $finding->flags()->advisories() === []
             && $finding->checksMissing() !== [];
@@ -187,23 +201,11 @@ final class FormatContext
     }
 
     /**
-     * The level of a finding in every format that marks one, from its gate standing:
-     * docs/ci.md#how-each-format-marks-a-finding. `error` when the finding fails the gate, `note`
-     * when the baseline knows it, else `warning` for a flagged finding. GithubFormatter spells
-     * `note` as `notice`.
-     *
-     * @param ?GateStanding           $standing the finding's standing, from Report::gate()
-     * @param null|BaselineComparison $baseline the run's comparison, from Report::baseline()
+     * The run settings the report was told. A report without them is judged on this context's
+     * fail-on, against the running PHP.
      */
-    public function levelOf(Finding $finding, ?GateStanding $standing, ?BaselineComparison $baseline = null): string
+    public function runOf(Report $report): RunSettings
     {
-        if ($standing !== null && $standing->fails()) {
-            return self::LEVEL_ERROR;
-        }
-        if ($baseline !== null && $baseline->isKnown($finding->package())) {
-            return self::LEVEL_NOTE;
-        }
-
-        return Verdict::flagged($finding->verdict()) ? self::LEVEL_WARNING : self::LEVEL_NOTE;
+        return $report->run() ?? new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, $this->lockPath, $this->failOn->value() === FailOn::NONE ? null : $this->failOn, RunSettings::SOURCE_OPTION, null);
     }
 }

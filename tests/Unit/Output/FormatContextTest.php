@@ -6,13 +6,12 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Tests\Support\BaselineEntries;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
-use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -33,54 +32,11 @@ final class FormatContextTest extends TestCase
         return new Report(array_values($findings), [], new \DateTimeImmutable(self::AT), \count($findings), 0);
     }
 
-    /** @param list<array{0: string, 1: string}> $entries package, verdict */
-    private function comparison(array $entries, Report $report): BaselineComparison
-    {
-        $rows = [];
-        foreach ($entries as [$package, $verdict]) {
-            $rows[] = BaselineEntries::of($package, '1.0.0', $verdict, '2026-01-15');
-        }
-        $names = [];
-        foreach ($report->findings() as $finding) {
-            $names[] = $finding->package();
-        }
-
-        return BaselineComparison::compare(BaselineEntries::baseline($rows, self::AT), $report, 'lockrot-baseline.json', $names);
-    }
-
-    /** docs/ci.md#how-each-format-marks-a-finding: the level follows the finding's gate standing. */
-    public function testAFindingThatFailsTheGateIsAnError(): void
-    {
-        $report = $this->report($this->finding('a/gone', Verdict::ABANDONED));
-        $gate = Gate::decide($report, FailOn::parse('high'), false, Gate::MODE_CHECK);
-
-        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'high')->levelOf($report->findings()[0], $gate->standingOf('a/gone')));
-    }
-
-    public function testAFlaggedFindingThatPassesIsAWarningAndAnUnflaggedOneANote(): void
-    {
-        $report = $this->report($this->finding('a/stale', Verdict::STALE), $this->finding('a/fine', Verdict::OK));
-        $gate = Gate::decide($report, FailOn::parse('critical'), false, Gate::MODE_CHECK);
-        $context = FormatContext::create(null, 'critical');
-
-        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($report->findings()[0], $gate->standingOf('a/stale')));
-        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/fine', Verdict::OK), $gate->standingOf('a/fine')));
-        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($report->findings()[0], null), 'without a gate');
-    }
 
     public function testAThresholdThatIsNotAValueIsRejected(): void
     {
         $this->expectException(ConfigException::class);
         FormatContext::create(null, 'dead');
-    }
-
-    public function testAFindingTheBaselineKnowsIsANote(): void
-    {
-        $report = $this->report($this->finding('a/stale', Verdict::STALE));
-        $compared = $report->withBaseline($this->comparison([['a/stale', Verdict::STALE]], $report));
-        $gate = Gate::decide($compared, FailOn::parse('stale'), false, Gate::MODE_CHECK);
-
-        self::assertSame(FormatContext::LEVEL_NOTE, FormatContext::create(null, 'stale')->levelOf($compared->findings()[0], $gate->standingOf('a/stale'), $compared->baseline()));
     }
 
     public function testUnknownContextCarriesNothing(): void
@@ -200,6 +156,37 @@ final class FormatContextTest extends TestCase
         self::assertFalse(FormatContext::create(null, 'unchecked')->isUncheckedRecord($this->finding('a/fine', Verdict::OK)), 'no missing check');
     }
 
+    public function testAMarkdownBudgetMakesACopyAndLeavesTheContextAsItWas(): void
+    {
+        $context = FormatContext::create(null, 'high');
+
+        self::assertSame(1000, $context->withMarkdownMaxBytes(1000)->markdownMaxBytes());
+        self::assertNull($context->markdownMaxBytes());
+    }
+
+    public function testTheRecordsAreTheGradedFindingsAndWithUncheckedActiveEveryOneWithAMissingCheck(): void
+    {
+        $report = CaseHydrator::everyCase();
+        $names = static fn (array $findings): array => array_map(static fn ($finding): string => $finding instanceof Finding ? $finding->package() : '', $findings);
+        $graded = $names(array_values(array_filter($report->sorted(), static fn (Finding $finding): bool => $finding->isGraded())));
+        $missing = $names(array_values(array_filter($report->sorted(), static fn (Finding $finding): bool => $finding->isGraded() || $finding->checksMissing() !== [])));
+
+        self::assertNotSame($graded, $missing);
+        self::assertSame($graded, $names(FormatContext::create(null, 'critical')->recordFindings($report, false)), 'a graded finding that passes the gate still has its record');
+        self::assertSame($missing, $names(FormatContext::create(null, 'critical,unchecked')->recordFindings($report, false)));
+        self::assertSame($names($report->sorted()), $names(FormatContext::create(null, 'critical')->recordFindings($report, true)));
+    }
+
+    public function testAnAdvisoriesGapThatTheBaselineKnowsIsAWarningBecauseTheGatePasses(): void
+    {
+        $offline = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
+        $known = $offline->withBaseline(BaselineComparison::compare(BaselineEntries::baseline([BaselineEntries::of('a/offline', '1.0.0', Verdict::STALE, '2026-06-01')]), $offline, 'lockrot-baseline.json', []));
+        $context = FormatContext::create(null, 'unchecked');
+
+        self::assertFalse($context->gateOf($known)->fails());
+        self::assertSame(FormatContext::LEVEL_WARNING, $context->advisoriesNotCheckedLevel($known));
+    }
+
     /** I15b: the record set holds every flagged finding, every failing one, and with `unchecked` active every one with a missing check. */
     public function testTheRecordSetHoldsEveryFindingThatTheGateCanFail(): void
     {
@@ -216,6 +203,6 @@ final class FormatContextTest extends TestCase
 
         self::assertSame(['a/stale', 'a/offline'], $names(FormatContext::create(null, 'unchecked')->recordFindings($report, false)));
         self::assertSame(['a/stale'], $names(FormatContext::create(null, 'high')->recordFindings($report, false)));
-        self::assertSame($names($report->findings()), $names(FormatContext::create(null, 'high')->recordFindings($report, true)), 'under --all, every finding');
+        self::assertSame($names($report->sorted()), $names(FormatContext::create(null, 'high')->recordFindings($report, true)), 'under --all, every finding');
     }
 }

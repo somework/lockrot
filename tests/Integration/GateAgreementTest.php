@@ -43,7 +43,6 @@ use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -258,7 +257,8 @@ final class GateAgreementTest extends TestCase
             if ($status === 'worsened' && $fails) {
                 $this->seen['worsened fails'] = true;
             }
-            $this->same($fails, $levels->levelOf($finding, $levelGate->standingOf($finding->package()), $report->baseline()) === FormatContext::LEVEL_ERROR, $where.': level');
+            $levelStanding = $levelGate->standingOf($finding->package());
+            $this->same($fails, $levelStanding !== null && $levelStanding->fails() && $levelStanding->by() !== [], $where.': a failing finding names the values that mark its records error');
             $anyFails = $anyFails || $fails;
         }
 
@@ -369,10 +369,10 @@ final class GateAgreementTest extends TestCase
         $entries = [];
         $worsened = false;
         $skipped = 0;
-        foreach ($report->flagged() as $finding) {
+        foreach ($report->graded() as $finding) {
             $entry = $written->entryFor($finding->package());
             self::assertNotNull($entry, $finding->package());
-            if (!$worsened && Verdict::severity($finding->verdict()) > Verdict::severity(Verdict::STALE)) {
+            if (!$worsened && $finding->lead() !== null && $finding->lead() !== Verdict::STALE) {
                 $entries[] = BaselineEntries::of($entry->package(), $entry->version(), Verdict::STALE, $entry->firstSeen());
                 $worsened = true;
             } elseif ($skipped++ === 1) {
@@ -382,7 +382,7 @@ final class GateAgreementTest extends TestCase
             }
         }
 
-        return $report->flagged() === [] ? null : BaselineEntries::baseline($entries, self::NOW);
+        return $report->graded() === [] ? null : BaselineEntries::baseline($entries, self::NOW);
     }
 
     /**
@@ -422,7 +422,6 @@ final class GateAgreementTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             true,
             $advisories

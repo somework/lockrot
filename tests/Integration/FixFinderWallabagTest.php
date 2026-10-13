@@ -30,7 +30,6 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\Golden;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -141,7 +140,6 @@ final class FixFinderWallabagTest extends TestCase
                 new RepoLocator(),
                 BuiltinAllowlist::load(),
                 SignalSet::default($clock, new Thresholds(), self::TARGET_PHP, PhpReleaseDates::load(), $project->requirePhp()),
-                new VerdictEngine(),
                 $clock,
                 false,
                 new RepositoryAdvisoryLoader($server->repositories())

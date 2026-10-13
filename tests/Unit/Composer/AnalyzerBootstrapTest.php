@@ -26,7 +26,6 @@ use Lockrot\Deadline;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 final class AnalyzerBootstrapTest extends TestCase
@@ -50,7 +49,6 @@ final class AnalyzerBootstrapTest extends TestCase
             new RepoLocator(),
             new Allowlist([new AllowlistEntry('vendor/builtin', null, 'builtin match', null, 'builtin')]),
             SignalSet::default($clock, $lockrot->thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false
         );

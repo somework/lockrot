@@ -26,7 +26,6 @@ use Lockrot\Output\Formatters;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
-use Lockrot\Verdict\VerdictEngine;
 
 const DIRS = ['apps/wallabag_wallabag', 'apps/nextcloud_3rdparty', 'skeletons/laravel', 'apps/matomo-org_matomo'];
 const FORMATS = ['github' => 'txt', 'gitlab' => 'json', 'sarif' => 'sarif', 'markdown' => 'md', 'table' => 'txt'];
@@ -60,7 +59,6 @@ try {
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false
         );

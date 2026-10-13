@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Legacy\Priority013;
+use Lockrot\Config\Gate;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ScoreModel;
 
 /**
- * The `table` format, a list grouped by priority (docs/example-run.md#the-table-format). A row is
- * prose, not a cell in a box, because a box needs a terminal wider than the widest evidence string.
+ * The `table` format, a list grouped by grade. A row is prose, not a cell in a box,
+ * because a box needs a terminal wider than the widest evidence string.
  *
  * The result is {@see ConsoleMarkup}, which only {@see ConsoleMarkup::render()} reads, never
  * Symfony's tag formatter. Every string from the analysed project goes through
@@ -21,13 +21,13 @@ use Lockrot\Verdict\Finding;
  */
 final class TableFormatter implements FormatterInterface
 {
-    /** The width of `old-promise` and `left-behind`, the longest bare verdicts. */
-    private const MIN_LABEL_WIDTH = 11;
-
     private const MIN_WRAP_WIDTH = 20;
 
-    /** Columns of whitespace before the label and between the label and the text. */
-    private const GAP = 2;
+    /** The block's columns: the header, the lines under it and the evidence text after its flag word. */
+    private const INDENT = '  ';
+    private const LINE = '      ';
+    private const FLAG_WIDTH = 12;
+    private const NOT_FLAGGED = 'not flagged';
 
     private FormatContext $context;
 
@@ -38,13 +38,20 @@ final class TableFormatter implements FormatterInterface
 
     public function format(Report $report, bool $showAll = false): string
     {
-        $baseline = $report->baseline();
-        $flagged = $report->flagged();
-        $rows = $showAll ? $report->findings() : $flagged;
-        $lines = $rows === []
-            ? [self::escape(\sprintf('No dependency rot found in %d packages.', $report->packagesChecked())), '']
-            : $this->groupLines($rows, $baseline);
-        foreach ($this->summaryLines($report, $baseline, $flagged !== []) as $line) {
+        $gate = $this->context->gateOf($report);
+        $lines = [];
+        foreach ($this->groups($showAll ? $report->sorted() : $report->graded()) as $group => $findings) {
+            $colour = FindingBlock::colour($group);
+            $heading = self::escape($group.' ('.\count($findings).')');
+            $lines[] = '<options=bold>'.($colour === null ? $heading : '<fg='.$colour.'>'.$heading.'</fg='.$colour.'>').'</options=bold>';
+            foreach ($findings as $finding) {
+                foreach ($this->blockLines($finding, $report, $gate) as $line) {
+                    $lines[] = $line;
+                }
+            }
+            $lines[] = '';
+        }
+        foreach ($this->footerLines($report, $gate) as $line) {
             $lines[] = $line;
         }
 
@@ -52,34 +59,8 @@ final class TableFormatter implements FormatterInterface
     }
 
     /**
-     * @param list<Finding> $rows
-     *
-     * @return list<string>
-     */
-    private function groupLines(array $rows, ?BaselineComparison $baseline): array
-    {
-        $labelWidth = $this->labelWidth($rows, $baseline);
-        $indent = self::GAP + $labelWidth + self::GAP;
-        $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth() - $indent);
-        $lines = [];
-        foreach ($this->groups($rows) as $priority => $group) {
-            if ($lines !== []) {
-                $lines[] = '';
-            }
-            $lines[] = '<options=bold>'.self::escape(self::header((string) $priority, \count($group))).'</options=bold>';
-            foreach ($group as $finding) {
-                foreach ($this->rowLines($finding, $baseline, $labelWidth, $indent, $wrap) as $line) {
-                    $lines[] = $line;
-                }
-            }
-        }
-        $lines[] = '';
-
-        return $lines;
-    }
-
-    /**
-     * Groups in {@see Priority013::all()} order. Inside a group, the order is the report's.
+     * The grades in verdict order, then the score-0 findings under `not flagged`. Inside a group,
+     * the report's order.
      *
      * @param list<Finding> $rows
      *
@@ -87,151 +68,126 @@ final class TableFormatter implements FormatterInterface
      */
     private function groups(array $rows): array
     {
-        $groups = array_fill_keys(Priority013::all(), []);
+        $groups = array_fill_keys(array_merge(ScoreModel::GRADES, [self::NOT_FLAGGED]), []);
         foreach ($rows as $finding) {
-            $groups[$finding->priority()][] = $finding;
+            $groups[$finding->isGraded() ? $finding->verdict() : self::NOT_FLAGGED][] = $finding;
         }
 
         return array_filter($groups, static fn (array $group): bool => $group !== []);
     }
 
-    private static function header(string $priority, int $count): string
+    /** @return list<string> the finding block, in its order */
+    private function blockLines(Finding $finding, Report $report, Gate $gate): array
     {
-        return ($priority === Priority013::NONE ? 'not flagged' : $priority).' ('.$count.')';
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function rowLines(Finding $finding, ?BaselineComparison $baseline, int $labelWidth, int $indent, int $wrap): array
-    {
-        $label = $this->label($finding, $baseline);
-        $head = str_repeat(' ', self::GAP)
-            .$this->styled($finding, self::escape($label))
-            .str_repeat(' ', $labelWidth - \strlen($label) + self::GAP);
-        $margin = str_repeat(' ', $indent);
-        $tail = self::wrap($finding->package().' '.$finding->version().'  '.Via::inline($finding, ' › '), $wrap, true);
-        $lines = [$head.array_shift($tail)];
-        foreach ($tail as $line) {
-            $lines[] = $margin.$line;
+        $baseline = $report->baseline();
+        $standing = $baseline === null ? null : $baseline->standingOf($finding->package());
+        $lines = [self::INDENT.self::escape($finding->package().' '.$finding->version().'  '.FindingBlock::reach($finding).'  ·  '.implode(' · ', FindingBlock::headerFlags($finding, $standing)))];
+        $suffix = FindingBlock::baselineSuffix($finding, $standing);
+        $lines[] = self::LINE.self::escape(FindingBlock::scoreLine($finding).($suffix === null ? '' : ' '.$suffix));
+        $gateLine = FindingBlock::gateLine($finding, $gate->standingOf($finding->package()));
+        if ($gateLine !== null) {
+            $lines[] = self::LINE.self::escape($gateLine);
         }
-        $evidence = $finding->evidenceLine();
-        if ($evidence !== '') {
-            foreach (self::wrap($evidence, $wrap, true) as $line) {
-                $lines[] = $margin.$line;
+        $move = FindingBlock::move($finding);
+        if ($move !== null) {
+            $lines = array_merge($lines, $this->wrapped(self::LINE.'do: ', $move, self::LINE.'    '));
+        }
+        foreach (FindingBlock::evidence($finding) as $flag => $summary) {
+            $lines = array_merge($lines, $this->wrapped(self::LINE.str_pad($flag, self::FLAG_WIDTH).' ', $summary, str_repeat(' ', \strlen(self::LINE) + self::FLAG_WIDTH + 1)));
+        }
+        foreach ([[FindingBlock::markingLine($finding), 2], [FindingBlock::ageLine($finding), 5], [FindingBlock::pullsIn($finding), 0], [FindingBlock::checksMissing($finding), 0], [FindingBlock::checksAccepted($finding), 0]] as [$text, $hang]) {
+            if ($text !== null) {
+                $lines = array_merge($lines, $this->wrapped(self::LINE, $text, self::LINE.str_repeat(' ', $hang)));
             }
         }
-
-        return $lines;
-    }
-
-    /** @param list<Finding> $rows */
-    private function labelWidth(array $rows, ?BaselineComparison $baseline): int
-    {
-        $width = self::MIN_LABEL_WIDTH;
-        foreach ($rows as $finding) {
-            $width = max($width, \strlen($this->label($finding, $baseline)));
-        }
-
-        return $width;
-    }
-
-    /** The verdict, annotated by the baseline (docs/baseline.md#reading-a-baseline). */
-    private function label(Finding $finding, ?BaselineComparison $baseline): string
-    {
-        if ($baseline === null) {
-            return $finding->verdict();
-        }
-        $status = $baseline->statusOf($finding->package());
-        if ($status === BaselineComparison::KNOWN) {
-            return $finding->verdict().' (baseline)';
-        }
-        if ($status === BaselineComparison::WORSENED) {
-            return $finding->verdict().' (was '.(string) $baseline->previousVerdictOf($finding->package()).')';
-        }
-
-        return $finding->verdict();
-    }
-
-    /** Colour follows priority, not verdict (docs/example-run.md#the-table-format). */
-    private function styled(Finding $finding, string $escapedLabel): string
-    {
-        $priority = $finding->priority();
-        if ($priority === Priority013::CRITICAL || $priority === Priority013::HIGH) {
-            return '<fg=red>'.$escapedLabel.'</fg=red>';
-        }
-        if ($priority === Priority013::MEDIUM) {
-            return '<fg=yellow>'.$escapedLabel.'</fg=yellow>';
-        }
-
-        return $escapedLabel;
-    }
-
-    /**
-     * With $cut, a word longer than $wrap is cut, so a row is never wider than the terminal. Without
-     * it, a path stays whole, so a reader can copy it. The text is wrapped before it is escaped: the
-     * added backslashes do not print. `wordwrap()` counts bytes, which can only wrap early. The chain
-     * separator is its own token and is never cut. With $cut, a single non-ASCII word longer than
-     * $wrap (only an allowlist reason holds one) is cut mid-codepoint: lockrot does not require
-     * ext-mbstring. Each line is right-trimmed, so spaces do not pad its end.
-     *
-     * @return list<string>
-     */
-    private static function wrap(string $text, int $wrap, bool $cut): array
-    {
-        $lines = [];
-        foreach (explode("\n", wordwrap($text, $wrap, "\n", $cut)) as $line) {
-            $lines[] = self::escape(rtrim($line));
+        $allowlist = FindingBlock::allowlist($finding);
+        if ($allowlist !== null) {
+            $lines = array_merge($lines, $this->wrapped(self::LINE.$allowlist[0].'  ', $allowlist[1], str_repeat(' ', 30)));
         }
 
         return $lines;
     }
 
     /**
-     * The summary block (docs/example-run.md#the-table-format). {@see Report::summaryLine()} is
-     * shared with the `github` format, which pins itself against it, so only this renderer decides
-     * where it folds. The priority totals print only when something is flagged, because a clean
-     * report shows only zeros.
+     * $text wrapped to the terminal, its first line after $prefix and the rest after $continuation.
+     * A first line after a prefix wider than the continuation gets the room that is left.
      *
      * @return list<string>
      */
-    private function summaryLines(Report $report, ?BaselineComparison $baseline, bool $hasFlagged): array
+    private function wrapped(string $prefix, string $text, string $continuation): array
     {
-        $texts = [$report->summaryLine()];
-        if ($hasFlagged) {
-            $texts[] = $report->prioritySummaryLine();
+        $width = $this->context->terminalWidth();
+        $first = explode("\n", wordwrap($text, max(self::MIN_WRAP_WIDTH, $width - max(\strlen($prefix), \strlen($continuation)))), 2);
+        $out = [rtrim(self::escape($prefix.$first[0]))];
+        foreach (isset($first[1]) ? self::wrap($first[1], max(self::MIN_WRAP_WIDTH, $width - \strlen($continuation))) : [] as $line) {
+            $out[] = self::escape($continuation).$line;
         }
-        // A clean report prints it too: a lock with nothing to flag can still be behind.
-        $texts[] = $report->libyears()->line();
-        $exposure = $report->exposureSummaryLine();
-        if ($exposure !== '') {
-            $texts[] = $exposure;
-        }
-        $unflagged = $report->unflaggedAdvisoriesLine();
-        if ($unflagged !== '') {
-            $texts[] = $unflagged;
-        }
-        if ($baseline !== null) {
-            $texts[] = $baseline->summaryLine();
-        }
-        $texts[] = \sprintf(
-            'Data as of %s (%s). Run composer lockrot --format=json for details.',
-            $report->generatedAt()->format('Y-m-d'),
-            $report->dataSourcesClause()
-        );
-        foreach ($report->notes() as $note) {
-            $texts[] = 'note: '.$note;
-        }
-        $stale = $baseline === null ? null : $baseline->staleNote();
-        if ($stale !== null) {
-            $texts[] = 'note: '.$stale;
-        }
+
+        return $out;
+    }
+
+    /**
+     * The run footer. The `gate:` line is red when the gate fails.
+     *
+     * @return list<string>
+     */
+    private function footerLines(Report $report, Gate $gate): array
+    {
+        $name = static fn (string $package): string => $package;
+        $baseline = $report->baseline();
+        $updateNow = RunFooter::updateNow($report);
+        $texts = [
+            RunFooter::counts($report),
+            RunFooter::flags($report),
+            RunFooter::depth($report, $name),
+            RunFooter::security($report, true),
+            RunFooter::fixes($report),
+            $updateNow === null ? null : 'update now: '.$updateNow,
+            $report->libyears()->line(),
+            RunFooter::exposure($report, $name),
+            RunFooter::advisories($report),
+            $baseline === null ? null : $baseline->summaryLine(),
+        ];
         $wrap = max(self::MIN_WRAP_WIDTH, $this->context->terminalWidth());
         $lines = [];
         foreach ($texts as $text) {
-            foreach (strpos($text, ' · ') !== false ? self::wrapBetweenItems($text, $wrap) : self::wrapKeepingCommands($text, $wrap) as $line) {
+            foreach ($text === null ? [] : self::wrapBetweenItems($text, $wrap) as $line) {
                 $lines[] = $line;
             }
+        }
+        foreach (self::wrapBetweenItems(RunGateText::render($gate, $this->context->runOf($report)), $wrap) as $line) {
+            $lines[] = $gate->fails() ? '<fg=red>'.$line.'</fg=red>' : $line;
+        }
+        foreach (self::wrapKeepingCommands(RunFooter::dataAsOf($report).'. Run composer lockrot --format=json for details.', $wrap) as $line) {
+            $lines[] = $line;
+        }
+        $notes = $report->notes();
+        $stale = $baseline === null ? null : $baseline->staleNote();
+        if ($stale !== null) {
+            $notes[] = $stale;
+        }
+        foreach ($notes as $note) {
+            foreach (self::wrapKeepingCommands('note: '.$note, $wrap) as $line) {
+                $lines[] = $line;
+            }
+        }
+
+        return $lines;
+    }
+
+    /**
+     * A word longer than $wrap stays whole, so a reader can copy a path or a command. The text is
+     * wrapped before it is escaped: the added backslashes do not print. `wordwrap()` counts bytes,
+     * which can only wrap early: lockrot does not require ext-mbstring. Each line is right-trimmed,
+     * so spaces do not pad its end.
+     *
+     * @return list<string>
+     */
+    private static function wrap(string $text, int $wrap): array
+    {
+        $lines = [];
+        foreach (explode("\n", wordwrap($text, $wrap, "\n")) as $line) {
+            $lines[] = self::escape(rtrim($line));
         }
 
         return $lines;
@@ -250,7 +206,7 @@ final class TableFormatter implements FormatterInterface
             $glued[] = str_replace(' ', "\x1F", $command);
         }
         $lines = [];
-        foreach (self::wrap(str_replace(self::COMMANDS, $glued, $text), $wrap, false) as $line) {
+        foreach (self::wrap(str_replace(self::COMMANDS, $glued, $text), $wrap) as $line) {
             $lines[] = str_replace("\x1F", ' ', $line);
         }
 

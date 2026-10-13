@@ -22,7 +22,6 @@
   "ignored-by-config-prefix.strict.json": "finding.security",
   "ignored-matched-the-value.json": "finding.security",
   "lead-vulnerable.json": "finding.lead",
-  "legacy-missing.json": "legacy",
   "maintenance-judged-without-metadata.json": "finding",
   "next-step-kind-none-revision-2.strict.json": "finding.next_step",
   "next-step-kind-unknown-on-a-require-move.strict.json": "finding.next_step",

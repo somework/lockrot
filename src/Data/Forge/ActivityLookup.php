@@ -80,6 +80,12 @@ final class ActivityLookup implements \JsonSerializable
         return $this->activity;
     }
 
+    /** The event that the host reports (`push` or `commit`), null when nothing was read. */
+    public function event(): ?string
+    {
+        return $this->activity === null ? null : $this->activity->ref()->event();
+    }
+
     /** Set exactly when a read answer did not carry the archived flag. */
     public function archivedUnread(): ?string
     {
@@ -100,7 +106,7 @@ final class ActivityLookup implements \JsonSerializable
             'forge' => $ref === null ? null : $ref->forge(),
             'host' => $this->where->host(),
             'repo' => $ref === null ? null : $ref->path(),
-            'event' => $activity === null ? null : $activity->ref()->event(),
+            'event' => $this->event(),
             'archived' => $activity === null ? null : $activity->archived(),
             'fetched_at' => $activity === null ? null : $activity->fetchedAt()->format(\DATE_ATOM),
             'cached_at' => $activity === null || $activity->cachedAt() === null ? null : $activity->cachedAt()->format(\DATE_ATOM),

@@ -101,14 +101,14 @@ final class BaselineComparison
         return $finding->isGraded() ? Standing::newPackage($counted, $advisories) : null;
     }
 
+    public function path(): string
+    {
+        return $this->path;
+    }
+
     public function standingOf(string $package): ?Standing
     {
         return $this->standings[$package] ?? null;
-    }
-
-    public function isKnown(string $package): bool
-    {
-        return $this->statusOf($package) === self::KNOWN;
     }
 
     /** Null when the finding does not stand against the file. */
@@ -117,14 +117,6 @@ final class BaselineComparison
         $standing = $this->standingOf($package);
 
         return $standing === null ? null : $standing->status();
-    }
-
-    /** The recorded lead: the first flag of the entry, null without an entry or for an advisory-only one. */
-    public function previousVerdictOf(string $package): ?string
-    {
-        $standing = $this->standingOf($package);
-
-        return $standing === null ? null : $standing->recordedLead();
     }
 
     public function knownCount(): int

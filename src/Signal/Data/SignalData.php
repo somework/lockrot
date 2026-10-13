@@ -6,8 +6,8 @@ namespace Lockrot\Signal\Data;
 
 /**
  * The data of one signal, as report-2 writes it in `findings[].signals[].data`. Only the encoder
- * and the report-1 view {@see \Lockrot\Legacy\SignalData013} read the serialized form. Any other
- * reader selects the data by its class and reads its typed values.
+ * reads the serialized form. Any other reader selects the data by its class and reads its typed
+ * values.
  *
  * @internal
  */

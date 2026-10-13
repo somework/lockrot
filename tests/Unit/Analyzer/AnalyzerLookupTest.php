@@ -43,7 +43,6 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -123,7 +122,6 @@ final class AnalyzerLookupTest extends TestCase
             new RepoLocator(),
             $allowlist,
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false,
             $advisories,
@@ -201,7 +199,7 @@ final class AnalyzerLookupTest extends TestCase
         $finding = self::finding(self::analyzeOne(self::analyzer(self::loader(['vendor/pkg' => self::metadata(false, '2015-01-01T00:00:00+00:00')]), self::http([self::GITHUB => [200, self::ARCHIVED]], $requested), true, new Allowlist([$entry]))));
 
         self::assertSame([], $requested->getArrayCopy());
-        self::assertSame(Verdict::FINISHED, $finding->verdict());
+        self::assertNull($finding->lead());
     }
 
     /** Tokenless runs ask only candidates. An ignored marking leaves S3 as the only abandonment fact, so the package is one. */
@@ -216,7 +214,7 @@ final class AnalyzerLookupTest extends TestCase
         self::assertSame([self::GITHUB], $requested->getArrayCopy(), 'no S2, and still a candidate');
         self::assertNotContains(Signal::S1, self::ids($finding));
         self::assertContains(Signal::S3, self::ids($finding), 'the archived repository still counts');
-        self::assertSame(Verdict::ABANDONED, $finding->verdict());
+        self::assertSame(Verdict::ABANDONED, $finding->lead());
     }
 
     /** The finding keeps the marking that the list removed, and one run note names the package. */
@@ -370,7 +368,7 @@ final class AnalyzerLookupTest extends TestCase
         $finding = self::finding(self::analyzeOne(self::analyzer(self::loader($metadata), self::http([self::GITHUB => [200, self::LIVE]], $requested), false, new Allowlist([]), self::listed())));
 
         self::assertSame([], self::ids($finding));
-        self::assertSame(Verdict::OK, $finding->verdict());
+        self::assertNull($finding->lead());
     }
 
     /** The S10 filter reads the raised S1, not the metadata's abandoned bit. */
@@ -397,7 +395,7 @@ final class AnalyzerLookupTest extends TestCase
 
         self::assertSame([], $requested->getArrayCopy());
         self::assertSame([Signal::S1], self::ids($finding), 'the activity gap of a raised S1 is no S10');
-        self::assertSame(Verdict::ABANDONED, $finding->verdict());
+        self::assertSame(Verdict::ABANDONED, $finding->lead());
     }
 
     public function testAMarkingInTheLockAloneAlsoDropsTheActivityGap(): void

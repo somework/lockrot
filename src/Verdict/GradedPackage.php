@@ -33,7 +33,7 @@ final class GradedPackage implements \JsonSerializable
 
     public static function of(Finding $finding): self
     {
-        return new self($finding->grade(), $finding->lead(), $finding->flagIds(), $finding->countedSuccessor(), $finding->nextStep());
+        return new self($finding->verdict(), $finding->lead(), $finding->flagIds(), $finding->countedSuccessor(), $finding->nextStep());
     }
 
     /** `replacement.finding`: the verdict, the lead and the flags. */

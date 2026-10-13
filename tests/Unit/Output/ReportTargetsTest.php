@@ -510,7 +510,7 @@ final class ReportTargetsTest extends TestCase
 
         $file = (string) file_get_contents($this->cwd.'/r.txt');
         self::assertStringContainsString("critical (1)\n", $file);
-        self::assertStringContainsString('(php ">=7.1 <8")', $file);
+        self::assertStringContainsString("  acme/old 1.0.0  direct  ·  abandoned · old-promise\n", $file);
         self::assertStringContainsString('a note with <info>tags</info> in it', $file);
         self::assertStringNotContainsString('<fg=', $file);
         self::assertStringNotContainsString('<options=', $file);

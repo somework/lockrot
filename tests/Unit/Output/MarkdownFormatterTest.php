@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
-use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
@@ -14,251 +13,113 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
+/** The `markdown` format, and `--markdown-max-bytes`. */
 final class MarkdownFormatterTest extends TestCase
 {
     private const AT = '2026-09-14T06:00:00+00:00';
+    private const ACTION_SUMMARY_LIMIT = 1000000;
 
-    private function report(): Report
+    private static ?Report $composite = null;
+
+    private static function composite(): Report
     {
-        $at = new \DateTimeImmutable(self::AT);
-
-        return new Report([
-            (new FindingBuilder())->withPackage('doctrine/cache')->withVersion('1.13.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['doctrine/cache'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('phpzip/phpzip')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', []))])->withChain(['wallabag/wallabag', 'grandt/phpepub', 'phpzip/phpzip'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build(),
-        ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 3, 0);
+        return self::$composite ??= CaseHydrator::composite();
     }
 
-    private function formatter(string $failOn = LockrotConfig::FAIL_ON_NONE): MarkdownFormatter
+    private static function formatter(string $failOn = LockrotConfig::FAIL_ON_NONE, ?int $maxBytes = null): MarkdownFormatter
     {
-        return new MarkdownFormatter(FormatContext::create(null, $failOn));
+        return new MarkdownFormatter(FormatContext::create(null, $failOn)->withMarkdownMaxBytes($maxBytes));
     }
 
-    public function testHeadingAndTable(): void
+    public function testTheCompositeRendersAsItsGolden(): void
     {
-        $out = $this->formatter()->format($this->report());
-
-        self::assertStringContainsString('### lockrot: dependency rot in 2 of 3 packages', $out);
-        self::assertStringContainsString('| Priority | Package | Version | Verdict | Evidence | Via |', $out);
-        self::assertStringContainsString('|---|---|---|---|---|---|', $out);
-        self::assertStringContainsString('| critical | `doctrine/cache` | 1.13.0 |', $out);
-        self::assertStringNotContainsString('vendor/ok', $out);
+        TextGolden::assertMatches('composite.markdown.md', self::formatter('high')->format(self::composite()), __METHOD__);
     }
 
-    /**
-     * Priority leads the row, so a reviewer scanning the comment reads the rows that apply most to
-     * the project first — the table keeps the report's own order, which is by priority.
-     */
-    public function testPriorityIsTheFirstColumn(): void
+    public function testABudgetKeepsEveryRowThatFitsAndNeverAByteMore(): void
     {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([
-            (new FindingBuilder())->withPackage('doctrine/cache')->withVersion('1.13.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['doctrine/cache'])->withDataDate($at)->build(),
-            // Transitive and development-only: two steps below critical.
-            (new FindingBuilder())->withPackage('acme/dev-only')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['a/parent', 'acme/dev-only'])->withDataDate($at)->withDev(true)->build(),
-            (new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build(),
-        ], [], $at, 3, 0);
-
-        $lines = explode("\n", trim($this->formatter(Verdict::SILENT)->format($report, true)));
-        $rows = array_values(array_filter($lines, static fn (string $line): bool => strpos($line, '` |') !== false));
-
-        self::assertSame([
-            '| critical | `doctrine/cache` | 1.13.0 | **abandoned** | marked abandoned by its repository | direct |',
-            '| medium | `acme/dev-only` | 2.0.0 | **abandoned** | marked abandoned by its repository | a/parent |',
-            '| none | `vendor/ok` | 1.0.0 | ok |  | direct |',
-        ], $rows);
-    }
-
-    public function testZeroFlaggedHeadingHasNoTable(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withChain(['vendor/ok'])->withDataDate($at)->build()], [], $at, 1, 0);
-
-        $out = $this->formatter()->format($report);
-
-        self::assertStringContainsString('### lockrot: no dependency rot found in 1 packages', $out);
-        self::assertStringNotContainsString('| Package |', $out);
-    }
-
-    public function testShowAllIncludesUnflaggedRows(): void
-    {
-        $out = $this->formatter()->format($this->report(), true);
-        self::assertStringContainsString('vendor/ok', $out);
-        self::assertStringContainsString('| `vendor/ok` |', $out);
-    }
-
-    public function testViaColumnUsesTheChainSeparator(): void
-    {
-        $out = $this->formatter()->format($this->report());
-        $line = self::findLine($out, '| `phpzip/phpzip`');
-        self::assertStringContainsString('wallabag/wallabag › grandt/phpepub', $line);
-    }
-
-    public function testDirectDependencyViaCell(): void
-    {
-        $out = $this->formatter()->format($this->report());
-        $line = self::findLine($out, 'doctrine/cache');
-        self::assertStringContainsString('| direct |', $line);
-    }
-
-    public function testViaCellNamesTheOtherDirectDependentsAndTheExposureLineFollowsTheTable(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent', 'b/parent'])->build(),
-            (new FindingBuilder())->withPackage('acme/twice')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', []))])->withChain(['acme/twice'])->withDataDate($at)->withDirectDependents(['acme/twice', 'b/parent'])->build(),
-        ], Notes::texts(['a note']), $at, 2, 0);
-        $out = $this->formatter()->format($report);
-        $lines = explode("\n", $out);
-
-        self::assertStringContainsString('| a/parent, also via b/parent |', self::findLine($out, '| `acme/leaf`'));
-        self::assertStringContainsString('| direct |', self::findLine($out, '| `acme/twice`'));
-        $exposure = array_search('pulled in by: a/parent 1 · b/parent 1', $lines, true);
-        self::assertNotFalse($exposure);
-        self::assertSame('', $lines[$exposure - 1], 'a blank line separates it from the table');
-        self::assertSame('', $lines[$exposure + 1]);
-        self::assertSame('- note: a note', $lines[$exposure + 2]);
-    }
-
-    public function testTheLibyearsLineIsItsOwnParagraphBetweenTheTableAndTheExposureLine(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent'])->withLibyears(LibyearsMeasurement::of(2.3))->build(),
-            (new FindingBuilder())->withPackage('acme/<b>')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', []))])->withChain(['acme/<b>'])->withDataDate($at)->withDirectDependents(['acme/<b>'])->withLibyears(LibyearsMeasurement::of(1.0))->build(),
-        ], [], $at, 2, 0);
-        $lines = explode("\n", $this->formatter()->format($report));
-        $libyears = array_search('libyears: 3.3 behind across all 2 packages · 1.0 from direct requirements · furthest behind acme/leaf 1.0.0 at 2.3', $lines, true);
-
-        self::assertNotFalse($libyears, implode("\n", $lines));
-        self::assertSame('', $lines[$libyears - 1], 'a blank line separates it from the table');
-        self::assertSame('', $lines[$libyears + 1]);
-        self::assertSame('pulled in by: a/parent 1', $lines[$libyears + 2]);
-    }
-
-    public function testTheLibyearsLineSaysSoWhenNothingWasMeasuredAndOnAnEmptyRun(): void
-    {
-        // the fixture findings carry no value
-        self::assertStringContainsString("\nlibyears: none of the 3 packages could be measured\n", $this->formatter()->format($this->report()));
-        $empty = new Report([], [], new \DateTimeImmutable(self::AT), 0, 0);
-        self::assertContains('libyears: nothing to measure', explode("\n", $this->formatter()->format($empty)));
-    }
-
-    public function testNoExposureLineWhenNothingIsPulledInThroughAnotherPackage(): void
-    {
-        self::assertStringNotContainsString('pulled in by:', $this->formatter()->format($this->report()));
-    }
-
-    public function testNotesAreListedAsBullets(): void
-    {
-        $out = $this->formatter()->format($this->report());
-        self::assertStringContainsString('- note: GitHub token not set: repository activity checked only for 2 candidate packages', $out);
-    }
-
-    public function testFooterCarriesTheSummaryLineAndDataDate(): void
-    {
-        $out = $this->formatter()->format($this->report());
-        self::assertStringContainsString(
-            '<sub>'.$this->report()->summaryLine().' — data as of 2026-09-14 (package repositories, repository hosts). Run `composer lockrot --format=json` for details.</sub>',
-            $out
-        );
-    }
-
-    public function testTheFooterStatesTheAgeOfCachedActivity(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $report = new Report([], [], $at, 0, 0, null, new \DateTimeImmutable('2026-09-13T05:00:00+00:00'));
-
-        self::assertStringContainsString(" — data as of 2026-09-14 (package repositories; repository activity from lockrot's cache, up to 19 h old). Run", $this->formatter()->format($report));
-    }
-
-    public function testCellEscapesPipesAndNewlines(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/pkg')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', "evidence with a | pipe\nand a second line", SignalDataStub::of('S2', []))])->withChain(['acme/pkg'])->withDataDate($at)->build(),
-        ], [], $at, 1, 0);
-
-        $out = $this->formatter()->format($report);
-        $line = self::findLine($out, 'acme/pkg');
-
-        self::assertStringContainsString('evidence with a \\| pipe and a second line', $line);
-        self::assertStringNotContainsString("\n\n", "\n".$line);
-    }
-
-    public function testVerdictIsBoldOnlyWhenNotANoteLevel(): void
-    {
-        $outAtFailOn = $this->formatter(Verdict::SILENT)->format($this->report());
-        self::assertStringContainsString('**abandoned**', $outAtFailOn);
-        self::assertStringContainsString('**silent**', $outAtFailOn);
-
-        $outAtNone = $this->formatter(LockrotConfig::FAIL_ON_NONE)->format($this->report(), true);
-        self::assertStringNotContainsString('**ok**', $outAtNone);
-    }
-
-    public function testBaselinedFindingIsNotBold(): void
-    {
-        $report = $this->report();
-        $names = [];
-        foreach ($report->findings() as $finding) {
-            $names[] = $finding->package();
+        $findings = [];
+        for ($i = 0; $i < 30; ++$i) {
+            $findings[] = (new FindingBuilder())->withPackage(\sprintf('vendor/p%02d', $i))->withVerdict(Verdict::STALE)->build();
         }
-        $baseline = BaselineEntries::baseline([
-            BaselineEntries::of('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
-        ], self::AT);
-        $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
-
-        $out = $this->formatter(Verdict::SILENT)->format($withBaseline);
-        $line = self::findLine($out, 'doctrine/cache');
-
-        self::assertStringNotContainsString('**abandoned**', $line);
-        self::assertStringContainsString('| abandoned |', $line);
-    }
-
-    public function testBaselineLineUnderTheHeading(): void
-    {
-        $report = $this->report();
-        $names = [];
-        foreach ($report->findings() as $finding) {
-            $names[] = $finding->package();
+        $report = new Report($findings, [], new \DateTimeImmutable('2026-10-08T00:00:00+00:00'), 30, 0);
+        $full = \strlen(self::formatter()->format($report));
+        for ($budget = $full - 500; $budget < $full; $budget += 7) {
+            self::assertLessThanOrEqual($budget, \strlen(self::formatter(LockrotConfig::FAIL_ON_NONE, $budget)->format($report)), 'budget '.$budget);
         }
-        $baseline = BaselineEntries::baseline([
-            BaselineEntries::of('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
-        ], self::AT);
-        $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
+        // 12 of 30 left out: the count has as many digits as the 30 that the cut reserves room for.
+        $cut = self::formatter(LockrotConfig::FAIL_ON_NONE, $full - 1600)->format($report);
 
-        $lines = explode("\n", trim($this->formatter()->format($withBaseline)));
-        $comparison = $withBaseline->baseline();
-        self::assertNotNull($comparison);
-
-        self::assertStringStartsWith('### lockrot:', $lines[0]);
-        self::assertSame($comparison->summaryLine(), $lines[1]);
+        self::assertStringContainsString('| … | 12 more findings: see the JSON report', $cut);
+        self::assertSame($cut, self::formatter(LockrotConfig::FAIL_ON_NONE, \strlen($cut))->format($report), 'a budget of exactly its size keeps every row');
     }
 
-    public function testBaselineStaleEntriesBecomeANoteBullet(): void
+    public function testABudgetBelowTheSkeletonCutsEveryRowAndKeepsTheSkeleton(): void
     {
-        $report = $this->report();
-        $baseline = BaselineEntries::baseline([
-            BaselineEntries::of('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
-        ], self::AT);
-        $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
+        $out = self::formatter('high', 100)->format(self::composite());
 
-        self::assertStringContainsString(
-            '- note: baseline lists 1 package no longer in composer.lock: vendor/departed',
-            $this->formatter()->format($withBaseline)
-        );
+        self::assertStringStartsWith('### lockrot: ', $out);
+        self::assertStringContainsString("\n| … | 7 more findings: see the JSON report | | | | |\n", $out);
+        self::assertStringNotContainsString('`twig/twig`', $out);
+        self::assertGreaterThan(100, \strlen($out), 'the skeleton always prints');
     }
 
-    public function testWithoutABaselineNoBaselineLineIsEmitted(): void
+    public function testTheHeadingCountsTheGradesAndTheGateLineFollowsInBold(): void
     {
-        $out = $this->formatter()->format($this->report());
-        self::assertStringNotContainsString('baseline:', $out);
+        $lines = explode("\n", self::formatter('high')->format(self::composite()));
+
+        self::assertSame('### lockrot: 7 of 7 packages flagged — critical 3 · high 2 · low 2', $lines[0]);
+        self::assertSame('**gate: fails** · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)', $lines[2]);
+        self::assertSame('| Verdict | Package | Version | Flags | Why | Via |', $lines[4]);
+    }
+
+    public function testACleanRunHasNoTableAndSaysNothingIsFlagged(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $out = self::formatter()->format(new Report([(new FindingBuilder())->withPackage('a/fine')->withDataDate($at)->build()], [], $at, 1, 0));
+
+        self::assertStringStartsWith("### lockrot: nothing flagged in 1 package\n\n**gate: off** · ", $out);
+        self::assertStringNotContainsString('| Verdict |', $out);
+        self::assertStringEndsWith("<sub>1 package checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>\n", $out);
+    }
+
+    public function testTheVerdictIsBoldWhereTheFindingFailsTheGateAndTheBaselineDoesNotKnowIt(): void
+    {
+        $report = self::report();
+        $known = $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline([BaselineEntries::of('a/gone', '2.2.0', Verdict::ABANDONED, '2026-01-15')]), $report, 'lockrot-baseline.json', ['a/gone', 'a/deep']));
+
+        self::assertStringContainsString('| **critical** | `a/gone` |', self::formatter('high')->format($report));
+        self::assertStringContainsString('| critical | `a/gone` |', self::formatter('none')->format($report));
+        self::assertStringContainsString('| critical | `a/gone` | 2.2.0 | abandoned (baseline) | `32 = abandoned 32 (baseline: known)`<br>`gate 0 = min(32, 2 × 0) (the new facts bound it); new: 0`', self::formatter('high')->format($known));
+    }
+
+    public function testTheViaCellNamesTheDirectDependents(): void
+    {
+        self::assertStringContainsString('| low | `a/deep` | 1.0.0 | stale |', self::formatter()->format(self::report()));
+        self::assertMatchesRegularExpression('/\| `a\/deep` .* \| a\/root, a\/other \|$/m', self::formatter()->format(self::report()));
+    }
+
+    public function testShowAllAddsTheScoreZeroRows(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('a/fine')->withDataDate($at)->build()], [], $at, 1, 0);
+
+        self::assertStringContainsString('| ok | `a/fine` | 1.0.0 | ok | `0` | direct |', self::formatter()->format($report, true));
+    }
+
+    public function testNotesAreABulletListBeforeTheSubLine(): void
+    {
+        $out = self::formatter()->format(self::report());
+
+        self::assertStringContainsString("\n\n- note: GitHub token not set\n\n<sub>", $out);
     }
 
     /**
@@ -270,45 +131,80 @@ final class MarkdownFormatterTest extends TestCase
     {
         $at = new \DateTimeImmutable(self::AT);
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/ev`il')->withVersion('1.0.0 <b>x</b>')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned, replacement: <img src=x onerror=alert(1)> [fine](https://example.com) *ok* &lt;b&gt; #1', SignalDataStub::of('S1', []))])->withChain(['acme/ev`il'])->withDataDate($at)->build(),
-        ], Notes::texts(['GitHub unreachable: <script>alert(1)</script> [x](y)']), $at, 1, 0);
+            (new FindingBuilder())->withPackage('acme/ev`il')->withVersion('1.0.0 <b>x</b>')->withVerdict(Verdict::ABANDONED)->withChain(['acme/ev`il'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/kept')->withSignals([new Signal(Signal::LEVEL_WARN, 'x', SignalDataStub::of(Signal::S2, []))])->withAllowlistReason('<img src=x onerror=alert(1)> [fine](https://example.com) *ok* &lt;b&gt; #1 a|b')->withDataDate($at)->build(),
+        ], Notes::texts(['GitHub unreachable: <script>alert(1)</script> [x](y)']), $at, 2, 0);
 
-        $out = $this->formatter()->format($report);
+        $out = self::formatter()->format($report, true);
 
         self::assertStringContainsString('| `` acme/ev`il `` | 1.0.0 \<b\>x\</b\> |', $out);
-        self::assertStringContainsString('replacement: \<img src=x onerror=alert(1)\> \[fine\](https://example.com) \*ok\* \&lt;b\&gt; \#1', $out);
+        self::assertStringContainsString('\<img src=x onerror=alert(1)\> \[fine\](https://example.com) \*ok\* \&lt;b\&gt; \#1 a\|b', $out);
         self::assertStringContainsString('- note: GitHub unreachable: \<script\>alert(1)\</script\> \[x\](y)', $out);
-        self::assertSame(0, preg_match('/(?<!\\\\)<(img|script|b)/', $out), 'every < from package metadata is escaped');
+        self::assertSame(0, preg_match('/(?<!\\\\)<(img|script|b>)/', $out), 'every < from package metadata is escaped');
     }
 
-    public function testCodeSpanFencesGrowPastTheLongestBacktickRun(): void
+    public function testEveryKindOfLineBreakInACellFoldsIntoOneSpace(): void
     {
         $at = new \DateTimeImmutable(self::AT);
+        $package = "acme/pk\r\ng|x";
         $report = new Report([
-            (new FindingBuilder())->withPackage('acme/a``b')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'x', SignalDataStub::of('S1', []))])->withChain(['acme/a``b'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/plain')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'x', SignalDataStub::of('S1', []))])->withChain(['acme/plain'])->withDataDate($at)->build(),
-        ], [], $at, 2, 0);
+            (new FindingBuilder())->withPackage($package)->withVerdict(Verdict::ABANDONED)->withChain([$package])->withDataDate($at)->build(),
+        ], Notes::texts(["note\r\nline"]), $at, 1, 0);
 
-        $out = $this->formatter()->format($report);
+        $out = self::formatter()->format($report);
 
-        self::assertStringContainsString('| ``` acme/a``b ``` |', $out);
-        self::assertStringContainsString('| `acme/plain` |', $out);
+        self::assertStringContainsString('| critical | `acme/pk g\|x` | 1.0.0 |', $out);
+        self::assertStringContainsString('- note: note line', $out);
     }
 
-    public function testWordingAvoidsBannedTerms(): void
+    public function testABudgetKeepsTheHeadAndTheFooterAndCutsRowsWholeInRankOrder(): void
     {
-        $out = strtolower($this->formatter(Verdict::SILENT)->format($this->report(), true));
-        foreach (['vulnerable', 'broken', 'insecure', 'dead'] as $banned) {
-            self::assertStringNotContainsString($banned, $out);
+        $full = self::formatter('high')->format(self::composite());
+        $cut = self::formatter('high', \strlen($full) - 1)->format(self::composite());
+        $rows = preg_grep('/^\| (\*\*)?(critical|high|medium|low)/', explode("\n", $cut)) ?: [];
+
+        self::assertLessThanOrEqual(\strlen($full) - 1, \strlen($cut));
+        self::assertStringContainsString("\n| … | ", $cut);
+        self::assertSame(6, \count($rows));
+        self::assertStringContainsString('| … | 1 more finding: see the JSON report | | | | |', $cut);
+        self::assertStringStartsWith('### lockrot: 7 of 7 packages flagged', $cut);
+        self::assertStringEndsWith("for details.</sub>\n", $cut);
+        self::assertSame($full, self::formatter('high', \strlen($full))->format(self::composite()), 'a document that fits is written whole');
+    }
+
+    public function testTwoThousandGradedFindingsStayWithinTheJobSummaryLimitAndCountWhatIsLeftOut(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $findings = [];
+        for ($i = 0; $i < 2000; ++$i) {
+            $findings[] = (new FindingBuilder())->withPackage(\sprintf('vendor/package-%04d', $i))->withVersion('1.0.0-'.str_repeat('x', 600))->withVerdict(Verdict::ABANDONED)->withDataDate($at)->build();
         }
+        $report = new Report($findings, [], $at, 2000, 0);
+        $out = self::formatter('high', self::ACTION_SUMMARY_LIMIT)->format($report);
+        $rows = \count(preg_grep('/^\| \*\*critical\*\* \| `vendor\//', explode("\n", $out)) ?: []);
+
+        self::assertLessThanOrEqual(self::ACTION_SUMMARY_LIMIT, \strlen($out));
+        self::assertSame(1, preg_match('/^\| … \| (\d+) more findings: see the JSON report \| \| \| \| \|$/m', $out, $m));
+        self::assertSame(2000, $rows + (int) ($m[1] ?? 0));
+        self::assertGreaterThan(0, $rows);
+    }
+
+    public function testNoBudgetWritesEveryRow(): void
+    {
+        self::assertStringNotContainsString('more findings: see the JSON report', self::formatter('high')->format(self::composite()));
+    }
+
+    public function testTheDocumentEndsWithExactlyOneNewline(): void
+    {
+        $out = self::formatter()->format(self::report());
+
+        self::assertStringEndsWith("</sub>\n", $out);
+        self::assertStringEndsNotWith("\n\n", $out);
     }
 
     public function testFactory(): void
     {
-        self::assertInstanceOf(
-            MarkdownFormatter::class,
-            Formatters::for('markdown', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE))
-        );
+        self::assertInstanceOf(MarkdownFormatter::class, Formatters::for('markdown', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE)));
     }
 
     public function testFactoryStillRejectsAnUnknownFormat(): void
@@ -317,35 +213,13 @@ final class MarkdownFormatterTest extends TestCase
         Formatters::for('xml', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE));
     }
 
-    private static function findLine(string $text, string $needle): string
-    {
-        foreach (explode("\n", $text) as $line) {
-            if (strpos($line, $needle) !== false) {
-                return $line;
-            }
-        }
-        self::fail('no line contains "'.$needle.'"');
-    }
-
-    public function testTheDocumentEndsWithExactlyOneNewline(): void
-    {
-        $out = $this->formatter()->format($this->report());
-
-        self::assertStringEndsWith("</sub>\n", $out);
-        self::assertStringEndsNotWith("\n\n", $out);
-    }
-
-    public function testEveryKindOfLineBreakInACellFoldsIntoOneSpaceAndAPipeInACodeCellIsEscaped(): void
+    private static function report(): Report
     {
         $at = new \DateTimeImmutable(self::AT);
-        $package = "acme/pk\r\ng|x";
-        $report = new Report([
-            (new FindingBuilder())->withPackage($package)->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', "first\r\nsecond\rthird\nfourth", SignalDataStub::of('S2', []))])->withChain([$package])->withDataDate($at)->build(),
-        ], Notes::texts(["note\r\nline"]), $at, 1, 0);
 
-        $out = $this->formatter()->format($report);
-
-        self::assertStringContainsString('| medium | `acme/pk g\|x` | 1.0.0 | **stale** | first second third fourth | direct |', $out);
-        self::assertStringContainsString('- note: note line', $out);
+        return new Report([
+            (new FindingBuilder())->withPackage('a/gone')->withVersion('2.2.0')->withVerdict(Verdict::ABANDONED)->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('a/deep')->withVerdict(Verdict::STALE)->withChain(['a/root', 'a/deep'])->withDirectDependents(['a/root', 'a/other'])->withDataDate($at)->build(),
+        ], Notes::texts(['GitHub token not set']), $at, 2, 0);
     }
 }

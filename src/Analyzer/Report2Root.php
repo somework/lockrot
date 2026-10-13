@@ -37,7 +37,7 @@ final class Report2Root
         foreach ($findings as $finding) {
             foreach ($finding->flagIds() as $flag) {
                 ++$carrying[$flag];
-                ++$byVerdict[$flag][$finding->grade()];
+                ++$byVerdict[$flag][$finding->verdict()];
             }
             $lead = $finding->lead();
             if ($lead !== null) {
@@ -154,7 +154,6 @@ final class Report2Root
         $advisories = ['counted' => 0, 'ignored' => 0];
         $severities = array_fill_keys(Severity::DISPLAY_ORDER, 0);
         $fixes = array_fill_keys(ScoreModel::FIX_KINDS, 0);
-        $updateNow = [];
         foreach ($findings as $finding) {
             $standing = $finding->securityStanding();
             $checks[$standing->check()] = $standing->check();
@@ -170,10 +169,8 @@ final class Report2Root
                 $advisories['counted'] += $count;
             }
             $fixes[$kind] = ($fixes[$kind] ?? 0) + 1;
-            if ($kind === 'update') {
-                $updateNow[] = $finding->package();
-            }
         }
+        $updateNow = self::updateNow($findings);
 
         return [
             'check' => \count($checks) === 1 ? reset($checks) : ($checks === [] ? 'complete' : 'partial'),
@@ -185,6 +182,26 @@ final class Report2Root
             'update_now_command' => $updateNow === [] ? null : array_merge(['composer', 'update'], $updateNow),
             'fix_unknown' => $fixes['unknown'],
         ];
+    }
+
+    /**
+     * `security.update_now`: the vulnerable packages whose fix is a `composer update`, in report order.
+     *
+     * @param list<Finding> $findings
+     *
+     * @return list<string>
+     */
+    public static function updateNow(array $findings): array
+    {
+        $packages = [];
+        foreach ($findings as $finding) {
+            $standing = $finding->securityStanding();
+            if ($standing->isVulnerable() && $standing->fixKind() === 'update') {
+                $packages[] = $finding->package();
+            }
+        }
+
+        return $packages;
     }
 
     /**

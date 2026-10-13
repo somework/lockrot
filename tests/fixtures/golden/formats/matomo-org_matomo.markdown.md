@@ -1,17 +1,22 @@
-### lockrot: dependency rot in 7 of 52 packages
+### lockrot: 7 of 52 packages flagged — critical 2 · high 3 · medium 1 · low 1
 
-| Priority | Package | Version | Verdict | Evidence | Via |
+**gate: fails** · --fail-on=high · 5 findings fail it · advisories not applied to 52 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)
+
+| Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| critical | `lox/xhprof` | dev-master | **abandoned** | marked abandoned by its repository; repository archived on GitHub; last push 2022-07-25 (4.1 years ago); released 2015-08-31 for PHP 5 (php "\>=5.2.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; pinned to branch snapshot dev-master | direct |
-| critical | `mustangostang/spyc` | 0.6.3 | **silent** | last release 2019-09-10 (7.0 years ago); last push 2020-03-16 (6.5 years ago); released 2019-09-10 for PHP 5 (php "\>=5.3.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested | direct |
-| high | `pear/console_getopt` | v1.4.3 | **silent** | last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago) | matomo/decompress › pear/archive\_tar › pear/pear-core-minimal |
-| high | `matomo/referrer-spam-list` | dev-master | **pinned** | pinned to branch snapshot dev-master | direct |
-| high | `matomo/searchengine-and-social-list` | dev-master | **pinned** | pinned to branch snapshot dev-master; last release 2023-01-20 (3.6 years ago) | direct |
-| medium | `pear/pear_exception` | v1.0.2 | **stale** | last release 2021-03-21 (5.5 years ago) | direct |
-| low | `matomo/doctrine-cache-fork` | 1.10.4 | **stale** | last release 2021-09-13 (5.0 years ago); last push 2021-09-13 (5.0 years ago) | matomo/cache |
+| **critical** | `lox/xhprof` | dev-master | abandoned · pinned · old-promise | `40 = abandoned 32 + pinned 4 [¼ of 16] + old-promise 4 [¼ of 16]`<br>**Do:** find a replacement (none named)<br>*abandoned:* marked abandoned by its registry; its repository is archived on GitHub; last push 2022-07-25 (4.1 years ago)<br>*pinned:* pinned to branch snapshot dev-master<br>*old-promise:* released 2015-08-31 for PHP 5 (php "\>=5.2.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested | direct |
+| **critical** | `mustangostang/spyc` | 0.6.3 | silent · old-promise | `36 = silent 32 + old-promise 4 [¼ of 16]`<br>**Do:** find a maintained alternative: nothing released for 7.0 years<br>*silent:* last release 2019-09-10 (7.0 years ago); last push 2020-03-16 (6.5 years ago)<br>*old-promise:* released 2019-09-10 for PHP 5 (php "\>=5.3.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested | direct |
+| **high** | `matomo/searchengine-and-social-list` | dev-master | pinned · stale | `18 = pinned 16 + stale 2 [¼ of 8]`<br>**Do:** require a tag — the newest is 3.14.0 (2023-01-20), older than your snapshot (2026-07-15); review, or replace; stale stays<br>*pinned:* pinned to branch snapshot dev-master<br>*stale:* last release 2023-01-20 (3.6 years ago) | direct |
+| **high** | `matomo/referrer-spam-list` | dev-master | pinned | `16 = pinned 16`<br>**Do:** require a tag — the newest is 4.0.5 (2026-04-15), older than your snapshot (2026-09-04); review, or replace<br>*pinned:* pinned to branch snapshot dev-master<br>*age:* newest release 4.0.5 2026-04-15 (0.4 years ago); last push 2026-09-04 (less than three weeks ago) | direct |
+| **high** | `pear/console_getopt` | v1.4.3 | silent | `16 = silent 32 ÷ 2 transitive`<br>**Do:** find a maintained alternative: nothing released for 6.8 years; it comes in through matomo/decompress: replace or update that package<br>*silent:* last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago) | matomo/decompress |
+| medium | `pear/pear_exception` | v1.0.2 | stale | `8 = stale 8`<br>**Do:** —<br>*stale:* last release 2021-03-21 (5.5 years ago) | direct |
+| low | `matomo/doctrine-cache-fork` | 1.10.4 | stale | `4 = stale 8 ÷ 2 transitive`<br>**Do:** —<br>*stale:* last release 2021-09-13 (5.0 years ago); last push 2021-09-13 (5.0 years ago) | matomo/cache |
 
+flags: abandoned 1 · silent 2 · pinned 3 · old-promise 2 · stale 3 · 3 packages carry more than one
+depth: 2 of 7 flagged packages are named by no line of composer.json · direct 5 · 1 hop 1 · 3 hops 1 · deepest: `pear/console_getopt`, 3 hops (`matomo/decompress` › `pear/archive_tar` › `pear/pear-core-minimal` › `pear/console_getopt`)
+security: no vulnerable package · advisories not checked
 libyears: 0.9 behind across 47 of 52 packages · 0.1 from direct requirements · furthest behind maxmind-db/reader v1.13.1 at 0.8
+pulled in by: `matomo/cache` 1 · `matomo/decompress` 1
+advisories: 0 packages asked, 52 not asked
 
-pulled in by: matomo/cache 1 · matomo/decompress 1
-
-<sub>52 packages checked · abandoned 1 · silent 2 · pinned 2 · left-behind 0 · old-promise 0 · stale 2 · unknown 0 · finished 9 · ok 36 — data as of 2026-09-14 (package repositories, repository hosts). Run `composer lockrot --format=json` for details.</sub>
+<sub>52 packages checked — data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

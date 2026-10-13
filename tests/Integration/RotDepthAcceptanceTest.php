@@ -22,7 +22,6 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -117,7 +116,6 @@ final class RotDepthAcceptanceTest extends TestCase
                 new RepoLocator(),
                 BuiltinAllowlist::load(),
                 SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-                new VerdictEngine(),
                 $clock,
                 true
             );

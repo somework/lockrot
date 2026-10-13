@@ -37,8 +37,10 @@ use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\ReportTarget;
 use Lockrot\Output\ReportTargets;
+use Lockrot\Output\RunGateText;
 use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,6 +53,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class LockrotCommand extends BaseCommand
 {
     use RejectsUnreadableInput;
+    public const UPGRADE_NOTICE = 'lockrot 0.14: the verdict is now a grade, the cause word is in .lead, documents are report-2/baseline-2; see https://lockrot.dev/changes/0.14/';
+
+    /** The formats whose stdout is a document: a failing gate also gets a stderr line. */
+    private const DOCUMENT_FORMATS = ['json', 'sarif', 'gitlab', 'html'];
+
+    /** The formats a CI step parses: writing one prints the upgrade notice. */
+    private const NOTICE_FORMATS = ['json', 'sarif', 'gitlab'];
 
     /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
     private $analyzerFactory;
@@ -98,7 +107,8 @@ final class LockrotCommand extends BaseCommand
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Baseline file to read or write (default: lockrot-baseline.json next to composer.json)')
             ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file and exit 0')
             ->addOption('explain', null, InputOption::VALUE_REQUIRED, 'Explain one package: its verdict, every signal with its raw data, and the repository facts they were read from (text, or JSON with --format=json); exit 0')
-            ->addOption('output', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Also write the report to a file, as <format>:<path> (e.g. sarif:lockrot.sarif), in any format --format takes; repeatable. A relative path is relative to the project directory lockrot runs in; the directory must exist. --format still decides stdout');
+            ->addOption('output', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Also write the report to a file, as <format>:<path> (e.g. sarif:lockrot.sarif), in any format --format takes; repeatable. A relative path is relative to the project directory lockrot runs in; the directory must exist. --format still decides stdout')
+            ->addOption('markdown-max-bytes', null, InputOption::VALUE_REQUIRED, 'Keep each markdown report written through --output within this many bytes: rows are left out from the end, and a last row counts them. The heading, the table head, that row and the footer always print');
     }
 
     /**
@@ -187,6 +197,9 @@ final class LockrotCommand extends BaseCommand
             [$config, $repositories] = $this->composerBootstrap($io, is_file($composerFile));
             // LOCKROT_DISABLE needs no check here: run() answered it before any of this was read.
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $project->platformPhp());
+            if (self::wantsUpgradeNotice($input, $lockrot)) {
+                $this->writeError($output, self::UPGRADE_NOTICE);
+            }
             // Here and not in initialize(), which reads the same manifest without printing: once per
             // run, on stderr only, after a config error has had its say. Never a failure.
             foreach (UnknownKeys::warnings($project->lockrotExtra()) as $warning) {
@@ -210,6 +223,7 @@ final class LockrotCommand extends BaseCommand
             // Checked before the analysis, like the baseline: a typo in a path fails before a
             // full repository round.
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
+            $markdownMaxBytes = self::markdownMaxBytes($input);
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
@@ -256,7 +270,7 @@ final class LockrotCommand extends BaseCommand
             // The annotation formats name the lock relative to the directory lockrot runs in, as the
             // checkout does. A file has no terminal, so a table in one uses the default width: the
             // same file on a laptop and on a CI runner.
-            $fileContext = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $cwd);
+            $fileContext = FormatContext::forFailOn($lockPath, $failOn, Version::STRING, FormatContext::DEFAULT_WIDTH, $cwd)->withMarkdownMaxBytes($markdownMaxBytes);
 
             // A generate run compares with the file it read before it rewrites it, as a check run would.
             if ($existingBaseline !== null) {
@@ -287,8 +301,13 @@ final class LockrotCommand extends BaseCommand
             );
             // After stdout, so the report is in the log even when a file cannot be written.
             $this->writeReports($output, $targets, $report, $fileContext, $page, $showAll);
+            $gate = self::gateOf($report);
+            // A document on stdout says nothing a CI log shows: this line says why the job exits 1.
+            if ($gate->fails() && \in_array($format, self::DOCUMENT_FORMATS, true)) {
+                $this->writeError($output, 'lockrot: '.$this->gateText($report, $gate));
+            }
 
-            return self::gateOf($report)->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+            return $gate->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
         } catch (ConfigException $e) {
             // Raw: a config error can quote the project's own keys (see ProjectConfig) or a path,
             // which are text, not console markup.
@@ -408,8 +427,55 @@ final class LockrotCommand extends BaseCommand
             $file->displayPath(),
             $baseline->count()
         ));
+        $gate = self::gateOf($report);
+        if ($gate->fails()) {
+            $this->writeError($output, 'lockrot: '.$this->gateText($report, $gate));
+        }
 
-        return self::gateOf($report)->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+        return $gate->fails() ? Policy::EXIT_FINDINGS : Policy::EXIT_OK;
+    }
+
+    /** `gate.text`, the `gate:` line that every format prints. */
+    private function gateText(Report $report, Gate $gate): string
+    {
+        $run = $report->run();
+        if ($run === null) {
+            throw new \LogicException('the report carries no run, so it has no gate');
+        }
+
+        return RunGateText::render($gate, $run);
+    }
+
+    /**
+     * The upgrade notice of the 0.14.x line: a run with a gate active, or one that writes
+     * json, sarif, gitlab or a baseline. lockrot keeps no state, so it prints on every such run.
+     */
+    private static function wantsUpgradeNotice(InputInterface $input, LockrotConfig $lockrot): bool
+    {
+        if ($input->getOption('generate-baseline') === true || \in_array($lockrot->format(), self::NOTICE_FORMATS, true)) {
+            return true;
+        }
+        foreach (self::outputSpecs($input) as $spec) {
+            if (\in_array(strstr($spec, ':', true), self::NOTICE_FORMATS, true)) {
+                return true;
+            }
+        }
+
+        return !\is_string($input->getOption('explain')) && $lockrot->failOn()->value() !== FailOn::NONE;
+    }
+
+    /** @throws ConfigException for a value that is not a whole number of bytes above zero */
+    private static function markdownMaxBytes(InputInterface $input): ?int
+    {
+        $bytes = $input->getOption('markdown-max-bytes');
+        if ($bytes === null) {
+            return null;
+        }
+        if (!\is_string($bytes) || preg_match('/^[1-9][0-9]{0,17}$/D', $bytes) !== 1) {
+            throw new ConfigException('--markdown-max-bytes must be a whole number of bytes above zero');
+        }
+
+        return (int) $bytes;
     }
 
     /** The gate that the run's documents write is also the exit code. */
