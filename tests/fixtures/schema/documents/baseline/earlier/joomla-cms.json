@@ -1,0 +1,115 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-09-24T17:41:23+00:00",
+ "target_php": "8.4",
+ "target_php_source": "runtime",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "jakeasmith/http_build_url": {
+   "version": "1.0.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "jfcherng/php-color-output": {
+   "version": "3.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "jfcherng/php-mb-string": {
+   "version": "2.0.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "jfcherng/php-sequence-matcher": {
+   "version": "4.0.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "joomla/filter": {
+   "version": "dev-4.x-sept26-release",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "lcobucci/jwt": {
+   "version": "4.3.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "lockrot-fixture/left-the-lock": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "phpseclib/phpseclib": {
+   "version": "3.0.55",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-12sz-bcny-pk4m": {
+     "known_since": "2026-09-24",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "tobscure/json-api": {
+   "version": "dev-joomla-backports",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "pinned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "web-auth/metadata-service": {
+   "version": "4.5.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "willdurand/negotiation": {
+   "version": "3.1.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  }
+ }
+}

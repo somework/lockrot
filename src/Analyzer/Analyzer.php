@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Allowlist\UncheckedAcceptance;
 use Lockrot\Clock;
 use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
@@ -41,6 +43,7 @@ use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
+use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Rule\AbandonedRule;
@@ -78,6 +81,7 @@ final class Analyzer
     private ?AdvisoryLoaderInterface $advisories;
     private MonorepoParents $parents;
     private AbandonedIgnore $abandonedIgnore;
+    private UncheckedAcceptance $acceptance;
 
     public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, VerdictEngine $engine, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null, ?AbandonedIgnore $abandonedIgnore = null)
     {
@@ -94,6 +98,7 @@ final class Analyzer
         $this->parents = $parents ?? MonorepoParents::load();
         $this->abandonedIgnore = $abandonedIgnore ?? AbandonedIgnore::none();
         $this->deadline = Deadline::never();
+        $this->acceptance = UncheckedAcceptance::none();
     }
 
     public function allowlist(): Allowlist
@@ -105,6 +110,20 @@ final class Analyzer
     {
         $clone = clone $this;
         $clone->allowlist = $allowlist;
+
+        return $clone;
+    }
+
+    /** The project's `accept-unchecked` list, which buildFinding() applies after the S10 filter. */
+    public function uncheckedAcceptance(): UncheckedAcceptance
+    {
+        return $this->acceptance;
+    }
+
+    public function withUncheckedAcceptance(UncheckedAcceptance $acceptance): self
+    {
+        $clone = clone $this;
+        $clone->acceptance = $acceptance;
 
         return $clone;
     }
@@ -209,7 +228,8 @@ final class Analyzer
         if ($notInRepository > 0) {
             $notes[] = RunNote::notFromComposerRepository($notInRepository, $advisories->coverage()->scope() === AdvisoryCoverage::SCOPE_ALL);
         }
-        $notes = array_merge($notes, $this->abandonedNotes($findings));
+        $uncovered = UncoveredAdvisories::of($findings);
+        $notes = array_merge($notes, $uncovered === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($uncovered)], $this->abandonedNotes($findings));
         $findings = TransitiveExposure::attach($findings, $graph);
         $graded = [];
         foreach ($findings as $finding) {
@@ -508,7 +528,10 @@ final class Analyzer
         if (($entry !== null && $entry->acceptsAll()) || $this->hasSignal($signals, Signal::S1)) {
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
-        $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
+        [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
+        $flags = FlagSet::fromSignals($signals, $entry, $counted);
+        // An entry that accepts every flag that fired accepts the package, as a 0.13 entry did.
+        $verdict = $this->engine->decide($signals, $entry !== null && $flags->countedMaintenance() === [], $meta !== null);
 
         $note = null;
         if (!$package->isFromComposerRepository()) {
@@ -538,8 +561,63 @@ final class Analyzer
 
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
-            ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
-            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts)));
+            ->withFlags($flags, $facts->metadataStatus() === PackageFacts::METADATA_READ)
+            ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted));
+    }
+
+    /**
+     * After the S10 filter, each S10 entry that the project's `accept-unchecked` list accepts
+     * leaves S10 (docs/configuration.md#accept-unchecked). S10 goes when no entry is left.
+     *
+     * @param list<Signal> $signals
+     *
+     * @return array{list<Signal>, list<AcceptedCheck>}
+     */
+    private function acceptUnchecked(array $signals, PackageFacts $facts): array
+    {
+        $s10 = null;
+        foreach ($signals as $signal) {
+            $data = $signal->data();
+            $s10 = $data instanceof NotCheckedData ? $data : $s10;
+        }
+        if ($s10 === null) {
+            return [$signals, []];
+        }
+        $package = $facts->package();
+        $where = $facts->activityLookup()->where();
+        $ref = $where->ref();
+        $meta = $facts->metadata();
+        $now = $this->clock->now();
+        // A Composer repository is named by the URL that answered, and a named registry also by its
+        // name. A package of no Composer repository kind has neither: only its source or its name matches.
+        $origin = $package->origin();
+        $composer = [];
+        if ($origin->isComposerRepository()) {
+            $composer = array_merge($meta === null ? [] : [$meta->composerRepositoryUrl()], self::registryUrls($origin->registry()));
+        }
+        $kept = [];
+        $accepted = [];
+        foreach ($s10->checks() as $check) {
+            $by = $this->acceptance->acceptedBy($check, $package->name(), $where->host(), $ref === null ? null : $ref->path(), $package->repositoryUrl(), $composer, $now);
+            if ($by === null) {
+                $kept[] = $check;
+                continue;
+            }
+            $accepted[] = new AcceptedCheck($check, $by);
+        }
+        // With nothing accepted, keeping() gives S10 back with the words that it had.
+        return [NotCheckedRule::keeping($signals, $kept, $where->host(), $package->origin()->kind()), $accepted];
+    }
+
+    /**
+     * The URLs that name a registry in `accept-unchecked`: its host, and repo.packagist.org for
+     * packagist.org.
+     *
+     * @return list<?string>
+     */
+    private static function registryUrls(?string $registry): array
+    {
+        return $registry === 'packagist.org' ? ['https://packagist.org', 'https://repo.packagist.org'] : [$registry === null ? null : 'https://'.$registry];
     }
 
     /**

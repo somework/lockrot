@@ -177,6 +177,26 @@ final class UnknownKeysTest extends TestCase
         );
     }
 
+    /** A misspelt `expires` would be a silent permanent acceptance: it warns with the nearest key. */
+    public function testAnAcceptUncheckedEntryKeyIsComparedWithItsKeys(): void
+    {
+        self::assertSame(
+            ['unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you mean expires?)'],
+            UnknownKeys::warnings(['accept-unchecked' => [['check' => 'advisories', 'host' => 'example.org', 'reason' => 'r', 'expire' => '2026-12-31']]])
+        );
+    }
+
+    public function testTheAcceptUncheckedWarningsFollowTheWarningsBeforeThem(): void
+    {
+        self::assertSame(
+            [
+                'unknown key extra.lockrot.fial-on ignored (did you mean fail-on?)',
+                'unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you mean expires?)',
+            ],
+            UnknownKeys::warnings(['fial-on' => 'high', 'accept-unchecked' => [['check' => 'advisories', 'host' => 'example.org', 'reason' => 'r', 'expire' => '2026-12-31']]])
+        );
+    }
+
     public function testAnIgnoreEntryKeyIsComparedWithTheIgnoreEntryKeys(): void
     {
         self::assertSame(
@@ -355,5 +375,13 @@ final class UnknownKeysTest extends TestCase
     {
         yield 'a string' => ['acme/legacy'];
         yield 'a list of strings' => [['acme/legacy']];
+    }
+
+    public function testAMisspeltExpiryOfAnAcceptUncheckedEntryNamesTheKnownKey(): void
+    {
+        self::assertSame(
+            ['unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you mean expires?)'],
+            UnknownKeys::warnings(['accept-unchecked' => [['check' => 'repository_activity', 'host' => 'codeberg.org', 'reason' => 'by hand', 'expire' => '2026-12-31']]])
+        );
     }
 }

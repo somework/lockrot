@@ -1,5 +1,5 @@
 {
- "pr": "4f",
+ "pr": "6b",
  "cases": [
   {
    "id": "A",
@@ -1084,6 +1084,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -3469,6 +3470,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -5040,6 +5042,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -6331,6 +6334,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -7610,6 +7614,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -9178,6 +9183,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -10440,6 +10446,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -11600,6 +11607,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -12802,6 +12810,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -14200,6 +14209,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -16154,6 +16164,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -17850,6 +17861,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -19620,6 +19632,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -21616,6 +21629,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -23109,6 +23123,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -24496,6 +24511,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -25570,6 +25586,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -26823,6 +26840,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -28195,6 +28213,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -30149,6 +30168,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -31302,6 +31322,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
@@ -32454,6 +32475,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -34104,6 +34126,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -36185,6 +36208,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -37438,6 +37462,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -38533,6 +38558,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -39790,6 +39816,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -41236,6 +41263,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -43238,6 +43266,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -44632,6 +44661,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -46039,6 +46069,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -47448,6 +47479,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
@@ -48551,6 +48583,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -49884,6 +49917,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -51267,6 +51301,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -53329,6 +53364,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -54876,6 +54912,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -56491,6 +56528,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -58330,6 +58368,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -60188,6 +60227,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -62116,6 +62156,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -63534,6 +63575,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -65123,6 +65165,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -66473,6 +66516,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -67982,6 +68026,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -69366,6 +69411,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -70505,6 +70551,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -72064,6 +72111,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -73351,6 +73399,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -74746,6 +74795,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -76347,6 +76397,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -78111,6 +78162,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "unavailable",
@@ -79264,6 +79316,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -80497,6 +80550,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -81508,6 +81562,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -82612,6 +82667,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -83896,6 +83952,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -85463,6 +85520,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -86699,6 +86757,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -88076,6 +88135,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -89481,6 +89541,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -90678,6 +90739,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -91661,6 +91723,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -92923,6 +92986,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -94990,6 +95054,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -96713,6 +96778,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -98245,6 +98311,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
@@ -99391,6 +99458,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -100599,6 +100667,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -101906,6 +101975,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -103218,6 +103288,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -104560,6 +104631,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -105984,6 +106056,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -107412,6 +107485,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -108680,6 +108754,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -109983,6 +110058,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -111137,6 +111213,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -112291,6 +112368,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -113589,6 +113667,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -114726,6 +114805,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -115858,6 +115938,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -117110,6 +117191,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -118439,6 +118521,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -119622,6 +119705,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -120894,6 +120978,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -122209,6 +122294,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -123605,6 +123691,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -125263,6 +125350,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
@@ -126230,6 +126318,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -127205,6 +127294,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -128340,6 +128430,7 @@
       ]
      }
     ],
+    "unchecked_accepted": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
@@ -130967,6 +131058,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
@@ -131940,17 +132032,33 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [
+    "checks_missing": [],
+    "checks_skipped": [
      {
       "check": "repository_activity",
-      "reason": "host_not_supported",
+      "reason": "accepted_by_config",
       "blocks": [
        "S3",
        "S4"
       ]
      }
     ],
-    "checks_skipped": [],
+    "unchecked_accepted": [
+     {
+      "check": "repository_activity",
+      "reason": "host_not_supported",
+      "blocks": [
+       "S3",
+       "S4"
+      ],
+      "accepted_by": {
+       "scope": "host",
+       "value": "codeberg.org",
+       "reason": "Forgejo has no API lockrot reads; we watch the repository by hand (‡)",
+       "expires": "2027-03-31"
+      }
+     }
+    ],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -131996,29 +132104,7 @@
     "direct_dependents": [
      "ssddanbrown/htmldiff"
     ],
-    "signals": [
-     {
-      "id": "S10",
-      "level": "info",
-      "summary": "repository activity not checked (lockrot cannot ask codeberg.org), so S3 and S4 could not be read",
-      "data": {
-       "unchecked": [
-        {
-         "check": "repository_activity",
-         "reason": "host_not_supported",
-         "blocks": [
-          "S3",
-          "S4"
-         ]
-        }
-       ],
-       "blocks": [
-        "S3",
-        "S4"
-       ]
-      }
-     }
-    ],
+    "signals": [],
     "evidence": "",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:39:37+00:00",
@@ -132916,6 +133002,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -133877,16 +133964,31 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [
+    "checks_missing": [],
+    "checks_skipped": [
      {
       "check": "advisories",
-      "reason": "no_feed",
+      "reason": "accepted_by_config",
       "blocks": [
        "S9"
       ]
      }
     ],
-    "checks_skipped": [],
+    "unchecked_accepted": [
+     {
+      "check": "advisories",
+      "reason": "no_feed",
+      "blocks": [
+       "S9"
+      ],
+      "accepted_by": {
+       "scope": "repository",
+       "value": "https://mirror.example.org",
+       "reason": "the mirror has no advisory feed; composer audit runs against packagist.org in CI (‡)",
+       "expires": null
+      }
+     }
+    ],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -133935,27 +134037,7 @@
      "joomla/oauth1",
      "joomla/oauth2"
     ],
-    "signals": [
-     {
-      "id": "S10",
-      "level": "info",
-      "summary": "security advisories not checked (no configured repository publishes advisories), so S9 could not be read",
-      "data": {
-       "unchecked": [
-        {
-         "check": "advisories",
-         "reason": "no_feed",
-         "blocks": [
-          "S9"
-         ]
-        }
-       ],
-       "blocks": [
-        "S9"
-       ]
-      }
-     }
-    ],
+    "signals": [],
     "evidence": "",
     "allowlist_reason": null,
     "data_date": "2026-10-01T17:41:33+00:00",
@@ -134934,14 +135016,39 @@
      "ignored": [],
      "ignored_count": 0
     },
-    "checks_missing": [
+    "checks_missing": [],
+    "checks_skipped": [
+     {
+      "check": "repository_activity",
+      "reason": "accepted_by_config",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
+     },
+     {
+      "check": "release_metadata",
+      "reason": "accepted_by_config",
+      "blocks": [
+       "S2",
+       "S8"
+      ]
+     }
+    ],
+    "unchecked_accepted": [
      {
       "check": "release_metadata",
       "reason": "not_from_composer_repository",
       "blocks": [
        "S2",
        "S8"
-      ]
+      ],
+      "accepted_by": {
+       "scope": "package",
+       "value": "tobscure/*",
+       "reason": "joomla's backport fork; we follow its branch (‡)",
+       "expires": null
+      }
      },
      {
       "check": "repository_activity",
@@ -134949,10 +135056,15 @@
       "blocks": [
        "S3",
        "S4"
-      ]
+      ],
+      "accepted_by": {
+       "scope": "repository",
+       "value": "https://github.com/joomla-backports/json-api-php.git",
+       "reason": "we watch the fork's commits on GitHub by hand (‡)",
+       "expires": null
+      }
      }
     ],
-    "checks_skipped": [],
     "maintenance_judged": false,
     "metadata": {
      "status": "not_from_composer_repository",
@@ -135012,37 +135124,6 @@
        "last_stable_dated_by": null,
        "snapshot_time": "2022-12-30T19:09:00+00:00",
        "tag_relation": null
-      }
-     },
-     {
-      "id": "S10",
-      "level": "info",
-      "summary": "release metadata not checked (not installed from a Composer repository), so S2 and S8 could not be read; repository activity not checked (not installed from a Composer repository), so S3 and S4 could not be read",
-      "data": {
-       "unchecked": [
-        {
-         "check": "release_metadata",
-         "reason": "not_from_composer_repository",
-         "blocks": [
-          "S2",
-          "S8"
-         ]
-        },
-        {
-         "check": "repository_activity",
-         "reason": "not_from_composer_repository",
-         "blocks": [
-          "S3",
-          "S4"
-         ]
-        }
-       ],
-       "blocks": [
-        "S2",
-        "S3",
-        "S4",
-        "S8"
-       ]
       }
      }
     ],
@@ -136096,6 +136177,7 @@
      }
     ],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -137567,6 +137649,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -139172,6 +139255,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -141013,6 +141097,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -143115,6 +143200,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -144483,6 +144569,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -146152,6 +146239,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -148553,6 +148641,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -150218,6 +150307,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",
@@ -151872,6 +151962,7 @@
     },
     "checks_missing": [],
     "checks_skipped": [],
+    "unchecked_accepted": [],
     "maintenance_judged": true,
     "metadata": {
      "status": "read",

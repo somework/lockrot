@@ -37,12 +37,14 @@ use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\ColdConfigSchema;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\VerdictEngine;
+use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -422,7 +424,7 @@ final class InstallTimeSummaryTest extends TestCase
     /** LOCKROT_DISABLE promises to silence all of lockrot — including the "check skipped" line a malformed extra.lockrot otherwise prints on every install. */
     public function testLockrotDisableAlsoSilencesAMalformedConfig(): void
     {
-        $this->project(['fail-on' => 'dead']);
+        $this->project(['include-dev' => 'yes']);
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 
@@ -482,7 +484,7 @@ final class InstallTimeSummaryTest extends TestCase
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), [], [], \PHP_VERSION, $project->platformPhp());
             $analyzer = ($this->analyzerFactory())(new BufferIO(), $server->config(), [], $lockrot, new Tokens('recorded', null), Clock::fixed(self::FIXED_NOW), Deadline::inSeconds(60.0));
             $report = $analyzer->analyzePackages($lock->packages(false), $lock, $project, false);
-            $fails = Gate::decide($report, FailOn::fromString($value), false, Gate::MODE_CHECK)->fails();
+            $fails = Gate::decide($report, FailOn::parse($value), false, Gate::MODE_CHECK)->fails();
 
             $blocked = false;
             try {
@@ -588,16 +590,39 @@ final class InstallTimeSummaryTest extends TestCase
         self::assertStringContainsString('is not valid JSON', $output);
     }
 
+    /**
+     * SPEC-0.14.md §6.4 "Reading" (O10): at install time a baseline-1 file is an unreadable
+     * baseline. The plugin prints the skip line with the refusal, the install continues, and
+     * install-time-strict does not block on it.
+     */
+    public function testABaseline1FileSkipsTheCheckAndNeverBlocksAStrictInstall(): void
+    {
+        $dir = $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise']);
+        file_put_contents($dir.'/lockrot-baseline.json', '{"lockrot": {"version": "0.13.0", "schema": 1}, "findings": {"phpzip/phpzip": {"version": "1.0.0", "verdict": "silent", "first_seen": "2025-01-01"}}}');
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+        [$major, $minor] = explode('.', Version::STRING);
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: install-time check skipped: lockrot '.$major.'.'.$minor.' reads baseline-2 only.', $io->getOutput());
+    }
+
     /** @param array<string, string> $verdicts package => verdict */
     private function writeBaseline(string $path, array $verdicts): void
     {
         $findings = [];
         foreach ($verdicts as $package => $verdict) {
-            $findings[$package] = ['version' => '2.0.8', 'verdict' => $verdict, 'first_seen' => '2026-01-15'];
+            $findings[$package] = BaselineEntries::of($package, '2.0.8', $verdict, '2026-01-15');
         }
         file_put_contents($path, (string) json_encode([
-            'lockrot' => ['version' => '0.1.0', 'schema' => 1],
+            '$schema' => 'https://lockrot.dev/schema/baseline-2.json',
+            'lockrot' => ['version' => '0.14.0', 'schema' => 2],
             'generated_at' => self::FIXED_NOW,
+            'target_php' => '8.4',
+            'target_php_source' => 'option',
+            'score_model_id' => 1,
+            'fix_model' => 1,
             'findings' => $findings,
         ], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");
     }
@@ -907,7 +932,7 @@ final class InstallTimeSummaryTest extends TestCase
 
     public function testAMalformedLockrotConfigIsReportedAsASkippedCheck(): void
     {
-        $this->project(['fail-on' => 'dead']);
+        $this->project(['include-dev' => 'yes']);
         $io = new BufferIO();
         $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
 

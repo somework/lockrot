@@ -8,6 +8,7 @@ use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Allowlist\ProjectIgnoreList;
+use Lockrot\Allowlist\UncheckedAcceptance;
 use Lockrot\Analyzer\Analyzer;
 use Lockrot\Clock;
 use Lockrot\Config\LockrotConfig;
@@ -39,6 +40,8 @@ final class AnalyzerBootstrap
         $tokens = Tokens::fromEnvironment($env, ServiceFactory::githubTokenFromComposer($config));
         $analyzer = $analyzerFactory($io, $config, $repositories, $lockrot, $tokens, $clock, $deadline, $project->requirePhp());
 
-        return $analyzer->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())));
+        return $analyzer
+            ->withAllowlist($analyzer->allowlist()->merge(ProjectIgnoreList::fromExtra($project->lockrotExtra())))
+            ->withUncheckedAcceptance(UncheckedAcceptance::fromConfig($project->lockrotExtra()['accept-unchecked'] ?? null));
     }
 }

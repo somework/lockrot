@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
+use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
+use Lockrot\Config\GateStanding;
 use Lockrot\Filesystem\Path;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\SecurityStanding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 
@@ -58,7 +62,7 @@ final class FormatContext
      */
     public static function create(?string $lockPath, string $failOn, string $toolVersion = Version::STRING, int $terminalWidth = self::DEFAULT_WIDTH, ?string $projectDirectory = null): self
     {
-        return self::forFailOn($lockPath, FailOn::fromString($failOn), $toolVersion, $terminalWidth, $projectDirectory);
+        return self::forFailOn($lockPath, FailOn::parse($failOn), $toolVersion, $terminalWidth, $projectDirectory);
     }
 
     /**
@@ -108,18 +112,96 @@ final class FormatContext
     }
 
     /**
-     * The level of a finding in every format that marks one:
-     * docs/ci.md#how-each-format-marks-a-finding. GithubFormatter spells `note` as `notice`.
+     * The findings that get a record: the flagged ones, every one that fails the gate (I15b), and
+     * with `unchecked` active every one with a missing check. Under `--all`, every finding.
      *
+     * @return list<Finding>
+     */
+    public function recordFindings(Report $report, bool $showAll): array
+    {
+        if ($showAll) {
+            return $report->findings();
+        }
+        $flagged = $report->flagged();
+        $gate = $this->gateOf($report);
+        $unchecked = $this->failOn->has(FailOn::KIND_UNCHECKED);
+        $out = [];
+        foreach ($report->findings() as $finding) {
+            $standing = $gate->standingOf($finding->package());
+            if (\in_array($finding, $flagged, true) || ($standing !== null && $standing->fails()) || ($unchecked && $finding->checksMissing() !== [])) {
+                $out[] = $finding;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Whether the finding's record is its own `lockrot/unchecked` one: `unchecked` is active, and the
+     * finding carries a missing check and no counted fact (SPEC §7.10, §7.11).
+     */
+    public function isUncheckedRecord(Finding $finding): bool
+    {
+        return $this->failOn->has(FailOn::KIND_UNCHECKED)
+            && $finding->flags()->countedMaintenance() === []
+            && $finding->flags()->advisories() === []
+            && $finding->checksMissing() !== [];
+    }
+
+    /**
+     * The level of the run-level `advisories not checked` record, null when every lookup ran. It is
+     * `error` only when a finding fails the `unchecked` value with S10 for its advisories: the gate
+     * then fails on that gap. A skip, an accepted gap or a gap that the baseline knows is a
+     * `warning` (SPEC §6.2).
+     */
+    public function advisoriesNotCheckedLevel(Report $report): ?string
+    {
+        $gate = $this->gateOf($report);
+        $gap = false;
+        foreach ($report->findings() as $finding) {
+            if ($finding->securityStanding()->status() !== SecurityStanding::UNCHECKED) {
+                continue;
+            }
+            $gap = true;
+            $standing = $gate->standingOf($finding->package());
+            if ($standing === null || !$standing->failsValue(FailOn::UNCHECKED)) {
+                continue;
+            }
+            foreach ($finding->checksMissing() as $check) {
+                if ($check->check() === 'advisories') {
+                    return self::LEVEL_ERROR;
+                }
+            }
+        }
+
+        return $gap ? self::LEVEL_WARNING : null;
+    }
+
+    /**
+     * The run's gate, which a report with run settings decides itself. A report without them, which
+     * only a test or a caller outside the command builds, is judged on this context's fail-on.
+     */
+    public function gateOf(Report $report): Gate
+    {
+        return $report->gate() ?? Gate::ofFindings($report, $this->failOn);
+    }
+
+    /**
+     * The level of a finding in every format that marks one, from its gate standing:
+     * docs/ci.md#how-each-format-marks-a-finding. `error` when the finding fails the gate, `note`
+     * when the baseline knows it, else `warning` for a flagged finding. GithubFormatter spells
+     * `note` as `notice`.
+     *
+     * @param ?GateStanding           $standing the finding's standing, from Report::gate()
      * @param null|BaselineComparison $baseline the run's comparison, from Report::baseline()
      */
-    public function levelOf(Finding $finding, ?BaselineComparison $baseline = null): string
+    public function levelOf(Finding $finding, ?GateStanding $standing, ?BaselineComparison $baseline = null): string
     {
+        if ($standing !== null && $standing->fails()) {
+            return self::LEVEL_ERROR;
+        }
         if ($baseline !== null && $baseline->isKnown($finding->package())) {
             return self::LEVEL_NOTE;
-        }
-        if ($this->failOn->reaches($finding)) {
-            return self::LEVEL_ERROR;
         }
 
         return Verdict::flagged($finding->verdict()) ? self::LEVEL_WARNING : self::LEVEL_NOTE;

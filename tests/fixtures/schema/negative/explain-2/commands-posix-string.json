@@ -299,6 +299,7 @@
   },
   "checks_missing": [],
   "checks_skipped": [],
+  "unchecked_accepted": [],
   "maintenance_judged": true,
   "metadata": {
    "status": "read",

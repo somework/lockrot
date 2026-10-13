@@ -6,6 +6,9 @@ namespace Lockrot\Allowlist;
 
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Output\TerminalText;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\ScoreModel;
 
 /** @internal */
 final class ProjectIgnoreList
@@ -26,6 +29,53 @@ final class ProjectIgnoreList
         }
 
         return new Allowlist($entries, []);
+    }
+
+    /**
+     * Each `flags` list holds maintenance flags only. It runs before the config schema, so the
+     * allowlist's own message prints, never the schema's enum error.
+     *
+     * @param mixed $rows `extra.lockrot.ignore`
+     *
+     * @throws ConfigException for a flag that is not a maintenance flag, or an empty list
+     */
+    public static function checkFlags($rows): void
+    {
+        foreach (\is_array($rows) ? $rows : [] as $index => $row) {
+            self::flags((string) $index, \is_array($row) ? ($row['flags'] ?? null) : null);
+        }
+    }
+
+    /**
+     * @param mixed $flags an entry's `flags`
+     *
+     * @return ?list<string> each flag once, null for an entry without `flags`
+     *
+     * @throws ConfigException for a flag that is not a maintenance flag, or an empty list
+     */
+    private static function flags(string $index, $flags): ?array
+    {
+        if ($flags === null) {
+            return null;
+        }
+        $at = TerminalText::escape($index, 255);
+        if (!\is_array($flags) || $flags === []) {
+            throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list at least one maintenance flag', $at));
+        }
+        $out = [];
+        foreach ($flags as $flag) {
+            if ($flag === FlagSet::VULNERABLE) {
+                throw new ConfigException(\sprintf("extra.lockrot.ignore[%s] \"flags\": the allowlist accepts maintenance flags; accept advisories in Composer's audit policy (config.policy.advisories), which composer audit reads too", $at));
+            }
+            if (!\is_string($flag) || !isset(ScoreModel::POINTS[$flag])) {
+                throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list maintenance flags only: %s', $at, implode(', ', array_keys(ScoreModel::POINTS))));
+            }
+            if (!\in_array($flag, $out, true)) {
+                $out[] = $flag;
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -54,7 +104,7 @@ final class ProjectIgnoreList
             throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] (%s) "version" must be a string', $index, $package));
         }
 
-        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), AllowlistEntry::BY_PROJECT);
+        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), AllowlistEntry::BY_PROJECT, self::flags($index, $row['flags'] ?? null));
     }
 
     /** @param mixed $expires */

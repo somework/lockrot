@@ -416,6 +416,10 @@ exit decision: `gate.fails`, its causes in `gate.tripped_by`, and each finding's
 [schema.md](schema.md#what-the-report-schema-types) types every field and has a CI validation step.
 [example-run.md](example-run.md) has a worked excerpt.
 
+## Reading the gate line {#reading-the-gate-line}
+
+The json report writes the `gate:` line as `gate.text`: whether the run fails, which `--fail-on` value and source decided it, and how many findings fail each value.
+
 ## Related
 
 - [baseline.md](baseline.md) — adopt lockrot on a project that does not start clean

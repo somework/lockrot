@@ -1,0 +1,8 @@
+{
+ "accept-unchecked": [
+  {
+   "host": "codeberg.org",
+   "reason": "x"
+  }
+ ]
+}

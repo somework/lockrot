@@ -1,0 +1,224 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-09-24T17:39:50+00:00",
+ "target_php": "8.4",
+ "target_php_source": "platform",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "arietimmerman/laravel-scim-server": {
+   "version": "dev-main",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "bacon/bacon-qr-code": {
+   "version": "2.0.8",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "defuse/php-encryption": {
+   "version": "v2.4.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "doctrine/cache": {
+   "version": "1.13.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "doctrine/instantiator": {
+   "version": "1.5.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "intervention/image": {
+   "version": "2.7.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "laravel/framework": {
+   "version": "v12.68.0",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-d5tc-s1qs-h781": {
+     "known_since": "2026-09-24",
+     "severity": "low",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "league/commonmark": {
+   "version": "2.10.0",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-m2dq-1fhr-29b1": {
+     "known_since": "2026-09-24",
+     "severity": "low",
+     "fix_kind": "update"
+    },
+    "PKSA-m4t9-vsgq-8khn": {
+     "known_since": "2026-09-24",
+     "severity": "high",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "league/config": {
+   "version": "v1.2.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "livewire/livewire": {
+   "version": "v4.3.3",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-bgw4-5zmg-2njg": {
+     "known_since": "2026-09-24",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "lockrot-fixture/left-the-lock": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "mtdowling/jmespath.php": {
+   "version": "2.8.0",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-mnyp-475s-ywph": {
+     "known_since": "2026-09-24",
+     "severity": "critical",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "neitanod/forceutf8": {
+   "version": "v2.0.4",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    },
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "okvpn/clock-lts": {
+   "version": "1.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "stale": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "onnov/detect-encoding": {
+   "version": "v2.0.0",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "phpseclib/phpseclib": {
+   "version": "3.0.52",
+   "first_seen": "2026-09-24",
+   "advisories": {
+    "PKSA-12sz-bcny-pk4m": {
+     "known_since": "2026-09-24",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "pragmarx/google2fa-laravel": {
+   "version": "v1.4.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-09-24"
+    },
+    "old-promise": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "pragmarx/google2fa-qrcode": {
+   "version": "v1.0.3",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "tmilos/scim-schema": {
+   "version": "0.1",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "tmilos/value": {
+   "version": "1.0.2",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-09-24"
+    }
+   }
+  },
+  "unicodeveloper/laravel-password": {
+   "version": "1.0.4",
+   "first_seen": "2026-09-24",
+   "flags": {
+    "silent": {
+     "known_since": "2026-09-24"
+    }
+   }
+  }
+ }
+}

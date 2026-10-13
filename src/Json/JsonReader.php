@@ -65,6 +65,8 @@ final class JsonReader
      * acceptable as an empty object.
      *
      * @param array<mixed, mixed> $data
+     *
+     * @phpstan-assert-if-true list<mixed> $data
      */
     public static function isList(array $data): bool
     {

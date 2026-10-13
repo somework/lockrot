@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "advisories",
+   "host": "mirror.acme.internal",
+   "reason": "x"
+  }
+ ]
+}

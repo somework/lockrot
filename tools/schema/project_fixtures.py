@@ -18,9 +18,15 @@ documents). The script writes, relative to the repository root:
     tests/fixtures/flags/coverage/<variant>.json        the coverage variants with a failed feed, from PR 4f on
     tests/fixtures/schema/documents/cases/<base>.json   the base documents of make_negatives.py
     tests/fixtures/schema/documents/explain/B.json      the base document of make_negatives_other.py
+At the last pull request of the train it also writes every model document, unprojected:
+    tests/fixtures/schema/documents/{cases,variants,explain,explain/coverage,baseline/*,config/*}/   plain JSON
+    tests/fixtures/schema/documents/{corpus,coverage/baselined,coverage/variants}/   gzipped (`.json.gz`)
+    tests/fixtures/schema/documents/provenance.json      the source, its run date and suite, the count of each set
 """
 import argparse
 import copy
+import glob
+import gzip
 import hashlib
 import json
 import os
@@ -73,7 +79,8 @@ COVERAGE_VARIANTS = ['lookup-not-run-lookup-failed', 'feed-invalid-response', 'c
 NEGATIVE_BASES = ['composite', 'A', 'A-baselined-dagger', 'A-blocked-dagger', 'B-baselined-dagger', 'B-dev-dagger', 'C-baselined-dagger', 'D-partial-dagger',
                   'E-ignored-dagger', 'baseline-read-score0', 'composite-generate-baseline', 'ok-unchecked', 'partial-op-dagger', 'psr-log', 'rounded-dev-dagger',
                   'routing', 'scope-registries-dagger', 'stale-only', 'unknown', 'host-unsupported', 'not-found-dagger', 'gitlab-anon-dagger', 'local-path-advisory',
-                  'ignored-marking-archived-dagger', 'ignored-marking-stale-dagger', 'no-feed-dagger']
+                  'ignored-marking-archived-dagger', 'ignored-marking-stale-dagger', 'no-feed-dagger',
+                  'B-gate-none', 'host-accepted-dagger']
 
 
 class Projection:
@@ -413,6 +420,62 @@ def dump(path, doc):
         fh.write('\n')
 
 
+def dump_gz(path, doc):
+    """The document gzipped with no name and no time in the header, as `gzip -9n` writes it."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    data = (json.dumps(doc, indent=1, ensure_ascii=False) + '\n').encode()
+    with open(path, 'wb') as raw, gzip.GzipFile(filename='', mode='wb', fileobj=raw, compresslevel=9, mtime=0) as fh:
+        fh.write(data)
+
+
+# Every model document set: the model's directory under docs/, the set under documents/, gzipped or not.
+DOCUMENT_SETS = [('report-2', 'corpus', True), ('report-2-variants', 'variants', False), ('cases', 'cases', False),
+                 (os.path.join('coverage', 'baselined'), os.path.join('coverage', 'baselined'), True),
+                 (os.path.join('coverage', 'variants'), os.path.join('coverage', 'variants'), True),
+                 ('explain-2', 'explain', False), (os.path.join('explain-2', 'coverage'), os.path.join('explain', 'coverage'), False)]
+DOCUMENT_SETS += [(os.path.join('baseline-2', sub), os.path.join('baseline', sub), False)
+                  for sub in ('cases', 'corpus', 'earlier', 'gate-rows', 'regenerate', 'regenerate-from-baseline-1')]
+DOCUMENT_SETS += [('config-2', 'config', False)] + [(os.path.join('config-2', sub), os.path.join('config', sub), False) for sub in ('coverage', 'repo-docs')]
+# Files of the model's directories that are not documents.
+NOT_DOCUMENTS = ('INDEX.json', 'EXPECT.json', 'corrections.json')
+
+
+def correct(doc):
+    """The model defects that a document carries, each corrected here and listed in provenance.json.
+
+    C75 R8: a repository that failed in transport is a network failure, so `network_failures` is true.
+    The model writes false and has no R8 check.
+    """
+    fixed = []
+    lookup = doc.get('run', {}).get('advisory_lookup') if isinstance(doc.get('run'), dict) else None
+    repositories = lookup.get('repositories', []) if isinstance(lookup, dict) else []
+    if doc.get('network_failures') is False and any(r.get('outcome') == 'failed' and r.get('reason') == 'transport' for r in repositories):
+        doc['network_failures'] = True
+        fixed.append('C75 R8: network_failures false beside a repository that failed in transport, written true')
+    return fixed
+
+
+def write_documents(source, run_date, suite):
+    counts = {}
+    corrections = {}
+    for model_dir, out_dir, zipped in DOCUMENT_SETS:
+        paths = sorted(p for p in glob.glob(os.path.join(source, 'docs', model_dir, '*.json')) if not p.endswith(NOT_DOCUMENTS))
+        for path in paths:
+            with open(path) as fh:
+                doc = json.load(fh)
+            stem = os.path.basename(path)
+            for fix in correct(doc):
+                corrections.setdefault(os.path.join(out_dir, stem), []).append(fix)
+            if zipped:
+                dump_gz(os.path.join(DOCS_OUT, out_dir, stem + '.gz'), doc)
+            else:
+                dump(os.path.join(DOCS_OUT, out_dir, stem), doc)
+        counts[out_dir] = len(paths)
+    dump(os.path.join(DOCS_OUT, 'provenance.json'), {'source': 'security-axis/r3/docs', 'model_run_date': run_date, 'suite': suite, 'documents': counts,
+                                                      'corrections': dict(sorted(corrections.items()))})
+    return counts
+
+
 def sha256(path):
     with open(path, 'rb') as fh:
         return hashlib.sha256(fh.read()).hexdigest()
@@ -465,6 +528,8 @@ def main():
     })
     print('%d cases (%d without inputs), %d base documents, %d dropped keys, %d kinds of reverted values'
           % (len(cases), len(without_inputs), len(bases), len(proj.dropped), len(proj.reverted)))
+    if args.pr == TRAIN[-1]:
+        print('documents: ' + ', '.join('%s %d' % kv for kv in write_documents(source, args.run_date, args.suite or model.get('validation')).items()))
     return 0
 
 

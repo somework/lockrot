@@ -1,0 +1,11 @@
+<options=bold>low (1)</options=bold>
+  stale        league/config v1.2.0  via laravel/framework › league/commonmark, also via laravel/tinker
+               last release 2022-12-11 (3.8 years ago)
+
+76 packages checked · abandoned 0 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 1 · unknown 0 ·
+finished 19 · ok 56
+priority: critical 0 · high 0 · medium 0 · low 1
+libyears: 0.5 behind across 73 of 76 packages · 0.0 from direct requirements ·
+furthest behind brick/math 0.18.0 at 0.2
+pulled in by: laravel/framework 1 · laravel/tinker 1
+Data as of 2026-09-14 (package repositories, repository hosts). Run composer lockrot --format=json for details.

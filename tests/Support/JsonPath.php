@@ -154,6 +154,7 @@ final class JsonPath
     {
         $out = [];
         foreach (self::arrayAt($data, $path) as $index => $row) {
+            $row = \is_object($row) ? self::decoded($row) : $row;
             if (!\is_array($row) || !\array_key_exists($key, $row)) {
                 throw new \RuntimeException(self::describe($path).'['.$index.'] has no '.$key);
             }
@@ -173,13 +174,15 @@ final class JsonPath
     {
         $value = $data;
         foreach ($path as $key) {
+            // A writer returns its child objects: read them as their JSON.
+            $value = \is_object($value) ? self::decoded($value) : $value;
             if (!\is_array($value) || !\array_key_exists($key, $value)) {
                 throw new \RuntimeException(self::describe($path).' is missing');
             }
             $value = $value[$key];
         }
 
-        return $value;
+        return \is_object($value) ? self::decoded($value) : $value;
     }
 
     /** @param list<int|string> $path */

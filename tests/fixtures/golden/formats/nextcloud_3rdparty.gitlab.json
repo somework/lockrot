@@ -1,0 +1,162 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "microsoft/azure-storage-blob 1.5.4 \u2014 abandoned (critical): marked abandoned by its repository; repository archived on GitHub; last release 2022-09-02 (4.0 years ago); last push 2023-07-18 (3.2 years ago); pulls in 1 flagged package: microsoft/azure-storage-common (stale)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "1e01b9b068e66f3c8515dc7cbbc445012202f18eacd88c04c978b183952b230b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "bantu/ini-get-wrapper v1.0.1 \u2014 silent (critical): last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "d914b608dfa1d4ab19eb5d4d853ca4125ee9cea3ab0378e4454db3d2d267cd08",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "pear/console_getopt v1.4.3 \u2014 silent (high): last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago) (via pear/pear-core-minimal, also via pear/archive_tar)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "f3d9570c31fc0cc2bc14a8fb3704d6ea75d70d20ad0d2e9d529df08d28b04523",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "deepdiver1975/tarstreamer v2.1.0 \u2014 stale (medium): last release 2023-06-16 (3.2 years ago)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "07a6cf2fd5420b6b9886fe5fa9012bbf8a0d6e91e837cd5f12078964ef396b9f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "kornrunner/blurhash v1.2.2 \u2014 stale (medium): last release 2022-07-13 (4.2 years ago)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "a3b193e8a289bfc2fde9915ce934ac4351192cfee4520b53a12222dc0d8fa4ff",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "mexitek/phpcolors v1.0.4 \u2014 stale (medium): last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "94899c573663a2d1df7ac62554940740cbb7739fded0dd4ce6ce971de756ba61",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "cweagans/composer-configurable-plugin 2.0.0 \u2014 stale (low): last release 2023-02-12 (3.6 years ago) (via cweagans/composer-patches)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "190d396801589f53be258aea090e12e5a0fcb8693b7df46e7f6701d8de5af8e2",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "microsoft/azure-storage-common 1.5.2 \u2014 stale (low): last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago) (via microsoft/azure-storage-blob)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "b1b33f6bce4b8e903f1f12a69c95f94d8fa3f74e198197463dcc162384dfc768",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "pear/pear_exception v1.0.2 \u2014 stale (low): last release 2021-03-21 (5.5 years ago) (via pear/pear-core-minimal, also via pear/archive_tar)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "af1145058bd7f227e53a21ff092e467a6a4248076b54eb7062237a948a347545",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/advisories-unchecked",
+        "description": "advisories not checked: the gate could not read the advisories of every package",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "aa6972ef903020f362b3f39114d8c697dd621f85b3eb09e4a07ad2d966294e3f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

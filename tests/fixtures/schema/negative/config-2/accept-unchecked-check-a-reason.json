@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "host_not_supported",
+   "host": "codeberg.org",
+   "reason": "x"
+  }
+ ]
+}

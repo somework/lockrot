@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineFile;
+use Lockrot\Exception\ConfigException;
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\Signal;
@@ -306,18 +307,24 @@ final class SchemaEvolutionTest extends TestCase
     }
 
     /**
-     * The baseline that an older release wrote is one that a user has committed. The current lockrot
-     * reads it back through the same schema check, and refuses one that does not match.
+     * The baseline that an older release wrote is one that a user has committed. lockrot 0.14 reads
+     * baseline-2 only, so each recorded baseline-1 file is refused with the message that says what
+     * to do. The recordings stay as they were written.
      *
      * @dataProvider versions
      */
     #[DataProvider('versions')]
-    public function testTheBaselineAnOlderReleaseWroteIsReadBack(string $version): void
+    public function testTheBaselineAnOlderReleaseWroteIsRefused(string $version): void
     {
         $findings = JsonPath::arrayAt(self::decode($version, self::BASELINE), ['findings']);
         self::assertNotSame([], $findings);
 
-        self::assertSame(\count($findings), BaselineFile::resolve(self::DIR.$version, self::BASELINE)->read()->count());
+        try {
+            BaselineFile::resolve(self::DIR.$version, self::BASELINE, '0.14.0')->read();
+            self::fail('a baseline-1 file is read');
+        } catch (ConfigException $e) {
+            self::assertSame('lockrot 0.14 reads baseline-2 only. Review the findings, then run --generate-baseline.', $e->getMessage());
+        }
         self::assertSame(self::BASELINE, JsonPath::stringAt(self::decode($version, 'report.json'), ['baseline', 'path']), 'the report was compared against it');
     }
 

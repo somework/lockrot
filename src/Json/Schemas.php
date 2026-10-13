@@ -30,8 +30,8 @@ final class Schemas
     private const NUMBERS = [
         self::REPORT => [1, 2],
         self::EXPLAIN => [1, 2],
-        self::BASELINE => [1],
-        self::CONFIG => [1],
+        self::BASELINE => [1, 2],
+        self::CONFIG => [1, 2],
     ];
 
     /** @return non-empty-string such as `https://lockrot.dev/schema/report-1.json` */

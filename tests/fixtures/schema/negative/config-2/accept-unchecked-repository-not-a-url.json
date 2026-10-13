@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "release_metadata",
+   "repository": "acme/fork",
+   "reason": "x"
+  }
+ ]
+}

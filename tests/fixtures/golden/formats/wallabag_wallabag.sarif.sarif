@@ -1,0 +1,2322 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.13.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/abandoned",
+                            "name": "abandoned",
+                            "shortDescription": {
+                                "text": "abandoned: Package is marked abandoned by its repository, or its repository is archived"
+                            },
+                            "fullDescription": {
+                                "text": "The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/silent",
+                            "name": "silent",
+                            "shortDescription": {
+                                "text": "silent: No stable release and no repository push for a long time"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release for at least release-high-years (default 5 years) and no repository push for at least push-high-years (default 5 years); an archived repository is reported as abandoned instead."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/pinned",
+                            "name": "pinned",
+                            "shortDescription": {
+                                "text": "pinned: Installed version is a branch snapshot, or the package has no stable release"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/left-behind",
+                            "name": "left-behind",
+                            "shortDescription": {
+                                "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release on the installed version's branch for at least release-high-years (default 5 years), while a higher branch has released since: the package is alive, the branch installed here gets no fixes."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/old-promise",
+                            "name": "old-promise",
+                            "shortDescription": {
+                                "text": "old-promise: Released before the target PHP's GA date with an open-ended php constraint"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version was released before the target PHP's GA date, and its require.php constraint is open-ended (>=N, *) for that target."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "Old release or old push, but not old enough \u2014 or not on both fronts \u2014 for silent."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/advisories-unchecked",
+                            "name": "advisories-unchecked",
+                            "shortDescription": {
+                                "text": "advisories-unchecked: The advisories of some packages were not checked"
+                            },
+                            "fullDescription": {
+                                "text": "The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "sensio/framework-extra-bundle v6.2.10: marked abandoned by its repository, replacement: Symfony; repository archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago); pulls in 1 flagged package: doctrine/annotations (abandoned)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "sensio/framework-extra-bundle"
+                    },
+                    "properties": {
+                        "package": "sensio/framework-extra-bundle",
+                        "version": "v6.2.10",
+                        "verdict": "abandoned",
+                        "priority": "critical",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4",
+                            "S7"
+                        ],
+                        "chain": [
+                            "sensio/framework-extra-bundle"
+                        ],
+                        "direct_dependents": [
+                            "sensio/framework-extra-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:50:07+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "javibravo/simpleue 2.1.0: last release 2017-11-15 (8.8 years ago); last push 2017-11-18 (8.8 years ago); released 2017-11-15 for PHP 5 (php \">=5.5\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "javibravo/simpleue"
+                    },
+                    "properties": {
+                        "package": "javibravo/simpleue",
+                        "version": "2.1.0",
+                        "verdict": "silent",
+                        "priority": "critical",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "javibravo/simpleue"
+                        ],
+                        "direct_dependents": [
+                            "javibravo/simpleue"
+                        ],
+                        "data_date": "2026-09-14T18:49:04+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "mnapoli/piwik-twig-extension 3.0.0: last release 2020-04-24 (6.4 years ago); last push 2020-04-28 (6.4 years ago); released 2020-04-24 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "mnapoli/piwik-twig-extension"
+                    },
+                    "properties": {
+                        "package": "mnapoli/piwik-twig-extension",
+                        "version": "3.0.0",
+                        "verdict": "silent",
+                        "priority": "critical",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "mnapoli/piwik-twig-extension"
+                        ],
+                        "direct_dependents": [
+                            "mnapoli/piwik-twig-extension"
+                        ],
+                        "data_date": "2026-09-14T18:49:18+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "behat/transliterator v1.5.0: marked abandoned by its repository; repository archived on GitHub; last release 2022-03-30 (4.5 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "behat/transliterator"
+                    },
+                    "properties": {
+                        "package": "behat/transliterator",
+                        "version": "v1.5.0",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3"
+                        ],
+                        "chain": [
+                            "stof/doctrine-extensions-bundle",
+                            "gedmo/doctrine-extensions",
+                            "behat/transliterator"
+                        ],
+                        "direct_dependents": [
+                            "stof/doctrine-extensions-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:00+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "doctrine/annotations 2.0.2: marked abandoned by its repository"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "doctrine/annotations"
+                    },
+                    "properties": {
+                        "package": "doctrine/annotations",
+                        "version": "2.0.2",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1"
+                        ],
+                        "chain": [
+                            "sensio/framework-extra-bundle",
+                            "doctrine/annotations"
+                        ],
+                        "direct_dependents": [
+                            "sensio/framework-extra-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:04+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "doctrine/cache 2.2.0: marked abandoned by its repository; last release 2022-05-20 (4.3 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "doctrine/cache"
+                    },
+                    "properties": {
+                        "package": "doctrine/cache",
+                        "version": "2.2.0",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2"
+                        ],
+                        "chain": [
+                            "doctrine/doctrine-bundle",
+                            "doctrine/cache"
+                        ],
+                        "direct_dependents": [
+                            "craue/config-bundle",
+                            "doctrine/doctrine-bundle",
+                            "doctrine/doctrine-migrations-bundle",
+                            "doctrine/orm",
+                            "pagerfanta/doctrine-orm-adapter",
+                            "spiriitlabs/form-filter-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:05+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/compiler 3.17.08.08: marked abandoned by its repository; repository archived on GitHub; last release 2017-08-08 (9.1 years ago); last push 2021-04-29 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/compiler"
+                    },
+                    "properties": {
+                        "package": "hoa/compiler",
+                        "version": "3.17.08.08",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/compiler"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:41+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/consistency 1.17.05.02: marked abandoned by its repository; repository archived on GitHub; last release 2017-08-29 (9.0 years ago); last push 2021-04-28 (5.4 years ago); released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/consistency"
+                    },
+                    "properties": {
+                        "package": "hoa/consistency",
+                        "version": "1.17.05.02",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/consistency"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:42+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/event 1.17.01.13: marked abandoned by its repository; repository archived on GitHub; last release 2017-08-30 (9.0 years ago); last push 2021-04-29 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/event"
+                    },
+                    "properties": {
+                        "package": "hoa/event",
+                        "version": "1.17.01.13",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/consistency",
+                            "hoa/exception",
+                            "hoa/event"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:43+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/exception 1.17.01.16: marked abandoned by its repository; repository archived on GitHub; last release 2017-08-30 (9.0 years ago); last push 2021-04-29 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/exception"
+                    },
+                    "properties": {
+                        "package": "hoa/exception",
+                        "version": "1.17.01.16",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/consistency",
+                            "hoa/exception"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:45+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/file 1.17.07.11: marked abandoned by its repository; repository archived on GitHub; last release 2017-07-11 (9.2 years ago); last push 2018-01-23 (8.6 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/file"
+                    },
+                    "properties": {
+                        "package": "hoa/file",
+                        "version": "1.17.07.11",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/file"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:46+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/iterator 2.17.01.10: marked abandoned by its repository; repository archived on GitHub; last release 2017-01-10 (9.7 years ago); last push 2021-04-29 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/iterator"
+                    },
+                    "properties": {
+                        "package": "hoa/iterator",
+                        "version": "2.17.01.10",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/compiler",
+                            "hoa/iterator"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:47+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/math 1.17.05.16: marked abandoned by its repository; repository archived on GitHub; last release 2017-05-16 (9.3 years ago); last push 2021-04-29 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/math"
+                    },
+                    "properties": {
+                        "package": "hoa/math",
+                        "version": "1.17.05.16",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/compiler",
+                            "hoa/math"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:48+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/protocol 1.17.01.14: marked abandoned by its repository; repository archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/protocol"
+                    },
+                    "properties": {
+                        "package": "hoa/protocol",
+                        "version": "1.17.01.14",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/protocol"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:49+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/regex 1.17.01.13: marked abandoned by its repository; repository archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/regex"
+                    },
+                    "properties": {
+                        "package": "hoa/regex",
+                        "version": "1.17.01.13",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/compiler",
+                            "hoa/regex"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:50+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/ruler 2.17.05.16: marked abandoned by its repository; repository archived on GitHub; last release 2017-05-16 (9.3 years ago); last push 2021-07-10 (5.2 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/ruler"
+                    },
+                    "properties": {
+                        "package": "hoa/ruler",
+                        "version": "2.17.05.16",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:51+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/stream 1.17.02.21: marked abandoned by its repository; repository archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.1 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/stream"
+                    },
+                    "properties": {
+                        "package": "hoa/stream",
+                        "version": "1.17.02.21",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/file",
+                            "hoa/stream"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:52+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/ustring 4.17.01.16: marked abandoned by its repository; repository archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/ustring"
+                    },
+                    "properties": {
+                        "package": "hoa/ustring",
+                        "version": "4.17.01.16",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/compiler",
+                            "hoa/regex",
+                            "hoa/ustring"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:53+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/visitor 2.17.01.16: marked abandoned by its repository; repository archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/visitor"
+                    },
+                    "properties": {
+                        "package": "hoa/visitor",
+                        "version": "2.17.01.16",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/visitor"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:55+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "hoa/zformat 1.17.01.10: marked abandoned by its repository; repository archived on GitHub; last release 2017-01-10 (9.7 years ago); last push 2018-02-12 (8.6 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "hoa/zformat"
+                    },
+                    "properties": {
+                        "package": "hoa/zformat",
+                        "version": "1.17.01.10",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz",
+                            "hoa/ruler",
+                            "hoa/compiler",
+                            "hoa/math",
+                            "hoa/zformat"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:56+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "symfony/security-guard v5.4.45: marked abandoned by its repository; repository archived on GitHub"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/security-guard"
+                    },
+                    "properties": {
+                        "package": "symfony/security-guard",
+                        "version": "v5.4.45",
+                        "verdict": "abandoned",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S3"
+                        ],
+                        "chain": [
+                            "symfony/security-bundle",
+                            "symfony/security-guard"
+                        ],
+                        "direct_dependents": [
+                            "friendsofsymfony/oauth-server-bundle",
+                            "friendsofsymfony/user-bundle",
+                            "scheb/2fa-backup-code",
+                            "scheb/2fa-bundle",
+                            "scheb/2fa-email",
+                            "scheb/2fa-google-authenticator",
+                            "scheb/2fa-trusted-device",
+                            "symfony/security-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:51:07+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "grandt/binstring 1.0.0: last release 2015-08-13 (11.1 years ago); last push 2015-08-13 (11.1 years ago); released 2015-08-13 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "grandt/binstring"
+                    },
+                    "properties": {
+                        "package": "grandt/binstring",
+                        "version": "1.0.0",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "wallabag/phpepub",
+                            "grandt/phpresizegif",
+                            "grandt/binstring"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/phpepub"
+                        ],
+                        "data_date": "2026-09-14T18:48:33+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "grandt/phpresizegif 1.0.3: last release 2015-05-10 (11.3 years ago); last push 2015-08-13 (11.1 years ago); released 2015-05-10 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "grandt/phpresizegif"
+                    },
+                    "properties": {
+                        "package": "grandt/phpresizegif",
+                        "version": "1.0.3",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "wallabag/phpepub",
+                            "grandt/phpresizegif"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/phpepub"
+                        ],
+                        "data_date": "2026-09-14T18:48:34+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "grandt/phpzipmerge 1.0.4: last release 2015-08-18 (11.1 years ago); last push 2015-08-18 (11.1 years ago); released 2015-08-18 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "grandt/phpzipmerge"
+                    },
+                    "properties": {
+                        "package": "grandt/phpzipmerge",
+                        "version": "1.0.4",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "wallabag/phpepub",
+                            "phpzip/phpzip",
+                            "grandt/phpzipmerge"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/phpepub"
+                        ],
+                        "data_date": "2026-09-14T18:48:36+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "grandt/relativepath 1.0.2: last release 2015-05-14 (11.3 years ago); last push 2020-04-01 (6.5 years ago); released 2015-05-14 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "grandt/relativepath"
+                    },
+                    "properties": {
+                        "package": "grandt/relativepath",
+                        "version": "1.0.2",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "wallabag/phpepub",
+                            "grandt/relativepath"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/phpepub"
+                        ],
+                        "data_date": "2026-09-14T18:48:37+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "phpzip/phpzip 2.0.8: last release 2015-11-16 (10.8 years ago); last push 2015-11-16 (10.8 years ago); released 2015-11-16 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "phpzip/phpzip"
+                    },
+                    "properties": {
+                        "package": "phpzip/phpzip",
+                        "version": "2.0.8",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "wallabag/phpepub",
+                            "phpzip/phpzip"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/phpepub"
+                        ],
+                        "data_date": "2026-09-14T18:49:43+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "pragmarx/random v0.2.2: last release 2017-11-21 (8.8 years ago); last push 2017-12-18 (8.7 years ago); released 2017-11-21 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "pragmarx/random"
+                    },
+                    "properties": {
+                        "package": "pragmarx/random",
+                        "version": "v0.2.2",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "pragmarx/recovery",
+                            "pragmarx/random"
+                        ],
+                        "direct_dependents": [
+                            "pragmarx/recovery"
+                        ],
+                        "data_date": "2026-09-14T18:49:44+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 2,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "friendsofsymfony/oauth-server-bundle dev-master: pinned to branch snapshot dev-master; last release 2019-01-23 (7.6 years ago); pulls in 2 flagged packages: symfony/security-guard (abandoned), friendsofsymfony/oauth2-php (stale)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "friendsofsymfony/oauth-server-bundle"
+                    },
+                    "properties": {
+                        "package": "friendsofsymfony/oauth-server-bundle",
+                        "version": "dev-master",
+                        "verdict": "pinned",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S6",
+                            "S7"
+                        ],
+                        "chain": [
+                            "friendsofsymfony/oauth-server-bundle"
+                        ],
+                        "direct_dependents": [
+                            "friendsofsymfony/oauth-server-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:28+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 2,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "wallabag/rulerz dev-master: pinned to branch snapshot dev-master; pulls in 14 flagged packages: hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "wallabag/rulerz"
+                    },
+                    "properties": {
+                        "package": "wallabag/rulerz",
+                        "version": "dev-master",
+                        "verdict": "pinned",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S6",
+                            "S7"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz",
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:51:31+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 2,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "wallabag/rulerz-bundle dev-master: pinned to branch snapshot dev-master; pulls in 15 flagged packages: hoa/compiler (abandoned), hoa/consistency (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "wallabag/rulerz-bundle"
+                    },
+                    "properties": {
+                        "package": "wallabag/rulerz-bundle",
+                        "version": "dev-master",
+                        "verdict": "pinned",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S6",
+                            "S7"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:51:34+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "doctrine/event-manager 1.2.0: branch 1.x last released 2022-10-12 (3.9 years ago); 2.x released 2.1.1 (2026-01-29); require ^2.1 to follow"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "doctrine/event-manager"
+                    },
+                    "properties": {
+                        "package": "doctrine/event-manager",
+                        "version": "1.2.0",
+                        "verdict": "left-behind",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S8"
+                        ],
+                        "chain": [
+                            "doctrine/event-manager"
+                        ],
+                        "direct_dependents": [
+                            "craue/config-bundle",
+                            "doctrine/common",
+                            "doctrine/dbal",
+                            "doctrine/doctrine-bundle",
+                            "doctrine/doctrine-migrations-bundle",
+                            "doctrine/event-manager",
+                            "doctrine/migrations",
+                            "doctrine/orm",
+                            "doctrine/persistence",
+                            "pagerfanta/doctrine-orm-adapter",
+                            "spiriitlabs/form-filter-bundle",
+                            "stof/doctrine-extensions-bundle",
+                            "symfony/doctrine-bridge"
+                        ],
+                        "data_date": "2026-09-14T18:48:13+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "lcobucci/jwt 4.3.0: branch 4.x last released 2023-01-02 (3.7 years ago); 5.x released 5.6.0 (2025-10-17); require ^5.6 to follow"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "lcobucci/jwt"
+                    },
+                    "properties": {
+                        "package": "lcobucci/jwt",
+                        "version": "4.3.0",
+                        "verdict": "left-behind",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S8"
+                        ],
+                        "chain": [
+                            "lcobucci/jwt"
+                        ],
+                        "direct_dependents": [
+                            "lcobucci/jwt",
+                            "scheb/2fa-trusted-device"
+                        ],
+                        "data_date": "2026-09-14T18:49:11+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "scheb/2fa-backup-code v5.13.2: branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to follow; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it; pulls in 1 flagged package: symfony/security-guard (abandoned)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "scheb/2fa-backup-code"
+                    },
+                    "properties": {
+                        "package": "scheb/2fa-backup-code",
+                        "version": "v5.13.2",
+                        "verdict": "left-behind",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S7",
+                            "S8",
+                            "S10"
+                        ],
+                        "chain": [
+                            "scheb/2fa-backup-code"
+                        ],
+                        "direct_dependents": [
+                            "scheb/2fa-backup-code"
+                        ],
+                        "data_date": "2026-09-14T18:49:59+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "scheb/2fa-bundle v5.13.2: branch 5.x last released 2022-04-16 (4.4 years ago); 8.x released v8.6.1 (2026-07-10); require ^8.6 to follow; pulls in 1 flagged package: symfony/security-guard (abandoned)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "scheb/2fa-bundle"
+                    },
+                    "properties": {
+                        "package": "scheb/2fa-bundle",
+                        "version": "v5.13.2",
+                        "verdict": "left-behind",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S7",
+                            "S8"
+                        ],
+                        "chain": [
+                            "scheb/2fa-bundle"
+                        ],
+                        "direct_dependents": [
+                            "scheb/2fa-backup-code",
+                            "scheb/2fa-bundle",
+                            "scheb/2fa-email",
+                            "scheb/2fa-google-authenticator",
+                            "scheb/2fa-trusted-device"
+                        ],
+                        "data_date": "2026-09-14T18:50:00+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "scheb/2fa-email v5.13.2: branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-06-08); require ^7.14 to follow; pulls in 1 flagged package: symfony/security-guard (abandoned)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "scheb/2fa-email"
+                    },
+                    "properties": {
+                        "package": "scheb/2fa-email",
+                        "version": "v5.13.2",
+                        "verdict": "left-behind",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S7",
+                            "S8"
+                        ],
+                        "chain": [
+                            "scheb/2fa-email"
+                        ],
+                        "direct_dependents": [
+                            "scheb/2fa-email"
+                        ],
+                        "data_date": "2026-09-14T18:50:01+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "scheb/2fa-google-authenticator v5.13.2: branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to follow; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it; pulls in 3 flagged packages: symfony/security-guard (abandoned), spomky-labs/otphp (left-behind), thecodingmachine/safe (left-behind)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "scheb/2fa-google-authenticator"
+                    },
+                    "properties": {
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "v5.13.2",
+                        "verdict": "left-behind",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S7",
+                            "S8",
+                            "S10"
+                        ],
+                        "chain": [
+                            "scheb/2fa-google-authenticator"
+                        ],
+                        "direct_dependents": [
+                            "scheb/2fa-google-authenticator"
+                        ],
+                        "data_date": "2026-09-14T18:50:03+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "scheb/2fa-trusted-device v5.13.2: branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24); require ^7.14 to follow; the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it; pulls in 1 flagged package: symfony/security-guard (abandoned)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "scheb/2fa-trusted-device"
+                    },
+                    "properties": {
+                        "package": "scheb/2fa-trusted-device",
+                        "version": "v5.13.2",
+                        "verdict": "left-behind",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S7",
+                            "S8",
+                            "S10"
+                        ],
+                        "chain": [
+                            "scheb/2fa-trusted-device"
+                        ],
+                        "direct_dependents": [
+                            "scheb/2fa-trusted-device"
+                        ],
+                        "data_date": "2026-09-14T18:50:04+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 4,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "mgargano/simplehtmldom 1.5: released 2014-01-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; last release 2014-01-05 (12.7 years ago); last push 2022-08-04 (4.1 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "mgargano/simplehtmldom"
+                    },
+                    "properties": {
+                        "package": "mgargano/simplehtmldom",
+                        "version": "1.5",
+                        "verdict": "old-promise",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "mgargano/simplehtmldom"
+                        ],
+                        "direct_dependents": [
+                            "mgargano/simplehtmldom"
+                        ],
+                        "data_date": "2026-09-14T18:49:17+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "wallabag/rulerz-bridge dev-master: pinned to branch snapshot dev-master"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "wallabag/rulerz-bridge"
+                    },
+                    "properties": {
+                        "package": "wallabag/rulerz-bridge",
+                        "version": "dev-master",
+                        "verdict": "pinned",
+                        "priority": "medium",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S6"
+                        ],
+                        "chain": [
+                            "wallabag/rulerz-bundle",
+                            "wallabag/rulerz-bridge"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/rulerz-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:51:33+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "smalot/pdfparser v1.1.0: branch 1.x last released 2021-08-03 (5.1 years ago); 2.x released v2.12.5 (2026-04-17)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "smalot/pdfparser"
+                    },
+                    "properties": {
+                        "package": "smalot/pdfparser",
+                        "version": "v1.1.0",
+                        "verdict": "left-behind",
+                        "priority": "medium",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S8"
+                        ],
+                        "chain": [
+                            "j0k3r/graby",
+                            "smalot/pdfparser"
+                        ],
+                        "direct_dependents": [
+                            "j0k3r/graby"
+                        ],
+                        "data_date": "2026-09-14T18:50:12+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "spomky-labs/otphp v10.0.3: branch 10.x last released 2022-03-17 (4.5 years ago); 11.x released 11.5.0 (2026-06-06)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "spomky-labs/otphp"
+                    },
+                    "properties": {
+                        "package": "spomky-labs/otphp",
+                        "version": "v10.0.3",
+                        "verdict": "left-behind",
+                        "priority": "medium",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S8"
+                        ],
+                        "chain": [
+                            "scheb/2fa-google-authenticator",
+                            "spomky-labs/otphp"
+                        ],
+                        "direct_dependents": [
+                            "scheb/2fa-google-authenticator"
+                        ],
+                        "data_date": "2026-09-14T18:50:14+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "symfony/psr-http-message-bridge v2.3.1: branch 2.x last released 2023-07-26 (3.1 years ago); 8.x released v8.1.0 (2026-05-29)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/psr-http-message-bridge"
+                    },
+                    "properties": {
+                        "package": "symfony/psr-http-message-bridge",
+                        "version": "v2.3.1",
+                        "verdict": "left-behind",
+                        "priority": "medium",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S8"
+                        ],
+                        "chain": [
+                            "sentry/sentry-symfony",
+                            "symfony/psr-http-message-bridge"
+                        ],
+                        "direct_dependents": [
+                            "sentry/sentry-symfony"
+                        ],
+                        "data_date": "2026-09-14T18:51:00+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "thecodingmachine/safe v2.5.0: branch 2.x last released 2023-04-05 (3.4 years ago); 3.x released v3.4.0 (2026-02-04)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "thecodingmachine/safe"
+                    },
+                    "properties": {
+                        "package": "thecodingmachine/safe",
+                        "version": "v2.5.0",
+                        "verdict": "left-behind",
+                        "priority": "medium",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S8"
+                        ],
+                        "chain": [
+                            "scheb/2fa-google-authenticator",
+                            "spomky-labs/otphp",
+                            "thecodingmachine/safe"
+                        ],
+                        "direct_dependents": [
+                            "scheb/2fa-google-authenticator"
+                        ],
+                        "data_date": "2026-09-14T18:51:26+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "craue/config-bundle 2.7.0: last release 2023-08-06 (3.1 years ago); pulls in 1 flagged package: doctrine/cache (abandoned)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "craue/config-bundle"
+                    },
+                    "properties": {
+                        "package": "craue/config-bundle",
+                        "version": "2.7.0",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S7"
+                        ],
+                        "chain": [
+                            "craue/config-bundle"
+                        ],
+                        "direct_dependents": [
+                            "craue/config-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:02+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "defuse/php-encryption v2.4.0: last release 2023-06-19 (3.2 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "defuse/php-encryption"
+                    },
+                    "properties": {
+                        "package": "defuse/php-encryption",
+                        "version": "v2.4.0",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "defuse/php-encryption"
+                        ],
+                        "direct_dependents": [
+                            "defuse/php-encryption"
+                        ],
+                        "data_date": "2026-09-14T18:48:03+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "pragmarx/recovery v0.2.1: last release 2021-08-15 (5.1 years ago); pulls in 1 flagged package: pragmarx/random (silent)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "pragmarx/recovery"
+                    },
+                    "properties": {
+                        "package": "pragmarx/recovery",
+                        "version": "v0.2.1",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S7"
+                        ],
+                        "chain": [
+                            "pragmarx/recovery"
+                        ],
+                        "direct_dependents": [
+                            "pragmarx/recovery"
+                        ],
+                        "data_date": "2026-09-14T18:49:46+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "wallabag/phpepub 4.0.10: last release 2022-03-21 (4.5 years ago); pulls in 5 flagged packages: grandt/binstring (silent), grandt/phpresizegif (silent), grandt/phpzipmerge (silent), grandt/relativepath (silent), phpzip/phpzip (silent)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "wallabag/phpepub"
+                    },
+                    "properties": {
+                        "package": "wallabag/phpepub",
+                        "version": "4.0.10",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S7"
+                        ],
+                        "chain": [
+                            "wallabag/phpepub"
+                        ],
+                        "direct_dependents": [
+                            "wallabag/phpepub"
+                        ],
+                        "data_date": "2026-09-14T18:51:30+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "friendsofsymfony/oauth2-php 1.3.1: last release 2021-04-06 (5.4 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "friendsofsymfony/oauth2-php"
+                    },
+                    "properties": {
+                        "package": "friendsofsymfony/oauth2-php",
+                        "version": "1.3.1",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "friendsofsymfony/oauth-server-bundle",
+                            "friendsofsymfony/oauth2-php"
+                        ],
+                        "direct_dependents": [
+                            "friendsofsymfony/oauth-server-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:48:29+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "phpdocumentor/reflection-common 2.2.0: last release 2020-06-27 (6.2 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "phpdocumentor/reflection-common"
+                    },
+                    "properties": {
+                        "package": "phpdocumentor/reflection-common",
+                        "version": "2.2.0",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "nelmio/api-doc-bundle",
+                            "phpdocumentor/reflection-docblock",
+                            "phpdocumentor/reflection-common"
+                        ],
+                        "direct_dependents": [
+                            "nelmio/api-doc-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:49:38+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "willdurand/jsonp-callback-validator v2.0.0: last release 2022-01-30 (4.6 years ago); last push 2023-07-29 (3.1 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "willdurand/jsonp-callback-validator"
+                    },
+                    "properties": {
+                        "package": "willdurand/jsonp-callback-validator",
+                        "version": "v2.0.0",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "friendsofsymfony/jsrouting-bundle",
+                            "willdurand/jsonp-callback-validator"
+                        ],
+                        "direct_dependents": [
+                            "friendsofsymfony/jsrouting-bundle",
+                            "friendsofsymfony/rest-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:51:38+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "willdurand/negotiation 3.1.0: last release 2022-01-30 (4.6 years ago); last push 2023-08-03 (3.1 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "willdurand/negotiation"
+                    },
+                    "properties": {
+                        "package": "willdurand/negotiation",
+                        "version": "3.1.0",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "friendsofsymfony/rest-bundle",
+                            "willdurand/negotiation"
+                        ],
+                        "direct_dependents": [
+                            "friendsofsymfony/rest-bundle"
+                        ],
+                        "data_date": "2026-09-14T18:51:39+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/advisories-unchecked",
+                    "ruleIndex": 6,
+                    "level": "warning",
+                    "message": {
+                        "text": "advisories not checked: the gate could not read the advisories of every package"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/run": "advisories-unchecked"
+                    }
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true
+                }
+            ]
+        }
+    ]
+}

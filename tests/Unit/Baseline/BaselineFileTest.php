@@ -5,15 +5,78 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Baseline;
 
 use Lockrot\Baseline\Baseline;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Tests\Support\BaselineEntries;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BaselineFileTest extends TestCase
 {
+    /** The root of a baseline-2 file without `findings`, as JSON members. */
+    private const ROOT_2 = '"$schema": "https://lockrot.dev/schema/baseline-2.json", "lockrot": {"version": "0.14.0", "schema": 2}, "generated_at": "2026-09-14T00:00:00+00:00", "target_php": "8.4", "target_php_source": "option", "score_model_id": 1, "fix_model": 1';
+
+    /** A file in the shape that lockrot 0.13 writes. */
+    private const BASELINE_1 = '{"$schema": "https://lockrot.dev/schema/baseline-1.json", "lockrot": {"version": "0.13.0", "schema": 1}, "generated_at": "2024-05-17T00:00:00+00:00", "findings": {"acme/a": {"version": "1.0.0", "verdict": "abandoned", "first_seen": "2024-05-17"}}}';
+
+    /** @return iterable<string, array{string, string}> */
+    public static function releases(): iterable
+    {
+        yield 'a 0.14 release' => ['0.14.0', 'lockrot 0.14 reads baseline-2 only. Review the findings, then run --generate-baseline.'];
+        yield 'a later release' => ['0.15.2', 'lockrot 0.15 reads baseline-2 only. Review the findings, then run --generate-baseline.'];
+        yield 'a build that is no release' => ['dev-main 1.2', 'lockrot dev-main 1.2 reads baseline-2 only. Review the findings, then run --generate-baseline.'];
+    }
+
+    /**
+     * SPEC §6.4 (Q2): a baseline-1 file exits 2 before schema validation.
+     *
+     * @dataProvider releases
+     */
+    #[DataProvider('releases')]
+    public function testABaseline1FileIsRefusedWithTheRunningReleaseInTheMessage(string $release, string $message): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/lockrot-baseline.json', self::BASELINE_1);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($message);
+
+        BaselineFile::resolve($dir, null, $release)->read();
+    }
+
+    /** @return iterable<string, array{string, ?int}> */
+    public static function numbers(): iterable
+    {
+        yield 'baseline-1' => [self::BASELINE_1, 1];
+        yield 'a missing number' => ['{"lockrot": {"version": "0.14.0"}, "findings": {}}', null];
+        yield 'a number as a string' => ['{"lockrot": {"version": "0.14.0", "schema": "1"}, "findings": {}}', null];
+        yield 'a number as a float' => ['{"lockrot": {"version": "0.14.0", "schema": 1.0}, "findings": {}}', null];
+        yield 'not JSON' => ['{', null];
+    }
+
+    /** @dataProvider numbers */
+    #[DataProvider('numbers')]
+    public function testTheSchemaNumberIsReadAlone(string $json, ?int $number): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/lockrot-baseline.json', $json);
+
+        self::assertSame($number, BaselineFile::resolve($dir, null, '0.14.0')->schemaNumber());
+    }
+
+    public function testANumberThatIsNotTheInteger1FailsWithTheSchemaError(): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir.'/lockrot-baseline.json', '{"lockrot": {"version": "0.14.0", "schema": "1"}, "findings": {}}');
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('baseline file is invalid:');
+
+        BaselineFile::resolve($dir, null, '0.14.0')->read();
+    }
+
     private const AT = '2026-09-14T00:00:00+00:00';
     private const FIXTURES = __DIR__.'/../../fixtures/baseline';
 
@@ -65,15 +128,15 @@ final class BaselineFileTest extends TestCase
 
     private function baseline(): Baseline
     {
-        return Baseline::of([
-            new BaselineEntry('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
-            new BaselineEntry('acme/silent', '2.0.8', Verdict::SILENT, '2026-02-20'),
+        return BaselineEntries::baseline([
+            BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+            BaselineEntries::of('acme/silent', '2.0.8', Verdict::SILENT, '2026-02-20'),
         ], self::AT);
     }
 
     public function testTheDefaultPathSitsNextToComposerJson(): void
     {
-        $file = BaselineFile::resolve('/projects/app', null);
+        $file = BaselineFile::resolve('/projects/app', null, '0.14.0');
 
         self::assertSame('/projects/app/lockrot-baseline.json', $file->path());
         self::assertSame('lockrot-baseline.json', $file->displayPath());
@@ -81,7 +144,7 @@ final class BaselineFileTest extends TestCase
 
     public function testAConfiguredRelativePathIsResolvedAgainstTheProjectDirectory(): void
     {
-        $file = BaselineFile::resolve('/projects/app', 'ci/rot.json');
+        $file = BaselineFile::resolve('/projects/app', 'ci/rot.json', '0.14.0');
 
         self::assertSame('/projects/app/ci/rot.json', $file->path());
         self::assertSame('ci/rot.json', $file->displayPath(), 'the display path stays relative so CI diffs are machine-independent');
@@ -89,7 +152,7 @@ final class BaselineFileTest extends TestCase
 
     public function testAConfiguredAbsolutePathIsUsedAsIs(): void
     {
-        $file = BaselineFile::resolve('/projects/app', '/elsewhere/rot.json');
+        $file = BaselineFile::resolve('/projects/app', '/elsewhere/rot.json', '0.14.0');
 
         self::assertSame('/elsewhere/rot.json', $file->path());
         self::assertSame('/elsewhere/rot.json', $file->displayPath(), 'the terminal says which file it means');
@@ -116,13 +179,13 @@ final class BaselineFileTest extends TestCase
     #[DataProvider('reportedPaths')]
     public function testTheReportNamesTheBaselineAndNeverLocatesTheMachine(string $projectDir, ?string $configured, string $reported): void
     {
-        self::assertSame($reported, BaselineFile::resolve($projectDir, $configured)->reportedPath());
+        self::assertSame($reported, BaselineFile::resolve($projectDir, $configured, '0.14.0')->reportedPath());
     }
 
     public function testATrailingSeparatorOnTheProjectDirectoryIsNotDoubled(): void
     {
-        self::assertSame('/projects/app/lockrot-baseline.json', BaselineFile::resolve('/projects/app/', null)->path());
-        self::assertSame('/projects/app/ci/rot.json', BaselineFile::resolve('/projects/app\\', 'ci/rot.json')->path());
+        self::assertSame('/projects/app/lockrot-baseline.json', BaselineFile::resolve('/projects/app/', null, '0.14.0')->path());
+        self::assertSame('/projects/app/ci/rot.json', BaselineFile::resolve('/projects/app\\', 'ci/rot.json', '0.14.0')->path());
     }
 
     /**
@@ -135,7 +198,7 @@ final class BaselineFileTest extends TestCase
     #[DataProvider('windowsAbsolutePaths')]
     public function testAWindowsAbsolutePathIsUsedAsIs(string $configured): void
     {
-        self::assertSame($configured, BaselineFile::resolve('/projects/app', $configured)->path());
+        self::assertSame($configured, BaselineFile::resolve('/projects/app', $configured, '0.14.0')->path());
     }
 
     /** @return iterable<string, array{string}> */
@@ -148,29 +211,29 @@ final class BaselineFileTest extends TestCase
 
     public function testWriteThenReadRoundTrip(): void
     {
-        $file = BaselineFile::resolve($this->tempDir(), null);
+        $file = BaselineFile::resolve($this->tempDir(), null, '0.14.0');
         self::assertFalse($file->exists());
 
         $file->write($this->baseline());
 
         self::assertTrue($file->exists());
-        self::assertSame($this->baseline()->toArray(), $file->read()->toArray());
+        self::assertSame(JsonPath::decoded($this->baseline()->toArray()), JsonPath::decoded($file->read()->toArray()));
     }
 
     public function testWrittenFileLooksLikeComposersOwnJson(): void
     {
-        $file = BaselineFile::resolve($this->tempDir(), null);
+        $file = BaselineFile::resolve($this->tempDir(), null, '0.14.0');
         $file->write($this->baseline());
         $contents = (string) file_get_contents($file->path());
 
-        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/baseline-1.json\",\n    \"lockrot\": {\n", $contents);
+        self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/baseline-2.json\",\n    \"lockrot\": {\n", $contents);
         self::assertStringEndsWith("}\n", $contents);
         self::assertStringNotContainsString('\\/', $contents, 'slashes stay unescaped, as in composer.json');
     }
 
     public function testWritingTwiceIsByteIdentical(): void
     {
-        $file = BaselineFile::resolve($this->tempDir(), null);
+        $file = BaselineFile::resolve($this->tempDir(), null, '0.14.0');
         $file->write($this->baseline());
         $first = (string) file_get_contents($file->path());
         $file->write($this->baseline());
@@ -181,7 +244,7 @@ final class BaselineFileTest extends TestCase
     public function testWriteLeavesNoTemporaryFileBehind(): void
     {
         $dir = $this->tempDir();
-        $file = BaselineFile::resolve($dir, null);
+        $file = BaselineFile::resolve($dir, null, '0.14.0');
         $file->write($this->baseline());
 
         $found = array_values(array_diff((array) scandir($dir), ['.', '..']));
@@ -191,7 +254,7 @@ final class BaselineFileTest extends TestCase
     public function testAnUnwritableTargetIsAConfigException(): void
     {
         $dir = $this->tempDir();
-        $file = BaselineFile::resolve($dir, null);
+        $file = BaselineFile::resolve($dir, null, '0.14.0');
         chmod($dir, 0555);
         clearstatcache(true, $dir);
         if (is_writable($dir)) {
@@ -215,7 +278,7 @@ final class BaselineFileTest extends TestCase
      */
     public function testAMissingDirectoryReportsTheFailedWriteAndNotTheCleanup(): void
     {
-        $file = BaselineFile::resolve($this->tempDir().'/no/such/dir', null);
+        $file = BaselineFile::resolve($this->tempDir().'/no/such/dir', null, '0.14.0');
 
         $thrown = null;
         try {
@@ -241,8 +304,8 @@ final class BaselineFileTest extends TestCase
      */
     public function testAnEmptyBaselineWritesFindingsAsAnObject(): void
     {
-        $file = BaselineFile::resolve($this->tempDir(), null);
-        $file->write(Baseline::of([], self::AT));
+        $file = BaselineFile::resolve($this->tempDir(), null, '0.14.0');
+        $file->write(BaselineEntries::baseline([], self::AT));
         $contents = (string) file_get_contents($file->path());
 
         self::assertStringContainsString('"findings": {}', $contents);
@@ -259,7 +322,7 @@ final class BaselineFileTest extends TestCase
         $dir = $this->tempDir();
         mkdir($dir.'/lockrot-baseline.json');
         file_put_contents($dir.'/lockrot-baseline.json/occupied', 'x');
-        $file = BaselineFile::resolve($dir, null);
+        $file = BaselineFile::resolve($dir, null, '0.14.0');
 
         $thrown = null;
         try {
@@ -287,7 +350,7 @@ final class BaselineFileTest extends TestCase
     {
         // The temp file is gone by the time a successful write() returns, so the name is observed
         // through the failure message of a write that cannot complete instead.
-        $file = BaselineFile::resolve($this->tempDir().'/missing', null);
+        $file = BaselineFile::resolve($this->tempDir().'/missing', null, '0.14.0');
 
         $messages = [];
         for ($i = 0; $i < 2; ++$i) {
@@ -305,7 +368,7 @@ final class BaselineFileTest extends TestCase
 
     public function testReadingAMalformedFileIsAConfigException(): void
     {
-        $file = BaselineFile::resolve(self::FIXTURES, 'malformed.json');
+        $file = BaselineFile::resolve(self::FIXTURES, 'malformed.json', '0.14.0');
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessageMatches('/is not valid JSON/');
@@ -326,14 +389,14 @@ final class BaselineFileTest extends TestCase
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($message);
-        BaselineFile::resolve($dir, null)->read();
+        BaselineFile::resolve($dir, null, '0.14.0')->read();
     }
 
     /** @return iterable<string, array{0: string, 1: string}> */
     public static function baselinesTheValidatorCouldNotRead(): iterable
     {
-        $lockrot = '"lockrot": {"version": "0.1.0", "schema": 1}';
-        $entry = '{"version": "1.0.0", "verdict": "abandoned", "first_seen": "2026-01-15"}';
+        $lockrot = self::ROOT_2;
+        $entry = '{"version": "1.0.0", "first_seen": "2026-01-15", "flags": {"abandoned": {"known_since": "2026-01-15"}}}';
 
         yield 'a NUL key at the top' => [
             '{'.$lockrot.', "findings": {}, "\u0000k": 1}',
@@ -344,15 +407,15 @@ final class BaselineFileTest extends TestCase
             "baseline file is invalid:\n  - findings.\\000acme/b: a key starting with a NUL byte cannot be read",
         ];
         yield 'a NUL key inside an entry' => [
-            '{'.$lockrot.', "findings": {"acme/a": {"version": "1.0.0", "verdict": "abandoned", "first_seen": "2026-01-15", "\u0000": 1}}}',
+            '{'.$lockrot.', "findings": {"acme/a": {"version": "1.0.0", "first_seen": "2026-01-15", "flags": {"abandoned": {"known_since": "2026-01-15"}}, "\u0000": 1}}}',
             "baseline file is invalid:\n  - findings.acme/a.\\000: a key starting with a NUL byte cannot be read",
         ];
         yield 'a number too large for a float where an integer is wanted' => [
-            '{"lockrot": {"version": "0.1.0", "schema": 1e400}, "findings": {}}',
+            '{"$schema": "https://lockrot.dev/schema/baseline-2.json", "lockrot": {"version": "0.14.0", "schema": 1e400}, "generated_at": "2026-09-14T00:00:00+00:00", "target_php": "8.4", "target_php_source": "option", "score_model_id": 1, "fix_model": 1, "findings": {}}',
             "baseline file is invalid:\n  - lockrot.schema: ",
         ];
         yield 'a number too large for a float where a string is wanted' => [
-            '{'.$lockrot.', "findings": {"acme/a": {"version": -1e400, "verdict": "abandoned", "first_seen": "2026-01-15"}}}',
+            '{'.$lockrot.', "findings": {"acme/a": {"version": -1e400, "first_seen": "2026-01-15", "flags": {"abandoned": {"known_since": "2026-01-15"}}}}}',
             "baseline file is invalid:\n  - findings.acme/a.version: ",
         ];
     }
@@ -367,18 +430,18 @@ final class BaselineFileTest extends TestCase
         $dir = $this->tempDir();
         file_put_contents(
             $dir.'/lockrot-baseline.json',
-            '{"lockrot": {"version": "0.1.0", "schema": 1}, "custom": 1e400, "k\u0000": {"deep": [-1e400]},'
-            .' "findings": {"acme/a": {"version": "1.0.0", "verdict": "abandoned", "first_seen": "2026-01-15", "note\u0000": []}}}'
+            '{'.self::ROOT_2.', "custom": 1e400, "k\u0000": {"deep": [-1e400]},'
+            .' "findings": {"acme/a": {"version": "1.0.0", "first_seen": "2026-01-15", "flags": {"abandoned": {"known_since": "2026-01-15"}}, "note\u0000": []}}}'
         );
 
-        $baseline = BaselineFile::resolve($dir, null)->read();
+        $baseline = BaselineFile::resolve($dir, null, '0.14.0')->read();
 
         self::assertSame(['acme/a'], $baseline->packages());
     }
 
     public function testReadingAMissingFileIsAConfigException(): void
     {
-        $file = BaselineFile::resolve($this->tempDir(), null);
+        $file = BaselineFile::resolve($this->tempDir(), null, '0.14.0');
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessageMatches('/not found/');

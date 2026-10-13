@@ -34,3 +34,7 @@
 /.python-version export-ignore
 /lockrot-release-key.asc export-ignore
 /lockrot-selfupdate-key.pub export-ignore
+# tools/schema/make_negatives*.py writes these: GitHub folds them in a pull request.
+/tests/fixtures/schema/negative/** linguist-generated
+# tools/score/sweep.py --axis gate --sample writes it.
+/tests/fixtures/score/gate-rows.sample.txt linguist-generated

@@ -9,10 +9,6 @@ use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\Report2Root;
-use Lockrot\Baseline\Baseline;
-use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
-use Lockrot\Config\Gate;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
@@ -21,7 +17,6 @@ use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
-use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
@@ -31,30 +26,6 @@ use PHPUnit\Framework\TestCase;
 /** The root blocks that report-2 counts from its findings. */
 final class Report2RootTest extends TestCase
 {
-    private const AT = '2026-09-14T00:00:00+00:00';
-
-    public function testTheGateCountsTheReachingTheFailingAndTheBaselineExemptions(): void
-    {
-        $known = (new FindingBuilder())->withPackage('vendor/known')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/known'])->build();
-        $new = (new FindingBuilder())->withPackage('vendor/new')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/new'])->build();
-        $fine = (new FindingBuilder())->withPackage('vendor/fine')->withChain(['vendor/fine'])->build();
-        $report = new Report([$known, $new, $fine], [], new \DateTimeImmutable(self::AT), 3, 0);
-        $baseline = Baseline::of([new BaselineEntry('vendor/known', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
-        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', ['vendor/known', 'vendor/new', 'vendor/fine']));
-
-        $check = Report2Root::toGateArray(Gate::decide($compared, FailOn::fromString('low'), false, Gate::MODE_CHECK), Gate::MODE_CHECK);
-        $generate = Report2Root::toGateArray(Gate::decide($compared, FailOn::fromString('low'), false, Gate::MODE_GENERATE_BASELINE), Gate::MODE_GENERATE_BASELINE);
-
-        self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true, 'reaching' => 2, 'failing' => 1, 'exempt' => ['baseline' => 1]], $check);
-        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => false, 'reaching' => 2, 'failing' => 0, 'exempt' => ['baseline' => 1]], $generate);
-    }
-
-    public function testWithoutAGateNothingReachesAndTheModeSaysWhetherFailOnApplies(): void
-    {
-        self::assertSame(['fails' => false, 'tripped_by' => [], 'fail_on_applied' => true, 'reaching' => 0, 'failing' => 0, 'exempt' => ['baseline' => 0]], Report2Root::toGateArray(null, Gate::MODE_CHECK));
-        self::assertFalse(Report2Root::toGateArray(null, Gate::MODE_GENERATE_BASELINE)['fail_on_applied']);
-    }
-
     public function testSecuritySumsTheVulnerableFindingsOnly(): void
     {
         $findings = [

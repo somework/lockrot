@@ -41,14 +41,17 @@ final class FlagSet
     /** @var list<string> */
     private array $fired;
     private ?string $hidden;
+    private bool $wholePackage;
 
     /**
      * @param array<string, string> $signals
      * @param list<string>          $acceptSet
      * @param list<CountedAdvisory>        $advisories
+     * @param bool                         $wholePackage the entry lists no flags: it accepts the whole package
      */
-    private function __construct(array $signals, array $acceptSet, array $advisories)
+    private function __construct(array $signals, array $acceptSet, array $advisories, bool $wholePackage = false)
     {
+        $this->wholePackage = $wholePackage;
         $this->signals = $signals;
         $this->acceptSet = $acceptSet;
         $this->advisories = $advisories;
@@ -74,7 +77,7 @@ final class FlagSet
             $levels[$signal->id()] = $signal->level();
         }
 
-        return new self($levels, self::acceptedBy($entry), $advisories);
+        return new self($levels, self::acceptedBy($entry), $advisories, $entry !== null && $entry->acceptsAll());
     }
 
     /** @return list<string> every flag that fired, accepted ones included, in flag order */
@@ -99,6 +102,15 @@ final class FlagSet
     public function acceptSet(): array
     {
         return $this->acceptSet;
+    }
+
+    /**
+     * Whether the entry lists no flags. Such an entry makes a score-0 package `finished` with
+     * nothing fired. An entry that names all six flags does not: it accepts flags, not the package.
+     */
+    public function acceptsWholePackage(): bool
+    {
+        return $this->wholePackage;
     }
 
     /** @return list<CountedAdvisory> */
@@ -133,12 +145,12 @@ final class FlagSet
     {
         $signals = array_diff_key($this->signals, array_flip(ScoreModel::RAISED_BY[$flag]));
 
-        return new self($signals, $this->acceptSet, $flag === self::VULNERABLE ? [] : $this->advisories);
+        return new self($signals, $this->acceptSet, $flag === self::VULNERABLE ? [] : $this->advisories, $this->wholePackage);
     }
 
     public function withoutAdvisory(string $id): self
     {
-        return new self($this->signals, $this->acceptSet, array_values(array_filter($this->advisories, static fn (CountedAdvisory $advisory): bool => $advisory->id() !== $id)));
+        return new self($this->signals, $this->acceptSet, array_values(array_filter($this->advisories, static fn (CountedAdvisory $advisory): bool => $advisory->id() !== $id)), $this->wholePackage);
     }
 
     /**
@@ -147,7 +159,7 @@ final class FlagSet
      */
     public function raising(string $flag): self
     {
-        return new self($this->signals + [ScoreModel::RAISED_BY[$flag][0] => Signal::LEVEL_WARN], $this->acceptSet, $this->advisories);
+        return new self($this->signals + [ScoreModel::RAISED_BY[$flag][0] => Signal::LEVEL_WARN], $this->acceptSet, $this->advisories, $this->wholePackage);
     }
 
     /** The same facts with $flag counted, not accepted: what the flag adds if counted. */

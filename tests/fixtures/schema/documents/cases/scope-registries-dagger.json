@@ -786,6 +786,7 @@
  "packages_multi_flag": 0,
  "include_dev": false,
  "not_from_composer_repository": 1,
+ "packages_unchecked_accepted": 0,
  "network_failures": false,
  "counts": {
   "critical": 0,
@@ -957,7 +958,21 @@
   "failing": 0,
   "exempt": {
    "baseline": 0
-  }
+  },
+  "failing_by": [
+   {
+    "value": "high",
+    "failing": 0
+   }
+  ],
+  "not_applied": [
+   {
+    "check": "advisories",
+    "packages": 1,
+    "reason": "not_from_composer_repository"
+   }
+  ],
+  "text": "gate: passes · --fail-on=high · no finding fails it · advisories not applied to 1 package: not asked (advisory-lookup: composer-repositories) · target php 8.4 (--target-php)"
  },
  "security": {
   "check": "not_run",
@@ -1074,6 +1089,7 @@
      ]
     }
    ],
+   "unchecked_accepted": [],
    "maintenance_judged": false,
    "metadata": {
     "status": "not_from_composer_repository",

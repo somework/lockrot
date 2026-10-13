@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
@@ -15,10 +15,12 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\GithubFormatter;
 use Lockrot\Output\TableFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +82,7 @@ final class GithubFormatterTest extends TestCase
 
         return new Report([
             (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', [])), new Signal('high', 'no push for 9 years', SignalDataStub::of('S4', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/absent')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['acme/absent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
@@ -97,7 +99,7 @@ final class GithubFormatterTest extends TestCase
         $lines = explode("\n", trim($out));
 
         self::assertSame('::error file=composer.lock,line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: marked abandoned by its repository', $lines[0]);
-        self::assertSame('::error file=composer.lock,line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
+        self::assertSame('::error file=composer.lock,line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago); no push for 9 years (via a/parent)', $lines[1]);
         self::assertSame('::warning file=composer.lock,title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
         self::assertSame('::notice file=composer.lock,title=lockrot%3A ok (none)::acme/fine 4.0.0', $lines[3]);
     }
@@ -123,6 +125,25 @@ final class GithubFormatterTest extends TestCase
         self::assertStringContainsString('title=lockrot%3A abandoned (medium)::acme/silent', $out);
         self::assertStringContainsString('title=lockrot%3A ok (none)::acme/fine', $out);
         self::assertStringNotContainsString('::error ', $out, 'the level still follows the verdict and fail-on, not the priority');
+    }
+
+    /**
+     * I15b: a finding that fails the gate gets an `error` record, whatever its 0.13 verdict. Here an
+     * entry that accepts `left-behind` only leaves the abandoned flag counted.
+     */
+    public function testAFindingThatFailsTheGateIsAnErrorWhateverItsLegacyVerdict(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $signals = [new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))];
+        $entry = new AllowlistEntry('acme/abandoned', null, 'behind on purpose', null, AllowlistEntry::BY_PROJECT, [FlagSet::LEFT_BEHIND]);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::FINISHED)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, $entry, []))->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+        ], [], $at, 1, 0);
+
+        $out = $this->formatter(Verdict::ABANDONED, null)->format($report);
+
+        self::assertStringStartsWith('::error file=composer.lock,title=lockrot%3A ', $out);
+        self::assertStringContainsString('::acme/abandoned 1.0.0', $out);
     }
 
     public function testFailOnNoneNeverProducesAnError(): void
@@ -234,7 +255,7 @@ final class GithubFormatterTest extends TestCase
         $lines = explode("\n", trim($this->inProject(Verdict::SILENT, $lockPath, \dirname($lockPath, 2))->format($this->report(), true)));
 
         self::assertSame('::error file='.$name.',line=4,title=lockrot%3A abandoned (critical)::acme/abandoned 1.0.0: marked abandoned by its repository', $lines[0]);
-        self::assertSame('::error file='.$name.',line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago) (via a/parent)', $lines[1]);
+        self::assertSame('::error file='.$name.',line=8,title=lockrot%3A silent (high)::acme/silent 2.0.8: last release 2015-11-16 (10.8 years ago); no push for 9 years (via a/parent)', $lines[1]);
         self::assertSame('::warning file='.$name.',title=lockrot%3A stale (medium)::acme/absent 3.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
     }
 
@@ -274,9 +295,9 @@ final class GithubFormatterTest extends TestCase
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
-        $baseline = Baseline::of([
-            new BaselineEntry('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
-            new BaselineEntry('acme/silent', '2.0.8', Verdict::STALE, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+            BaselineEntries::of('acme/silent', '2.0.8', Verdict::STALE, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
 
@@ -290,8 +311,8 @@ final class GithubFormatterTest extends TestCase
     public function testBaselineStaleEntriesBecomeANotice(): void
     {
         $report = $this->report();
-        $baseline = Baseline::of([
-            new BaselineEntry('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
 
@@ -379,5 +400,40 @@ final class GithubFormatterTest extends TestCase
         $lines = explode("\n", trim($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report)));
 
         self::assertSame('pulled in by: evil/root injected 1', $lines[1]);
+    }
+
+    /** SPEC §6.2: one run-level annotation, `error` only when `unchecked` fails on the advisories gap. */
+    public function testTheRunLevelAdvisoriesAnnotationIsAnErrorOnlyWhenUncheckedFailsOnTheGap(): void
+    {
+        $line = '::%s title=lockrot::advisories not checked: the gate could not read the advisories of every package';
+
+        self::assertStringContainsString(\sprintf($line, 'error'), $this->formatter('unchecked', null)->format(self::uncheckedReport()));
+        self::assertStringContainsString(\sprintf($line, 'warning'), $this->formatter('high', null)->format(self::uncheckedReport()));
+        self::assertStringContainsString(\sprintf($line, 'warning'), $this->formatter('unchecked', null)->format(self::skippedReport()));
+        self::assertStringNotContainsString('advisories not checked:', $this->formatter('unchecked', null)->format($this->report()));
+    }
+
+    /** SPEC §7.3: a finding with S10 and no counted fact gets its own annotation while `unchecked` is active. */
+    public function testAFindingWithS10AndNoCountedFactIsAnnotatedWhileUncheckedIsActive(): void
+    {
+        self::assertStringContainsString('::acme/offline 1.0.0', $this->formatter('unchecked', null)->format(self::uncheckedReport()));
+        self::assertStringStartsWith('::error ', $this->formatter('unchecked', null)->format(self::uncheckedReport()));
+        self::assertStringNotContainsString('::acme/offline', $this->formatter('high', null)->format(self::uncheckedReport()));
+    }
+
+    /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
+    private static function uncheckedReport(): Report
+    {
+        $at = new \DateTimeImmutable(self::AT);
+
+        return new Report([
+            FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true),
+            FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false),
+        ], [], $at, 2, 0);
+    }
+
+    private static function skippedReport(): Report
+    {
+        return new Report([FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false)], [], new \DateTimeImmutable(self::AT), 1, 0);
     }
 }

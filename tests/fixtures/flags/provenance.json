@@ -1,22 +1,12 @@
 {
- "pr": "4f",
+ "pr": "6b",
  "source": {
   "cases.json": "f90d69c457bdc04e6b31198c59573bb0532c512feac3235753c9ce57ad4a1939",
   "model_run_date": "2026-10-08"
  },
  "suite": "run_all.sh: 55 of 55 steps pass (the attack-rounds step with its PHP cap raised)",
- "dropped": [
-  "(root).packages_unchecked_accepted",
-  "cases[].finding.unchecked_accepted",
-  "finding.unchecked_accepted",
-  "findings[].unchecked_accepted",
-  "gate.failing_by",
-  "gate.not_applied",
-  "gate.text"
- ],
- "reverted": {
-  "checks_skipped accepted_by_config -> the S10 entry it accepted": 4
- },
+ "dropped": [],
+ "reverted": {},
  "cases_without_inputs": [
   "psr-log",
   "pinned-unread",
@@ -64,6 +54,8 @@
   "local-path-advisory",
   "ignored-marking-archived-dagger",
   "ignored-marking-stale-dagger",
-  "no-feed-dagger"
+  "no-feed-dagger",
+  "B-gate-none",
+  "host-accepted-dagger"
  ]
 }

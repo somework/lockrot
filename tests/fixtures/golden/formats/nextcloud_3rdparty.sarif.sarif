@@ -1,0 +1,474 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.13.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/abandoned",
+                            "name": "abandoned",
+                            "shortDescription": {
+                                "text": "abandoned: Package is marked abandoned by its repository, or its repository is archived"
+                            },
+                            "fullDescription": {
+                                "text": "The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/silent",
+                            "name": "silent",
+                            "shortDescription": {
+                                "text": "silent: No stable release and no repository push for a long time"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release for at least release-high-years (default 5 years) and no repository push for at least push-high-years (default 5 years); an archived repository is reported as abandoned instead."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "Old release or old push, but not old enough \u2014 or not on both fronts \u2014 for silent."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/advisories-unchecked",
+                            "name": "advisories-unchecked",
+                            "shortDescription": {
+                                "text": "advisories-unchecked: The advisories of some packages were not checked"
+                            },
+                            "fullDescription": {
+                                "text": "The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "microsoft/azure-storage-blob 1.5.4: marked abandoned by its repository; repository archived on GitHub; last release 2022-09-02 (4.0 years ago); last push 2023-07-18 (3.2 years ago); pulls in 1 flagged package: microsoft/azure-storage-common (stale)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "microsoft/azure-storage-blob"
+                    },
+                    "properties": {
+                        "package": "microsoft/azure-storage-blob",
+                        "version": "1.5.4",
+                        "verdict": "abandoned",
+                        "priority": "critical",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4",
+                            "S7"
+                        ],
+                        "chain": [
+                            "microsoft/azure-storage-blob"
+                        ],
+                        "direct_dependents": [
+                            "microsoft/azure-storage-blob"
+                        ],
+                        "data_date": "2026-09-14T18:52:05+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "bantu/ini-get-wrapper v1.0.1: last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "bantu/ini-get-wrapper"
+                    },
+                    "properties": {
+                        "package": "bantu/ini-get-wrapper",
+                        "version": "v1.0.1",
+                        "verdict": "silent",
+                        "priority": "critical",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "bantu/ini-get-wrapper"
+                        ],
+                        "direct_dependents": [
+                            "bantu/ini-get-wrapper"
+                        ],
+                        "data_date": "2026-09-14T18:51:44+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "pear/console_getopt v1.4.3: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "pear/console_getopt"
+                    },
+                    "properties": {
+                        "package": "pear/console_getopt",
+                        "version": "v1.4.3",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "pear/pear-core-minimal",
+                            "pear/console_getopt"
+                        ],
+                        "direct_dependents": [
+                            "pear/archive_tar",
+                            "pear/pear-core-minimal"
+                        ],
+                        "data_date": "2026-09-14T18:52:11+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "deepdiver1975/tarstreamer v2.1.0: last release 2023-06-16 (3.2 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "deepdiver1975/tarstreamer"
+                    },
+                    "properties": {
+                        "package": "deepdiver1975/tarstreamer",
+                        "version": "v2.1.0",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "deepdiver1975/tarstreamer"
+                        ],
+                        "direct_dependents": [
+                            "deepdiver1975/tarstreamer"
+                        ],
+                        "data_date": "2026-09-14T18:51:50+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "kornrunner/blurhash v1.2.2: last release 2022-07-13 (4.2 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "kornrunner/blurhash"
+                    },
+                    "properties": {
+                        "package": "kornrunner/blurhash",
+                        "version": "v1.2.2",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "kornrunner/blurhash"
+                        ],
+                        "direct_dependents": [
+                            "kornrunner/blurhash"
+                        ],
+                        "data_date": "2026-09-14T18:52:00+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "mexitek/phpcolors v1.0.4: last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "mexitek/phpcolors"
+                    },
+                    "properties": {
+                        "package": "mexitek/phpcolors",
+                        "version": "v1.0.4",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "mexitek/phpcolors"
+                        ],
+                        "direct_dependents": [
+                            "mexitek/phpcolors"
+                        ],
+                        "data_date": "2026-09-14T18:52:03+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "cweagans/composer-configurable-plugin 2.0.0: last release 2023-02-12 (3.6 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "cweagans/composer-configurable-plugin"
+                    },
+                    "properties": {
+                        "package": "cweagans/composer-configurable-plugin",
+                        "version": "2.0.0",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "cweagans/composer-patches",
+                            "cweagans/composer-configurable-plugin"
+                        ],
+                        "direct_dependents": [
+                            "cweagans/composer-patches"
+                        ],
+                        "data_date": "2026-09-14T18:51:47+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "microsoft/azure-storage-common 1.5.2: last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "microsoft/azure-storage-common"
+                    },
+                    "properties": {
+                        "package": "microsoft/azure-storage-common",
+                        "version": "1.5.2",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "microsoft/azure-storage-blob",
+                            "microsoft/azure-storage-common"
+                        ],
+                        "direct_dependents": [
+                            "microsoft/azure-storage-blob"
+                        ],
+                        "data_date": "2026-09-14T18:52:06+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "pear/pear_exception v1.0.2: last release 2021-03-21 (5.5 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "pear/pear_exception"
+                    },
+                    "properties": {
+                        "package": "pear/pear_exception",
+                        "version": "v1.0.2",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "pear/pear-core-minimal",
+                            "pear/pear_exception"
+                        ],
+                        "direct_dependents": [
+                            "pear/archive_tar",
+                            "pear/pear-core-minimal"
+                        ],
+                        "data_date": "2026-09-14T18:52:13+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/advisories-unchecked",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "message": {
+                        "text": "advisories not checked: the gate could not read the advisories of every package"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/run": "advisories-unchecked"
+                    }
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "Repository activity not checked for 3 packages on hosts lockrot cannot ask: codeberg.org (3). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host."
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

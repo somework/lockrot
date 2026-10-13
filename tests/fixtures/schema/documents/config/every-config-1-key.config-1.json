@@ -1,0 +1,23 @@
+{
+ "project": "acme/shop",
+ "fail-on": "high",
+ "target-php": "8.3",
+ "format": "sarif",
+ "include-dev": false,
+ "install-time": "off",
+ "install-time-strict": false,
+ "install-time-budget": 120,
+ "baseline": ".ci/lockrot-baseline.json",
+ "release-warn-years": 2,
+ "release-high-years": 4,
+ "push-warn-years": 2,
+ "push-high-years": 4,
+ "ignore": [
+  {
+   "package": "psr/log",
+   "reason": "complete",
+   "version": "1.1.4",
+   "expires": "2027-03-31"
+  }
+ ]
+}

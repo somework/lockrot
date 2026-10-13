@@ -1,0 +1,355 @@
+{
+ "$schema": "https://lockrot.dev/schema/baseline-2.json",
+ "lockrot": {
+  "version": "0.14.0",
+  "schema": 2
+ },
+ "generated_at": "2026-10-01T17:39:31+00:00",
+ "target_php": "8.4",
+ "target_php_source": "option",
+ "score_model_id": 1,
+ "fix_model": 1,
+ "findings": {
+  "composer/semver": {
+   "version": "1.7.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "geoip2/geoip2": {
+   "version": "v2.13.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "lox/xhprof": {
+   "version": "dev-master",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "abandoned": {
+     "known_since": "2026-10-01"
+    },
+    "pinned": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "matomo/cache": {
+   "version": "2.0.6",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "matomo/decompress": {
+   "version": "2.1.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "matomo/doctrine-cache-fork": {
+   "version": "1.10.4",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "silent": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "matomo/network": {
+   "version": "2.0.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "matomo/referrer-spam-list": {
+   "version": "dev-master",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "pinned": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "matomo/searchengine-and-social-list": {
+   "version": "3.13.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "maxmind/web-service-common": {
+   "version": "v0.9.0",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "monolog/monolog": {
+   "version": "1.27.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "mustangostang/spyc": {
+   "version": "0.6.3",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "silent": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "pear/console_getopt": {
+   "version": "v1.4.3",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "silent": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "pear/pear_exception": {
+   "version": "v1.0.2",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "stale": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "php-di/php-di": {
+   "version": "6.3.5",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "php-di/phpdoc-reader": {
+   "version": "2.2.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "silent": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/console": {
+   "version": "v2.6.13",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/event-dispatcher": {
+   "version": "v2.6.13",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    }
+   }
+  },
+  "symfony/monolog-bridge": {
+   "version": "v2.6.13",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    },
+    "old-promise": {
+     "known_since": "2026-10-01"
+    },
+    "outdated": {
+     "known_since": "2026-10-01"
+    }
+   },
+   "advisories": {
+    "PKSA-4wjj-gy1p-ft3r": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "upgrade"
+    }
+   }
+  },
+  "tecnickcom/tcpdf": {
+   "version": "6.6.2",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-62dz-rc7r-pb8r": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-98jj-zbnk-dgwp": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "update"
+    },
+    "PKSA-d3g2-dzgm-n74r": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-jwjn-w3mx-tq38": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-tdkc-7xrw-d14c": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    },
+    "PKSA-wb9y-hg45-chz4": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "update"
+    },
+    "PKSA-ys59-hzk7-wxt5": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "update"
+    }
+   }
+  },
+  "twig/twig": {
+   "version": "v3.5.1",
+   "first_seen": "2026-10-01",
+   "advisories": {
+    "PKSA-1tmc-rt7x-12w6": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-2wrf-1xmk-1pky": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-3mcc-k66d-pydb": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-6319-ffpf-gx66": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-8zx5-v2nz-58pb": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-dpx1-78wg-1kqs": {
+     "known_since": "2026-10-01",
+     "severity": "high",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-fbvq-z33h-r2np": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-g9zw-qxh8-pq8w": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-h8hf-ytnd-5t9q": {
+     "known_since": "2026-10-01",
+     "severity": "critical",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-kvv6-36cr-fkzb": {
+     "known_since": "2026-10-01",
+     "severity": "unrated",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-n14z-jjjg-g8vd": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-sjvz-tbbr-vwth": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-wwb1-81rc-pd65": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-xx6c-6d96-db2w": {
+     "known_since": "2026-10-01",
+     "severity": "medium",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-yd6k-t2gh-1m43": {
+     "known_since": "2026-10-01",
+     "severity": "unrated",
+     "fix_kind": "raise-php"
+    },
+    "PKSA-yhcn-xrg3-68b1": {
+     "known_since": "2026-10-01",
+     "severity": "low",
+     "fix_kind": "raise-php"
+    }
+   }
+  },
+  "wikimedia/less.php": {
+   "version": "v3.2.1",
+   "first_seen": "2026-10-01",
+   "flags": {
+    "left-behind": {
+     "known_since": "2026-10-01"
+    }
+   }
+  }
+ }
+}

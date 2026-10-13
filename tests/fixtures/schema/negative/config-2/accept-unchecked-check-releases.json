@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "releases",
+   "package": "acme/*",
+   "reason": "x"
+  }
+ ]
+}

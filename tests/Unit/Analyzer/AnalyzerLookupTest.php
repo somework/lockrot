@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Composer\Config;
 use Composer\Policy\AbandonedPolicyConfig;
+use Composer\Semver\VersionParser;
 use Composer\Util\Platform;
 use Lockrot\Allowlist\Allowlist;
 use Lockrot\Allowlist\AllowlistEntry;
@@ -17,6 +18,7 @@ use Lockrot\Data\Abandoned\AbandonedIgnore;
 use Lockrot\Data\Abandoned\AbandonedIgnoreMatch;
 use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Abandoned\AbandonedPolicyReader;
+use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
@@ -130,6 +132,23 @@ final class AnalyzerLookupTest extends TestCase
         );
     }
 
+    private static function advisories(AdvisoryBatch $batch): AdvisoryLoaderInterface
+    {
+        return new class ($batch) implements AdvisoryLoaderInterface {
+            private AdvisoryBatch $batch;
+
+            public function __construct(AdvisoryBatch $batch)
+            {
+                $this->batch = $batch;
+            }
+
+            public function load(array $versionByName, array $notFromComposerRepository = [], array $aliasVersionsByName = []): AdvisoryBatch
+            {
+                return $this->batch;
+            }
+        };
+    }
+
     private static function metadata(bool $abandoned, string $releasedAt): PackageMetadata
     {
         return new PackageMetadata('vendor/pkg', $abandoned, null, true, new \DateTimeImmutable($releasedAt), '1.0.0', 1, 'https://github.com/vendor/pkg.git', 'library', new \DateTimeImmutable(F::NOW));
@@ -232,6 +251,30 @@ final class AnalyzerLookupTest extends TestCase
 
         self::assertCount(1, $notes);
         self::assertSame(['z/old', 'a/new'], array_column(JsonPath::arrayAt($notes[0]->data(), ['packages']), 'package'));
+    }
+
+    /** The note names the `ignore[]` entries in report order: the graded one first, whatever the lock order. */
+    public function testTheIgnoreEntriesNoteFollowsTheReportOrder(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [
+            ['name' => 'a/new', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+            ['name' => 'z/old', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'],
+        ]]);
+        $metadata = ['a/new' => self::metadata(false, '2026-08-01T00:00:00+00:00'), 'z/old' => self::metadata(false, '2015-01-01T00:00:00+00:00')];
+        $allowlist = new Allowlist([
+            new AllowlistEntry('a/new', null, 'kept', null, AllowlistEntry::BY_PROJECT, ['left-behind']),
+            new AllowlistEntry('z/old', null, 'kept', null, AllowlistEntry::BY_PROJECT, ['left-behind']),
+        ]);
+        $advisories = new AdvisoryBatch([
+            'a/new' => [new Advisory('PKSA-new', null, 'Title', null, 'low', null, (new VersionParser())->parseConstraints('<2.0.0'))],
+            'z/old' => [new Advisory('PKSA-old', null, 'Title', null, 'high', null, (new VersionParser())->parseConstraints('<2.0.0'))],
+        ]);
+
+        $report = self::analyzer(self::loader($metadata), self::http([], new \ArrayObject()), true, $allowlist, null, self::advisories($advisories))->analyze($lock, ProjectConfig::empty(), false);
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::IGNORE_DOES_NOT_COVER_ADVISORIES));
+
+        self::assertCount(1, $notes);
+        self::assertSame(['z/old', 'a/new'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['entries'], 'package'));
     }
 
     /** @return iterable<string, array{array<string, mixed>, bool, ?string}> the config, whether the package is marked, and the note that the run writes */

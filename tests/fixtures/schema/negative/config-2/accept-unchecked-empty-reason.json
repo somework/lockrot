@@ -1,0 +1,9 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "advisories",
+   "package": "acme/*",
+   "reason": ""
+  }
+ ]
+}

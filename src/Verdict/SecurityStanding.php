@@ -12,6 +12,8 @@ namespace Lockrot\Verdict;
 final class SecurityStanding
 {
     public const VULNERABLE = 'vulnerable';
+    public const CLEAR = 'clear';
+    public const UNCHECKED = 'unchecked';
 
     private string $status;
     private string $check;
@@ -48,7 +50,7 @@ final class SecurityStanding
      */
     public static function notVulnerable(string $check, int $ignoredCount, array $counts): self
     {
-        return new self($check === 'complete' ? 'clear' : 'unchecked', $check, $ignoredCount, $counts, null);
+        return new self($check === 'complete' ? self::CLEAR : self::UNCHECKED, $check, $ignoredCount, $counts, null);
     }
 
     public function status(): string

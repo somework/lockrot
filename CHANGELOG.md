@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Verdict changes
 
+- **Breaking:** **Baseline:** a finding is worsened by a flag above the recorded one, a new
+  advisory, or a known one re-rated or no longer fixable. The gate reads `min(score, 2 × what the
+  new facts add)`. Action: run once, review, then `--generate-baseline`.
+  ([Baseline](docs/baseline.md))
 - **Breaking:** **All formats:** a finding lists every flag that fired (`abandoned`, `silent`,
   `pinned`, `left-behind`, `old-promise`, `stale`, and the new `vulnerable`). Accepted flags stay
   listed, muted. Action: read a finding's `flags` where you read the verdict, or `lead` for 0.13's
@@ -69,6 +73,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **CLI, Config:** `--fail-on` takes a list, one value per kind: a grade, a flag (at or above in
+  flag order), `vulnerable` or `vulnerable-medium|high|critical`, and `unchecked`. ([In
+  CI](docs/ci.md))
+- **Config:** `ignore[].flags` accepts named maintenance flags. A liveness word also accepts the
+  words below it. Without it an entry accepts them all.
+  ([The allowlist](docs/configuration.md#the-allowlist))
+- **json:** the root `gate` writes `text`, `failing_by` and `not_applied`: the `gate:` line, how many
+  findings fail each value, and what the gate could not judge.
+  ([Reading the gate line](docs/ci.md#reading-the-gate-line))
+- **Config, json:** `extra.lockrot.accept-unchecked` accepts a check that lockrot did not run (a
+  host it cannot ask, no advisory feed, a package from vcs or an unknown origin) by host,
+  repository or package, with a reason and an optional `expires`. It hides no flag. json writes
+  `unchecked_accepted` and `packages_unchecked_accepted`.
+  ([Configuration](docs/configuration.md#accept-unchecked))
 - **json:** a graded finding's `next_step` names one move with its kind, constraint and commands.
   It says what the move clears, what holds it, and the score after it (`if_applied`).
   Each branch row's `fixes.if_applied` scores a move to that branch. For a package that comes in
@@ -96,12 +114,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** **Self-update, Baseline, Config:** `self-update` from 0.13 lands on 0.14 at once.
+  lockrot 0.13 cannot read baseline-2 or config-2. 0.13 reads an `ignore[]` entry with `flags` as an
+  entry for the whole package, and warns. Action: upgrade every job, then regenerate the baseline.
+  ([Self-update](docs/phar.md#keeping-it-updated))
 - **Breaking:** **json:** report-2: `verdict` is a grade, and `lead`, `flags`, `score`,
   `next_step`, `security`, `checks_missing` and `run.score_model` join it. `run.gates[]` carry a
   kind, S4's `data` gains `forge` and `event`, and `evidence` holds the counted flags' summaries
   only. Action: assert `."$schema" == "https://lockrot.dev/schema/report-2.json"` first, then read
   `.findings[] | [.flags[].summary]`.
   ([Schema](docs/schema.md#migrating-from-report-1))
+- **Breaking:** **Config:** an `ignore[]` entry whose `flags` key has another shape (`"stale"`,
+  `["vulnerable"]`) now exits 2. Action: list maintenance flag ids, or drop the key.
+  ([The allowlist](docs/configuration.md#the-allowlist))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
@@ -113,6 +138,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **Breaking:** **Baseline:** 0.14 reads baseline-2 only, and a baseline-1 file exits 2. Action:
+  review the findings, then run `--generate-baseline`, which overwrites the file. `known_since`
+  starts again on that day. ([Baseline](docs/baseline.md))
 - **Breaking:** **json:** `priority_basis`, `no_fix_expected`, `run.flagged_verdicts`,
   `run.fail_on_kind`, S9's `fixed_by` and `fixed_on_branch`, `baseline.previous_verdict`, the
   cause keys of `counts` and the html details block's `activity`. Action: read `score`, `security`,

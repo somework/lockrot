@@ -1,0 +1,15 @@
+{
+ "project": "wallabag/wallabag",
+ "commit": "c7e57555632f277f6260eb3f7a953500624227a8",
+ "lock_date": "2024-05-17",
+ "source": ".private/handoff/0.13-fixtures: src/wallabag_wallabag-older and baselines/wallabag-older.baseline.json",
+ "lockrot-baseline-1.json": {
+  "written_by": "lockrot 0.13.0 --generate-baseline --target-php=8.4 --dev with LOCKROT_TODAY=2024-05-17",
+  "entries": 55,
+  "sha256": "5b0ce4412f4266a3974c2488cb1d939e143d3334624b619f5fa43c4fbe014cc0"
+ },
+ "before/composer.lock": "c303b807a03f9c2f1c69e8760cb4863b43ab2f48ce51bbd5aa3c29b79432cbe8",
+ "before/composer.json": "14968e44c61e6af570fff8b0774da5d83853409544b109e88588d39602ab55e4",
+ "lockrot-baseline.json": "written by BaselinedProjectTest (LOCKROT_REWRITE_GOLDEN=1)",
+ "http": "p2, GitHub and advisory answers that bin/record-fixtures recorded for before/, kept in http/ so they move no other fixture"
+}

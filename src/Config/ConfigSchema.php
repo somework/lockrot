@@ -7,6 +7,7 @@ namespace Lockrot\Config;
 use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\KnownValues;
+use Lockrot\Json\SchemaErrors;
 use Lockrot\Json\SchemaPayload;
 use Lockrot\Json\Schemas;
 
@@ -24,7 +25,7 @@ use Lockrot\Json\Schemas;
 final class ConfigSchema
 {
     /** A config document carries no number of its own, so this constant selects the schema file. */
-    public const NUMBER = 1;
+    public const NUMBER = 2;
 
     private static ?object $schema = null;
 
@@ -41,17 +42,7 @@ final class ConfigSchema
             return;
         }
 
-        $lines = ['extra.lockrot is invalid:'];
-        foreach ($validator->getErrors() as $error) {
-            // The validator documents every error as {property, message, ...}, so this narrows the
-            // type for PHPStan. Skipping a malformed entry hides nothing: the method still throws.
-            if (!\is_array($error) || !\is_string($error['property'] ?? null) || !\is_string($error['message'] ?? null)) {
-                continue;
-            }
-            $lines[] = \sprintf('  - %s: %s', $error['property'], $error['message']);
-        }
-
-        throw new ConfigException(implode("\n", $lines));
+        throw SchemaErrors::exception('extra.lockrot is invalid:', self::schema(), $data, $validator);
     }
 
     private static function schema(): object

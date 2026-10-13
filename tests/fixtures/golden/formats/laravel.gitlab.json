@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "league/config v1.2.0 \u2014 stale (low): last release 2022-12-11 (3.8 years ago) (via laravel/framework > league/commonmark, also via laravel/tinker)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "4c310f7e6976072450b6c8f5bdfe6821dbe59cc0a145812a352e1d0877bfe0b5",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/advisories-unchecked",
+        "description": "advisories not checked: the gate could not read the advisories of every package",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "aa6972ef903020f362b3f39114d8c697dd621f85b3eb09e4a07ad2d966294e3f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

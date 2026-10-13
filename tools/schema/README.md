@@ -18,14 +18,18 @@ python3 tools/schema/build_report2_schema.py
 python3 tools/schema/build_other_schemas.py
 python3 tools/schema/make_negatives.py
 python3 tools/schema/make_negatives_other.py explain-2
+python3 tools/schema/make_negatives_other.py baseline-2
+python3 tools/schema/make_negatives_other.py config-2
 ```
 
 | Script | Reads | Writes |
 |---|---|---|
 | `build_report2_schema.py` | `inputs/` | `resources/lockrot-report-2.schema.json` |
-| `build_other_schemas.py` | `inputs/`, `resources/lockrot-report-2.schema.json` | `resources/lockrot-explain-2.schema.json` |
+| `build_other_schemas.py` | `inputs/`, `resources/lockrot-report-2.schema.json` | `resources/lockrot-explain-2.schema.json`, `lockrot-baseline-2.schema.json`, `lockrot-config-2.schema.json` |
 | `make_negatives.py` | `tests/fixtures/schema/documents/cases/` | `tests/fixtures/schema/negative/report-2/` |
 | `make_negatives_other.py explain-2` | `tests/fixtures/schema/documents/explain/B.json` | `tests/fixtures/schema/negative/explain-2/` |
+| `make_negatives_other.py baseline-2` | `tests/fixtures/schema/documents/baseline/corpus/matomo-v4.json` | `tests/fixtures/schema/negative/baseline-2/` |
+| `make_negatives_other.py config-2` | none: each fixture is written whole | `tests/fixtures/schema/negative/config-2/` |
 | `ts/emit_dts.py` | `resources/lockrot-report-2.schema.json` | `types/` |
 | `project_fixtures.py` | the reference model's `cases.json` and `docs/` | `tests/fixtures/flags/`, `tests/fixtures/schema/documents/` |
 
@@ -74,7 +78,9 @@ The model writes every field of 0.14. The script drops each key that a later pul
 reverts each value that a later pull request changes. So the fixtures carry what the draft of that
 pull request holds. `tests/fixtures/flags/provenance.json` lists the source hash, the model run date,
 the suite result, every dropped key and every reverted value. The base documents of the negative
-fixtures come from the same projection. CI does not run this script: its input is not in the
+fixtures come from the same projection. At the last pull request of the train, the script writes
+every model document unprojected. It corrects a model defect that a relation refuses, and
+`tests/fixtures/schema/documents/provenance.json` lists each correction by document. CI does not run this script: its input is not in the
 repository.
 
 ## A second validator

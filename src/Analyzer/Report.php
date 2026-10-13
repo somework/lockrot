@@ -6,11 +6,14 @@ namespace Lockrot\Analyzer;
 
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Config\GateStanding;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Legacy\Compare013;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Legacy\Verdict013;
+use Lockrot\Score\ScoreText;
 use Lockrot\Signal\Data\AdvisoryData;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
@@ -104,6 +107,7 @@ final class Report
             $this->includesDev,
             $this->advisoryCoverage
         );
+        $copy->notes = array_merge($this->notes, $baseline->notes());
         $copy->run = $this->run;
 
         return $copy;
@@ -114,7 +118,10 @@ final class Report
         return $this->baseline;
     }
 
-    /** Returns a copy, like {@see self::withBaseline()}. */
+    /**
+     * Returns a copy, like {@see self::withBaseline()}. With a grade value active, the copy notes
+     * each finding that reached it under 0.13's rules and does not under 0.14's (`verdict_rules_changed`).
+     */
     public function withRun(RunSettings $run): self
     {
         $copy = new self(
@@ -129,8 +136,34 @@ final class Report
             $this->advisoryCoverage
         );
         $copy->run = $run;
+        $note = $this->verdictRulesChanged($run);
+        if ($note !== null) {
+            $copy->notes[] = $note;
+        }
 
         return $copy;
+    }
+
+    private function verdictRulesChanged(RunSettings $run): ?RunNote
+    {
+        $grade = null;
+        foreach ($run->failOn() === null ? [] : $run->failOn()->values() as $value) {
+            $grade = $value->kind() === FailOn::KIND_GRADE ? $value->value() : $grade;
+        }
+        if ($grade === null) {
+            return null;
+        }
+        $changed = [];
+        foreach ($this->findings as $finding) {
+            // 0.13 read every matched `ignore[]` entry as accepting the whole package: priority none.
+            if ($finding->details()->entry() !== null || Priority013::rank($finding->priority()) < Priority013::rank($grade) || $finding->score()->total() >= ScoreModel::floorOf($grade)) {
+                continue;
+            }
+            $changed[] = new ChangedVerdict($finding->package(), $finding->version(), $finding->verdict(), $finding->priorityBasis(), $finding->grade(), $finding->score()->total(), ScoreText::render($finding->scoreBasis()));
+        }
+        usort($changed, static fn (ChangedVerdict $a, ChangedVerdict $b): int => [$a->package(), $a->version()] <=> [$b->package(), $b->version()]);
+
+        return $changed === [] ? null : RunNote::verdictRulesChanged($grade, $changed);
     }
 
     /** @return list<Finding> */
@@ -298,16 +331,16 @@ final class Report
 
     /**
      * Decided on every call, over the findings, the baseline comparison and the network failures,
-     * so it cannot go stale when a baseline is attached. Null without a run or without a fail-on.
+     * so it cannot go stale when a baseline is attached. Null without a run. A run without a
+     * fail-on gates on `none`.
      */
     public function gate(): ?Gate
     {
         if ($this->run === null) {
             return null;
         }
-        $failOn = $this->run->failOn();
 
-        return $failOn === null ? null : Gate::decide($this, $failOn, $this->run->strictNetwork(), $this->run->mode());
+        return Gate::decide($this, $this->run->failOn() ?? FailOn::none(), $this->run->strictNetwork(), $this->run->mode());
     }
 
     public function includesDev(): bool
@@ -458,12 +491,12 @@ final class Report
         }
         $rows = [];
         foreach ($this->sorted() as $at => $finding) {
-            $row = $finding->toArray();
-            $standing = $standings[$finding->package()] ?? null;
+            $baseline = $this->baseline === null ? null : $this->baseline->standingOf($finding->package());
+            $row = $finding->toArray($baseline);
             $lead = array_search('lead', array_keys($row), true) + 1;
             $rows[$finding->package()] = \array_slice($row, 0, $lead, true) + ['rank' => $at + 1] + \array_slice($row, $lead, null, true) + [
-                'baseline' => null,
-                'gate' => ['reaches_fail_on' => $standing !== null && $standing->reachesFailOn(), 'fails' => $standing !== null && $standing->fails(), 'exempt_by' => $standing === null ? null : $standing->exemptBy(), 'by' => [], 'basis' => null],
+                'baseline' => $baseline,
+                'gate' => $standings[$finding->package()] ?? new GateStanding(false, false, null),
             ];
         }
 
@@ -496,6 +529,7 @@ final class Report
             'packages_multi_flag' => \count($multi),
             'include_dev' => $this->includesDev,
             'not_from_composer_repository' => $this->notFromComposerRepository,
+            'packages_unchecked_accepted' => \count(array_filter($this->findings, static fn (Finding $f): bool => $f->details()->uncheckedAccepted() !== [])),
             'network_failures' => $this->hadNetworkFailures(),
             'counts' => $this->byGrade(),
             'abandoned' => Report2Root::toAbandonedArray($sorted),
@@ -507,7 +541,7 @@ final class Report
             'rot_depth' => RotDepth::of($sorted),
             'libyears' => Report2Root::toLibyearsArray($this->libyears(), $sorted),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
-            'gate' => Report2Root::toGateArray($gate, $run->mode()),
+            'gate' => ($gate ?? Gate::ofFindings($this, FailOn::none()))->toArray($run),
             'security' => Report2Root::toSecurityArray($sorted),
             'data_date' => Report2Root::dataDate($sorted),
             'notes' => $this->notes(),

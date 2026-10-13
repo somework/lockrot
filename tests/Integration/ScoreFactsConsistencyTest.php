@@ -8,6 +8,7 @@ use Composer\Repository\AdvisoryProviderInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
 use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
@@ -29,8 +30,11 @@ use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\ItemRelations;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
@@ -114,6 +118,11 @@ final class ScoreFactsConsistencyTest extends TestCase
         $broken = [];
         foreach ($runs as $run => [$server, $dir, $withManifest, $dev, $target]) {
             $analysis = self::analysis($server, $dir, $withManifest, $dev, $target);
+            $written = $analysis->report()->withRun(new RunSettings(null, null, $target, RunSettings::SOURCE_OPTION, null, FailOn::parse('high,unchecked'), RunSettings::SOURCE_OPTION, new Thresholds()));
+            $document = JsonPath::decoded($written->toArray());
+            foreach (array_merge(FindingRelations::violations($document), ItemRelations::violations($document)) as $violation) {
+                $broken[] = $run.' '.$violation;
+            }
             foreach (self::findings($analysis, $dir) as $finding) {
                 $package = JsonPath::stringAt($finding, ['package']);
                 foreach (array_merge(self::violations($finding, $seen), self::legacyViolations($analysis, $package, $finding, $target, $legacySeen)) as $violation) {

@@ -13,16 +13,18 @@ use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\Gate;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -39,6 +41,53 @@ final class ReportTest extends TestCase
     private function transitive(string $package, string $verdict, bool $dev = false): Finding
     {
         return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain(['vendor/root', $package])->withDev($dev)->build();
+    }
+
+    /** A finding whose only counted flag is stale: 0.13 placed it high on its verdict, the score reads medium. */
+    private function demoted(string $package, string $verdict = Verdict::LEFT_BEHIND): Finding
+    {
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain([$package])
+            ->withFlags(FlagSet::fromSignals(ScoreSweep::signalsOf('stale'), null, []))->build();
+    }
+
+    public function testTheVerdictRulesNoteListsItsFindingsByPackage(): void
+    {
+        $report = $this->report($this->demoted('z/last'), $this->demoted('a/first'))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::VERDICT_RULES_CHANGED));
+
+        self::assertCount(1, $notes);
+        self::assertSame(['a/first', 'z/last'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['findings'], 'package'));
+    }
+
+    public function testTheVerdictRulesNoteListsByPackageWhatTheReportListsByScore(): void
+    {
+        $report = $this->report($this->demoted('a/first'), $this->demoted('z/last', Verdict::PINNED))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::VERDICT_RULES_CHANGED));
+
+        self::assertSame(['z/last', 'a/first'], $this->names($report), '0.13 lists pinned before left-behind');
+        self::assertSame(['a/first', 'z/last'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['findings'], 'package'));
+    }
+
+    public function testARunWithoutAGateValueNeverTripsOnAFailedLookup(): void
+    {
+        $report = new Report([$this->finding('a/b', Verdict::STALE)], [RunNote::metadataUnavailable(['vendor/x' => 'HTTP 503'])], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 1, 0);
+        $written = JsonPath::decoded($report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray());
+
+        self::assertFalse(JsonPath::boolAt($written, ['gate', 'fails']));
+    }
+
+    public function testTheBaselineNotesJoinTheRunNotes(): void
+    {
+        $report = new Report([$this->finding('a/b', Verdict::STALE)], [RunNote::offline()], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 1, 0);
+        $baseline = Baseline::of([BaselineEntries::of('a/b', '1.0.0', 'stale', '2026-01-01')], '2026-01-01T00:00:00+00:00', '7.1', 'option');
+        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/b']));
+
+        $codes = array_map(static fn (RunNote $note): string => $note->code(), $compared->runNotes());
+
+        self::assertContains(RunNote::OFFLINE, $codes);
+        self::assertContains(RunNote::BASELINE_TARGET_DIFFERS, $codes);
     }
 
     private function report(Finding ...$findings): Report
@@ -187,7 +236,7 @@ final class ReportTest extends TestCase
 
         self::assertSame(1, $report->abandonedWithReplacement());
         self::assertSame(['total' => 3, 'with_replacement' => 1, 'with_suggestion' => 1], $report->toArray()['abandoned'], 'Symfony names no package: a suggestion');
-        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 10, 3), 'the split sits right after the counts');
+        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 11, 3), 'the split sits right after the counts');
         self::assertStringStartsWith('4 packages checked · abandoned 3 (1 with a replacement) · silent 1 · ', $report->summaryLine());
 
         $none = $this->report($this->finding('vendor/dead', Verdict::ABANDONED));
@@ -246,7 +295,7 @@ final class ReportTest extends TestCase
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
     {
         $report = $this->report($this->finding('vendor/a', Verdict::SILENT))
-            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::fromString('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 6, 8), '>=8.2'));
+            ->withRun(new RunSettings('Acme shop', 'acme/shop', '8.4', RunSettings::SOURCE_OPTION, '/home/someone/clients/acme/composer.lock', FailOn::parse('silent'), RunSettings::SOURCE_OPTION, new Thresholds(2, 4, 6, 8), '>=8.2'));
 
         $run = JsonPath::arrayAt($report->toArray(), ['run']);
 
@@ -254,7 +303,7 @@ final class ReportTest extends TestCase
             ['project' => 'Acme shop', 'root_package' => 'acme/shop', 'target_php' => '8.4', 'project_php' => '>=8.2', 'project_php_lowest' => '8.2.0', 'lock_file' => 'composer.lock', 'fail_on' => 'silent'],
             array_intersect_key($run, array_flip(['project', 'root_package', 'target_php', 'project_php', 'project_php_lowest', 'lock_file', 'fail_on']))
         );
-        self::assertSame([['value' => 'silent', 'kind' => 'flag', 'threshold' => 'silent']], $run['gates'], "report-1's verdict word is a flag gate");
+        self::assertSame([['value' => 'silent', 'kind' => 'flag', 'threshold' => 'silent']], JsonPath::decoded($run['gates']), 'a flag word is a flag gate');
         self::assertSame(['release-warn-years' => 2, 'release-high-years' => 4, 'push-warn-years' => 6, 'push-high-years' => 8], $run['thresholds']);
         self::assertSame(['critical', 'high', 'medium', 'low'], $run['graded_verdicts']);
     }
@@ -312,7 +361,7 @@ final class ReportTest extends TestCase
      * report-2 writes a finding's standing against the baseline from baseline-2 on: with a
      * baseline-1 file, the root block names the file and each finding's `baseline` is null.
      */
-    public function testAFindingWritesNoStandingAgainstABaseline1File(): void
+    public function testEachFindingWritesItsStandingAgainstTheBaseline(): void
     {
         $report = $this->report(
             $this->finding('vendor/known', Verdict::STALE),
@@ -328,11 +377,14 @@ final class ReportTest extends TestCase
             ['vendor/known', 'vendor/worse', 'vendor/fresh']
         ));
 
+        $status = [];
         foreach (JsonPath::arrayAt($compared->toArray(), ['findings']) as $finding) {
             self::assertIsArray($finding);
-            self::assertNull($finding['baseline'], "report-2 writes a finding's standing from baseline-2 on");
+            $status[JsonPath::stringAt($finding, ['package'])] = JsonPath::stringAt($finding, ['baseline', 'status']);
         }
-        self::assertIsArray($compared->toArray()['baseline'], 'the root block names the file the run read');
+        ksort($status);
+        self::assertSame(['vendor/fresh' => 'new', 'vendor/known' => 'known', 'vendor/worse' => 'worsened'], $status);
+        self::assertSame(['path' => 'lockrot-baseline.json', 'known' => 1, 'new' => 1, 'worsened' => 1, 'stale' => []], JsonPath::arrayAt($compared->toArray(), ['baseline']));
     }
 
     public function testAFindingWithoutABaselineStandsNowhere(): void
@@ -363,7 +415,7 @@ final class ReportTest extends TestCase
 
     public function testTheRunSaysHowItWasToldToGate(): void
     {
-        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::fromString('high'), RunSettings::SOURCE_OPTION, null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
+        $run = JsonPath::arrayAt($this->report()->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null, null, true, Gate::MODE_GENERATE_BASELINE))->toArray(), ['run']);
 
         self::assertSame('high', $run['fail_on']);
         self::assertSame('grade', JsonPath::stringAt($run, ['gates', 0, 'kind']));
@@ -386,7 +438,9 @@ final class ReportTest extends TestCase
         $document = $report->toArray();
 
         self::assertSame([], JsonPath::arrayAt($document, ['run', 'gates']));
-        self::assertNull($report->gate());
+        $gate = $report->gate();
+        self::assertNotNull($gate);
+        self::assertFalse($gate->fails());
         self::assertArrayHasKey('gate', $document);
         self::assertSame(['fails' => false, 'tripped_by' => []], \array_slice(JsonPath::arrayAt($document, ['gate']), 0, 2, true), 'report-2 always writes the gate');
         self::assertSame(['reaches_fail_on' => false, 'fails' => false, 'exempt_by' => null, 'by' => [], 'basis' => null], JsonPath::arrayAt($document, ['findings', 0, 'gate']));
@@ -417,7 +471,7 @@ final class ReportTest extends TestCase
     public function testTheGateIsDecidedOverTheReportAsItStands(): void
     {
         $report = $this->report($this->finding('vendor/known', Verdict::ABANDONED), $this->finding('vendor/fine', Verdict::OK))
-            ->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::fromString(Verdict::SILENT), RunSettings::SOURCE_OPTION, null));
+            ->withRun(new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, FailOn::parse(Verdict::SILENT), RunSettings::SOURCE_OPTION, null));
         $before = $report->toArray();
 
         self::assertSame(['fails' => true, 'tripped_by' => ['fail_on'], 'fail_on_applied' => true], \array_slice(JsonPath::arrayAt($before, ['gate']), 0, 3, true));
@@ -471,7 +525,7 @@ final class ReportTest extends TestCase
         );
         $array = $report->toArray();
         self::assertSame(
-            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'rot_depth', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
+            ['generated_at', 'run', 'activity_cache_oldest_at', 'activity_cache_age_hours', 'packages_checked', 'packages_flagged', 'packages_multi_flag', 'include_dev', 'not_from_composer_repository', 'packages_unchecked_accepted', 'network_failures', 'counts', 'abandoned', 'priorities', 'flags', 'exposure', 'exposure_rule', 'unattributed', 'rot_depth', 'libyears', 'baseline', 'gate', 'security', 'data_date', 'notes', 'note_details', 'findings'],
             array_keys($array)
         );
         // The literal, not the constant: the document states the value it attributed by.
@@ -544,7 +598,7 @@ final class ReportTest extends TestCase
             0
         );
         $comparison = BaselineComparison::compare(
-            Baseline::of([new BaselineEntry('vendor/a', '1.0.0', Verdict::SILENT, '2026-01-15')], '2026-09-14T00:00:00+00:00'),
+            BaselineEntries::baseline([BaselineEntries::of('vendor/a', '1.0.0', Verdict::SILENT, '2026-01-15')], '2026-09-14T00:00:00+00:00'),
             $report,
             'lockrot-baseline.json',
             ['vendor/a']
@@ -623,7 +677,7 @@ final class ReportTest extends TestCase
         self::assertFalse($withoutDev->toArray()['include_dev']);
         self::assertTrue($withDev->includesDev());
         self::assertTrue($withDev->toArray()['include_dev']);
-        $comparison = BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00'), $withDev, 'lockrot-baseline.json', ['vendor/ok']);
+        $comparison = BaselineComparison::compare(BaselineEntries::baseline([], '2026-09-14T00:00:00+00:00'), $withDev, 'lockrot-baseline.json', ['vendor/ok']);
         self::assertTrue($withDev->withBaseline($comparison)->includesDev(), 'the baseline view keeps the scope');
     }
 
@@ -803,7 +857,7 @@ final class ReportTest extends TestCase
 
         self::assertSame($oldest, $report->activityCacheOldestAt());
         self::assertSame('2026-09-13T20:00:00+00:00', $report->toArray()['activity_cache_oldest_at']);
-        $withBaseline = $report->withBaseline(BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00'), $report, 'lockrot-baseline.json', []));
+        $withBaseline = $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline([], '2026-09-14T00:00:00+00:00'), $report, 'lockrot-baseline.json', []));
         self::assertSame($oldest, $withBaseline->activityCacheOldestAt());
     }
 

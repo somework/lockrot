@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockLineIndex;
@@ -76,7 +77,18 @@ final class SarifFormatter implements FormatterInterface
             'None of the other verdicts applied',
             'None of the other verdicts applied to this package.',
         ],
+        self::UNCHECKED => [
+            'A check did not run, and nothing else grades the package',
+            'A check that the package needs did not run (S10), and no counted fact grades it. --fail-on=unchecked fails on it.',
+        ],
+        self::ADVISORIES_UNCHECKED => [
+            'The advisories of some packages were not checked',
+            'The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap.',
+        ],
     ];
+
+    private const UNCHECKED = 'unchecked';
+    private const ADVISORIES_UNCHECKED = 'advisories-unchecked';
 
     private FormatContext $context;
 
@@ -91,16 +103,30 @@ final class SarifFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
+        $gate = $this->context->gateOf($report);
         $rules = [];
         $ruleIndexes = [];
         $results = [];
-        foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
-            $verdict = $finding->verdict();
-            if (!isset($ruleIndexes[$verdict])) {
-                $ruleIndexes[$verdict] = \count($rules);
-                $rules[] = $this->rule($verdict);
+        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
+            $rule = $this->context->isUncheckedRecord($finding) ? self::UNCHECKED : $finding->verdict();
+            if (!isset($ruleIndexes[$rule])) {
+                $ruleIndexes[$rule] = \count($rules);
+                $rules[] = $this->rule($rule);
             }
-            $results[] = $this->result($finding, $ruleIndexes[$verdict], $index->lineOf($finding->package()), $baseline);
+            $results[] = $this->result($finding, $rule, $ruleIndexes[$rule], $index->lineOf($finding->package()), $baseline, $gate);
+        }
+        $gap = $this->context->advisoriesNotCheckedLevel($report);
+        if ($gap !== null) {
+            $ruleIndexes[self::ADVISORIES_UNCHECKED] = \count($rules);
+            $rules[] = $this->rule(self::ADVISORIES_UNCHECKED);
+            $results[] = [
+                'ruleId' => 'lockrot/'.self::ADVISORIES_UNCHECKED,
+                'ruleIndex' => $ruleIndexes[self::ADVISORIES_UNCHECKED],
+                'level' => $gap,
+                'message' => ['text' => 'advisories not checked: the gate could not read the advisories of every package'],
+                'locations' => [['physicalLocation' => ['artifactLocation' => $this->artifactLocation()]]],
+                'partialFingerprints' => ['lockrot/run' => self::ADVISORIES_UNCHECKED],
+            ];
         }
 
         $run = [
@@ -138,13 +164,9 @@ final class SarifFormatter implements FormatterInterface
     }
 
     /** @return array<string, mixed> */
-    private function result(Finding $finding, int $ruleIndex, ?int $line, ?BaselineComparison $baseline): array
+    private function result(Finding $finding, string $rule, int $ruleIndex, ?int $line, ?BaselineComparison $baseline, Gate $gate): array
     {
-        $artifactLocation = ['uri' => self::relativeUri($this->context->lockName())];
-        if ($this->context->lockDirectory() !== null) {
-            $artifactLocation['uriBaseId'] = self::URI_BASE_ID;
-        }
-        $physicalLocation = ['artifactLocation' => $artifactLocation];
+        $physicalLocation = ['artifactLocation' => $this->artifactLocation()];
         if ($line !== null) {
             $physicalLocation['region'] = ['startLine' => $line];
         }
@@ -174,9 +196,9 @@ final class SarifFormatter implements FormatterInterface
         }
 
         return [
-            'ruleId' => 'lockrot/'.$finding->verdict(),
+            'ruleId' => 'lockrot/'.$rule,
             'ruleIndex' => $ruleIndex,
-            'level' => $this->context->levelOf($finding, $baseline),
+            'level' => $this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline),
             'rank' => Priority013::rank($finding->priority()) * self::RANK_STEP,
             'message' => ['text' => $this->message($finding)],
             'locations' => [['physicalLocation' => $physicalLocation]],
@@ -185,6 +207,17 @@ final class SarifFormatter implements FormatterInterface
             'partialFingerprints' => ['lockrot/package' => $finding->package()],
             'properties' => $properties,
         ];
+    }
+
+    /** @return array{uri: string, uriBaseId?: string} */
+    private function artifactLocation(): array
+    {
+        $location = ['uri' => self::relativeUri($this->context->lockName())];
+        if ($this->context->lockDirectory() !== null) {
+            $location['uriBaseId'] = self::URI_BASE_ID;
+        }
+
+        return $location;
     }
 
     /** @return array<string, mixed> */

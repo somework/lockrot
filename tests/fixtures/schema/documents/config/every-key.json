@@ -1,0 +1,39 @@
+{
+ "project": "acme/shop",
+ "fail-on": [
+  "high",
+  "left-behind",
+  "vulnerable-high",
+  "unchecked"
+ ],
+ "target-php": "8.4",
+ "format": "html",
+ "include-dev": true,
+ "install-time": "on",
+ "install-time-strict": true,
+ "install-time-budget": 10,
+ "baseline": "lockrot-baseline.json",
+ "release-warn-years": 3,
+ "release-high-years": 5,
+ "push-warn-years": 3,
+ "push-high-years": 5,
+ "ignore": [
+  {
+   "package": "tubalmartin/cssmin",
+   "flags": [
+    "stale"
+   ],
+   "reason": "a single-file minifier, finished",
+   "expires": "2027-03-31"
+  }
+ ],
+ "advisory-lookup": "all",
+ "accept-unchecked": [
+  {
+   "check": "repository_activity",
+   "host": "codeberg.org",
+   "reason": "Forgejo has no API lockrot reads",
+   "expires": "2027-03-31"
+  }
+ ]
+}

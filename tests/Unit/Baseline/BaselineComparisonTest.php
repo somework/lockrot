@@ -8,7 +8,12 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
+use Lockrot\Baseline\RecordedAdvisory;
+use Lockrot\Data\Php\PhpReleaseDates;
+use Lockrot\Score\CountedAdvisory;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -34,10 +39,10 @@ final class BaselineComparisonTest extends TestCase
     {
         $entries = [];
         foreach ($rows as [$package, $version, $verdict, $firstSeen]) {
-            $entries[] = new BaselineEntry($package, $version, $verdict, $firstSeen);
+            $entries[] = BaselineEntries::of($package, $version, $verdict, $firstSeen);
         }
 
-        return Baseline::of($entries, self::AT);
+        return BaselineEntries::baseline($entries, self::AT);
     }
 
     /** @param list<string> $present */
@@ -52,6 +57,23 @@ final class BaselineComparisonTest extends TestCase
         }
 
         return BaselineComparison::compare($baseline, $report, self::PATH, $names);
+    }
+
+    /** A lost fix is compared only when the run's target PHP and fix model equal the file's. */
+    public function testALostFixIsComparedOnlyUnderTheTargetOfTheFile(): void
+    {
+        $finding = (new FindingBuilder())->withPackage('acme/x')->withChain(['acme/x'])->withFlags(FlagSet::fromSignals([], null, [new CountedAdvisory('A', 'high', 'none')]))->build();
+        $report = new Report([$finding], [], new \DateTimeImmutable(self::AT), 1, 0);
+        $entry = new BaselineEntry('acme/x', '1.0.0', '2026-01-15', [], [new RecordedAdvisory('A', '2026-01-15', 'high', 'update')]);
+        $state = static function (string $target) use ($entry, $report): ?string {
+            $standing = BaselineComparison::compare(Baseline::of([$entry], self::AT, $target, 'runtime'), $report, self::PATH, ['acme/x'])->standingOf('acme/x');
+            $fact = $standing === null ? null : $standing->advisoryState('A');
+
+            return $fact === null ? null : $fact->state();
+        };
+
+        self::assertSame('fix_lost', $state(PhpReleaseDates::minorOf(\PHP_VERSION)));
+        self::assertSame('known', $state('5.6'));
     }
 
     public function testAFindingAtTheBaselinedVerdictIsKnown(): void

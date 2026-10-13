@@ -9,7 +9,7 @@ namespace Lockrot\Legacy;
  *
  * @internal
  */
-final class PriorityBasis013
+final class PriorityBasis013 implements \JsonSerializable
 {
     public const STEP_TRANSITIVE = 'transitive';
     public const STEP_UNREACHED = 'unreached';
@@ -50,9 +50,21 @@ final class PriorityBasis013
         return $this->steps;
     }
 
+    /** @return list<string> the reason of each step, in the order the steps apply */
+    public function reasons(): array
+    {
+        return array_column($this->steps, 'reason');
+    }
+
     public function priority(): string
     {
         return $this->steps === [] ? $this->base : $this->steps[\count($this->steps) - 1]['to'];
+    }
+
+    /** @return array{base: string, steps: list<array{reason: string, from: string, to: string}>} */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     /** @return array{base: string, steps: list<array{reason: string, from: string, to: string}>} */

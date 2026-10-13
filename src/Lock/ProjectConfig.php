@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Lock;
 
 use Composer\Repository\PlatformRepository;
+use Lockrot\Allowlist\ProjectIgnoreList;
 use Lockrot\Config\ConfigSchema;
 use Lockrot\Config\UnknownKeys;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Verdict\FailOn;
 
 /** @internal */
 final class ProjectConfig
@@ -131,6 +133,12 @@ final class ProjectConfig
 
         $lockrotExtra = JsonReader::stringKeyed($lockrotRaw);
         try {
+            // lockrot's own checks speak before the schema's enum and pattern errors.
+            $failOn = $lockrotExtra['fail-on'] ?? null;
+            if (\is_string($failOn) || (\is_array($failOn) && JsonReader::isList($failOn) && array_filter($failOn, 'is_string') === $failOn)) {
+                FailOn::parse($failOn, 'extra.lockrot.fail-on');
+            }
+            ProjectIgnoreList::checkFlags($lockrotExtra['ignore'] ?? null);
             ConfigSchema::validate($lockrotExtra);
         } catch (ConfigException $e) {
             throw self::withUnknownKeys($e, $lockrotExtra);
@@ -153,7 +161,7 @@ final class ProjectConfig
             return $schemaError;
         }
 
-        return new ConfigException($schemaError->getMessage()."\n  - ".implode("\n  - ", $warnings), $schemaError->getCode(), $schemaError);
+        return ConfigException::withDetails($schemaError->getMessage()."\n  - ".implode("\n  - ", $warnings), $schemaError->details(), $schemaError);
     }
 
     /**

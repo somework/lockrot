@@ -6,15 +6,14 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
@@ -210,8 +209,8 @@ final class MarkdownFormatterTest extends TestCase
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
-        $baseline = Baseline::of([
-            new BaselineEntry('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
 
@@ -229,8 +228,8 @@ final class MarkdownFormatterTest extends TestCase
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
-        $baseline = Baseline::of([
-            new BaselineEntry('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('doctrine/cache', '1.13.0', Verdict::ABANDONED, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
 
@@ -245,8 +244,8 @@ final class MarkdownFormatterTest extends TestCase
     public function testBaselineStaleEntriesBecomeANoteBullet(): void
     {
         $report = $this->report();
-        $baseline = Baseline::of([
-            new BaselineEntry('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('vendor/departed', '1.0.0', Verdict::SILENT, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
 

@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
+use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
-use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
-use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
@@ -40,114 +38,49 @@ final class FormatContextTest extends TestCase
     {
         $rows = [];
         foreach ($entries as [$package, $verdict]) {
-            $rows[] = new BaselineEntry($package, '1.0.0', $verdict, '2026-01-15');
+            $rows[] = BaselineEntries::of($package, '1.0.0', $verdict, '2026-01-15');
         }
         $names = [];
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
 
-        return BaselineComparison::compare(Baseline::of($rows, self::AT), $report, 'lockrot-baseline.json', $names);
+        return BaselineComparison::compare(BaselineEntries::baseline($rows, self::AT), $report, 'lockrot-baseline.json', $names);
     }
 
-    public function testDefaultsWithoutABaseline(): void
+    /** docs/ci.md#how-each-format-marks-a-finding: the level follows the finding's gate standing. */
+    public function testAFindingThatFailsTheGateIsAnError(): void
     {
-        $context = FormatContext::create(null, Verdict::SILENT, Version::STRING);
+        $report = $this->report($this->finding('a/gone', Verdict::ABANDONED));
+        $gate = Gate::decide($report, FailOn::parse('high'), false, Gate::MODE_CHECK);
 
-        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($this->finding('a/b', Verdict::ABANDONED)));
-        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($this->finding('a/b', Verdict::SILENT)));
-        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/b', Verdict::STALE)));
-        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/b', Verdict::OK)));
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'high')->levelOf($report->findings()[0], $gate->standingOf('a/gone')));
     }
 
-    public function testAPriorityThresholdDrawsTheErrorLineByPriority(): void
+    public function testAFlaggedFindingThatPassesIsAWarningAndAnUnflaggedOneANote(): void
     {
-        $context = FormatContext::create(null, 'high', Version::STRING);
-        $directAbandoned = $this->finding('a/direct', Verdict::ABANDONED);
-        $transitiveStale = (new FindingBuilder())->withPackage('a/deep')->withVerdict(Verdict::STALE)->withChain(['a/root', 'a/deep'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
+        $report = $this->report($this->finding('a/stale', Verdict::STALE), $this->finding('a/fine', Verdict::OK));
+        $gate = Gate::decide($report, FailOn::parse('critical'), false, Gate::MODE_CHECK);
+        $context = FormatContext::create(null, 'critical');
 
-        self::assertSame('high', $context->failOn());
-        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($directAbandoned));
-        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($transitiveStale));
-        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/b', Verdict::OK)));
-        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($directAbandoned, $this->comparison([['a/direct', Verdict::ABANDONED]], $this->report($directAbandoned))), 'accepted stays a note');
+        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($report->findings()[0], $gate->standingOf('a/stale')));
+        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/fine', Verdict::OK), $gate->standingOf('a/fine')));
+        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($report->findings()[0], null), 'without a gate');
     }
 
-    public function testAThresholdThatIsNeitherAVerdictNorAPriorityIsRejected(): void
+    public function testAThresholdThatIsNotAValueIsRejected(): void
     {
         $this->expectException(ConfigException::class);
-        FormatContext::create(null, 'dead', Version::STRING);
+        FormatContext::create(null, 'dead');
     }
 
-    public function testFailOnNoneNeverProducesAnError(): void
+    public function testAFindingTheBaselineKnowsIsANote(): void
     {
-        $context = FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, Version::STRING);
+        $report = $this->report($this->finding('a/stale', Verdict::STALE));
+        $compared = $report->withBaseline($this->comparison([['a/stale', Verdict::STALE]], $report));
+        $gate = Gate::decide($compared, FailOn::parse('stale'), false, Gate::MODE_CHECK);
 
-        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/b', Verdict::ABANDONED)));
-    }
-
-    public function testABaselinedFindingIsDemotedToANote(): void
-    {
-        $context = FormatContext::create(null, Verdict::SILENT, Version::STRING);
-        $finding = $this->finding('a/b', Verdict::ABANDONED);
-        $report = $this->report($finding);
-
-        self::assertSame(
-            FormatContext::LEVEL_NOTE,
-            $context->levelOf($finding, $this->comparison([['a/b', Verdict::ABANDONED]], $report))
-        );
-    }
-
-    public function testANewFindingKeepsTheNormalMapping(): void
-    {
-        $context = FormatContext::create(null, Verdict::SILENT, Version::STRING);
-        $finding = $this->finding('a/new', Verdict::ABANDONED);
-        $report = $this->report($finding);
-
-        self::assertSame(
-            FormatContext::LEVEL_ERROR,
-            $context->levelOf($finding, $this->comparison([['a/other', Verdict::ABANDONED]], $report))
-        );
-    }
-
-    public function testAWorsenedFindingKeepsTheNormalMapping(): void
-    {
-        $context = FormatContext::create(null, Verdict::SILENT, Version::STRING);
-        $finding = $this->finding('a/b', Verdict::ABANDONED);
-        $report = $this->report($finding);
-
-        self::assertSame(
-            FormatContext::LEVEL_ERROR,
-            $context->levelOf($finding, $this->comparison([['a/b', Verdict::STALE]], $report))
-        );
-    }
-
-    /**
-     * `unchecked` reads S10, not the verdict, so a row only `--all` shows becomes an error when its
-     * check did not run — docs/compatibility.md states the mapping in this order: known first, then
-     * the threshold, then flagged.
-     */
-    public function testUnderUncheckedAnUnflaggedFindingWhoseCheckDidNotRunIsAnError(): void
-    {
-        $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
-        $unchecked = (new FindingBuilder())->withPackage('a/b')->withSignals([new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, []))])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
-
-        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked));
-        self::assertSame(FormatContext::LEVEL_WARNING, $context->levelOf($this->finding('a/c', Verdict::ABANDONED)), 'flagged without S10');
-        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($this->finding('a/d', Verdict::OK)));
-    }
-
-    /**
-     * The mapping's first rule wins: a finding the baseline accepted is a note, although without the
-     * baseline `--fail-on=unchecked` makes it an error for carrying S10.
-     */
-    public function testUnderUncheckedAFindingTheBaselineKnowsStaysANote(): void
-    {
-        $context = FormatContext::create(null, FailOn::UNCHECKED, Version::STRING);
-        $unchecked = (new FindingBuilder())->withPackage('a/b')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, []))])->withChain(['a/b'])->withDataDate(new \DateTimeImmutable(self::AT))->build();
-
-        self::assertSame(FormatContext::LEVEL_ERROR, $context->levelOf($unchecked), 'without the baseline');
-        self::assertSame(FormatContext::LEVEL_NOTE, $context->levelOf($unchecked, $this->comparison([['a/b', Verdict::ABANDONED]], $this->report($unchecked))));
+        self::assertSame(FormatContext::LEVEL_NOTE, FormatContext::create(null, 'stale')->levelOf($compared->findings()[0], $gate->standingOf('a/stale'), $compared->baseline()));
     }
 
     public function testUnknownContextCarriesNothing(): void
@@ -228,5 +161,61 @@ final class FormatContextTest extends TestCase
             FormatContext::MIN_WIDTH,
             FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, Version::STRING, 3)->terminalWidth()
         );
+    }
+
+    /** SPEC §6.2: the run-level record's level, from the gap and the active values. */
+    public function testTheAdvisoriesRecordLevelFollowsTheGapAndTheActiveValues(): void
+    {
+        $offline = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
+        $skipped = $this->report(FindingBuilder::advisoriesUnchecked('a/vcs', 'not_from_composer_repository', false));
+
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($offline));
+        self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'high')->advisoriesNotCheckedLevel($offline));
+        self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($skipped));
+        self::assertNull(FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($this->report($this->finding('a/fine', Verdict::OK))));
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($this->report($this->finding('a/fine', Verdict::OK), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true))), 'a checked finding before the gap');
+    }
+
+    /** A gap of a finding that the baseline knows exempts it from `unchecked`: the gate passes, so the record is a `warning`. */
+    public function testTheAdvisoriesRecordIsAWarningWhenTheBaselineKnowsTheFinding(): void
+    {
+        $report = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
+        $known = $report->withBaseline($this->comparison([['a/offline', 'stale']], $report));
+
+        self::assertFalse(FormatContext::create(null, 'unchecked')->gateOf($known)->fails());
+        self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($known));
+
+        $mixed = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true), FindingBuilder::advisoriesUnchecked('b/offline', 'offline', true));
+        $oneKnown = $mixed->withBaseline($this->comparison([['a/offline', 'stale']], $mixed));
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($oneKnown), 'a known gap before a failing one');
+    }
+
+    /** SPEC §7.10: the own `lockrot/unchecked` record needs `unchecked` active, a missing check and no counted fact. */
+    public function testAFindingGetsTheUncheckedRecordOnlyWhileUncheckedIsActive(): void
+    {
+        $offline = FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true);
+
+        self::assertTrue(FormatContext::create(null, 'unchecked')->isUncheckedRecord($offline));
+        self::assertFalse(FormatContext::create(null, 'high')->isUncheckedRecord($offline));
+        self::assertFalse(FormatContext::create(null, 'unchecked')->isUncheckedRecord($this->finding('a/fine', Verdict::OK)), 'no missing check');
+    }
+
+    /** I15b: the record set holds every flagged finding, every failing one, and with `unchecked` active every one with a missing check. */
+    public function testTheRecordSetHoldsEveryFindingThatTheGateCanFail(): void
+    {
+        $report = $this->report($this->finding('a/stale', Verdict::STALE), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true), $this->finding('a/fine', Verdict::OK));
+        $names = static function (array $findings): array {
+            $out = [];
+            foreach ($findings as $finding) {
+                self::assertInstanceOf(Finding::class, $finding);
+                $out[] = $finding->package();
+            }
+
+            return $out;
+        };
+
+        self::assertSame(['a/stale', 'a/offline'], $names(FormatContext::create(null, 'unchecked')->recordFindings($report, false)));
+        self::assertSame(['a/stale'], $names(FormatContext::create(null, 'high')->recordFindings($report, false)));
+        self::assertSame($names($report->findings()), $names(FormatContext::create(null, 'high')->recordFindings($report, true)), 'under --all, every finding');
     }
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds resources/lockrot-explain-2.schema.json (draft-04).
+"""Builds resources/lockrot-explain-2.schema.json, lockrot-baseline-2.schema.json and lockrot-config-2.schema.json (draft-04).
 
 explain-2 copies the finding, signal, note and run definitions of resources/lockrot-report-2.schema.json, so build
 that file first. The explain-1 file is read from the committed copy under inputs/, so a definition that explain-2
@@ -31,6 +31,7 @@ def pinned(name):
 
 R1 = pinned('lockrot-report.schema.json')
 E1 = pinned('lockrot-explain.schema.json')
+C1 = pinned('lockrot-config.schema.json')
 D1 = R1['definitions']
 DRAFT = 'http://json-schema.org/draft-04/schema#'
 
@@ -45,6 +46,10 @@ FIX_KINDS = ['update', 'upgrade', 'raise-php', 'unknown', 'blocked', 'none']
 MOVE_KINDS = ['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix']
 V013_VERDICTS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'unknown', 'finished', 'ok']
 PRIORITIES = ['critical', 'high', 'medium', 'low', 'none']
+TARGET_SOURCES = ['option', 'env', 'config', 'platform', 'runtime']
+# kept by hand: FailOnSchemaAgreementTest compares it with FailOn::allowed()
+FAIL_ON_VALUES = ['none', 'critical', 'high', 'medium', 'low', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale',
+                  'vulnerable', 'vulnerable-medium', 'vulnerable-high', 'vulnerable-critical', 'unchecked']
 REASON = '^[a-z][a-z0-9_]*$'           # reason-like open values (underscores), the repo's style
 FLAGLIKE = '^[a-z][a-z0-9-]*$'         # flag-like open values keep hyphens (raise-php)
 SIGNAL_IDS = ['S%d' % i for i in range(1, 11)]
@@ -334,7 +339,7 @@ def add_relations_round2(D):
                '`reach` and the reach modifier go together on a graded score: none when direct, `transitive` when transitive, `unreached` when unreached.',
                '`allowlist_reason` (report-1) is set only beside an entry that accepts the whole package (`allowlist.flag_ids` null).',
                'A flag labelled `role: accepted` (a fired flag no term counts) stands only beside an allowlist entry; whether a flag counts is the join `flags[].id` ∈ `score.terms[].flag`, which this relation does not replace.',
-               '`gate.basis` is set exactly under a baseline entry (`baseline.recorded` an object).',
+               '`gate.basis` is set exactly under a baseline entry (`baseline.recorded` an object), and `exempt_by: baseline` only there. A later `exempt_by` value is not constrained.',
                'A score-0 finding never stands `new` against a baseline: with no entry its `baseline` is null (§6.4).',
                'The security part\'s zero status follows the lookup: `clear` on a complete lookup, `unchecked` on a partial or unrun one; values this schema does not list are not constrained.',
                '`security.move_in` points at a move that exists: `next_step` an object, `also` a non-empty `next_step.also`.',
@@ -349,7 +354,7 @@ def add_relations_round2(D):
             P(reach=E('unreached'), score=P(modifiers={'allOf': [CONTAINS(P(reason=E('unreached'))), NONE(P(reason=E('transitive')))]}))],
            [P(allowlist_reason=NULL), P(allowlist={'allOf': [OBJ, P(flag_ids=NULL)]})],
            [{'properties': {'flags': {'items': {'anyOf': [P(id=E('vulnerable')), P(role=NOT('accepted'))]}}}}, P(allowlist=OBJ)],
-           [P(baseline={'allOf': [OBJ, P(recorded=OBJ)]}, gate=P(basis=OBJ)), P(baseline=P(recorded=NULL), gate=P(basis=NULL))],
+           [P(baseline={'allOf': [OBJ, P(recorded=OBJ)]}, gate=P(basis=OBJ)), P(baseline=P(recorded=NULL), gate=P(basis=NULL, exempt_by=NOT('baseline')))],
            [P(score={'required': ['terms']}), P(baseline=P(status=NOT('new')))],
            [P(score={'not': {'required': ['terms']}}), P(score=P(parts=P(security=P(status=NOT('clear', 'unchecked'))))),
             P(security=P(check=E('complete')), score=P(parts=P(security=P(status=E('clear'))))),
@@ -546,9 +551,10 @@ def add_relations(D):
     relate(inner(D['gateBasis']), ['`verdict` is null exactly at gate score 0 (I21).', '`limited_by` is `cap` whenever `new.total` is 0.'],
            [P(score=E(0), verdict=NULL), P(score={'minimum': 1}, verdict=STR)],
            [P(new=P(total=E(0)), limited_by=E('cap')), P(new=P(total={'minimum': 1}))])
-    relate(D['findingGate'], 'A failing finding reaches a value and is not exempt; a passing one is exempt only when it reaches a value.',
-           [P(fails=E(True), reaches_fail_on=E(True), exempt_by=NULL), P(fails=E(False), exempt_by=NULL),
-            P(fails=E(False), reaches_fail_on=E(True), exempt_by=STR)])
+    relate(D['findingGate'], 'A failing finding reaches a value, is not exempt and names the values it fails. A passing one names none, and is '
+                             'exempt only when it reaches a value.',
+           [P(fails=E(True), reaches_fail_on=E(True), exempt_by=NULL, by=MIN1), P(fails=E(False), by=EMPTY, exempt_by=NULL),
+            P(fails=E(False), by=EMPTY, reaches_fail_on=E(True), exempt_by=STR)])
     relate(D['band'], '`next` and `to_next` are null together, at the top band.', [P(next=NULL, to_next=NULL), P(next=STR, to_next={'type': 'integer'})])
     # the floor and the next band follow each other (model 1's bands are a closed table of four)
     relate(D['band'], '`floor` and `next` name adjacent bands: 32 at the top, 16 below critical, 8 below high, 1 below medium.',
@@ -687,6 +693,203 @@ def explain_schema():
     return root
 
 
+# baseline-2
+def report2_definitions():
+    return json.load(open(REPORT2))['definitions']
+
+
+def baseline_schema():
+    adv = obj('One counted advisory that the entry knows, as of the date it first became known.', {
+        'known_since': ref('date', 'The date it first became known. A regeneration keeps it.'),
+        'severity': ref('severity', 'Its severity bucket as of the last regeneration. Each regeneration refreshes it, so a regenerated file accepts a re-rating. '
+                                    'A reader compares it by gate rank: unrated counts as medium, so unrated to medium is never a re-rating.'),
+        'fix_kind': ref('fixKind', "Its fix kind (the S9 row's `fix.kind`) as of the last regeneration, refreshed like `severity`. A fix recorded `update`, `upgrade`, "
+                                   '`raise-php` or `unknown` that reads `blocked` or `none` later is lost. A reader compares fixes only when the target PHP and `fix_model` of the run equal those of the file.'),
+    })
+    flag = obj('One counted maintenance flag that the entry knows.', {
+        'known_since': ref('date', 'The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, '
+                                   'because a stored years value changes on every regeneration of an unchanged lock.'),
+    })
+    entry = obj('What the baseline knows about one package: its counted facts, each with the date it became known. A maintenance flag is covered when the '
+                'entry lists it or a flag above it in flag order, so only the first flag of the entry decides coverage.', {
+        'version': string('The version that was locked when the entry was last written.', minLength=1),
+        'first_seen': ref('date', 'The date the package first got an entry. A regeneration keeps it.'),
+        'flags': {'description': 'The counted maintenance flags, id to `{known_since}`. The key is present exactly when the entry has one: the writer never writes an empty '
+                                 "map, because PHP's `json_decode(…, true)` reads `{}` back as a list. The file never stores an accepted flag or `vulnerable`.",
+                  'type': 'object', 'minProperties': 1, 'properties': {f: copy.deepcopy(flag) for f in MAINT}, 'additionalProperties': False},
+        'advisories': {'description': 'The counted advisories, id to `{known_since, severity, fix_kind}`. The key is present exactly when the entry has one. '
+                                      "The file never stores an advisory that Composer's audit policy ignores. The writer drops an id only after a complete lookup.",
+                       'type': 'object', 'minProperties': 1, 'additionalProperties': adv},
+    }, required=['version', 'first_seen'])
+    entry['anyOf'] = [
+        {'description': 'An entry stores at least one counted maintenance flag...', 'required': ['flags']},
+        {'description': '...or at least one counted advisory: the writer gives an entry only to a graded finding, which has a counted fact.', 'required': ['advisories']},
+    ]
+    return {
+        '$schema': DRAFT,
+        'id': 'https://lockrot.dev/schema/baseline-2.json',
+        'title': 'lockrot baseline',
+        'description': ('The file that `composer lockrot --generate-baseline` writes and that later runs compare with: the counted maintenance flags and the counted '
+                        'advisories of each graded finding, with the date each became known, and the target PHP, score model and fix model of the run that '
+                        'wrote it. The baseline knows facts and does not accept them. A known fact still counts for the verdict, and only what the uncovered '
+                        'facts add sets the level of the gate, min(score, 2 × new). lockrot 0.14 reads baseline-2 only: a baseline-1 file exits 2 with a message '
+                        'to review the findings and run --generate-baseline, which overwrites it. lockrot 0.13 exits 2 on this file. Objects are open: a field '
+                        'added later validates against this file unchanged. The number in the id changes only when a field is removed or renamed.'),
+        'type': 'object',
+        'required': ['$schema', 'lockrot', 'generated_at', 'target_php', 'target_php_source', 'score_model_id', 'fix_model', 'findings'],
+        'properties': {
+            '$schema': {'description': 'The published URL of this schema, always written. lockrot refuses a baseline-1 file before it validates the file.', 'type': 'string', 'enum': ['https://lockrot.dev/schema/baseline-2.json']},
+            'lockrot': obj('The writer and the schema number of the file.', {
+                'version': string('The lockrot release that wrote the file.', minLength=1),
+                'schema': {'description': 'The schema number of the file: 2. A reader picks the schema to validate against by this number.', 'type': 'integer', 'enum': [2]},
+            }),
+            'generated_at': ref('dateTime', 'When the file was written: the run clock of the run that wrote it.'),
+            'target_php': string('The target PHP minor that the file was written for (`8.4`), as `run.target_php`. A reader compares fixes only when the target of the run '
+                                 'equals it, else the note `baseline_target_differs` says so.', pattern='^[0-9]+\\.[0-9]+$'),
+            'target_php_source': closed('Where that target came from, as `run.target_php_source`. Closed.', TARGET_SOURCES),
+            'score_model_id': integer('`run.score_model.id` of the run that wrote it. Grades under two score models are not comparable.', 1),
+            'fix_model': integer('`run.fix_model` of the run that wrote it. A reader compares fixes only under an equal fix model, else the note '
+                                 '`baseline_fix_model_differs` says so.', 1),
+            'findings': {'description': 'One entry per graded finding, keyed by package name and sorted by it, so a regenerated file diffs cleanly. An '
+                                        'ok, finished or unknown package gets no entry, and reads `new` when it is graded later.',
+                         'type': 'object', 'patternProperties': {'^[^\\/]+\\/[^\\/]+$': ref('entry')}, 'additionalProperties': False},
+        },
+        'definitions': {
+            'dateTime': {'description': 'An ISO 8601 date and time with an offset, as `DATE_ATOM` writes it.', 'type': 'string', 'format': 'date-time'},
+            'date': {'description': 'A calendar date, `YYYY-MM-DD`.', 'type': 'string', 'pattern': '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'},
+            # report-2's own definitions, copied, so the -2 files type one vocabulary one way
+            'severity': copy.deepcopy(report2_definitions()['severity']),
+            'fixKind': copy.deepcopy(report2_definitions()['fixKind']),
+            'entry': entry,
+        },
+    }
+
+
+# config-2
+def ci(word):
+    """a case-insensitive spelling of one fail-on token in an ECMA-262 pattern (draft-04 patterns have no inline flags)."""
+    assert re.fullmatch('[a-z-]+', word), word
+    return ''.join('[%s%s]' % (c.lower(), c.upper()) if c.isalpha() else c for c in word)
+
+
+def config_schema():
+    s = copy.deepcopy(C1)
+    s['id'] = 'https://lockrot.dev/schema/config-2.json'
+    s['description'] = ('The `extra.lockrot` object in composer.json (config-2, lockrot 0.14). Unknown keys are allowed, and every config-1 document is '
+                        'config-2. The listed keys must have the listed type. config-2 adds the `fail-on` list (a comma-separated string or a JSON '
+                        'array, one value per kind: a grade, a maintenance flag, a raw advisory severity, `unchecked`), `ignore[].flags`, '
+                        '`accept-unchecked` and `advisory-lookup`.')
+    tokens = sorted(FAIL_ON_VALUES, key=len, reverse=True)  # the longest first, so `vulnerable-high` is not read as `vulnerable`
+    tok = '(' + '|'.join(ci(t) for t in tokens) + ')'
+    one = '^\\s*' + tok + '\\s*$'
+    lst = '^\\s*' + tok + '\\s*(,\\s*' + tok + '\\s*)*$'
+    s['properties']['fail-on'] = {
+        'description': ('When the run fails. `none` is the default and must stand alone. A grade (`critical high medium low`) fails when the band of the gate score '
+                        'is at or above it. A maintenance flag (`abandoned silent pinned left-behind old-promise stale`) fails on a counted flag at or above it in flag order '
+                        'that the baseline does not cover, as the verdict gate of 0.13 did. A raw advisory severity (`vulnerable`, `vulnerable-medium`, '
+                        '`vulnerable-high`, `vulnerable-critical`) fails on a counted advisory at or above it that the baseline does not know. `vulnerable` means any '
+                        'severity, so `vulnerable-low` is not a value. `unchecked` fails on S10. A list holds at most one value per kind. lockrot trims and lower-cases '
+                        'each value and accepts whitespace around commas. `--fail-on` and `LOCKROT_FAIL_ON` replace this value whole. This schema checks the '
+                        'spelling of each value. Two values of one kind and `none` beside another value are errors of lockrot itself (exit 2), which name the values. '
+                        '`run.fail_on` writes the list in canonical form.'),
+        'oneOf': [
+            {'description': 'A comma-separated list in one string: `"high"`, `"left-behind, vulnerable-high"`.', 'type': 'string',
+             'anyOf': [{'description': 'One value, as an editor offers it.', 'enum': FAIL_ON_VALUES}, {'pattern': lst}]},
+            {'description': 'A JSON array, read as the string form is read: `["left-behind", "vulnerable-high"]`.', 'type': 'array', 'minItems': 1,
+             'uniqueItems': True, 'items': {'description': 'One value.', 'type': 'string',
+                                            'anyOf': [{'description': 'As an editor offers it.', 'enum': FAIL_ON_VALUES}, {'pattern': one}]}},
+        ],
+    }
+    ign = s['properties']['ignore']
+    ign['description'] = ('The allowlist of the project: each entry accepts maintenance flags of the packages it matches, with a reason. An accepted '
+                          'flag is listed, muted, weighs 0 and reaches no gate. An entry never accepts an advisory. Accept advisories in the audit policy '
+                          'of Composer (`config.audit.ignore` on 2.4 to 2.9, `config.policy.advisories` on 2.10 and later), which `composer audit` reads too.')
+    item = ign['items']
+    item['description'] = 'One allowlist entry.'
+    item['properties']['package']['description'] = 'The package name or a pattern with `*` wildcards (`symfony/*`).'
+    item['properties']['reason']['description'] = 'Why the project accepts it. Reports show it verbatim (report-2 `finding.allowlist.reason`, `reason_by: user`), never inside a machine string.'
+    item['properties']['version']['description'] = 'One exact version that the entry applies to. Without it the entry applies to every version.'
+    item['properties']['expires']['description'] = 'The date the entry stops accepting (`YYYY-MM-DD`). An expired entry accepts nothing and its flags count again.'
+    item['properties']['flags'] = {
+        'description': ('The maintenance flags that this entry accepts. Without it the entry accepts every maintenance flag, as in config-1. The '
+                        'other flags keep counting, and the repository activity lookup still runs unless the entry accepts every flag. A liveness word '
+                        'also accepts the liveness words below it. `vulnerable` is not a value: the allowlist accepts maintenance flags only. report-2 '
+                        'writes it as `finding.allowlist.flag_ids`. lockrot 0.13 reads an entry with `flags` as an entry that accepts the whole package.'),
+        'type': 'array', 'minItems': 1, 'uniqueItems': True,
+        'items': closed('A maintenance flag id.', MAINT),
+    }
+    item['properties'] = dict(sorted(item['properties'].items()))
+    s['properties']['advisory-lookup'] = {
+        'description': ('Which packages lockrot asks the advisory APIs of the Composer repositories about, by name. `all` (the default) asks every locked package, '
+                        'as `composer audit` does, so the name of a package installed from vcs, path or an archive reaches packagist.org. `composer-repositories` '
+                        'asks only the packages installed from a Composer repository, as 0.13 did, and marks every other one `checks_skipped` '
+                        '{check: advisories, reason: not_from_composer_repository}. `--offline` asks none.'),
+        'type': 'string', 'enum': ['all', 'composer-repositories'],
+    }
+    s['properties']['accept-unchecked'] = accept_unchecked_schema()
+    s['properties'] = dict(sorted(s['properties'].items()))
+    return s
+
+
+ACCEPT_CHECKS = ['repository_activity', 'release_metadata', 'advisories']
+HOST_PATTERN = '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(:[0-9]{1,5})?$'
+# a scheme URL carries no userinfo, so a credential in composer.json never reaches a report through accepted_by.value; the scp
+# form keeps its user name (`git@`). UncheckedAcceptanceEntry reads the same grammar.
+URL_PATTERN = '^([a-z][a-z0-9+.-]*:\\/\\/[^\\s\\/?#@]+([\\/?#][^\\s]*)?|[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:[^\\s]+)$'
+
+
+def accept_unchecked_schema():
+    """config-2 `accept-unchecked`: entries in the style of `ignore[]` (a reason required, `expires` optional) that accept one named S10
+    check for the packages that one scope key names: `host`, `repository` or `package`, exactly one per entry."""
+    scope = lambda desc, extra: dict({'description': desc, 'type': 'string', 'minLength': 1}, **extra)
+    item = {
+        'description': 'One accepted check.',
+        'type': 'object',
+        'properties': {
+            'check': closed('The check that lockrot did not run: `repository_activity` (S3 and S4), `release_metadata` (S2 and S8) or `advisories` (S9). '
+                            'For a package outside every Composer repository, an accepted `release_metadata` also accepts the unknown fix of each counted advisory, '
+                            'because the fix scan reads the same releases. Its score can then be lower than with the releases read.', ACCEPT_CHECKS),
+            'expires': {'description': 'A real calendar date (`YYYY-MM-DD`). The entry accepts through 23:59:59 UTC that day, as an `ignore[]` entry does. lockrot rejects a date '
+                                       'that does not exist, and this schema checks the shape. After that day the entry accepts nothing, and the check is S10 again.',
+                        'type': 'string', 'pattern': '^\\d{4}-\\d{2}-\\d{2}$'},
+            'host': scope('The host of the repository URL of the package, as `finding.activity.host` writes it (`codeberg.org`, `git.example.com:8443`): '
+                          'lower case, with its port, without a scheme or a path. lockrot does not compare a GitLab path prefix of `activity.host`. '
+                          'Never with `check: advisories`: that gap comes from the Composer repositories, not from a source host.', {'pattern': HOST_PATTERN}),
+            'package': scope('The package name or a case-sensitive shell pattern (`acme/*`), matched with fnmatch as in `ignore[]`.', {}),
+            'reason': {'description': 'Why the project accepts the check. report-2 shows it verbatim (`finding.unchecked_accepted[].accepted_by.reason`), never inside a '
+                                      'machine string. lockrot rejects a reason of whitespace only.', 'type': 'string', 'minLength': 1},
+            'repository': scope('The repository that the package is installed from: its vcs URL (`https://github.com/acme/fork.git`, '
+                                '`git@github.com:acme/fork.git`), or the URL of a Composer repository (`https://mirror.acme.internal`). lockrot '
+                                'compares the lower-case host and the case-sensitive path, without the scheme, a trailing `/` or `.git`. A query and a fragment stay significant. '
+                                'A source URL matches on a host that lockrot cannot ask too. A Composer repository matches a package that lockrot attributes to it: '
+                                'by `origin.registry` when lockrot names the registry, else by the URL of the repository that lockrot '
+                                'read the entry from. The report does not write that URL. A package that lockrot cannot attribute to one repository '
+                                'never matches a Composer repository. A scheme URL carries no userinfo (lockrot rejects `https://user:secret@…` and `ssh://git@…`), '
+                                'because report-2 writes the value in `accepted_by.value` and a user name can be a token. Write `ssh://host:2222/path`: '
+                                'it matches the same source URL. Without a scheme lockrot reads only the scp form `user@host:path`. A `file://` URL has no host: '
+                                'accept such a package by `package`.', {'pattern': URL_PATTERN}),
+        },
+        'required': ['check', 'reason'],
+        'not': {'description': 'The advisories check is never scoped by host.', 'properties': {'check': {'enum': ['advisories']}}, 'required': ['check', 'host']},
+        'oneOf': [
+            {'description': 'Scoped by host.', 'required': ['host']},
+            {'description': 'Scoped by repository.', 'required': ['repository']},
+            {'description': 'Scoped by package.', 'required': ['package']},
+        ],
+    }
+    return {
+        'description': ('Checks that lockrot did not run and that the project accepts. Each entry names one check and one scope (`host`, `repository` or '
+                        '`package`), with a reason. It accepts exactly three gaps: a repository on a host that lockrot cannot ask (`host_not_supported`), '
+                        'a run whose Composer repositories publish no advisories (`no_feed`), and a package installed from vcs or from an origin that lockrot cannot tell '
+                        '(`not_from_composer_repository`). Every other unchecked reason stays S10, `undated_releases` included. An accepted check is not S10: '
+                        '`checks_skipped[]` lists it with the reason `accepted_by_config`, report-2 writes the entry in `finding.unchecked_accepted[]`, and '
+                        '`--fail-on=unchecked` does not fail on it. It hides no flag and changes no score. `ignore[]` comes first: a package that it accepts whole '
+                        'has no maintenance S10 left to accept. The first matching entry, in order, is the one that report-2 writes. lockrot 0.13 ignores this key.'),
+        'type': 'array',
+        'items': item,
+    }
+
+
 # properties the -1 files left undescribed (report-1 described the object, not each member); every -2
 # property carries a description, as the report-2 builder already checks
 MEMBER_DESCRIPTIONS = {
@@ -726,7 +929,7 @@ def describe_members(doc):
 
 
 def main():
-    out = {'lockrot-explain-2.schema.json': explain_schema()}
+    out = {'lockrot-explain-2.schema.json': explain_schema(), 'lockrot-baseline-2.schema.json': baseline_schema(), 'lockrot-config-2.schema.json': config_schema()}
     from ship_text import ship_schema, leftovers
     for doc in out.values():
         describe_members(doc)

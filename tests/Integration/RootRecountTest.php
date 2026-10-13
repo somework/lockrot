@@ -80,16 +80,16 @@ final class RootRecountTest extends TestCase
             $report = CaseHydrator::report($case);
             yield $id => self::decode($report);
             foreach (self::FAIL_ON as $failOn) {
-                $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString($failOn), RunSettings::SOURCE_OPTION, null);
+                $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse($failOn), RunSettings::SOURCE_OPTION, null);
                 yield $id.' --fail-on='.$failOn => self::decode($report->withRun($run));
             }
             $names = array_map(static fn (Finding $finding): string => $finding->package(), $report->findings());
             $known = $report->withBaseline(BaselineComparison::compare(Baseline::fromReport($report), $report, 'lockrot-baseline.json', $names));
-            $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString('low'), RunSettings::SOURCE_OPTION, null);
+            $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('low'), RunSettings::SOURCE_OPTION, null);
             yield $id.' with its own baseline' => self::decode($known->withRun($run));
         }
         self::assertGreaterThan(0, $cases);
-        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString('low'), RunSettings::SOURCE_OPTION, null);
+        $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('low'), RunSettings::SOURCE_OPTION, null);
         yield 'the facts that no case has' => self::decode((new Report(self::factsNoCaseHas(), [], new \DateTimeImmutable('2026-01-02T00:00:00+00:00'), 6, 0))->withRun($run));
     }
 

@@ -18,6 +18,9 @@ interface Term extends \JsonSerializable
 
     public function role(): string;
 
+    /** The points after every halving, in half points. */
+    public function contributionHalves(): int;
+
     /** @return MaintenanceShape|SecurityShape */
     public function jsonSerialize(): array;
 }

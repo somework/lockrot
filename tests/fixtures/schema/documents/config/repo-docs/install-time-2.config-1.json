@@ -1,0 +1,4 @@
+{
+ "install-time-strict": true,
+ "fail-on": "high"
+}

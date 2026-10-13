@@ -7,10 +7,10 @@ namespace Lockrot\Tests\Unit\Config;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
 use Lockrot\Legacy\Priority013;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Verdict\Finding;
@@ -101,12 +101,12 @@ final class PolicyTest extends TestCase
         }
         $entries = [];
         foreach ($baselined as [$package, $verdict]) {
-            $entries[] = new BaselineEntry($package, '1.0.0', $verdict, '2026-01-15');
+            $entries[] = BaselineEntries::of($package, '1.0.0', $verdict, '2026-01-15');
         }
         $report = new Report($findings, $networkFailures ? [Notes::text('a lookup failed', true)] : [], $at, \count($findings), 0);
 
         return $report->withBaseline(BaselineComparison::compare(
-            Baseline::of($entries, '2026-09-14T00:00:00+00:00'),
+            BaselineEntries::baseline($entries, '2026-09-14T00:00:00+00:00'),
             $report,
             'lockrot-baseline.json',
             $names

@@ -1,0 +1,16 @@
+{
+ "ignore": [
+  {
+   "package": "acme/legacy-*",
+   "flags": [
+    "abandoned",
+    "silent",
+    "pinned",
+    "left-behind",
+    "old-promise",
+    "stale"
+   ],
+   "reason": "listed one by one: the same as no flags"
+  }
+ ]
+}

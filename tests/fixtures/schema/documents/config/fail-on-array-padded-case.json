@@ -1,0 +1,6 @@
+{
+ "fail-on": [
+  " Old-Promise ",
+  "VULNERABLE-CRITICAL"
+ ]
+}

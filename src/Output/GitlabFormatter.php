@@ -6,6 +6,7 @@ namespace Lockrot\Output;
 
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Lock\LockLineIndex;
 use Lockrot\Verdict\Finding;
@@ -40,24 +41,39 @@ final class GitlabFormatter implements FormatterInterface
         $index = $lockPath === null ? LockLineIndex::empty() : LockLineIndex::fromFile($lockPath);
 
         $baseline = $report->baseline();
+        $gate = $this->context->gateOf($report);
         $issues = [];
-        foreach ($showAll ? $report->findings() : $report->flagged() as $finding) {
-            $issues[] = $this->issue($finding, $index->lineOf($finding->package()), $baseline);
+        foreach ($this->context->recordFindings($report, $showAll) as $finding) {
+            $issues[] = $this->issue($finding, $index->lineOf($finding->package()), $baseline, $gate);
+        }
+        $gap = $this->context->advisoriesNotCheckedLevel($report);
+        if ($gap !== null) {
+            $issues[] = [
+                'type' => 'issue',
+                'check_name' => 'lockrot/advisories-unchecked',
+                'description' => 'advisories not checked: the gate could not read the advisories of every package',
+                'categories' => self::CATEGORIES,
+                'severity' => $gap === FormatContext::LEVEL_ERROR ? 'major' : 'minor',
+                'fingerprint' => hash('sha256', 'lockrot|advisories-unchecked'),
+                'location' => ['path' => $this->context->lockName(), 'lines' => ['begin' => self::FALLBACK_LINE]],
+            ];
         }
 
         return self::encode($issues);
     }
 
     /** @return array<string, mixed> */
-    private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline): array
+    private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline, Gate $gate): array
     {
+        $check = $this->context->isUncheckedRecord($finding) ? 'unchecked' : $finding->verdict();
+
         return [
             'type' => 'issue',
-            'check_name' => 'lockrot/'.$finding->verdict(),
+            'check_name' => 'lockrot/'.$check,
             'description' => $this->description($finding),
             'categories' => self::CATEGORIES,
-            'severity' => $this->severity($finding, $baseline),
-            'fingerprint' => hash('sha256', 'lockrot|'.$finding->package().'|'.$finding->verdict()),
+            'severity' => $this->severity($finding, $baseline, $gate),
+            'fingerprint' => hash('sha256', 'lockrot|'.$finding->package().'|'.$check),
             'location' => [
                 'path' => $this->context->lockName(),
                 'lines' => ['begin' => $line ?? self::FALLBACK_LINE],
@@ -65,9 +81,9 @@ final class GitlabFormatter implements FormatterInterface
         ];
     }
 
-    private function severity(Finding $finding, ?BaselineComparison $baseline): string
+    private function severity(Finding $finding, ?BaselineComparison $baseline, Gate $gate): string
     {
-        switch ($this->context->levelOf($finding, $baseline)) {
+        switch ($this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline)) {
             case FormatContext::LEVEL_ERROR:
                 return 'major';
             case FormatContext::LEVEL_WARNING:

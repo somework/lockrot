@@ -147,7 +147,7 @@ final class ProjectConfigTest extends TestCase
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('extra.lockrot is invalid:');
-        ProjectConfig::fromArray(['extra' => ['lockrot' => ['fail-on' => 'dead']]]);
+        ProjectConfig::fromArray(['extra' => ['lockrot' => ['include-dev' => 'yes']]]);
     }
 
     /**
@@ -169,18 +169,18 @@ final class ProjectConfigTest extends TestCase
     /** An unknown key beside an unrelated schema error is still named, after the schema's own lines. */
     public function testASchemaErrorIsFollowedByEveryUnknownKey(): void
     {
-        $message = $this->configErrorFor(['install-tme' => 'off', 'fail-on' => 'dead', 'x-ci' => 1]);
+        $message = $this->configErrorFor(['install-tme' => 'off', 'include-dev' => 'yes', 'x-ci' => 1]);
 
-        self::assertStringStartsWith("extra.lockrot is invalid:\n  - fail-on: ", $message);
+        self::assertStringStartsWith("extra.lockrot is invalid:\n  - include-dev: ", $message);
         self::assertStringEndsWith("\n  - unknown key extra.lockrot.install-tme ignored (did you mean install-time?)", $message);
         self::assertStringNotContainsString('x-ci', $message);
     }
 
     public function testASchemaErrorWithNoUnknownKeyIsTheSchemasAlone(): void
     {
-        $message = $this->configErrorFor(['fail-on' => 'dead']);
+        $message = $this->configErrorFor(['include-dev' => 'yes']);
 
-        self::assertStringStartsWith("extra.lockrot is invalid:\n  - fail-on: ", $message);
+        self::assertStringStartsWith("extra.lockrot is invalid:\n  - include-dev: ", $message);
         self::assertStringNotContainsString('unknown key', $message);
         self::assertSame(1, substr_count($message, "\n"), $message);
     }
@@ -189,7 +189,7 @@ final class ProjectConfigTest extends TestCase
     public function testTheSchemaErrorIsKeptAsThePrevious(): void
     {
         try {
-            ProjectConfig::fromArray(['extra' => ['lockrot' => ['install-tme' => 'off', 'fail-on' => 'dead']]]);
+            ProjectConfig::fromArray(['extra' => ['lockrot' => ['install-tme' => 'off', 'include-dev' => 'yes']]]);
             self::fail('a schema error was expected');
         } catch (ConfigException $e) {
             $previous = $e->getPrevious();

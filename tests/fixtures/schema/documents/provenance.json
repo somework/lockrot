@@ -1,0 +1,31 @@
+{
+ "source": "security-axis/r3/docs",
+ "model_run_date": "2026-10-08",
+ "suite": "run_all.sh: 55 of 55 steps pass (the attack-rounds step with its PHP cap raised)",
+ "documents": {
+  "corpus": 49,
+  "variants": 3,
+  "cases": 111,
+  "coverage/baselined": 49,
+  "coverage/variants": 39,
+  "explain": 106,
+  "explain/coverage": 48,
+  "baseline/cases": 3,
+  "baseline/corpus": 49,
+  "baseline/earlier": 50,
+  "baseline/gate-rows": 33,
+  "baseline/regenerate": 2,
+  "baseline/regenerate-from-baseline-1": 1,
+  "config": 33,
+  "config/coverage": 40,
+  "config/repo-docs": 4
+ },
+ "corrections": {
+  "coverage/variants/finished-lookup-failed.json": [
+   "C75 R8: network_failures false beside a repository that failed in transport, written true"
+  ],
+  "coverage/variants/lookup-not-run-lookup-failed.json": [
+   "C75 R8: network_failures false beside a repository that failed in transport, written true"
+  ]
+ }
+}

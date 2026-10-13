@@ -6,7 +6,6 @@ namespace Lockrot\Tests\Unit\Json;
 
 use Lockrot\Json\Schemas;
 use Lockrot\Output\JsonFormatter;
-use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,8 +13,7 @@ use PHPUnit\Framework\TestCase;
  * "else null", "never") is held by the schema or listed with the reason it is not: a relation that
  * names the property in backticks encodes it, the property's own keywords hold it
  * ({@see STRUCTURAL}), or draft-04 cannot say it ({@see ENGINE}: arithmetic, list equality, a value
- * in another object or outside the document, or prose that states no cross-field rule). A claim that
- * this head writes a placeholder for is listed with the pull request that restores it ({@see PLACEHOLDERS}).
+ * in another object or outside the document, or prose that states no cross-field rule).
  */
 final class SchemaClaimsTest extends TestCase
 {
@@ -117,16 +115,7 @@ final class SchemaClaimsTest extends TestCase
         'advisoryRepository.registry' => 'a host derived from the repository URL, outside the document',
         'advisoryLookup.other_repositories' => 'the configured repositories are outside the document',
         'rotDepth.require_dev_not_walked' => 'a count over findings (RotDepthTest)',
-    ];
-
-    /**
-     * The claims that this head writes a placeholder for, by the pull request that restores the
-     * rule, and the text of the strict relation that the schema leaves out until then (null when
-     * no relation says it).
-     */
-    private const PLACEHOLDERS = [
-        'findingGate.by' => ['PR 6a: gate.by names the values a failing finding fails', 'names the values it fails'],
-        'findingGate.exempt_by' => ['PR 5: exempt_by baseline only under a baseline entry', '`exempt_by: baseline` only there'],
+        'rootGate.not_applied' => 'a count over findings per reason (GateTest)',
     ];
 
     /** The claims that a relation of another definition encodes. */
@@ -148,21 +137,6 @@ final class SchemaClaimsTest extends TestCase
         $claims = self::claims(self::schema());
 
         self::assertSame([], array_values(array_diff(array_merge(array_keys(self::STRUCTURAL), array_keys(self::ENGINE), array_keys(self::ENCODED_AT)), array_keys($claims))));
-    }
-
-    public function testEachPlaceholderIsAPropertyThatNoRelationEncodes(): void
-    {
-        $schema = self::schema();
-        $relations = self::allRelations($schema);
-
-        self::assertNotSame([], $relations);
-        foreach (self::PLACEHOLDERS as $key => [$restoredBy, $strict]) {
-            [$definition, $property] = explode('.', $key);
-            self::assertTrue(JsonPath::has($schema, ['definitions', $definition, 'properties', $property]), $key.' is a property of the schema');
-            foreach ($relations as $relation) {
-                self::assertStringNotContainsString($strict, $relation, $key.' is encoded: take it off PLACEHOLDERS ('.$restoredBy.')');
-            }
-        }
     }
 
     public function testAClaimWithoutARelationIsFound(): void
@@ -237,9 +211,6 @@ final class SchemaClaimsTest extends TestCase
     /** @param list<string> $relations */
     private static function classOf(string $key, string $name, array $relations): string
     {
-        if (isset(self::PLACEHOLDERS[$key])) {
-            return 'placeholder';
-        }
         foreach ($relations as $relation) {
             if (preg_match('{[`.]'.preg_quote($name, '{').'`}', $relation) === 1) {
                 return 'encoded';
@@ -253,26 +224,6 @@ final class SchemaClaimsTest extends TestCase
         }
 
         return isset(self::ENGINE[$key]) ? 'engine' : 'unclassified';
-    }
-
-    /**
-     * The descriptions of every `allOf` entry and `anyOf` branch in the schema.
-     *
-     * @param mixed $node
-     *
-     * @return list<string>
-     */
-    private static function allRelations($node): array
-    {
-        if (!\is_array($node)) {
-            return [];
-        }
-        $out = self::relations($node);
-        foreach ($node as $child) {
-            $out = array_merge($out, self::allRelations($child));
-        }
-
-        return $out;
     }
 
     /**

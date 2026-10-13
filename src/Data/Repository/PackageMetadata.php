@@ -35,6 +35,8 @@ final class PackageMetadata
      */
     private const SELF_VERSION = 'self.version';
 
+    private ?string $composerRepositoryUrl = null;
+
     private string $name;
     private bool $abandoned;
     private ?string $replacement;
@@ -579,6 +581,24 @@ final class PackageMetadata
     {
         return $this->releaseCount;
     }
+    /**
+     * The URL of the Composer repository that answered for this name, null when none did. Never
+     * written to a report: `accept-unchecked` compares it with a `repository` entry.
+     */
+    public function composerRepositoryUrl(): ?string
+    {
+        return $this->composerRepositoryUrl;
+    }
+
+    /** A copy that knows which Composer repository answered for it. */
+    public function withComposerRepositoryUrl(?string $url): self
+    {
+        $clone = clone $this;
+        $clone->composerRepositoryUrl = $url;
+
+        return $clone;
+    }
+
     public function repositoryUrl(): ?string
     {
         return $this->repositoryUrl;

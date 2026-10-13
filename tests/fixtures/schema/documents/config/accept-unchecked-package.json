@@ -1,0 +1,16 @@
+{
+ "fail-on": "unchecked",
+ "accept-unchecked": [
+  {
+   "check": "release_metadata",
+   "package": "acme/*",
+   "reason": "our packages, installed from vcs",
+   "expires": "2026-12-31"
+  },
+  {
+   "check": "repository_activity",
+   "package": "acme/*",
+   "reason": "our packages, installed from vcs"
+  }
+ ]
+}

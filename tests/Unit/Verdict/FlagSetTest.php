@@ -110,6 +110,14 @@ final class FlagSetTest extends TestCase
         self::assertSame($acceptSet, $flags->acceptSet());
     }
 
+    /** A whole-package entry stays whole through a removal, and stops being whole once a flag counts. */
+    public function testCountingAFlagEndsTheWholePackageAcceptance(): void
+    {
+        $flags = FlagSet::fromSignals(self::signals([['S2', 'warn'], ['S5', 'high']]), new AllowlistEntry('vendor/pkg', null, 'kept on purpose', null, 'project', null), []);
+
+        self::assertSame([true, true, false], [$flags->acceptsWholePackage(), $flags->without('stale')->acceptsWholePackage(), $flags->counting('stale')->acceptsWholePackage()]);
+    }
+
     /** @return iterable<string, array{list<array{string, string}>, ?list<string>, list<string>, list<string>, list<string>}> */
     public static function acceptance(): iterable
     {

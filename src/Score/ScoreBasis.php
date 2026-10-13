@@ -59,14 +59,14 @@ final class ScoreBasis implements \JsonSerializable
 
     /**
      * The band of the total, else the score-0 word: `finished` when the entry accepts the whole
-     * package or a fired flag, `unknown` when lockrot read no release metadata, else `ok`.
+     * package (it lists no flags) or a fired flag, `unknown` when lockrot read no release metadata, else `ok`.
      */
     public static function verdict(Score $score, FlagSet $flags, bool $maintenanceJudged): string
     {
         if ($score->grade() !== null) {
             return $score->grade();
         }
-        if ($flags->accepted() !== [] || $flags->acceptSet() === array_keys(ScoreModel::POINTS)) {
+        if ($flags->accepted() !== [] || $flags->acceptsWholePackage()) {
             return 'finished';
         }
 
@@ -181,7 +181,7 @@ final class ScoreBasis implements \JsonSerializable
     }
 
     /** @return list<Modifier> */
-    private static function modifiersOf(Score $score): array
+    public static function modifiersOf(Score $score): array
     {
         $modifiers = [];
         if ($score->reach() !== Score::DIRECT) {

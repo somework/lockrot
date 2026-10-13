@@ -14,6 +14,8 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Clock;
 use Lockrot\Config\Gate;
+use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
+use Lockrot\Data\Advisory\RepositoryAdvisoryLoader;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
 use Lockrot\Data\Forge\ForgeAuth;
@@ -27,14 +29,19 @@ use Lockrot\Json\Schemas;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\FormatContext;
+use Lockrot\Output\GithubFormatter;
+use Lockrot\Output\GitlabFormatter;
 use Lockrot\Output\JsonFormatter;
+use Lockrot\Output\SarifFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -117,20 +124,81 @@ final class GateAgreementTest extends TestCase
         }
     }
 
+    /**
+     * SPEC §6.2: an `--offline` run at `--fail-on=unchecked` fails on the advisories gap, and each
+     * format writes the run-level record at `error` beside the failing findings' records.
+     *
+     * @runInSeparateProcess
+     */
+    #[RunInSeparateProcess]
+    public function testAnOfflineRunFailsUncheckedWithARunLevelErrorRecord(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);
+        $server->start();
+        try {
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW));
+            $analysed = $this->analyse($loader, 'mini', new RepositoryAdvisoryLoader($server->repositories(), true));
+        } finally {
+            $server->stop();
+        }
+        $failOn = FailOn::parse('unchecked');
+        $report = $analysed->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, $failOn, RunSettings::SOURCE_OPTION, new Thresholds()));
+        $this->recorded($report, FormatContext::create(null, 'unchecked'), 'mini offline fail-on=unchecked');
+
+        self::assertSame([], $this->mismatches);
+        self::assertNotNull($report->gate());
+        self::assertTrue($report->gate()->fails());
+        foreach (['github', 'gitlab', 'sarif'] as $format) {
+            self::assertArrayHasKey($format.' run-level error', $this->seen);
+        }
+    }
+
+    /** I15b under a baseline: an offline run whose every finding the baseline knows passes, with no `error` record. */
+    public function testAnOfflineRunThatTheBaselineKnowsWritesNoErrorRecord(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);
+        $server->start();
+        try {
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW));
+            $analysed = $this->analyse($loader, 'mini', new RepositoryAdvisoryLoader($server->repositories(), true));
+        } finally {
+            $server->stop();
+        }
+        $report = $analysed->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('unchecked'), RunSettings::SOURCE_OPTION, new Thresholds()));
+        $generated = Baseline::fromReport($report);
+        $entries = array_map(static fn (Finding $f): BaselineEntry => $generated->entryFor($f->package()) ?? new BaselineEntry($f->package(), $f->version(), '2026-01-01', [], []), $report->findings());
+        $names = array_map(static fn (Finding $f): string => $f->package(), $report->findings());
+        $known = $report->withBaseline(BaselineComparison::compare(Baseline::of($entries, self::NOW, '8.4', 'option'), $report, 'lockrot-baseline.json', $names));
+        $this->recorded($known, FormatContext::create(null, 'unchecked'), 'mini offline fail-on=unchecked, every finding known');
+
+        self::assertSame([], $this->mismatches);
+        self::assertNotNull($known->gate());
+        self::assertFalse($known->gate()->fails());
+        foreach (['github', 'gitlab', 'sarif'] as $format) {
+            self::assertArrayNotHasKey($format.' run-level error', $this->seen);
+        }
+    }
+
     private function agree(Report $analysed, string $dir): void
     {
         foreach ([false, true] as $networkFailures) {
             $report = self::withNetworkFailures($analysed, $networkFailures);
-            foreach ([null, self::changedBaseline($report)] as $baseline) {
+            foreach ([null, self::changedBaseline($report), self::realBaseline($dir)] as $i => $baseline) {
+                if ($i > 0 && $baseline === null) {
+                    continue;
+                }
                 $compared = $baseline === null ? $report : $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
                 foreach (FailOn::allowed() as $value) {
-                    $failOn = FailOn::fromString($value);
+                    $failOn = FailOn::parse($value);
                     $levels = FormatContext::create(null, $value);
                     foreach ([false, true] as $strict) {
                         foreach (Gate::MODES as $mode) {
-                            $what = \sprintf('%s fail-on=%s strict=%d network_failures=%d baseline=%d %s', $dir, $value, $strict, $networkFailures, $baseline !== null, $mode);
+                            $what = \sprintf('%s fail-on=%s strict=%d network_failures=%d baseline=%d %s', $dir, $value, $strict, $networkFailures, $i, $mode);
                             $withRun = $compared->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, $failOn, RunSettings::SOURCE_OPTION, new Thresholds(), null, $strict, $mode));
                             $this->holds($withRun->toArray(), $compared, $levels, $failOn, $strict, $mode, $what);
+                            if (!$strict && $mode === Gate::MODE_CHECK) {
+                                $this->recorded($withRun, $levels, $what);
+                            }
                             // One document per lock and mode through both schemas: the fields' shape
                             // does not depend on the threshold, and validating every document is slow.
                             if ($value === 'medium' && $strict && $networkFailures && ($baseline !== null) === ($mode === Gate::MODE_CHECK)) {
@@ -152,11 +220,11 @@ final class GateAgreementTest extends TestCase
     {
         $run = JsonPath::arrayAt($document, ['run']);
         $this->same($failOn->value(), $run['fail_on'], $what);
-        $this->same(['none' => [], 'priority' => ['grade'], 'verdict' => ['flag'], 'unchecked' => ['unchecked']][$failOn->kind()], JsonPath::column($run, ['gates'], 'kind'), $what);
+        $this->same($failOn->kinds(), JsonPath::column($run, ['gates'], 'kind'), $what);
         $this->same($strict, $run['strict_network'], $what);
         $this->same($mode, $run['mode'], $what);
         $gate = JsonPath::arrayAt($document, ['gate']);
-        $this->same(['fails', 'tripped_by', 'fail_on_applied', 'reaching', 'failing', 'exempt'], array_keys($gate), $what);
+        $this->same(['fails', 'tripped_by', 'fail_on_applied', 'reaching', 'failing', 'exempt', 'failing_by', 'not_applied', 'text'], array_keys($gate), $what);
         $trippedBy = JsonPath::arrayAt($gate, ['tripped_by']);
         $applied = $gate['fail_on_applied'];
         $this->same($mode === Gate::MODE_CHECK, $applied, $what);
@@ -166,6 +234,7 @@ final class GateAgreementTest extends TestCase
         foreach ($report->findings() as $finding) {
             $byPackage[$finding->package()] = $finding;
         }
+        $levelGate = Gate::decide($report, $failOn, $strict, $mode);
         foreach (JsonPath::arrayAt($document, ['findings']) as $row) {
             if (!\is_array($row)) {
                 $this->same('an object', $row, $what.': a finding');
@@ -177,19 +246,20 @@ final class GateAgreementTest extends TestCase
             $standing = JsonPath::arrayAt($row, ['gate']);
             $this->seen['finding '.json_encode(\array_slice($standing, 0, 3, true))] = true;
             ['reaches_fail_on' => $reaches, 'fails' => $fails, 'exempt_by' => $exemptBy] = $standing;
-            $this->same([[], null], [$standing['by'], $standing['basis']], $where.': the gate values and the basis wait for their pull requests');
-            $this->same($failOn->reaches($finding), $reaches, $where);
-            $this->same($reaches && $exemptBy === null && $applied, $fails, $where.': fails');
-            $status = $report->baseline() === null ? null : $report->baseline()->statusOf($finding->package());
-            $this->same($status === 'known' && $reaches, $exemptBy === Gate::EXEMPT_BASELINE, $where.': exempt by the baseline');
-            if ($exemptBy !== null) {
-                $this->same(true, $reaches, $where.': only what reaches is exempt');
+            $values = JsonPath::column($document, ['run', 'gates'], 'value');
+            $this->same($fails, $standing['by'] !== [], $where.': a finding fails exactly when it names a value');
+            foreach (JsonPath::arrayAt($row, ['gate', 'by']) as $by) {
+                $this->same(true, \is_array($by) && \in_array($by['value'], $values, true) && $by['facts'] !== [], $where.': each failing value is active and names a fact (I15b)');
             }
+            $this->same(false, $fails && !$applied, $where.': a generate run fails nothing');
+            if ($exemptBy !== null) {
+                $this->same([true, false, true], [$reaches, $fails, $standing['basis'] !== null], $where.': only a reaching finding under an entry is exempt');
+            }
+            $status = $report->baseline() === null ? null : $report->baseline()->statusOf($finding->package());
             if ($status === 'worsened' && $fails) {
                 $this->seen['worsened fails'] = true;
             }
-            // The annotation level reads the same two primitives by its own rule, the same in both modes.
-            $this->same($reaches && $exemptBy !== Gate::EXEMPT_BASELINE, $levels->levelOf($finding, $report->baseline()) === FormatContext::LEVEL_ERROR, $where.': level');
+            $this->same($fails, $levels->levelOf($finding, $levelGate->standingOf($finding->package()), $report->baseline()) === FormatContext::LEVEL_ERROR, $where.': level');
             $anyFails = $anyFails || $fails;
         }
 
@@ -199,8 +269,79 @@ final class GateAgreementTest extends TestCase
         $this->same(array_values(array_filter(Gate::TRIPS, static fn (string $trip): bool => \in_array($trip, $trippedBy, true))), $trippedBy, $what.': unique, in order');
         $this->seen['tripped_by '.json_encode($trippedBy)] = true;
 
-        $oracle = $mode === Gate::MODE_CHECK ? self::oracleExitCode($report, $failOn, $strict) : ($strict && $report->hadNetworkFailures() ? 1 : 0);
-        $this->same($oracle, $gate['fails'] ? 1 : 0, $what.': the exit code of oracleExitCode()');
+        $this->same(($strict && $report->hadNetworkFailures()) || $anyFails ? 1 : 0, $gate['fails'] ? 1 : 0, $what.': the exit code is a failing finding or a failed lookup under --strict-network');
+    }
+
+    /**
+     * I15b in the records that github, gitlab and sarif write: a finding has an `error` record
+     * exactly when it fails the gate, and a run-level `error` record only beside a failing gate.
+     * `--strict-network` is excluded: a failed lookup fails the run with no finding to record.
+     */
+    private function recorded(Report $report, FormatContext $context, string $what): void
+    {
+        $gate = $report->gate();
+        self::assertNotNull($gate);
+        $failing = [];
+        foreach ($report->findings() as $finding) {
+            $standing = $gate->standingOf($finding->package());
+            if ($standing !== null && $standing->fails()) {
+                $failing[] = $finding->package();
+            }
+        }
+        sort($failing);
+        foreach (self::errorRecords($report, $context) as $format => [$packages, $runLevel]) {
+            sort($packages);
+            $this->same($failing, array_values(array_unique($packages)), $what.' '.$format.': the error records name the failing findings');
+            $this->same(false, $runLevel && !$gate->fails(), $what.' '.$format.': a run-level error record fails the gate');
+            $this->seen[$format.' run-level '.($runLevel ? 'error' : 'none or warning')] = true;
+        }
+    }
+
+    /**
+     * The packages that each format gives an `error` record, and whether its run-level record is an error.
+     *
+     * @return array<string, array{list<string>, bool}>
+     */
+    private static function errorRecords(Report $report, FormatContext $context): array
+    {
+        $github = [[], false];
+        foreach (explode("\n", (new GithubFormatter($context))->format($report)) as $line) {
+            if (strncmp($line, '::error ', 8) !== 0) {
+                continue;
+            }
+            $message = (string) substr($line, (int) strpos($line, '::', 2) + 2);
+            if (strncmp($message, 'advisories not checked:', 23) === 0) {
+                $github[1] = true;
+            } else {
+                $github[0][] = explode(' ', $message)[0];
+            }
+        }
+        $gitlab = [[], false];
+        foreach (JsonPath::decoded(json_decode((new GitlabFormatter($context))->format($report), true)) as $issue) {
+            if (!\is_array($issue) || $issue['severity'] !== 'major') {
+                continue;
+            }
+            if ($issue['check_name'] === 'lockrot/advisories-unchecked') {
+                $gitlab[1] = true;
+            } else {
+                $gitlab[0][] = explode(' ', JsonPath::stringAt($issue, ['description']))[0];
+            }
+        }
+        $sarif = [[], false];
+        $document = json_decode((new SarifFormatter($context))->format($report), true);
+        self::assertIsArray($document);
+        foreach (JsonPath::arrayAt($document, ['runs', 0, 'results']) as $result) {
+            if (!\is_array($result) || $result['level'] !== FormatContext::LEVEL_ERROR) {
+                continue;
+            }
+            if ($result['ruleId'] === 'lockrot/advisories-unchecked') {
+                $sarif[1] = true;
+            } else {
+                $sarif[0][] = JsonPath::stringAt($result, ['properties', 'package']);
+            }
+        }
+
+        return ['github' => $github, 'gitlab' => $gitlab, 'sarif' => $sarif];
     }
 
     /**
@@ -218,28 +359,6 @@ final class GateAgreementTest extends TestCase
         }
     }
 
-    /** The exit code rule, written out here independently of the gate. */
-    private static function oracleExitCode(Report $report, FailOn $threshold, bool $strict): int
-    {
-        if ($strict && $report->hadNetworkFailures()) {
-            return 1;
-        }
-        if ($threshold->isNone()) {
-            return 0;
-        }
-        $baseline = $report->baseline();
-        foreach ($report->findings() as $finding) {
-            if ($baseline !== null && $baseline->isKnown($finding->package())) {
-                continue;
-            }
-            if ($threshold->reaches($finding)) {
-                return 1;
-            }
-        }
-
-        return 0;
-    }
-
     /**
      * The baseline that this report writes, with the first finding more severe than `stale` accepted
      * only at `stale` (so it is worsened) and the second of the other flagged ones omitted (so it is
@@ -255,7 +374,7 @@ final class GateAgreementTest extends TestCase
             $entry = $written->entryFor($finding->package());
             self::assertNotNull($entry, $finding->package());
             if (!$worsened && Verdict::severity($finding->verdict()) > Verdict::severity(Verdict::STALE)) {
-                $entries[] = new BaselineEntry($entry->package(), $entry->version(), Verdict::STALE, $entry->firstSeen());
+                $entries[] = BaselineEntries::of($entry->package(), $entry->version(), Verdict::STALE, $entry->firstSeen());
                 $worsened = true;
             } elseif ($skipped++ === 1) {
                 continue;
@@ -264,7 +383,22 @@ final class GateAgreementTest extends TestCase
             }
         }
 
-        return $report->flagged() === [] ? null : Baseline::of($entries, self::NOW);
+        return $report->flagged() === [] ? null : BaselineEntries::baseline($entries, self::NOW);
+    }
+
+    /**
+     * The baseline-2 file that wallabag's lock of 2024-05-17 writes on its own day
+     * (BaselinedProjectTest pins it), read against the fixture's later lock. Null for another lock.
+     */
+    private static function realBaseline(string $dir): ?Baseline
+    {
+        if ($dir !== 'apps/wallabag_wallabag') {
+            return null;
+        }
+        /** @var array<string, mixed> $data */
+        $data = JsonPath::decodeFile(self::FIXTURES.'baselined/wallabag-main/lockrot-baseline.json');
+
+        return Baseline::fromArray($data);
     }
 
     /** The report with a failed lookup among its notes, or with none: the notes are what the flag is computed from. */
@@ -278,7 +412,7 @@ final class GateAgreementTest extends TestCase
         return new Report($report->findings(), $notes, $report->generatedAt(), $report->packagesChecked(), $report->notFromComposerRepository(), null, $report->activityCacheOldestAt(), $report->includesDev());
     }
 
-    private function analyse(MetadataLoaderInterface $loader, string $dir): Report
+    private function analyse(MetadataLoaderInterface $loader, string $dir, ?AdvisoryLoaderInterface $advisories = null): Report
     {
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
@@ -291,7 +425,8 @@ final class GateAgreementTest extends TestCase
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
             $clock,
-            true
+            true,
+            $advisories
         );
         $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
 

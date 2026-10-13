@@ -32,6 +32,7 @@ final class CauseWords
         'repository_not_found' => 'repository not found',
         'no_feed' => 'no repository publishes advisories',
         'unparseable_version' => 'version not readable',
+        'accepted_by_config' => 'accepted by your accept-unchecked list',
         'no_versions' => 'no version left to read',
         'shared_commit' => 'dated only by a commit its tags share',
         'undated' => 'no date',

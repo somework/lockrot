@@ -202,6 +202,13 @@ final class RepositoryMetadataLoaderTest extends TestCase
             self::assertSame([], $batch->notFound());
             self::assertArrayHasKey('one/pkg', $batch->metadata(), 'resolved by the first repository');
             self::assertArrayHasKey('two/pkg', $batch->metadata(), 'resolved by the second');
+            $firstRepository = $first->repositories()[0];
+            $secondRepository = $second->repositories()[0];
+            self::assertInstanceOf(ComposerRepository::class, $firstRepository);
+            self::assertInstanceOf(ComposerRepository::class, $secondRepository);
+            self::assertSame($firstRepository->getRepoConfig()['url'] ?? null, $batch->metadata()['one/pkg']->composerRepositoryUrl(), 'accept-unchecked compares the repository that answered');
+            self::assertSame($secondRepository->getRepoConfig()['url'] ?? null, $batch->metadata()['two/pkg']->composerRepositoryUrl());
+            self::assertNotSame($batch->metadata()['one/pkg']->composerRepositoryUrl(), $batch->metadata()['two/pkg']->composerRepositoryUrl());
         } finally {
             $first->stop();
             $second->stop();

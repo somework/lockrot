@@ -1,0 +1,271 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://lockrot.dev/schema/baseline-2.json",
+    "title": "lockrot baseline",
+    "description": "The file that `composer lockrot --generate-baseline` writes and that later runs compare with: the counted maintenance flags and the counted advisories of each graded finding, with the date each became known, and the target PHP, score model and fix model of the run that wrote it. The baseline knows facts and does not accept them. A known fact still counts for the verdict, and only what the uncovered facts add sets the level of the gate, min(score, 2 × new). lockrot 0.14 reads baseline-2 only: a baseline-1 file exits 2 with a message to review the findings and run --generate-baseline, which overwrites it. lockrot 0.13 exits 2 on this file. Objects are open: a field added later validates against this file unchanged. The number in the id changes only when a field is removed or renamed.",
+    "type": "object",
+    "required": [
+        "$schema",
+        "lockrot",
+        "generated_at",
+        "target_php",
+        "target_php_source",
+        "score_model_id",
+        "fix_model",
+        "findings"
+    ],
+    "properties": {
+        "$schema": {
+            "description": "The published URL of this schema, always written. lockrot refuses a baseline-1 file before it validates the file.",
+            "type": "string",
+            "enum": [
+                "https://lockrot.dev/schema/baseline-2.json"
+            ]
+        },
+        "lockrot": {
+            "description": "The writer and the schema number of the file.",
+            "type": "object",
+            "required": [
+                "version",
+                "schema"
+            ],
+            "properties": {
+                "version": {
+                    "description": "The lockrot release that wrote the file.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "schema": {
+                    "description": "The schema number of the file: 2. A reader picks the schema to validate against by this number.",
+                    "type": "integer",
+                    "enum": [
+                        2
+                    ]
+                }
+            }
+        },
+        "generated_at": {
+            "description": "When the file was written: the run clock of the run that wrote it.",
+            "$ref": "#/definitions/dateTime"
+        },
+        "target_php": {
+            "description": "The target PHP minor that the file was written for (`8.4`), as `run.target_php`. A reader compares fixes only when the target of the run equals it, else the note `baseline_target_differs` says so.",
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+$"
+        },
+        "target_php_source": {
+            "description": "Where that target came from, as `run.target_php_source`. Closed.",
+            "type": "string",
+            "enum": [
+                "option",
+                "env",
+                "config",
+                "platform",
+                "runtime"
+            ]
+        },
+        "score_model_id": {
+            "description": "`run.score_model.id` of the run that wrote it. Grades under two score models are not comparable.",
+            "type": "integer",
+            "minimum": 1
+        },
+        "fix_model": {
+            "description": "`run.fix_model` of the run that wrote it. A reader compares fixes only under an equal fix model, else the note `baseline_fix_model_differs` says so.",
+            "type": "integer",
+            "minimum": 1
+        },
+        "findings": {
+            "description": "One entry per graded finding, keyed by package name and sorted by it, so a regenerated file diffs cleanly. An ok, finished or unknown package gets no entry, and reads `new` when it is graded later.",
+            "type": "object",
+            "patternProperties": {
+                "^[^\\/]+\\/[^\\/]+$": {
+                    "$ref": "#/definitions/entry"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "definitions": {
+        "dateTime": {
+            "description": "An ISO 8601 date and time with an offset, as `DATE_ATOM` writes it.",
+            "type": "string",
+            "format": "date-time"
+        },
+        "date": {
+            "description": "A calendar date, `YYYY-MM-DD`.",
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "severity": {
+            "description": "An advisory severity bucket in the one order used everywhere: `critical high medium unrated low`; `moderate` reads `medium`, a missing or unknown rating reads `unrated` (which counts as medium). Closed. Compare severities by `run.score_model.severities[].gate_rank`, never by position.",
+            "type": "string",
+            "enum": [
+                "critical",
+                "high",
+                "medium",
+                "unrated",
+                "low"
+            ]
+        },
+        "fixKind": {
+            "description": "A fix kind: the class of the easiest release outside an advisory's range, in ease order `update upgrade raise-php unknown blocked none`. `blocked` and `none` double the advisory (`run.score_model.fix_kinds[].doubles`). An open set: a fix-model change may add a kind, which arrives with its row in `run.score_model.fix_kinds[]`; read an unknown kind's `ease` and `doubles` there and show its id.",
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "x-known-values": [
+                "update",
+                "upgrade",
+                "raise-php",
+                "unknown",
+                "blocked",
+                "none"
+            ]
+        },
+        "entry": {
+            "description": "What the baseline knows about one package: its counted facts, each with the date it became known. A maintenance flag is covered when the entry lists it or a flag above it in flag order, so only the first flag of the entry decides coverage.",
+            "type": "object",
+            "required": [
+                "version",
+                "first_seen"
+            ],
+            "properties": {
+                "version": {
+                    "description": "The version that was locked when the entry was last written.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "first_seen": {
+                    "description": "The date the package first got an entry. A regeneration keeps it.",
+                    "$ref": "#/definitions/date"
+                },
+                "flags": {
+                    "description": "The counted maintenance flags, id to `{known_since}`. The key is present exactly when the entry has one: the writer never writes an empty map, because PHP's `json_decode(…, true)` reads `{}` back as a list. The file never stores an accepted flag or `vulnerable`.",
+                    "type": "object",
+                    "minProperties": 1,
+                    "properties": {
+                        "abandoned": {
+                            "description": "One counted maintenance flag that the entry knows.",
+                            "type": "object",
+                            "required": [
+                                "known_since"
+                            ],
+                            "properties": {
+                                "known_since": {
+                                    "description": "The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, because a stored years value changes on every regeneration of an unchanged lock.",
+                                    "$ref": "#/definitions/date"
+                                }
+                            }
+                        },
+                        "silent": {
+                            "description": "One counted maintenance flag that the entry knows.",
+                            "type": "object",
+                            "required": [
+                                "known_since"
+                            ],
+                            "properties": {
+                                "known_since": {
+                                    "description": "The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, because a stored years value changes on every regeneration of an unchanged lock.",
+                                    "$ref": "#/definitions/date"
+                                }
+                            }
+                        },
+                        "pinned": {
+                            "description": "One counted maintenance flag that the entry knows.",
+                            "type": "object",
+                            "required": [
+                                "known_since"
+                            ],
+                            "properties": {
+                                "known_since": {
+                                    "description": "The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, because a stored years value changes on every regeneration of an unchanged lock.",
+                                    "$ref": "#/definitions/date"
+                                }
+                            }
+                        },
+                        "left-behind": {
+                            "description": "One counted maintenance flag that the entry knows.",
+                            "type": "object",
+                            "required": [
+                                "known_since"
+                            ],
+                            "properties": {
+                                "known_since": {
+                                    "description": "The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, because a stored years value changes on every regeneration of an unchanged lock.",
+                                    "$ref": "#/definitions/date"
+                                }
+                            }
+                        },
+                        "old-promise": {
+                            "description": "One counted maintenance flag that the entry knows.",
+                            "type": "object",
+                            "required": [
+                                "known_since"
+                            ],
+                            "properties": {
+                                "known_since": {
+                                    "description": "The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, because a stored years value changes on every regeneration of an unchanged lock.",
+                                    "$ref": "#/definitions/date"
+                                }
+                            }
+                        },
+                        "stale": {
+                            "description": "One counted maintenance flag that the entry knows.",
+                            "type": "object",
+                            "required": [
+                                "known_since"
+                            ],
+                            "properties": {
+                                "known_since": {
+                                    "description": "The date it first became known. A regeneration keeps it. The file stores no headline, degree or points, because a stored years value changes on every regeneration of an unchanged lock.",
+                                    "$ref": "#/definitions/date"
+                                }
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "advisories": {
+                    "description": "The counted advisories, id to `{known_since, severity, fix_kind}`. The key is present exactly when the entry has one. The file never stores an advisory that Composer's audit policy ignores. The writer drops an id only after a complete lookup.",
+                    "type": "object",
+                    "minProperties": 1,
+                    "additionalProperties": {
+                        "description": "One counted advisory that the entry knows, as of the date it first became known.",
+                        "type": "object",
+                        "required": [
+                            "known_since",
+                            "severity",
+                            "fix_kind"
+                        ],
+                        "properties": {
+                            "known_since": {
+                                "description": "The date it first became known. A regeneration keeps it.",
+                                "$ref": "#/definitions/date"
+                            },
+                            "severity": {
+                                "description": "Its severity bucket as of the last regeneration. Each regeneration refreshes it, so a regenerated file accepts a re-rating. A reader compares it by gate rank: unrated counts as medium, so unrated to medium is never a re-rating.",
+                                "$ref": "#/definitions/severity"
+                            },
+                            "fix_kind": {
+                                "description": "Its fix kind (the S9 row's `fix.kind`) as of the last regeneration, refreshed like `severity`. A fix recorded `update`, `upgrade`, `raise-php` or `unknown` that reads `blocked` or `none` later is lost. A reader compares fixes only when the target PHP and `fix_model` of the run equal those of the file.",
+                                "$ref": "#/definitions/fixKind"
+                            }
+                        }
+                    }
+                }
+            },
+            "anyOf": [
+                {
+                    "description": "An entry stores at least one counted maintenance flag...",
+                    "required": [
+                        "flags"
+                    ]
+                },
+                {
+                    "description": "...or at least one counted advisory: the writer gives an entry only to a graded finding, which has a counted fact.",
+                    "required": [
+                        "advisories"
+                    ]
+                }
+            ]
+        }
+    }
+}

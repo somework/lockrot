@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
-use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
-use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\GitlabFormatter;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
@@ -77,7 +76,7 @@ final class GitlabFormatterTest extends TestCase
 
         return new Report([
             (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
+            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::SILENT)->withSignals([new Signal('high', 'last release 2015-11-16 (10.8 years ago)', SignalDataStub::of('S2', [])), new Signal('high', 'no push for 9 years', SignalDataStub::of('S4', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/absent')->withVersion('3.0.0')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['acme/absent'])->withDataDate($at)->build(),
             (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
@@ -116,7 +115,7 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame(4, JsonPath::intAt($first, ['location', 'lines', 'begin']));
 
         $second = $issues[1];
-        self::assertSame('acme/silent 2.0.8 — silent (high): last release 2015-11-16 (10.8 years ago) (via a/parent)', $second['description']);
+        self::assertSame('acme/silent 2.0.8 — silent (high): last release 2015-11-16 (10.8 years ago); no push for 9 years (via a/parent)', $second['description']);
         self::assertSame(8, JsonPath::intAt($second, ['location', 'lines', 'begin']));
     }
 
@@ -141,8 +140,8 @@ final class GitlabFormatterTest extends TestCase
         foreach ($report->findings() as $finding) {
             $names[] = $finding->package();
         }
-        $baseline = Baseline::of([
-            new BaselineEntry('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
+        $baseline = BaselineEntries::baseline([
+            BaselineEntries::of('acme/abandoned', '1.0.0', Verdict::ABANDONED, '2026-01-15'),
         ], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
 
@@ -251,7 +250,7 @@ final class GitlabFormatterTest extends TestCase
     public function testTheBaselineStaleNoteIsNotRepresentableAndIsDropped(): void
     {
         $report = $this->report();
-        $baseline = Baseline::of([new BaselineEntry('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('acme/departed', '1.0.0', Verdict::ABANDONED, '2026-01-15')], self::AT);
         $withBaseline = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', ['acme/abandoned']));
 
         $out = $this->formatter(Verdict::SILENT, $this->lockPath())->format($withBaseline);
@@ -398,5 +397,63 @@ final class GitlabFormatterTest extends TestCase
         self::assertStringStartsWith("[\n    {\n", $json);
         self::assertStringContainsString('"acme/abandoned 1.0.0', $json);
         self::assertStringNotContainsString('\/', $json);
+    }
+
+    /** SPEC §6.2: one run-level issue, `major` only when `unchecked` fails on the advisories gap. */
+    public function testTheRunLevelAdvisoriesIssueIsMajorOnlyWhenUncheckedFailsOnTheGap(): void
+    {
+        $severity = function (string $failOn, Report $report): ?string {
+            $severity = array_column($this->decode($this->formatter($failOn, null)->format($report)), 'severity', 'check_name')['lockrot/advisories-unchecked'] ?? null;
+
+            return \is_string($severity) ? $severity : null;
+        };
+
+        self::assertSame('major', $severity('unchecked', self::uncheckedReport()));
+        self::assertSame('minor', $severity('high', self::uncheckedReport()));
+        self::assertSame('minor', $severity('unchecked', self::skippedReport()));
+        self::assertNull($severity('unchecked', $this->report()));
+    }
+
+    /** The run-level issue is a whole Code Quality issue, which GitLab places on the lock's first line. */
+    public function testTheRunLevelAdvisoriesIssueIsACompleteCodeQualityIssue(): void
+    {
+        $issues = $this->decode($this->formatter('high', null)->format(self::uncheckedReport()));
+
+        self::assertSame([
+            'type' => 'issue',
+            'check_name' => 'lockrot/advisories-unchecked',
+            'description' => 'advisories not checked: the gate could not read the advisories of every package',
+            'categories' => ['Bug Risk'],
+            'severity' => 'minor',
+            'fingerprint' => hash('sha256', 'lockrot|advisories-unchecked'),
+            'location' => ['path' => 'composer.lock', 'lines' => ['begin' => 1]],
+        ], $issues[\count($issues) - 1]);
+    }
+
+    /** SPEC §7.10: a finding with S10 and no counted fact gets one `lockrot/unchecked` issue while `unchecked` is active. */
+    public function testAFindingWithS10AndNoCountedFactGetsAnUncheckedIssue(): void
+    {
+        $issues = $this->decode($this->formatter('unchecked', null)->format(self::uncheckedReport()));
+
+        self::assertSame('lockrot/unchecked', $issues[0]['check_name'] ?? null);
+        self::assertSame('major', $issues[0]['severity'] ?? null);
+        self::assertSame(hash('sha256', 'lockrot|acme/offline|unchecked'), $issues[0]['fingerprint'] ?? null);
+        self::assertNotContains('lockrot/unchecked', array_column($this->decode($this->formatter('high', null)->format(self::uncheckedReport())), 'check_name'));
+    }
+
+    /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
+    private static function uncheckedReport(): Report
+    {
+        $at = new \DateTimeImmutable(self::AT);
+
+        return new Report([
+            FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true),
+            FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false),
+        ], [], $at, 2, 0);
+    }
+
+    private static function skippedReport(): Report
+    {
+        return new Report([FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false)], [], new \DateTimeImmutable(self::AT), 1, 0);
     }
 }

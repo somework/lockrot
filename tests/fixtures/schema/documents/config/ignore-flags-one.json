@@ -1,0 +1,12 @@
+{
+ "ignore": [
+  {
+   "package": "tubalmartin/cssmin",
+   "flags": [
+    "stale"
+   ],
+   "reason": "a single-file minifier, finished",
+   "expires": "2027-03-31"
+  }
+ ]
+}

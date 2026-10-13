@@ -12,6 +12,7 @@ use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\CountedAdvisory;
+use Lockrot\Score\Standing;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Data\LeftBehindData;
@@ -469,7 +470,7 @@ final class FindingTest extends TestCase
         $finding = (new FindingBuilder())->withVersion('1.2.3')->withVerdict(Verdict::STALE)->withChain(['vendor/root', 'vendor/pkg'])->withDev(true)->build();
         $array = $finding->toArray();
         self::assertSame(
-            ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'maintenance_judged', 'metadata', 'activity', 'allowlist',
+            ['package', 'version', 'branch', 'installed_php', 'verdict', 'priority', 'lead', 'flags', 'score', 'next_step', 'security', 'checks_missing', 'checks_skipped', 'unchecked_accepted', 'maintenance_judged', 'metadata', 'activity', 'allowlist',
                 'abandoned_ignored', 'from_composer_repository', 'origin', 'replacement', 'replacement_url', 'note', 'libyears_unmeasured', 'libyears_at_least', 'direct', 'dev', 'reach', 'chain', 'depth', 'depth_unmeasured',
                 'named_in', 'direct_dependents', 'signals', 'evidence', 'allowlist_reason', 'data_date', 'libyears', 'age'],
             array_keys($array)
@@ -1238,5 +1239,24 @@ final class FindingTest extends TestCase
         $gaps = [['check' => 'a', 'reason' => 'no_token', 'blocks' => ['S9']], ['check' => 'b', 'reason' => 'no_token', 'blocks' => ['S9', 'S4']]];
         yield 'beside an S10 whose gaps share a block' => [[$s6, new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $gaps, 'blocks' => ['S9', 'S4']]))], ['S4', 'S9']];
         yield 'with no S10' => [[$s6], ['S9']];
+    }
+
+    /** report-2: each S9 row carries its state against the baseline entry that the standing compared. */
+    public function testEachS9RowWritesItsBaselineState(): void
+    {
+        $signals = [new Signal(Signal::LEVEL_HIGH, 'advisory', new AdvisoryData([SignalDataStub::row(['id' => 'PKSA-1', 'severity' => 'high'])], true, true))];
+        $finding = (new FindingBuilder())->withPackage('a/vulnerable')->withSignals($signals)->withChain(['a/vulnerable'])
+            ->withFlags(FlagSet::fromSignals($signals, null, [new CountedAdvisory('PKSA-1', 'high', 'update')]))->build();
+        $s9 = static function (array $written): array {
+            foreach (JsonPath::arrayAt($written, ['signals']) as $signal) {
+                if (\is_array($signal) && ($signal['id'] ?? null) === 'S9') {
+                    return JsonPath::arrayAt($signal, ['data', 'advisories', '0']);
+                }
+            }
+            self::fail('no S9 written');
+        };
+
+        self::assertSame(['state' => 'new', 'since' => null, 'covered_by' => null], $s9(JsonPath::decoded($finding->toArray(Standing::newPackage([], [new CountedAdvisory('PKSA-1', 'high', 'update')]))))['baseline']);
+        self::assertNull($s9(JsonPath::decoded($finding->toArray()))['baseline']);
     }
 }

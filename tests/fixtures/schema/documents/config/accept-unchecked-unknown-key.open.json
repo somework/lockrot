@@ -1,0 +1,10 @@
+{
+ "accept-unchecked": [
+  {
+   "check": "advisories",
+   "package": "acme/*",
+   "reason": "x",
+   "x-ticket": "OPS-7"
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+{
+ "ignore": [
+  {
+   "package": "psr/container",
+   "reason": "an interface package, complete by design"
+  }
+ ]
+}
