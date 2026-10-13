@@ -54,6 +54,16 @@ final class PackageMetadataTest extends TestCase
         return array_map(static fn (StableRelease $release): string => $release->pretty(), $releases);
     }
 
+    public function testTheRepositoryUrlIsSetOnACopy(): void
+    {
+        $meta = new PackageMetadata('vendor/pkg', false, null, true, new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), '1.0.0', 1, null, 'library', new \DateTimeImmutable('2026-01-01T00:00:00+00:00'));
+
+        $copy = $meta->withComposerRepositoryUrl('https://mirror.example.org');
+
+        self::assertSame('https://mirror.example.org', $copy->composerRepositoryUrl());
+        self::assertNull($meta->composerRepositoryUrl(), 'the original keeps its value');
+    }
+
     public function testItKeepsTheStableReleasesAboveTheInstalledOneInVersionOrder(): void
     {
         $meta = PackageMetadata::fromPackages('a/b', array_reverse($this->history()), new \DateTimeImmutable(self::NOW), '1.2.0.0');
