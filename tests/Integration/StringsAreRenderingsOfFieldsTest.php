@@ -82,7 +82,7 @@ final class StringsAreRenderingsOfFieldsTest extends TestCase
      */
     private static function checkFinding(array &$differ, array &$rendered, string $label, array $in, bool $moves): void
     {
-        self::check($differ, $rendered, $label.' score.text', JsonPath::stringAt($in, ['score', 'text']), static fn (): string => ScoreLineFromJson::render(JsonPath::arrayAt(Fields::only($in, ReferenceText::INPUTS['score.text']), ['score'])));
+        self::check($differ, $rendered, $label.' score.text', JsonPath::stringAt($in, ['score', 'text']), static fn (): string => ScoreLineFromJson::render(ContractBundle::stringKeys(JsonPath::arrayAt(Fields::only($in, ReferenceText::INPUTS['score.text']), ['score']))));
         self::check($differ, $rendered, $label.' evidence', JsonPath::stringAt($in, ['evidence']), static fn (): string => ReferenceText::evidence(Fields::only($in, ReferenceText::INPUTS['evidence'])));
         $move = $in['next_step'] ?? null;
         if (!$moves || !\is_array($move)) {

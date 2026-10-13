@@ -53,15 +53,15 @@ final class ReferenceText
         if (\in_array($kind, array_merge(self::ROW_KINDS, ['tag']), true)) {
             $text .= self::leaves($move).self::unverified($move);
         }
-        $holders = array_map([self::class, 'holder'], Fields::list($move, 'held_by'));
+        $holders = array_map([self::class, 'holder'], Fields::objects($move, 'held_by'));
         if ($holders !== []) {
             $text .= '; held by '.implode(' and ', $holders);
         }
-        $because = Fields::list($move, 'composer_moves_because');
+        $because = Fields::strings($move, 'composer_moves_because');
         foreach ($because as $reason) {
-            $text .= '; '.self::because((string) $reason, $kind, $in);
+            $text .= '; '.self::because($reason, $kind, $in);
         }
-        $through = self::through(\array_key_exists('through', $move) ? Fields::nullableList($move, 'through') : null);
+        $through = self::through(\array_key_exists('through', $move) && $move['through'] !== null ? Fields::objects($move, 'through') : null);
         if ($through !== '' && \in_array('transitive', $because, true)) {
             $text .= '; '.$through;
         }
@@ -77,7 +77,7 @@ final class ReferenceText
     {
         $gate = Fields::object($root, 'gate');
         $run = Fields::object($root, 'run');
-        $gates = Fields::list($run, 'gates');
+        $gates = Fields::objects($run, 'gates');
         if (Fields::bool($gate, 'fails')) {
             $head = 'fails';
         } elseif (Fields::string($run, 'mode') === 'generate_baseline') {
@@ -87,13 +87,13 @@ final class ReferenceText
         }
         $parts = ['gate: '.$head];
         $source = Fields::string($run, 'fail_on_source');
-        $parts[] = '--fail-on='.Fields::string($run, 'fail_on').($source === 'option' ? '' : ' ('.self::word($words['fail_on_source'] ?? [], $source).')');
+        $parts[] = '--fail-on='.Fields::string($run, 'fail_on').($source === 'option' ? '' : ' ('.self::word(Fields::table($words, 'fail_on_source'), $source).')');
         if ($gates !== [] && Fields::bool($gate, 'fail_on_applied')) {
             $failing = Fields::int($gate, 'failing');
             $count = $failing === 0 ? 'no finding fails it' : self::plural($failing, 'finding fails it', 'findings fail it');
             if ($failing > 0 && \count($gates) > 1) {
                 $by = [];
-                foreach (Fields::list($gate, 'failing_by') as $value) {
+                foreach (Fields::objects($gate, 'failing_by') as $value) {
                     if (Fields::int($value, 'failing') > 0) {
                         $by[] = Fields::string($value, 'value').' '.Fields::int($value, 'failing');
                     }
@@ -108,13 +108,13 @@ final class ReferenceText
         } elseif ($gates !== []) {
             $parts[] = self::plural(Fields::int($gate, 'reaching'), 'finding reaches it', 'findings reach it');
         }
-        if (\in_array('strict_network', Fields::list($gate, 'tripped_by'), true)) {
+        if (\in_array('strict_network', Fields::strings($gate, 'tripped_by'), true)) {
             $parts[] = '--strict-network: a lookup failed';
         }
-        foreach (Fields::list($gate, 'not_applied') as $gap) {
-            $parts[] = \sprintf('%s not applied to %s: %s', Fields::string($gap, 'check'), self::plural(Fields::int($gap, 'packages'), 'package', 'packages'), self::word($words['not_applied'] ?? [], Fields::string($gap, 'reason')));
+        foreach (Fields::objects($gate, 'not_applied') as $gap) {
+            $parts[] = \sprintf('%s not applied to %s: %s', Fields::string($gap, 'check'), self::plural(Fields::int($gap, 'packages'), 'package', 'packages'), self::word(Fields::table($words, 'not_applied'), Fields::string($gap, 'reason')));
         }
-        $parts[] = \sprintf('target php %s (%s)', Fields::string($run, 'target_php'), self::word($words['target_php_source'] ?? [], Fields::string($run, 'target_php_source')));
+        $parts[] = \sprintf('target php %s (%s)', Fields::string($run, 'target_php'), self::word(Fields::table($words, 'target_php_source'), Fields::string($run, 'target_php_source')));
 
         return implode(' · ', $parts);
     }
@@ -125,11 +125,11 @@ final class ReferenceText
         $counted = [];
         $score = Fields::object($in, 'score');
         // A score of 0 has no `terms` key: nothing counts.
-        foreach (\array_key_exists('terms', $score) ? Fields::list($score, 'terms') : [] as $term) {
+        foreach (\array_key_exists('terms', $score) ? Fields::objects($score, 'terms') : [] as $term) {
             $counted[] = Fields::string($term, 'flag');
         }
         $lines = [];
-        foreach (Fields::list($in, 'flags') as $flag) {
+        foreach (Fields::objects($in, 'flags') as $flag) {
             if (\in_array(Fields::string($flag, 'id'), $counted, true)) {
                 $lines[] = Fields::string($flag, 'id').': '.Fields::string($flag, 'summary');
             }
@@ -147,7 +147,7 @@ final class ReferenceText
             return null;
         }
         $new = Fields::object($basis, 'new');
-        $line = Fields::list($new, 'terms') === [] ? '0' : ScoreLineFromJson::render($new + ['accepted' => []]);
+        $line = Fields::objects($new, 'terms') === [] ? '0' : ScoreLineFromJson::render(ContractBundle::stringKeys($new + ['accepted' => []]));
         $limitedBy = Fields::string($basis, 'limited_by');
 
         return \sprintf('gate %d = min(%d, 2 × %d) (%s); new: %s', Fields::int($basis, 'score'), Fields::int(Fields::object($in, 'score'), 'total'), Fields::int($new, 'total'), self::LIMITED_BY[$limitedBy] ?? $limitedBy, $line);
@@ -177,7 +177,7 @@ final class ReferenceText
             }
             $parts[] = $text;
         } elseif (!\in_array($age['installed_unmeasured'] ?? null, ['branch_snapshot', 'details_missing'], true)) {
-            $parts[] = 'installed '.$version.', release date not known ('.self::word($reasons['words'] ?? [], Fields::string($age, 'installed_unmeasured')).')';
+            $parts[] = 'installed '.$version.', release date not known ('.self::word(Fields::table($reasons, 'words'), Fields::string($age, 'installed_unmeasured')).')';
         }
         if ($branchRelease !== null && Fields::string($branchRelease, 'version') !== $version && !($release !== null && Fields::string($release, 'version') === Fields::string($branchRelease, 'version'))) {
             $parts[] = $branch.' last released '.Fields::string($branchRelease, 'version').' '.self::when($branchRelease, $years);
@@ -222,16 +222,16 @@ final class ReferenceText
             $released = $shown ?? ($reading === null ? null : ($reading['version'] ?? null));
             $head = str_pad($name, 11).str_pad(\is_string($released) ? $released : '', 10);
             if ($reading === null) {
-                $lines[] = $head.strtr(Fields::string($words, 'not_read'), ['{reading} ' => '', '{reason words}' => self::word($reasons['words'] ?? [], Fields::string($age, $key.'_unmeasured'))]);
+                $lines[] = $head.strtr(Fields::string($words, 'not_read'), ['{reading} ' => '', '{reason words}' => self::word(Fields::table($reasons, 'words'), Fields::string($age, $key.'_unmeasured'))]);
                 continue;
             }
             $notes = [];
             if ($kind !== null) {
-                $level = $reading['level'] ?? null;
+                $level = \is_string($reading['level'] ?? null) ? $reading['level'] : null;
                 $warn = Fields::int($thresholds, $kind.'-warn-years');
                 $notes[] = $level === null
                     ? strtr(Fields::string($words, 'below'), ['{kind}' => $kind, '{warn}' => (string) $warn])
-                    : strtr(Fields::string($words, 'past'), ['{kind}' => $kind, '{level}' => (string) $level, '{years}' => (string) ($level === 'high' ? Fields::int($thresholds, $kind.'-high-years') : $warn)]);
+                    : strtr(Fields::string($words, 'past'), ['{kind}' => $kind, '{level}' => $level, '{years}' => (string) ($level === 'high' ? Fields::int($thresholds, $kind.'-high-years') : $warn)]);
             }
             if (\is_string($reading['dated_by'] ?? null)) {
                 $notes[] = str_replace('{package}', $reading['dated_by'], Fields::string($words, 'dated_by'));
@@ -241,7 +241,7 @@ final class ReferenceText
         $libyears = $in['libyears'] ?? null;
         $lines[] = \is_int($libyears) || \is_float($libyears)
             ? 'libyears '.(Fields::bool($in, 'libyears_at_least') ? 'at least ' : '').number_format((float) $libyears, 1, '.', '').' behind the newest stable release'
-            : 'libyears not measured: '.self::word($reasons['words'] ?? [], Fields::string($in, 'libyears_unmeasured'));
+            : 'libyears not measured: '.self::word(Fields::table($reasons, 'words'), Fields::string($in, 'libyears_unmeasured'));
 
         return $lines;
     }
@@ -258,7 +258,7 @@ final class ReferenceText
             return '(baseline: new package)';
         }
         $now = Fields::object($baseline, 'advisories_now');
-        $worsened = Fields::list($baseline, 'worsened_by');
+        $worsened = Fields::objects($baseline, 'worsened_by');
         $items = [];
         if (Fields::int($now, 'known') > 0) {
             $items[] = Fields::int($now, 'known').' '.(Fields::int($now, 'known') === 1 ? 'advisory' : 'advisories').' known';
@@ -289,7 +289,7 @@ final class ReferenceText
             $crossed = $compared && !\in_array(Fields::string($was, 'fix_kind'), self::LOST, true) && \in_array(Fields::string($is, 'fix_kind'), self::LOST, true);
             $items[] = $name.' re-rated '.Fields::string($was, 'severity').' → '.Fields::string($is, 'severity').($crossed ? ','.$lost : '');
         }
-        foreach (Fields::list($in, 'flags') as $flag) {
+        foreach (Fields::objects($in, 'flags') as $flag) {
             $state = Fields::nullableObject($flag, 'baseline');
             if ($state !== null && ($state['state'] ?? null) === 'covered') {
                 $items[] = Fields::string($flag, 'id').' covered by the recorded '.Fields::string($state, 'covered_by');
@@ -302,8 +302,8 @@ final class ReferenceText
     /** @param array<mixed, mixed> $years en/years-phrases.json */
     public static function ago(float $value, array $years): string
     {
-        foreach (Fields::list($years, 'pairs') as $pair) {
-            if ((float) $pair['value'] === $value) {
+        foreach (Fields::objects($years, 'pairs') as $pair) {
+            if (Fields::number($pair, 'value') === $value) {
                 return Fields::string($pair, 'phrase');
             }
         }
@@ -328,7 +328,7 @@ final class ReferenceText
                 if (\is_string($replacement['package'] ?? null)) {
                     $finding = Fields::nullableObject($replacement, 'finding');
 
-                    return 'replace with '.$replacement['package'].' ('.($byRegistry ? 'named by its registry' : 'named in composer.lock').($finding === null ? '' : '; itself '.Fields::string($finding, 'verdict').': '.implode(' · ', Fields::list($finding, 'flag_ids'))).')';
+                    return 'replace with '.$replacement['package'].' ('.($byRegistry ? 'named by its registry' : 'named in composer.lock').($finding === null ? '' : '; itself '.Fields::string($finding, 'verdict').': '.implode(' · ', Fields::strings($finding, 'flag_ids'))).')';
                 }
 
                 return 'replace it: '.($byRegistry ? 'its registry' : 'composer.lock').' suggests "'.Fields::string($replacement, 'suggestion').'"';
@@ -358,9 +358,9 @@ final class ReferenceText
             case 'blocked':
                 $latest = Fields::nullableObject($move, 'latest');
                 $pinned = Fields::string($move, 'source') === 'pinned';
-                $where = $pinned && $latest !== null ? 'the newest tag, '.Fields::string($latest, 'version').',' : ($move['to_branch'] ?? 'the fix');
+                $where = $pinned && $latest !== null ? 'the newest tag, '.Fields::string($latest, 'version').',' : (Fields::nullableString($move, 'to_branch') ?? 'the fix');
                 $text = $check !== null && \is_string($check['requires'] ?? null)
-                    ? 'no move runs on the target: '.$where.' needs php '.$check['requires'].' and the target php '.$target.' does not run it'
+                    ? 'no move runs on the target: '.$where.' needs php '.Fields::string($check, 'requires').' and the target php '.$target.' does not run it'
                     : 'no move runs on the target: the target php '.$target.' does not run '.$where;
 
                 return $text.($pinned ? '; replace it' : '');
@@ -405,7 +405,7 @@ final class ReferenceText
             $text .= self::php($move, $check, Fields::object($in, 'run'));
         }
         $byBasis = [];
-        foreach (Fields::list($move, 'adds') as $fact) {
+        foreach (Fields::objects($move, 'adds') as $fact) {
             $byBasis[Fields::string($fact, 'basis')][] = Fields::string($fact, 'id');
         }
         foreach ($byBasis as $basis => $ids) {
@@ -440,7 +440,7 @@ final class ReferenceText
     {
         $parts = [];
         $advisories = 0;
-        foreach (Fields::list($move, 'clears') as $fact) {
+        foreach (Fields::objects($move, 'clears') as $fact) {
             if (Fields::string($fact, 'kind') === 'advisory') {
                 ++$advisories;
             } elseif (Fields::string($fact, 'id') !== 'pinned') {
@@ -459,7 +459,7 @@ final class ReferenceText
     {
         $flags = [];
         $advisories = 0;
-        foreach (Fields::list($move, 'leaves') as $fact) {
+        foreach (Fields::objects($move, 'leaves') as $fact) {
             if (Fields::string($fact, 'kind') === 'flag') {
                 $flags[] = Fields::string($fact, 'id');
             } else {
@@ -477,13 +477,13 @@ final class ReferenceText
     /** @param array<mixed, mixed> $move */
     private static function unverified(array $move): string
     {
-        $ids = array_map(static fn ($fact): string => Fields::string($fact, 'id'), Fields::list($move, 'unverified'));
+        $ids = array_map(static fn ($fact): string => Fields::string($fact, 'id'), Fields::objects($move, 'unverified'));
 
         return $ids === [] ? '' : '; not checked: '.implode(', ', $ids);
     }
 
-    /** @param mixed $holder */
-    private static function holder($holder): string
+    /** @param array<mixed, mixed> $holder */
+    private static function holder(array $holder): string
     {
         $constraint = \is_string($holder['constraint'] ?? null) ? $holder['constraint'] : null;
         if (Fields::string($holder, 'source') === 'root') {
@@ -492,7 +492,7 @@ final class ReferenceText
         $bits = $constraint === null ? [] : ['requires '.$constraint];
         $finding = Fields::nullableObject($holder, 'holder');
         if ($finding !== null && \in_array(Fields::string($finding, 'verdict'), self::GRADES, true)) {
-            $bits[] = \is_string($finding['lead'] ?? null) ? 'itself '.$finding['lead'] : 'itself '.Fields::string($finding, 'verdict').': '.implode(' · ', Fields::list($finding, 'flag_ids'));
+            $bits[] = \is_string($finding['lead'] ?? null) ? 'itself '.$finding['lead'] : 'itself '.Fields::string($finding, 'verdict').': '.implode(' · ', Fields::strings($finding, 'flag_ids'));
         }
 
         return Fields::string($holder, 'package').' '.Fields::string($holder, 'version').($bits === [] ? '' : ' ('.implode('; ', $bits).')');
@@ -510,7 +510,7 @@ final class ReferenceText
 
                 return (\is_string($toBranch) && strpos($toBranch, '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements, which lockrot does not solve';
             case 'transitive':
-                return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::dependents($in).': replace or update '.(\count(Fields::list($in, 'direct_dependents')) === 1 ? 'that package' : 'them');
+                return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::dependents($in).': replace or update '.(\count(Fields::strings($in, 'direct_dependents')) === 1 ? 'that package' : 'them');
             case 'unreached':
                 return $resolved ? 'lockrot found no path from your requirements to it, so what requires it must allow it' : 'lockrot found no path from your requirements to it: `composer why` names what requires it';
             default:
@@ -518,7 +518,7 @@ final class ReferenceText
         }
     }
 
-    /** @param list<mixed>|null $through */
+    /** @param list<array<mixed, mixed>>|null $through */
     private static function through(?array $through): string
     {
         $gone = [];
@@ -543,7 +543,7 @@ final class ReferenceText
     /** @param array<mixed, mixed> $in */
     private static function dependents(array $in): string
     {
-        $names = array_map('strval', Fields::list($in, 'direct_dependents'));
+        $names = Fields::strings($in, 'direct_dependents');
 
         return \count($names) > self::DEPENDENTS_SHOWN ? implode(', ', \array_slice($names, 0, self::DEPENDENTS_SHOWN)).' and '.(\count($names) - self::DEPENDENTS_SHOWN).' more' : implode(', ', $names);
     }
@@ -600,11 +600,11 @@ final class ReferenceText
     /** @param array<mixed, mixed> $in */
     private static function advisoryName(array $in, string $id): string
     {
-        foreach (Fields::list($in, 'signals') as $signal) {
+        foreach (Fields::objects($in, 'signals') as $signal) {
             if (($signal['id'] ?? null) !== 'S9') {
                 continue;
             }
-            foreach (Fields::list(Fields::object($signal, 'data'), 'advisories') as $row) {
+            foreach (Fields::objects(Fields::object($signal, 'data'), 'advisories') as $row) {
                 if (($row['id'] ?? null) === $id) {
                     return \is_string($row['cve'] ?? null) ? $row['cve'] : $id;
                 }

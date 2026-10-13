@@ -60,7 +60,7 @@ final class BaselinedScenario
     private const JSON = \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE;
 
     private string $name;
-    /** @var array<string, mixed> */
+    /** @var array{before: string, after: string, before_ref: string, before_kind: string, after_kind: string, after_ref?: string, t0: string, dev: bool, targets: list<string>} */
     private array $scenario;
     private string $t1;
     /** @var array<string, string> each written file by its path below the scenario directory */
@@ -164,31 +164,39 @@ final class BaselinedScenario
         $data = JsonPath::decoded($written->toArray());
         $removed = [];
         $entriesRemoved = [];
-        foreach (JsonPath::arrayAt($data, ['findings']) as $package => $entry) {
+        $findings = JsonPath::arrayAt($data, ['findings']);
+        foreach ($findings as $package => $entry) {
             if (!\is_array($entry)) {
                 continue;
             }
+            $advisories = \is_array($entry['advisories'] ?? null) ? $entry['advisories'] : [];
             foreach ($later[(string) $package] ?? [] as $id => $at) {
-                if (isset($entry['advisories'][$id])) {
-                    unset($entry['advisories'][$id]);
+                if (isset($advisories[$id])) {
+                    unset($advisories[$id]);
                     $removed[] = ['package' => (string) $package, 'id' => (string) $id, 'reported_at' => $at];
                 }
             }
-            if (($entry['advisories'] ?? null) === []) {
-                unset($entry['advisories']);
+            unset($entry['advisories']);
+            if ($advisories !== []) {
+                $entry['advisories'] = $advisories;
             }
             if (($entry['flags'] ?? []) === [] && !isset($entry['advisories'])) {
-                unset($data['findings'][$package]);
+                unset($findings[$package]);
                 $entriesRemoved[] = (string) $package;
                 continue;
             }
-            $data['findings'][$package] = $entry;
+            $findings[$package] = $entry;
         }
+        $data['findings'] = $findings;
 
         return [Baseline::fromArray(ContractBundle::stringKeys(['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + $data)), ['removed' => $removed, 'entries_removed' => $entriesRemoved]];
     }
 
-    /** R6: one package per standing shape, the first by name, as explain-2. @return list<string> */
+    /**
+     * R6: one package per standing shape, the first by name, as explain-2.
+     *
+     * @return list<string>
+     */
     private function explain(Analysis $analysis, Report $check): array
     {
         $shapes = [];
@@ -199,7 +207,7 @@ final class BaselinedScenario
             $status = $finding['baseline']['status'] ?? null;
             $worsened = \is_array($finding['baseline']['worsened_by'] ?? null) ? $finding['baseline']['worsened_by'] : [];
             $kinds = array_map(static fn ($fact): string => \is_array($fact) && \is_string($fact['kind'] ?? null) ? $fact['kind'] : '', $worsened);
-            $covered = array_filter(\is_array($finding['flags'] ?? null) ? $finding['flags'] : [], static fn ($flag): bool => \is_array($flag) && ($flag['baseline']['state'] ?? null) === 'covered');
+            $covered = array_filter(\is_array($finding['flags'] ?? null) ? $finding['flags'] : [], static fn ($flag): bool => \is_array($flag) && \is_array($flag['baseline'] ?? null) && ($flag['baseline']['state'] ?? null) === 'covered');
             $dev = ($finding['dev'] ?? false) === true && \is_array($finding['baseline']['recorded'] ?? null);
             foreach (['known' => $status === 'known', 'new' => $status === 'new', 'worsened by a flag' => \in_array('flag', $kinds, true), 'worsened by an advisory' => \in_array('advisory', $kinds, true), 'covered' => $covered !== [], 'dev' => $dev] as $shape => $matches) {
                 if ($matches && !isset($shapes[$shape])) {
@@ -210,9 +218,12 @@ final class BaselinedScenario
         $packages = array_values(array_unique($shapes));
         sort($packages);
         foreach ($packages as $package) {
-            $finding = $check->findings()[array_search($package, array_map(static fn ($f): string => $f->package(), $check->findings()), true)];
+            $finding = null;
+            foreach ($check->findings() as $each) {
+                $finding = $each->package() === $package ? $each : $finding;
+            }
             $facts = $analysis->facts($package);
-            if ($facts === null) {
+            if ($facts === null || $finding === null) {
                 throw new \LogicException('no facts for '.$package);
             }
             $this->put('check/explain/'.str_replace('/', '--', $package).'.json', (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), self::TARGET_PHP, $check, $this->projectPhp())));
@@ -265,9 +276,12 @@ final class BaselinedScenario
         foreach ([$this->scenario['before'], $this->scenario['after']] as $side) {
             $recorded = is_file($http.'advisories/'.basename((string) $side).'.json') ? $http.'advisories/' : self::FIXTURES.'http/advisories/';
             $result = HttpResult::fromEnvelopeJson('https://packagist.org/api/security-advisories/', (string) file_get_contents($recorded.basename((string) $side).'.json'));
-            $answer = json_decode((string) $result->body(), true);
+            $answer = $result === null ? null : json_decode((string) $result->body(), true);
             foreach (\is_array($answer) && \is_array($answer['advisories'] ?? null) ? $answer['advisories'] : [] as $package => $list) {
-                $advisories[(string) $package] = $list;
+                if (\is_array($list)) {
+                    /** @var list<array<string, mixed>> $list the recorded answer of packagist.org */
+                    $advisories[(string) $package] = $list;
+                }
             }
         }
         $server->withAdvisoryApi($advisories);
@@ -332,10 +346,10 @@ final class BaselinedScenario
      */
     private function provenance(array $asOf, array $explained, Report $t0, Report $after): array
     {
-        $side = function (string $key): array {
-            $dir = self::FIXTURES.$this->scenario[$key];
+        $side = static function (string $dir, string $ref, string $kind): array {
+            $path = self::FIXTURES.$dir;
 
-            return ['ref' => (string) ($this->scenario[$key.'_ref'] ?? 'tests/fixtures/'.$this->scenario[$key]), 'ref_kind' => (string) $this->scenario[$key.'_kind'], 'lock_sha256' => hash_file('sha256', $dir.'/composer.lock'), 'manifest_sha256' => hash_file('sha256', $dir.'/composer.json')];
+            return ['ref' => $ref, 'ref_kind' => $kind, 'lock_sha256' => (string) hash_file('sha256', $path.'/composer.lock'), 'manifest_sha256' => (string) hash_file('sha256', $path.'/composer.json')];
         };
         $files = [];
         foreach ($this->files as $path => $contents) {
@@ -346,8 +360,8 @@ final class BaselinedScenario
             'scenario' => $this->name,
             'project' => self::PROJECT,
             'recorded_by' => 'tools/report/record --baselined '.$this->name,
-            'before' => $side('before'),
-            'after' => $side('after'),
+            'before' => $side($this->scenario['before'], $this->scenario['before_ref'], $this->scenario['before_kind']),
+            'after' => $side($this->scenario['after'], $this->scenario['after_ref'] ?? 'tests/fixtures/'.$this->scenario['after'], $this->scenario['after_kind']),
             'clocks' => ['t0' => $this->scenario['t0'], 't1' => $this->t1],
             'options' => array_merge(['--target-php='.self::TARGET_PHP], $this->scenario['dev'] ? ['--dev'] : []),
             'runs' => $this->runs,
@@ -370,7 +384,7 @@ final class BaselinedScenario
         $limit = new \DateTimeImmutable($clock);
         $later = [];
         foreach (JsonPath::arrayAt(JsonPath::decoded($report->findingRows()), []) as $package => $finding) {
-            foreach (\is_array($finding['age'] ?? null) ? $finding['age'] : [] as $reading => $value) {
+            foreach (\is_array($finding) && \is_array($finding['age'] ?? null) ? $finding['age'] : [] as $reading => $value) {
                 if (\is_array($value) && \is_string($value['at'] ?? null) && new \DateTimeImmutable($value['at']) > $limit) {
                     $later[] = ['package' => (string) $package, 'reading' => 'age.'.$reading, 'at' => $value['at']];
                 }

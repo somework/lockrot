@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\Contract\ContractBundle;
+use Lockrot\Tests\Support\Contract\Fields;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -190,7 +191,7 @@ final class ScoreContractTest extends TestCase
         if ($skipped !== self::inOrder($skipped, self::SKIP_ORDER)) {
             $breaks[] = 'checks_skipped[] is not in the fixed check order';
         }
-        $missing = array_map(static fn ($entry) => \is_array($entry) && \is_array($entry['blocks'] ?? null) ? ($entry['blocks'][0] ?? '') : '', JsonPath::arrayAt($finding, ['checks_missing']));
+        $missing = array_values(array_map(static fn ($entry) => \is_array($entry) && \is_array($entry['blocks'] ?? null) ? ($entry['blocks'][0] ?? '') : '', JsonPath::arrayAt($finding, ['checks_missing'])));
         if ($missing !== self::inOrder($missing, self::SIGNAL_ORDER)) {
             $breaks[] = 'checks_missing[] is not in signal order';
         }
@@ -208,20 +209,22 @@ final class ScoreContractTest extends TestCase
     private static function factLists(array $finding): array
     {
         $lists = [];
-        $moves = \is_array($finding['next_step'] ?? null) ? ['next_step' => $finding['next_step']] : [];
-        foreach (\is_array($finding['next_step']['also'] ?? null) ? $finding['next_step']['also'] : [] as $i => $also) {
-            $moves['also['.$i.']'] = $also;
+        $moves = [];
+        if (\is_array($finding['next_step'] ?? null)) {
+            $moves['next_step'] = $finding['next_step'];
+            foreach (\array_key_exists('also', $finding['next_step']) ? Fields::objects($finding['next_step'], 'also') : [] as $i => $also) {
+                $moves['also['.$i.']'] = $also;
+            }
         }
         foreach ($moves as $label => $move) {
             foreach (['clears', 'unverified', 'leaves', 'adds'] as $key) {
-                $lists[$label.'.'.$key] = \is_array($move) && \is_array($move[$key] ?? null) ? $move[$key] : [];
+                $lists[$label.'.'.$key] = \array_key_exists($key, $move) ? Fields::objects($move, $key) : [];
             }
         }
         foreach (['gets' => ['clears'], 'partial' => ['clears', 'unverified']] as $part => $keys) {
             foreach ($keys as $key) {
-                $value = $finding['security'][$part][$key] ?? null;
-                if (\is_array($value)) {
-                    $lists['security.'.$part.'.'.$key] = $value;
+                if (JsonPath::has($finding, ['security', $part, $key])) {
+                    $lists['security.'.$part.'.'.$key] = Fields::objects(JsonPath::arrayAt($finding, ['security', $part]), $key);
                 }
             }
         }

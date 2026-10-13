@@ -50,7 +50,7 @@ final class BaselinedFloors
                 continue;
             }
             $baseline = \is_array($finding['baseline'] ?? null) ? $finding['baseline'] : [];
-            $met[] = 'status '.($baseline['status'] ?? 'none');
+            $met[] = 'status '.(\is_string($baseline['status'] ?? null) ? $baseline['status'] : 'none');
             $lead = \is_array($baseline['recorded'] ?? null) && \is_string($baseline['recorded']['lead'] ?? null);
             foreach (\is_array($baseline['worsened_by'] ?? null) ? $baseline['worsened_by'] : [] as $fact) {
                 if (\is_array($fact) && ($fact['why'] ?? null) === 'new') {
@@ -58,16 +58,18 @@ final class BaselinedFloors
                 }
             }
             foreach (\is_array($finding['flags'] ?? null) ? $finding['flags'] : [] as $flag) {
-                $met[] = 'flag '.(\is_array($flag) && \is_array($flag['baseline'] ?? null) ? ($flag['baseline']['state'] ?? '') : '');
+                $state = \is_array($flag) && \is_array($flag['baseline'] ?? null) ? ($flag['baseline']['state'] ?? null) : null;
+                $met[] = 'flag '.(\is_string($state) ? $state : '');
             }
             foreach (\is_array($finding['signals'] ?? null) ? $finding['signals'] : [] as $signal) {
                 foreach (\is_array($signal) && ($signal['id'] ?? null) === 'S9' ? JsonPath::arrayAt($signal, ['data', 'advisories']) : [] as $row) {
-                    $met[] = 'advisory '.(\is_array($row) && \is_array($row['baseline'] ?? null) ? ($row['baseline']['state'] ?? '') : '');
+                    $state = \is_array($row) && \is_array($row['baseline'] ?? null) ? ($row['baseline']['state'] ?? null) : null;
+                    $met[] = 'advisory '.(\is_string($state) ? $state : '');
                 }
             }
             $gate = \is_array($finding['gate'] ?? null) ? $finding['gate'] : [];
             if (\is_array($gate['basis'] ?? null)) {
-                $met[] = 'limited_by '.($gate['basis']['limited_by'] ?? '');
+                $met[] = 'limited_by '.(\is_string($gate['basis']['limited_by'] ?? null) ? $gate['basis']['limited_by'] : '');
             }
             if (($gate['fails'] ?? false) === true) {
                 $met[] = 'a failing finding';

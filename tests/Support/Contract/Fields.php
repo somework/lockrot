@@ -22,7 +22,8 @@ final class Fields
     {
         $kept = [];
         foreach ($paths as $path) {
-            $kept = self::merge($kept, self::path($document, explode('.', $path)));
+            $merged = self::merge($kept, self::path($document, explode('.', $path)));
+            $kept = \is_array($merged) ? $merged : [];
         }
 
         return $kept;
@@ -67,7 +68,55 @@ final class Fields
             throw new \UnexpectedValueException($key.' is not a list');
         }
 
-        return $value;
+        return array_values($value);
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return list<array<mixed, mixed>>
+     */
+    public static function objects($data, string $key): array
+    {
+        $objects = [];
+        foreach (self::list($data, $key) as $item) {
+            if (!\is_array($item)) {
+                throw new \UnexpectedValueException($key.' holds an item that is not an object');
+            }
+            $objects[] = $item;
+        }
+
+        return $objects;
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return list<string>
+     */
+    public static function strings($data, string $key): array
+    {
+        $strings = [];
+        foreach (self::list($data, $key) as $item) {
+            if (!\is_string($item)) {
+                throw new \UnexpectedValueException($key.' holds an item that is not a string');
+            }
+            $strings[] = $item;
+        }
+
+        return $strings;
+    }
+
+    /**
+     * A words table of the bundle: an absent table is empty, so each id reads as written.
+     *
+     * @param array<mixed, mixed> $words
+     *
+     * @return array<mixed, mixed>
+     */
+    public static function table(array $words, string $key): array
+    {
+        return \is_array($words[$key] ?? null) ? $words[$key] : [];
     }
 
     /**

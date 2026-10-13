@@ -80,20 +80,26 @@ final class RenderedFromTest extends TestCase
 
     public function testTheDepthLineChangesWhenOnlyTheDepthChanges(): void
     {
-        $line = static function (array $chain): ?string {
-            $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain($chain)->withNamedIn([ProjectConfig::REQUIRE])->build();
-
-            return RunFooter::depth(new Report([$finding], [], new \DateTimeImmutable('2026-10-14T00:00:00+00:00'), 1, 0), static fn (string $name): string => $name);
-        };
-
-        self::assertNotSame($line(['root/project', 'vendor/a', 'vendor/pkg']), $line(['root/project', 'vendor/a', 'vendor/b', 'vendor/pkg']));
+        self::assertNotSame(self::depthLine(['root/project', 'vendor/a', 'vendor/pkg']), self::depthLine(['root/project', 'vendor/a', 'vendor/b', 'vendor/pkg']));
     }
 
     public function testTheExplainReachLineChangesWhenOnlyTheDepthChanges(): void
     {
-        $line = static fn (array $chain): string => ExplainFormatter::reachLine((new FindingBuilder())->withChain($chain)->withNamedIn([ProjectConfig::REQUIRE])->build(), false);
+        self::assertNotSame(self::reachLine(['root/project', 'vendor/a', 'vendor/pkg']), self::reachLine(['root/project', 'vendor/a', 'vendor/b', 'vendor/pkg']));
+    }
 
-        self::assertNotSame($line(['root/project', 'vendor/a', 'vendor/pkg']), $line(['root/project', 'vendor/a', 'vendor/b', 'vendor/pkg']));
+    /** @param list<string> $chain */
+    private static function depthLine(array $chain): ?string
+    {
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withChain($chain)->withNamedIn([ProjectConfig::REQUIRE])->build();
+
+        return RunFooter::depth(new Report([$finding], [], new \DateTimeImmutable('2026-10-14T00:00:00+00:00'), 1, 0), static fn (string $name): string => $name);
+    }
+
+    /** @param list<string> $chain */
+    private static function reachLine(array $chain): string
+    {
+        return ExplainFormatter::reachLine((new FindingBuilder())->withChain($chain)->withNamedIn([ProjectConfig::REQUIRE])->build(), false);
     }
 
     /** Whether leaving $path out of the inputs changes the rendering of $key on one recorded document. */
@@ -135,7 +141,7 @@ final class RenderedFromTest extends TestCase
         $words = static fn (string $file): array => JsonPath::decodeFile(ContractBundle::DIRECTORY.'/en/'.$file);
         switch ($key) {
             case 'score.text':
-                return ScoreLineFromJson::render(\is_array($in['score'] ?? null) ? $in['score'] : []);
+                return ScoreLineFromJson::render(ContractBundle::stringKeys(\is_array($in['score'] ?? null) ? $in['score'] : []));
             case 'next_step.text':
                 return ReferenceText::move($in);
             case 'also.text':

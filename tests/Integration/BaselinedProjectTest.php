@@ -90,11 +90,16 @@ final class BaselinedProjectTest extends TestCase
         self::assertSame($counts, array_intersect_key(JsonPath::arrayAt($report, ['baseline']), $counts));
     }
 
-    /** Q2: every entry comes from a baseline-2 file, so its fix model, target PHP and dates are set. */
+    /**
+     * Q2: every entry comes from a baseline-2 file, so its fix model, target PHP and dates are set.
+     *
+     * @param array<mixed, mixed> $report
+     */
     private static function assertRecordedValuesAreSet(array $report): void
     {
         foreach (JsonPath::arrayAt($report, ['findings']) as $finding) {
-            $recorded = \is_array($finding) && \is_array($finding['baseline']['recorded'] ?? null) ? $finding['baseline']['recorded'] : null;
+            $baseline = \is_array($finding) && \is_array($finding['baseline'] ?? null) ? $finding['baseline'] : [];
+            $recorded = \is_array($baseline['recorded'] ?? null) ? $baseline['recorded'] : null;
             if ($recorded === null) {
                 continue;
             }
@@ -122,7 +127,7 @@ final class BaselinedProjectTest extends TestCase
         $new = JsonPath::arrayAt($after, ['findings']);
         foreach (JsonPath::arrayAt($report, ['baseline', 'stale']) as $stale) {
             $package = \is_array($stale) ? ($stale['package'] ?? null) : $stale;
-            self::assertArrayNotHasKey((string) $package, $new, 'a stale entry is dropped');
+            self::assertArrayNotHasKey(\is_string($package) ? $package : '', $new, 'a stale entry is dropped');
         }
         $kept = 0;
         foreach ($new as $package => $entry) {
@@ -130,7 +135,7 @@ final class BaselinedProjectTest extends TestCase
             $was = \is_array($old[$package] ?? null) ? $old[$package] : null;
             self::assertSame($was === null ? $today : $was['first_seen'], $entry['first_seen'], (string) $package);
             foreach (\is_array($entry['flags'] ?? null) ? $entry['flags'] : [] as $flag => $state) {
-                $since = $was['flags'][$flag]['known_since'] ?? null;
+                $since = $was !== null && JsonPath::has($was, ['flags', $flag, 'known_since']) ? JsonPath::stringAt($was, ['flags', $flag, 'known_since']) : null;
                 self::assertSame($since ?? $today, \is_array($state) ? $state['known_since'] : null, $package.' '.$flag);
                 $kept += $since === null ? 0 : 1;
             }
