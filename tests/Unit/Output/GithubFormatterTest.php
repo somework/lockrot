@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
@@ -19,6 +20,7 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
@@ -123,6 +125,25 @@ final class GithubFormatterTest extends TestCase
         self::assertStringContainsString('title=lockrot%3A abandoned (medium)::acme/silent', $out);
         self::assertStringContainsString('title=lockrot%3A ok (none)::acme/fine', $out);
         self::assertStringNotContainsString('::error ', $out, 'the level still follows the verdict and fail-on, not the priority');
+    }
+
+    /**
+     * I15b: a finding that fails the gate gets an `error` record, whatever its 0.13 verdict. Here an
+     * entry that accepts `left-behind` only leaves the abandoned flag counted.
+     */
+    public function testAFindingThatFailsTheGateIsAnErrorWhateverItsLegacyVerdict(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $signals = [new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))];
+        $entry = new AllowlistEntry('acme/abandoned', null, 'behind on purpose', null, AllowlistEntry::BY_PROJECT, [FlagSet::LEFT_BEHIND]);
+        $report = new Report([
+            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::FINISHED)->withSignals($signals)->withFlags(FlagSet::fromSignals($signals, $entry, []))->withChain(['acme/abandoned'])->withDataDate($at)->build(),
+        ], [], $at, 1, 0);
+
+        $out = $this->formatter(Verdict::ABANDONED, null)->format($report);
+
+        self::assertStringStartsWith('::error file=composer.lock,title=lockrot%3A ', $out);
+        self::assertStringContainsString('::acme/abandoned 1.0.0', $out);
     }
 
     public function testFailOnNoneNeverProducesAnError(): void

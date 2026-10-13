@@ -28,7 +28,11 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'a package by pattern' => [['package' => 'acme/*'], null, null, null, null];
     }
 
-    /** @param array<string, string> $scope */
+    /**
+     * @param array<string, string> $scope
+     *
+     * @dataProvider scopes
+     */
     #[DataProvider('scopes')]
     public function testEachScopeNamesThePackage(array $scope, ?string $host, ?string $repo, ?string $source, ?string $composer): void
     {
@@ -91,7 +95,11 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'an unknown check' => [['check' => 'releases', 'package' => 'a/*', 'reason' => 'x'], '"check" must be one of'];
     }
 
-    /** @param array<string, mixed> $entry */
+    /**
+     * @param array<string, mixed> $entry
+     *
+     * @dataProvider refused
+     */
     #[DataProvider('refused')]
     public function testAnInvalidEntryIsAConfigErrorNamingIt(array $entry, string $message): void
     {

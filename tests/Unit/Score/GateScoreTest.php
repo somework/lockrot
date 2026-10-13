@@ -40,6 +40,8 @@ final class GateScoreTest extends TestCase
     /**
      * @param list<string>                      $flags
      * @param list<array{string, string, bool}> $advisories
+     *
+     * @dataProvider gateRows
      */
     #[DataProvider('gateRows')]
     public function testTheGateScoreIsTheScoreBoundByTwiceWhatTheNewFactsAdd(array $flags, array $advisories, string $reach, bool $dev, ?string $lead, int $score, int $new, int $gate, string $limitedBy): void

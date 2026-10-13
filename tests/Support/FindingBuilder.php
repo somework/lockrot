@@ -260,7 +260,7 @@ final class FindingBuilder
      * The details of a finding whose advisory lookup answered and whose release scan found no
      * branch: the metadata is read exactly when maintenance is judged.
      */
-    public static function detailsOf(Finding $finding, bool $maintenanceJudged): FindingDetails
+    public static function detailsOf(Finding $finding, bool $maintenanceJudged, ?AllowlistEntry $entry = null): FindingDetails
     {
         $status = $maintenanceJudged ? 'read' : (!$finding->isFromComposerRepository() ? 'not_from_composer_repository' : ($finding->note() === 'not found in the repository' ? 'not_found' : 'unavailable'));
         $skipped = [];
@@ -270,7 +270,7 @@ final class FindingBuilder
             $skipped[] = new Check('release_branch', 'branch_snapshot', [Signal::S8]);
         }
         $reason = $finding->allowlistReason();
-        $entry = $reason === null ? null : new AllowlistEntry($finding->package(), null, $reason, null, AllowlistEntry::BY_PROJECT);
+        $entry ??= $reason === null ? null : new AllowlistEntry($finding->package(), null, $reason, null, AllowlistEntry::BY_PROJECT);
 
         $activity = self::activityOf($finding);
 

@@ -112,8 +112,8 @@ final class FormatContext
     }
 
     /**
-     * The findings that get a record: the flagged ones, or all under `--all`. With `unchecked` active,
-     * a finding that carries S10 and no counted fact gets one too, so the gate's failure has a record.
+     * The findings that get a record: the flagged ones, every one that fails the gate (I15b), and
+     * with `unchecked` active every one with a missing check. Under `--all`, every finding.
      *
      * @return list<Finding>
      */
@@ -123,12 +123,12 @@ final class FormatContext
             return $report->findings();
         }
         $flagged = $report->flagged();
-        if (!$this->failOn->has(FailOn::KIND_UNCHECKED)) {
-            return $flagged;
-        }
+        $gate = $this->gateOf($report);
+        $unchecked = $this->failOn->has(FailOn::KIND_UNCHECKED);
         $out = [];
         foreach ($report->findings() as $finding) {
-            if (\in_array($finding, $flagged, true) || $finding->checksMissing() !== []) {
+            $standing = $gate->standingOf($finding->package());
+            if (\in_array($finding, $flagged, true) || ($standing !== null && $standing->fails()) || ($unchecked && $finding->checksMissing() !== [])) {
                 $out[] = $finding;
             }
         }

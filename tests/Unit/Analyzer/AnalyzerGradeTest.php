@@ -54,6 +54,7 @@ final class AnalyzerGradeTest extends TestCase
         yield 'packages-dev halves the whole score' => ['vendor/devtool', 'medium', null, 8];
         yield 'nothing reaches it: maintenance counts half' => ['vendor/orphan', 'low', 'stale', 4];
         yield 'a direct stale package' => ['vendor/stale', 'medium', 'stale', 8];
+        yield 'an entry that accepts another flag leaves stale counted' => ['vendor/partly', 'medium', 'stale', 8];
     }
 
     /** @dataProvider packages */
@@ -67,6 +68,16 @@ final class AnalyzerGradeTest extends TestCase
         self::assertSame($total, $finding->score()->total());
     }
 
+    /** An entry accepts the flags that it names only, so the 0.13 verdict of the package stays its own. */
+    public function testAnEntryThatNamesSomeFlagsLeavesTheVerdictOfTheOthers(): void
+    {
+        $report = self::report();
+
+        self::assertSame('stale', self::named($report, 'vendor/partly')->verdict());
+        self::assertSame('finished', self::named($report, 'vendor/accepted')->verdict());
+        self::assertContains('vendor/partly', array_map(static fn (Finding $f): string => $f->package(), $report->flagged()));
+    }
+
     private static function report(): Report
     {
         $lock = LockFile::fromArray([
@@ -78,12 +89,13 @@ final class AnalyzerGradeTest extends TestCase
                 self::locked('vendor/accepted'),
                 self::locked('vendor/orphan'),
                 self::locked('vendor/stale'),
+                self::locked('vendor/partly'),
                 self::locked('vendor/two'),
             ],
             'packages-dev' => [self::locked('vendor/devtool')],
         ]);
         $project = ProjectConfig::fromArray([
-            'require' => ['vendor/update' => '^1.0', 'vendor/none' => '^1.0', 'vendor/blocked' => '^1.0', 'vendor/absent' => '^1.0', 'vendor/accepted' => '^1.0', 'vendor/stale' => '^1.0', 'vendor/two' => '^1.0'],
+            'require' => ['vendor/update' => '^1.0', 'vendor/none' => '^1.0', 'vendor/blocked' => '^1.0', 'vendor/absent' => '^1.0', 'vendor/accepted' => '^1.0', 'vendor/stale' => '^1.0', 'vendor/partly' => '^1.0', 'vendor/two' => '^1.0'],
             'require-dev' => ['vendor/devtool' => '^1.0'],
         ]);
         $metadata = [
@@ -93,6 +105,7 @@ final class AnalyzerGradeTest extends TestCase
             'vendor/accepted' => self::metadata('vendor/accepted', [['1.0.0', null, self::OLD]]),
             'vendor/orphan' => self::metadata('vendor/orphan', [['1.0.0', null, self::OLD]]),
             'vendor/stale' => self::metadata('vendor/stale', [['1.0.0', null, self::OLD]]),
+            'vendor/partly' => self::metadata('vendor/partly', [['1.0.0', null, self::OLD]]),
             'vendor/two' => self::metadata('vendor/two', [['1.0.0', null, self::RECENT], ['1.1.0', null, self::RECENT]]),
             'vendor/devtool' => self::metadata('vendor/devtool', [['1.0.0', null, self::RECENT], ['1.1.0', null, self::RECENT]]),
         ];
@@ -110,7 +123,10 @@ final class AnalyzerGradeTest extends TestCase
             new ActivityClient(new FakeHttpClient(), $auth),
             new ActivityFetchPlanner($auth),
             new RepoLocator(),
-            new Allowlist([new AllowlistEntry('vendor/accepted', null, 'interfaces', null, 'builtin')]),
+            new Allowlist([
+                new AllowlistEntry('vendor/accepted', null, 'interfaces', null, 'builtin'),
+                new AllowlistEntry('vendor/partly', null, 'behind on purpose', null, AllowlistEntry::BY_PROJECT, ['left-behind']),
+            ]),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),
             $clock,

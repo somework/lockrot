@@ -75,9 +75,9 @@ final class RunGateText
         $byValue = $gate->failingBy();
         if ($failing > 0 && \count($byValue) > 1) {
             $parts = [];
-            foreach ($byValue as $value => $count) {
-                if ($count > 0) {
-                    $parts[] = $value.' '.$count;
+            foreach ($byValue as $value) {
+                if ($value->failing() > 0) {
+                    $parts[] = $value->value().' '.$value->failing();
                 }
             }
             $text .= ' ('.implode(', ', $parts).')';

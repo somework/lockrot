@@ -30,6 +30,8 @@ final class CoverageTest extends TestCase
     /**
      * @param list<string> $counted
      * @param list<string> $uncovered
+     *
+     * @dataProvider coverageRows
      */
     #[DataProvider('coverageRows')]
     public function testTheRecordedLeadCoversItselfAndEveryFlagAfterIt(?string $lead, array $counted, array $uncovered): void

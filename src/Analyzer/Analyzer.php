@@ -501,7 +501,8 @@ final class Analyzer
     }
 
     /**
-     * An `ignore[]` entry no longer hides the advisories of its package.
+     * The project `ignore[]` entries that match packages with counted advisories, in report order:
+     * an entry accepts maintenance flags only.
      *
      * @param list<Finding> $findings
      *
@@ -509,6 +510,7 @@ final class Analyzer
      */
     private static function ignoreNotes(array $findings): array
     {
+        usort($findings, [Report::class, 'compareGraded']);
         $entries = [];
         foreach ($findings as $finding) {
             $entry = $finding->details()->entry();
@@ -517,7 +519,7 @@ final class Analyzer
                 continue;
             }
             usort($advisories, 'strcmp');
-            $entries[] = ['package' => $finding->package(), 'pattern' => (string) $entry->pattern(), 'advisories' => $advisories];
+            $entries[] = new UncoveredAdvisories($finding->package(), (string) $entry->pattern(), $advisories);
         }
 
         return $entries === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($entries)];
@@ -546,7 +548,7 @@ final class Analyzer
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
         [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
-        $verdict = $this->engine->decide($signals, $entry !== null, $meta !== null);
+        $verdict = $this->engine->decide($signals, $entry !== null && $entry->acceptsAll(), $meta !== null);
 
         $note = null;
         if (!$package->isFromComposerRepository()) {

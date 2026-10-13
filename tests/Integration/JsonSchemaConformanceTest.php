@@ -11,11 +11,13 @@ use JsonSchema\Validator;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\ChangedVerdict;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Analyzer\TransitiveExposure;
+use Lockrot\Analyzer\UncoveredAdvisories;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
@@ -928,10 +930,10 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
             RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
             RunNote::notFromComposerRepository(2, true),
-            RunNote::verdictRulesChanged('high', [['package' => 'symfony/yaml', 'version' => 'v3.4.47', 'legacy' => ['verdict' => 'left-behind', 'priority' => 'critical', 'basis' => PriorityBasis013::startingAt('high')->withStep('no_fix_expected', 'critical')], 'verdict' => 'medium', 'score_total' => 14, 'score_text' => '14 = left-behind 12 + vulnerable 2 [low advisory]']]),
+            RunNote::verdictRulesChanged('high', [new ChangedVerdict('symfony/yaml', 'v3.4.47', 'left-behind', PriorityBasis013::startingAt('high')->withStep('no_fix_expected', 'critical'), 'medium', 14, '14 = left-behind 12 + vulnerable 2 [low advisory]')]),
             RunNote::baselineTargetDiffers('8.3', 'option', '8.4', 'runtime'),
             RunNote::baselineFixModelDiffers(2, 1),
-            RunNote::ignoreDoesNotCoverAdvisories([['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['PKSA-1']]]),
+            RunNote::ignoreDoesNotCoverAdvisories([new UncoveredAdvisories('symfony/yaml', 'symfony/*', ['PKSA-1'])]),
             RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),
             RunNote::abandonedNotAuditedByComposer('policy.abandoned.audit', 'ignore'),
             RunNote::abandonedIgnoreUnreadable(''),

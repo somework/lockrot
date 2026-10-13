@@ -6,9 +6,11 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Composer\Downloader\TransportException;
 use Lockrot\Analyzer\RunNote;
+use Lockrot\Analyzer\UncoveredAdvisories;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -241,7 +243,7 @@ final class RunNoteTest extends TestCase
             ['baseline_fix_model' => 2, 'run_fix_model' => 1],
         ];
         yield 'an ignore[] entry beside counted advisories' => [
-            static fn (): RunNote => RunNote::ignoreDoesNotCoverAdvisories([['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['A1', 'A2', 'A3']]]),
+            static fn (): RunNote => RunNote::ignoreDoesNotCoverAdvisories([new UncoveredAdvisories('symfony/yaml', 'symfony/*', ['A1', 'A2', 'A3'])]),
             'ignore_does_not_cover_advisories',
             "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision",
             false,
@@ -298,7 +300,7 @@ final class RunNoteTest extends TestCase
         self::assertSame($text, $note->text());
         self::assertSame('https://lockrot.dev/notes/#'.$code, $note->docsUrl());
         self::assertSame($setsNetworkFailures, $note->setsNetworkFailures());
-        self::assertSame($data, $note->data());
+        self::assertSame($data, JsonPath::decoded($note->data()));
         self::assertContains($code, RunNote::CODES);
 
         $row = $note->toArray();

@@ -155,19 +155,13 @@ final class Report
         }
         $changed = [];
         foreach ($this->findings as $finding) {
-            if (Priority013::rank($finding->priority()) < Priority013::rank($grade) || $finding->score()->total() >= ScoreModel::floorOf($grade)) {
+            // 0.13 read every matched `ignore[]` entry as accepting the whole package: priority none.
+            if ($finding->details()->entry() !== null || Priority013::rank($finding->priority()) < Priority013::rank($grade) || $finding->score()->total() >= ScoreModel::floorOf($grade)) {
                 continue;
             }
-            $changed[] = [
-                'package' => $finding->package(),
-                'version' => $finding->version(),
-                'legacy' => ['verdict' => $finding->verdict(), 'priority' => $finding->priority(), 'basis' => $finding->priorityBasis()],
-                'verdict' => $finding->grade(),
-                'score_total' => $finding->score()->total(),
-                'score_text' => ScoreText::render($finding->scoreBasis()),
-            ];
+            $changed[] = new ChangedVerdict($finding->package(), $finding->version(), $finding->verdict(), $finding->priorityBasis(), $finding->grade(), $finding->score()->total(), ScoreText::render($finding->scoreBasis()));
         }
-        usort($changed, static fn (array $a, array $b): int => [$a['package'], $a['version']] <=> [$b['package'], $b['version']]);
+        usort($changed, static fn (ChangedVerdict $a, ChangedVerdict $b): int => [$a->package(), $a->version()] <=> [$b->package(), $b->version()]);
 
         return $changed === [] ? null : RunNote::verdictRulesChanged($grade, $changed);
     }

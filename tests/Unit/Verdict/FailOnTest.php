@@ -29,6 +29,7 @@ final class FailOnTest extends TestCase
         yield 'upper case, padded' => ['  Critical ', 'critical', 'grade', 'critical'];
     }
 
+    /** @dataProvider oneValue */
     #[DataProvider('oneValue')]
     public function testEachValueHasItsKindAndThreshold(string $input, string $value, string $kind, ?string $threshold): void
     {
@@ -48,7 +49,11 @@ final class FailOnTest extends TestCase
         yield 'none' => ['none', 'none'];
     }
 
-    /** @param string|list<string> $input */
+    /**
+     * @param string|list<string> $input
+     *
+     * @dataProvider lists
+     */
     #[DataProvider('lists')]
     public function testTheCanonicalFormIsTheValuesInKindOrderJoinedByCommas($input, string $canonical): void
     {
@@ -87,7 +92,11 @@ final class FailOnTest extends TestCase
         yield 'an array with an unknown value' => [['high', 'dead'], 'unknown value "dead"'];
     }
 
-    /** @param string|list<string> $input */
+    /**
+     * @param string|list<string> $input
+     *
+     * @dataProvider rejected
+     */
     #[DataProvider('rejected')]
     public function testAnInvalidListIsRejectedWithItsReason($input, string $message): void
     {

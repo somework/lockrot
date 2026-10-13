@@ -26,7 +26,7 @@ use Lockrot\Verdict\SecurityStanding;
  *
  * @internal
  *
- * @phpstan-type Shape array{fails: bool, tripped_by: list<string>, fail_on_applied: bool, reaching: int, failing: int, exempt: array{baseline: int}, failing_by: list<array{value: string, failing: int}>, not_applied: list<GateNotApplied>, text: string}
+ * @phpstan-type Shape array{fails: bool, tripped_by: list<string>, fail_on_applied: bool, reaching: int, failing: int, exempt: array{baseline: int}, failing_by: list<GateValueFailing>, not_applied: list<GateNotApplied>, text: string}
  */
 final class Gate
 {
@@ -245,12 +245,12 @@ final class Gate
         return \count(array_filter($this->standings, static fn (GateStanding $standing): bool => $standing->exemptBy() === self::EXEMPT_BASELINE));
     }
 
-    /** @return array<string, int> each `run.gates[]` value with the findings that fail it, in its order, zeros included */
+    /** @return list<GateValueFailing> each `run.gates[]` value with the findings that fail it, in its order, zeros included */
     public function failingBy(): array
     {
         $out = [];
         foreach ($this->failOn->values() as $value) {
-            $out[$value->value()] = \count(array_filter($this->standings, static fn (GateStanding $standing): bool => $standing->failsValue($value->value())));
+            $out[] = new GateValueFailing($value->value(), \count(array_filter($this->standings, static fn (GateStanding $standing): bool => $standing->failsValue($value->value()))));
         }
 
         return $out;
@@ -269,11 +269,6 @@ final class Gate
      */
     public function toArray(RunSettings $run): array
     {
-        $failingBy = [];
-        foreach ($this->failingBy() as $value => $failing) {
-            $failingBy[] = ['value' => (string) $value, 'failing' => $failing];
-        }
-
         return [
             'fails' => $this->fails(),
             'tripped_by' => $this->trippedBy,
@@ -281,7 +276,7 @@ final class Gate
             'reaching' => $this->reaching(),
             'failing' => $this->failing(),
             'exempt' => ['baseline' => $this->exemptByBaseline()],
-            'failing_by' => $failingBy,
+            'failing_by' => $this->failingBy(),
             'not_applied' => $this->notApplied,
             'text' => RunGateText::render($this, $run),
         ];

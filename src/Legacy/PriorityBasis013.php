@@ -50,6 +50,12 @@ final class PriorityBasis013 implements \JsonSerializable
         return $this->steps;
     }
 
+    /** @return list<string> the reason of each step, in the order the steps apply */
+    public function reasons(): array
+    {
+        return array_column($this->steps, 'reason');
+    }
+
     public function priority(): string
     {
         return $this->steps === [] ? $this->base : $this->steps[\count($this->steps) - 1]['to'];

@@ -28,7 +28,11 @@ final class BaselineFileTest extends TestCase
         yield 'a later release' => ['0.15.2', 'lockrot 0.15 reads baseline-2 only. Review the findings, then run --generate-baseline.'];
     }
 
-    /** SPEC §6.4 (Q2): a baseline-1 file exits 2 before schema validation. */
+    /**
+     * SPEC §6.4 (Q2): a baseline-1 file exits 2 before schema validation.
+     *
+     * @dataProvider releases
+     */
     #[DataProvider('releases')]
     public function testABaseline1FileIsRefusedWithTheRunningReleaseInTheMessage(string $release, string $message): void
     {
@@ -51,6 +55,7 @@ final class BaselineFileTest extends TestCase
         yield 'not JSON' => ['{', null];
     }
 
+    /** @dataProvider numbers */
     #[DataProvider('numbers')]
     public function testTheSchemaNumberIsReadAlone(string $json, ?int $number): void
     {

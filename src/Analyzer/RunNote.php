@@ -9,7 +9,6 @@ use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\RepositoryUrl;
-use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Signal\Rule\NotCheckedRule;
 
 /**
@@ -420,7 +419,7 @@ final class RunNote
      * The findings that reached a grade value under the rules of 0.13 and no longer do. The sentence
      * quotes each `score_text` from the note's own data.
      *
-     * @param list<array{package: string, version: string, legacy: array{verdict: string, priority: string, basis: PriorityBasis013}, verdict: string, score_total: int, score_text: string}> $findings by package, then version
+     * @param list<ChangedVerdict> $findings by package, then version
      */
     public static function verdictRulesChanged(string $failOn, array $findings): self
     {
@@ -429,11 +428,11 @@ final class RunNote
         }
         $count = \count($findings);
         $text = \sprintf("%d %s --fail-on=%s under 0.13's rules and no longer %s: ", $count, $count === 1 ? 'finding reached' : 'findings reached', $failOn, $count === 1 ? 'does' : 'do')
-            .implode(', ', array_map(static fn (array $f): string => \sprintf('%s %s (%s)', $f['package'], $f['version'], $f['score_text']), $findings)).'.';
+            .implode(', ', array_map(static fn (ChangedVerdict $f): string => \sprintf('%s %s (%s)', $f->package(), $f->version(), $f->scoreText()), $findings)).'.';
         $reasons = [];
         foreach ($findings as $finding) {
-            foreach ($finding['legacy']['basis']->steps() as $step) {
-                $reasons[$step['reason']] = self::LEGACY_STEP_WORDS[$step['reason']] ?? str_replace('_', ' ', $step['reason']);
+            foreach ($finding->legacyBasis()->reasons() as $reason) {
+                $reasons[$reason] = self::LEGACY_STEP_WORDS[$reason] ?? str_replace('_', ' ', $reason);
             }
         }
         foreach ($reasons as $words) {
@@ -466,9 +465,10 @@ final class RunNote
     }
 
     /**
-     * An `ignore[]` entry no longer hides the advisories of its package.
+     * Project `ignore[]` entries that match packages with counted advisories: an entry accepts
+     * maintenance flags only.
      *
-     * @param list<array{package: string, pattern: string, advisories: list<string>}> $entries in report order
+     * @param list<UncoveredAdvisories> $entries in report order
      */
     public static function ignoreDoesNotCoverAdvisories(array $entries): self
     {
@@ -477,8 +477,8 @@ final class RunNote
         }
         $items = [];
         foreach ($entries as $entry) {
-            $count = \count($entry['advisories']);
-            $items[] = $entry['package'].($entry['pattern'] !== $entry['package'] ? ' (ignore[] '.$entry['pattern'].')' : '').\sprintf(': %d counted %s', $count, $count === 1 ? 'advisory' : 'advisories');
+            $count = \count($entry->advisories());
+            $items[] = $entry->package().($entry->pattern() !== $entry->package() ? ' (ignore[] '.$entry->pattern().')' : '').\sprintf(': %d counted %s', $count, $count === 1 ? 'advisory' : 'advisories');
         }
 
         return self::of(self::IGNORE_DOES_NOT_COVER_ADVISORIES, "extra.lockrot.ignore[] no longer hides advisories: ".implode('; ', $items)."; accept them in Composer's audit policy if that is the decision", false, ['entries' => $entries]);

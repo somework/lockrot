@@ -46,8 +46,8 @@ final class GateTest extends TestCase
     {
         $report = self::report(self::finding('a/stale', Verdict::STALE), self::finding('a/pinned', Verdict::PINNED));
 
-        self::assertSame(['left-behind' => 1], self::gate($report, 'left-behind')->failingBy());
-        self::assertSame(['stale' => 2], self::gate($report, 'stale')->failingBy());
+        self::assertSame([['value' => 'left-behind', 'failing' => 1]], JsonPath::decoded(self::gate($report, 'left-behind')->failingBy()));
+        self::assertSame([['value' => 'stale', 'failing' => 2]], JsonPath::decoded(self::gate($report, 'stale')->failingBy()));
     }
 
     public function testAKnownFindingReachesAndIsExempt(): void
@@ -74,8 +74,8 @@ final class GateTest extends TestCase
     {
         $gate = self::gate(self::report(self::finding('a/gone', Verdict::ABANDONED)), 'high,unchecked');
 
-        self::assertSame(['high' => 1, 'unchecked' => 0], $gate->failingBy());
-        self::assertSame([['value' => 'high', 'failing' => 1], ['value' => 'unchecked', 'failing' => 0]], JsonPath::arrayAt($gate->toArray(self::runSettings('high,unchecked')), ['failing_by']));
+        self::assertSame([['value' => 'high', 'failing' => 1], ['value' => 'unchecked', 'failing' => 0]], JsonPath::decoded($gate->failingBy()));
+        self::assertSame([['value' => 'high', 'failing' => 1], ['value' => 'unchecked', 'failing' => 0]], JsonPath::arrayAt(JsonPath::decoded($gate->toArray(self::runSettings('high,unchecked'))), ['failing_by']));
         self::assertSame([], JsonPath::arrayAt(self::gate(self::report(), 'none')->toArray(self::runSettings('none')), ['failing_by']));
     }
 
@@ -91,7 +91,7 @@ final class GateTest extends TestCase
         $gate = Gate::decide(self::report(self::finding('a/gone', Verdict::ABANDONED)), FailOn::parse('high'), false, Gate::MODE_GENERATE_BASELINE);
         $standing = $gate->standings()[0];
 
-        self::assertSame([false, false, 1, 0, [], ['high' => 0]], [$gate->fails(), $gate->failOnApplied(), $gate->reaching(), $gate->failing(), $standing->by(), $gate->failingBy()]);
+        self::assertSame([false, false, 1, 0, [], [['value' => 'high', 'failing' => 0]]], [$gate->fails(), $gate->failOnApplied(), $gate->reaching(), $gate->failing(), $standing->by(), JsonPath::decoded($gate->failingBy())]);
     }
 
     public function testAFindingThatCarriesS10FailsUnchecked(): void
