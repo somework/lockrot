@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Allowlist\AllowlistEntry;
+use Lockrot\Analyzer\FlagTotals;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\Report2Root;
+use Lockrot\Analyzer\SecurityTotals;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\IgnoredAdvisory;
@@ -26,6 +28,26 @@ use PHPUnit\Framework\TestCase;
 /** The root blocks that report-2 counts from its findings. */
 final class Report2RootTest extends TestCase
 {
+    /**
+     * @param list<Finding> $findings
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function security(array $findings): array
+    {
+        return JsonPath::decoded(SecurityTotals::of($findings));
+    }
+
+    /**
+     * @param list<Finding> $findings
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function flags(array $findings): array
+    {
+        return JsonPath::decoded(FlagTotals::of($findings));
+    }
+
     public function testSecuritySumsTheVulnerableFindingsOnly(): void
     {
         $findings = [
@@ -35,7 +57,7 @@ final class Report2RootTest extends TestCase
             self::withDetails((new FindingBuilder())->withPackage('acme/d')->build(), 'complete', 1),
         ];
 
-        $security = Report2Root::toSecurityArray($findings);
+        $security = self::security($findings);
 
         self::assertSame('complete', $security['check']);
         self::assertSame(['vulnerable' => 3, 'unchecked' => 0, 'ignored' => 2, 'clear' => 1], $security['packages']);
@@ -51,17 +73,17 @@ final class Report2RootTest extends TestCase
     {
         $finding = fn (string $check): Finding => self::withDetails((new FindingBuilder())->build(), $check, 0);
 
-        self::assertSame('partial', Report2Root::toSecurityArray([$finding('complete'), $finding('not_run')])['check']);
-        self::assertSame('not_run', Report2Root::toSecurityArray([$finding('not_run')])['check']);
-        self::assertSame(['vulnerable' => 0, 'unchecked' => 1, 'ignored' => 0, 'clear' => 0], Report2Root::toSecurityArray([$finding('not_run')])['packages']);
-        self::assertSame('complete', Report2Root::toSecurityArray([])['check']);
-        self::assertNull(Report2Root::toSecurityArray([])['update_now_command']);
+        self::assertSame('partial', self::security([$finding('complete'), $finding('not_run')])['check']);
+        self::assertSame('not_run', self::security([$finding('not_run')])['check']);
+        self::assertSame(['vulnerable' => 0, 'unchecked' => 1, 'ignored' => 0, 'clear' => 0], self::security([$finding('not_run')])['packages']);
+        self::assertSame('complete', self::security([])['check']);
+        self::assertNull(self::security([])['update_now_command']);
     }
 
     /** A severity outside the display order counts from zero after the listed ones. */
     public function testSecurityCountsASeverityItDoesNotListFromZero(): void
     {
-        $security = Report2Root::toSecurityArray([self::vulnerable('acme/a', [['acme:severe', 'upgrade'], ['acme:severe', 'upgrade']])]);
+        $security = self::security([self::vulnerable('acme/a', [['acme:severe', 'upgrade'], ['acme:severe', 'upgrade']])]);
 
         self::assertSame(['critical' => 0, 'high' => 0, 'medium' => 0, 'unrated' => 0, 'low' => 0, 'acme:severe' => 2], $security['severities']);
         self::assertSame(2, JsonPath::intAt($security, ['advisories', 'counted']));
@@ -81,12 +103,12 @@ final class Report2RootTest extends TestCase
             $finding(FlagSet::fromSignals([$s('S2', 'warn')], $entry('stale'), [])),
         ];
 
-        $flags = Report2Root::toFlagsArray($findings);
+        $flags = self::flags($findings);
 
         self::assertSame(['carrying' => 1, 'leading' => 1, 'accepted' => ['all' => 0, 'in_graded' => 0], 'by_verdict' => ['critical' => 1, 'high' => 0, 'medium' => 0, 'low' => 0]], $flags['silent']);
         self::assertSame(['carrying' => 2, 'leading' => 2, 'accepted' => ['all' => 0, 'in_graded' => 0], 'by_verdict' => ['critical' => 1, 'high' => 1, 'medium' => 0, 'low' => 0]], $flags['old-promise']);
         self::assertSame(['carrying' => 0, 'leading' => 0, 'accepted' => ['all' => 1, 'in_graded' => 1], 'by_verdict' => ['critical' => 0, 'high' => 0, 'medium' => 0, 'low' => 0]], $flags['pinned']);
-        self::assertSame(['all' => 2, 'in_graded' => 1], $flags['stale']['accepted']);
+        self::assertSame(['all' => 2, 'in_graded' => 1], JsonPath::arrayAt($flags, ['stale', 'accepted']));
         self::assertSame(['carrying' => 1, 'leading' => null, 'accepted' => null, 'by_verdict' => ['critical' => 1, 'high' => 0, 'medium' => 0, 'low' => 0]], $flags['vulnerable']);
         self::assertSame(['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'vulnerable'], array_keys($flags));
     }

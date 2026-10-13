@@ -25,7 +25,6 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\RootRecount;
 use Lockrot\Verdict\FailOn;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -93,7 +92,6 @@ final class AppRootRecountTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load(), $project->requirePhp()),
-            new VerdictEngine(),
             $clock,
             false
         );

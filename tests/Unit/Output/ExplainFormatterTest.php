@@ -4,171 +4,243 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
-use Composer\Package\Loader\ArrayLoader;
-use Lockrot\Analyzer\Libyears;
+use Lockrot\Allowlist\AcceptedCheck;
+use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryFeed;
+use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
+use Lockrot\Data\Forge\ActivityLookup;
+use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
-use Lockrot\Lock\LockedPackage;
+use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\ExplainFormatter;
+use Lockrot\Output\FindingBlock;
+use Lockrot\Signal\AgeMeasure;
+use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\Data\Check;
-use Lockrot\Signal\Data\LeftBehindData;
-use Lockrot\Signal\Data\NotCheckedData;
-use Lockrot\Signal\Data\ReachableBranch;
-use Lockrot\Signal\Rule\AbandonedRule;
-use Lockrot\Signal\Rule\AdvisoryRule;
-use Lockrot\Signal\Rule\PinnedRule;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
-use Lockrot\Tests\Support\Origins;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
+use Lockrot\Verdict\Age;
+use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 
+/** `--explain` as text and as explain-2 JSON. */
 final class ExplainFormatterTest extends TestCase
 {
-    /** The text as a terminal without colour shows it: tags applied, escapes resolved. */
-    private function plain(Explanation $explanation): string
+    private static function plain(Explanation $explanation): string
     {
-        $plain = (new OutputFormatter(false))->format((new ExplainFormatter())->text($explanation));
-        self::assertIsString($plain);
-
-        return $plain;
+        return ConsoleMarkup::render((new ExplainFormatter())->text($explanation), false);
     }
 
     /** @param list<string> $notes */
-    private function report(array $notes = []): Report
+    private static function report(array $notes = []): Report
     {
         return new Report([], Notes::texts($notes), new \DateTimeImmutable(F::NOW), 3, 0);
     }
 
-    /**
-     * The whole text of a flagged, transitive, abandoned-with-replacement package with an archived
-     * repository read from the cache: every block, every separator, the raw data in every shape a
-     * signal can carry (scalars, null, a nested array, the advisory list).
-     */
-    public function testAFlaggedPackageReadsVerdictSignalsDataAndBranches(): void
+    private static function explain(Finding $finding): Explanation
     {
-        $s8 = new Signal(Signal::LEVEL_WARN, 'branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)', new LeftBehindData('1.x', '2021-06-01T00:00:00+00:00', '1.5.0', 5.3, null, '2.x', '2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1', 0.7, true, null, null, new ReachableBranch('2.x', '2.1.0', '2026-01-01T00:00:00+00:00', 0.7, '>=8.1', ['project' => true, 'target' => true], null)));
-        $s9 = new Signal(Signal::LEVEL_WARN, '2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)', SignalDataStub::of(Signal::S9, []));
-        $s10 = new Signal(Signal::LEVEL_INFO, 'repository activity not checked (no token for the repository host), so S3 and S4 could not be read', new NotCheckedData([new Check('repository_activity', 'no_token', [Signal::S3, Signal::S4])]));
-        $legacy = SignalDataStub::legacy([
-            ['id' => 'PKSA-1', 'cve' => 'CVE-2026-1', 'severity' => 'high', 'fixed_by' => '2.1.0', 'fixed_on_branch' => false, 'reported_at' => '2026-03-01T00:00:00+00:00', 'link' => 'https://example.test/a'],
-            ['id' => 'PKSA-2', 'cve' => '', 'severity' => null, 'fixed_by' => null, 'fixed_on_branch' => false],
-        ]);
-        $finding = (new FindingBuilder())->withVersion('1.5.0')->withVerdict(Verdict::LEFT_BEHIND)->withSignals([$s8, $s9, $s10])->withChain(['root/app', 'vendor/mid', 'vendor/pkg'])->withDataDate(new \DateTimeImmutable(F::NOW))->withDirectDependents(['root/app', 'root/other'])->withLibyears(LibyearsMeasurement::of(4.58))->withAdvisoryFacts013($legacy)->build();
-        // Branches listed out of order: the table sorts them.
-        $metadata = F::metadata([['1.5.0', '2021-06-01T00:00:00+00:00', '>=7.1 <8.0'], ['1.4.9', '2021-01-01T00:00:00+00:00'], ['2.1.0', '2026-01-01T00:00:00+00:00', '>=8.1']], true, 'vendor/next');
-        $package = F::package(['version' => '1.5.0', 'php' => '>=7.1 <8.0', 'time' => '2021-06-01T00:00:00+00:00']);
-        $activity = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', 'vendor/pkg'), true, null, new \DateTimeImmutable(F::NOW), new \DateTimeImmutable('2026-09-13T00:00:00+00:00'));
-        $explanation = new Explanation($finding, F::facts($package, $metadata, $activity), new Thresholds(), '8.4', $this->report(['GitHub token not set']));
-
-        $expected = <<<'TEXT'
-            vendor/pkg 1.5.0 — left-behind, priority high
-              via root/app > vendor/mid > vendor/pkg; also reached from root/other
-              libyears 4.6 behind the newest stable release
-
-            signals
-              S8 warn branch 1.x last released 2021-06-01 (5.3 years ago); 2.x released 2.1.0 (2026-01-01)
-                       branch 1.x · branch_last_release 2021-06-01T00:00:00+00:00 · branch_last_version 1.5.0 · years 5.3 · newest_branch 2.x · newest_version 2.1.0 · newest_release 2026-01-01T00:00:00+00:00 · newest_php >=8.1 · newest_within_reach true · floor_php null · floor_source null · reachable_branch 2.x · reachable_version 2.1.0 · reachable_release 2026-01-01T00:00:00+00:00 · suggested_constraint null · dated_by null
-              S9 warn 2 security advisories affect 1.5.0 (CVE-2026-1, PKSA-2)
-                       CVE-2026-1 (PKSA-1) high · fixed by 2.1.0, not on the installed branch · reported 2026-03-01 · https://example.test/a
-                       PKSA-2 · no listed release fixes it
-              S10 info repository activity not checked (no token for the repository host), so S3 and S4 could not be read
-                       unchecked [{"check":"repository_activity","reason":"no_token","blocks":["S3","S4"]}]
-                       blocks ["S3","S4"]
-
-            composer.lock
-              version 1.5.0 · php >=7.1 <8.0 · released 2021-06-01 · from a Composer repository
-              source https://github.com/vendor/pkg.git
-
-            repository metadata (as of 2026-09-14)
-              3 versions listed · library · abandoned, replacement vendor/next
-              source https://github.com/vendor/pkg.git
-              last stable release 2.1.0 (2026-01-01)
-                branch     highest tag        released           newest dated release     php
-                2.x        2.1.0              2026-01-01         2.1.0 (2026-01-01)       >=8.1
-              * 1.x        1.5.0              2021-06-01         1.5.0 (2021-06-01)       >=7.1 <8.0
-
-            repository activity
-              GitHub vendor/pkg · archived · last push unknown · fetched 2026-09-14 (from lockrot's cache)
-
-            thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
-            note: GitHub token not set
-
-            TEXT;
-        self::assertSame($expected, $this->plain($explanation));
-        $raw = (new ExplainFormatter())->text($explanation);
-        self::assertStringStartsWith("<options=bold>vendor/pkg 1.5.0</> — <fg=yellow>left-behind</fg=yellow>, priority high\n", $raw, 'a flagged verdict is coloured');
-        self::assertStringContainsString('php \>=7.1 \<8.0', $raw, 'escaped for the console formatter, which the plain rendering resolves');
+        return new Explanation($finding, F::facts(F::package(['version' => $finding->version()]), F::metadata([[$finding->version(), '2020-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', self::report(['run note']));
     }
 
-    /**
-     * S9 as {@see AdvisoryRule} writes it carries `releases_read` for the JSON and the no-fix list.
-     * The text prints the advisories the same, read or not.
-     */
-    public function testTheAdvisoryBlockLeavesReleasesReadToTheJson(): void
+    public function testTheMonologBridgeCaseReadsEveryBlockInOrder(): void
     {
-        $advisory = new Advisory('PKSA-1', 'CVE-2024-0001', 'Title of PKSA-1', 'https://example.test/PKSA-1', 'high', new \DateTimeImmutable('2024-03-01T12:00:00+00:00'));
-        $package = F::package(['version' => '1.0.0']);
-        $metadata = F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']]);
-        $expected = <<<'TEXT'
-              S9 warn 1 security advisory affects 1.0.0 (CVE-2024-0001)
-                       CVE-2024-0001 (PKSA-1) high · no listed release fixes it · reported 2024-03-01 · https://example.test/PKSA-1
-
-            TEXT;
-
-        foreach (['read' => [$metadata, true], 'not read' => [null, false]] as $case => [$meta, $read]) {
-            $facts = F::facts($package, $meta, null, [$advisory]);
-            $s9 = (new AdvisoryRule())->evaluate($facts);
-            self::assertNotNull($s9);
-            self::assertSame($read, JsonPath::decoded($s9->data())['releases_read'], $case);
-            $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([new Signal(Signal::LEVEL_HIGH, 'marked abandoned by its repository', SignalDataStub::of(Signal::S1, [])), $s9])->withDataDate(new \DateTimeImmutable(F::NOW))->withAdvisoryFacts013(AdvisoryRule::legacy($facts)[1])->build();
-
-            $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
-
-            self::assertStringContainsString("\n".$expected."\n", $text, $case);
-            self::assertStringNotContainsString('releases_read', $text, $case);
+        $text = self::plain(self::caseExplanation('B'));
+        $blocks = [];
+        foreach (explode("\n", $text) as $line) {
+            if (preg_match('/^(age|repository metadata|repository|score|do|flags)(\s|$)/', $line, $m) === 1) {
+                $blocks[] = $m[1];
+            }
         }
 
+        self::assertStringStartsWith("symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable\n  direct requirement (composer.json require)\n\nage       installed  v2.6.13   2016-01-14   10.7 years ago\n", $text);
+        self::assertSame(['age', 'repository', 'score', 'do', 'flags', 'repository metadata'], $blocks);
+        self::assertStringContainsString("\nscore     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]     critical from 32\n  maintenance  left-behind 16 (lead) · old-promise 4 (¼ of 16)\n  security     vulnerable 16 (high advisory CVE-2026-45077)\n  reach        direct requirement: maintenance not halved for reach\n  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)\n", $text);
+        self::assertStringContainsString("\n          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5\n", $text);
+        self::assertStringContainsString("\n  feeds        packagist.org: 1 on record, 1 affects v2.6.13\n  accepted     none\n  not checked  nothing\n", $text);
+        self::assertStringContainsString("\n     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it\n", $text);
+        self::assertStringContainsString("\n   * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1\n", $text);
+        self::assertStringContainsString("\n               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52\n", $text);
+    }
+
+    public function testATransitivePackageReadsItsChainAndItsHops(): void
+    {
+        $text = self::plain(self::caseExplanation('F'));
+
+        self::assertStringContainsString("\n  via guzzlehttp/guzzle > symfony/polyfill-intl-idn: 1 hop from the nearest composer.json line; no line of composer.json names it\n", $text);
+        self::assertStringContainsString("\n          last push            not read (allowlisted)\n          libyears not measured: ", $text);
+        self::assertStringContainsString("\n  reach        via guzzlehttp/guzzle: maintenance would be halved (none counts); security is never halved for reach\n", $text);
     }
 
     /**
-     * The package, its version, the note and the run's notes are the lock's and the repository's
-     * text. Rendered by {@see ConsoleMarkup}, which is what `--explain` writes, they print as
-     * written, and the only styles are lockrot's: the bold name, closed where lockrot closed it even
-     * when the version ends in a backslash, and the yellow verdict.
+     * @param list<string>                         $chain
+     * @param list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV> $namedIn
+     *
+     * @dataProvider reaches
+     */
+    #[DataProvider('reaches')]
+    public function testTheReachLineSaysWhereComposerJsonNamesThePackage(array $chain, array $namedIn, bool $read, bool $dev, string $expected): void
+    {
+        $finding = (new FindingBuilder())->withPackage('a/leaf')->withChain($chain)->withNamedIn($namedIn)->withComposerJsonRead($read)->build();
+
+        self::assertSame($expected, ExplainFormatter::reachLine($finding, $dev));
+    }
+
+    /** @return iterable<string, array{list<string>, list<ProjectConfig::REQUIRE|ProjectConfig::REQUIRE_DEV>, bool, bool, string}> */
+    public static function reaches(): iterable
+    {
+        yield 'direct' => [['a/leaf'], [ProjectConfig::REQUIRE], true, false, 'direct requirement (composer.json require)'];
+        yield 'direct in require-dev' => [['a/leaf'], [ProjectConfig::REQUIRE_DEV], true, true, 'direct requirement (composer.json require-dev)'];
+        yield 'named by no line' => [['a/root', 'a/mid', 'a/leaf'], [], true, false, 'via a/root > a/mid > a/leaf: 2 hops from the nearest composer.json line; no line of composer.json names it'];
+        yield 'named in require-dev only' => [['a/root', 'a/leaf'], [ProjectConfig::REQUIRE_DEV], true, false, 'via a/root > a/leaf: 1 hop; composer.json names it in require-dev, which this run did not walk (pass --dev)'];
+        yield 'unreached' => [[], [], true, false, 'unreached: lockrot found no path from your require (require-dev counts only with --dev) to it'];
+        yield 'unreached with --dev' => [[], [], true, true, 'unreached: lockrot found no path from your require or require-dev to it'];
+        yield 'lock-only' => [[], [], false, false, 'depth not measured: the run read no composer.json'];
+    }
+
+    /** @dataProvider repositories */
+    #[DataProvider('repositories')]
+    public function testTheRepositoryLineReadsTheActivityLookup(ActivityLookup $lookup, AgeReading $push, string $expected): void
+    {
+        self::assertSame($expected, ExplainFormatter::repositoryLine(self::withAge((new FindingBuilder())->build(), $lookup, $push)));
+    }
+
+    /** @return iterable<string, array{ActivityLookup, AgeReading}> */
+    public static function repositories(): iterable
+    {
+        $ref = new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'hoaproject/Consistency');
+        $pushed = AgeReading::measured(new \DateTimeImmutable('2021-04-28T10:00:00+00:00'), 54, 5.4, null, null, 'high', AgeReading::PUSH);
+        $none = AgeReading::unmeasuredBecause(AgeMeasure::UNDATED);
+        $read = new RepositoryActivity($ref, null, new \DateTimeImmutable('2021-04-28T10:00:00+00:00'), new \DateTimeImmutable('2026-10-01T10:00:00+00:00'), new \DateTimeImmutable('2026-10-01T09:00:00+00:00'));
+        yield 'read, flag not read, from the cache' => [ActivityLookup::read($read), $pushed, 'GitLab gitlab.com/hoaproject/Consistency: last commit 2021-04-28, archived flag not read (no token) · fetched 2026-10-01 (cached 2026-10-01)'];
+        $archived = new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', 'a/b'), true, null, new \DateTimeImmutable('2026-10-01T10:00:00+00:00'));
+        yield 'read, archived, no push' => [ActivityLookup::read($archived), $none, 'GitHub github.com/a/b: no push reported, archived · fetched 2026-10-01'];
+        yield 'not found' => [ActivityLookup::notFound(new RepoRef(RepoRef::GITHUB, 'github.com', 'hoaproject/Consistency')), $none, 'GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed)'];
+        yield 'host not supported' => [ActivityLookup::notRead(ActivityLookup::HOST_NOT_SUPPORTED, LocatedRepository::unsupported('codeberg.org', null)), $none, 'lockrot cannot ask codeberg.org about repository activity'];
+        yield 'not asked, with a repository' => [ActivityLookup::notRead(ActivityLookup::ALLOWLISTED, LocatedRepository::located(new RepoRef(RepoRef::GITHUB, 'github.com', 'symfony/polyfill-intl-idn'))), $none, 'github.com/symfony/polyfill-intl-idn: not asked (allowlisted)'];
+        yield 'not asked, no repository' => [ActivityLookup::notRead(ActivityLookup::NO_REPOSITORY, LocatedRepository::none(null)), $none, 'repository activity not asked (no repository found)'];
+    }
+
+    public function testTheAgeBlockNamesEachThresholdAndTheLibyearsLine(): void
+    {
+        $finding = (new FindingBuilder())->withVersion('v1.2.0')->withLibyears(LibyearsMeasurement::of(2.74))->build();
+        $warn = AgeReading::measured(new \DateTimeImmutable('2022-01-01T00:00:00+00:00'), 37, 3.7, 'v1.9.0', 'a/mono', 'warn', AgeReading::RELEASE);
+        $finding = self::withAge($finding, ActivityLookup::read(new RepositoryActivity(new RepoRef(RepoRef::GITHUB, 'github.com', 'a/b'), false, null, new \DateTimeImmutable(F::NOW))), AgeReading::unmeasuredBecause('no_token'), AgeReading::unmeasuredBecause(AgeMeasure::SHARED_COMMIT), $warn, AgeReading::unmeasuredBecause(AgeMeasure::NO_STABLE_RELEASE));
+        $text = self::plain(self::explain($finding));
+
+        self::assertStringContainsString("\nage       installed  v1.2.0    not read (dated only by a commit its tags share)\n          1.x        v1.9.0    2022-01-01   3.7 years ago                 past release-warn-years 3; dated by a/mono\n          newest               not read (no stable release)\n          last push            not read (no token)\n          libyears 2.7 behind the newest stable release\n", $text);
+    }
+
+    public function testTheAgeBlockNamesTheHostsEventABelowAndAHighThresholdAndAnUnmeasuredLibyears(): void
+    {
+        $finding = (new FindingBuilder())->withVersion('v1.2.0')->withLibyears(null)->build();
+        $high = AgeReading::measured(new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), 67, 6.7, 'v1.9.0', null, 'high', AgeReading::RELEASE);
+        $fresh = AgeReading::measured(new \DateTimeImmutable('2026-09-01T00:00:00+00:00'), 1, 0.1, null, null, null, AgeReading::PUSH);
+        $finding = self::withAge($finding, ActivityLookup::read(new RepositoryActivity(new RepoRef(RepoRef::GITLAB, 'gitlab.com', 'a/b'), false, null, new \DateTimeImmutable(F::NOW))), $fresh, null, $high);
+        $text = self::plain(self::explain($finding));
+
+        self::assertStringContainsString("\n          1.x        v1.9.0    2020-01-01   6.7 years ago                 past release-high-years 5\n", $text);
+        self::assertStringContainsString("\n          last commit          2026-09-01   0.1 years ago                 below push-warn-years 3\n", $text);
+        self::assertMatchesRegularExpression('/\n          libyears not measured: [a-z]/', $text);
+    }
+
+    public function testAMissingCheckReadsItsReasonWords(): void
+    {
+        $finding = (new FindingBuilder())->withSignals([new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [['check' => 'repository_activity', 'reason' => 'no_token', 'blocks' => ['S3', 'S4']]]]))])->build();
+
+        self::assertStringContainsString("\n  not checked  S3, S4 (no token)\n", self::plain(self::explain($finding)));
+    }
+
+    /** An accepted check reads its S10 words, then the entry that accepted it. */
+    public function testAnAcceptedCheckNamesTheEntryThatAcceptedIt(): void
+    {
+        $check = new Check('repository_activity', 'host_not_supported', ['S3', 'S4']);
+        $entry = UncheckedAcceptanceEntry::fromConfig(0, ['check' => 'repository_activity', 'host' => 'codeberg.org', 'reason' => 'we watch it by hand', 'expires' => '2027-03-31']);
+        $finding = (new FindingBuilder())->build();
+        $details = FindingDetails::of(F::looked(F::facts(F::package(), F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']]))), null, new PhpFloor('8.4'), [], [], null, $finding->details()->age(), [new AcceptedCheck($check, $entry)]);
+        $finding = $finding->withDetails($details);
+
+        self::assertStringContainsString('  not checked  S3, S4 (host not supported; accepted by your accept-unchecked list (host codeberg.org, until 2027-03-31): we watch it by hand)', self::plain(self::explain($finding)));
+        self::assertSame('checks accepted: S3, S4 (host not supported; accepted by your accept-unchecked list: we watch it by hand)', FindingBlock::checksAccepted($finding));
+    }
+
+    public function testAScoreZeroPackageHasNoMoveAndNoBandFloor(): void
+    {
+        $text = self::plain(self::explain((new FindingBuilder())->build()));
+
+        self::assertStringStartsWith("vendor/pkg 1.0.0 — ok\n", $text);
+        self::assertStringContainsString("\nscore     0\n", $text);
+        self::assertStringContainsString("\ndo        nothing to do: nothing counts\n", $text);
+        self::assertStringEndsWith("\nnote: run note\n", $text);
+    }
+
+    /**
+     * Text from the lock prints as written, and the only styles on the page are lockrot's own.
      *
      * @dataProvider textsThatLookLikeMarkup
      */
     #[DataProvider('textsThatLookLikeMarkup')]
     public function testTextThatLooksLikeMarkupPrintsAsWrittenAndLeavesNoStyleBehind(string $text): void
     {
-        $finding = (new FindingBuilder())->withPackage('vendor/'.$text)->withVersion($text)->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned: '.$text, SignalDataStub::of('S1', []))])->withChain(['vendor/'.$text])->withDataDate(new \DateTimeImmutable(F::NOW))->withNote('lookup: '.$text)->build();
-        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', $this->report(['run: '.$text]));
+        $finding = (new FindingBuilder())->withPackage('vendor/'.$text)->withVersion($text)->withVerdict(Verdict::ABANDONED)->withChain(['vendor/'.$text])->build();
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', self::report(['run: '.$text]));
 
         $markup = (new ExplainFormatter())->text($explanation);
         $plain = ConsoleMarkup::render($markup, false);
         $decorated = ConsoleMarkup::render($markup, true);
 
-        self::assertStringStartsWith('vendor/'.$text.' '.$text." — abandoned, priority critical\n", $plain);
-        self::assertStringContainsString("\n  note: lookup: ".$text."\n", $plain);
-        self::assertStringContainsString("\n  S1 high marked abandoned: ".$text."\n", $plain);
+        self::assertStringStartsWith('vendor/'.$text.' '.$text." — critical: abandoned\n", $plain);
         self::assertStringEndsWith("\nnote: run: ".$text."\n", $plain);
-        self::assertStringStartsWith("\033[1mvendor/".$text.' '.$text."\033[22m — \033[33mabandoned\033[39m, priority critical\n", $decorated);
-        self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[33m", "\033[39m"], '', $decorated), 'nothing but those two styles');
+        self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m"], '', $decorated), 'nothing but lockrot\'s styles');
+    }
+
+    /**
+     * An advisory's CVE and title come from the feed: they print as written in the score and flags
+     * blocks.
+     *
+     * @dataProvider textsThatLookLikeMarkup
+     */
+    #[DataProvider('textsThatLookLikeMarkup')]
+    public function testAnAdvisoryTextThatLooksLikeMarkupPrintsAsWritten(string $text): void
+    {
+        $case = CaseHydrator::case('B');
+        self::assertIsArray($case['inputs']);
+        self::assertIsArray($case['inputs']['advisories']);
+        self::assertIsArray($case['inputs']['advisories'][0]);
+        $case['inputs']['advisories'][0]['cve'] = 'CVE-'.$text;
+        $case['inputs']['advisories'][0]['title'] = 'title '.$text;
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding('symfony/monolog-bridge');
+        $facts = $analysis->facts('symfony/monolog-bridge');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+
+        $markup = (new ExplainFormatter())->text(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()));
+        $plain = ConsoleMarkup::render($markup, false);
+
+        self::assertMatchesRegularExpression('/\n  security     vulnerable \d+ \(high advisory '.preg_quote('CVE-'.$text, '/').'\)\n/', $plain);
+        self::assertStringContainsString('CVE-'.$text.'  title '.$text."\n", $plain);
+        self::assertSame($plain, str_replace(["\033[1m", "\033[22m", "\033[31m", "\033[39m", "\033[33m", "\033[32m", "\033[36m"], '', ConsoleMarkup::render($markup, true)), 'nothing but lockrot\'s styles');
     }
 
     /** @return iterable<string, array{string}> */
@@ -178,386 +250,145 @@ final class ExplainFormatterTest extends TestCase
         yield 'a link tag' => ['<<href=x>>'];
         yield 'an escaped tag' => ['a\\<b'];
         yield 'a trailing backslash' => ['a\\'];
-        yield 'a long run of <b' => [str_repeat('<b', 4000)];
     }
 
-    /**
-     * The question `--explain` exists for: a package the report does not flag, and the rows that
-     * say why S8 stayed quiet. Two of the three branches are dated only by a commit their tags share
-     * (a subtree split, as {@see PackageMetadata::fromPackages()} reads it) and read `commit <date>`.
-     * The third carries no date at all and reads `undated`.
-     */
-    public function testAnUnflaggedSplitPackageSaysWhyItsBranchIsNotMeasured(): void
-    {
-        $finding = (new FindingBuilder())->withVersion('10.48.28')->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::unmeasured(Libyears::UNDATED))->build();
-        $loader = new ArrayLoader();
-        $on = static fn (string $version, ?string $commit, ?string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
-        $metadata = PackageMetadata::fromPackages('vendor/pkg', [
-            $loader->load($on('13.1.0', 'split-13', '2026-04-29T09:35:06+00:00')),
-            $loader->load($on('13.0.1', 'split-13', '2026-04-29T09:35:06+00:00')),
-            $loader->load($on('13.0.0', 'split-13', '2026-04-29T09:35:06+00:00')),
-            $loader->load($on('12.0.0', null, null)),
-            $loader->load($on('10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
-        ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($finding, F::facts(F::package(['version' => '10.48.28']), $metadata), new Thresholds(), '8.4', $this->report());
-
-        $expected = <<<'TEXT'
-            vendor/pkg 10.48.28 — ok, priority none
-              direct requirement
-              libyears not measured: no date
-
-            signals: none
-
-            composer.lock
-              version 10.48.28 · no php constraint · undated · from a Composer repository
-              source https://github.com/vendor/pkg.git
-
-            repository metadata (as of 2026-09-14)
-              7 versions listed · library · not abandoned
-              source https://github.com/vendor/pkg.git
-              last stable release unknown: the highest tag 13.1.0 has no release date, so S2 does not measure the package
-                branch     highest tag        released           newest dated release     php
-                13.x       13.1.0             commit 2026-04-29  13.1.0 (2026-04-29)      —
-                12.x       12.0.0             undated            —                        —
-              * 10.x       10.49.0            commit 2023-06-05  10.49.0 (2023-06-05)     —
-              * the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
-
-            repository activity
-              not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
-
-            thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
-
-            TEXT;
-        self::assertSame($expected, $this->plain($explanation));
-        self::assertStringNotContainsString('<fg=', (new ExplainFormatter())->text($explanation), 'an unflagged verdict is not coloured');
-    }
-
-    public function testAPackageWithoutMetadataShowsTheNoteInsteadOfATable(): void
-    {
-        $finding = (new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->withNote('not from a Composer repository, not checked')->withDev(true)->withLibyears(LibyearsMeasurement::unmeasured(Libyears::NOT_FROM_COMPOSER_REPOSITORY))->withOrigin(Origins::of(false))->build();
-        $sourceless = new LockedPackage('vendor/pkg', '1.0.0', null, null, [], null, 'library', Origins::facts(false), true, false);
-        $explanation = new Explanation($finding, F::facts($sourceless), new Thresholds(), '8.4', $this->report());
-
-        $text = $this->plain($explanation);
-
-        self::assertStringContainsString("  direct requirement · packages-dev\n  note: not from a Composer repository, not checked\n", $text);
-        self::assertStringContainsString("  version 1.0.0 · no php constraint · undated · not from a Composer repository\n", $text);
-        self::assertStringContainsString("repository metadata\n  none — not from a Composer repository, not checked\n", $text);
-        self::assertStringContainsString("  libyears not measured: not from a Composer repository\n", $text);
-        self::assertStringNotContainsString('branch     highest tag', $text);
-        self::assertStringNotContainsString('  source ', $text, 'no source in the lock, no source line');
-
-        $devOnly = new Explanation($finding, F::facts(F::package(['version' => 'dev-main']), F::metadata([['dev-main', null]])), new Thresholds(), '8.4', $this->report());
-        self::assertStringNotContainsString('branch     highest tag', $this->plain($devOnly), 'a package with no release branch has no table, not an empty one');
-        self::assertStringContainsString("\n  no stable release\n", $this->plain($devOnly), 'and its last release is said to be none, not unknown');
-
-        $noNote = new Explanation((new FindingBuilder())->withVerdict(Verdict::UNKNOWN)->build(), F::facts(F::package()), new Thresholds(), '8.4', $this->report());
-        self::assertStringContainsString("repository metadata\n  none — not available\n", $this->plain($noNote));
-    }
-
-    /**
-     * Two lines say `source`: the lock's URL and the repository metadata's. Both come from a place
-     * that routinely carries a token — `https://gitlab-ci-token:$CI_JOB_TOKEN@…` is how GitLab CI
-     * hands a job access to a private Composer source — and `--explain` is printed into tickets and
-     * CI logs. Both lines must redact it.
-     */
-    public function testNeitherSourceLineCarriesACredential(): void
-    {
-        $credentialed = 'https://gitlab-ci-token:glpat-abcdef123456@gitlab.internal.acme.com/team/service.git';
-        $package = new LockedPackage('vendor/pkg', '1.0.0', new \DateTimeImmutable('2020-01-01T00:00:00+00:00'), '>=7.4', [], $credentialed, 'library', Origins::facts(true), false, false);
-        $metadata = new PackageMetadata(
-            'vendor/pkg',
-            false,
-            null,
-            true,
-            new \DateTimeImmutable('2020-01-01T00:00:00+00:00'),
-            '1.0.0',
-            1,
-            $credentialed,
-            'library',
-            new \DateTimeImmutable(F::NOW)
-        );
-        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->build();
-        $explanation = new Explanation($finding, F::facts($package, $metadata), new Thresholds(), '8.4', $this->report());
-
-        $text = $this->plain($explanation);
-
-        self::assertStringNotContainsString('glpat-', $text, 'no token reaches the output');
-        self::assertStringNotContainsString('gitlab-ci-token', $text);
-        self::assertSame(
-            2,
-            substr_count($text, '  source https://gitlab.internal.acme.com/team/service.git'),
-            'both source lines keep the host and lose the userinfo'
-        );
-    }
-
-    /** A source on the machine that wrote the lock is its last segment, and says so: its path carries the account. A remote loses its login. */
-    public function testASourceLineNeverLocatesTheMachine(): void
-    {
-        $at = new \DateTimeImmutable('2020-01-01T00:00:00+00:00');
-        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, '1.0.0', 1, 'igor@git.acme.test:pkg.git', 'library', new \DateTimeImmutable(F::NOW));
-        $package = new LockedPackage('vendor/pkg', '1.0.0', $at, '>=7.4', [], '/Users/igor/client-x/pkg', 'library', Origins::facts(false), false, false);
-        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->build();
-
-        $text = $this->plain(new Explanation($finding, F::facts($package, $metadata), new Thresholds(), '8.4', $this->report()));
-
-        self::assertStringNotContainsString('igor', $text);
-        self::assertStringContainsString('  source .../pkg (a path on the machine lockrot ran on)', $text);
-        self::assertStringContainsString('  source git.acme.test:pkg.git', $text);
-    }
-
-    public function testTheBranchTableIsCappedAndAnAllowlistedPackageSaysSo(): void
+    public function testTheBranchTableIsCapped(): void
     {
         $releases = [];
         for ($i = 20; $i >= 1; --$i) {
             $releases[] = ['0.0.'.$i, '2020-01-01T00:00:00+00:00'];
         }
-        $finding = (new FindingBuilder())->withVersion('0.0.3')->withVerdict(Verdict::FINISHED)->withAllowlistReason('interfaces only')->withDataDate(new \DateTimeImmutable(F::NOW))->build();
-        $explanation = new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata($releases), F::activity(false, '2026-02-01T00:00:00+00:00')), new Thresholds(), '8.4', $this->report());
+        $finding = (new FindingBuilder())->withVersion('0.0.3')->build();
+        $text = self::plain(new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata($releases)), new Thresholds(), '8.4', self::report()));
 
-        $text = $this->plain($explanation);
-
-        self::assertStringContainsString("  allowlisted: interfaces only\n", $text);
-        self::assertStringContainsString("repository activity\n  GitHub vendor/pkg · not archived · last push 2026-02-01 · fetched 2026-09-14\n", $text, 'a dated push, fetched in this run');
-        self::assertSame(Explanation::BRANCH_ROWS, preg_match_all('/^    0\.0\.\d+ /m', $text));
-        self::assertStringContainsString('  … and 5 more', $text);
-
-        $exactly = new Explanation($finding, F::facts(F::package(['version' => '0.0.3']), F::metadata(\array_slice($releases, 0, Explanation::BRANCH_ROWS))), new Thresholds(), '8.4', $this->report());
-        self::assertStringNotContainsString('more', $this->plain($exactly), 'a table that fits is not counted');
-    }
-
-    public function testAReadWithoutTheArchivedFlagSaysTheFlagWasNotRead(): void
-    {
-        $finding = (new FindingBuilder())->withDataDate(new \DateTimeImmutable(F::NOW))->build();
-        $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']]), F::activity(null, '2026-02-01T00:00:00+00:00', RepoRef::GITLAB)), new Thresholds(), '8.4', $this->report());
-
-        self::assertStringContainsString("repository activity\n  GitLab vendor/pkg · archived flag not read · last push 2026-02-01 · fetched 2026-09-14\n", $this->plain($explanation));
+        self::assertSame(Explanation::BRANCH_ROWS, preg_match_all('/^   [ *] 0\.0\.\d+ /m', $text));
+        self::assertStringContainsString("\n     … and 5 more\n", $text);
     }
 
     public function testJsonCarriesTheEnvelopeAndTheExplanation(): void
     {
         $finding = (new FindingBuilder())->withDataDate(new \DateTimeImmutable(F::NOW))->build();
-        $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', $this->report());
+        $explanation = new Explanation($finding, F::facts(F::package(), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']])), new Thresholds(), '8.4', self::report());
 
         $encoded = (new ExplainFormatter())->json($explanation);
         $json = json_decode($encoded, true);
 
         self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-2.json\",\n    \"lockrot\": {\n", $encoded, 'pretty-printed');
         self::assertStringEndsWith("}\n", $encoded);
-        self::assertStringContainsString('"https://github.com/vendor/pkg.git"', $encoded, 'slashes unescaped');
         self::assertIsArray($json);
         self::assertSame(['version' => Version::STRING, 'schema' => 2], $json['lockrot']);
         self::assertSame('vendor/pkg', $json['package']);
         self::assertIsArray($json['finding']);
         self::assertSame('ok', $json['finding']['verdict']);
-        self::assertIsArray($json['metadata']);
-        self::assertIsArray($json['metadata']['branches']);
-        self::assertSame([['branch' => '1.x', 'installed' => true, 'highest' => '1.0.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.0.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 0.7, 'fixes' => null]], $json['metadata']['branches']);
     }
 
-    /** A split package dated by its monorepo: the rows read the parent's dates, and a footnote says whose they are. */
-    public function testASplitPackageDatedByItsMonorepoSaysSo(): void
+    public function testAPackageWithNoRepositoryMetadataSaysWhy(): void
     {
-        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v10.48.28')->withChain(['illuminate/contracts'])->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::of(2.74))->build();
-        $loader = new ArrayLoader();
-        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
-        $child = PackageMetadata::fromPackages('illuminate/contracts', [
-            $loader->load($on('illuminate/contracts', 'v10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('illuminate/contracts', 'v10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('illuminate/contracts', 'v10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('illuminate/contracts', 'v9.52.0', 'split-9', '2023-01-01T00:00:00+00:00')),
-            $loader->load($on('illuminate/contracts', 'v9.51.0', 'split-9', '2023-01-01T00:00:00+00:00')),
-            $loader->load($on('illuminate/contracts', 'v9.50.0', 'split-9', '2023-01-01T00:00:00+00:00')),
-            $loader->load($on('illuminate/contracts', 'v8.83.27', 'own-8', '2022-01-13T14:47:47+00:00')),
-        ], new \DateTimeImmutable(F::NOW));
-        $parent = PackageMetadata::fromPackages('laravel/framework', [
-            $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
-            $loader->load($on('laravel/framework', 'v10.48.28', 'f10-48', '2023-11-14T15:31:23+00:00')),
-            $loader->load($on('laravel/framework', 'v9.52.22', 'f9', '2026-08-12T03:46:05+00:00')),
-        ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'source' => 'https://github.com/illuminate/contracts.git']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+        $finding = (new FindingBuilder())->withVersion('1.0.0')->build();
+        $noted = (new FindingBuilder())->withVersion('1.0.0')->withNote('metadata unavailable (HTTP 503)')->build();
+        $explain = static fn (Finding $finding): string => self::plain(new Explanation($finding, F::facts(F::package(['version' => '1.0.0'])), new Thresholds(), '8.4', self::report()));
 
-        $expected = <<<'TEXT'
-            illuminate/contracts v10.48.28 — ok, priority none
-              direct requirement
-              libyears 2.7 behind the newest stable release
-
-            signals: none
-
-            composer.lock
-              version v10.48.28 · no php constraint · undated · from a Composer repository
-              source https://github.com/illuminate/contracts.git
-
-            repository metadata (as of 2026-09-14)
-              7 versions listed · library · not abandoned
-              source https://github.com/illuminate/contracts.git
-              last stable release v10.50.3 (2026-08-12, dated by laravel/framework)
-              installed release v10.48.28 (2023-11-14, dated by laravel/framework)
-                branch     highest tag        released           newest dated release     php
-              * 10.x       v10.50.3           2026-08-12         v10.50.3 (2026-08-12)    —
-                9.x        v9.52.22           2026-08-12         v9.52.22 (2026-08-12)    —
-                8.x        v8.83.27           2022-01-13         v8.83.27 (2022-01-13)    —
-              branches 10.x, 9.x dated by laravel/framework, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
-
-            repository activity
-              not fetched — S3 and S4 have nothing to read; the run's notes below say why when a cap or a failure is the cause
-
-            thresholds: release-warn-years 3 · release-high-years 5 · push-warn-years 3 · push-high-years 5 · target PHP 8.4
-
-            TEXT;
-        self::assertSame($expected, $this->plain($explanation));
+        self::assertStringContainsString("\nrepository metadata\n  none — not available\n", $explain($finding));
+        self::assertStringContainsString("\nrepository metadata\n  none — metadata unavailable (HTTP 503)\n", $explain($noted));
     }
 
-    /**
-     * A split package with no parent to date it: the lock carries a `time`, but it is the date of
-     * the commit the package's tags share, so nothing dates the installed version and the libyears
-     * go unmeasured. The block says which date it is refusing to read.
-     */
-    public function testALockDateThatIsASharedCommitsSaysItIsNotAReleases(): void
+    public function testATagThatSharesItsCommitIsDatedByTheCommit(): void
     {
-        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v10.48.28')->withChain(['illuminate/contracts'])->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::unmeasured(Libyears::SHARED_COMMIT))->build();
-        $loader = new ArrayLoader();
-        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
-        $child = PackageMetadata::fromPackages('illuminate/contracts', [
-            $loader->load($on('illuminate/contracts', 'v10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('illuminate/contracts', 'v10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('illuminate/contracts', 'v10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
-        ], new \DateTimeImmutable(F::NOW));
-        // The parent dates the branch, but never listed the installed version: nothing dates it.
-        $parent = PackageMetadata::fromPackages('laravel/framework', [
-            $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
-        ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+        $at = new \DateTimeImmutable('2024-03-01T00:00:00+00:00');
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, 'v1.4.0', 1, null, 'library', new \DateTimeImmutable(F::NOW), ['1' => ['version' => 'v1.4.0', 'at' => $at, 'highest' => ['normalized' => '1.4.0.0', 'pretty' => 'v1.4.0', 'at' => null], 'php' => null]]);
+        $finding = (new FindingBuilder())->withVersion('v1.4.0')->build();
 
-        $text = $this->plain($explanation);
-        self::assertStringContainsString('  libyears not measured: dated only by a commit its tags share', $text);
-        self::assertStringContainsString('  installed release v10.48.28 undated: the lock dates it 2023-06-05, a commit its tags share, not a release', $text);
-        self::assertStringContainsString('version v10.48.28 · no php constraint · dated 2023-06-05 by a commit its tags share · from a Composer repository', $text, 'the block cannot call that date a release four lines above saying it is not one');
-        self::assertStringNotContainsString('released 2023-06-05', $text);
+        self::assertStringContainsString("\n   * 1.x      v1.4.0        commit 2024-03-01 —\n", self::plain(new Explanation($finding, F::facts(F::package(['version' => 'v1.4.0']), $metadata), new Thresholds(), '8.4', self::report())));
     }
 
-    /**
-     * The lock's date for a version the monorepo parent dates is the split's own tag's — the commit
-     * its tags share — so the block says so there too, and `installed release` gives the
-     * date that is a release's.
-     */
-    public function testTheLockBlockCallsTheSplitsOwnDateWhatItIs(): void
+    /** Case B's monolog-bridge v2.6.13 holds one counted advisory. */
+    /** @param list<IgnoredAdvisory> $ignored */
+    private static function feedsOf(AdvisoryNameCoverage $lookup, array $ignored = []): string
     {
-        $finding = (new FindingBuilder())->withPackage('illuminate/contracts')->withVersion('v10.48.28')->withChain(['illuminate/contracts'])->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::of(2.74))->build();
-        $loader = new ArrayLoader();
-        $on = static fn (string $name, string $version, string $commit, string $time, array $replace = []): array => array_filter(['name' => $name, 'version' => $version, 'time' => $time, 'source' => ['type' => 'git', 'url' => 'https://github.com/'.$name.'.git', 'reference' => $commit], 'replace' => $replace]);
-        $child = PackageMetadata::fromPackages('illuminate/contracts', [
-            $loader->load($on('illuminate/contracts', 'v10.49.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('illuminate/contracts', 'v10.20.0', 'split-10', '2023-06-05T12:46:42+00:00')),
-            $loader->load($on('illuminate/contracts', 'v10.13.1', 'split-10', '2023-06-05T12:46:42+00:00')),
-        ], new \DateTimeImmutable(F::NOW));
-        $parent = PackageMetadata::fromPackages('laravel/framework', [
-            $loader->load($on('laravel/framework', 'v10.50.3', 'f10', '2026-08-12T03:46:26+00:00', ['illuminate/contracts' => 'self.version'])),
-            $loader->load($on('laravel/framework', 'v10.48.28', 'f10-48', '2023-11-14T15:31:23+00:00')),
-        ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($finding, F::facts(F::package(['name' => 'illuminate/contracts', 'version' => 'v10.48.28', 'time' => '2023-06-05T12:46:42+00:00']), $child->datedBy($parent)), new Thresholds(), '8.4', $this->report());
+        $explanation = self::caseExplanation('B');
+        $finding = $explanation->finding();
+        $finding = $finding->withDetails(FindingBuilder::detailsOf($finding, true, null, $lookup, null, $ignored));
+        $text = self::plain(new Explanation($finding, $explanation->facts(), new Thresholds(), '8.4', $explanation->report()));
 
-        $text = $this->plain($explanation);
-        self::assertStringContainsString('version v10.48.28 · no php constraint · dated 2023-06-05 by a commit its tags share · from a Composer repository', $text);
-        self::assertStringNotContainsString('released 2023-06-05', $text, 'the release is the parent\'s date, four lines below');
-        self::assertStringContainsString('installed release v10.48.28 (2023-11-14, dated by laravel/framework)', $text);
+        return preg_match('/^  feeds\s+(.*)$/m', $text, $m) === 1 ? $m[1] : '';
     }
 
-    public function testALowerBoundOfLibyearsSaysAtLeast(): void
+    public function testTheFeedWithTheMostRecordsCountsTheAffectingAdvisoriesWhenItHoldsEveryRecord(): void
     {
-        $finding = (new FindingBuilder())->withVersion('1.2.0')->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::atLeast(2.0))->build();
-        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.2.0', 'time' => '2024-01-01T00:00:00+00:00'])), new Thresholds(), '8.4', $this->report());
+        $feeds = [AdvisoryFeed::answered('a', 3), AdvisoryFeed::answered('b', 5), AdvisoryFeed::notAsked('c', 'offline'), AdvisoryFeed::failed('d', 'HTTP 500')];
 
-        self::assertStringContainsString('  libyears at least 2.0 behind the newest stable release', $this->plain($explanation));
+        self::assertSame('a: 3 on record · b: 5 on record, 1 affects v2.6.13 · c: not asked (offline) · d: lookup failed', self::feedsOf(new AdvisoryNameCoverage($feeds, 5, null)));
+        self::assertSame('a: 3 on record · b: 5 on record · c: not asked (offline) · d: lookup failed', self::feedsOf(new AdvisoryNameCoverage($feeds, 7, null)), 'two feeds answered and neither holds every record');
     }
 
-    /**
-     * A branch snapshot is undated for a reason of its own: the lock's `time` is the commit's,
-     * which the `composer.lock` block says next to `branch snapshot`. The shared-commit
-     * sentence is about a tag, and claiming it of `dev-main` states a fact the data does not
-     * carry.
-     */
-    public function testABranchSnapshotIsNotToldItsTagsShareACommit(): void
+    public function testOfTwoFeedsWithEqualRecordsTheFirstCountsTheAffectingAdvisories(): void
     {
-        $finding = (new FindingBuilder())->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))->build();
-        $loader = new ArrayLoader();
-        $metadata = PackageMetadata::fromPackages('vendor/pkg', [
-            $loader->load(['name' => 'vendor/pkg', 'version' => '1.2.0', 'time' => '2026-01-01T00:00:00+00:00', 'source' => ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => 'tag-12']]),
-        ], new \DateTimeImmutable(F::NOW));
-        $explanation = new Explanation($finding, F::facts(F::package(['version' => 'dev-main', 'time' => '2026-09-13T00:00:00+00:00']), $metadata), new Thresholds(), '8.4', $this->report());
-
-        $text = $this->plain($explanation);
-        self::assertStringContainsString('  libyears not measured: a branch snapshot has no release branch', $text);
-        self::assertStringNotContainsString('installed release', $text);
-        self::assertStringContainsString('version dev-main · no php constraint · dated 2026-09-13 by its commit · from a Composer repository · branch snapshot', $text, 'a snapshot is dated by the commit it points at, and no release of it exists');
-        self::assertStringNotContainsString('released 2026-09-13', $text);
+        self::assertSame('a: 5 on record, 1 affects v2.6.13 · b: 5 on record', self::feedsOf(new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 5), AdvisoryFeed::answered('b', 5)], 5, null)));
     }
 
-    /**
-     * The explain text prints S6's release facts that have a value and omits the ones that are
-     * null (not known, or not applicable to the reason): a null there reads as noise on a line a
-     * person scans, and the JSON carries every key, nulls included.
-     *
-     * @dataProvider snapshotSignals
-     */
-    #[DataProvider('snapshotSignals')]
-    public function testTheSnapshotSignalPrintsTheReleaseFactsThatHaveAValue(string $version, ?PackageMetadata $metadata, string $summary, string $dataLine): void
+    public function testTheOnlyFeedThatAnsweredCountsTheAffectingAdvisoriesWhateverTheTotal(): void
     {
-        $facts = F::facts(F::package(['version' => $version, 'time' => '2026-09-13T00:00:00+00:00']), $metadata);
-        $s6 = (new PinnedRule())->evaluate($facts);
-        self::assertNotNull($s6);
-        $finding = (new FindingBuilder())->withVersion($version)->withVerdict(Verdict::PINNED)->withSignals([$s6])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
-
-        $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
-
-        self::assertStringContainsString("signals\n  S6 warn ".$summary."\n           ".$dataLine."\n\ncomposer.lock\n", $text);
+        self::assertSame('a: 5 on record, 1 affects v2.6.13 · b: lookup failed', self::feedsOf(new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 5), AdvisoryFeed::failed('b', null)], 7, null)));
+        self::assertSame('a: none on record · b: lookup failed', self::feedsOf(new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 0), AdvisoryFeed::failed('b', null)], 0, null)));
     }
 
-    /** @return iterable<string, array{string, ?PackageMetadata, string, string}> */
-    public static function snapshotSignals(): iterable
+    public function testTheAffectingCountAddsTheAdvisoriesThatTheAuditIgnores(): void
     {
-        yield 'a snapshot of a package that never released' => [
-            'dev-main',
-            F::metadata([['dev-main', '2026-09-13T00:00:00+00:00']]),
-            'pinned to branch snapshot dev-main',
-            'version dev-main · reason branch_snapshot · has_stable_release false · snapshot_time 2026-09-13T00:00:00+00:00',
-        ];
-        yield 'a snapshot of a package with a dated tag' => [
-            'dev-main',
-            F::metadata([['dev-main', '2026-09-13T00:00:00+00:00'], ['1.2.0', '2026-01-01T00:00:00+00:00']]),
-            'pinned to branch snapshot dev-main',
-            'version dev-main · reason branch_snapshot · has_stable_release true · last_stable_release 2026-01-01T00:00:00+00:00 · last_stable_version 1.2.0 · snapshot_time 2026-09-13T00:00:00+00:00',
-        ];
-        yield 'a snapshot without repository metadata' => [
-            'dev-main',
-            null,
-            'pinned to branch snapshot dev-main',
-            'version dev-main · reason branch_snapshot · snapshot_time 2026-09-13T00:00:00+00:00',
-        ];
-        yield 'a tagged version of a repository that lists no tag' => [
-            '1.0.0',
-            F::metadata([['dev-main', '2026-09-13T00:00:00+00:00']]),
-            'no tagged release in its repository',
-            'version 1.0.0 · reason no_stable_release · has_stable_release false',
-        ];
+        $ignored = static fn (string $id): IgnoredAdvisory => new IgnoredAdvisory(new Advisory($id, null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, $id, null, AdvisoryIgnoreMatch::BY_AUDIT));
+        $lookup = new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 3)], 3, null);
+        $finding = (new FindingBuilder())->withVersion('1.0.0')->build();
+        $finding = $finding->withDetails(FindingBuilder::detailsOf($finding, true, null, $lookup, null, [$ignored('PKSA-i')]));
+
+        self::assertSame('a: 3 on record, 3 affect v2.6.13', self::feedsOf($lookup, [$ignored('PKSA-i'), $ignored('PKSA-j')]), 'one counted and two ignored');
+        self::assertStringContainsString("\n  feeds        a: 3 on record, 1 affects 1.0.0\n", self::plain(self::explain($finding)), 'no S9 and one ignored');
     }
 
-    /**
-     * Only S6 omits its nulls. Every other signal's data line prints a null as `null`: S1 without a
-     * replacement here, S8's `suggested_constraint` in testAFlaggedPackageReadsVerdictSignalsDataAndBranches.
-     */
-    public function testAnotherSignalStillPrintsItsNullData(): void
+    public function testABranchRowWordsItsFixKindAndNamesEachHolderOnce(): void
     {
-        $facts = F::facts(F::package(['version' => '1.0.0']), F::metadata([['1.0.0', '2026-01-01T00:00:00+00:00']], true));
-        $s1 = (new AbandonedRule())->evaluate($facts);
-        self::assertNotNull($s1);
-        self::assertSame(['marked_by' => 'repository', 'replacement' => null, 'replacement_url' => null], JsonPath::decoded($s1->data()));
-        $finding = (new FindingBuilder())->withVerdict(Verdict::ABANDONED)->withSignals([$s1])->withDataDate(new \DateTimeImmutable(F::NOW))->build();
+        self::assertStringContainsString(' 3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it', self::plain(self::caseExplanation('E')));
+        self::assertStringContainsString(' 15 of 15 · php floor raise (lowest fix); held by composer.json and symfony/twig-bridge; after it: 0, ok', self::plain(self::caseExplanation('A')));
 
-        $text = $this->plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $this->report()));
+        $case = CaseHydrator::case('A');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['root'] = JsonPath::arrayAt($inputs, ['root']) + ['conflict' => ['twig/twig' => '>=3.0']];
+        $case['inputs'] = $inputs;
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding('twig/twig');
+        $facts = $analysis->facts('twig/twig');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        self::assertStringContainsString('; held by composer.json and symfony/twig-bridge; after it', self::plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), 'the require and the conflict of composer.json name it once');
+    }
 
-        self::assertStringContainsString("signals\n  S1 high marked abandoned by its repository\n           replacement null\n\ncomposer.lock\n", $text);
+    public function testEveryCaseExplainsAsItsGolden(): void
+    {
+        $text = '';
+        foreach (array_keys(CaseHydrator::findings()) as $id) {
+            $text .= '== case '.$id."\n".self::plain(self::caseExplanation((string) $id))."\n";
+        }
+
+        self::assertNotSame('', $text);
+        TextGolden::assertMatches('cases.explain.txt', $text, __FUNCTION__);
+    }
+
+    private static function caseExplanation(string $id): Explanation
+    {
+        $case = CaseHydrator::case($id);
+        $package = JsonPath::stringAt($case, ['finding', 'package']);
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding($package);
+        $facts = $analysis->facts($package);
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+
+        return new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report());
+    }
+
+    private static function withAge(Finding $finding, ActivityLookup $lookup, AgeReading $push, ?AgeReading $installed = null, ?AgeReading $branch = null, ?AgeReading $release = null): Finding
+    {
+        $details = $finding->details();
+        $age = new Age($installed ?? AgeReading::unmeasuredBecause(AgeMeasure::UNDATED), $release ?? AgeReading::unmeasuredBecause(AgeMeasure::UNDATED_RELEASES), $branch ?? AgeReading::unmeasuredBecause(AgeMeasure::NO_BRANCH_ROW), $push);
+
+        return $finding->withDetails(new FindingDetails($details->metadataStatus(), null, null, $details->skipped(), $details->installedPhp(), $details->entry(), 'complete', null, [], null, $lookup, $age, null, null));
     }
 }

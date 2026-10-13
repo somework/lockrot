@@ -21528,166 +21528,6 @@
         }
       }
     },
-    "noteVerdictRulesChanged": {
-      "description": "`verdict_rules_changed`: findings that reached a grade value under the rules of 0.13 and no longer do. The sentence quotes `score_text` from this data.",
-      "type": "object",
-      "required": [
-        "fail_on",
-        "findings"
-      ],
-      "properties": {
-        "fail_on": {
-          "description": "The grade value.",
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]*$"
-        },
-        "findings": {
-          "description": "The findings, by package name, then version.",
-          "type": "array",
-          "items": {
-            "description": "One finding.",
-            "type": "object",
-            "required": [
-              "package",
-              "version",
-              "legacy",
-              "verdict",
-              "score_total",
-              "score_text"
-            ],
-            "properties": {
-              "package": {
-                "$ref": "#/definitions/packageName"
-              },
-              "version": {
-                "description": "The installed version.",
-                "type": "string"
-              },
-              "legacy": {
-                "description": "The computation of 0.13.",
-                "type": "object",
-                "required": [
-                  "verdict",
-                  "priority",
-                  "basis"
-                ],
-                "properties": {
-                  "verdict": {
-                    "description": "The cause word of 0.13.",
-                    "type": "string",
-                    "enum": [
-                      "abandoned",
-                      "silent",
-                      "pinned",
-                      "left-behind",
-                      "old-promise",
-                      "stale",
-                      "unknown",
-                      "finished",
-                      "ok"
-                    ]
-                  },
-                  "priority": {
-                    "description": "The priority of 0.13.",
-                    "type": "string",
-                    "enum": [
-                      "critical",
-                      "high",
-                      "medium",
-                      "low",
-                      "none"
-                    ]
-                  },
-                  "basis": {
-                    "description": "The `priority_basis` of 0.13.",
-                    "type": "object",
-                    "required": [
-                      "base",
-                      "steps"
-                    ],
-                    "properties": {
-                      "base": {
-                        "description": "The starting level.",
-                        "type": "string",
-                        "enum": [
-                          "critical",
-                          "high",
-                          "medium",
-                          "low",
-                          "none"
-                        ]
-                      },
-                      "steps": {
-                        "description": "The steps, as the `priority_basis.steps` of report-1.",
-                        "type": "array",
-                        "items": {
-                          "description": "A step.",
-                          "type": "object",
-                          "required": [
-                            "reason",
-                            "from",
-                            "to"
-                          ],
-                          "properties": {
-                            "reason": {
-                              "description": "Why the step was taken (report-1). Open.",
-                              "type": "string",
-                              "pattern": "^[a-z][a-z0-9_]*$",
-                              "x-known-values": [
-                                "transitive",
-                                "unreached",
-                                "dev",
-                                "no_fix_expected"
-                              ]
-                            },
-                            "from": {
-                              "description": "The priority order without `none`: the levels a step of a finding's `priority_basis` moves between. The same order as `priority`, restricted; not a set of its own.",
-                              "type": "string",
-                              "enum": [
-                                "critical",
-                                "high",
-                                "medium",
-                                "low"
-                              ]
-                            },
-                            "to": {
-                              "description": "The priority order without `none`: the levels a step of a finding's `priority_basis` moves between. The same order as `priority`, restricted; not a set of its own.",
-                              "type": "string",
-                              "enum": [
-                                "critical",
-                                "high",
-                                "medium",
-                                "low"
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              "verdict": {
-                "$ref": "#/definitions/verdict"
-              },
-              "score_total": {
-                "description": "Its `score.total`.",
-                "type": "integer",
-                "minimum": 0
-              },
-              "score_text": {
-                "description": "Its `score.text`, carried in the note so that the note text reads its own data. Prose, not contract; key on the fields it is rendered from.",
-                "type": "string",
-                "x-rendered-from": [
-                  "findings[].score.text"
-                ]
-              }
-            }
-          },
-          "minItems": 1
-        }
-      }
-    },
     "noteBaselineTargetDiffers": {
       "description": "`baseline_target_differs`: lockrot does not compare fix changes across targets.",
       "type": "object",
@@ -21809,7 +21649,6 @@
         "repository_activity_unreachable",
         "repository_activity_not_found",
         "not_from_composer_repository",
-        "verdict_rules_changed",
         "baseline_target_differs",
         "baseline_fix_model_differs",
         "ignore_does_not_cover_advisories",
@@ -22006,18 +21845,6 @@
           "properties": {
             "code": {
               "enum": [
-                "verdict_rules_changed"
-              ]
-            },
-            "data": {
-              "$ref": "#/definitions/noteVerdictRulesChanged"
-            }
-          }
-        },
-        {
-          "properties": {
-            "code": {
-              "enum": [
                 "baseline_target_differs"
               ]
             },
@@ -22128,7 +21955,6 @@
                   "repository_activity_unreachable",
                   "repository_activity_not_found",
                   "not_from_composer_repository",
-                  "verdict_rules_changed",
                   "baseline_target_differs",
                   "baseline_fix_model_differs",
                   "ignore_does_not_cover_advisories",

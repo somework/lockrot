@@ -26,7 +26,6 @@ use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
-use Lockrot\Verdict\VerdictEngine;
 
 const TARGET_PHP = '8.4';
 const DEFAULT_TODAY = '2026-10-01T00:00:00+00:00';
@@ -69,7 +68,6 @@ try {
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), TARGET_PHP, PhpReleaseDates::load(), $project->requirePhp()),
-            new VerdictEngine(),
             $clock,
             false
         );

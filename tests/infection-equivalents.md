@@ -26,7 +26,6 @@ start the reason with `in method():`.
 - `src/Analyzer/Analyzer.php` ReturnRemoval `return [$metadata, []];` — in dateSplitPackages(): with no package to date, the rest of the method finds no candidate and makes no request.
 - `src/Analyzer/Libyears.php` GreaterThan `if ($newest === null || $release['at'] > $newest) {` — on a tie the two dates are the same instant, and nothing reads which release gave it.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.
-- `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict013::flagged($f->verdict())));` — the findings are sorted with every flagged one first, so the filter leaves the keys `0..n-1`.
 - `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->sorted(), static fn (Finding $f): bool => $f->isGraded()));` — `sorted()` puts every graded finding first, so the filter leaves the keys `0..n-1`.
 - `src/Analyzer/Report.php` DecrementInteger and IncrementInteger `'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),` — `max(0, …)` clamps an age that a backwards clock makes negative, and a bound of one second either way rounds to `0.0` at one decimal.
 - `src/Analyzer/Analyzer.php` LogicalAnd `if ($fixes !== null && $facts->advisories() !== []) {` — a package with no advisory gets an empty scan, which writes the same finding as no scan: no row, no branch fix, no gets.
@@ -117,10 +116,13 @@ start the reason with `in method():`.
 
 ## src/Output
 
+- `src/Output/ExplainFormatter.php` CastString `$holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json' : (string) $holder->package(), $candidate->heldBy());` — a holder that is not the root always names its package, so the cast never meets null.
+- `src/Output/MarkdownFormatter.php` Break_ `break;` — the room only shrinks row by row, so no row after the first that does not fit can fit.
+- `src/Output/InstallSummaryFormatter.php` LogicalAnd `$gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;` — a report decides its gate only from its run settings, so the gate and the run are null together.
+- `src/Output/AgeText.php` Coalesce `$key = ReleaseBranch::of($version) ?? ReleaseBranch::aliasLine($version);` — `ReleaseBranch::of()` answers only a release and `aliasLine()` only a branch alias, so at most one of them is not null.
 - `src/Output/HtmlFormatter.php` BitwiseOr `return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');` — `title()` is the one caller, and its string holds no quote and no invalid byte.
 - `src/Output/JsonFormatter.php` FalseValue `public function format(Report $report, bool $showAll = false): string` — the JSON document lists every finding and does not read `$showAll`.
 - `src/Output/ReportTarget.php` GreaterThan `if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {` — two format names of one length cannot both start a spec before its colon, so `>=` picks the same name.
-- `src/Output/TableFormatter.php` CastString `return $finding->verdict().' (was '.(string) $baseline->previousVerdictOf($finding->package()).')';` — `previousVerdictOf()` is not null for a verdict that worsened. The cast is for the type.
 - `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
 - `src/Output/HtmlFormatter.php` UnwrapArrayFilter and UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
 

@@ -1,8 +1,24 @@
 [
     {
         "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "bantu/ini-get-wrapper v1.0.1 \u2014 finding critical (32 = silent 32) \u2014 silent: last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago). Do: find a maintained alternative: nothing released for 12.0 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "d914b608dfa1d4ab19eb5d4d853ca4125ee9cea3ab0378e4454db3d2d267cd08",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
         "check_name": "lockrot/abandoned",
-        "description": "microsoft/azure-storage-blob 1.5.4 \u2014 abandoned (critical): marked abandoned by its repository; repository archived on GitHub; last release 2022-09-02 (4.0 years ago); last push 2023-07-18 (3.2 years ago); pulls in 1 flagged package: microsoft/azure-storage-common (stale)",
+        "description": "microsoft/azure-storage-blob 1.5.4 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-09-02 (4.0 years ago); last push 2023-07-18 (3.2 years ago). Do: find a replacement (none named).",
         "categories": [
             "Bug Risk"
         ],
@@ -18,23 +34,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/silent",
-        "description": "bantu/ini-get-wrapper v1.0.1 \u2014 silent (critical): last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago)",
-        "categories": [
-            "Bug Risk"
-        ],
-        "severity": "major",
-        "fingerprint": "d914b608dfa1d4ab19eb5d4d853ca4125ee9cea3ab0378e4454db3d2d267cd08",
-        "location": {
-            "path": "composer.lock",
-            "lines": {
-                "begin": 1
-            }
-        }
-    },
-    {
-        "type": "issue",
-        "check_name": "lockrot/silent",
-        "description": "pear/console_getopt v1.4.3 \u2014 silent (high): last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago) (via pear/pear-core-minimal, also via pear/archive_tar)",
+        "description": "pear/console_getopt v1.4.3 \u2014 finding high (16 = silent 32 \u00f7 2 transitive) \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar, pear/pear-core-minimal: replace or update them; the newest release of pear/pear-core-minimal (v1.10.18) still requires it. (via pear/archive_tar, pear/pear-core-minimal)",
         "categories": [
             "Bug Risk"
         ],
@@ -50,7 +50,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "deepdiver1975/tarstreamer v2.1.0 \u2014 stale (medium): last release 2023-06-16 (3.2 years ago)",
+        "description": "deepdiver1975/tarstreamer v2.1.0 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2023-06-16 (3.2 years ago). Do: \u2014.",
         "categories": [
             "Bug Risk"
         ],
@@ -66,7 +66,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "kornrunner/blurhash v1.2.2 \u2014 stale (medium): last release 2022-07-13 (4.2 years ago)",
+        "description": "kornrunner/blurhash v1.2.2 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2022-07-13 (4.2 years ago). Do: \u2014.",
         "categories": [
             "Bug Risk"
         ],
@@ -82,7 +82,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "mexitek/phpcolors v1.0.4 \u2014 stale (medium): last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago)",
+        "description": "mexitek/phpcolors v1.0.4 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago). Do: \u2014.",
         "categories": [
             "Bug Risk"
         ],
@@ -98,7 +98,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "cweagans/composer-configurable-plugin 2.0.0 \u2014 stale (low): last release 2023-02-12 (3.6 years ago) (via cweagans/composer-patches)",
+        "description": "cweagans/composer-configurable-plugin 2.0.0 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2023-02-12 (3.6 years ago). Do: \u2014. (via cweagans/composer-patches)",
         "categories": [
             "Bug Risk"
         ],
@@ -114,7 +114,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "microsoft/azure-storage-common 1.5.2 \u2014 stale (low): last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago) (via microsoft/azure-storage-blob)",
+        "description": "microsoft/azure-storage-common 1.5.2 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago). Do: \u2014. (via microsoft/azure-storage-blob)",
         "categories": [
             "Bug Risk"
         ],
@@ -130,7 +130,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "pear/pear_exception v1.0.2 \u2014 stale (low): last release 2021-03-21 (5.5 years ago) (via pear/pear-core-minimal, also via pear/archive_tar)",
+        "description": "pear/pear_exception v1.0.2 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2021-03-21 (5.5 years ago). Do: \u2014. (via pear/archive_tar, pear/pear-core-minimal)",
         "categories": [
             "Bug Risk"
         ],

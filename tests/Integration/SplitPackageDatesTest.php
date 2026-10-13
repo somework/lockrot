@@ -27,7 +27,6 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -77,7 +76,6 @@ final class SplitPackageDatesTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, $thresholds, '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false,
             null,
@@ -116,7 +114,7 @@ final class SplitPackageDatesTest extends TestCase
 
         self::assertNull(self::signal($finding, Signal::S8));
         self::assertNull(self::signal($finding, Signal::S2), 'the package\'s own age is unknown too');
-        self::assertSame(Verdict::OK, $finding->verdict());
+        self::assertNull($finding->lead());
     }
 
     public function testTheMonorepoDatesTheBranchAndTheFindingSaysWhose(): void
@@ -128,7 +126,7 @@ final class SplitPackageDatesTest extends TestCase
         $s8 = self::signal($finding, Signal::S8);
 
         self::assertNotNull($s8);
-        self::assertSame(Verdict::LEFT_BEHIND, $finding->verdict());
+        self::assertSame(Verdict::LEFT_BEHIND, $finding->lead());
         self::assertStringContainsString('branch 8.x last released 2024-11-20 (1.8 years ago, dated by laravel/framework)', $s8->summary());
         self::assertSame('laravel/framework', JsonPath::decoded($s8->data())['dated_by']);
         self::assertSame([], $report->notes(), 'the parent loads from the same repositories: nothing to report');
@@ -143,7 +141,7 @@ final class SplitPackageDatesTest extends TestCase
 
         self::assertNull(self::signal($finding, Signal::S8), '1.8 years is under release-warn-years 3');
         self::assertNull(self::signal($finding, Signal::S2));
-        self::assertSame(Verdict::OK, $finding->verdict(), 'measured, and the answer is that the branch still gets releases');
+        self::assertNull($finding->lead(), 'measured, and the answer is that the branch still gets releases');
     }
 
     /**

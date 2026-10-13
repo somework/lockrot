@@ -25,12 +25,13 @@ final class Standing implements \JsonSerializable
     public const WORSENED = 'worsened';
 
     /** A fix is lost when a fix recorded as one of the other kinds reads one of these. */
-    private const LOST = ['blocked', 'none'];
+    public const LOST = ['blocked', 'none'];
 
     private ?BaselineEntry $entry;
     // Set only with an entry: read them only where $entry is not null.
     private string $recordedTargetPhp;
     private int $recordedFixModel;
+    private bool $comparedFixes = false;
     /** @var array<string, FactState> by flag */
     private array $flags = [];
     /** @var array<string, FactState> by advisory id */
@@ -85,6 +86,7 @@ final class Standing implements \JsonSerializable
         $standing = new self($entry);
         $standing->recordedTargetPhp = $recordedTargetPhp;
         $standing->recordedFixModel = $recordedFixModel;
+        $standing->comparedFixes = $compareFixes;
         $lead = $entry->recordedLead();
         $coverage = Coverage::under($lead);
         $recordedFlags = $entry->flags();
@@ -183,6 +185,18 @@ final class Standing implements \JsonSerializable
     public function unknownAdvisories(): array
     {
         return $this->unknown;
+    }
+
+    /** Whether a lost fix was compared: the run's target PHP and fix model equal the file's. */
+    public function comparedFixes(): bool
+    {
+        return $this->comparedFixes;
+    }
+
+    /** @return array{known: int, new: int, re_rated: int, fix_lost: int} the counted advisories by their state */
+    public function advisoriesNow(): array
+    {
+        return $this->advisoriesNow;
     }
 
     /** @return list<WorsenedFact> */

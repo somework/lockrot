@@ -9,7 +9,6 @@ use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\Policy;
-use Lockrot\Legacy\Priority013;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
@@ -59,8 +58,6 @@ final class PolicyTest extends TestCase
         $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
         $directProd = (new FindingBuilder())->withPackage('a/direct')->withVerdict(Verdict::ABANDONED)->withChain(['a/direct'])->withDataDate($at)->build();
         $transitiveDev = (new FindingBuilder())->withPackage('a/deep')->withVerdict(Verdict::ABANDONED)->withChain(['a/root', 'a/deep'])->withDataDate($at)->withDev(true)->build();
-        self::assertSame(Priority013::CRITICAL, $directProd->priority());
-        self::assertSame(Priority013::MEDIUM, $transitiveDev->priority());
         $report = static fn (Finding ...$findings): Report => new Report(array_values($findings), [], $at, \count($findings), 0);
 
         self::assertSame(1, Policy::exitCode($report($directProd), $this->config('critical')));

@@ -516,6 +516,7 @@ final class LibyearsTest extends TestCase
 
         self::assertSame('libyears: 1.0 behind across the one package · 1.0 from direct requirements · furthest behind a/a 1.0.0 at 1.0', $block->line());
         self::assertSame('libyears: 2.0 behind across all 2 packages · 2.0 from direct requirements · furthest behind a/a 1.0.0 at 1.0', Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::of(1.0)), self::finding('b/b', LibyearsMeasurement::of(1.0))])->line());
+        self::assertSame('libyears: at least 3.0 behind across all 2 packages · 3.0 from direct requirements · furthest behind a/a 1.0.0 at 2.0 or more', Libyears::fromFindings([self::finding('a/a', LibyearsMeasurement::atLeast(2.0)), self::finding('b/b', LibyearsMeasurement::of(1.0))])->line());
     }
 
     public function testTheLineSaysSoWhenNothingCouldBeMeasured(): void

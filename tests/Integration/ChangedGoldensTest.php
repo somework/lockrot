@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Integration;
 
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analyzer;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
@@ -22,7 +23,7 @@ use Lockrot\Output\Formatters;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
-use Lockrot\Verdict\VerdictEngine;
+use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -47,22 +48,32 @@ final class ChangedGoldensTest extends TestCase
     private const DIRS = ['apps/wallabag_wallabag', 'apps/nextcloud_3rdparty', 'skeletons/laravel', 'apps/matomo-org_matomo'];
     private const FORMATS = ['github' => 'txt', 'gitlab' => 'json', 'sarif' => 'sarif', 'markdown' => 'md', 'table' => 'txt'];
     private const NOW = '2026-09-14T00:00:00+00:00';
-    private const RUN_LEVEL = 'SPEC 6.2: the run-level advisories record. These runs have no advisory lookup, so the record is a warning';
+
+    private const TEXT = 'SPEC 7.0 to 7.3: each graded finding prints its flags, score line, move and evidence under its grade; a vulnerable-only finding becomes a row; the footer adds flags:, depth:, security:, advisories: and gate:';
+    private const RECORDS = 'SPEC 7.4, 7.5: one record per counted flag, and in SARIF per counted advisory, marked by gate.by; SARIF writes the invocation exit code and the run properties';
 
     /** Each golden that a pull request of the 0.14 train changed, with its reason. Every other golden is unchanged. */
     private const CHANGED = [
-        'laravel.github.txt' => self::RUN_LEVEL,
-        'laravel.gitlab.json' => self::RUN_LEVEL,
-        'laravel.sarif.sarif' => self::RUN_LEVEL,
-        'matomo-org_matomo.github.txt' => self::RUN_LEVEL,
-        'matomo-org_matomo.gitlab.json' => self::RUN_LEVEL,
-        'matomo-org_matomo.sarif.sarif' => self::RUN_LEVEL,
-        'nextcloud_3rdparty.github.txt' => self::RUN_LEVEL,
-        'nextcloud_3rdparty.gitlab.json' => self::RUN_LEVEL,
-        'nextcloud_3rdparty.sarif.sarif' => self::RUN_LEVEL,
-        'wallabag_wallabag.github.txt' => self::RUN_LEVEL,
-        'wallabag_wallabag.gitlab.json' => self::RUN_LEVEL,
-        'wallabag_wallabag.sarif.sarif' => self::RUN_LEVEL,
+        'laravel.github.txt' => self::TEXT,
+        'laravel.gitlab.json' => self::RECORDS,
+        'laravel.markdown.md' => self::TEXT,
+        'laravel.sarif.sarif' => self::RECORDS,
+        'laravel.table.txt' => self::TEXT,
+        'matomo-org_matomo.github.txt' => self::TEXT,
+        'matomo-org_matomo.gitlab.json' => self::RECORDS,
+        'matomo-org_matomo.markdown.md' => self::TEXT,
+        'matomo-org_matomo.sarif.sarif' => self::RECORDS,
+        'matomo-org_matomo.table.txt' => self::TEXT,
+        'nextcloud_3rdparty.github.txt' => self::TEXT,
+        'nextcloud_3rdparty.gitlab.json' => self::RECORDS,
+        'nextcloud_3rdparty.markdown.md' => self::TEXT,
+        'nextcloud_3rdparty.sarif.sarif' => self::RECORDS,
+        'nextcloud_3rdparty.table.txt' => self::TEXT,
+        'wallabag_wallabag.github.txt' => self::TEXT,
+        'wallabag_wallabag.gitlab.json' => self::RECORDS,
+        'wallabag_wallabag.markdown.md' => self::TEXT,
+        'wallabag_wallabag.sarif.sarif' => self::RECORDS,
+        'wallabag_wallabag.table.txt' => self::TEXT,
     ];
 
     /**
@@ -89,11 +100,11 @@ final class ChangedGoldensTest extends TestCase
                     new RepoLocator(),
                     BuiltinAllowlist::load(),
                     SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-                    new VerdictEngine(),
                     $clock,
                     false
                 );
-                $report = $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), false);
+                $report = $analyzer->analyze(LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock'), ProjectConfig::fromFile(self::FIXTURES.$dir.'/composer.json'), false)
+                    ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
                 foreach (self::FORMATS as $format => $extension) {
                     $name = basename($dir).'.'.$format.'.'.$extension;
                     $names[] = $name;

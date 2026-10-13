@@ -32,7 +32,6 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ReportSample;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -230,7 +229,6 @@ final class FromComposerRepositoryTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             true
         );

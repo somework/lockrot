@@ -44,8 +44,6 @@ ZERO_WORDS = ['unknown', 'finished', 'ok']
 SEVERITIES = ['critical', 'high', 'medium', 'unrated', 'low']
 FIX_KINDS = ['update', 'upgrade', 'raise-php', 'unknown', 'blocked', 'none']
 MOVE_KINDS = ['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix']
-V013_VERDICTS = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale', 'unknown', 'finished', 'ok']
-PRIORITIES = ['critical', 'high', 'medium', 'low', 'none']
 TARGET_SOURCES = ['option', 'env', 'config', 'platform', 'runtime']
 # kept by hand: FailOnSchemaAgreementTest compares it with FailOn::allowed()
 FAIL_ON_VALUES = ['none', 'critical', 'high', 'medium', 'low', 'abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale',
@@ -184,18 +182,6 @@ def shared_definitions():
                            '`blocked` (no fixing release runs on the target PHP), `none` (no release fixes it). `blocked` and `none` double an '
                            'advisory\'s points. An open set (§8.2): a fix-model change can add a kind, and it arrives with its row in '
                            '`run.score_model.fix_kinds[]`, so read its `ease` and `doubles` there and show its id.', FIX_KINDS, FLAGLIKE)
-    D['priority'] = closed('A 0.13 priority, `none` included.', PRIORITIES)
-    D['flaggedPriority'] = kept('flaggedPriority')
-    D['priorityStep'] = kept('priorityStep')
-    D['legacy'] = nullable(obj('0.13\'s reading of the finding.', {
-        'verdict': closed('0.13\'s verdict word: the first raised flag in 0.13\'s order, or `unknown`, `finished`, `ok`.', V013_VERDICTS),
-        'priority': ref('priority', '0.13\'s priority.'),
-        'basis': obj('How 0.13 reached `priority`: report-1\'s `priority_basis`.', {
-            'base': ref('priority', 'The priority 0.13\'s verdict starts from.'),
-            'steps': array('Each step 0.13 took from `base`, in order.', ref('priorityStep')),
-        }),
-    }), '0.13\'s verdict and priority for this finding, computed by a frozen copy of 0.13\'s rules (`Legacy\\Priority013`): the `0.13:` line of '
-        '`--explain` and the `verdict_rules_changed` note read it. Null only in a document written after report-3 retires the frozen rules (§6.2, §7.7).')
     D['factRef'] = obj('A counted fact: a maintenance flag or an advisory.', {
         'kind': closed('`flag` or `advisory`.', ['flag', 'advisory']),
         'id': string('A flag id when `kind` is `flag`; the advisory\'s id (an S9 row\'s `id`) when `kind` is `advisory`.', minLength=1),
@@ -602,7 +588,7 @@ def add_relations(D):
 
 EXPLAIN_RUN_KEYS = ['target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts',
                     'signal_ids', 'fail_on', 'fail_on_source', 'gates', 'fix_model', 'text_grammar', 'score_model', 'advisory_lookup']
-EXPLAIN_ONLY = ['legacy', 'priority', 'priorityStep', 'flaggedPriority', 'lock', 'repositoryMetadata', 'explainRun']
+EXPLAIN_ONLY = ['lock', 'repositoryMetadata', 'explainRun']
 
 
 def refs_in(node, out):
@@ -638,8 +624,6 @@ def explain_schema():
     RD = R2['definitions']
     D = {}
     sd = shared_definitions()
-    for k in ('legacy', 'priority', 'priorityStep', 'flaggedPriority'):
-        D[k] = sd[k]
     run = copy.deepcopy(RD['run'])
     D['explainRun'] = {'description': ('What an `--explain` run read, and every field `score_model` refers to (§7.7, §8.3): the explain text renders from this '
                                        'block and the finding alone. Each key is report-2\'s `run` key of the same name, typed by the same schema.'),
@@ -667,13 +651,13 @@ def explain_schema():
         'id': 'https://lockrot.dev/schema/explain-2.json',
         'title': 'lockrot explanation',
         'description': ('The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding exactly as '
-                        'report-2 carries it, everything it was read from, the run block every field of `run.score_model` refers to, and 0.13\'s '
-                        'reading of it (§7.7, §8.3). Every human string in it is a rendering of fields in the same object or in `run` (§7.11): '
+                        'report-2 carries it, everything it was read from, and the run block every field of `run.score_model` refers to '
+                        '(§7.7, §8.3). Every human string in it is a rendering of fields in the same object or in `run` (§7.11): '
                         'strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this '
                         'file unchanged; the number in the id changes only when a field is removed or renamed. Open sets carry a `pattern` and '
                         '`x-known-values`; closed sets are enums.'),
         'type': 'object',
-        'required': ['$schema', 'lockrot', 'package', 'version', 'finding', 'lock', 'metadata', 'run', 'legacy', 'generated_at', 'notes', 'note_details'],
+        'required': ['$schema', 'lockrot', 'package', 'version', 'finding', 'lock', 'metadata', 'run', 'generated_at', 'notes', 'note_details'],
         'properties': {
             '$schema': {'description': 'This schema\'s published URL; always written (schema round), so an explain-1 document fails at once.', 'type': 'string', 'enum': ['https://lockrot.dev/schema/explain-2.json']},
             'lockrot': ref('envelope', 'The writer and the schema number.'),
@@ -683,7 +667,6 @@ def explain_schema():
             'lock': ref('lock', 'The package\'s entry in composer.lock.'),
             'metadata': nullable(ref('repositoryMetadata'), 'What the Composer repository said; null when it could not be loaded or was never asked.'),
             'run': ref('explainRun', 'What the run read.'),
-            'legacy': ref('legacy', '0.13\'s reading of the finding (the `0.13:` line).'),
             'generated_at': ref('dateTime', 'The run clock: every years field is measured against it.'),
             'notes': array('The run\'s notes, as printed.', {'description': 'One note: ' + PROSE + '.', 'type': 'string', 'x-rendered-from': ['note_details[].data']}),
             'note_details': array('The run\'s notes, typed: one entry per `notes` string, at the same index.', ref('noteDetail')),

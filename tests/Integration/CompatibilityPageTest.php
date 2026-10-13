@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Lockrot\Legacy\Priority013;
-use Lockrot\Legacy\Verdict013;
 use Lockrot\Tests\Support\ClosedSets;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,7 +22,7 @@ final class CompatibilityPageTest extends TestCase
 {
     private const DOCS = __DIR__.'/../../docs/';
 
-    /** The two pages that list verdicts in Verdict013::all() order. */
+    /** The two pages that list the verdicts in verdict order. */
     private const VERDICT_PAGES = ['compatibility.md', 'verdicts.md'];
 
     /** @var array<string, string> page => contents, read once */
@@ -33,9 +31,6 @@ final class CompatibilityPageTest extends TestCase
     public function testThePageStatesTheOrdersTheCodeKeeps(): void
     {
         $page = self::prose('compatibility.md');
-
-        self::assertStringContainsString('Verdicts, most severe first: `'.implode('`, `', Verdict013::all()).'`.', $page);
-        self::assertStringContainsString('Priorities, highest first: `'.implode('`, `', Priority013::all()).'`.', $page);
         self::assertStringContainsString('Grades, highest first: `'.implode('`, `', ScoreModel::GRADES).'`.', $page);
         self::assertStringContainsString('Signal levels, lowest first: `'.implode('`, `', ClosedSets::levels()).'`.', $page);
         self::assertStringContainsString("A finding's standing against the baseline: `".implode('`, `', ClosedSets::standings()).'`.', $page);
@@ -44,7 +39,7 @@ final class CompatibilityPageTest extends TestCase
 
     /**
      * The SARIF rules follow the order the results first use them (SarifFormatterTest pins that),
-     * so neither page can name them among the lists kept in Verdict013::all() order.
+     * so neither page can name them among the lists kept in verdict order.
      */
     public function testThePagesDoNotClaimVerdictOrderForTheSarifRules(): void
     {
@@ -62,18 +57,6 @@ final class CompatibilityPageTest extends TestCase
         self::assertStringContainsString('!!! warning "Draft until 1.0.0-RC1"', self::read('compatibility.md'));
     }
 
-    /** `>` where the next verdict is less severe, `=` where the two tie. */
-    public function testTheVerdictsPageStatesTheSameLadder(): void
-    {
-        $verdicts = Verdict013::all();
-        $ladder = $verdicts[0];
-        for ($i = 1, $count = \count($verdicts); $i < $count; ++$i) {
-            $tie = Verdict013::severity($verdicts[$i - 1]) === Verdict013::severity($verdicts[$i]);
-            $ladder .= ($tie ? ' = ' : ' > ').$verdicts[$i];
-        }
-
-        self::assertStringContainsString('`'.$ladder.'`', self::prose('verdicts.md'));
-    }
 
     /**
      * The site renders with Python-Markdown, which needs four spaces to nest: a sub-list indented by

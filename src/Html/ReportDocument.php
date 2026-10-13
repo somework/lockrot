@@ -12,7 +12,6 @@ use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
 
 /**
@@ -88,7 +87,7 @@ final class ReportDocument
      */
     private static function worthExplaining(Finding $finding): bool
     {
-        if (Verdict::flagged($finding->verdict())) {
+        if ($finding->isGraded()) {
             return true;
         }
         foreach ($finding->signals() as $signal) {

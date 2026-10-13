@@ -50,11 +50,33 @@ final class AdvisoryLookup implements \JsonSerializable
         return $this->asked;
     }
 
+    public function packagesNotAsked(): int
+    {
+        return $this->notAsked;
+    }
+
+    /** `all`, or `composer-repositories` under `advisory-lookup: composer-repositories`. */
+    public function scope(): string
+    {
+        return $this->coverage->scope();
+    }
+
+    /** @return list<AdvisoryRepository> */
+    public function repositories(): array
+    {
+        return $this->coverage->repositories();
+    }
+
+    public function otherRepositories(): int
+    {
+        return $this->coverage->otherRepositories();
+    }
+
     /** @return array{scope: string, scope_source: string, packages_asked: int, packages_not_asked: int, other_repositories: int, repositories: list<AdvisoryRepository>} */
     public function jsonSerialize(): array
     {
         return [
-            'scope' => $this->coverage->scope(),
+            'scope' => $this->scope(),
             'scope_source' => $this->coverage->scopeSource(),
             'packages_asked' => $this->asked,
             'packages_not_asked' => $this->notAsked,

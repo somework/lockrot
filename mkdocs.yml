@@ -66,6 +66,7 @@ nav:
   - PHAR and self-update: phar.md
   - Example run: example-run.md
   - Data sources: internals.md
+  - Upgrading to 0.14: changes/0.14.md
   - Changelog: changelog.md
 
 markdown_extensions:

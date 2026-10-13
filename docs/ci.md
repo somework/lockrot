@@ -279,6 +279,10 @@ anywhere else, strip it first ([what a report reveals](schema.md#where-a-package
 jq 'del(.runs[].originalUriBaseIds)' lockrot.sarif > lockrot.public.sarif
 ```
 
+### SARIF exit code {#sarif-exit-code}
+
+`runs[0].invocations[0].exitCode` is the exit code that the gate decides, and `exitCodeDescription` is the `gate:` line.
+
 ## `--format=gitlab` {#-formatgitlab}
 
 A [GitLab Code Quality](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format)

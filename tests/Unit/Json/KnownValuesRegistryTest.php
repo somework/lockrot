@@ -18,7 +18,6 @@ use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Json\Schemas;
-use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Output\MarkedFact;
 use Lockrot\Security\Fix;
@@ -120,7 +119,6 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/gateValue/properties/kind' => [FailOn::KINDS, 'FailOn'],
             '#/definitions/uncheckedAccepted/properties/check' => [UncheckedAcceptanceEntry::CHECKS, 'UncheckedAcceptanceEntry'],
             '#/definitions/uncheckedAccepted/properties/reason' => [UncheckedAcceptanceEntry::ACCEPTABLE_REASONS, 'UncheckedAcceptanceEntry'],
-            '#/definitions/noteVerdictRulesChanged/properties/findings/items/properties/legacy/properties/basis/properties/steps/items/properties/reason' => [PriorityBasis013::STEPS, 'Priority013'],
             '#/definitions/gateNotApplied/properties/check' => [['advisories'], 'Gate'],
             '#/definitions/gateNotApplied/properties/reason' => [[AdvisoryCoverage::OFFLINE, AdvisoryCoverage::COMPOSER_TOO_OLD, AdvisoryCoverage::INSTALL_TIME_BUDGET, AdvisoryCoverage::LOOKUP_FAILED, AdvisoryCoverage::NO_FEED, AdvisoryCoverage::NOT_FROM_COMPOSER_REPOSITORY, AdvisoryCoverage::UNPARSEABLE_VERSION], 'Gate'],
             '#/definitions/findingGate/properties/by/items/properties/kind' => [FailOn::KINDS, 'RecordMarks'],
@@ -167,7 +165,6 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/scoreModel/properties/sort/items/properties/key' => [self::model(['sort', '*', 'key']), 'ScoreModel'],
             '#/definitions/scoreModel/properties/sort/items/properties/dir' => [self::model(['sort', '*', 'dir']), 'ScoreModel'],
             '#/definitions/scoreModel/properties/sort/items/properties/collation/oneOf/0' => [self::model(['sort', '*', 'collation']), 'ScoreModel'],
-            '#/definitions/priorityStep/properties/reason' => [PriorityBasis013::STEPS, 'PriorityBasis013'],
             '#/definitions/repositoryMetadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [$floors, 'PhpFloor'],
             '#/definitions/repositoryMetadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [$misses, 'PhpFloor'],
             '#/definitions/repositoryMetadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [$misses, 'PhpFloor'],

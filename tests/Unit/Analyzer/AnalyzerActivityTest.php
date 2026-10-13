@@ -36,7 +36,6 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -629,7 +628,6 @@ final class AnalyzerActivityTest extends TestCase
             $locator ?? new RepoLocator(),
             $allowlist,
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             $offline,
             $advisories === null ? null : self::advisories($advisories)

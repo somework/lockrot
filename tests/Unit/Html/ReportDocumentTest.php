@@ -92,7 +92,7 @@ final class ReportDocumentTest extends TestCase
         ];
 
         self::assertSame(['vendor/rotten'], array_keys(J::arrayAt($this->document($report, $facts)->toArray(), ['details'])));
-        self::assertSame(['vendor/rotten', 'vendor/fine'], array_keys(J::arrayAt($this->document($report, $facts)->toArray(true), ['details'])));
+        self::assertSame(['vendor/fine', 'vendor/rotten'], array_keys(J::arrayAt($this->document($report, $facts)->toArray(true), ['details'])));
     }
 
     /**

@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "id": "https://lockrot.dev/schema/explain-2.json",
     "title": "lockrot explanation",
-    "description": "The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding exactly as report-2 carries it, everything it was read from, the run block every field of `run.score_model` refers to, and 0.13's reading of it. Every human string in it is a rendering of fields in the same object or in `run`: strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this file unchanged; the number in the id changes only when a field is removed or renamed. Open sets carry a `pattern` and `x-known-values`; closed sets are enums.",
+    "description": "The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding exactly as report-2 carries it, everything it was read from, and the run block every field of `run.score_model` refers to. Every human string in it is a rendering of fields in the same object or in `run`: strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this file unchanged; the number in the id changes only when a field is removed or renamed. Open sets carry a `pattern` and `x-known-values`; closed sets are enums.",
     "type": "object",
     "required": [
         "$schema",
@@ -13,7 +13,6 @@
         "lock",
         "metadata",
         "run",
-        "legacy",
         "generated_at",
         "notes",
         "note_details"
@@ -61,10 +60,6 @@
         "run": {
             "description": "What the run read.",
             "$ref": "#/definitions/explainRun"
-        },
-        "legacy": {
-            "description": "0.13's reading of the finding (the `0.13:` line).",
-            "$ref": "#/definitions/legacy"
         },
         "generated_at": {
             "description": "The run clock: every years field is measured against it.",
@@ -11769,16 +11764,6 @@
                 "vulnerable"
             ]
         },
-        "flaggedPriority": {
-            "description": "The priority order without `none`: the levels a step of a finding's `priority_basis` moves between. The same order as `priority`, restricted; not a set of its own.",
-            "type": "string",
-            "enum": [
-                "critical",
-                "high",
-                "medium",
-                "low"
-            ]
-        },
         "forgeId": {
             "description": "The kind of repository host a note is about: `github`, `gitlab` (gitlab.com and every host in Composer's `gitlab-domains`) or `bitbucket`. An open set: a later release can add a host; read one you do not know as \"other\". The display name (`GitHub`) is the explanation's `activity.forge`, which is not this set.",
             "type": "string",
@@ -12934,65 +12919,6 @@
                                     "type": "null"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "type": "null"
-                }
-            ]
-        },
-        "legacy": {
-            "description": "0.13's verdict and priority for this finding, computed by a frozen copy of 0.13's rules: the `0.13:` line of `--explain` and the `verdict_rules_changed` note read it. Null only in a document written after report-3 retires the frozen rules.",
-            "oneOf": [
-                {
-                    "description": "0.13's reading of the finding.",
-                    "type": "object",
-                    "required": [
-                        "verdict",
-                        "priority",
-                        "basis"
-                    ],
-                    "properties": {
-                        "verdict": {
-                            "description": "0.13's verdict word: the first raised flag in 0.13's order, or `unknown`, `finished`, `ok`.",
-                            "type": "string",
-                            "enum": [
-                                "abandoned",
-                                "silent",
-                                "pinned",
-                                "left-behind",
-                                "old-promise",
-                                "stale",
-                                "unknown",
-                                "finished",
-                                "ok"
-                            ]
-                        },
-                        "priority": {
-                            "description": "0.13's priority.",
-                            "$ref": "#/definitions/priority"
-                        },
-                        "basis": {
-                            "description": "How 0.13 reached `priority`: report-1's `priority_basis`.",
-                            "type": "object",
-                            "required": [
-                                "base",
-                                "steps"
-                            ],
-                            "properties": {
-                                "base": {
-                                    "description": "The priority 0.13's verdict starts from.",
-                                    "$ref": "#/definitions/priority"
-                                },
-                                "steps": {
-                                    "description": "Each step 0.13 took from `base`, in order.",
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/priorityStep"
-                                    }
-                                }
-                            }
                         }
                     }
                 },
@@ -14669,7 +14595,6 @@
                 "repository_activity_unreachable",
                 "repository_activity_not_found",
                 "not_from_composer_repository",
-                "verdict_rules_changed",
                 "baseline_target_differs",
                 "baseline_fix_model_differs",
                 "ignore_does_not_cover_advisories",
@@ -14866,18 +14791,6 @@
                     "properties": {
                         "code": {
                             "enum": [
-                                "verdict_rules_changed"
-                            ]
-                        },
-                        "data": {
-                            "$ref": "#/definitions/noteVerdictRulesChanged"
-                        }
-                    }
-                },
-                {
-                    "properties": {
-                        "code": {
-                            "enum": [
                                 "baseline_target_differs"
                             ]
                         },
@@ -14988,7 +14901,6 @@
                                     "repository_activity_unreachable",
                                     "repository_activity_not_found",
                                     "not_from_composer_repository",
-                                    "verdict_rules_changed",
                                     "baseline_target_differs",
                                     "baseline_fix_model_differs",
                                     "ignore_does_not_cover_advisories",
@@ -15283,166 +15195,6 @@
                     "items": {
                         "$ref": "#/definitions/failedForgeRepository"
                     }
-                }
-            }
-        },
-        "noteVerdictRulesChanged": {
-            "description": "`verdict_rules_changed`: findings that reached a grade value under the rules of 0.13 and no longer do. The sentence quotes `score_text` from this data.",
-            "type": "object",
-            "required": [
-                "fail_on",
-                "findings"
-            ],
-            "properties": {
-                "fail_on": {
-                    "description": "The grade value.",
-                    "type": "string",
-                    "pattern": "^[a-z][a-z0-9-]*$"
-                },
-                "findings": {
-                    "description": "The findings, by package name, then version.",
-                    "type": "array",
-                    "items": {
-                        "description": "One finding.",
-                        "type": "object",
-                        "required": [
-                            "package",
-                            "version",
-                            "legacy",
-                            "verdict",
-                            "score_total",
-                            "score_text"
-                        ],
-                        "properties": {
-                            "package": {
-                                "$ref": "#/definitions/packageName"
-                            },
-                            "version": {
-                                "description": "The installed version.",
-                                "type": "string"
-                            },
-                            "legacy": {
-                                "description": "The computation of 0.13.",
-                                "type": "object",
-                                "required": [
-                                    "verdict",
-                                    "priority",
-                                    "basis"
-                                ],
-                                "properties": {
-                                    "verdict": {
-                                        "description": "The cause word of 0.13.",
-                                        "type": "string",
-                                        "enum": [
-                                            "abandoned",
-                                            "silent",
-                                            "pinned",
-                                            "left-behind",
-                                            "old-promise",
-                                            "stale",
-                                            "unknown",
-                                            "finished",
-                                            "ok"
-                                        ]
-                                    },
-                                    "priority": {
-                                        "description": "The priority of 0.13.",
-                                        "type": "string",
-                                        "enum": [
-                                            "critical",
-                                            "high",
-                                            "medium",
-                                            "low",
-                                            "none"
-                                        ]
-                                    },
-                                    "basis": {
-                                        "description": "The `priority_basis` of 0.13.",
-                                        "type": "object",
-                                        "required": [
-                                            "base",
-                                            "steps"
-                                        ],
-                                        "properties": {
-                                            "base": {
-                                                "description": "The starting level.",
-                                                "type": "string",
-                                                "enum": [
-                                                    "critical",
-                                                    "high",
-                                                    "medium",
-                                                    "low",
-                                                    "none"
-                                                ]
-                                            },
-                                            "steps": {
-                                                "description": "The steps, as the `priority_basis.steps` of report-1.",
-                                                "type": "array",
-                                                "items": {
-                                                    "description": "A step.",
-                                                    "type": "object",
-                                                    "required": [
-                                                        "reason",
-                                                        "from",
-                                                        "to"
-                                                    ],
-                                                    "properties": {
-                                                        "reason": {
-                                                            "description": "Why the step was taken (report-1). Open.",
-                                                            "type": "string",
-                                                            "pattern": "^[a-z][a-z0-9_]*$",
-                                                            "x-known-values": [
-                                                                "transitive",
-                                                                "unreached",
-                                                                "dev",
-                                                                "no_fix_expected"
-                                                            ]
-                                                        },
-                                                        "from": {
-                                                            "description": "The priority order without `none`: the levels a step of a finding's `priority_basis` moves between. The same order as `priority`, restricted; not a set of its own.",
-                                                            "type": "string",
-                                                            "enum": [
-                                                                "critical",
-                                                                "high",
-                                                                "medium",
-                                                                "low"
-                                                            ]
-                                                        },
-                                                        "to": {
-                                                            "description": "The priority order without `none`: the levels a step of a finding's `priority_basis` moves between. The same order as `priority`, restricted; not a set of its own.",
-                                                            "type": "string",
-                                                            "enum": [
-                                                                "critical",
-                                                                "high",
-                                                                "medium",
-                                                                "low"
-                                                            ]
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "verdict": {
-                                "$ref": "#/definitions/verdict"
-                            },
-                            "score_total": {
-                                "description": "Its `score.total`.",
-                                "type": "integer",
-                                "minimum": 0
-                            },
-                            "score_text": {
-                                "description": "Its `score.text`, carried in the note so that the note text reads its own data. Prose, not contract; key on the fields it is rendered from.",
-                                "type": "string",
-                                "x-rendered-from": [
-                                    "findings[].score.text"
-                                ]
-                            }
-                        }
-                    },
-                    "minItems": 1
                 }
             }
         },
@@ -15840,45 +15592,6 @@
                             "type": "null"
                         }
                     ]
-                }
-            }
-        },
-        "priority": {
-            "description": "A 0.13 priority, `none` included.",
-            "type": "string",
-            "enum": [
-                "critical",
-                "high",
-                "medium",
-                "low",
-                "none"
-            ]
-        },
-        "priorityStep": {
-            "description": "One step of a finding's `priority_basis`: why it was taken, and the level before and after it. A step that could not move the level has `from` equal to `to`; up or down is the direction from `from` to `to` in the priority order.",
-            "type": "object",
-            "required": [
-                "reason",
-                "from",
-                "to"
-            ],
-            "properties": {
-                "reason": {
-                    "description": "Why the step was taken: `transitive` (no direct requirement names the package, and one reaches it: `chain` has two or more entries), `unreached` (no direct requirement the run knows reaches it: `chain` is empty, as in a run without composer.json; the same step down as `transitive`, named apart so the page need not read `chain`), `dev` (the finding's `dev` is true) or `no_fix_expected` (the finding's `no_fix_expected` names an advisory). The first three lower the level one step, never below `low`; the last raises it one step, never above `critical`. An open set: a later release can add a step; read an unknown value as \"other\" and show it as written with its `from` and `to`.",
-                    "type": "string",
-                    "pattern": "^[a-z][a-z0-9_]*$",
-                    "x-known-values": [
-                        "transitive",
-                        "unreached",
-                        "dev",
-                        "no_fix_expected"
-                    ]
-                },
-                "from": {
-                    "$ref": "#/definitions/flaggedPriority"
-                },
-                "to": {
-                    "$ref": "#/definitions/flaggedPriority"
                 }
             }
         },

@@ -8,19 +8,14 @@ use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
 use Lockrot\Config\GateStanding;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
-use Lockrot\Legacy\Compare013;
-use Lockrot\Legacy\Priority013;
-use Lockrot\Legacy\Verdict013;
-use Lockrot\Score\ScoreText;
-use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\ScoreModel;
-use Lockrot\Verdict\Verdict;
 
 /** @internal */
 final class Report
 {
+    /** The parents the `pulled in by:` line names before it counts the rest. */
     public const EXPOSURE_NAMES = 5;
 
     /** @var list<Finding> */
@@ -50,7 +45,8 @@ final class Report
      */
     public function __construct(array $findings, array $notes, \DateTimeImmutable $generatedAt, int $packagesChecked, int $notFromComposerRepository, ?BaselineComparison $baseline = null, ?\DateTimeImmutable $activityCacheOldestAt = null, bool $includesDev = false, ?AdvisoryCoverage $advisoryCoverage = null)
     {
-        usort($findings, [self::class, 'compare']);
+        // By name: the order is the input's to {@see sorted()}, and a run's order must not depend on it.
+        usort($findings, static fn (Finding $a, Finding $b): int => strcmp($a->package(), $b->package()));
         $this->advisoryCoverage = $advisoryCoverage ?? AdvisoryCoverage::none();
         $this->findings = $findings;
         $this->notes = $notes;
@@ -60,15 +56,6 @@ final class Report
         $this->baseline = $baseline;
         $this->activityCacheOldestAt = $activityCacheOldestAt;
         $this->includesDev = $includesDev;
-    }
-
-    /**
-     * The order of {@see findings()} and {@see flagged()}. Public so {@see TransitiveExposure} lists a
-     * parent's descendants in the same order.
-     */
-    public static function compare(Finding $a, Finding $b): int
-    {
-        return Compare013::compare($a, $b);
     }
 
     /**
@@ -85,12 +72,12 @@ final class Report
     private static function verdictGroup(Finding $finding): int
     {
         foreach (ScoreModel::VERDICT_ORDER as $group => $verdicts) {
-            if (\in_array($finding->grade(), $verdicts, true)) {
+            if (\in_array($finding->verdict(), $verdicts, true)) {
                 return $group;
             }
         }
 
-        throw new \LogicException(\sprintf('%s has a verdict outside the verdict order: %s', $finding->package(), $finding->grade()));
+        throw new \LogicException(\sprintf('%s has a verdict outside the verdict order: %s', $finding->package(), $finding->verdict()));
     }
 
     /** Returns a copy: a caller that handed the report on keeps the report it handed over. */
@@ -118,10 +105,7 @@ final class Report
         return $this->baseline;
     }
 
-    /**
-     * Returns a copy, like {@see self::withBaseline()}. With a grade value active, the copy notes
-     * each finding that reached it under 0.13's rules and does not under 0.14's (`verdict_rules_changed`).
-     */
+    /** Returns a copy, like {@see self::withBaseline()}. */
     public function withRun(RunSettings $run): self
     {
         $copy = new self(
@@ -136,46 +120,14 @@ final class Report
             $this->advisoryCoverage
         );
         $copy->run = $run;
-        $note = $this->verdictRulesChanged($run);
-        if ($note !== null) {
-            $copy->notes[] = $note;
-        }
 
         return $copy;
-    }
-
-    private function verdictRulesChanged(RunSettings $run): ?RunNote
-    {
-        $grade = null;
-        foreach ($run->failOn() === null ? [] : $run->failOn()->values() as $value) {
-            $grade = $value->kind() === FailOn::KIND_GRADE ? $value->value() : $grade;
-        }
-        if ($grade === null) {
-            return null;
-        }
-        $changed = [];
-        foreach ($this->findings as $finding) {
-            // 0.13 read every matched `ignore[]` entry as accepting the whole package: priority none.
-            if ($finding->details()->entry() !== null || Priority013::rank($finding->priority()) < Priority013::rank($grade) || $finding->score()->total() >= ScoreModel::floorOf($grade)) {
-                continue;
-            }
-            $changed[] = new ChangedVerdict($finding->package(), $finding->version(), $finding->verdict(), $finding->priorityBasis(), $finding->grade(), $finding->score()->total(), ScoreText::render($finding->scoreBasis()));
-        }
-        usort($changed, static fn (ChangedVerdict $a, ChangedVerdict $b): int => [$a->package(), $a->version()] <=> [$b->package(), $b->version()]);
-
-        return $changed === [] ? null : RunNote::verdictRulesChanged($grade, $changed);
     }
 
     /** @return list<Finding> */
     public function findings(): array
     {
         return $this->findings;
-    }
-
-    /** @return list<Finding> */
-    public function flagged(): array
-    {
-        return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict013::flagged($f->verdict())));
     }
 
     /** @return list<Finding> every finding in the order of {@see compareGraded()} */
@@ -193,50 +145,12 @@ final class Report
         return array_values(array_filter($this->sorted(), static fn (Finding $f): bool => $f->isGraded()));
     }
 
-    /** @return array<string, int> */
-    public function byVerdict(): array
-    {
-        $counts = array_fill_keys(Verdict013::all(), 0);
-        foreach ($this->findings as $finding) {
-            ++$counts[$finding->verdict()];
-        }
-
-        return $counts;
-    }
-
-    /** @return array<string, int> the findings by {@see Finding::grade()}, every verdict in sort order */
+    /** @return array<string, int> the findings by {@see Finding::verdict()}, every verdict in sort order */
     public function byGrade(): array
     {
         $counts = array_fill_keys(array_merge(...ScoreModel::VERDICT_ORDER), 0);
         foreach ($this->findings as $finding) {
-            ++$counts[$finding->grade()];
-        }
-
-        return $counts;
-    }
-
-    /**
-     * The `abandoned` findings that name a package to move to ({@see Finding::successor()}):
-     * docs/verdicts.md#abandoned-and-where-to.
-     */
-    public function abandonedWithReplacement(): int
-    {
-        $count = 0;
-        foreach ($this->findings as $finding) {
-            if ($finding->successor() !== null) {
-                ++$count;
-            }
-        }
-
-        return $count;
-    }
-
-    /** @return array<string, int> */
-    public function byPriority(): array
-    {
-        $counts = array_fill_keys(Priority013::all(), 0);
-        foreach ($this->findings as $finding) {
-            ++$counts[$finding->priority()];
+            ++$counts[$finding->verdict()];
         }
 
         return $counts;
@@ -268,59 +182,10 @@ final class Report
         return $counts;
     }
 
-    /**
-     * The `pulled in by:` line, empty when {@see exposure()} is empty:
-     * docs/verdicts.md#transitive-exposure.
-     */
-    public function exposureSummaryLine(): string
+    /** Root `rot_depth`, counted from the findings on every call. */
+    public function rotDepth(): RotDepth
     {
-        $exposure = $this->exposure();
-        if ($exposure === []) {
-            return '';
-        }
-        $parts = [];
-        foreach (\array_slice($exposure, 0, self::EXPOSURE_NAMES, true) as $parent => $count) {
-            $parts[] = $parent.' '.$count;
-        }
-        if (\count($exposure) > self::EXPOSURE_NAMES) {
-            $parts[] = \sprintf('… and %d more', \count($exposure) - self::EXPOSURE_NAMES);
-        }
-
-        return 'pulled in by: '.implode(' · ', $parts);
-    }
-
-    /**
-     * The footer line for S9 advisories on packages that the report does not flag, empty when there
-     * are none. A footer that totals every verdict and omits them reads as "nothing to report".
-     * Without `--dev` the line says that `composer audit` counts `packages-dev` too, so the two
-     * totals differ by scope, not by a miss in one tool.
-     */
-    public function unflaggedAdvisoriesLine(): string
-    {
-        $packages = 0;
-        $advisories = 0;
-        foreach ($this->findings as $finding) {
-            if (Verdict013::flagged($finding->verdict())) {
-                continue;
-            }
-            $s9 = $finding->signalData(AdvisoryData::class);
-            if ($s9 !== null) {
-                ++$packages;
-                $advisories += \count($s9->rows());
-            }
-        }
-        if ($packages === 0) {
-            return '';
-        }
-
-        return \sprintf(
-            '%d security %s on %d %s the report does not flag; see composer audit%s',
-            $advisories,
-            $advisories === 1 ? 'advisory' : 'advisories',
-            $packages,
-            $packages === 1 ? 'package' : 'packages',
-            $this->includesDev ? '' : ' (it counts packages-dev too, which this run skipped; pass --dev to include them)'
-        );
+        return RotDepth::of($this->sorted());
     }
 
     /** Derived from the findings on every call, so the block cannot disagree with them. */
@@ -406,36 +271,6 @@ final class Report
     }
 
     /**
-     * One-line totals, shared by the table and GitHub formats. The replacement count shows only
-     * when it is not zero.
-     */
-    public function summaryLine(): string
-    {
-        $parts = [\sprintf('%d packages checked', $this->packagesChecked)];
-        $withReplacement = $this->abandonedWithReplacement();
-        foreach ($this->byVerdict() as $verdict => $count) {
-            $parts[] = $verdict.' '.$count.($verdict === Verdict::ABANDONED && $withReplacement > 0 ? \sprintf(' (%d with a replacement)', $withReplacement) : '');
-        }
-
-        return implode(' · ', $parts);
-    }
-
-    /**
-     * The four flagged priorities. `none` is omitted: it counts the unflagged rows, which
-     * {@see summaryLine()} totals.
-     */
-    public function prioritySummaryLine(): string
-    {
-        $counts = $this->byPriority();
-        $parts = [];
-        foreach ([Priority013::CRITICAL, Priority013::HIGH, Priority013::MEDIUM, Priority013::LOW] as $level) {
-            $parts[] = $level.' '.$counts[$level];
-        }
-
-        return 'priority: '.implode(' · ', $parts);
-    }
-
-    /**
      * {@see exposure()} as a list, so the JSON document always encodes it as an array, never as an
      * object keyed by parent.
      *
@@ -455,9 +290,9 @@ final class Report
     private function unattributedList(): array
     {
         $list = [];
-        foreach ($this->findings as $finding) {
+        foreach ($this->sorted() as $finding) {
             if (TransitiveExposure::sharedAboveCap($finding)) {
-                $list[] = ['package' => $finding->package(), 'verdict' => $finding->grade(), 'lead' => $finding->lead(), 'flag_ids' => $finding->flagIds(), 'fan_in' => \count($finding->directDependents())];
+                $list[] = ['package' => $finding->package(), 'verdict' => $finding->verdict(), 'lead' => $finding->lead(), 'flag_ids' => $finding->flagIds(), 'fan_in' => \count($finding->directDependents())];
             }
         }
 
@@ -534,15 +369,15 @@ final class Report
             'counts' => $this->byGrade(),
             'abandoned' => Report2Root::toAbandonedArray($sorted),
             'priorities' => Report2Root::toPrioritiesArray($sorted),
-            'flags' => Report2Root::toFlagsArray($sorted),
+            'flags' => FlagTotals::of($sorted),
             'exposure' => $this->exposureList(),
             'exposure_rule' => ['max_fan_in' => TransitiveExposure::MAX_FAN_IN],
             'unattributed' => $this->unattributedList(),
-            'rot_depth' => RotDepth::of($sorted),
+            'rot_depth' => $this->rotDepth(),
             'libyears' => Report2Root::toLibyearsArray($this->libyears(), $sorted),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'gate' => ($gate ?? Gate::ofFindings($this, FailOn::none()))->toArray($run),
-            'security' => Report2Root::toSecurityArray($sorted),
+            'security' => SecurityTotals::of($sorted),
             'data_date' => Report2Root::dataDate($sorted),
             'notes' => $this->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->notes),

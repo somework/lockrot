@@ -228,6 +228,14 @@ final class Gate
         return $this->byPackage[$package] ?? null;
     }
 
+    /** Whether the finding of that package fails the gate, false for a package the report does not hold. */
+    public function packageFails(string $package): bool
+    {
+        $standing = $this->standingOf($package);
+
+        return $standing !== null && $standing->fails();
+    }
+
     /** @return list<GateStanding> one per finding, in the order of the report's findings() */
     public function standings(): array
     {

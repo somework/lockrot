@@ -1,39 +1,65 @@
-<options=bold>critical (2)</options=bold>
-  <fg=red>abandoned</fg=red>    microsoft/azure-storage-blob 1.5.4  direct
-               marked abandoned by its repository; repository archived on GitHub; last release 2022-09-02 (4.0 years
-               ago); last push 2023-07-18 (3.2 years ago); pulls in 1 flagged package: microsoft/azure-storage-common
-               (stale)
-  <fg=red>silent</fg=red>       bantu/ini-get-wrapper v1.0.1  direct
-               last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago)
+<options=bold><fg=red>critical (2)</fg=red></options=bold>
+  bantu/ini-get-wrapper v1.0.1  direct  ·  silent
+      32 = silent 32
+      do: find a maintained alternative: nothing released for 12.0 years
+      silent       last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago)
+  microsoft/azure-storage-blob 1.5.4  direct  ·  abandoned
+      32 = abandoned 32
+      do: find a replacement (none named)
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2022-09-02 (4.0
+                   years ago); last push 2023-07-18 (3.2 years ago)
+      pulls in 1 flagged package: microsoft/azure-storage-common (stale)
 
-<options=bold>high (1)</options=bold>
-  <fg=red>silent</fg=red>       pear/console_getopt v1.4.3  via pear/pear-core-minimal, also via pear/archive_tar
-               last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)
+<options=bold><fg=red>high (1)</fg=red></options=bold>
+  pear/console_getopt v1.4.3  via pear/archive_tar, pear/pear-core-minimal  ·  silent
+      16 = silent 32 ÷ 2 transitive
+      do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar,
+          pear/pear-core-minimal: replace or update them; the newest release of pear/pear-core-minimal (v1.10.18) still
+          requires it
+      silent       last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)
 
-<options=bold>medium (3)</options=bold>
-  <fg=yellow>stale</fg=yellow>        deepdiver1975/tarstreamer v2.1.0  direct
-               last release 2023-06-16 (3.2 years ago)
-  <fg=yellow>stale</fg=yellow>        kornrunner/blurhash v1.2.2  direct
-               last release 2022-07-13 (4.2 years ago)
-  <fg=yellow>stale</fg=yellow>        mexitek/phpcolors v1.0.4  direct
-               last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago)
+<options=bold><fg=yellow>medium (3)</fg=yellow></options=bold>
+  deepdiver1975/tarstreamer v2.1.0  direct  ·  stale
+      8 = stale 8
+      do: —
+      stale        last release 2023-06-16 (3.2 years ago)
+  kornrunner/blurhash v1.2.2  direct  ·  stale
+      8 = stale 8
+      do: —
+      stale        last release 2022-07-13 (4.2 years ago)
+  mexitek/phpcolors v1.0.4  direct  ·  stale
+      8 = stale 8
+      do: —
+      stale        last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago)
 
 <options=bold>low (3)</options=bold>
-  stale        cweagans/composer-configurable-plugin 2.0.0  via cweagans/composer-patches
-               last release 2023-02-12 (3.6 years ago)
-  stale        microsoft/azure-storage-common 1.5.2  via microsoft/azure-storage-blob
-               last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago)
-  stale        pear/pear_exception v1.0.2  via pear/pear-core-minimal, also via pear/archive_tar
-               last release 2021-03-21 (5.5 years ago)
+  cweagans/composer-configurable-plugin 2.0.0  via cweagans/composer-patches  ·  stale
+      4 = stale 8 ÷ 2 transitive
+      do: —
+      stale        last release 2023-02-12 (3.6 years ago)
+  microsoft/azure-storage-common 1.5.2  via microsoft/azure-storage-blob  ·  stale
+      4 = stale 8 ÷ 2 transitive
+      do: —
+      stale        last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago)
+  pear/pear_exception v1.0.2  via pear/archive_tar, pear/pear-core-minimal  ·  stale
+      4 = stale 8 ÷ 2 transitive
+      do: —
+      stale        last release 2021-03-21 (5.5 years ago)
 
-94 packages checked · abandoned 1 · silent 2 · pinned 0 · left-behind 0 · old-promise 0 · stale 6 · unknown 0 ·
-finished 16 · ok 69
-priority: critical 2 · high 1 · medium 3 · low 3
-libyears: 47.5 behind across all 94 packages · 13.3 from direct requirements ·
+94 packages checked · 9 flagged: critical 2 · high 1 · medium 3 · low 3
+flags: abandoned 1 · silent 2 · stale 6
+depth: 4 of 9 flagged packages are named by no line of composer.json · direct 5 · 1 hop 4 ·
+deepest: cweagans/composer-configurable-plugin, microsoft/azure-storage-common, pear/console_getopt and 1 more, 1 hop (cweagans/composer-patches › cweagans/composer-configurable-plugin)
+security: no vulnerable package · advisories not checked · packages-dev not checked (pass --dev)
+libyears: at least 47.5 behind across all 94 packages · 13.3 from direct requirements ·
 furthest behind punic/punic 3.8.1 at 3.5
 pulled in by: pear/archive_tar 2 · pear/pear-core-minimal 2 · cweagans/composer-patches 1 ·
 microsoft/azure-storage-blob 1
-Data as of 2026-09-14 (package repositories, repository hosts). Run composer lockrot --format=json for details.
+advisories: 0 packages asked, 94 not asked
+<fg=red>gate: fails · --fail-on=high · 3 findings fail it ·</fg=red>
+<fg=red>advisories not applied to 94 packages: not checked (Composer below 2.4) · target php 8.4 (--target-php)</fg=red>
+Data as of 2026-09-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+details.
 note: Repository activity not checked for 3 packages on hosts lockrot cannot ask: codeberg.org (3). A host that runs
 GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a
 Subversion host.

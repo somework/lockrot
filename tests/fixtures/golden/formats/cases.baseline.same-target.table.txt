@@ -1,0 +1,328 @@
+critical (9)
+  twig/twig v2.16.1  direct  ·  vulnerable
+      32 = vulnerable 32 [critical advisory] (baseline: new package)
+      do: raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0,
+          require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and
+          symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new
+          major brings its own requirements, which lockrot does not solve
+      vulnerable   15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst:
+                   CVE-2026-46633 PHP code injection via `{% use %}` template name
+      age: installed v2.16.1 released 2024-09-09 (2.1 years ago), the newest on 2.x; newest release v3.30.0
+           2026-09-25 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago)
+  geoip2/geoip2 v2.4.5  direct  ·  left-behind · old-promise · vulnerable
+      36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory] (baseline: new package)
+      do: raise require.php to >=8.1, then require geoip2/geoip2 ^3.4 — clears left-behind, old-promise and 2
+          advisories; 3.x needs php >=8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new
+          major brings its own requirements, which lockrot does not solve
+      left-behind  branch 2.x last released 2022-08-05 (4.2 years ago); 3.x released v3.4.0 (2026-07-16), needs php
+                   >=8.1 above the project's php >=7.2.5; no releasing branch within reach
+      old-promise  released 2017-01-31 for PHP 5 (php ">=5.3.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+      vulnerable   2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x; worst: CVE-2026-00011 an advisory only the
+                   next major fixes (‡)
+  symfony/monolog-bridge v2.6.13  direct  ·  left-behind · old-promise · vulnerable
+      36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory] (baseline: new package)
+      do: require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php
+          >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new
+          major brings its own requirements, which lockrot does not solve
+      left-behind  branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php
+                   >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+      old-promise  released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+      vulnerable   1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object
+                   Deserialization in MonologBridge server:log Listener
+  guzzlehttp/guzzle 6.5.8  direct  ·  left-behind (baseline) · vulnerable
+      32 = left-behind 16 + vulnerable 16 [high advisory] (baseline: 9 new advisories)
+      gate 32 = min(32, 2 × 16) (both agree); new: 16 = vulnerable 16 [high advisory]
+      do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 9 advisories;
+          7.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; a new major
+          brings its own requirements, which lockrot does not solve
+      left-behind  branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4
+                   || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach
+      vulnerable   9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host
+                   can bypass host-based checks
+  guzzlehttp/cache-subscriber 0.2.0  direct  ·  abandoned · old-promise
+      36 = abandoned 32 + old-promise 4 [¼ of 16] (baseline: new package)
+      do: find a replacement (none named)
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.1
+                   years ago); last push 2019-09-16 (7.1 years ago)
+      old-promise  released 2019-09-16 for PHP 5 (php ">=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+  symfony/debug v3.4.47  direct  ·  abandoned (baseline) · old-promise
+      36 = abandoned 32 + old-promise 4 [¼ of 16] (baseline: old-promise covered by the recorded abandoned)
+      gate 0 = min(36, 2 × 0) (the new facts bound it); new: 0
+      do: replace with symfony/error-handler (named by its registry)
+      abandoned    marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on
+                   GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)
+      old-promise  released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26);
+                   admits 8.4 untested
+  yosymfony/toml v1.0.4  direct  ·  silent · old-promise
+      36 = silent 32 + old-promise 4 [¼ of 16] (baseline: new package)
+      do: find a maintained alternative: nothing released for 8.2 years
+      silent       last release 2018-08-08 (8.2 years ago); last push 2020-08-08 (6.2 years ago)
+      old-promise  released 2018-08-08 for PHP 7 (php ">=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+  sensio/framework-extra-bundle v6.2.10  direct  ·  abandoned
+      32 = abandoned 32 (baseline: new package)
+      do: replace it: its registry suggests "Symfony"
+      abandoned    marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last
+                   release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago)
+  web-token/jwt-key-mgmt 3.4.3  direct  ·  abandoned
+      32 = abandoned 32 (baseline: new package)
+      do: replace with web-token/jwt-library (named by its registry)
+      abandoned    marked abandoned by its registry, replacement: web-token/jwt-library
+      age: installed 3.4.3, release date not known (no date); last push 2025-05-07 (1.4 years ago)
+
+high (13)
+  robrichards/xmlseclibs 3.1.1  via mautic/core-lib  ·  old-promise · vulnerable
+      24 = old-promise 16 ÷ 2 transitive + vulnerable 16 [high advisory] (baseline: new package)
+      do: composer update robrichards/xmlseclibs (gets 3.1.5) — clears old-promise and 2 advisories
+      old-promise  released 2020-09-05 for PHP 5 (php ">= 5.4"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+      vulnerable   2 advisories: 1 high, 1 medium — all fixed on 3.x; worst: CVE-2026-32313 xmlseclibs: Missing
+                   AES-GCM Authentication Tag Validation on Encrypted Nodes Allows for Unauthorized Decryption
+      age: installed 3.1.1 released 2020-09-05 (6.1 years ago); 3.x last released 3.1.5 2026-03-13 (0.6 years ago);
+           newest release 4.0.0 2026-08-22 (0.1 years ago); last push 2026-08-22 (0.1 years ago)
+  laravel/framework v9.52.16  direct  ·  vulnerable
+      16 = vulnerable 16 [high advisory] (baseline: new package)
+      do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php
+          ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own
+          requirements, which lockrot does not solve
+      vulnerable   6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9
+                   Laravel Framework: CRLF injection in default email rule
+      age: installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.2 years
+           ago); newest release v11.57.0 2026-09-29 (less than three weeks ago); last push 2026-09-30 (less than three
+           weeks ago)
+  league/commonmark 2.9.1  via laravel/framework, laravel/nightwatch, spatie/laravel-markdown  ·  vulnerable
+      16 = vulnerable 16 [high advisory] (baseline: 2 new advisories; PKSA-m4t9-vsgq-8khn re-rated medium → high)
+      gate 16 = min(16, 2 × 16) (the score is lower); new: 16 = vulnerable 16 [high advisory]
+      do: composer update league/commonmark (gets 2.10.3) — clears 3 advisories
+      vulnerable   3 advisories: 2 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark:
+                   Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan
+      age: installed 2.9.1 released 2026-08-09 (0.2 years ago); 2.x last released 2.10.3 2026-09-21 (0.1 years
+           ago), its newest release; last push 2026-10-01 (less than three weeks ago)
+  guzzlehttp/psr7 1.9.1  via guzzlehttp/guzzle  ·  left-behind · vulnerable
+      16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory] (baseline: new package)
+      do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle — clears
+          left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target
+          php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move
+          too; a new major brings its own requirements, which lockrot does not solve
+      left-behind  branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4
+                   || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach
+      vulnerable   4 advisories: 4 medium — none fixed on 1.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line
+                   serialization
+  symfony/routing v4.4.41  via mautic/core-lib  ·  left-behind · vulnerable
+      16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory] (baseline: new package)
+      do: move symfony/routing to ^5.4.53 through mautic/core-lib — clears left-behind and 2 advisories; 5.x needs php
+          >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve;
+          what requires it must allow it
+      left-behind  branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28)
+      vulnerable   2 advisories: 2 medium — none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding
+                   Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986
+                   Normalization
+  friendsofsymfony/oauth-server-bundle dev-master  direct  ·  pinned · stale
+      18 = pinned 16 + stale 2 [¼ of 8] (baseline: new package)
+      do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it;
+          replace it
+      pinned       pinned to branch snapshot dev-master
+      stale        last release 2019-01-23 (7.7 years ago)
+  roots/wp-config 1.0.0  direct  ·  old-promise · stale
+      18 = old-promise 16 + stale 2 [¼ of 8] (baseline: new package)
+      do: test it on PHP 8.4 — 1.0.0 is its newest release
+      old-promise  released 2018-08-10 for PHP 5 (php ">=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+      stale        last release 2018-08-10 (8.2 years ago)
+  tubalmartin/cssmin v4.1.1  direct  ·  old-promise · stale
+      18 = old-promise 16 + stale 2 [¼ of 8] (baseline: new package)
+      do: test it on PHP 8.4 — v4.1.1 is its newest release
+      old-promise  released 2018-01-15 for PHP 5 (php ">=5.3.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+      stale        last release 2018-01-15 (8.7 years ago)
+  hoa/consistency 1.17.05.02  via lorisleiva/laravel-search-string  ·  abandoned · old-promise
+      18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive (baseline: new package)
+      do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that
+          package
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1
+                   years ago); last push 2021-04-28 (5.5 years ago)
+      old-promise  released 2017-05-02 for PHP 5 (php ">=5.5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+  web-auth/metadata-service v2.1.7  via web-auth/webauthn-lib  ·  abandoned · left-behind
+      18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive (baseline: new package)
+      do: replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace
+          or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
+      abandoned    marked abandoned by its registry, replacement: web-auth/webauthn-lib
+      left-behind  branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11)
+  joomla/string 2.0.1  direct  ·  left-behind
+      16 = left-behind 16 (baseline: new package)
+      do: raise require.php to >=8.1, then require joomla/string ^3.0 — clears left-behind; 3.x needs php ^8.1.0,
+          require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires
+          ^2.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot
+          does not solve
+      left-behind  branch 2.x last released 2022-08-15 (4.2 years ago); 4.x released 4.0.0 (2025-07-23), needs php
+                   ^8.3.0 above the project's php ^7.2.5; no releasing branch within reach
+  matomo/network 2.0.1  direct  ·  old-promise
+      16 = old-promise 16 (baseline: new package)
+      do: composer update matomo/network (gets 2.0.3) — clears old-promise
+      old-promise  released 2020-10-05 for PHP 5 (php ">=5.4"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+      age: installed 2.0.1 released 2020-10-05 (6.0 years ago); 2.x last released 2.0.3 2026-04-17 (0.5 years ago),
+           its newest release; last push 2026-04-17 (0.5 years ago)
+  fgrosse/phpasn1 v2.5.0  unreached  ·  abandoned
+      16 = abandoned 32 ÷ 2 unreached (baseline: abandoned new)
+      gate 16 = min(16, 2 × 16) (the score is lower); new: 16 = abandoned 32 ÷ 2 unreached
+      do: find a replacement (none named); lockrot found no path from your requirements to it: `composer why` names what
+          requires it
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8
+                   years ago); last push 2023-04-23 (3.5 years ago)
+
+medium (11)
+  joomla/filter 2.0.5  direct  ·  vulnerable
+      8 = vulnerable 8 [medium advisory] (baseline: new package)
+      do: raise require.php to >=8.1, then require joomla/filter ^3.0.5 — clears the advisory; 3.x needs php ^8.1.0,
+          require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements,
+          which lockrot does not solve
+      vulnerable   1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable
+                   to XSS via the input filter
+      age: installed 2.0.5 released 2024-08-20 (2.1 years ago); 2.x last released 2.0.6 2025-09-30 (1.0 years ago);
+           newest release 3.0.7 2026-09-29 (less than three weeks ago); last push 2026-09-29 (less than three weeks ago)
+  league/flysystem 1.1.9  via mautic/core-lib  ·  left-behind · vulnerable
+      10 = left-behind 16 ÷ 2 transitive + vulnerable 2 [low advisory] (baseline: new package)
+      do: move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php
+          ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve;
+          what requires it must allow it
+      left-behind  branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02)
+      vulnerable   1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-102601 Flysystem:
+                   WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed
+                   UTF-8 in the path, affecting every adapter
+  league/uri 6.4.0  unreached  ·  left-behind · old-promise
+      10 = (left-behind 16 + old-promise 4 [¼ of 16]) ÷ 2 unreached (baseline: new package)
+      do: raise require.php to >=8.1, then move league/uri to ^7.8 — clears left-behind and old-promise; 7.x needs php
+          ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own
+          requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what
+          requires it must allow it
+      left-behind  branch 6.x last released 2022-09-13 (4.1 years ago); 7.x released 7.8.1 (2026-03-15), needs php ^8.1
+                   above the project's php ^7.2.5 || ^8.0; no releasing branch within reach
+      old-promise  released 2020-11-22 for PHP 7 (php ">=7.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+  akaunting/laravel-debugbar-collector 2.1.1  direct  ·  stale
+      8 = stale 8 (baseline: new package)
+      do: —
+      stale        last release 2023-06-02 (3.4 years ago); last push 2023-06-02 (3.4 years ago)
+  doctrine/cache 2.1.1  direct  ·  stale
+      8 = stale 8 (baseline: new package)
+      do: —
+      stale        last release 2022-05-20 (4.4 years ago)
+  hyvor/php-json-exporter 0.0.3  direct  ·  stale
+      8 = stale 8 (baseline: new package)
+      do: —
+      stale        last release 2023-04-11 (3.5 years ago)
+  bacon/bacon-qr-code 2.0.8  unreached  ·  left-behind
+      8 = left-behind 16 ÷ 2 unreached (baseline: new package)
+      do: raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 — clears left-behind; 3.x needs php ^8.1,
+          require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements,
+          which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must
+          allow it
+      left-behind  branch 2.x last released 2022-12-07 (3.8 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1
+                   above the project's php ^7.2.5 || ^8.0; no releasing branch within reach
+  genealabs/laravel-pivot-events 10.0.1  via genealabs/laravel-model-caching  ·  left-behind
+      8 = left-behind 16 ÷ 2 transitive (baseline: new package)
+      do: move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching — clears left-behind; a
+          new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the
+          newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it
+      left-behind  branch 10.x last released 2023-03-22 (3.6 years ago); 13.x released 13.1.0 (2026-02-28), needs php
+                   ^8.2 above the project's php ^8.1; 12.x released 12.0.0 (2025-02-26)
+  symfony/event-dispatcher 5.4.x-dev  via mautic/core-lib  ·  pinned
+      8 = pinned 16 ÷ 2 transitive (baseline: new package)
+      do: move it to a tag — the newest on its own line is v5.4.45, through mautic/core-lib (2024-09-25); 5.x needs
+          php >=7.2.5; what requires it must allow it
+      pinned       pinned to branch snapshot 5.4.x-dev
+      age: 5.x last released v5.4.45 2024-09-25 (2.0 years ago); newest release v8.1.5 2026-08-21 (0.1 years ago);
+           last push 2026-09-25 (less than three weeks ago)
+  symfony/event-dispatcher-contracts v1.10.0  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/event-dispatcher, symfony/form, symfony/framework-bundle, symfony/google-mailer, symfony/http-kernel, symfony/mailer, symfony/monolog-bundle, symfony/security-bundle, symfony/security-core, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle  ·  left-behind
+      8 = left-behind 16 ÷ 2 transitive (baseline: new package)
+      do: move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle,
+          bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more — clears left-behind; 2.x needs php
+          >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which
+          lockrot does not solve; what requires it must allow it; the newest releases of friendsofsymfony/user-bundle
+          (v4.1.0), symfony/event-dispatcher (v8.1.5) and symfony/security-core (v8.1.8) still require it
+      left-behind  branch 1.x last released 2022-07-20 (4.2 years ago); 3.x released v3.7.1 (2026-06-05), needs php
+                   >=8.1 above the project's php >=7.4; 2.x released v2.5.4 (2024-09-25)
+  symfony/var-dumper v4.4.47  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/error-handler, symfony/framework-bundle, symfony/http-kernel, symfony/monolog-bundle, symfony/security-bundle, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle  ·  left-behind
+      8 = left-behind 16 ÷ 2 transitive (baseline: new package)
+      do: move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator,
+          craue/config-bundle and 31 more — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the
+          target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires
+          it must allow it; the newest release of symfony/error-handler (v8.1.8) still requires it
+      left-behind  branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.7 (2026-09-03), needs php
+                   >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-08)
+
+low (4)
+  balping/json-raw-encoder v1.0.2  via akaunting/laravel-apexcharts  ·  stale (baseline) · vulnerable
+      4 = (stale 8 ÷ 2 transitive + vulnerable 4 [low advisory 2 × 2: no reachable fix]) ÷ 2 dev (baseline: 1 advisory known)
+      gate 0 = min(4, 2 × 0) (the new facts bound it); new: 0
+      do: no release fixes it
+      stale        last release 2023-03-27 (3.5 years ago)
+      vulnerable   1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-00004 an advisory added to show the
+                   either opening (‡)
+      checks missing: S3, S4 (request failed)
+  symfony/yaml v5.4.23  direct  ·  vulnerable
+      2 = vulnerable 2 [low advisory] (baseline: 1 advisory known; 2 new advisories)
+      gate 2 = min(2, 2 × 2) (the score is lower); new: 2 = vulnerable 2 [low advisory]
+      do: composer update symfony/yaml (gets v5.4.53) — clears 3 advisories
+      vulnerable   3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via
+                   Unbounded Recursion in Nested Blocks, Sequences, and Mappings
+      age: installed v5.4.23 released 2023-04-23 (3.5 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years
+           ago); newest release v8.1.8 2026-09-26 (less than three weeks ago); last push 2026-10-01 (less than three
+           weeks ago)
+  symfony/polyfill-intl-idn v1.37.0  via guzzlehttp/guzzle  ·  vulnerable
+      2 = vulnerable 2 [low advisory] (baseline: new package)
+      do: composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory
+      vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts
+                   xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
+      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (0.1 years
+           ago), its newest release
+      maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
+                              API of the extension they replace
+  jfcherng/php-color-output 2.0.2  via jfcherng/php-diff  ·  old-promise · stale
+      4 = ((old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down) (baseline: new package)
+      do: move jfcherng/php-color-output to ^3.0.0 through jfcherng/php-diff — clears old-promise; 3.x needs php
+          >=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own
+          requirements, which lockrot does not solve; what requires it must allow it; the newest release of
+          jfcherng/php-diff (7.0.1) still requires it
+      old-promise  released 2020-05-27 for PHP 7 (php ">=7.1.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+                   untested
+      stale        last release 2021-05-27 (5.4 years ago)
+
+not flagged (4)
+  akaunting/laravel-version 1.0.4  direct  ·  finished · stale (accepted)
+      0 (stale accepted)
+  pagerfanta/twig v3.8.0  direct  ·  ok
+      0
+      checks missing: S2, S8 (undated releases)
+  doctrine/annotations 2.0.2  via mautic/core-lib  ·  ok
+      0
+  scheb/2fa-google-authenticator v8.6.1  via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle, pimcore/studio-ui-bundle  ·  ok
+      0
+      gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0
+      checks missing: S2, S8 (undated releases)
+
+41 packages checked · 37 flagged: critical 9 · high 13 · medium 11 · low 4
+flags: abandoned 7 · silent 1 · pinned 2 · left-behind 13 · old-promise 12 · stale 8 · vulnerable 14 ·
+18 packages carry more than one
+depth: 17 of 37 flagged packages are named by no line of composer.json · direct 20 · 1 hop 11 · 2 hops 2 ·
+4 hops 1 · unreached 3 ·
+deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs)
+security: 14 vulnerable packages · 51 advisories: 1 critical, 11 high, 24 medium, 3 unrated, 12 low ·
+packages-dev not checked (pass --dev)
+fix, by package: composer update 6 · upgrade 1 · php floor raise 6 · no fix 1
+update now: composer update robrichards/xmlseclibs league/commonmark symfony/routing league/flysystem symfony/yaml symfony/polyfill-intl-idn
+libyears: 90.1 behind across 35 of 41 packages · 45.9 from direct requirements ·
+furthest behind symfony/monolog-bridge v2.6.13 at 10.6
+pulled in by: mautic/core-lib 4 · guzzlehttp/guzzle 2 · akaunting/laravel-apexcharts 1 ·
+genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 · … and 5 more
+advisories: 41 packages asked · packagist.org answered (51 on record for 14 packages)
+baseline: 3 known · 31 new · 4 worsened · 0 stale (lockrot-baseline.json)
+gate: fails · --fail-on=high,unchecked ·
+22 findings fail it (high 21, unchecked 1); 3 reach it and are known to the baseline · target php 8.4 (--target-php)
+Data as of 2026-10-13 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+details.

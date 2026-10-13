@@ -30,7 +30,6 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -234,7 +233,6 @@ final class BranchFloorAgreementTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), $target, PhpReleaseDates::load(), $projectPhp),
-            new VerdictEngine(),
             $clock,
             true
         );

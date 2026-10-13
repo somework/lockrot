@@ -27,7 +27,6 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 final class RotDepthTest extends TestCase
@@ -178,7 +177,7 @@ final class RotDepthTest extends TestCase
         ]]);
         $project = ProjectConfig::fromArray(['require' => ['ocramius/proxy-manager' => '^2.1']]);
         $clock = Clock::fixed('2026-09-14T00:00:00+00:00');
-        $analyzer = new Analyzer(self::loader(), new ActivityClient(self::http(), ForgeAuth::anonymous()), new ActivityFetchPlanner(ForgeAuth::anonymous()), new RepoLocator(), new Allowlist([]), SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()), new VerdictEngine(), $clock, false);
+        $analyzer = new Analyzer(self::loader(), new ActivityClient(self::http(), ForgeAuth::anonymous()), new ActivityFetchPlanner(ForgeAuth::anonymous()), new RepoLocator(), new Allowlist([]), SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()), $clock, false);
         $report = $analyzer->analyze($lock, $project, false);
         $document = JsonPath::decoded($report->toArray());
         $finding = JsonPath::arrayAt($document, ['findings', 0]);

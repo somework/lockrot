@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Score;
 
+use Lockrot\Verdict\Score;
+
 /**
  * The one score line, text grammar 1, rendered from the score object's fields alone:
  *
@@ -24,16 +26,40 @@ final class ScoreText
     {
         $accepted = array_map(static fn (Accepted $row): string => $row->flag(), $score->accepted());
         $tail = $accepted === [] ? '' : ' ('.implode(', ', $accepted).' accepted)';
-        if ($score->terms() === []) {
-            return '0'.$tail;
+
+        return ($score->terms() === [] ? '0' : self::line($score->total(), $score->maintenanceTerms(), $score->securityTerm(), $score->modifiers(), $score->roundedDown(), $score->exactHalves())).$tail;
+    }
+
+    /**
+     * A score that no flag set backs, such as the gate basis's `new`: its terms and modifiers, no
+     * accepted flag.
+     *
+     * @throws \LogicException for a corroborating share that the grammar has no glyph for
+     */
+    public static function ofScore(Score $score): string
+    {
+        if ($score->grade() === null) {
+            return '0';
         }
+
+        return self::line($score->total(), $score->maintenanceTerms(), $score->deciding(), ScoreBasis::modifiersOf($score), $score->exactHalves() !== 2 * $score->total(), $score->exactHalves());
+    }
+
+    /**
+     * @param list<MaintenanceTerm> $terms
+     * @param list<Modifier>        $modifiers
+     *
+     * @throws \LogicException for a corroborating share that the grammar has no glyph for
+     */
+    private static function line(int $total, array $terms, ?SecurityTerm $security, array $modifiers, bool $roundedDown, int $exactHalves): string
+    {
         $maintenance = [];
-        foreach ($score->maintenanceTerms() as $term) {
+        foreach ($terms as $term) {
             $maintenance[] = $term->isLead() ? $term->flag().' '.$term->points() : self::corroborating($term);
         }
         $reach = null;
         $dev = null;
-        foreach ($score->modifiers() as $modifier) {
+        foreach ($modifiers as $modifier) {
             if (!$modifier->changes()) {
                 continue;
             }
@@ -49,7 +75,6 @@ final class ScoreText
             $line = implode(' + ', $maintenance);
             $body[] = $reach === null ? $line : (\count($maintenance) > 1 ? '('.$line.')' : $line).$reach;
         }
-        $security = $score->securityTerm();
         if ($security !== null) {
             $body[] = self::security($security);
         }
@@ -58,7 +83,7 @@ final class ScoreText
             $atom = \count($body) === 1 && ($maintenance === [] || (\count($maintenance) === 1 && $reach === null));
             $line = ($atom ? $line : '('.$line.')').$dev;
         }
-        return $score->total().' = '.$line.($score->roundedDown() ? ' ('.HalfPoints::text($score->exactHalves()).', rounded down)' : '').$tail;
+        return $total.' = '.$line.($roundedDown ? ' ('.HalfPoints::text($exactHalves).', rounded down)' : '');
     }
 
     /** @throws \LogicException for a share that the grammar has no glyph for */

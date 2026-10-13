@@ -14,17 +14,15 @@ use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
-use Lockrot\Legacy\Priority013;
+use Lockrot\Output\RunFooter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
-use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -37,38 +35,9 @@ final class ReportTest extends TestCase
         return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain([$package])->build();
     }
 
-    /** A transitive finding: the chain is a root plus the package itself, so isDirect() is false. */
-    private function transitive(string $package, string $verdict, bool $dev = false): Finding
-    {
-        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain(['vendor/root', $package])->withDev($dev)->build();
-    }
 
-    /** A finding whose only counted flag is stale: 0.13 placed it high on its verdict, the score reads medium. */
-    private function demoted(string $package, string $verdict = Verdict::LEFT_BEHIND): Finding
-    {
-        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain([$package])
-            ->withFlags(FlagSet::fromSignals(ScoreSweep::signalsOf('stale'), null, []))->build();
-    }
 
-    public function testTheVerdictRulesNoteListsItsFindingsByPackage(): void
-    {
-        $report = $this->report($this->demoted('z/last'), $this->demoted('a/first'))
-            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
-        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::VERDICT_RULES_CHANGED));
 
-        self::assertCount(1, $notes);
-        self::assertSame(['a/first', 'z/last'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['findings'], 'package'));
-    }
-
-    public function testTheVerdictRulesNoteListsByPackageWhatTheReportListsByScore(): void
-    {
-        $report = $this->report($this->demoted('a/first'), $this->demoted('z/last', Verdict::PINNED))
-            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
-        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::VERDICT_RULES_CHANGED));
-
-        self::assertSame(['z/last', 'a/first'], $this->names($report), '0.13 lists pinned before left-behind');
-        self::assertSame(['a/first', 'z/last'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['findings'], 'package'));
-    }
 
     public function testARunWithoutAGateValueNeverTripsOnAFailedLookup(): void
     {
@@ -95,201 +64,18 @@ final class ReportTest extends TestCase
         return new Report(array_values($findings), [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), \count($findings), 0);
     }
 
-    /** @return list<string> */
-    private function names(Report $report): array
-    {
-        return array_map(static fn (Finding $f): string => $f->package(), $report->findings());
-    }
 
-    public function testFindingsAreSortedByPriorityThenSeverityThenDirectThenName(): void
-    {
-        // abandoned transitive dev -> medium, pinned direct prod -> high, so the pinned row sorts first
-        // even though abandoned outranks pinned on verdict severity.
-        $report = $this->report(
-            $this->transitive('vendor/abandoned-transitive-dev', Verdict::ABANDONED, true),
-            $this->finding('vendor/pinned-direct', Verdict::PINNED),
-            $this->finding('vendor/abandoned-direct', Verdict::ABANDONED),
-            $this->finding('vendor/ok', Verdict::OK)
-        );
 
-        self::assertSame(
-            ['vendor/abandoned-direct', 'vendor/pinned-direct', 'vendor/abandoned-transitive-dev', 'vendor/ok'],
-            $this->names($report)
-        );
-    }
 
-    public function testWithinOnePriorityTheHigherVerdictSeverityComesFirst(): void
-    {
-        // Both are high: silent transitive prod and pinned direct prod. Silent outranks pinned.
-        $report = $this->report(
-            $this->finding('vendor/pinned-direct', Verdict::PINNED),
-            $this->transitive('vendor/silent-transitive', Verdict::SILENT)
-        );
 
-        self::assertSame(['vendor/silent-transitive', 'vendor/pinned-direct'], $this->names($report));
-    }
 
-    public function testWithinOnePriorityAndVerdictDirectComesBeforeTransitive(): void
-    {
-        // Both dev and stale, so both land on the `low` floor: the only thing left to order them by
-        // is direct-before-transitive, which beats the alphabetical package name.
-        $report = $this->report(
-            $this->transitive('vendor/aaa-transitive', Verdict::STALE, true),
-            (new FindingBuilder())->withPackage('vendor/zzz-direct')->withVerdict(Verdict::STALE)->withChain(['vendor/zzz-direct'])->withDev(true)->build()
-        );
 
-        self::assertSame(['vendor/zzz-direct', 'vendor/aaa-transitive'], $this->names($report));
-    }
 
-    public function testBySeverityStillBreaksTiesByPackageNameAscending(): void
-    {
-        $report = new Report(
-            [
-                $this->finding('vendor/ok-b', Verdict::OK),
-                $this->finding('vendor/silent-b', Verdict::SILENT),
-                $this->finding('vendor/abandoned-b', Verdict::ABANDONED),
-                $this->finding('vendor/silent-a', Verdict::SILENT),
-                $this->finding('vendor/abandoned-a', Verdict::ABANDONED),
-                $this->finding('vendor/ok-a', Verdict::OK),
-            ],
-            [],
-            new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
-            6,
-            0
-        );
 
-        self::assertSame(
-            ['vendor/abandoned-a', 'vendor/abandoned-b', 'vendor/silent-a', 'vendor/silent-b', 'vendor/ok-a', 'vendor/ok-b'],
-            array_map(static fn (Finding $f): string => $f->package(), $report->findings())
-        );
-    }
 
-    public function testFlaggedExcludesOkFinishedAndUnknown(): void
-    {
-        $report = new Report(
-            [
-                $this->finding('vendor/a', Verdict::ABANDONED),
-                $this->finding('vendor/b', Verdict::SILENT),
-                $this->finding('vendor/c', Verdict::PINNED),
-                $this->finding('vendor/d', Verdict::OLD_PROMISE),
-                $this->finding('vendor/e', Verdict::STALE),
-                $this->finding('vendor/f', Verdict::UNKNOWN),
-                $this->finding('vendor/g', Verdict::FINISHED),
-                $this->finding('vendor/h', Verdict::OK),
-            ],
-            [],
-            new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
-            8,
-            0
-        );
 
-        self::assertSame(
-            ['vendor/a', 'vendor/b', 'vendor/c', 'vendor/d', 'vendor/e'],
-            array_map(static fn (Finding $f): string => $f->package(), $report->flagged())
-        );
-    }
 
-    public function testByVerdictHasAllNineKeysWithZeros(): void
-    {
-        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
-        self::assertSame(
-            [
-                Verdict::ABANDONED => 0,
-                Verdict::SILENT => 0,
-                Verdict::PINNED => 0,
-                Verdict::LEFT_BEHIND => 0,
-                Verdict::OLD_PROMISE => 0,
-                Verdict::STALE => 0,
-                Verdict::UNKNOWN => 0,
-                Verdict::FINISHED => 0,
-                Verdict::OK => 0,
-            ],
-            $report->byVerdict()
-        );
-    }
 
-    public function testByVerdictCountsFindings(): void
-    {
-        $report = new Report(
-            [$this->finding('vendor/a', Verdict::SILENT), $this->finding('vendor/b', Verdict::SILENT), $this->finding('vendor/c', Verdict::OK)],
-            [],
-            new \DateTimeImmutable('2026-09-14T00:00:00+00:00'),
-            3,
-            0
-        );
-        $counts = $report->byVerdict();
-        self::assertSame(2, $counts[Verdict::SILENT]);
-        self::assertSame(1, $counts[Verdict::OK]);
-        self::assertSame(0, $counts[Verdict::ABANDONED]);
-    }
-
-    /** `abandoned` alone does not say whether a package died or moved. */
-    public function testTheAbandonedCountIsSplitByWhetherAReplacementIsNamed(): void
-    {
-        $s1 = static fn (?string $replacement): Signal => new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', ['replacement' => $replacement]));
-        $report = $this->report(
-            (new FindingBuilder())->withPackage('vendor/moved')->withVerdict(Verdict::ABANDONED)->withSignals([$s1('vendor/successor')])->withChain(['vendor/moved'])->build(),
-            (new FindingBuilder())->withPackage('vendor/dead')->withVerdict(Verdict::ABANDONED)->withSignals([$s1(null)])->withChain(['vendor/dead'])->build(),
-            (new FindingBuilder())->withPackage('vendor/text')->withVerdict(Verdict::ABANDONED)->withSignals([$s1('Symfony')])->withChain(['vendor/text'])->build(),
-            $this->finding('vendor/quiet', Verdict::SILENT)
-        );
-
-        self::assertSame(1, $report->abandonedWithReplacement());
-        self::assertSame(['total' => 3, 'with_replacement' => 1, 'with_suggestion' => 1], $report->toArray()['abandoned'], 'Symfony names no package: a suggestion');
-        self::assertSame(['counts', 'abandoned', 'priorities'], \array_slice(array_keys($report->toArray()), 11, 3), 'the split sits right after the counts');
-        self::assertStringStartsWith('4 packages checked · abandoned 3 (1 with a replacement) · silent 1 · ', $report->summaryLine());
-
-        $none = $this->report($this->finding('vendor/dead', Verdict::ABANDONED));
-        self::assertSame(['total' => 1, 'with_replacement' => 0, 'with_suggestion' => 0], $none->toArray()['abandoned']);
-        self::assertStringStartsWith('1 packages checked · abandoned 1 · silent 0', $none->summaryLine(), 'a zero is not said');
-    }
-
-    public function testByPriorityHasAllFiveKeysWithZeros(): void
-    {
-        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
-        self::assertSame(
-            [
-                Priority013::CRITICAL => 0,
-                Priority013::HIGH => 0,
-                Priority013::MEDIUM => 0,
-                Priority013::LOW => 0,
-                Priority013::NONE => 0,
-            ],
-            $report->byPriority()
-        );
-    }
-
-    public function testByPriorityCountsFindings(): void
-    {
-        $report = $this->report(
-            $this->finding('vendor/a', Verdict::ABANDONED),
-            $this->transitive('vendor/b', Verdict::ABANDONED),
-            $this->transitive('vendor/c', Verdict::STALE),
-            $this->finding('vendor/d', Verdict::OK)
-        );
-        self::assertSame(
-            [Priority013::CRITICAL => 1, Priority013::HIGH => 1, Priority013::MEDIUM => 0, Priority013::LOW => 1, Priority013::NONE => 1],
-            $report->byPriority()
-        );
-    }
-
-    public function testPrioritySummaryLineNamesTheFourFlaggedLevelsOnly(): void
-    {
-        $report = $this->report(
-            $this->finding('vendor/a', Verdict::ABANDONED),
-            $this->transitive('vendor/b', Verdict::ABANDONED),
-            $this->finding('vendor/c', Verdict::STALE),
-            $this->transitive('vendor/d', Verdict::STALE),
-            $this->finding('vendor/e', Verdict::OK)
-        );
-        self::assertSame('priority: critical 1 · high 1 · medium 1 · low 1', $report->prioritySummaryLine());
-    }
-
-    public function testPrioritySummaryLineOnAnEmptyReport(): void
-    {
-        $report = new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0);
-        self::assertSame('priority: critical 0 · high 0 · medium 0 · low 0', $report->prioritySummaryLine());
-    }
 
     /** The `run` block records the settings, so two reports show whether the locks or the settings differ. */
     public function testTheReportRecordsWhatTheRunWasToldToDo(): void
@@ -532,11 +318,6 @@ final class ReportTest extends TestCase
         self::assertSame(['max_fan_in' => 8], $array['exposure_rule']);
         self::assertSame([], $array['unattributed']);
         self::assertIsArray($array['priorities']);
-        self::assertSame(
-            [Priority013::CRITICAL, Priority013::HIGH, Priority013::MEDIUM, Priority013::LOW, Priority013::NONE],
-            array_keys($array['priorities'])
-        );
-        self::assertSame(1, $array['priorities'][Priority013::CRITICAL]);
         self::assertSame('2026-09-14T00:00:00+00:00', $array['generated_at']);
         self::assertNull($array['activity_cache_oldest_at']);
         self::assertSame(5, $array['packages_checked']);
@@ -613,7 +394,7 @@ final class ReportTest extends TestCase
             ['path' => 'lockrot-baseline.json', 'known' => 1, 'new' => 0, 'worsened' => 0, 'stale' => []],
             $withBaseline->toArray()['baseline']
         );
-        self::assertSame($report->summaryLine(), $withBaseline->summaryLine());
+        self::assertSame($report->byGrade(), $withBaseline->byGrade());
     }
 
     /** A finding reachable from the named roots. The chain starts at the first of them, or is empty without any. */
@@ -637,74 +418,22 @@ final class ReportTest extends TestCase
             $this->reachedFrom('vendor/unreached', Verdict::ABANDONED)
         );
         self::assertSame(['root/two' => 2, 'root/one' => 1, 'root/three' => 1], $report->exposure());
-        self::assertSame('pulled in by: root/two 2 · root/one 1 · root/three 1', $report->exposureSummaryLine());
+        self::assertSame('pulled in by: root/two 2 · root/one 1 · root/three 1', self::exposureLine($report));
         self::assertSame(
             [['package' => 'root/two', 'flagged' => 2], ['package' => 'root/one', 'flagged' => 1], ['package' => 'root/three', 'flagged' => 1]],
             $report->toArray()['exposure']
         );
     }
 
-    public function testUnflaggedAdvisoriesAreTotalledForTheFooterAndFlaggedOnesAreNot(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $s9 = static fn (int $n): Signal => new Signal('warn', $n.' security advisories affect x', SignalDataStub::of('S9', ['advisories' => array_fill(0, $n, ['id' => 'x'])]));
-        $report = new Report([
-            (new FindingBuilder())->withPackage('vendor/ok')->withSignals([$s9(12)])->withChain(['vendor/ok'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('vendor/done')->withVerdict(Verdict::FINISHED)->withSignals([$s9(4)])->withChain(['vendor/done'])->withAllowlistReason('interfaces')->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'abandoned', SignalDataStub::of('S1', [])), $s9(2)])->withChain(['vendor/gone'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('vendor/clean')->withChain(['vendor/clean'])->withDataDate($at)->build(),
-        ], [], $at, 4, 0, null, null, true);
 
-        self::assertSame('16 security advisories on 2 packages the report does not flag; see composer audit', $report->unflaggedAdvisoriesLine());
-    }
 
-    /**
-     * `composer audit` counts `packages-dev` by default and a run without `--dev` does not, so the
-     * two totals differ on most projects. The line says why before a reader asks.
-     */
-    public function testWithoutDevTheFooterSaysWhyAuditCountsMore(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $finding = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('warn', '2 security advisories affect x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x'], ['id' => 'y']]]))])->withChain(['vendor/ok'])->withDataDate($at)->build();
-        $withoutDev = new Report([$finding], [], $at, 1, 0);
-        $withDev = new Report([$finding], [], $at, 1, 0, null, null, true);
 
-        self::assertFalse($withoutDev->includesDev());
-        self::assertSame(
-            '2 security advisories on 1 package the report does not flag; see composer audit (it counts packages-dev too, which this run skipped; pass --dev to include them)',
-            $withoutDev->unflaggedAdvisoriesLine()
-        );
-        self::assertFalse($withoutDev->toArray()['include_dev']);
-        self::assertTrue($withDev->includesDev());
-        self::assertTrue($withDev->toArray()['include_dev']);
-        $comparison = BaselineComparison::compare(BaselineEntries::baseline([], '2026-09-14T00:00:00+00:00'), $withDev, 'lockrot-baseline.json', ['vendor/ok']);
-        self::assertTrue($withDev->withBaseline($comparison)->includesDev(), 'the baseline view keeps the scope');
-    }
-
-    public function testAnS9WithoutDataCountsItsPackageAndNoAdvisory(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $bare = (new FindingBuilder())->withPackage('vendor/bare')->withSignals([new Signal('warn', 'advisories', SignalDataStub::of('S9', []))])->withChain(['vendor/bare'])->withDataDate($at)->build();
-        $two = (new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('warn', '2 security advisories affect x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x'], ['id' => 'y']]]))])->withChain(['vendor/ok'])->withDataDate($at)->build();
-
-        self::assertSame('2 security advisories on 2 packages the report does not flag; see composer audit', (new Report([$bare, $two], [], $at, 2, 0, null, null, true))->unflaggedAdvisoriesLine());
-    }
-
-    public function testUnflaggedAdvisoriesLineIsSingularAndEmptyWhenNoneAreThere(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T00:00:00+00:00');
-        $one = new Report([(new FindingBuilder())->withPackage('vendor/ok')->withSignals([new Signal('warn', '1 security advisory affects x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x']]]))])->withChain(['vendor/ok'])->withDataDate($at)->build()], [], $at, 1, 0, null, null, true);
-        $none = new Report([(new FindingBuilder())->withPackage('vendor/gone')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('warn', 'x', SignalDataStub::of('S9', ['advisories' => [['id' => 'x']]]))])->withChain(['vendor/gone'])->withDataDate($at)->build()], [], $at, 1, 0);
-
-        self::assertSame('1 security advisory on 1 package the report does not flag; see composer audit', $one->unflaggedAdvisoriesLine());
-        self::assertSame('', $none->unflaggedAdvisoriesLine());
-    }
 
     public function testExposureIsEmptyWhenNothingFlaggedIsReachedThroughAnotherPackage(): void
     {
         $report = $this->report($this->reachedFrom('vendor/a', Verdict::ABANDONED, 'vendor/a'), $this->finding('vendor/b', Verdict::OK));
         self::assertSame([], $report->exposure());
-        self::assertSame('', $report->exposureSummaryLine());
+        self::assertSame('', self::exposureLine($report));
         self::assertSame([], $report->toArray()['exposure']);
     }
 
@@ -714,7 +443,7 @@ final class ReportTest extends TestCase
         for ($i = 1; $i <= 7; ++$i) {
             $findings[] = $this->reachedFrom(\sprintf('vendor/p%02d', $i), Verdict::STALE, \sprintf('root/r%02d', $i));
         }
-        $line = $this->report(...$findings)->exposureSummaryLine();
+        $line = self::exposureLine($this->report(...$findings));
         self::assertStringStartsWith('pulled in by: root/r01 1 · root/r02 1 · ', $line);
         self::assertStringEndsWith(' · root/r05 1 · … and 2 more', $line);
         self::assertStringNotContainsString('root/r06', $line);
@@ -732,7 +461,7 @@ final class ReportTest extends TestCase
         );
 
         self::assertSame(['root/r01' => 1], $report->exposure());
-        self::assertSame('pulled in by: root/r01 1', $report->exposureSummaryLine());
+        self::assertSame('pulled in by: root/r01 1', self::exposureLine($report));
     }
 
     /** @return list<string> root/r01 … root/rNN */
@@ -760,7 +489,7 @@ final class ReportTest extends TestCase
 
         self::assertSame([['package' => 'vendor/shared', 'verdict' => 'high', 'lead' => 'abandoned', 'flag_ids' => ['abandoned'], 'fan_in' => 9]], $report->toArray()['unattributed']);
         self::assertSame(['root/r01' => 1], $report->exposure());
-        self::assertSame('pulled in by: root/r01 1', $report->exposureSummaryLine());
+        self::assertSame('pulled in by: root/r01 1', self::exposureLine($report));
         self::assertSame([['package' => 'root/r01', 'flagged' => 1]], $report->toArray()['exposure']);
     }
 
@@ -815,7 +544,7 @@ final class ReportTest extends TestCase
             $findings[] = $this->reachedFrom(\sprintf('vendor/p%02d', $i), Verdict::STALE, \sprintf('root/r%02d', $i));
         }
 
-        self::assertSame('pulled in by: root/r01 1 · root/r02 1 · root/r03 1 · root/r04 1 · root/r05 1', $this->report(...$findings)->exposureSummaryLine());
+        self::assertSame('pulled in by: root/r01 1 · root/r02 1 · root/r03 1 · root/r04 1 · root/r05 1', self::exposureLine($this->report(...$findings)));
     }
 
     public function testExposureKeepsAPackageReachedFromExactlyAsManyRootsAsTheCap(): void
@@ -905,5 +634,11 @@ final class ReportTest extends TestCase
         self::assertIsInt($at);
         self::assertSame('rank', $keys[$at + 1]);
         self::assertSame('flags', $keys[$at + 2]);
+    }
+
+    /** The `pulled in by:` line, empty when nothing is pulled in. */
+    private static function exposureLine(Report $report): string
+    {
+        return RunFooter::exposure($report, static fn (string $package): string => $package) ?? '';
     }
 }

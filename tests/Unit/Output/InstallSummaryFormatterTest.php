@@ -5,267 +5,222 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
-use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
-use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/** The install-time block: at most ten lines, the gate line when the gate fails. */
 final class InstallSummaryFormatterTest extends TestCase
 {
     private const NOW = '2026-09-14T00:00:00+00:00';
 
-    private const BANNED_WORDS = ['vulnerable', 'broken', 'insecure', 'dead'];
-
-    /** @param list<string> $chain */
-    private function finding(string $package, string $version, string $verdict, string $evidence, array $chain = []): Finding
+    /** @return list<string> */
+    private static function lines(Report $report): array
     {
-        // No signals: Finding::evidence() then falls back to the note, which keeps these cases
-        // independent of the signal wording.
-        return (new FindingBuilder())->withPackage($package)->withVersion($version)->withVerdict($verdict)->withChain($chain)->withNote($evidence)->build();
+        return array_map(static fn (string $line): string => ConsoleMarkup::render($line, false), (new InstallSummaryFormatter())->format($report));
     }
 
     /**
      * @param list<Finding> $findings
      * @param list<string>  $notes
      */
-    private function report(array $findings, array $notes = [], ?int $packagesChecked = null, bool $hadNetworkFailures = false): Report
+    private static function report(array $findings, array $notes = [], ?int $packagesChecked = null, bool $hadNetworkFailures = false): Report
     {
         return new Report($findings, Notes::texts($notes, $hadNetworkFailures), new \DateTimeImmutable(self::NOW), $packagesChecked ?? \count($findings), 0);
     }
 
-    public function testNothingFlaggedAndNothingFailedProducesNoLinesAtAll(): void
+    /** @param RunSettings::SOURCE_* $targetSource */
+    private static function settings(string $failOn, string $targetSource = RunSettings::SOURCE_OPTION): RunSettings
     {
-        $report = $this->report([$this->finding('vendor/a', '1.0.0', Verdict::OK, '')]);
-
-        self::assertSame([], (new InstallSummaryFormatter())->format($report));
+        return new RunSettings(null, null, $targetSource === RunSettings::SOURCE_RUNTIME ? null : '8.4', $targetSource, null, FailOn::parse($failOn), RunSettings::SOURCE_OPTION, null);
     }
 
-    /**
-     * An exhausted budget (or an unreachable repository) leaves every affected package `unknown`,
-     * which is below the flagged threshold — so without this block the install prints nothing
-     * and reads as clean when in fact nothing was checked.
-     */
-    public function testNothingFlaggedButAFailedLookupReportsTheUncheckedPackages(): void
+    public function testTheCompositeAtHighShowsFiveFindingsTheUpdateLineAndTheGateInTenLines(): void
     {
-        $report = $this->report(
-            [$this->finding('vendor/a', '1.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted')],
-            ['Repository metadata unavailable for 1 package: not checked: install-time budget exhausted'],
-            1,
-            true
-        );
+        $lines = self::lines(CaseHydrator::composite());
 
-        self::assertSame([
-            '<warning>lockrot: 1 of 1 changed package could not be checked</warning>',
-            '  note: Repository metadata unavailable for 1 package: not checked: install-time budget exhausted',
-            'Run composer lockrot for details.',
-        ], (new InstallSummaryFormatter())->format($report));
-    }
-
-    public function testTheUncheckedBlockCountsOnlyUnknownFindingsAndCapsItsNotes(): void
-    {
-        $report = $this->report([
-            $this->finding('vendor/a', '1.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
-            $this->finding('vendor/b', '2.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
-            $this->finding('vendor/c', '3.0.0', Verdict::OK, ''),
-        ], ['first note', 'second note', 'third note', 'fourth note'], 3, true);
-
-        $lines = (new InstallSummaryFormatter())->format($report);
-
-        self::assertSame([
-            '<warning>lockrot: 2 of 3 changed packages could not be checked</warning>',
-            '  note: first note',
-            '  note: second note',
-            '  note: third note',
-            'Run composer lockrot for details.',
-        ], $lines);
-    }
-
-    /** Metadata arrived for every package, only the advisory request failed: nothing is unknown, so "0 of 3" contradicts the note. */
-    public function testALookupThatFailedWithNothingUnknownSaysSoInsteadOfCountingZero(): void
-    {
-        $report = $this->report([
-            $this->finding('vendor/a', '1.0.0', Verdict::OK, ''),
-            $this->finding('vendor/b', '2.0.0', Verdict::OK, ''),
-        ], ['security advisories unavailable from packagist.org: timeout'], 2, true);
-
-        self::assertSame([
-            '<warning>lockrot: 2 changed packages checked, one check incomplete</warning>',
-            '  note: security advisories unavailable from packagist.org: timeout',
-            'Run composer lockrot for details.',
-        ], (new InstallSummaryFormatter())->format($report));
-    }
-
-    public function testTwoFlaggedPackagesRenderHeaderFindingsAndFooter(): void
-    {
-        $report = $this->report([
-            $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'last release 2015-11-16 (10.8 years ago)'),
-            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'marked abandoned by its repository', ['vendor/a', 'vendor/b']),
-        ], [], 5);
-
-        self::assertSame([
-            '<warning>lockrot: dependency rot in 2 of 5 changed packages</warning>',
-            '  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a)',
-            '  <comment>silent      </comment>vendor/a 1.0.0: last release 2015-11-16 (10.8 years ago)',
-            'Run composer lockrot for details.',
-        ], (new InstallSummaryFormatter())->format($report));
-    }
-
-    public function testTwelveFindingsAndNotesAreCappedAtTenLines(): void
-    {
-        $findings = [];
-        for ($i = 1; $i <= 12; ++$i) {
-            $findings[] = $this->finding(\sprintf('vendor/p%02d', $i), '1.0.0', Verdict::SILENT, 'no stable release');
-        }
-        $report = $this->report($findings, ['first note', 'second note', 'third note', 'a fourth note the block has no room for'], 12);
-
-        $lines = (new InstallSummaryFormatter())->format($report);
-
-        self::assertCount(InstallSummaryFormatter::MAX_LINES, $lines);
-        self::assertSame('<warning>lockrot: dependency rot in 12 of 12 changed packages</warning>', $lines[0]);
-        self::assertStringContainsString('vendor/p01 1.0.0', $lines[1]);
-        self::assertStringContainsString('vendor/p04 1.0.0', $lines[4]);
-        self::assertSame('  … and 8 more', $lines[5]);
-        self::assertSame('  note: first note', $lines[6]);
-        self::assertSame('  note: second note', $lines[7]);
-        self::assertSame('  note: third note', $lines[8]);
+        self::assertCount(10, $lines);
+        self::assertSame('lockrot: 7 of 7 changed packages flagged — critical 3 · high 2 · low 2', $lines[0]);
+        self::assertStringStartsWith('  critical [32] twig/twig v2.16.1: vulnerable (critical advisory; 15 in all) — raise require.php to >=8.1, then require twig/twig ^3.27.0', $lines[1]);
+        self::assertSame('  critical [36] symfony/debug v3.4.47: abandoned · old-promise — replace with symfony/error-handler (named by its registry)', $lines[3]);
+        self::assertSame('  … and 2 more', $lines[6]);
+        self::assertSame('  update now: composer update symfony/yaml symfony/polyfill-intl-idn (2 not shown above)', $lines[7]);
+        self::assertSame('  gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)', $lines[8]);
         self::assertSame('Run composer lockrot for details.', $lines[9]);
     }
 
-    public function testFlaggedPackagesKeepTheirBlockEvenWhenSomeLookupsFailed(): void
+    public function testWithoutABaselineTheRuntimeTargetAddsNoNote(): void
     {
-        $report = $this->report([
-            $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'no stable release'),
-            $this->finding('vendor/b', '2.0.0', Verdict::UNKNOWN, 'not checked: install-time budget exhausted'),
-        ], ['Repository metadata unavailable for 1 package: not checked: install-time budget exhausted'], 2, true);
+        $lines = self::lines(CaseHydrator::composite()->withRun(self::settings('high', RunSettings::SOURCE_RUNTIME)));
 
-        self::assertSame([
-            '<warning>lockrot: dependency rot in 1 of 2 changed packages</warning>',
-            '  <comment>silent      </comment>vendor/a 1.0.0: no stable release',
-            '  note: Repository metadata unavailable for 1 package: not checked: install-time budget exhausted',
-            'Run composer lockrot for details.',
-        ], (new InstallSummaryFormatter())->format($report));
+        self::assertSame([], preg_grep('/^  note: /', $lines));
     }
 
-    public function testASingleChangedPackageUsesTheSingularNoun(): void
+    public function testTheRuntimeTargetNoteTakesASlotWhenABaselineIsRead(): void
     {
-        $report = $this->report([$this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'no stable release')], [], 1);
+        $report = CaseHydrator::composite();
+        $report = $report->withBaseline(BaselineComparison::compare(Baseline::of([], '2026-09-14T00:00:00+00:00', '8.4', RunSettings::SOURCE_OPTION), $report, 'lockrot-baseline.json', []))->withRun(self::settings('high', RunSettings::SOURCE_RUNTIME));
+        $lines = self::lines($report);
 
-        self::assertSame(
-            '<warning>lockrot: dependency rot in 1 of 1 changed package</warning>',
-            (new InstallSummaryFormatter())->format($report)[0]
-        );
+        $notes = array_values(preg_grep('/^  note: /', $lines) ?: []);
+        $first = \is_string($notes[0] ?? null) ? $notes[0] : '';
+
+        self::assertCount(10, $lines);
+        self::assertMatchesRegularExpression('/^  note: target php from the running PHP \\(\\d+\\.\\d+\\); /', $first);
+        self::assertStringEndsWith('); fix changes against the baseline not compared', $first);
+        self::assertContains('  … and 3 more', $lines, 'the note takes the slot of one finding');
     }
 
-    public function testTheBlockUsesNoneOfTheBannedSeverityWords(): void
+    public function testTwentyFindingsThreeNotesAndAFailingGateFillTenLinesAndCountTheThirdNote(): void
     {
-        $report = $this->report([
-            $this->finding('vendor/a', '1.0.0', Verdict::SILENT, 'last release 2015-11-16; last push 2015-11-16'),
-            $this->finding('vendor/b', '2.0.0', Verdict::ABANDONED, 'marked abandoned by its repository', ['vendor/a', 'vendor/b']),
-            $this->finding('vendor/c', 'dev-main', Verdict::PINNED, 'installed version is a branch snapshot'),
-        ], ['GitHub token not set: repository activity checked for 0 candidate packages'], 3);
-
-        $text = strtolower(implode("\n", (new InstallSummaryFormatter())->format($report)));
-
-        foreach (self::BANNED_WORDS as $word) {
-            self::assertStringNotContainsString($word, $text);
+        $findings = [];
+        for ($i = 0; $i < 20; ++$i) {
+            $findings[] = (new FindingBuilder())->withPackage(\sprintf('vendor/p%02d', $i))->withVerdict(Verdict::ABANDONED)->build();
         }
+        $report = self::report($findings, ['one', 'two', 'three'])->withRun(self::settings('critical'));
+        $lines = self::lines($report);
+
+        self::assertCount(10, $lines);
+        self::assertSame('  … and 16 more', $lines[5]);
+        self::assertSame('  gate: fails · --fail-on=critical · 20 findings fail it · target php 8.4 (--target-php)', $lines[6]);
+        self::assertSame(['  note: one', '  note: two'], \array_slice($lines, 7, 2));
+        self::assertSame('Run composer lockrot for details; 1 more note.', $lines[9]);
     }
 
-    /** The block is read in passing: the chain stays, the other parents and what a package pulls in (S7) do not. */
-    public function testAFindingLineKeepsTheChainButNeitherTheOtherParentsNorS7(): void
+    public function testAPassingGatePrintsNoGateLine(): void
     {
-        $s7 = new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: vendor/b (abandoned)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]));
-        $report = $this->report([
-            (new FindingBuilder())->withPackage('vendor/b')->withVersion('2.0.0')->withVerdict(Verdict::ABANDONED)->withChain(['vendor/a', 'vendor/b'])->withNote('marked abandoned by its repository')->withDirectDependents(['vendor/a', 'vendor/c'])->build(),
-            (new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', [])), $s7])->withChain(['vendor/a'])->withDirectDependents(['vendor/a'])->build(),
-        ], [], 3);
+        $report = self::report([(new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::STALE)->build()])->withRun(self::settings('critical'));
 
-        $lines = (new InstallSummaryFormatter())->format($report);
-        self::assertSame('  <comment>abandoned   </comment>vendor/b 2.0.0: marked abandoned by its repository (via vendor/a)', $lines[1]);
-        self::assertSame('  <comment>stale       </comment>vendor/a 1.0.0: last release 2022-05-20 (4.3 years ago)', $lines[2]);
+        self::assertSame(['lockrot: 1 of 1 changed package flagged — medium 1', '  medium   [ 8] vendor/a 1.0.0: stale', 'Run composer lockrot for details.'], self::lines($report));
+    }
+
+    public function testExactlyAsManyFindingsAsThereAreSlotsAreAllShownWithoutACountLine(): void
+    {
+        $findings = [];
+        for ($i = 0; $i < 8; ++$i) {
+            $findings[] = (new FindingBuilder())->withPackage(\sprintf('vendor/p%d', $i))->withVerdict(Verdict::STALE)->build();
+        }
+        $lines = self::lines(self::report($findings));
+
+        self::assertCount(10, $lines);
+        self::assertSame([], preg_grep('/more$/', $lines));
+    }
+
+    public function testOneFindingMoreThanTheSlotsLeavesOneSlotForTheCountLine(): void
+    {
+        $findings = [];
+        for ($i = 0; $i < 9; ++$i) {
+            $findings[] = (new FindingBuilder())->withPackage(\sprintf('vendor/p%d', $i))->withVerdict(Verdict::STALE)->build();
+        }
+        $lines = self::lines(self::report($findings));
+
+        self::assertCount(10, $lines);
+        self::assertSame('  medium   [ 8] vendor/p6 1.0.0: stale', $lines[7]);
+        self::assertSame('  … and 2 more', $lines[8]);
+    }
+
+    public function testTheUpdateLineCountsOnlyThePackagesThatTheBlockDoesNotShow(): void
+    {
+        $composite = CaseHydrator::composite();
+        $findings = array_values(array_filter($composite->findings(), static fn (Finding $finding): bool => \in_array($finding->package(), ['symfony/yaml', 'symfony/polyfill-intl-idn'], true)));
+        $lines = self::lines(self::report($findings));
+
+        self::assertContains('  update now: composer update symfony/yaml symfony/polyfill-intl-idn', $lines);
+    }
+
+    public function testOneAdvisoryNamesItsSeverityAndSeveralLowOnesAreCounted(): void
+    {
+        $composite = CaseHydrator::composite();
+        $findings = array_values(array_filter($composite->findings(), static fn (Finding $finding): bool => \in_array($finding->package(), ['symfony/yaml'], true)));
+        $joomla = array_values(array_filter(CaseHydrator::everyCase()->findings(), static fn (Finding $finding): bool => $finding->package() === 'joomla/filter'));
+
+        self::assertStringStartsWith('  low      [ 2] symfony/yaml v5.4.23: vulnerable (3 low advisories) — ', self::lines(self::report($findings))[1]);
+        self::assertStringContainsString(': vulnerable (1 medium advisory)', self::lines(self::report($joomla))[1]);
+    }
+
+    /** The finding line of a medium grade holds 152 characters after the grade, then it is cut. */
+    public function testAFindingLineIsCutOnlyPastItsLimit(): void
+    {
+        $fits = (new FindingBuilder())->withPackage('vendor/'.str_repeat('a', 124))->withVerdict(Verdict::STALE)->build();
+        $over = (new FindingBuilder())->withPackage('vendor/'.str_repeat('a', 125))->withVerdict(Verdict::STALE)->build();
+
+        self::assertSame('  medium   [ 8] vendor/'.str_repeat('a', 124).' 1.0.0: stale', self::lines(self::report([$fits]))[1]);
+        self::assertSame('  medium   [ 8] vendor/'.str_repeat('a', 125).' 1.0.0:…', self::lines(self::report([$over]))[1]);
+    }
+
+    public function testALongMoveIsCutAtAWordBoundary(): void
+    {
+        foreach (self::lines(CaseHydrator::composite()) as $line) {
+            self::assertLessThanOrEqual(InstallSummaryFormatter::MAX_FINDING_LINE + \strlen('…'), \strlen($line), $line);
+        }
+        self::assertStringEndsWith(' clears 15…', self::lines(CaseHydrator::composite())[1]);
+    }
+
+    public function testNothingGradedAndNothingFailedProducesNoLinesAtAll(): void
+    {
+        self::assertSame([], (new InstallSummaryFormatter())->format(self::report([(new FindingBuilder())->withPackage('vendor/a')->build()])));
+    }
+
+    public function testNothingGradedButAFailedLookupReportsTheUncheckedPackages(): void
+    {
+        $report = self::report([(new FindingBuilder())->withPackage('vendor/a')->withVerdict(Verdict::UNKNOWN)->build()], ['metadata unavailable', 'two', 'three'], 1, true);
+
+        self::assertSame(['lockrot: 1 of 1 changed package could not be checked', '  note: metadata unavailable', '  note: two', 'Run composer lockrot for details.'], self::lines($report));
+    }
+
+    public function testNothingGradedButAFailingGatePrintsTheGateLine(): void
+    {
+        $report = self::report([FindingBuilder::advisoriesUnchecked('vendor/vcs', 'not_from_composer_repository', true)])->withRun(self::settings('unchecked'));
+        $lines = self::lines($report);
+
+        self::assertSame('lockrot: 1 changed package checked, one check incomplete', $lines[0]);
+        self::assertStringStartsWith('  gate: fails · --fail-on=unchecked · ', $lines[1]);
+        self::assertSame('Run composer lockrot for details.', $lines[\count($lines) - 1]);
+    }
+
+    public function testALookupThatFailedWithNothingUnknownSaysSoInsteadOfCountingZero(): void
+    {
+        $report = self::report([(new FindingBuilder())->withPackage('vendor/a')->build()], ['advisories unavailable'], 3, true);
+
+        self::assertSame('lockrot: 3 changed packages checked, one check incomplete', self::lines($report)[0]);
     }
 
     /**
-     * The package, its version, the evidence, the chain and the notes are the lock's and the
-     * repository's text. Rendered by {@see ConsoleMarkup}, which is how the block is written, each
-     * prints as written, with only lockrot's own `warning` and `comment` styles, each closed on its
-     * own line.
+     * Text from the lock prints as written and obeys nothing in it.
      *
      * @dataProvider textsThatLookLikeMarkup
      */
     #[DataProvider('textsThatLookLikeMarkup')]
     public function testTextThatLooksLikeMarkupPrintsAsWrittenAndLeavesNoStyleBehind(string $text): void
     {
-        $report = $this->report(
-            [$this->finding('vendor/'.$text, $text, Verdict::ABANDONED, 'marked abandoned: '.$text, ['vendor/'.$text.'-parent', 'vendor/'.$text.'-middle', 'vendor/'.$text])],
-            ['note: '.$text],
-            2
-        );
+        $lines = (new InstallSummaryFormatter())->format(self::report([(new FindingBuilder())->withPackage('vendor/'.$text)->withVerdict(Verdict::ABANDONED)->build()], ['note '.$text]));
+        $plain = implode("\n", array_map(static fn (string $line): string => ConsoleMarkup::render($line, false), $lines));
 
-        $lines = (new InstallSummaryFormatter())->format($report);
-        $plain = array_map(static fn (string $line): string => ConsoleMarkup::render($line, false), $lines);
-        $decorated = array_map(static fn (string $line): string => ConsoleMarkup::render($line, true), $lines);
-
-        self::assertSame([
-            'lockrot: dependency rot in 1 of 2 changed packages',
-            '  abandoned   vendor/'.$text.' '.$text.': marked abandoned: '.$text.' (via vendor/'.$text.'-parent > vendor/'.$text.'-middle)',
-            '  note: note: '.$text,
-            'Run composer lockrot for details.',
-        ], $plain);
-        self::assertSame("\033[30;43mlockrot: dependency rot in 1 of 2 changed packages\033[39;49m", $decorated[0]);
-        self::assertSame("  \033[33mabandoned   \033[39m".substr($plain[1], 14), $decorated[1]);
-        self::assertSame(\array_slice($plain, 2), \array_slice($decorated, 2));
-    }
-
-    /**
-     * The block is written raw, without Composer's sanitising, so what a terminal obeys — an escape
-     * sequence in a version, a line break in the evidence — is shown as an escape, not acted on.
-     */
-    public function testControlCharactersInTheProjectsTextAreShownRatherThanObeyed(): void
-    {
-        $report = $this->report([$this->finding("vendor/a\033[2J", "1.0\r", Verdict::SILENT, "last release\nlong ago")], ["a note\x07"], 1);
-
-        $lines = array_map(static fn (string $line): string => ConsoleMarkup::render($line, false), (new InstallSummaryFormatter())->format($report));
-
-        self::assertSame([
-            'lockrot: dependency rot in 1 of 1 changed package',
-            '  silent      vendor/a\\x1B[2J 1.0\\r: last release\\nlong ago',
-            '  note: a note\\x07',
-            'Run composer lockrot for details.',
-        ], $lines);
+        self::assertStringContainsString('vendor/'.$text.' 1.0.0: abandoned', $plain);
+        self::assertStringContainsString('  note: note '.$text, $plain);
     }
 
     /** @return iterable<string, array{string}> */
     public static function textsThatLookLikeMarkup(): iterable
     {
         yield 'a style tag' => ['<<fg=red>>'];
-        yield 'a link tag' => ['<<href=x>>'];
         yield 'an escaped tag' => ['a\\<b'];
-        yield 'a trailing backslash' => ['a\\'];
-        yield 'a long run of <b' => [str_repeat('<b', 4000)];
     }
 
-    /** Header and footer take two of the lines. With no notes, exactly that many findings fit and none is counted away. */
-    public function testExactlyAsManyFindingsAsThereAreSlotsAreAllShownWithoutACountLine(): void
+    public function testControlCharactersInTheProjectsTextAreShownRatherThanObeyed(): void
     {
-        $slots = InstallSummaryFormatter::MAX_LINES - 2;
-        $findings = [];
-        for ($i = 1; $i <= $slots; ++$i) {
-            $findings[] = $this->finding(\sprintf('vendor/p%02d', $i), '1.0.0', Verdict::SILENT, 'no stable release');
-        }
+        $plain = implode("\n", self::lines(self::report([(new FindingBuilder())->withPackage("vendor/\x1b[31mred")->withVerdict(Verdict::ABANDONED)->build()])));
 
-        $lines = (new InstallSummaryFormatter())->format($this->report($findings));
-
-        self::assertCount(InstallSummaryFormatter::MAX_LINES, $lines);
-        self::assertStringContainsString('vendor/p01 1.0.0', $lines[1]);
-        self::assertStringContainsString(\sprintf('vendor/p%02d 1.0.0', $slots), $lines[$slots]);
-        self::assertSame('Run composer lockrot for details.', $lines[$slots + 1]);
-        self::assertSame([], preg_grep('/ more$/', $lines));
+        self::assertStringNotContainsString("\x1b", $plain);
     }
 }

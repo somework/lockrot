@@ -24,8 +24,8 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Lockrot\Html\ReportDocument',
         'Lockrot\Json\JsonWriter',
     ];
-    /** The namespaces whose every class writes a document: the formatters and report-1. */
-    private const WRITER_NAMESPACES = ['Lockrot\Output\\', 'Lockrot\Legacy\\'];
+    /** The namespaces whose every class writes a document: the formatters. */
+    private const WRITER_NAMESPACES = ['Lockrot\Output\\'];
 
     /** A file of src/ that is not listed has a ceiling of 0. */
     private const CEILINGS = [
@@ -58,13 +58,11 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Json/JsonReader.php' => 4,
         'Json/KnownValues.php' => 1,
         'Json/SchemaPayload.php' => 2,
-        'Legacy/SignalData013.php' => 1,
         'Lock/ConfiguredRepositories.php' => 1,
         'Lock/LockFile.php' => 1,
         'Lock/ProjectConfig.php' => 6,
-        'Output/GitlabFormatter.php' => 2,
         'Output/HtmlFormatter.php' => 1,
-        'Output/SarifFormatter.php' => 4,
+        'Output/SarifFormatter.php' => 3,
         'SelfUpdate/ReleaseLocator.php' => 9,
         'Signal/Thresholds.php' => 1,
         'Verdict/Finding.php' => 2,
@@ -158,7 +156,6 @@ final class ArraysAtTheBoundaryTest extends TestCase
         yield 'json_encode() and json_decode()' => ['    public function a($o) { return json_decode(json_encode($o->toArray()), true)[\'id\']; }', ['6: '.$encodes, '6: '.$outside]];
         yield 'a round trip of a signal\'s data through json_encode()' => ['    public function a($s) { return json_decode(json_encode($s->data()), true)[\'replacement\']; }', ['6: '.$encodes]];
         yield 'a round trip of a signal\'s data through the JSON writer' => ['    public function a($s) { return json_decode(\\Lockrot\\Json\\JsonWriter::encode($s->data()), true)[\'replacement\']; }', ['6: '.$encodes]];
-        yield 'a key of the report-1 view of a signal' => ['    public function a($s) { return \\Lockrot\\Legacy\\SignalData013::toReport1Array($s)[\'replacement\']; }', ['6: '.$outside]];
         yield 'a key compared in a foreach' => ['    public function a($o) { foreach ($o->toArray() as $k => $v) { if ($k === \'id\') { return $v; } } }', ['6: '.$outside]];
         yield 'an ArrayObject' => ['    public function a($o) { return (new \ArrayObject($o->toArray()))[\'id\']; }', ['6: passes a written array to ArrayObject']];
         yield 'an object cast' => ['    public function a($o) { return ((object) $o->toArray())->id; }', ['6: '.$outside]];

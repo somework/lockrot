@@ -30,7 +30,6 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 final class AnalyzerSplitPackagesTest extends TestCase
@@ -84,7 +83,6 @@ final class AnalyzerSplitPackagesTest extends TestCase
             new RepoLocator(),
             new Allowlist([]),
             SignalSet::default($clock, $thresholds, '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false,
             null,
@@ -172,7 +170,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
 
         self::assertSame([['illuminate/contracts' => '8.83.27.0'], ['laravel/framework' => null]], $this->asked, 'the lock first with its versions, then the parent for its dates only');
         $finding = self::finding($report, 'illuminate/contracts');
-        self::assertSame(Verdict::LEFT_BEHIND, $finding->verdict());
+        self::assertSame(Verdict::LEFT_BEHIND, $finding->lead());
         // The branch summary lists no release, so the move names the line by its constraint and no release.
         $move = $finding->nextStep();
         self::assertNotNull($move);
@@ -221,7 +219,7 @@ final class AnalyzerSplitPackagesTest extends TestCase
         $report = $this->analyzer($loader, new MonorepoParents(['laravel/framework' => ['illuminate/contracts']]), new Thresholds(1, 1))
             ->analyze($this->lock('illuminate/contracts@v8.83.27'), ProjectConfig::empty(), false);
 
-        self::assertSame(Verdict::OK, self::finding($report, 'illuminate/contracts')->verdict(), 'undated as before: not measured');
+        self::assertNull(self::finding($report, 'illuminate/contracts')->lead(), 'undated as before: not measured');
         self::assertSame([], self::metadataNotes($report));
         self::assertFalse($report->hadNetworkFailures());
     }

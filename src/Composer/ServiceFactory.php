@@ -32,7 +32,6 @@ use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Deadline;
 use Lockrot\Output\TerminalText;
 use Lockrot\Signal\SignalSet;
-use Lockrot\Verdict\VerdictEngine;
 
 /** @internal */
 final class ServiceFactory
@@ -59,7 +58,6 @@ final class ServiceFactory
             RepoLocator::fromConfig($config),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load(), $projectPhp),
-            new VerdictEngine(),
             $clock,
             $lockrot->offline(),
             new RepositoryAdvisoryLoader($repositories, $lockrot->offline(), $deadline, AdvisoryIgnore::fromConfig($config), $lockrot->advisoryLookup(), $lockrot->advisoryLookupSource()),

@@ -36,7 +36,6 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -59,7 +58,7 @@ final class AcceptUncheckedTest extends TestCase
     {
         $clock = Clock::fixed(self::NOW);
         $auth = ForgeAuth::withTokens(new Tokens(null, null));
-        $analyzer = new Analyzer(self::loader([]), new ActivityClient(new FakeHttpClient([]), $auth), new ActivityFetchPlanner($auth), new RepoLocator(), new Allowlist([]), SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()), new VerdictEngine(), $clock, false);
+        $analyzer = new Analyzer(self::loader([]), new ActivityClient(new FakeHttpClient([]), $auth), new ActivityFetchPlanner($auth), new RepoLocator(), new Allowlist([]), SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()), $clock, false);
         $accepting = $analyzer->withUncheckedAcceptance(UncheckedAcceptance::fromConfig([['check' => 'advisories', 'package' => 'acme/pkg', 'reason' => 'r']]));
 
         self::assertSame([true, false], [$analyzer->uncheckedAcceptance()->isEmpty(), $accepting->uncheckedAcceptance()->isEmpty()]);
@@ -362,7 +361,6 @@ final class AcceptUncheckedTest extends TestCase
             new RepoLocator(),
             new Allowlist($allowlist),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false,
             self::advisories($name, \is_string($inputs['gap']) ? $inputs['gap'] : null)

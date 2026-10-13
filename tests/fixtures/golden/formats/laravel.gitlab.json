@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "league/config v1.2.0 \u2014 stale (low): last release 2022-12-11 (3.8 years ago) (via laravel/framework > league/commonmark, also via laravel/tinker)",
+        "description": "league/config v1.2.0 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2022-12-11 (3.8 years ago). Do: \u2014. (via laravel/framework, laravel/tinker)",
         "categories": [
             "Bug Risk"
         ],

@@ -11,7 +11,7 @@ import re
 SHIP_BANNED = re.compile(r'§|SPEC|\bround \d|attack round|schema round|critic round|revision[- ]?\d|‡|r3/|\bcorpus\b|\bI\d+[a-c]?\b'
                          r'|\b\d+ of \d+\b|\bgenerated\b|lockrot\.dev\'s|\((?:calls|says)\b'
                          # history an editor shows on hover ("config-1 unchanged."), internal PHP symbols
-                         # (`Legacy\Priority013`, `ReleaseBranch::label`) and repository-relative doc paths a consumer cannot open
+                         # (`Output\RunFooter`, `ReleaseBranch::label`) and repository-relative doc paths a consumer cannot open
                          r'|config-1 unchanged|report-1 unchanged|\b[A-Z][A-Za-z]+(?:\\[A-Z][A-Za-z0-9]+)+|::[a-z]+|docs/[a-z-]+\.md'
                          # a backticked PHP class name; the grammar names a renderer implements are public
                          r'|`(?!(?:FlagSentence|GateText|MoveText|ScoreText|SignalSentence|NoteSentence|RunGateText|AgeText|GitHub|GitLab)`)[A-Z][a-z]+[A-Z][A-Za-z]*`'
@@ -79,8 +79,7 @@ MANUAL = [  # running-text references the token pass cannot rewrite on its own
     (re.compile(r' \((?:§6\.2; )?`Output\\RecordMarks` is the single producer\)'), ''),
     (re.compile(r'`RepoRef::forge(?:\(\))?`; '), ''),
     (re.compile(r'as `PhpReleaseDates::minorOf` writes it'), 'as MAJOR.MINOR'),
-    (re.compile(r"0\.13's computation \(`Legacy\\Priority013`\)\."), "0.13's computation, by a frozen copy of 0.13's rules."),
-    (re.compile(r'\s*\(`Legacy\\Priority013`\)'), ''),    (re.compile(r"`PhpFloor`'s lower bound"), "its lower bound"),
+    (re.compile(r"`PhpFloor`'s lower bound"), "its lower bound"),
     (re.compile(r'Null exactly when `PhpFloor` has no lowest'), 'Null exactly when the constraint has no lowest'),
     (re.compile(r', as `RepoRef` words it'), ''),
 ]

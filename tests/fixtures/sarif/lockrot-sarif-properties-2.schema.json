@@ -1,0 +1,3244 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "urn:lockrot:schema:sarif-properties-2",
+  "title": "lockrot SARIF property bags",
+  "description": "The property bags lockrot 0.14.0 writes into its SARIF 2.1.0 output (`--format=sarif`), for report schema 2: each result's `properties` and the run's. A test fixture of lockrot's SarifFormatterTest, not a published schema: the instance is the whole SARIF log, whose structure SARIF 2.1.0's own schema checks; objects stay open.",
+  "type": "object",
+  "required": [
+    "runs"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "runs": {
+      "description": "The runs; lockrot writes one.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "description": "A run.",
+        "type": "object",
+        "required": [
+          "properties",
+          "invocations",
+          "results"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "properties": {
+            "$ref": "#/definitions/runProperties"
+          },
+          "invocations": {
+            "description": "lockrot writes one invocation.",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "$ref": "#/definitions/invocation"
+            }
+          },
+          "results": {
+            "description": "The results.",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/result"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "advisoryId": {
+      "description": "An advisory's `id` as its Composer repository serves it (Packagist: `PKSA-…`); not promised to be a Packagist id (report-1's S9 rule).",
+      "type": "string",
+      "minLength": 1
+    },
+    "advisoryLookup": {
+      "description": "How the one advisory lookup of the run went: its scope, the packages it asked, and the outcome of each advisory-capable repository.",
+      "type": "object",
+      "required": [
+        "scope",
+        "scope_source",
+        "packages_asked",
+        "packages_not_asked",
+        "other_repositories",
+        "repositories"
+      ],
+      "properties": {
+        "scope": {
+          "description": "`extra.lockrot.advisory-lookup` as config-2 spells it: `all` (every locked package, the default) or `composer-repositories`. Closed.",
+          "type": "string",
+          "enum": [
+            "all",
+            "composer-repositories"
+          ]
+        },
+        "scope_source": {
+          "description": "Where `scope` came from. Closed.",
+          "type": "string",
+          "enum": [
+            "config",
+            "default"
+          ]
+        },
+        "packages_asked": {
+          "description": "Findings whose name went to at least one feed. Plus `packages_not_asked`, it is `packages_checked`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "packages_not_asked": {
+          "description": "Findings whose name went to no feed.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "other_repositories": {
+          "description": "Configured repositories that publish no advisory API (vcs, path, artifact). lockrot counts them and never names them.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "repositories": {
+          "description": "Every advisory-capable repository, in configured order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/advisoryRepository"
+          }
+        }
+      }
+    },
+    "advisoryRepository": {
+      "description": "One advisory-capable Composer repository of the run and what it did, in configured order.",
+      "type": "object",
+      "required": [
+        "composer_repository",
+        "registry",
+        "outcome",
+        "reason",
+        "message",
+        "packages_with_records",
+        "records"
+      ],
+      "properties": {
+        "composer_repository": {
+          "description": "The name that Composer gives the repository, credentials stripped (the join key).",
+          "type": "string",
+          "minLength": 1
+        },
+        "registry": {
+          "description": "The registry host for display. Null for another repository. An open set.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9.-]*$",
+              "x-known-values": [
+                "packagist.org",
+                "repo.packagist.com",
+                "wp-packages.org",
+                "packages.drupal.org"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome": {
+          "description": "What the repository did in this run. `no_feed`: it publishes no advisories. Closed.",
+          "type": "string",
+          "enum": [
+            "answered",
+            "failed",
+            "not_asked",
+            "no_feed"
+          ]
+        },
+        "reason": {
+          "description": "Why. On `not_asked`: `offline`, `composer_too_old`, `install_time_budget`, or `not_from_composer_repository` when every package was outside the composer-repositories scope. On `failed`: `transport` or `invalid_response`. Null on `answered` and `no_feed`. An open set.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "offline",
+                "composer_too_old",
+                "install_time_budget",
+                "not_from_composer_repository",
+                "transport",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "message": {
+          "description": "The first line of what the repository threw, credentials stripped. Foreign text, not contract. Set on `failed`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "packages_with_records": {
+          "description": "Asked names with at least one record. Set on `answered`.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "records": {
+          "description": "Distinct records for all asked names. Set on `answered`.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "anyOf": [
+        {
+          "description": "`answered`: counts, no reason, no message.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "answered"
+              ]
+            },
+            "reason": {
+              "type": "null"
+            },
+            "message": {
+              "type": "null"
+            },
+            "packages_with_records": {
+              "type": "integer"
+            },
+            "records": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "description": "`no_feed`: nothing to count, no reason.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "no_feed"
+              ]
+            },
+            "reason": {
+              "type": "null"
+            },
+            "message": {
+              "type": "null"
+            },
+            "packages_with_records": {
+              "type": "null"
+            },
+            "records": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "`failed`: a reason and a message.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "failed"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "packages_with_records": {
+              "type": "null"
+            },
+            "records": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "`not_asked`: a reason, no message.",
+          "properties": {
+            "outcome": {
+              "enum": [
+                "not_asked"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            },
+            "message": {
+              "type": "null"
+            },
+            "packages_with_records": {
+              "type": "null"
+            },
+            "records": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "age": {
+      "description": "How old four dates are on the run clock. The dates are the installed release, the newest release of the package, the newest release of the installed branch, and the last push or commit. No score, gate, sort or baseline reads them. A reading that lockrot could not take is null, with its reason beside it.",
+      "type": "object",
+      "required": [
+        "installed",
+        "installed_unmeasured",
+        "release",
+        "release_unmeasured",
+        "branch_release",
+        "branch_release_unmeasured",
+        "push",
+        "push_unmeasured"
+      ],
+      "properties": {
+        "installed": {
+          "description": "The installed release. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ageInstalled"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "installed_unmeasured": {
+          "description": "Why `installed` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/installedUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "release": {
+          "description": "The newest release of the package. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ageRelease"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "release_unmeasured": {
+          "description": "Why `release` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/releaseUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch_release": {
+          "description": "The newest dated release of the installed branch. For a branch-alias snapshot (`5.4.x-dev`), the newest one of its own line. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ageBranchRelease"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch_release_unmeasured": {
+          "description": "Why `branch_release` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/branchReleaseUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "push": {
+          "description": "The last push or commit of the repository. Null when not measured.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/agePush"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "push_unmeasured": {
+          "description": "Why `push` is null. Null when lockrot took the reading.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/pushUnmeasured"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "description": "`installed` is null exactly when `installed_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "installed": {
+                  "type": "object"
+                },
+                "installed_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "installed": {
+                  "type": "null"
+                },
+                "installed_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`release` is null exactly when `release_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "release": {
+                  "type": "object"
+                },
+                "release_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "release": {
+                  "type": "null"
+                },
+                "release_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`branch_release` is null exactly when `branch_release_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "branch_release": {
+                  "type": "object"
+                },
+                "branch_release_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "branch_release": {
+                  "type": "null"
+                },
+                "branch_release_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`push` is null exactly when `push_unmeasured` is set.",
+          "anyOf": [
+            {
+              "properties": {
+                "push": {
+                  "type": "object"
+                },
+                "push_unmeasured": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "push": {
+                  "type": "null"
+                },
+                "push_unmeasured": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "ageBranchRelease": {
+      "description": "The newest dated stable release on the installed branch (`finding.branch`), dated as S8 dates it. S8 judges it against the `release-*` thresholds, and S8's data quotes it when S8 fires. S8 also needs a living higher branch.",
+      "type": "object",
+      "required": [
+        "version",
+        "at",
+        "years",
+        "level",
+        "dated_by"
+      ],
+      "properties": {
+        "version": {
+          "description": "The release.",
+          "type": "string",
+          "minLength": 1
+        },
+        "at": {
+          "description": "Its date.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "level": {
+          "$ref": "#/definitions/ageLevel"
+        },
+        "dated_by": {
+          "description": "The monorepo parent that dates it. Null when its own tag dates it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ageInstalled": {
+      "description": "The date that lockrot trusts for the installed release: the lock's `time`, or the tag of the same version on the monorepo parent. No threshold applies.",
+      "type": "object",
+      "required": [
+        "at",
+        "years",
+        "dated_by"
+      ],
+      "properties": {
+        "at": {
+          "description": "The release date.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "dated_by": {
+          "description": "The monorepo parent that dates it. Null when the lock dates it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ageLevel": {
+      "description": "The threshold of `run.thresholds` that the reading passes (`warn` or `high`), from the exact ratio, as the signal decides it. Null below the warn threshold. Closed. It is not a flag: `signals[]` says whether a signal fired.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "warn",
+            "high"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "agePush": {
+      "description": "The last push (GitHub) or the last commit (GitLab, Bitbucket) of the repository. S4 judges this reading against the `push-*` thresholds. `activity.event` says which event it dates.",
+      "type": "object",
+      "required": [
+        "at",
+        "years",
+        "level"
+      ],
+      "properties": {
+        "at": {
+          "description": "The date that the host reported.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "level": {
+          "$ref": "#/definitions/ageLevel"
+        }
+      }
+    },
+    "ageRelease": {
+      "description": "The newest tag of the package by date, pre-releases counted. S2 judges this reading against the `release-*` thresholds, and S2's data quotes it when S2 fires.",
+      "type": "object",
+      "required": [
+        "version",
+        "at",
+        "years",
+        "level",
+        "dated_by"
+      ],
+      "properties": {
+        "version": {
+          "description": "The tag.",
+          "type": "string",
+          "minLength": 1
+        },
+        "at": {
+          "description": "Its date.",
+          "$ref": "#/definitions/dateTime"
+        },
+        "years": {
+          "description": "Years from `at` to `generated_at`: integer tenths on the run clock (a years field).",
+          "$ref": "#/definitions/years"
+        },
+        "level": {
+          "$ref": "#/definitions/ageLevel"
+        },
+        "dated_by": {
+          "description": "The monorepo parent that dates it. Null when its own tag dates it.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "branchLabel": {
+      "description": "A release branch as lockrot labels it (`2.x`, `0.15.x`, and `0.0.3` for a 0.0.n branch, which is one release wide).",
+      "type": "string",
+      "minLength": 1
+    },
+    "branchReleaseUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.branch_release` is null. The metadata was not read (the `metadata.status` value, which comes first). Or the installed line has no dated release: a snapshot names no line, the branch has no release, or its releases have no date. Or the installed version is above every listed release. An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "not_from_composer_repository",
+        "unavailable",
+        "not_found",
+        "branch_snapshot",
+        "no_branch_row",
+        "undated_releases",
+        "above_listed_releases"
+      ]
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "An ISO 8601 date-time with its offset, as lockrot writes every instant (`2026-10-01T17:39:31+00:00`)."
+    },
+    "depth": {
+      "description": "The fewest hops from a composer.json requirement that the run walked to the package: the length of `chain` minus one. No score, gate, sort or baseline reads it.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "fixKind": {
+      "description": "A fix kind: the class of the easiest release outside an advisory's range, in ease order `update upgrade raise-php unknown blocked none`. `blocked` and `none` double the advisory (`run.score_model.fix_kinds[].doubles`). An open set: a fix-model change may add a kind, which arrives with its row in `run.score_model.fix_kinds[]`; read an unknown kind's `ease` and `doubles` there and show its id.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "x-known-values": [
+        "update",
+        "upgrade",
+        "raise-php",
+        "unknown",
+        "blocked",
+        "none"
+      ]
+    },
+    "flag": {
+      "description": "A flag id, in the frozen flag order `abandoned silent pinned left-behind old-promise stale vulnerable`. Closed: a new flag is a report-3 event.",
+      "type": "string",
+      "enum": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale",
+        "vulnerable"
+      ]
+    },
+    "gateNotApplied": {
+      "description": "A check that the gate could not apply, on how many packages, and why: the gap where the gate failed open, as data.",
+      "type": "object",
+      "required": [
+        "check",
+        "packages",
+        "reason"
+      ],
+      "properties": {
+        "check": {
+          "description": "What was not checked (the `check` vocabulary of S10). An open set.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "advisories"
+          ]
+        },
+        "packages": {
+          "description": "Packages that the gate could not judge on it for this reason: the covered unchecked findings whose `security.unchecked_reason` is `reason`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "reason": {
+          "description": "Why: the `security.unchecked_reason` of the unchecked findings. An open set.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "offline",
+            "composer_too_old",
+            "install_time_budget",
+            "lookup_failed",
+            "no_feed",
+            "not_from_composer_repository",
+            "unparseable_version"
+          ]
+        }
+      }
+    },
+    "gateValue": {
+      "description": "One parsed `--fail-on` value: `run.gates[]`.",
+      "type": "object",
+      "required": [
+        "value",
+        "kind",
+        "threshold"
+      ],
+      "properties": {
+        "value": {
+          "description": "The value as parsed: trimmed, lower-cased (`high`, `left-behind`, `vulnerable-high`, `unchecked`).",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "kind": {
+          "description": "`grade` (0.13's `priority`), `flag` (0.13's `verdict`), `vulnerable`, `unchecked`. An open set, reason-like (underscores); no kind keeps the token `verdict`.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "grade",
+            "flag",
+            "vulnerable",
+            "unchecked"
+          ]
+        },
+        "threshold": {
+          "description": "The grade, the flag or the minimum severity the value names (`vulnerable` → `low`, `vulnerable-high` → `high`); null exactly for `unchecked`.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "not": {
+        "description": "`none` is the absence of a gate: `--fail-on=none` writes `gates: []`, never a `none` entry.",
+        "properties": {
+          "value": {
+            "description": "The value `none`.",
+            "enum": [
+              "none"
+            ]
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "anyOf": [
+        {
+          "description": "A known kind but `unchecked` names its threshold.",
+          "properties": {
+            "kind": {
+              "enum": [
+                "grade",
+                "flag",
+                "vulnerable"
+              ]
+            },
+            "threshold": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "description": "`unchecked` names none.",
+          "properties": {
+            "kind": {
+              "enum": [
+                "unchecked"
+              ]
+            },
+            "threshold": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "description": "A kind this schema does not list is not constrained.",
+          "not": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "grade",
+                  "flag",
+                  "vulnerable",
+                  "unchecked"
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "description": "A value's kind follows the value: the four grades are `grade`, the six maintenance flags `flag`, `vulnerable` and `vulnerable-<severity>` `vulnerable`, `unchecked` `unchecked`; a value or a kind this schema does not list is not constrained.",
+          "anyOf": [
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "critical",
+                    "high",
+                    "medium",
+                    "low"
+                  ]
+                },
+                "kind": {
+                  "enum": [
+                    "grade"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "abandoned",
+                    "silent",
+                    "pinned",
+                    "left-behind",
+                    "old-promise",
+                    "stale"
+                  ]
+                },
+                "kind": {
+                  "enum": [
+                    "flag"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "pattern": "^vulnerable(-[a-z]+)?$"
+                },
+                "kind": {
+                  "enum": [
+                    "vulnerable"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "unchecked"
+                  ]
+                },
+                "kind": {
+                  "enum": [
+                    "unchecked"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "kind": {
+                  "not": {
+                    "enum": [
+                      "grade",
+                      "flag",
+                      "vulnerable",
+                      "unchecked"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "critical",
+                          "high",
+                          "medium",
+                          "low"
+                        ]
+                      },
+                      {
+                        "enum": [
+                          "abandoned",
+                          "silent",
+                          "pinned",
+                          "left-behind",
+                          "old-promise",
+                          "stale"
+                        ]
+                      },
+                      {
+                        "pattern": "^vulnerable(-[a-z]+)?$"
+                      },
+                      {
+                        "enum": [
+                          "unchecked"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "The threshold follows the value: a grade or a flag is its own threshold, `vulnerable` reads `low`, `vulnerable-<severity>` the severity, `unchecked` none; a value this schema does not list is not constrained.",
+          "anyOf": [
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "critical"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "critical"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "high"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "high"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "medium"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "medium"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "low"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "low"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "abandoned"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "abandoned"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "silent"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "silent"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "pinned"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "pinned"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "left-behind"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "left-behind"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "old-promise"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "old-promise"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "stale"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "stale"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "vulnerable"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "low"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "vulnerable-medium"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "medium"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "vulnerable-high"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "high"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "vulnerable-critical"
+                  ]
+                },
+                "threshold": {
+                  "enum": [
+                    "critical"
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "unchecked"
+                  ]
+                },
+                "threshold": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "value": {
+                  "not": {
+                    "enum": [
+                      "critical",
+                      "high",
+                      "medium",
+                      "low",
+                      "abandoned",
+                      "silent",
+                      "pinned",
+                      "left-behind",
+                      "old-promise",
+                      "stale",
+                      "vulnerable",
+                      "vulnerable-medium",
+                      "vulnerable-high",
+                      "vulnerable-critical",
+                      "unchecked"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "gateValueFailing": {
+      "description": "One `run.gates` value and how many findings fail it.",
+      "type": "object",
+      "required": [
+        "value",
+        "failing"
+      ],
+      "properties": {
+        "value": {
+          "description": "`run.gates[].value`.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "failing": {
+          "description": "Findings whose `gate.by[]` names this value.",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "halfPoints": {
+      "description": "A score number in half points: exact, dyadic, `multipleOf: 0.5` (`run.score_model.exact_unit`); a whole value is written as an integer.",
+      "type": "number",
+      "minimum": 0,
+      "multipleOf": 0.5
+    },
+    "heldBy": {
+      "description": "One link that excludes the move or the fix: the root's or a locked package's `require`, `require-dev` or `conflict`.",
+      "type": "object",
+      "required": [
+        "source",
+        "package",
+        "version",
+        "link",
+        "constraint",
+        "holder"
+      ],
+      "properties": {
+        "source": {
+          "description": "Who holds it: `root` (composer.json) or `package` (a locked package). Closed.",
+          "type": "string",
+          "enum": [
+            "root",
+            "package"
+          ]
+        },
+        "package": {
+          "description": "The locked package that holds it; null for `source: root`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/packageName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "description": "That package's locked version; null for `source: root`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "link": {
+          "description": "The link that excludes it. Closed.",
+          "type": "string",
+          "enum": [
+            "require",
+            "require-dev",
+            "conflict"
+          ]
+        },
+        "constraint": {
+          "description": "The constraint as the link writes it, quoted and never interpreted (\"requires ^2.0\").",
+          "type": "string",
+          "minLength": 1
+        },
+        "holder": {
+          "$ref": "#/definitions/holder"
+        }
+      },
+      "allOf": [
+        {
+          "description": "`source` root has no `package`, `version` or `holder`; `source` package names the package in `package`.",
+          "anyOf": [
+            {
+              "properties": {
+                "source": {
+                  "enum": [
+                    "root"
+                  ]
+                },
+                "package": {
+                  "type": "null"
+                },
+                "version": {
+                  "type": "null"
+                },
+                "holder": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "source": {
+                  "enum": [
+                    "package"
+                  ]
+                },
+                "package": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "holder": {
+      "description": "The holder's own finding in this report, for display only (no score reads it): `{verdict, lead, flag_ids[], replacement, next_step}`. Null for the root, and for a holder that is not a finding of this report.",
+      "oneOf": [
+        {
+          "description": "A holder's finding, restated.",
+          "type": "object",
+          "required": [
+            "verdict",
+            "lead",
+            "flag_ids",
+            "replacement",
+            "next_step"
+          ],
+          "properties": {
+            "verdict": {
+              "$ref": "#/definitions/verdict"
+            },
+            "lead": {
+              "description": "The holder's `lead`.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/maintenanceFlag"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "flag_ids": {
+              "description": "The holder's counted flag ids, in flag order (every list of bare flag ids is `flag_ids`).",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/flag"
+              },
+              "uniqueItems": true
+            },
+            "replacement": {
+              "description": "The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/packageName"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "next_step": {
+              "description": "The holder's own move; null when the holder's finding has no move (score 0).",
+              "oneOf": [
+                {
+                  "description": "The holder's own move, `{kind, to_branch, constraint}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding.",
+                  "type": "object",
+                  "required": [
+                    "kind",
+                    "to_branch",
+                    "constraint"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "description": "The holder's `next_step.kind` (an open set, as `next_step.kind`).",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]*$",
+                      "x-known-values": [
+                        "replace",
+                        "find-alternative",
+                        "tag",
+                        "require",
+                        "update",
+                        "raise-php",
+                        "test",
+                        "blocked",
+                        "no-tag",
+                        "no-move",
+                        "no-fix",
+                        "no-single-fix"
+                      ]
+                    },
+                    "to_branch": {
+                      "description": "The holder's `next_step.to_branch`.",
+                      "oneOf": [
+                        {
+                          "$ref": "#/definitions/branchLabel"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "constraint": {
+                      "description": "The holder's `next_step.constraint`.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "installedUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.installed` is null: a dev pin (`branch_snapshot`), a tag dated only by a commit that other tags share (`shared_commit`), or a lock entry with no date (`undated`). An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "branch_snapshot",
+        "shared_commit",
+        "undated"
+      ]
+    },
+    "invocation": {
+      "description": "The invocation lockrot writes.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "executionSuccessful",
+        "exitCode",
+        "exitCodeDescription",
+        "properties"
+      ],
+      "properties": {
+        "executionSuccessful": {
+          "description": "lockrot ran to completion: always true (the exit code is the gate's).",
+          "enum": [
+            true
+          ]
+        },
+        "exitCode": {
+          "description": "1 when `properties.gate.fails`, else 0.",
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "exitCodeDescription": {
+          "description": "`properties.gate.text`, the gate: line; prose, not contract.",
+          "type": "string",
+          "minLength": 1
+        },
+        "properties": {
+          "$ref": "#/definitions/invocationProperties"
+        }
+      },
+      "anyOf": [
+        {
+          "description": "Exit code 1 exactly when the gate fails.",
+          "properties": {
+            "exitCode": {
+              "enum": [
+                1
+              ]
+            },
+            "properties": {
+              "properties": {
+                "gate": {
+                  "properties": {
+                    "fails": {
+                      "enum": [
+                        true
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "exitCode": {
+              "enum": [
+                0
+              ]
+            },
+            "properties": {
+              "properties": {
+                "gate": {
+                  "properties": {
+                    "fails": {
+                      "enum": [
+                        false
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "invocationProperties": {
+      "description": "The invocation's bag: the run gate and the run keys it reads, each typed as report-2 types it.",
+      "type": "object",
+      "required": [
+        "gate",
+        "fail_on",
+        "fail_on_source",
+        "gates",
+        "mode",
+        "strict_network"
+      ],
+      "properties": {
+        "gate": {
+          "description": "The report's root `gate`.",
+          "$ref": "#/definitions/rootGate"
+        },
+        "fail_on": {
+          "description": "The parsed values in kind order (grade, flag, vulnerable, unchecked; a list holds one value per kind), joined with `,`, no spaces, lower case (`high`, `left-behind,vulnerable-high`, `none`): one gate writes one string whatever order it was typed in. report-1's string type.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*(,[a-z][a-z0-9-]*)*$"
+        },
+        "fail_on_source": {
+          "description": "Which source gave `fail_on`. Closed.",
+          "type": "string",
+          "enum": [
+            "option",
+            "env",
+            "config",
+            "default"
+          ]
+        },
+        "gates": {
+          "description": "`run.gates`.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/gateValue"
+          }
+        },
+        "mode": {
+          "description": "What the run was asked to do: `check` or `generate_baseline` (report-1). An open set.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "check",
+            "generate_baseline"
+          ]
+        },
+        "strict_network": {
+          "description": "Whether `--strict-network` was on (report-1).",
+          "type": "boolean"
+        }
+      }
+    },
+    "maintenanceFlag": {
+      "description": "A maintenance flag id: the flag order without `vulnerable`. The same closed set as `flag`, restricted; the values `lead`, an accepted flag and a baseline entry can name.",
+      "type": "string",
+      "enum": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale"
+      ]
+    },
+    "packageName": {
+      "description": "A Composer package name, vendor/name.",
+      "type": "string",
+      "pattern": "^[^\\/]+\\/[^\\/]+$"
+    },
+    "pushUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.push` is null: `activity.reason` when the activity was not read, or `undated` when the answer carried no date. An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "allowlisted",
+        "not_from_composer_repository",
+        "no_repository",
+        "host_not_supported",
+        "repository_not_found",
+        "offline",
+        "install_time_budget",
+        "no_token",
+        "anonymous_budget",
+        "rate_limit",
+        "fetch_failed",
+        "undated"
+      ]
+    },
+    "releaseUnmeasured": {
+      "description": "Each `*_unmeasured` key has its own known list. An id means the same cause in every reason set, and one words table words them all. Why `age.release` is null: the metadata was not read (the `metadata.status` value), no stable release, or no dated stable release. An open set: read an unknown reason as another reason.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "x-known-values": [
+        "not_from_composer_repository",
+        "unavailable",
+        "not_found",
+        "no_stable_release",
+        "undated_releases"
+      ]
+    },
+    "result": {
+      "description": "A SARIF result lockrot writes; SARIF 2.1.0's schema checks the rest of it.",
+      "type": "object",
+      "required": [
+        "ruleId",
+        "level",
+        "properties"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "ruleId": {
+          "description": "`lockrot/<flag>`, `lockrot/advisory/<id>`, `lockrot/unchecked`, or a score-0 word under `--all`.",
+          "type": "string",
+          "pattern": "^lockrot\\/"
+        },
+        "level": {
+          "description": "`error` (a fact `gate.by[].facts` names), `note` (a fact the baseline knows or covers, or a score-0 result), else `warning`. Closed.",
+          "type": "string",
+          "enum": [
+            "error",
+            "warning",
+            "note"
+          ]
+        },
+        "rank": {
+          "description": "A maintenance result: its term's band × 25 (25 below low's floor); an advisory result: its severity (95 80 55 55 20).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "suppressions": {
+          "description": "Present only on a `note` for a fact the baseline knows or covers.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/definitions/suppression"
+          }
+        },
+        "properties": {
+          "description": "The property bag, chosen by `ruleId`.",
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "description": "The bag by `ruleId` (the four branches exclude each other).",
+          "anyOf": [
+            {
+              "properties": {
+                "ruleId": {
+                  "pattern": "^lockrot\\/advisory\\/"
+                },
+                "properties": {
+                  "$ref": "#/definitions/resultAdvisory"
+                }
+              }
+            },
+            {
+              "properties": {
+                "ruleId": {
+                  "pattern": "^lockrot\\/(abandoned|silent|pinned|left-behind|old-promise|stale)$"
+                },
+                "properties": {
+                  "$ref": "#/definitions/resultMaintenance"
+                }
+              }
+            },
+            {
+              "properties": {
+                "ruleId": {
+                  "enum": [
+                    "lockrot/unchecked"
+                  ]
+                },
+                "properties": {
+                  "$ref": "#/definitions/resultUnchecked"
+                }
+              }
+            },
+            {
+              "properties": {
+                "ruleId": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "pattern": "^lockrot\\/advisory\\/"
+                      },
+                      {
+                        "pattern": "^lockrot\\/(abandoned|silent|pinned|left-behind|old-promise|stale)$"
+                      },
+                      {
+                        "enum": [
+                          "lockrot/unchecked"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "properties": {
+                  "$ref": "#/definitions/resultOther"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`level` is `error` exactly when `error_by` is not empty.",
+          "anyOf": [
+            {
+              "properties": {
+                "level": {
+                  "enum": [
+                    "error"
+                  ]
+                },
+                "properties": {
+                  "properties": {
+                    "error_by": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "level": {
+                  "not": {
+                    "enum": [
+                      "error"
+                    ]
+                  }
+                },
+                "properties": {
+                  "properties": {
+                    "error_by": {
+                      "maxItems": 0
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`suppressions` only on a `note`.",
+          "anyOf": [
+            {
+              "not": {
+                "required": [
+                  "suppressions"
+                ]
+              }
+            },
+            {
+              "properties": {
+                "level": {
+                  "enum": [
+                    "note"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "resultAdvisory": {
+      "description": "The bag of an advisory result, one per (package, counted advisory) (`lockrot/advisory/<id>`).",
+      "type": "object",
+      "required": [
+        "package",
+        "version",
+        "verdict",
+        "priority",
+        "lead",
+        "score_total",
+        "score_text",
+        "score_model_id",
+        "flag_ids",
+        "direct",
+        "dev",
+        "data_date",
+        "baseline_status",
+        "error_by",
+        "advisory",
+        "cve",
+        "severity",
+        "fix",
+        "points",
+        "deciding"
+      ],
+      "properties": {
+        "package": {
+          "description": "The package (`finding.package`).",
+          "$ref": "#/definitions/packageName"
+        },
+        "version": {
+          "description": "The installed version.",
+          "type": "string",
+          "minLength": 1
+        },
+        "verdict": {
+          "description": "The finding's verdict, a grade or a score-0 word (`finding.verdict`; 0.13 wrote the cause word here, now `lead`).",
+          "$ref": "#/definitions/verdict"
+        },
+        "priority": {
+          "description": "`verdict` when graded, else `none`: a deprecated alias that leaves in report-3.",
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "none"
+          ]
+        },
+        "lead": {
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/maintenanceFlag"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "score_total": {
+          "description": "`finding.score.total`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "score_text": {
+          "description": "`finding.score.text` (ScoreText); prose, not contract.",
+          "type": "string",
+          "minLength": 1
+        },
+        "score_model_id": {
+          "description": "`finding.score.model`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "flag_ids": {
+          "description": "The finding's fired flags the allowlist does not accept, in flag order (`finding.flags[].id` where `role` is not `accepted`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flag"
+          },
+          "uniqueItems": true
+        },
+        "direct": {
+          "description": "`finding.direct`.",
+          "type": "boolean"
+        },
+        "dev": {
+          "description": "`finding.dev`.",
+          "type": "boolean"
+        },
+        "data_date": {
+          "description": "The time of the newest repository data the finding read (report-1); null when lockrot read none.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "baseline_status": {
+          "description": "`finding.baseline.status` (`known`, `new`, `worsened`), or null when the run read no baseline or the finding stands nowhere against it. 0.13 named it `baseline`, which report-2 uses for the `{status, recorded, …}` object.",
+          "oneOf": [
+            {
+              "description": "The standing. Closed.",
+              "type": "string",
+              "enum": [
+                "known",
+                "new",
+                "worsened"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error_by": {
+          "description": "The active `run.gates[]` values whose `gate.by[].facts` name this result's fact; empty when the result is not `error`.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "chain": {
+          "description": "From the direct requirement down to this package; one element when direct; empty when no direct requirement reaches it (report-1).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "depth": {
+          "description": "`finding.depth`: hops from the nearest composer.json requirement; null when unreached.",
+          "$ref": "#/definitions/depth"
+        },
+        "direct_dependents": {
+          "description": "The direct requirements that reach it (report-1); a transitive move names them.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "signal_ids": {
+          "description": "The finding's signal ids (`finding.signals[].id`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signalId"
+          },
+          "uniqueItems": true
+        },
+        "age": {
+          "description": "`finding.age`: how old the installed release, the newest release, the installed branch's newest release and the last push are.",
+          "$ref": "#/definitions/age"
+        },
+        "advisory": {
+          "description": "The advisory id (the S9 row `id`).",
+          "$ref": "#/definitions/advisoryId"
+        },
+        "cve": {
+          "description": "Its CVE; null when it has none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "severity": {
+          "description": "The S9 row `severity`.",
+          "$ref": "#/definitions/severity"
+        },
+        "fix": {
+          "description": "The S9 row's `fix` object (`fix` is always the object and `fix_kind` the string).",
+          "$ref": "#/definitions/s9fix"
+        },
+        "points": {
+          "description": "Severity points × multiplier, before halving.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "deciding": {
+          "description": "True on exactly the advisory the security term names.",
+          "type": "boolean"
+        },
+        "term": {
+          "description": "The security term, on the deciding advisory only.",
+          "$ref": "#/definitions/termSecurity"
+        }
+      },
+      "allOf": [
+        {
+          "description": "`chain`, `depth`, `direct_dependents`, `signal_ids` and `age` come together: on the first result of each kind for a package, on no other.",
+          "anyOf": [
+            {
+              "required": [
+                "chain",
+                "depth",
+                "direct_dependents",
+                "signal_ids",
+                "age"
+              ]
+            },
+            {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "chain"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "depth"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "direct_dependents"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "signal_ids"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "age"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "description": "`baseline` is 0.13's name for `baseline_status` and is never written.",
+          "not": {
+            "required": [
+              "baseline"
+            ]
+          }
+        },
+        {
+          "description": "`term` exactly on the deciding advisory.",
+          "anyOf": [
+            {
+              "properties": {
+                "deciding": {
+                  "enum": [
+                    true
+                  ]
+                }
+              },
+              "required": [
+                "term"
+              ]
+            },
+            {
+              "properties": {
+                "deciding": {
+                  "enum": [
+                    false
+                  ]
+                }
+              },
+              "not": {
+                "required": [
+                  "term"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "resultMaintenance": {
+      "description": "The bag of a maintenance result, one per counted maintenance flag (`lockrot/<flag>`).",
+      "type": "object",
+      "required": [
+        "package",
+        "version",
+        "verdict",
+        "priority",
+        "lead",
+        "score_total",
+        "score_text",
+        "score_model_id",
+        "flag_ids",
+        "direct",
+        "dev",
+        "data_date",
+        "baseline_status",
+        "error_by",
+        "term"
+      ],
+      "properties": {
+        "package": {
+          "description": "The package (`finding.package`).",
+          "$ref": "#/definitions/packageName"
+        },
+        "version": {
+          "description": "The installed version.",
+          "type": "string",
+          "minLength": 1
+        },
+        "verdict": {
+          "description": "The finding's verdict, a grade or a score-0 word (`finding.verdict`; 0.13 wrote the cause word here, now `lead`).",
+          "$ref": "#/definitions/verdict"
+        },
+        "priority": {
+          "description": "`verdict` when graded, else `none`: a deprecated alias that leaves in report-3.",
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "none"
+          ]
+        },
+        "lead": {
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/maintenanceFlag"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "score_total": {
+          "description": "`finding.score.total`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "score_text": {
+          "description": "`finding.score.text` (ScoreText); prose, not contract.",
+          "type": "string",
+          "minLength": 1
+        },
+        "score_model_id": {
+          "description": "`finding.score.model`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "flag_ids": {
+          "description": "The finding's fired flags the allowlist does not accept, in flag order (`finding.flags[].id` where `role` is not `accepted`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flag"
+          },
+          "uniqueItems": true
+        },
+        "direct": {
+          "description": "`finding.direct`.",
+          "type": "boolean"
+        },
+        "dev": {
+          "description": "`finding.dev`.",
+          "type": "boolean"
+        },
+        "data_date": {
+          "description": "The time of the newest repository data the finding read (report-1); null when lockrot read none.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "baseline_status": {
+          "description": "`finding.baseline.status` (`known`, `new`, `worsened`), or null when the run read no baseline or the finding stands nowhere against it. 0.13 named it `baseline`, which report-2 uses for the `{status, recorded, …}` object.",
+          "oneOf": [
+            {
+              "description": "The standing. Closed.",
+              "type": "string",
+              "enum": [
+                "known",
+                "new",
+                "worsened"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error_by": {
+          "description": "The active `run.gates[]` values whose `gate.by[].facts` name this result's fact; empty when the result is not `error`.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "chain": {
+          "description": "From the direct requirement down to this package; one element when direct; empty when no direct requirement reaches it (report-1).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "depth": {
+          "description": "`finding.depth`: hops from the nearest composer.json requirement; null when unreached.",
+          "$ref": "#/definitions/depth"
+        },
+        "direct_dependents": {
+          "description": "The direct requirements that reach it (report-1); a transitive move names them.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "signal_ids": {
+          "description": "The finding's signal ids (`finding.signals[].id`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signalId"
+          },
+          "uniqueItems": true
+        },
+        "age": {
+          "description": "`finding.age`: how old the installed release, the newest release, the installed branch's newest release and the last push are.",
+          "$ref": "#/definitions/age"
+        },
+        "term": {
+          "description": "A copy of the flag's `score.terms[]` entry; the level is read from `error_by`, never from it.",
+          "$ref": "#/definitions/termMaintenance"
+        }
+      },
+      "allOf": [
+        {
+          "description": "`chain`, `depth`, `direct_dependents`, `signal_ids` and `age` come together: on the first result of each kind for a package, on no other.",
+          "anyOf": [
+            {
+              "required": [
+                "chain",
+                "depth",
+                "direct_dependents",
+                "signal_ids",
+                "age"
+              ]
+            },
+            {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "chain"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "depth"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "direct_dependents"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "signal_ids"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "age"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "description": "`baseline` is 0.13's name for `baseline_status` and is never written.",
+          "not": {
+            "required": [
+              "baseline"
+            ]
+          }
+        }
+      ]
+    },
+    "resultOther": {
+      "description": "The bag of another lockrot result (`--all`'s `lockrot/ok`, `lockrot/finished`, `lockrot/unknown`).",
+      "type": "object",
+      "required": [
+        "package",
+        "version",
+        "verdict",
+        "priority",
+        "lead",
+        "score_total",
+        "score_text",
+        "score_model_id",
+        "flag_ids",
+        "direct",
+        "dev",
+        "data_date",
+        "baseline_status",
+        "error_by"
+      ],
+      "properties": {
+        "package": {
+          "description": "The package (`finding.package`).",
+          "$ref": "#/definitions/packageName"
+        },
+        "version": {
+          "description": "The installed version.",
+          "type": "string",
+          "minLength": 1
+        },
+        "verdict": {
+          "description": "The finding's verdict, a grade or a score-0 word (`finding.verdict`; 0.13 wrote the cause word here, now `lead`).",
+          "$ref": "#/definitions/verdict"
+        },
+        "priority": {
+          "description": "`verdict` when graded, else `none`: a deprecated alias that leaves in report-3.",
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "none"
+          ]
+        },
+        "lead": {
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/maintenanceFlag"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "score_total": {
+          "description": "`finding.score.total`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "score_text": {
+          "description": "`finding.score.text` (ScoreText); prose, not contract.",
+          "type": "string",
+          "minLength": 1
+        },
+        "score_model_id": {
+          "description": "`finding.score.model`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "flag_ids": {
+          "description": "The finding's fired flags the allowlist does not accept, in flag order (`finding.flags[].id` where `role` is not `accepted`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flag"
+          },
+          "uniqueItems": true
+        },
+        "direct": {
+          "description": "`finding.direct`.",
+          "type": "boolean"
+        },
+        "dev": {
+          "description": "`finding.dev`.",
+          "type": "boolean"
+        },
+        "data_date": {
+          "description": "The time of the newest repository data the finding read (report-1); null when lockrot read none.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "baseline_status": {
+          "description": "`finding.baseline.status` (`known`, `new`, `worsened`), or null when the run read no baseline or the finding stands nowhere against it. 0.13 named it `baseline`, which report-2 uses for the `{status, recorded, …}` object.",
+          "oneOf": [
+            {
+              "description": "The standing. Closed.",
+              "type": "string",
+              "enum": [
+                "known",
+                "new",
+                "worsened"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error_by": {
+          "description": "The active `run.gates[]` values whose `gate.by[].facts` name this result's fact; empty when the result is not `error`.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "chain": {
+          "description": "From the direct requirement down to this package; one element when direct; empty when no direct requirement reaches it (report-1).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "depth": {
+          "description": "`finding.depth`: hops from the nearest composer.json requirement; null when unreached.",
+          "$ref": "#/definitions/depth"
+        },
+        "direct_dependents": {
+          "description": "The direct requirements that reach it (report-1); a transitive move names them.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "signal_ids": {
+          "description": "The finding's signal ids (`finding.signals[].id`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signalId"
+          },
+          "uniqueItems": true
+        },
+        "age": {
+          "description": "`finding.age`: how old the installed release, the newest release, the installed branch's newest release and the last push are.",
+          "$ref": "#/definitions/age"
+        }
+      },
+      "allOf": [
+        {
+          "description": "`chain`, `depth`, `direct_dependents`, `signal_ids` and `age` come together: on the first result of each kind for a package, on no other.",
+          "anyOf": [
+            {
+              "required": [
+                "chain",
+                "depth",
+                "direct_dependents",
+                "signal_ids",
+                "age"
+              ]
+            },
+            {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "chain"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "depth"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "direct_dependents"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "signal_ids"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "age"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "description": "`baseline` is 0.13's name for `baseline_status` and is never written.",
+          "not": {
+            "required": [
+              "baseline"
+            ]
+          }
+        }
+      ]
+    },
+    "resultUnchecked": {
+      "description": "The bag of a `lockrot/unchecked` result: a finding with S10 and no counted fact, when `unchecked` is active.",
+      "type": "object",
+      "required": [
+        "package",
+        "version",
+        "verdict",
+        "priority",
+        "lead",
+        "score_total",
+        "score_text",
+        "score_model_id",
+        "flag_ids",
+        "direct",
+        "dev",
+        "data_date",
+        "baseline_status",
+        "error_by",
+        "chain",
+        "depth",
+        "direct_dependents",
+        "signal_ids",
+        "age"
+      ],
+      "properties": {
+        "package": {
+          "description": "The package (`finding.package`).",
+          "$ref": "#/definitions/packageName"
+        },
+        "version": {
+          "description": "The installed version.",
+          "type": "string",
+          "minLength": 1
+        },
+        "verdict": {
+          "description": "The finding's verdict, a grade or a score-0 word (`finding.verdict`; 0.13 wrote the cause word here, now `lead`).",
+          "$ref": "#/definitions/verdict"
+        },
+        "priority": {
+          "description": "`verdict` when graded, else `none`: a deprecated alias that leaves in report-3.",
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "none"
+          ]
+        },
+        "lead": {
+          "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/maintenanceFlag"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "score_total": {
+          "description": "`finding.score.total`.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "score_text": {
+          "description": "`finding.score.text` (ScoreText); prose, not contract.",
+          "type": "string",
+          "minLength": 1
+        },
+        "score_model_id": {
+          "description": "`finding.score.model`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "flag_ids": {
+          "description": "The finding's fired flags the allowlist does not accept, in flag order (`finding.flags[].id` where `role` is not `accepted`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flag"
+          },
+          "uniqueItems": true
+        },
+        "direct": {
+          "description": "`finding.direct`.",
+          "type": "boolean"
+        },
+        "dev": {
+          "description": "`finding.dev`.",
+          "type": "boolean"
+        },
+        "data_date": {
+          "description": "The time of the newest repository data the finding read (report-1); null when lockrot read none.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "baseline_status": {
+          "description": "`finding.baseline.status` (`known`, `new`, `worsened`), or null when the run read no baseline or the finding stands nowhere against it. 0.13 named it `baseline`, which report-2 uses for the `{status, recorded, …}` object.",
+          "oneOf": [
+            {
+              "description": "The standing. Closed.",
+              "type": "string",
+              "enum": [
+                "known",
+                "new",
+                "worsened"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error_by": {
+          "description": "The active `run.gates[]` values whose `gate.by[].facts` name this result's fact; empty when the result is not `error`.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "chain": {
+          "description": "From the direct requirement down to this package; one element when direct; empty when no direct requirement reaches it (report-1).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "depth": {
+          "description": "`finding.depth`: hops from the nearest composer.json requirement; null when unreached.",
+          "$ref": "#/definitions/depth"
+        },
+        "direct_dependents": {
+          "description": "The direct requirements that reach it (report-1); a transitive move names them.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/packageName"
+          }
+        },
+        "signal_ids": {
+          "description": "The finding's signal ids (`finding.signals[].id`).",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signalId"
+          },
+          "uniqueItems": true
+        },
+        "age": {
+          "description": "`finding.age`: how old the installed release, the newest release, the installed branch's newest release and the last push are.",
+          "$ref": "#/definitions/age"
+        }
+      },
+      "allOf": [
+        {
+          "description": "`chain`, `depth`, `direct_dependents`, `signal_ids` and `age` come together: on the first result of each kind for a package, on no other.",
+          "anyOf": [
+            {
+              "required": [
+                "chain",
+                "depth",
+                "direct_dependents",
+                "signal_ids",
+                "age"
+              ]
+            },
+            {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "chain"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "depth"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "direct_dependents"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "signal_ids"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "age"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "description": "`baseline` is 0.13's name for `baseline_status` and is never written.",
+          "not": {
+            "required": [
+              "baseline"
+            ]
+          }
+        }
+      ]
+    },
+    "rootGate": {
+      "description": "The run's gate (report-1's) plus the finding counts the `gate:` line prints.",
+      "type": "object",
+      "required": [
+        "fails",
+        "tripped_by",
+        "fail_on_applied",
+        "reaching",
+        "failing",
+        "exempt",
+        "failing_by",
+        "not_applied",
+        "text"
+      ],
+      "properties": {
+        "fails": {
+          "description": "The gate's decision. True: the run exits 1, unless it then fails to write a file or the baseline, in which case it exits 2 and says so on stderr. False: it exits 0, under the same proviso. True exactly when `tripped_by` is not empty.",
+          "type": "boolean"
+        },
+        "tripped_by": {
+          "description": "What failed the run, each cause once: `strict_network`, `run.strict_network` is true and `network_failures` is true; `fail_on`, at least one finding's `gate.fails` is true. Both are listed when both hold. Empty exactly when `fails` is false. lockrot writes them in the order of `x-known-values`; do not rely on the position. An open set: a later minor release may add a cause; read a value you do not know as another condition that failed the run.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "x-known-values": [
+              "strict_network",
+              "fail_on"
+            ]
+          }
+        },
+        "fail_on_applied": {
+          "description": "Whether the run judged its findings against `run.fail_on`: true in a `check` run, `fail_on` none included; false in a `generate_baseline` run, where only `--strict-network` can fail it. Where it is false no finding's `gate.fails` is true.",
+          "type": "boolean"
+        },
+        "reaching": {
+          "description": "Findings whose `gate.reaches_fail_on` is true (\"5 findings reach it\").",
+          "type": "integer",
+          "minimum": 0
+        },
+        "failing": {
+          "description": "Findings whose `gate.fails` is true.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "exempt": {
+          "description": "Findings that reach and are exempt, by `exempt_by` value.",
+          "type": "object",
+          "required": [
+            "baseline"
+          ],
+          "properties": {
+            "baseline": {
+              "description": "Exempt by the baseline.",
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "failing_by": {
+          "description": "One entry per `run.gates` value, in its order: how many findings fail that value (their `gate.by[]` names it). Zero counts are written. `[]` when `run.gates` is `[]`.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/gateValueFailing"
+          }
+        },
+        "not_applied": {
+          "description": "What the gate could not judge, so it failed open: advisories that a grade or vulnerable value could not read because nothing checked them. Written in a check run with a grade or vulnerable value active. With `unchecked` also active, it counts only the packages whose advisories carry no S10 (a skip reason: `not_from_composer_repository`, `unparseable_version`, or a `no_feed` that the project accepted), because the others carry S10 and fail closed. One entry per reason, by `packages` descending, then by reason. The `packages` of the entries add up to the findings covered. `[]` otherwise, and when nothing is missing.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/gateNotApplied"
+          }
+        },
+        "text": {
+          "description": "The `gate:` line of the text formats, `RunGateText` (text grammar 1). Prose, not contract; key on the fields it is rendered from.",
+          "type": "string",
+          "x-rendered-from": [
+            "gate",
+            "run.fail_on",
+            "run.fail_on_source",
+            "run.gates",
+            "run.mode",
+            "run.target_php",
+            "run.target_php_source"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "runProperties": {
+      "description": "The SARIF run's bag: what a consumer guards on, as a jq user guards on `.lockrot.schema`.",
+      "type": "object",
+      "required": [
+        "lockrot_schema",
+        "text_grammar",
+        "score_text_grammar",
+        "score_model_id",
+        "fix_model",
+        "advisory_lookup"
+      ],
+      "properties": {
+        "lockrot_schema": {
+          "description": "The report schema number this SARIF projects: 2.",
+          "type": "integer",
+          "enum": [
+            2
+          ]
+        },
+        "text_grammar": {
+          "description": "`run.text_grammar`: every `message` and rule text.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "score_text_grammar": {
+          "description": "`run.score_model.score_text_grammar`: every `score_text`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "score_model_id": {
+          "description": "`run.score_model.id`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "fix_model": {
+          "description": "`run.fix_model`.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "advisory_lookup": {
+          "description": "`run.advisory_lookup`: the run's advisory lookup, typed as report-2 types it.",
+          "$ref": "#/definitions/advisoryLookup"
+        }
+      }
+    },
+    "s9fix": {
+      "description": "The advisory's fix: `fix` is always this object, `fix_kind` always the string. Null keys below mean the kind names no fixing release.",
+      "type": "object",
+      "required": [
+        "kind",
+        "to_branch",
+        "version",
+        "newest",
+        "on_installed_branch",
+        "php",
+        "held_by",
+        "reason"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/fixKind"
+        },
+        "to_branch": {
+          "description": "The branch of the fixing release; null for `unknown` and `none` (no fixing release known).",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/branchLabel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "description": "The lowest fixing release on `to_branch`; null when not known (releases not read). Not the move's `version`.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "newest": {
+          "description": "`to_branch`'s newest tag; null for `unknown` and `none`.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "on_installed_branch": {
+          "description": "Whether the easiest fix is on the installed branch; null for `unknown` and `none`.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "php": {
+          "description": "The fixing release's php requirement; null for `unknown` and `none`, or when it declares none.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "held_by": {
+          "description": "The links that exclude the fixing release; `upgrade` ⇒ not empty where lockrot read the links.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/heldBy"
+          }
+        },
+        "reason": {
+          "description": "Set for `unknown` (`releases_unknown`, `affected_range_unknown`, `not_from_composer_repository`) and `none` (`no_release_outside_range`), else null. An open set.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "x-known-values": [
+                "releases_unknown",
+                "affected_range_unknown",
+                "not_from_composer_repository",
+                "no_release_outside_range"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "description": "A fix of kind `unknown` or `none` has a `reason` and no `to_branch`; a known reachable kind has a branch and no reason; a kind this schema does not list is not constrained.",
+          "anyOf": [
+            {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "unknown",
+                    "none"
+                  ]
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "to_branch": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "update",
+                    "upgrade",
+                    "raise-php",
+                    "blocked"
+                  ]
+                },
+                "reason": {
+                  "type": "null"
+                },
+                "to_branch": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "properties": {
+                "kind": {
+                  "not": {
+                    "enum": [
+                      "update",
+                      "upgrade",
+                      "raise-php",
+                      "unknown",
+                      "blocked",
+                      "none"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`on_installed_branch` and `newest` are null when there is no branch; `on_installed_branch` is set when there is one.",
+          "anyOf": [
+            {
+              "properties": {
+                "to_branch": {
+                  "type": "null"
+                },
+                "on_installed_branch": {
+                  "type": "null"
+                },
+                "newest": {
+                  "type": "null"
+                }
+              }
+            },
+            {
+              "properties": {
+                "to_branch": {
+                  "type": "string"
+                },
+                "on_installed_branch": {
+                  "type": "boolean"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "`php` is null for `unknown` and `none` (no fixing release known).",
+          "anyOf": [
+            {
+              "properties": {
+                "kind": {
+                  "not": {
+                    "enum": [
+                      "unknown",
+                      "none"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "php": {
+                  "type": "null"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "severity": {
+      "description": "An advisory severity bucket in the one order used everywhere: `critical high medium unrated low`; `moderate` reads `medium`, a missing or unknown rating reads `unrated` (which counts as medium). Closed. Compare severities by `run.score_model.severities[].gate_rank`, never by position.",
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "unrated",
+        "low"
+      ]
+    },
+    "signalId": {
+      "description": "A signal identifier: `S` and a number for lockrot's own, as https://lockrot.dev/verdicts/#the-signals lists them, or `<vendor>:<name>` for one that does not come from lockrot. An open set: a later release under this schema number can add an id, so read one you do not know as \"other\". `x-known-values` lists the ids this release writes; read it as the enum to hold a document to them.",
+      "type": "string",
+      "pattern": "^(S[1-9][0-9]*|[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*)$",
+      "x-known-values": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8",
+        "S9",
+        "S10"
+      ]
+    },
+    "suppression": {
+      "description": "The one suppression lockrot writes: a fact the baseline knows or covers.",
+      "type": "object",
+      "required": [
+        "kind",
+        "status",
+        "justification"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Closed.",
+          "type": "string",
+          "enum": [
+            "external"
+          ]
+        },
+        "status": {
+          "description": "Closed.",
+          "type": "string",
+          "enum": [
+            "accepted"
+          ]
+        },
+        "justification": {
+          "description": "\"covered by <baseline path> (known since <date>)\"; prose, not contract.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "termMaintenance": {
+      "description": "A maintenance term: one counted maintenance flag. `points` = `weight` ÷ `divisor`; `contribution` is after every modifier.",
+      "type": "object",
+      "required": [
+        "part",
+        "flag",
+        "role",
+        "weight",
+        "divisor",
+        "points",
+        "contribution"
+      ],
+      "properties": {
+        "part": {
+          "description": "The discriminator of `terms[]` (closed): this term counts in the maintenance part.",
+          "type": "string",
+          "enum": [
+            "maintenance"
+          ]
+        },
+        "flag": {
+          "$ref": "#/definitions/maintenanceFlag"
+        },
+        "role": {
+          "description": "The maintenance term's role: `lead` (the first counted maintenance flag, in full) or `corroborating` (every other counted maintenance flag, at its share). Open with `x-known-values`, so a model change cannot force report-3.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "lead",
+            "corroborating"
+          ]
+        },
+        "weight": {
+          "description": "The flag's points in the model (`run.score_model.flags[].points`).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "divisor": {
+          "description": "1 for the lead, 4 for a corroborating flag in score model 1 (the share `rules[corroborating-share].share`); `divisor` 4 ⇔ corroborating. A JSON integer.",
+          "type": "integer",
+          "minimum": 1,
+          "x-known-values": [
+            1,
+            4
+          ]
+        },
+        "points": {
+          "description": "`weight` ÷ `divisor`, before any halving. A JSON integer: every quarter of a weight is whole.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "contribution": {
+          "description": "The term's share of `exact` after every modifier (reach, then dev), in half points; Σ `terms[].contribution` = `exact`.",
+          "$ref": "#/definitions/halfPoints"
+        }
+      }
+    },
+    "termSecurity": {
+      "description": "The security term: the deciding advisory, the one with the most points, ties by severity order, then the lowest id. `points` = `weight` × `multiplier`.",
+      "type": "object",
+      "required": [
+        "part",
+        "flag",
+        "role",
+        "advisory",
+        "severity",
+        "fix_kind",
+        "weight",
+        "multiplier",
+        "points",
+        "contribution"
+      ],
+      "properties": {
+        "part": {
+          "description": "The discriminator of `terms[]` (closed): this term counts in the security part.",
+          "type": "string",
+          "enum": [
+            "security"
+          ]
+        },
+        "flag": {
+          "description": "Always `vulnerable`: the security part has one flag.",
+          "type": "string",
+          "enum": [
+            "vulnerable"
+          ]
+        },
+        "role": {
+          "description": "The security term's role: `security` (the deciding advisory). Open with `x-known-values`, so a model change cannot force report-3.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "x-known-values": [
+            "security"
+          ]
+        },
+        "advisory": {
+          "description": "The deciding advisory: joins the S9 row whose `deciding` is true.",
+          "$ref": "#/definitions/advisoryId"
+        },
+        "severity": {
+          "description": "The deciding advisory's severity, which is not always `security.worst`.",
+          "$ref": "#/definitions/severity"
+        },
+        "fix_kind": {
+          "description": "The deciding advisory's fix kind (its S9 row's `fix.kind`); `fix` is always the S9 object and `fix_kind` always this string.",
+          "$ref": "#/definitions/fixKind"
+        },
+        "weight": {
+          "description": "The severity's points (`run.score_model.severities[].points`).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "multiplier": {
+          "description": "2 when the fix is `none` or `blocked` (no reachable fix), else 1, in score model 1. A JSON integer.",
+          "type": "integer",
+          "minimum": 1,
+          "x-known-values": [
+            1,
+            2
+          ]
+        },
+        "points": {
+          "description": "`weight` × `multiplier`, before the dev halving (security is never halved for reach).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "contribution": {
+          "description": "The term's share of `exact` after the dev modifier, in half points.",
+          "$ref": "#/definitions/halfPoints"
+        }
+      }
+    },
+    "verdict": {
+      "description": "The verdict: a grade scored from the counted flags (`critical high medium low`, by `score.total` and the bands of `run.score_model`), or at score 0 the word that says why (`unknown` no metadata, `finished` the allowlist accepted a fired flag, `ok` otherwise). Closed.",
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "unknown",
+        "finished",
+        "ok"
+      ]
+    },
+    "years": {
+      "description": "Years elapsed, counted up to `generated_at`, one decimal, written as PHP json_encode writes a float under serialize_precision=-1, so a whole value is an integer (`4`, never `4.0`); print it with one decimal. The one-decimal rule is stated, not encoded: `multipleOf: 0.1` has no exact binary form and standard validators (ajv, python-jsonschema) reject a third of all tenths with it; only `multipleOf: 0.5` is used, which is exact.",
+      "type": "number",
+      "minimum": 0
+    }
+  }
+}

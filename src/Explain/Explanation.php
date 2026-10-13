@@ -166,7 +166,6 @@ final class Explanation
         $package = $this->facts->package();
         // Both command paths give the report its run. A caller that skips them passed the target PHP to the constructor.
         $run = $this->report->run() ?? new RunSettings(null, null, $this->targetPhp, RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, $this->thresholds, $this->projectPhp);
-        $basis = $this->finding->priorityBasis();
 
         return [
             'package' => $package->name(),
@@ -175,7 +174,6 @@ final class Explanation
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
             'run' => $run->toExplainArray($this->report->advisoryLookup()),
-            'legacy' => ['verdict' => $this->finding->verdict(), 'priority' => $basis->priority(), 'basis' => $basis->toArray()],
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),

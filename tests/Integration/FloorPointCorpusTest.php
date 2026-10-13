@@ -22,7 +22,6 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -117,7 +116,6 @@ final class FloorPointCorpusTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), self::TARGET_PHP, PhpReleaseDates::load(), $project->requirePhp()),
-            new VerdictEngine(),
             $clock,
             false
         );

@@ -30,7 +30,6 @@ use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Deadline;
-use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
@@ -40,9 +39,9 @@ use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\Summaries;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 final class AnalyzerTest extends TestCase
@@ -120,7 +119,6 @@ final class AnalyzerTest extends TestCase
             new RepoLocator(),
             $allowlist,
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             $offline,
             $advisories
@@ -230,9 +228,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame(['vendor/direct' => '1.0.0.0', 'vendor/local' => '1.0.0.0'], $asked->getArrayCopy(), 'every package the run checks, whatever its origin, by its normalised version');
         $finding = $report->findings()[0];
         self::assertSame('vendor/direct', $finding->package());
-        self::assertSame(Verdict::ABANDONED, $finding->verdict());
-        self::assertSame(Priority013::CRITICAL, $finding->priority());
-        self::assertSame('marked abandoned by its repository; 1 security advisory affects 1.0.0 (CVE-2024-0001); no fix expected', $finding->evidence());
+        self::assertSame(Verdict::ABANDONED, $finding->lead());
+        self::assertSame('marked abandoned by its repository; 1 security advisory affects 1.0.0 (CVE-2024-0001)', Summaries::of($finding));
         self::assertSame(['1 package is not from a Composer repository: its release metadata and repository activity were not read'], $report->notes(), 'no advisory note on a complete answer');
         self::assertFalse($report->hadNetworkFailures());
     }
@@ -300,15 +297,15 @@ final class AnalyzerTest extends TestCase
         // quiet and the verdict is OK. vendor/transitive (2015, ">=5.3.0") is the old promise here, but
         // `silent` outranks it. LockFileTest, DependencyGraphTest and ProjectConfigTest read the same
         // fixture: change this assertion, not the fixture.
-        self::assertSame(Verdict::OK, $byName['vendor/direct']->verdict());
-        self::assertSame(Verdict::SILENT, $byName['vendor/transitive']->verdict());
+        self::assertNull($byName['vendor/direct']->lead());
+        self::assertSame(Verdict::SILENT, $byName['vendor/transitive']->lead());
         self::assertSame(['vendor/direct', 'vendor/transitive'], $byName['vendor/transitive']->chain());
         self::assertNotNull($byName['vendor/transitive']->dataDate());
         self::assertSame('2026-09-14T06:00:00+00:00', $byName['vendor/transitive']->dataDate()->format(\DATE_ATOM));
-        self::assertSame(Verdict::PINNED, $byName['vendor/snapshot']->verdict());
-        self::assertSame(Verdict::UNKNOWN, $byName['private/thing']->verdict());
+        self::assertSame(Verdict::PINNED, $byName['vendor/snapshot']->lead());
+        self::assertNull($byName['private/thing']->lead());
         self::assertSame('not from a Composer repository, not checked', $byName['private/thing']->note());
-        self::assertStringStartsWith('release metadata not checked (lockrot cannot tell which repository serves it)', $byName['private/thing']->evidence(), 'an unknown origin raises S10');
+        self::assertStringStartsWith('release metadata not checked (lockrot cannot tell which repository serves it)', Summaries::of($byName['private/thing']), 'an unknown origin raises S10');
         // Only private/thing carries no notification-url.
         self::assertFalse($byName['private/thing']->isFromComposerRepository());
         foreach (['vendor/direct', 'vendor/transitive', 'vendor/snapshot'] as $asked) {
@@ -317,15 +314,8 @@ final class AnalyzerTest extends TestCase
         self::assertSame(4, $report->packagesChecked());
         self::assertSame(1, $report->notFromComposerRepository());
         self::assertFalse($report->hadNetworkFailures());
-        // Sort order is priority desc, then severity desc, then direct first, then name asc.
-        // vendor/snapshot is pinned, but nothing in the lock reaches it, so its chain is empty, it counts as transitive
-        // and its `high` base drops to `medium`. The two unflagged rows follow, unknown ahead of ok.
-        self::assertSame(Priority013::HIGH, $byName['vendor/transitive']->priority());
-        self::assertSame(Priority013::NONE, $byName['vendor/direct']->priority());
         self::assertSame([], $byName['vendor/snapshot']->chain());
-        self::assertSame(Priority013::MEDIUM, $byName['vendor/snapshot']->priority());
-        self::assertSame(Priority013::NONE, $byName['private/thing']->priority());
-        self::assertSame(['vendor/transitive', 'vendor/snapshot', 'private/thing', 'vendor/direct'], array_map(static fn ($f) => $f->package(), $report->findings()));
+        self::assertSame(['vendor/transitive', 'vendor/snapshot', 'private/thing', 'vendor/direct'], array_map(static fn ($f) => $f->package(), $report->sorted()));
         self::assertNotEmpty(array_filter($report->notes(), static fn (string $n): bool => strpos($n, 'GitHub token not set') !== false));
         // vendor/direct is the one root and pulls in the silent package, so it carries S7, with no
         // change of verdict or priority.
@@ -338,7 +328,7 @@ final class AnalyzerTest extends TestCase
         $notChecked = $byName['vendor/direct']->signals()[1];
         self::assertSame(['S3', 'S4'], JsonPath::decoded($notChecked->data())['blocks']);
         self::assertStringContainsString('repository activity not checked', $notChecked->summary());
-        self::assertSame('repository activity not checked (no token for the repository host), so S3 and S4 could not be read; pulls in 1 flagged package: vendor/transitive (silent)', $byName['vendor/direct']->evidence(), 'nothing observed about the package itself: what it pulls in, and what was not checked');
+        self::assertSame('pulls in 1 flagged package: vendor/transitive (silent); repository activity not checked (no token for the repository host), so S3 and S4 could not be read', Summaries::of($byName['vendor/direct']), 'nothing observed about the package itself: what it pulls in, and what was not checked');
         self::assertSame(['vendor/direct' => 1], $report->exposure());
     }
 
@@ -363,14 +353,12 @@ final class AnalyzerTest extends TestCase
             $byName[$finding->package()] = $finding;
         }
 
-        self::assertSame(Verdict::SILENT, $byName['vendor/prod']->verdict());
-        self::assertSame(Verdict::SILENT, $byName['vendor/devtool']->verdict());
+        self::assertSame(Verdict::SILENT, $byName['vendor/prod']->lead());
+        self::assertSame(Verdict::SILENT, $byName['vendor/devtool']->lead());
         self::assertFalse($byName['vendor/prod']->isDev());
         self::assertTrue($byName['vendor/devtool']->isDev());
-        self::assertSame(Priority013::CRITICAL, $byName['vendor/prod']->priority());
-        self::assertSame(Priority013::HIGH, $byName['vendor/devtool']->priority());
-        // Priority orders the report: the prod row comes first even though the two verdicts are equal.
-        self::assertSame(['vendor/prod', 'vendor/devtool'], array_map(static fn ($f) => $f->package(), $report->findings()));
+        // The score orders the report: the prod row comes first, because packages-dev halves the other.
+        self::assertSame(['vendor/prod', 'vendor/devtool'], array_map(static fn ($f) => $f->package(), $report->sorted()));
         // A dev root is a parent like any other once --dev brings it in.
         self::assertSame(['vendor/devtool'], $byName['vendor/devtool']->directDependents());
         self::assertSame(['vendor/prod'], $byName['vendor/prod']->directDependents());
@@ -383,7 +371,7 @@ final class AnalyzerTest extends TestCase
         ];
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/transitive', 'version' => '2.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $report = $this->analyzer($this->loader($metadata), $this->http([]), false, new Allowlist([new AllowlistEntry('vendor/*', null, 'complete', null, 'builtin')]))->analyze($lock, ProjectConfig::empty(), false);
-        self::assertSame(Verdict::FINISHED, $report->findings()[0]->verdict());
+        self::assertNull($report->findings()[0]->lead());
         self::assertSame('complete', $report->findings()[0]->allowlistReason());
     }
 
@@ -401,9 +389,9 @@ final class AnalyzerTest extends TestCase
         $ids = static fn (string $name): array => array_map(static fn ($s) => $s->id(), $byName[$name]->signals());
 
         self::assertSame(['S10'], $ids('vendor/plain'), 'the control: undated releases raise S10');
-        self::assertSame(Verdict::FINISHED, $byName['vendor/allowlisted']->verdict());
+        self::assertNull($byName['vendor/allowlisted']->lead());
         self::assertSame([], $ids('vendor/allowlisted'));
-        self::assertSame(Verdict::ABANDONED, $byName['vendor/abandoned']->verdict());
+        self::assertSame(Verdict::ABANDONED, $byName['vendor/abandoned']->lead());
         self::assertSame(['S1'], $ids('vendor/abandoned'));
     }
 
@@ -411,10 +399,10 @@ final class AnalyzerTest extends TestCase
     {
         $lock = LockFile::fromArray(['packages' => [['name' => 'vendor/direct', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/']]]);
         $report = $this->analyzer($this->loader([], [], ['vendor/direct' => 'HTTP 503']), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
-        self::assertSame(Verdict::UNKNOWN, $report->findings()[0]->verdict());
+        self::assertNull($report->findings()[0]->lead());
         self::assertTrue($report->hadNetworkFailures());
         self::assertContains('Repository metadata unavailable for 1 package: HTTP 503', $report->notes());
-        self::assertSame('Repository metadata unavailable: HTTP 503', $report->findings()[0]->evidence());
+        self::assertSame('Repository metadata unavailable: HTTP 503', Summaries::of($report->findings()[0]));
         self::assertTrue($report->findings()[0]->isFromComposerRepository(), 'a note, and still a package a repository was asked about');
         self::assertNull($report->findings()[0]->libyears());
         self::assertSame(Libyears::UNAVAILABLE, $report->findings()[0]->libyearsUnmeasured());
@@ -466,7 +454,7 @@ final class AnalyzerTest extends TestCase
 
         $report = $this->analyzer($this->loader([], [], $failed), $this->http([]), true, new Allowlist([]), true)->analyze($lock, ProjectConfig::empty(), false);
 
-        self::assertSame(MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, $report->findings()[0]->evidence());
+        self::assertSame(MetadataLoaderInterface::OFFLINE_NOT_FOUND_REASON, Summaries::of($report->findings()[0]));
     }
 
     /**
@@ -562,11 +550,6 @@ final class AnalyzerTest extends TestCase
         self::assertTrue($report->hadNetworkFailures());
     }
 
-    public function testCountsByVerdictCoverAllVerdicts(): void
-    {
-        $report = $this->analyzer($this->loader(), $this->http([]), true, new Allowlist([]))->analyze(LockFile::fromArray(['packages' => []]), ProjectConfig::empty(), false);
-        self::assertSame(array_fill_keys(Verdict::all(), 0), $report->byVerdict());
-    }
 
     public function testAllowlistAccessorReturnsConstructorValue(): void
     {
@@ -643,7 +626,7 @@ final class AnalyzerTest extends TestCase
 
         $report = $this->analyzer($this->loader([], [], $failed), $this->http([]), true, new Allowlist([]))->analyze($lock, ProjectConfig::empty(), false);
 
-        self::assertSame(MetadataLoaderInterface::BUDGET_REASON, $report->findings()[0]->evidence());
+        self::assertSame(MetadataLoaderInterface::BUDGET_REASON, Summaries::of($report->findings()[0]));
     }
 
     public function testWithAllowlistReturnsClonedInstanceLeavingOriginalUnchanged(): void
@@ -723,10 +706,10 @@ final class AnalyzerTest extends TestCase
         $report = $this->analyzeLock([self::locked('vendor/gone'), self::locked('vendor/fine')], $this->loader($metadata, ['vendor/gone']), $this->http([]), true);
         $byName = self::byName($report);
 
-        self::assertSame(Verdict::UNKNOWN, $byName['vendor/gone']->verdict());
-        self::assertSame('not found in the repository', $byName['vendor/gone']->evidence());
-        self::assertSame(Verdict::OK, $byName['vendor/fine']->verdict());
-        self::assertSame('', $byName['vendor/fine']->evidence());
+        self::assertNull($byName['vendor/gone']->lead());
+        self::assertSame('not found in the repository', Summaries::of($byName['vendor/gone']));
+        self::assertNull($byName['vendor/fine']->lead());
+        self::assertSame('', Summaries::of($byName['vendor/fine']));
         self::assertFalse($report->hadNetworkFailures());
         self::assertSame([], $report->notes());
     }
@@ -744,8 +727,8 @@ final class AnalyzerTest extends TestCase
         $byName = self::byName($this->analyzeLock($packages, $this->loader($metadata), $this->http([], $requested), true, $allowlist));
 
         self::assertSame([], $requested->getArrayCopy());
-        self::assertSame(Verdict::FINISHED, $byName['vendor/allowlisted']->verdict());
-        self::assertSame(Verdict::UNKNOWN, $byName['private/mirror']->verdict());
+        self::assertNull($byName['vendor/allowlisted']->lead());
+        self::assertNull($byName['private/mirror']->lead());
     }
 
     public function testTheRepositorysSourceUrlOutranksTheLocksAndTheLocksIsTheFallback(): void
@@ -775,13 +758,12 @@ final class AnalyzerTest extends TestCase
         $loader = $this->loader(['vendor/pkg' => $this->metadataNamed('vendor/pkg', null)]);
         $report = $this->analyzeLock($packages, $loader, $this->http(['https://api.github.com/repos/vendor/pkg-src' => $answer], $requested), true);
         self::assertSame(['https://api.github.com/repos/vendor/pkg-src'], $requested->getArrayCopy());
-        self::assertSame(Verdict::ABANDONED, self::byName($report)['vendor/pkg']->verdict());
+        self::assertSame(Verdict::ABANDONED, self::byName($report)['vendor/pkg']->lead());
 
         $requested = new \ArrayObject();
         $packages = [self::locked('vendor/pkg')];
         $report = $this->analyzeLock($packages, $loader, $this->http([], $requested), true);
         self::assertSame([], $requested->getArrayCopy());
-        self::assertNotSame(Verdict::ABANDONED, self::byName($report)['vendor/pkg']->verdict());
         self::assertFalse($report->hadNetworkFailures());
     }
 
@@ -829,9 +811,9 @@ final class AnalyzerTest extends TestCase
         self::assertSame(array_reverse(array_keys($answers)), $requested->getArrayCopy(), 'both fetched (in package-name order), with a budget of one and no token');
         self::assertSame([], $report->notes());
         $byName = self::byName($report);
-        self::assertSame(Verdict::SILENT, $byName['vendor/old']->verdict());
-        self::assertSame(Verdict::OK, $byName['vendor/recent']->verdict());
-        self::assertStringContainsString('last commit 2015-01-01', $byName['vendor/old']->evidence());
+        self::assertSame(Verdict::SILENT, $byName['vendor/old']->lead());
+        self::assertNull($byName['vendor/recent']->lead());
+        self::assertStringContainsString('last commit 2015-01-01', Summaries::of($byName['vendor/old']));
     }
 
     /** Anonymously a GitLab repository can be silent but never archived: the flag needs credentials. */
@@ -847,14 +829,14 @@ final class AnalyzerTest extends TestCase
         $requested = new \ArrayObject();
         $anonymous = self::byName($this->analyzeLock($packages, $loader, $this->http($answers, $requested), false))['vendor/pkg'];
         self::assertSame([self::GL_COMMITS], $requested->getArrayCopy());
-        self::assertSame(Verdict::SILENT, $anonymous->verdict());
+        self::assertSame(Verdict::SILENT, $anonymous->lead());
 
         $requested = new \ArrayObject();
         $auth = ForgeAuth::withTokens(new Tokens(null, 'glpat-x'));
         $withToken = self::byName($this->analyzeLock($packages, $loader, $this->http($answers, $requested), false, null, ActivityFetchPlanner::DEFAULT_ANONYMOUS_BUDGET, $auth))['vendor/pkg'];
         self::assertSame([self::GL_COMMITS, self::GL_PROJECT], $requested->getArrayCopy());
-        self::assertSame(Verdict::ABANDONED, $withToken->verdict());
-        self::assertStringContainsString('repository archived on GitLab', $withToken->evidence());
+        self::assertSame(Verdict::ABANDONED, $withToken->lead());
+        self::assertStringContainsString('repository archived on GitLab', Summaries::of($withToken));
     }
 
     /** Each repository host reports its own cap and its own failures, GitHub first, then GitLab, then Bitbucket. */
@@ -899,7 +881,7 @@ final class AnalyzerTest extends TestCase
         self::assertContains('Bitbucket did not answer for 2 repositories (private, renamed or removed); repository activity missing', $report->notes());
         self::assertContains('GitLab did not answer for 1 repositories (private, renamed or removed); repository activity missing', $report->notes());
         self::assertFalse($report->hadNetworkFailures(), 'a 404 is an answer, not a failure');
-        self::assertSame(Verdict::STALE, self::byName($report)['vendor/one']->verdict(), 'S2 alone, no S4');
+        self::assertSame(Verdict::STALE, self::byName($report)['vendor/one']->lead(), 'S2 alone, no S4');
     }
 
     /** The Bitbucket credential exchange is planning-time network work, so it must wait behind the budget check too. */
@@ -930,8 +912,8 @@ final class AnalyzerTest extends TestCase
 
         $finding = self::byName($this->analyzeLock($packages, $loader, $this->http($answers), true))['vendor/pkg'];
 
-        self::assertSame(Verdict::SILENT, $finding->verdict());
-        self::assertStringContainsString('last commit 2015-01-01 (11.7 years ago)', $finding->evidence());
+        self::assertSame(Verdict::SILENT, $finding->lead());
+        self::assertStringContainsString('last commit 2015-01-01 (11.7 years ago)', Summaries::of($finding));
         self::assertSame('bitbucket.org', JsonPath::decoded($finding->signals()[1]->data())['host']);
     }
 
@@ -1003,7 +985,7 @@ final class AnalyzerTest extends TestCase
 
         self::assertSame('2026-09-13T04:30:00+00:00', self::atomOf($report->activityCacheOldestAt()));
         $table = (new TableFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE, '0.4.0', 200)))->format($report);
-        self::assertStringContainsString("Data as of 2026-09-14 (package repositories; repository activity from lockrot's cache, up to 20 h old). Run composer lockrot --format=json for details.", $table);
+        self::assertStringContainsString("Data as of 2026-09-14 (package repositories; repository activity from lockrot's cache, up to 20 h old) · score model 1.", $table);
         self::assertSame('2026-09-13T04:30:00+00:00', $report->toArray()['activity_cache_oldest_at']);
     }
 

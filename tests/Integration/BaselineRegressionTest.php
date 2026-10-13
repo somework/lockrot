@@ -26,12 +26,11 @@ use Lockrot\Json\Schemas;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\SplitStreamTester;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 
 /** A package whose only fact is an advisory gets an entry without flags in baseline-2, and is known on the next run.
  *
@@ -157,7 +156,7 @@ final class BaselineRegressionTest extends TestCase
         self::fail('no finding for '.$package);
     }
 
-    private function tester(): CommandTester
+    private function tester(): SplitStreamTester
     {
         $server = $this->server;
         self::assertNotNull($server);
@@ -171,7 +170,6 @@ final class BaselineRegressionTest extends TestCase
                 new RepoLocator(),
                 BuiltinAllowlist::load(),
                 SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
-                new VerdictEngine(),
                 $clock,
                 false,
                 new RepositoryAdvisoryLoader($server->repositories())
@@ -183,6 +181,6 @@ final class BaselineRegressionTest extends TestCase
         $app->add($command);
         $command->setApplication($app);
 
-        return new CommandTester($command);
+        return new SplitStreamTester($command);
     }
 }

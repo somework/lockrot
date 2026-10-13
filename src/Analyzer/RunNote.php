@@ -37,7 +37,6 @@ final class RunNote
     public const ABANDONED_MARKINGS_IGNORED = 'abandoned_markings_ignored';
     public const ABANDONED_NOT_AUDITED_BY_COMPOSER = 'abandoned_not_audited_by_composer';
     public const ABANDONED_IGNORE_UNREADABLE = 'abandoned_ignore_unreadable';
-    public const VERDICT_RULES_CHANGED = 'verdict_rules_changed';
     public const BASELINE_TARGET_DIFFERS = 'baseline_target_differs';
     public const BASELINE_FIX_MODEL_DIFFERS = 'baseline_fix_model_differs';
     public const IGNORE_DOES_NOT_COVER_ADVISORIES = 'ignore_does_not_cover_advisories';
@@ -60,7 +59,6 @@ final class RunNote
         self::REPOSITORY_ACTIVITY_NOT_FOUND,
         self::REPOSITORY_ACTIVITY_HOST_NOT_SUPPORTED,
         self::NOT_FROM_COMPOSER_REPOSITORY,
-        self::VERDICT_RULES_CHANGED,
         self::BASELINE_TARGET_DIFFERS,
         self::BASELINE_FIX_MODEL_DIFFERS,
         self::IGNORE_DOES_NOT_COVER_ADVISORIES,
@@ -406,40 +404,6 @@ final class RunNote
     public static function abandonedIgnoreUnreadable(string $message): self
     {
         return self::of(self::ABANDONED_IGNORE_UNREADABLE, \sprintf("Composer rejected the project's abandoned ignore list (%s), so every abandoned marking counts.", $message), false, ['message' => $message]);
-    }
-
-    /** Why 0.13 moved a priority, as the `verdict_rules_changed` sentence words each step reason. */
-    private const LEGACY_STEP_WORDS = [
-        'no_fix_expected' => '0.13 raised each one for any advisory not fixed on its branch; in 0.14 an advisory adds its own severity',
-        'transitive' => '0.13 lowered a transitive package one step; model 1 halves its maintenance',
-        'dev' => '0.13 lowered a packages-dev package one step; model 1 halves its whole score',
-    ];
-
-    /**
-     * The findings that reached a grade value under the rules of 0.13 and do not reach it under 0.14's. The sentence
-     * quotes each `score_text` from the note's own data.
-     *
-     * @param list<ChangedVerdict> $findings by package, then version
-     */
-    public static function verdictRulesChanged(string $failOn, array $findings): self
-    {
-        if ($findings === []) {
-            throw new \InvalidArgumentException('A note about changed verdict rules names at least one finding.');
-        }
-        $count = \count($findings);
-        $text = \sprintf("%d %s --fail-on=%s under 0.13's rules and %s not reach it under 0.14's: ", $count, $count === 1 ? 'finding reached' : 'findings reached', $failOn, $count === 1 ? 'does' : 'do')
-            .implode(', ', array_map(static fn (ChangedVerdict $f): string => \sprintf('%s %s (%s)', $f->package(), $f->version(), $f->scoreText()), $findings)).'.';
-        $reasons = [];
-        foreach ($findings as $finding) {
-            foreach ($finding->legacyBasis()->reasons() as $reason) {
-                $reasons[$reason] = self::LEGACY_STEP_WORDS[$reason] ?? str_replace('_', ' ', $reason);
-            }
-        }
-        foreach ($reasons as $words) {
-            $text .= ' '.$words.'.';
-        }
-
-        return self::of(self::VERDICT_RULES_CHANGED, $text, false, ['fail_on' => $failOn, 'findings' => $findings]);
     }
 
     /** The baseline file was written for another target PHP: fix changes against it are not compared. */

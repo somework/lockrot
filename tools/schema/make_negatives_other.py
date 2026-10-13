@@ -84,7 +84,6 @@ def explain_negatives():
         'explain-1-root-target-php-no-run': (f(lambda d: (d.pop('run'), d.update(target_php='8.4', thresholds={}))), 'run'),
         'branch-row-without-fixes': (f(lambda d: d['metadata']['branches'][0].pop('fixes')), 'metadata'),
         'branch-row-fixes-clears-revision-3': (f(lambda d: d['metadata']['branches'][0].__setitem__('fixes', {'clears': 1, 'of': 1, 'kind': 'raise-php', 'lowest': 'v8.0.12'})), 'metadata'),
-        'legacy-missing': (f(lambda d: d.pop('legacy')), 'legacy'),
         'schema-number-1': (f(lambda d: d['lockrot'].__setitem__('schema', 1)), 'lockrot.schema'),
         'note-advisories-not-checked-without-reason': (f(lambda d: (d['note_details'].append({'code': 'advisories_not_checked', 'text': 't', 'docs_url': None, 'sets_network_failures': False, 'data': {'composer_repositories_checked': 0}}), d['notes'].append('t'))), 'note_details'),
         'fix-kind-held-revision-1.strict': (f(lambda d: d['finding']['security'].__setitem__('fix_kind', 'held')), 'finding.security'),

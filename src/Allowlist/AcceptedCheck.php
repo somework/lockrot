@@ -32,6 +32,11 @@ final class AcceptedCheck implements \JsonSerializable
         return $this->unchecked;
     }
 
+    public function entry(): UncheckedAcceptanceEntry
+    {
+        return $this->entry;
+    }
+
     /** The skip that stands for it in `checks_skipped[]`. */
     public function skip(): Check
     {

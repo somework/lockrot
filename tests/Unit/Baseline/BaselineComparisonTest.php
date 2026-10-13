@@ -83,7 +83,6 @@ final class BaselineComparisonTest extends TestCase
             $this->report([['acme/abandoned', '1.0.0', Verdict::ABANDONED]])
         );
 
-        self::assertTrue($comparison->isKnown('acme/abandoned'));
         self::assertSame(BaselineComparison::KNOWN, $comparison->statusOf('acme/abandoned'));
         self::assertSame(1, $comparison->knownCount());
         self::assertSame(0, $comparison->newCount());
@@ -97,7 +96,7 @@ final class BaselineComparisonTest extends TestCase
             $this->report([['acme/abandoned', '9.9.9', Verdict::ABANDONED]])
         );
 
-        self::assertTrue($comparison->isKnown('acme/abandoned'));
+        self::assertSame(BaselineComparison::KNOWN, $comparison->statusOf('acme/abandoned'));
         self::assertSame(1, $comparison->knownCount());
     }
 
@@ -121,7 +120,7 @@ final class BaselineComparisonTest extends TestCase
             ])
         );
 
-        self::assertFalse($comparison->isKnown('acme/fresh'));
+        self::assertNotSame(BaselineComparison::KNOWN, $comparison->statusOf('acme/fresh'));
         self::assertSame(BaselineComparison::NEW_FINDING, $comparison->statusOf('acme/fresh'));
         self::assertSame(1, $comparison->newCount());
         self::assertSame(1, $comparison->knownCount());
@@ -134,9 +133,9 @@ final class BaselineComparisonTest extends TestCase
             $this->report([['acme/pkg', '1.0.0', Verdict::ABANDONED]])
         );
 
-        self::assertFalse($comparison->isKnown('acme/pkg'));
+        self::assertNotSame(BaselineComparison::KNOWN, $comparison->statusOf('acme/pkg'));
         self::assertSame(BaselineComparison::WORSENED, $comparison->statusOf('acme/pkg'));
-        self::assertSame(Verdict::STALE, $comparison->previousVerdictOf('acme/pkg'));
+        self::assertSame(Verdict::STALE, $comparison->standingOf('acme/pkg') === null ? null : $comparison->standingOf('acme/pkg')->recordedLead());
         self::assertSame(1, $comparison->worsenedCount());
     }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
-use Lockrot\Security\Severity;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
@@ -18,50 +17,6 @@ use Lockrot\Verdict\ScoreModel;
  */
 final class Report2Root
 {
-    /**
-     * Per flag: the graded findings that count it, the findings it leads, the fired flags the
-     * allowlist accepts and the counting findings by grade. `vulnerable` leads nothing and no entry
-     * accepts it.
-     *
-     * @param list<Finding> $findings
-     *
-     * @return array<string, array{carrying: int, leading: ?int, accepted: ?array{all: int, in_graded: int}, by_verdict: array<string, int>}>
-     */
-    public static function toFlagsArray(array $findings): array
-    {
-        $carrying = array_fill_keys(ScoreModel::FLAG_ORDER, 0);
-        $leading = $carrying;
-        $acceptedAll = $carrying;
-        $acceptedGraded = $carrying;
-        $byVerdict = array_fill_keys(ScoreModel::FLAG_ORDER, array_fill_keys(ScoreModel::GRADES, 0));
-        foreach ($findings as $finding) {
-            foreach ($finding->flagIds() as $flag) {
-                ++$carrying[$flag];
-                ++$byVerdict[$flag][$finding->grade()];
-            }
-            $lead = $finding->lead();
-            if ($lead !== null) {
-                ++$leading[$lead];
-            }
-            foreach ($finding->flags()->accepted() as $flag) {
-                ++$acceptedAll[$flag];
-                $acceptedGraded[$flag] += $finding->isGraded() ? 1 : 0;
-            }
-        }
-        $out = [];
-        foreach (ScoreModel::FLAG_ORDER as $flag) {
-            $maintenance = $flag !== FlagSet::VULNERABLE;
-            $out[$flag] = [
-                'carrying' => $carrying[$flag],
-                'leading' => $maintenance ? $leading[$flag] : null,
-                'accepted' => $maintenance ? ['all' => $acceptedAll[$flag], 'in_graded' => $acceptedGraded[$flag]] : null,
-                'by_verdict' => $byVerdict[$flag],
-            ];
-        }
-
-        return $out;
-    }
-
     /**
      * @param list<Finding> $findings
      *
@@ -143,48 +98,23 @@ final class Report2Root
     }
 
     /**
+     * `security.update_now`: the vulnerable packages whose fix is a `composer update`, in report order.
+     *
      * @param list<Finding> $findings
      *
-     * @return array{check: string, packages: array<string, int>, advisories: array{counted: int, ignored: int}, severities: array<string, int>, fixes: array<string, int>, update_now: list<string>, update_now_command: ?list<string>, fix_unknown: int}
+     * @return list<string>
      */
-    public static function toSecurityArray(array $findings): array
+    public static function updateNow(array $findings): array
     {
-        $checks = [];
-        $packages = ['vulnerable' => 0, 'unchecked' => 0, 'ignored' => 0, 'clear' => 0];
-        $advisories = ['counted' => 0, 'ignored' => 0];
-        $severities = array_fill_keys(Severity::DISPLAY_ORDER, 0);
-        $fixes = array_fill_keys(ScoreModel::FIX_KINDS, 0);
-        $updateNow = [];
+        $packages = [];
         foreach ($findings as $finding) {
             $standing = $finding->securityStanding();
-            $checks[$standing->check()] = $standing->check();
-            ++$packages[$standing->status()];
-            $packages['ignored'] += $standing->ignoredCount() > 0 ? 1 : 0;
-            $advisories['ignored'] += $standing->ignoredCount();
-            if (!$standing->isVulnerable()) {
-                continue;
-            }
-            $kind = $standing->fixKind();
-            foreach ($standing->counts() as $severity => $count) {
-                $severities[$severity] = ($severities[$severity] ?? 0) + $count;
-                $advisories['counted'] += $count;
-            }
-            $fixes[$kind] = ($fixes[$kind] ?? 0) + 1;
-            if ($kind === 'update') {
-                $updateNow[] = $finding->package();
+            if ($standing->isVulnerable() && $standing->fixKind() === 'update') {
+                $packages[] = $finding->package();
             }
         }
 
-        return [
-            'check' => \count($checks) === 1 ? reset($checks) : ($checks === [] ? 'complete' : 'partial'),
-            'packages' => $packages,
-            'advisories' => $advisories,
-            'severities' => $severities,
-            'fixes' => $fixes,
-            'update_now' => $updateNow,
-            'update_now_command' => $updateNow === [] ? null : array_merge(['composer', 'update'], $updateNow),
-            'fix_unknown' => $fixes['unknown'],
-        ];
+        return $packages;
     }
 
     /**

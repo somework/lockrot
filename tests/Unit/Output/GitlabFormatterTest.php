@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
 use Lockrot\Exception\ConfigException;
@@ -13,10 +14,13 @@ use Lockrot\Output\Formatters;
 use Lockrot\Output\GitlabFormatter;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Support\TextGolden;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -98,26 +102,6 @@ final class GitlabFormatterTest extends TestCase
         return $decoded;
     }
 
-    public function testShape(): void
-    {
-        $issues = $this->decode($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));
-
-        // acme/absent (stale) is also flagged: Verdict::flagged() includes stale and above.
-        self::assertCount(3, $issues);
-        $first = $issues[0];
-        self::assertSame('issue', $first['type']);
-        self::assertSame('lockrot/abandoned', $first['check_name']);
-        self::assertSame('acme/abandoned 1.0.0 — abandoned (critical): marked abandoned by its repository', $first['description']);
-        self::assertSame(['Bug Risk'], $first['categories']);
-        self::assertSame('major', $first['severity']);
-        self::assertSame(hash('sha256', 'lockrot|acme/abandoned|abandoned'), $first['fingerprint']);
-        self::assertSame('composer.lock', JsonPath::stringAt($first, ['location', 'path']));
-        self::assertSame(4, JsonPath::intAt($first, ['location', 'lines', 'begin']));
-
-        $second = $issues[1];
-        self::assertSame('acme/silent 2.0.8 — silent (high): last release 2015-11-16 (10.8 years ago); no push for 9 years (via a/parent)', $second['description']);
-        self::assertSame(8, JsonPath::intAt($second, ['location', 'lines', 'begin']));
-    }
 
     public function testSeverityMappingAtTheFailOnBoundary(): void
     {
@@ -282,36 +266,6 @@ final class GitlabFormatterTest extends TestCase
         self::assertSame('lockrot/ok', $issues[3]['check_name']);
     }
 
-    /**
-     * Code Quality has no title field of its own, so the description carries the same
-     * `<verdict> (<priority>)` phrase the GitHub annotation title does. Severity and fingerprint are
-     * untouched by it: both still follow the verdict alone.
-     */
-    public function testTheDescriptionNamesThePriority(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['acme/abandoned'])->withDataDate($at)->build(),
-            // Transitive and development-only: two steps below critical.
-            (new FindingBuilder())->withPackage('acme/silent')->withVersion('2.0.8')->withVerdict(Verdict::ABANDONED)->withSignals([new Signal('high', 'marked abandoned by its repository', SignalDataStub::of('S1', []))])->withChain(['a/parent', 'acme/silent'])->withDataDate($at)->withDev(true)->build(),
-            (new FindingBuilder())->withPackage('acme/fine')->withVersion('4.0.0')->withChain(['acme/fine'])->withDataDate($at)->build(),
-        ], [], $at, 3, 0);
-
-        $issues = $this->decode($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
-
-        self::assertSame([
-            'acme/abandoned 1.0.0 — abandoned (critical): marked abandoned by its repository',
-            'acme/silent 2.0.8 — abandoned (medium): marked abandoned by its repository (via a/parent)',
-            'acme/fine 4.0.0 — ok (none)',
-        ], array_column($issues, 'description'));
-
-        self::assertSame(['minor', 'minor', 'info'], array_column($issues, 'severity'), 'severity still follows the verdict and fail-on');
-        self::assertSame(
-            hash('sha256', 'lockrot|acme/abandoned|abandoned'),
-            $issues[0]['fingerprint'],
-            'the priority must not enter the issue identity'
-        );
-    }
 
     public function testUnflaggedRowsAreOmittedWithoutShowAll(): void
     {
@@ -320,17 +274,6 @@ final class GitlabFormatterTest extends TestCase
         self::assertNotContains('lockrot/ok', array_column($issues, 'check_name'));
     }
 
-    public function testAllowlistReasonIsCarriedAsDescription(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/abandoned')->withVerdict(Verdict::FINISHED)->withChain(['acme/abandoned'])->withAllowlistReason('interfaces')->withDataDate($at)->build(),
-        ], [], $at, 1, 0);
-
-        $issues = $this->decode($this->formatter(Verdict::SILENT, $this->lockPath())->format($report, true));
-
-        self::assertSame('acme/abandoned 1.0.0 — finished (none): allowlisted: interfaces', $issues[0]['description']);
-    }
 
     /** Report notes are not representable in this format and must never leak into an issue's fields. */
     public function testReportNotesAreNotRepresented(): void
@@ -361,33 +304,7 @@ final class GitlabFormatterTest extends TestCase
         Formatters::for('xml', FormatContext::create(null, LockrotConfig::FAIL_ON_NONE));
     }
 
-    public function testTheDescriptionNamesTheOtherDirectDependents(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/leaf')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of('S2', []))])->withChain(['a/parent', 'acme/leaf'])->withDataDate($at)->withDirectDependents(['a/parent', 'b/parent', 'c/parent', 'd/parent', 'e/parent'])->build(),
-        ], [], $at, 1, 0);
-        $issues = self::decode((new GitlabFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE)))->format($report));
 
-        self::assertSame(
-            'acme/leaf 1.0.0 — stale (low): last release 2022-05-20 (4.3 years ago) (via a/parent, also via b/parent, c/parent, d/parent and 1 more)',
-            $issues[0]['description']
-        );
-        // The fingerprint is untouched by where the package is reached from.
-        self::assertSame(hash('sha256', 'lockrot|acme/leaf|stale'), $issues[0]['fingerprint']);
-    }
-
-    public function testS7RidesInTheDescriptionLikeAnyOtherSignal(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', [])), new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]))])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
-        ], [], $at, 1, 0);
-        $issues = self::decode((new GitlabFormatter(FormatContext::create(null, LockrotConfig::FAIL_ON_NONE)))->format($report));
-
-        self::assertSame('acme/root 1.0.0 — stale (medium): old; pulls in 1 flagged package: acme/leaf (stale)', $issues[0]['description']);
-        self::assertSame(hash('sha256', 'lockrot|acme/root|stale'), $issues[0]['fingerprint']);
-    }
 
     /** GitLab reads compact JSON as well. The pretty, slash-unescaped form is for the human diffing the artifact. */
     public function testTheDocumentIsPrettyPrintedWithSlashesLeftAlone(): void
@@ -441,6 +358,23 @@ final class GitlabFormatterTest extends TestCase
         self::assertNotContains('lockrot/unchecked', array_column($this->decode($this->formatter('high', null)->format(self::uncheckedReport())), 'check_name'));
     }
 
+    public function testUnderAllAScoreZeroFindingWithS10KeepsItsWordIssueBesideItsUncheckedIssue(): void
+    {
+        $issues = function (string $failOn): array {
+            $out = [];
+            foreach ($this->decode($this->formatter($failOn, null)->format(self::uncheckedReport(), true)) as $issue) {
+                if ($issue['check_name'] !== 'lockrot/advisories-unchecked') {
+                    $out[] = JsonPath::stringAt($issue, ['check_name']).' '.JsonPath::stringAt($issue, ['severity']);
+                }
+            }
+
+            return $out;
+        };
+
+        self::assertSame(['lockrot/ok info', 'lockrot/unchecked major', 'lockrot/ok info'], $issues('unchecked'));
+        self::assertSame(['lockrot/ok info', 'lockrot/unchecked info', 'lockrot/ok info'], $issues('high'));
+    }
+
     /** An offline finding with S10 for its advisories, and a package outside every Composer repository, which is skipped. */
     private static function uncheckedReport(): Report
     {
@@ -455,5 +389,57 @@ final class GitlabFormatterTest extends TestCase
     private static function skippedReport(): Report
     {
         return new Report([FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false)], [], new \DateTimeImmutable(self::AT), 1, 0);
+    }
+
+    public function testTheCompositeRendersAsItsGolden(): void
+    {
+        TextGolden::assertMatches('composite.gitlab.json', (new GitlabFormatter(FormatContext::create(null, 'high')))->format(CaseHydrator::composite()), __METHOD__);
+    }
+
+    /** One issue per counted flag, its fingerprint the hash of the package and the flag. */
+    public function testEachCountedFlagGetsAnIssueWithThe013Fingerprint(): void
+    {
+        $issues = self::issues('high');
+        $byKey = [];
+        foreach ($issues as $issue) {
+            $byKey[JsonPath::stringAt($issue, ['check_name']).' '.explode(' ', JsonPath::stringAt($issue, ['description']))[0]] = $issue;
+        }
+
+        self::assertCount(12, $issues);
+        self::assertSame(hash('sha256', 'lockrot|symfony/debug|abandoned'), $byKey['lockrot/abandoned symfony/debug']['fingerprint']);
+        self::assertStringStartsWith('2df5056e8311a7fe', JsonPath::stringAt($byKey['lockrot/abandoned symfony/debug'], ['fingerprint']));
+        self::assertStringStartsWith('24be27cc46819fdc', JsonPath::stringAt($byKey['lockrot/vulnerable symfony/yaml'], ['fingerprint']));
+        self::assertSame(['Security'], $byKey['lockrot/vulnerable symfony/yaml']['categories']);
+        self::assertSame(['Bug Risk'], $byKey['lockrot/abandoned symfony/debug']['categories']);
+    }
+
+    /** The issue whose own fact reaches the active value is major; under left-behind the advisory is minor. */
+    public function testTheSeverityFollowsTheFactThatReachedTheValue(): void
+    {
+        $severity = static function (string $failOn): array {
+            $out = [];
+            foreach (self::issues($failOn) as $issue) {
+                $out[explode(' ', JsonPath::stringAt($issue, ['description']))[0].' '.JsonPath::stringAt($issue, ['check_name'])] = JsonPath::stringAt($issue, ['severity']);
+            }
+
+            return $out;
+        };
+        $high = $severity('high');
+        $leftBehind = $severity('left-behind');
+
+        self::assertSame(['major' => 6, 'minor' => 6], array_count_values($high));
+        self::assertSame('major', $high['symfony/monolog-bridge lockrot/vulnerable']);
+        self::assertSame('minor', $high['symfony/monolog-bridge lockrot/old-promise']);
+        self::assertSame('major', $leftBehind['symfony/monolog-bridge lockrot/left-behind']);
+        self::assertSame('minor', $leftBehind['symfony/monolog-bridge lockrot/vulnerable']);
+    }
+
+    /** @return list<array<mixed, mixed>> */
+    private static function issues(string $failOn): array
+    {
+        $issues = json_decode((new GitlabFormatter(FormatContext::create(null, $failOn)))->format(CaseHydrator::composite()->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse($failOn), RunSettings::SOURCE_OPTION, null))), true);
+        self::assertIsArray($issues);
+
+        return array_values(array_filter($issues, 'is_array'));
     }
 }

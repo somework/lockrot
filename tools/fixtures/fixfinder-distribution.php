@@ -30,7 +30,6 @@ use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
-use Lockrot\Verdict\VerdictEngine;
 
 $root = \dirname(__DIR__, 2);
 require $root.'/vendor/autoload.php';
@@ -101,7 +100,6 @@ foreach ($dirs as $dir) {
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), TARGET_PHP, PhpReleaseDates::load(), $project->requirePhp()),
-            new VerdictEngine(),
             $clock,
             false,
             is_file($recorded) ? new RepositoryAdvisoryLoader($server->repositories()) : null

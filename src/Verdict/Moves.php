@@ -53,6 +53,16 @@ final class Moves
         return $this->moveIn;
     }
 
+    /** The move that `move_in` names: the next step or its first other move. Null when no move clears the counted advisories. */
+    public function securityMove(): ?Move
+    {
+        if ($this->moveIn === null || $this->nextStep === null) {
+            return null;
+        }
+
+        return $this->moveIn === self::IN_ALSO ? $this->nextStep->also()[0] : $this->nextStep;
+    }
+
     public function fixKind(): ?string
     {
         return $this->fixKind;

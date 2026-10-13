@@ -180,6 +180,29 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
         return $this->check;
     }
 
+    /** `host`, `repository` or `package`. */
+    public function scope(): string
+    {
+        return $this->scope;
+    }
+
+    public function value(): string
+    {
+        return $this->value;
+    }
+
+    /** The project's own words, which never enter a machine string. */
+    public function reason(): string
+    {
+        return $this->reason;
+    }
+
+    /** A `Y-m-d` date, null for an entry that does not expire. */
+    public function expiresOn(): ?string
+    {
+        return $this->expires;
+    }
+
     /** @return Shape `accepted_by`: the entry's scope value and reason, as the project wrote them */
     public function jsonSerialize(): array
     {

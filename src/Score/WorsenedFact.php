@@ -63,6 +63,24 @@ final class WorsenedFact implements \JsonSerializable
         return $this->why;
     }
 
+    /** The severity the entry stored, null for a flag or a new advisory. */
+    public function recordedSeverity(): ?string
+    {
+        return $this->recorded === null ? null : $this->recorded->severity();
+    }
+
+    /** The fix kind the entry stored, null for a flag or a new advisory. */
+    public function recordedFixKind(): ?string
+    {
+        return $this->recorded === null ? null : $this->recorded->fixKind();
+    }
+
+    /** The advisory as it counts now, null for a flag. */
+    public function now(): ?CountedAdvisory
+    {
+        return $this->now;
+    }
+
     /** @return Shape */
     public function jsonSerialize(): array
     {

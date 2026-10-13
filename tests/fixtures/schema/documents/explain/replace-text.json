@@ -1186,14 +1186,6 @@
    ]
   }
  },
- "legacy": {
-  "verdict": "abandoned",
-  "priority": "critical",
-  "basis": {
-   "base": "critical",
-   "steps": []
-  }
- },
  "generated_at": "2026-10-01T17:39:46+00:00",
  "notes": [],
  "note_details": []

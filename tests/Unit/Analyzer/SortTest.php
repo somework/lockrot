@@ -186,7 +186,7 @@ final class SortTest extends TestCase
         $first = self::floorReport('wallabag')->sorted()[0];
 
         self::assertSame('twig/twig', $first->package());
-        self::assertSame('critical', $first->grade());
+        self::assertSame('critical', $first->verdict());
         self::assertSame(64, $first->score()->securityHalves());
     }
 
@@ -198,7 +198,7 @@ final class SortTest extends TestCase
     private static function row(Finding $finding): array
     {
         return [
-            'verdict' => $finding->grade(),
+            'verdict' => $finding->verdict(),
             'score.parts.security.contribution' => $finding->score()->securityHalves() / 2,
             'score.exact' => $finding->score()->exactHalves() / 2,
             'direct' => $finding->isDirect(),

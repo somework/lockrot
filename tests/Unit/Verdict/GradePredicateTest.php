@@ -29,7 +29,6 @@ use Lockrot\Tests\Support\FakeHttpClient;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\TestCase;
 
 /** A package whose only fact is a counted advisory has the report-1 verdict `ok` and a grade. */
@@ -41,23 +40,13 @@ final class GradePredicateTest extends TestCase
     {
         $report = self::report();
         $vulnerable = self::named($report, 'vendor/vulnerable');
-
-        self::assertSame(Verdict::OK, $vulnerable->verdict());
-        self::assertSame('high', $vulnerable->grade());
+        self::assertSame('high', $vulnerable->verdict());
         self::assertTrue($vulnerable->isGraded());
         self::assertNull($vulnerable->lead(), 'no maintenance flag counts');
         self::assertSame(['vendor/vulnerable', 'vendor/stale'], self::packages($report->graded()));
-        self::assertSame(['vendor/stale'], self::packages($report->flagged()));
         self::assertSame(['critical' => 0, 'high' => 1, 'medium' => 1, 'low' => 0, 'unknown' => 0, 'finished' => 0, 'ok' => 1], $report->byGrade());
     }
 
-    public function testByVerdictCountsTheReport1Verdicts(): void
-    {
-        $counts = self::report()->byVerdict();
-
-        self::assertSame(2, $counts[Verdict::OK]);
-        self::assertSame(1, $counts[Verdict::STALE]);
-    }
 
     public function testAVulnerableOnlyTransitivePackageCountsInItsParentsS7AndInTheCounts(): void
     {
@@ -101,7 +90,6 @@ final class GradePredicateTest extends TestCase
             new RepoLocator(),
             new Allowlist([]),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false,
             self::advisories($advisories)

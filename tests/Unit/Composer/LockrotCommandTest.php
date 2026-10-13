@@ -38,7 +38,7 @@ use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\RecordingOutput;
 use Lockrot\Tests\Support\SplitStreamOutput;
-use Lockrot\Verdict\VerdictEngine;
+use Lockrot\Tests\Support\SplitStreamTester;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -148,7 +148,6 @@ final class LockrotCommandTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, $lockrot->thresholds(), $lockrot->targetPhp(), PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             $lockrot->offline()
         );
@@ -176,9 +175,10 @@ final class LockrotCommandTest extends TestCase
         return $command;
     }
 
-    private function tester(?MetadataLoaderInterface $loader = null): CommandTester
+    /** The upgrade notice and the gate line go to stderr, so the display holds the report alone. */
+    private function tester(?MetadataLoaderInterface $loader = null): SplitStreamTester
     {
-        return new CommandTester($this->command($loader));
+        return new SplitStreamTester($this->command($loader));
     }
 
     /**
@@ -502,11 +502,9 @@ final class LockrotCommandTest extends TestCase
         $display = $tester->getDisplay();
         self::assertSame(0, $code, $display);
         self::assertStringStartsWith('doctrine/annotations ', $display, 'the name is trimmed and lower-cased, as Composer names packages');
-        self::assertStringContainsString('— abandoned, priority', $display);
-        self::assertStringContainsString("\n  S1 high marked abandoned by its repository", $display);
-        self::assertStringContainsString("\nrepository metadata (as of ", $display);
-        self::assertStringContainsString("\n    branch     highest tag        released           newest dated release     php\n", $display);
-        self::assertStringContainsString("\nthresholds: release-warn-years 3", $display);
+        self::assertStringContainsString(' — high: abandoned', $display);
+        self::assertStringContainsString("\n  abandoned    S1 high · marked abandoned by its registry", $display);
+        self::assertStringContainsString("\nrepository metadata\n     branch   highest tag   released     php        fixes\n", $display);
         self::assertStringNotContainsString('packages checked', $display, 'the report itself is not printed');
     }
 
@@ -634,7 +632,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(0, $code, $tester->getDisplay());
         self::assertStringStartsWith('clue/ndjson-react ', $tester->getDisplay());
-        self::assertStringContainsString(' · packages-dev', $tester->getDisplay());
+        self::assertStringContainsString("\n  via friendsofphp/php-cs-fixer > clue/ndjson-react: 1 hop", $tester->getDisplay());
     }
 
     public function testGithubAnnotationsOnWallabag(): void
@@ -646,10 +644,113 @@ final class LockrotCommandTest extends TestCase
         $lines = explode("\n", trim($display));
 
         self::assertSame(1, $code, $display);
-        self::assertMatchesRegularExpression('{^::error file=composer\.lock,line=\d+,title=lockrot%3A abandoned \(critical\)::}', $lines[0]);
+        self::assertMatchesRegularExpression('{^::error file=composer\.lock,line=\d+,title=lockrot%3A critical — }', $lines[0]);
         self::assertStringContainsString('phpzip/phpzip', $display);
-        [$checked, $abandoned] = $this->wallabagTotals();
-        self::assertStringStartsWith($checked.' packages checked · abandoned '.$abandoned.' · ', $lines[\count($lines) - 1]);
+        self::assertStringStartsWith('gate: fails · --fail-on=silent · ', $lines[\count($lines) - 1]);
+    }
+
+    /**
+     * The upgrade notice is the first stderr line of every run with a gate active, or one
+     * that writes json, sarif, gitlab or a baseline, byte for byte.
+     *
+     * @param array<string, mixed> $args
+     *
+     * @dataProvider noticeRuns
+     */
+    #[DataProvider('noticeRuns')]
+    public function testTheUpgradeNoticeOpensStderrOnEachTrigger(array $args, bool $notice): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+
+        [, , $stderr] = $this->runWithSplitStreams($args + ['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame('lockrot 0.14: the verdict is now a grade, the cause word is in .lead, documents are report-2/baseline-2; see https://lockrot.dev/changes/0.14/', LockrotCommand::UPGRADE_NOTICE);
+        self::assertSame($notice, strpos($stderr, LockrotCommand::UPGRADE_NOTICE."\n") === 0, $stderr);
+        self::assertSame($notice ? 1 : 0, substr_count($stderr, 'https://lockrot.dev/changes/0.14/'));
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, bool}> */
+    public static function noticeRuns(): iterable
+    {
+        yield 'a gate' => [['--fail-on' => 'high'], true];
+        yield 'json' => [['--format' => 'json'], true];
+        yield 'sarif' => [['--format' => 'sarif'], true];
+        yield 'gitlab' => [['--format' => 'gitlab'], true];
+        yield 'a json file' => [['--output' => ['json:r.json']], true];
+        yield 'a baseline' => [['--generate-baseline' => true], true];
+        yield 'a table without a gate' => [['--fail-on' => 'none'], false];
+        yield 'markdown and github without a gate' => [['--format' => 'github', '--output' => ['markdown:r.md']], false];
+    }
+
+    /**
+     * A document on stdout gets the stderr line `lockrot: ` + `gate.text` when the gate
+     * fails, so a CI log says why the job exits 1. A text format prints the line itself.
+     *
+     * @dataProvider gateLineRuns
+     */
+    #[DataProvider('gateLineRuns')]
+    public function testAFailingGateWritesItsLineToStderrBesideADocument(string $format, string $failOn, bool $line): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--format' => $format, '--fail-on' => $failOn, '--target-php' => '8.4'], $this->loader());
+        $lines = explode("\n", rtrim($stderr, "\n"));
+
+        self::assertSame($line, preg_match('/^lockrot: gate: fails · --fail-on='.preg_quote($failOn, '/').' · \d+ findings? fails? it · .*target php 8\.4 \(--target-php\)$/', end($lines)) === 1, $stderr);
+        self::assertSame($failOn === 'none' ? 0 : 1, $code);
+    }
+
+    /** @return iterable<string, array{string, string, bool}> */
+    public static function gateLineRuns(): iterable
+    {
+        foreach (['json', 'sarif', 'gitlab', 'html'] as $format) {
+            yield $format.', failing' => [$format, 'high', true];
+            yield $format.', passing' => [$format, 'none', false];
+        }
+        foreach (['table', 'markdown', 'github'] as $format) {
+            yield $format.', failing' => [$format, 'high', false];
+        }
+    }
+
+    /** @dataProvider badBudgets */
+    #[DataProvider('badBudgets')]
+    public function testAMarkdownBudgetThatIsNotAWholeNumberAboveZeroIsExit2(string $bytes): void
+    {
+        $this->fixtureCopy(self::WALLABAG_LOCK);
+
+        $neverAsked = new class () implements MetadataLoaderInterface {
+            public function load(array $installedByName): MetadataBatch
+            {
+                throw new \LogicException('the budget check must come before the analysis');
+            }
+        };
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--markdown-max-bytes' => $bytes, '--output' => ['markdown:r.md'], '--target-php' => '8.4'], $neverAsked);
+
+        self::assertSame(2, $code, $stderr);
+        self::assertStringContainsString('lockrot: --markdown-max-bytes must be a whole number of bytes above zero', $stderr);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function badBudgets(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'negative' => ['-1'];
+        yield 'not a number' => ['1k'];
+        yield 'a trailing line break' => ["100\n"];
+    }
+
+    public function testAMarkdownBudgetCutsTheFileAndNeverStdout(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+
+        [$code, $stdout] = $this->runWithSplitStreams(['--format' => 'markdown', '--markdown-max-bytes' => '4000', '--output' => ['markdown:r.md'], '--target-php' => '8.4'], $this->loader());
+        $file = (string) file_get_contents($dir.'/r.md');
+
+        self::assertSame(0, $code);
+        self::assertLessThanOrEqual(4000, \strlen($file));
+        self::assertStringContainsString('more findings: see the JSON report', $file);
+        self::assertStringNotContainsString('more findings: see the JSON report', $stdout);
     }
 
     public function testSarifOutputOnWallabag(): void
@@ -700,8 +801,9 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(1, $code, $display);
         [$checked, , $flagged] = $this->wallabagTotals();
-        self::assertStringStartsWith('### lockrot: dependency rot in '.$flagged.' of '.$checked.' packages', $display);
-        self::assertStringContainsString('| Package | Version | Verdict | Evidence | Via |', $display);
+        self::assertStringStartsWith('### lockrot: ', $display);
+        self::assertStringContainsString(' of '.$checked.' packages flagged — ', $display);
+        self::assertStringContainsString('| Verdict | Package | Version | Flags | Why | Via |', $display);
     }
 
     /**
@@ -742,7 +844,7 @@ final class LockrotCommandTest extends TestCase
         $cwd = (string) getcwd();
         $tester = $this->tester();
         self::assertSame(2, $tester->execute([]));
-        $display = $tester->getDisplay();
+        $display = $tester->getErrorOutput();
         self::assertStringStartsWith('lockrot: composer.lock not found in ', $display);
         self::assertStringContainsString('not found in '.$cwd.';', $display);
         self::assertStringContainsString('lockrot does not look in parent directories', $display);
@@ -785,7 +887,7 @@ final class LockrotCommandTest extends TestCase
 
         chdir($project);
         $this->withComposerEnv($this->tempDir('lockrot-default-factory-cache-'), $this->tempDir('lockrot-default-factory-home-'), function (): void {
-            $tester = new CommandTester($this->buildDefaultCommand());
+            $tester = new SplitStreamTester($this->buildDefaultCommand());
             $code = $tester->execute(['--format' => 'json', '--target-php' => '8.4']);
 
             self::assertSame(0, $code, $tester->getDisplay());
@@ -855,7 +957,7 @@ final class LockrotCommandTest extends TestCase
         putenv('LOCKROT_DISABLE=1');
         try {
             self::assertSame(0, $tester->execute([]));
-            self::assertStringContainsString('disabled', $tester->getDisplay());
+            self::assertStringContainsString('disabled', $tester->getErrorOutput());
         } finally {
             putenv('LOCKROT_DISABLE');
         }
@@ -1015,7 +1117,7 @@ final class LockrotCommandTest extends TestCase
         [, , $first] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
         [$code, $stdout, $second] = $this->runWithSplitStreams(['--format' => 'json'], $this->loader());
 
-        $line = "lockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n";
+        $line = LockrotCommand::UPGRADE_NOTICE."\nlockrot: unknown key extra.lockrot.install-tme ignored (did you mean install-time?)\n";
         self::assertSame($line, $first);
         self::assertSame($line, $second);
         self::assertSame(0, $code, $second);
@@ -1041,7 +1143,7 @@ final class LockrotCommandTest extends TestCase
         $stderr = $errors->fetch();
         self::assertSame(0, $code, $stderr);
         self::assertIsArray(json_decode($stdout, true), $stdout);
-        self::assertSame('lockrot: unknown key extra.lockrot.'.$shown." ignored\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n".'lockrot: unknown key extra.lockrot.'.$shown." ignored\n", $stderr);
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -1133,7 +1235,7 @@ final class LockrotCommandTest extends TestCase
             [$code, $stdout] = $this->runWithErrorOutput(['--all' => true], new BufferedOutput(), $formatter);
             self::assertSame(0, $code, $stdout);
             // Unrequired: composer.json cannot name it, Composer 2.2 rejects such a name in `require`.
-            self::assertStringContainsString('  unknown      '.$name.' 1.0.0  ?', $stdout);
+            self::assertStringContainsString('  '.$name.' 1.0.0  unreached  ·  unknown', $stdout);
             self::assertStringStartsWith($decorated ? "\033[1mnot flagged (1)\033[22m\n" : "not flagged (1)\n", $stdout);
 
             [$code, $stdout] = $this->runWithErrorOutput(['--explain' => $name], new BufferedOutput(), $formatter);
@@ -1205,7 +1307,7 @@ final class LockrotCommandTest extends TestCase
                 self::assertInstanceOf(Application::class, $application);
                 $application->getComposer(false, false);
 
-                $tester = new CommandTester($command);
+                $tester = new SplitStreamTester($command);
                 $code = $tester->execute(['--offline' => true, '--format' => 'json']);
 
                 self::assertSame(0, $code, $tester->getDisplay());
@@ -1535,12 +1637,12 @@ final class LockrotCommandTest extends TestCase
         $json = json_decode($tester->getDisplay(), true);
         self::assertIsArray($json);
         $verdicts = self::assertVerdictsMatchTheGolden($json);
-        $flagged = ['abandoned', 'silent', 'pinned', 'left-behind', 'old-promise', 'stale'];
+        $leads = array_column(JsonPath::arrayAt($json, ['findings']), 'lead');
 
         return self::$wallabagTotals = [
             \count(LockFile::fromFile(self::WALLABAG_LOCK)->packages(false)),
-            \count(array_keys($verdicts, 'abandoned', true)),
-            \count(array_filter($verdicts, static fn ($verdict): bool => \in_array($verdict, $flagged, true))),
+            \count(array_keys($leads, 'abandoned', true)),
+            \count(array_filter($verdicts, static fn ($verdict): bool => \in_array($verdict, ['critical', 'high', 'medium', 'low'], true))),
         ];
     }
 
@@ -1551,11 +1653,10 @@ final class LockrotCommandTest extends TestCase
      */
     private static function assertVerdictsMatchTheGolden(array $json): array
     {
-        // report-1's verdict word: the lead of a graded finding, the score-0 word of the rest.
         $verdicts = [];
         foreach (JsonPath::arrayAt($json, ['findings']) as $finding) {
             self::assertIsArray($finding);
-            $verdicts[JsonPath::stringAt($finding, ['package'])] = $finding['lead'] ?? $finding['verdict'];
+            $verdicts[JsonPath::stringAt($finding, ['package'])] = $finding['verdict'];
         }
         $golden = JsonPath::arrayAt(JsonPath::decodeFile(__DIR__.'/../../fixtures/golden/wallabag.json'), ['verdicts']);
         ksort($verdicts);
@@ -1693,7 +1794,8 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(1, $code, $tester->getDisplay());
         self::assertStringContainsString('1 worsened', $tester->getDisplay());
-        self::assertStringContainsString('abandoned (was stale)', $tester->getDisplay());
+        self::assertStringContainsString('  doctrine/annotations 2.0.2  ', $tester->getDisplay());
+        self::assertStringContainsString('(baseline: abandoned new)', $tester->getDisplay());
     }
 
     public function testRegeneratingCarriesFirstSeenOver(): void
@@ -2103,7 +2205,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(0, $code, $stderr);
         self::assertStringContainsString($this->wallabagTotals()[0].' packages checked', $stdout, 'stdout is still the table');
-        self::assertSame("lockrot: json report written to r.json\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n"."lockrot: json report written to r.json\n", $stderr);
         $json = $this->readJsonFile($dir.'/r.json');
         self::assertIsArray($json['counts']);
         $this->assertWallabagReport($json);
@@ -2219,7 +2321,7 @@ final class LockrotCommandTest extends TestCase
         [$code, , $stderr] = $this->runWithSplitStreams(['--output' => ['sarif:out/r.sarif', 'json:r.json'], '--target-php' => '8.4'], $this->loader());
 
         self::assertSame(0, $code, $stderr);
-        self::assertSame("lockrot: sarif report written to out/r.sarif\nlockrot: json report written to r.json\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n"."lockrot: sarif report written to out/r.sarif\nlockrot: json report written to r.json\n", $stderr);
         self::assertFileExists($dir.'/out/r.sarif');
     }
 
@@ -2231,7 +2333,7 @@ final class LockrotCommandTest extends TestCase
         [$code, , $stderr] = $this->runWithSplitStreams(['--output' => ['json:<info>r.json'], '--target-php' => '8.4'], $this->loader());
 
         self::assertSame(0, $code, $stderr);
-        self::assertSame("lockrot: json report written to <info>r.json\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n"."lockrot: json report written to <info>r.json\n", $stderr);
         self::assertFileExists($dir.'/<info>r.json');
     }
 
@@ -2242,7 +2344,7 @@ final class LockrotCommandTest extends TestCase
         [$code, , $stderr] = $this->runWithSplitStreams(['--output' => ['json:<info>/r.json'], '--target-php' => '8.4'], $this->loader());
 
         self::assertSame(2, $code);
-        self::assertSame("lockrot: --output=json:<info>/r.json: directory <info> does not exist; lockrot does not create directories\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n"."lockrot: --output=json:<info>/r.json: directory <info> does not exist; lockrot does not create directories\n", $stderr);
     }
 
     public function testTheExitCodeDoesNotDependOnOutput(): void
@@ -2296,7 +2398,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertSame('lockrot: --output='.$spec.': '.$reason."\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n".'lockrot: --output='.$spec.': '.$reason."\n", $stderr);
         self::assertFalse($called, 'refused before the analysis');
         self::assertSame($before, [md5_file($dir.'/composer.json'), md5_file($dir.'/composer.lock')]);
         self::assertSame(['composer.json', 'composer.lock'], array_values(array_diff((array) scandir($dir), ['.', '..'])));
@@ -2330,7 +2432,7 @@ final class LockrotCommandTest extends TestCase
                 [$code, , $stderr] = $this->runWithSplitStreams(['--output' => [$spec], '--target-php' => '8.4'], $this->loader());
 
                 self::assertSame(2, $code, $spec);
-                self::assertSame('lockrot: --output='.$spec.': that is '.$what.' COMPOSER names, which lockrot never writes'."\n", $stderr);
+                self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n".'lockrot: --output='.$spec.': that is '.$what.' COMPOSER names, which lockrot never writes'."\n", $stderr);
             }
         });
     }
@@ -2359,7 +2461,7 @@ final class LockrotCommandTest extends TestCase
         [$code, , $stderr] = $this->runCommandWithSplitStreams($this->recordingCommand($called), ['--output' => ['json:out/r.json'], '--target-php' => '8.4']);
 
         self::assertSame(2, $code);
-        self::assertSame("lockrot: --output=json:out/r.json: lockrot never writes composer.json or composer.lock\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n"."lockrot: --output=json:out/r.json: lockrot never writes composer.json or composer.lock\n", $stderr);
         self::assertFalse($called);
     }
 
@@ -2371,18 +2473,18 @@ final class LockrotCommandTest extends TestCase
         [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--baseline' => '<info>b.json', '--target-php' => '8.4'], $this->loader());
 
         self::assertSame(0, $code, $stderr);
-        self::assertMatchesRegularExpression('/\Alockrot: baseline written to <info>b\.json \(\d+ findings\)\n\z/', $stderr);
+        self::assertMatchesRegularExpression('/\A'.preg_quote(LockrotCommand::UPGRADE_NOTICE, '/').'\nlockrot: baseline written to <info>b\.json \(\d+ findings\)\n\z/', $stderr);
         self::assertFileExists($dir.'/<info>b.json');
     }
 
-    /** @return iterable<string, array{list<string>, string}> */
+    /** @return iterable<string, array{list<string>, string, bool}> each set's specs, its message, and whether a spec asks for a document that prints the upgrade notice */
     public static function invalidOutputs(): iterable
     {
-        yield 'no colon' => [['r.json'], '--output=r.json: expected <format>:<path>, e.g. --output=sarif:lockrot.sarif'];
-        yield 'an unknown format' => [['xml:r.xml'], '--output=xml:r.xml: unknown format "xml"; the formats are table, json, github, sarif, gitlab, markdown, html'];
-        yield 'an empty path' => [['json:'], '--output=json:: the path is empty'];
-        yield 'the same file twice' => [['json:r.json', 'html:./r.json'], '--output=html:./r.json: the same file as --output=json:r.json'];
-        yield 'a missing directory' => [['json:missing/r.json'], '--output=json:missing/r.json: directory missing does not exist; lockrot does not create directories'];
+        yield 'no colon' => [['r.json'], '--output=r.json: expected <format>:<path>, e.g. --output=sarif:lockrot.sarif', false];
+        yield 'an unknown format' => [['xml:r.xml'], '--output=xml:r.xml: unknown format "xml"; the formats are table, json, github, sarif, gitlab, markdown, html', false];
+        yield 'an empty path' => [['json:'], '--output=json:: the path is empty', true];
+        yield 'the same file twice' => [['json:r.json', 'html:./r.json'], '--output=html:./r.json: the same file as --output=json:r.json', true];
+        yield 'a missing directory' => [['json:missing/r.json'], '--output=json:missing/r.json: directory missing does not exist; lockrot does not create directories', true];
     }
 
     /**
@@ -2391,7 +2493,7 @@ final class LockrotCommandTest extends TestCase
      * @dataProvider invalidOutputs
      */
     #[DataProvider('invalidOutputs')]
-    public function testAnInvalidOutputIsExit2BeforeTheAnalysis(array $specs, string $message): void
+    public function testAnInvalidOutputIsExit2BeforeTheAnalysis(array $specs, string $message, bool $notice): void
     {
         $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
         $called = false;
@@ -2400,7 +2502,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertSame('lockrot: '.$message."\n", $stderr);
+        self::assertSame(($notice ? LockrotCommand::UPGRADE_NOTICE."\n" : '').'lockrot: '.$message."\n", $stderr);
         self::assertFalse($called, 'refused before the analysis');
         self::assertDirectoryDoesNotExist($dir.'/missing');
     }
@@ -2426,7 +2528,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertSame("lockrot: --explain prints one package on stdout and --output writes whole-run reports; run them separately\n", $stderr);
+        self::assertSame(LockrotCommand::UPGRADE_NOTICE."\n"."lockrot: --explain prints one package on stdout and --output writes whole-run reports; run them separately\n", $stderr);
         self::assertFalse($called);
         self::assertFileDoesNotExist($dir.'/r.json');
     }
@@ -2443,7 +2545,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(0, $code, $stderr);
         self::assertSame('', $stdout);
-        self::assertMatchesRegularExpression('/\Alockrot: json report written to r\.json\nlockrot: baseline written to lockrot-baseline\.json \(\d+ findings\)\n\z/', $stderr);
+        self::assertMatchesRegularExpression('/\A'.preg_quote(LockrotCommand::UPGRADE_NOTICE, '/').'\nlockrot: json report written to r\.json\nlockrot: baseline written to lockrot-baseline\.json \(\d+ findings\)\n\z/', $stderr);
         self::assertFileExists($dir.'/lockrot-baseline.json');
         $json = $this->readJsonFile($dir.'/r.json');
         self::assertNull($json['baseline']);
@@ -2464,7 +2566,7 @@ final class LockrotCommandTest extends TestCase
 
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
-        self::assertMatchesRegularExpression('/\Alockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
+        self::assertMatchesRegularExpression('/\A'.preg_quote(LockrotCommand::UPGRADE_NOTICE, '/').'\nlockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
         self::assertFileDoesNotExist($dir.'/lockrot-baseline.json');
     }
 
@@ -2486,7 +2588,7 @@ final class LockrotCommandTest extends TestCase
         self::assertTrue($called);
         self::assertSame(2, $code);
         self::assertStringContainsString($this->wallabagTotals()[0].' packages checked', $stdout, 'stdout already holds the report');
-        self::assertMatchesRegularExpression('/\Alockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
+        self::assertMatchesRegularExpression('/\A'.preg_quote(LockrotCommand::UPGRADE_NOTICE, '/').'\nlockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
     }
 
     /**
@@ -2539,7 +2641,8 @@ final class LockrotCommandTest extends TestCase
             if ($result['ruleId'] === 'lockrot/advisories-unchecked') {
                 continue;
             }
-            $levels[JsonPath::stringAt($result, ['partialFingerprints', 'lockrot/package'])] = JsonPath::stringAt($result, ['level']);
+            $package = JsonPath::stringAt($result, ['partialFingerprints', 'lockrot/package']);
+            $levels[$package] = ($levels[$package] ?? '') === 'error' ? 'error' : JsonPath::stringAt($result, ['level']);
         }
         $failing = $unjudged = 0;
         foreach (JsonPath::arrayAt($json, ['findings']) as $finding) {
@@ -2548,7 +2651,7 @@ final class LockrotCommandTest extends TestCase
             $standing = JsonPath::arrayAt($finding, ['gate']);
             self::assertArrayHasKey($package, $levels, '--all gives every finding a result');
             $error = $levels[$package] === 'error';
-            self::assertSame($standing['fails'], $error, $package.': a record is an error exactly when its finding fails the gate');
+            self::assertSame($standing['fails'], $error, $package.': a finding fails the gate exactly when one of its records is an error');
             $failing += $standing['fails'] ? 1 : 0;
         }
         self::assertSame($failing > 0, \in_array('fail_on', JsonPath::arrayAt($gate, ['tripped_by']), true));
@@ -2574,7 +2677,7 @@ final class LockrotCommandTest extends TestCase
         $document = json_decode($stdout, true);
         self::assertIsArray($document);
         self::assertTrue(JsonPath::arrayAt($document, ['gate'])['fails'], 'the report on stdout says the gate failed');
-        self::assertMatchesRegularExpression('/\Alockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
+        self::assertMatchesRegularExpression('/\A'.preg_quote(LockrotCommand::UPGRADE_NOTICE, '/').'\nlockrot: Cannot write r\.json: \S[^\n]*\n\z/', $stderr);
     }
 
     public function testLockrotDisableWritesNoFile(): void

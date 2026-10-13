@@ -17,9 +17,9 @@ use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
-use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\RunFooter;
 use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
@@ -27,9 +27,9 @@ use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\Golden;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
+use Lockrot\Tests\Support\Summaries;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -102,7 +102,6 @@ final class AcceptanceTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false
         );
@@ -137,29 +136,21 @@ final class AcceptanceTest extends TestCase
             $f = $this->byName($report);
             self::assertSame(\count(LockFile::fromFile(self::FIXTURES.'apps/wallabag_wallabag/composer.lock')->packages(false)), $report->packagesChecked());
             $verdicts = array_map(static fn (Finding $finding): string => $finding->verdict(), $f);
-            self::assertSame(\count(array_keys($verdicts, Verdict::ABANDONED, true)), $report->byVerdict()[Verdict::ABANDONED]);
-            self::assertSame(Verdict::SILENT, $f['phpzip/phpzip']->verdict());
-            self::assertStringContainsString('last release 2015-11-16', $f['phpzip/phpzip']->evidence());
-            self::assertStringContainsString('last push 2015-11-16', $f['phpzip/phpzip']->evidence());
-            self::assertNotSame(Verdict::SILENT, $f['psr/cache']->verdict());
-            self::assertSame(Verdict::FINISHED, $f['ralouphie/getallheaders']->verdict());
-            self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
-            self::assertSame(Verdict::ABANDONED, $f['hoa/ruler']->verdict());
-            // Priority, read off this fixture: wallabag/rulerz is a root require (chain length 1) and
-            // pinned -> high; hoa/ruler is reached through wallabag/rulerz and abandoned -> critical
-            // lowered one step for being transitive -> high; phpzip/phpzip is reached through
-            // wallabag/phpepub and silent -> the same one-step drop to high. The lock is analysed with
-            // includeDev = false, so every row here is a prod row.
-            self::assertSame(Priority013::HIGH, $f['wallabag/rulerz']->priority());
+            self::assertSame(Verdict::SILENT, $f['phpzip/phpzip']->lead());
+            self::assertStringContainsString('last release 2015-11-16', Summaries::of($f['phpzip/phpzip']));
+            self::assertStringContainsString('last push 2015-11-16', Summaries::of($f['phpzip/phpzip']));
+            self::assertNotSame(Verdict::SILENT, $f['psr/cache']->lead());
+            self::assertNull($f['ralouphie/getallheaders']->lead());
+            self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->lead());
+            self::assertSame(Verdict::ABANDONED, $f['hoa/ruler']->lead());
+            // The lock is analysed with includeDev = false, so every row here is a prod row.
             self::assertTrue($f['wallabag/rulerz']->isDirect());
-            self::assertSame(Priority013::HIGH, $f['hoa/ruler']->priority());
             self::assertSame(['wallabag/rulerz', 'hoa/ruler'], $f['hoa/ruler']->chain());
-            self::assertSame(Priority013::HIGH, $f['phpzip/phpzip']->priority());
             self::assertSame(['wallabag/phpepub', 'phpzip/phpzip'], $f['phpzip/phpzip']->chain());
             self::assertFalse($f['phpzip/phpzip']->isDev());
             // Transitive exposure (S7). hoa/ruler is reached from two root requires, so the second
             // one is what directDependents() adds over the chain; both roots carry S7 naming it, and
-            // wallabag/rulerz keeps the pinned verdict and high priority.
+            // wallabag/rulerz keeps its pinned lead.
             self::assertSame(['wallabag/rulerz', 'wallabag/rulerz-bundle'], $f['hoa/ruler']->directDependents());
             self::assertSame(['wallabag/rulerz-bundle'], $f['hoa/ruler']->otherDirectDependents());
             $rulerzS7 = self::signal($f['wallabag/rulerz'], Signal::S7);
@@ -168,7 +159,7 @@ final class AcceptanceTest extends TestCase
             $pulledIn = JsonPath::decoded($rulerzS7->data())['packages'];
             self::assertIsArray($pulledIn);
             self::assertContains('hoa/ruler', array_column($pulledIn, 'package'));
-            self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->verdict());
+            self::assertSame(Verdict::PINNED, $f['wallabag/rulerz']->lead());
             self::assertNull(self::signal($f['hoa/ruler'], Signal::S7), 'a transitive package is not a parent');
             $exposure = $report->exposure();
             self::assertArrayHasKey('wallabag/rulerz', $exposure);
@@ -178,12 +169,13 @@ final class AcceptanceTest extends TestCase
             for ($i = 1; $i < \count($counts); ++$i) {
                 self::assertGreaterThanOrEqual($counts[$i], $counts[$i - 1], 'exposure is ordered most first');
             }
-            Golden::assertMatches('wallabag.json', ['verdicts' => $verdicts, 'exposure' => $exposure, 'exposure_summary_line' => $report->exposureSummaryLine()], 'testWallabagKeepsItsVerdictsPrioritiesAndExposure');
+            ksort($verdicts);
+            Golden::assertMatches('wallabag.json', ['verdicts' => $verdicts, 'exposure' => $exposure, 'exposure_summary_line' => RunFooter::exposure($report, static fn (string $package): string => $package) ?? ''], 'testWallabagKeepsItsVerdictsPrioritiesAndExposure');
             // Every flagged transitive package is attributed, shared above the cap, or reached by no
             // direct requirement — exactly one of the three. wallabag's widest fan-in is 8, so the
             // document lists nothing above the cap.
             foreach ($report->findings() as $finding) {
-                if (!Verdict::flagged($finding->verdict()) || $finding->isDirect()) {
+                if ($finding->lead() === null || $finding->isDirect()) {
                     continue;
                 }
                 $arms = (int) TransitiveExposure::attributable($finding) + (int) TransitiveExposure::sharedAboveCap($finding) + (int) ($finding->directDependents() === []);
@@ -192,16 +184,6 @@ final class AcceptanceTest extends TestCase
             $document = $report->toArray();
             self::assertSame([], $document['unattributed']);
             self::assertSame(['max_fan_in' => 8], $document['exposure_rule']);
-            // The report leads with its critical rows. sensio/framework-extra-bundle is the fixture's
-            // only root require whose GitHub repository is recorded as archived
-            // (sensiolabs/SensioFrameworkExtraBundle in tests/fixtures/http/github), so it is the one
-            // package here that is abandoned *and* direct *and* prod — the only way to reach
-            // critical. Named rather than asserted positionally so a shift in the recorded data says
-            // which package moved.
-            self::assertSame(Priority013::CRITICAL, $f['sensio/framework-extra-bundle']->priority());
-            self::assertTrue($f['sensio/framework-extra-bundle']->isDirect());
-            self::assertSame('sensio/framework-extra-bundle', $report->findings()[0]->package());
-            self::assertSame(Priority013::CRITICAL, $report->findings()[0]->priority());
             self::assertFalse($report->hadNetworkFailures(), implode("\n", $report->notes()));
             // The PHAR runs under PHP's default 128M memory_limit: analysing wallabag's lock must not
             // retain the expanded Packagist release history. The exact peak, not the allocated chunks,
@@ -224,12 +206,12 @@ final class AcceptanceTest extends TestCase
     {
         $f = $this->byName($this->analyze('apps/wallabag_wallabag'));
         $expected = [
-            'wallabag/rulerz' => [false, null, null, '2023-12-24T00:53:44+00:00', Priority013::HIGH, null],
-            'wallabag/rulerz-bundle' => [false, null, null, '2023-12-24T22:23:50+00:00', Priority013::HIGH, null],
-            'wallabag/rulerz-bridge' => [false, null, null, '2023-12-24T01:18:26+00:00', Priority013::MEDIUM, null],
-            'friendsofsymfony/oauth-server-bundle' => [true, '2019-01-23T15:23:04+00:00', '1.6.2', '2022-03-24T10:22:23+00:00', Priority013::HIGH, 'older'],
+            'wallabag/rulerz' => [false, null, null, '2023-12-24T00:53:44+00:00', null],
+            'wallabag/rulerz-bundle' => [false, null, null, '2023-12-24T22:23:50+00:00', null],
+            'wallabag/rulerz-bridge' => [false, null, null, '2023-12-24T01:18:26+00:00', null],
+            'friendsofsymfony/oauth-server-bundle' => [true, '2019-01-23T15:23:04+00:00', '1.6.2', '2022-03-24T10:22:23+00:00', 'older'],
         ];
-        foreach ($expected as $package => [$released, $lastRelease, $lastVersion, $snapshotTime, $priority, $tagRelation]) {
+        foreach ($expected as $package => [$released, $lastRelease, $lastVersion, $snapshotTime, $tagRelation]) {
             $s6 = self::signal($f[$package], Signal::S6);
             self::assertNotNull($s6, $package);
             self::assertSame([
@@ -243,24 +225,22 @@ final class AcceptanceTest extends TestCase
                 'tag_relation' => $tagRelation,
             ], JsonPath::decoded($s6->data()), $package);
             self::assertSame('pinned to branch snapshot dev-master', $s6->summary(), $package);
-            self::assertSame(Verdict::PINNED, $f[$package]->verdict(), $package);
-            self::assertSame($priority, $f[$package]->priority(), $package);
+            self::assertSame(Verdict::PINNED, $f[$package]->lead(), $package);
         }
     }
 
     public function testNextcloudBantuIniGetWrapperIsSilent(): void
     {
         $f = $this->byName($this->analyze('apps/nextcloud_3rdparty'));
-        self::assertSame(Verdict::SILENT, $f['bantu/ini-get-wrapper']->verdict());
-        self::assertStringContainsString('last release 2014-09-15', $f['bantu/ini-get-wrapper']->evidence());
-        self::assertStringContainsString('last push 2015-03-05', $f['bantu/ini-get-wrapper']->evidence());
+        self::assertSame(Verdict::SILENT, $f['bantu/ini-get-wrapper']->lead());
+        self::assertStringContainsString('last release 2014-09-15', Summaries::of($f['bantu/ini-get-wrapper']));
+        self::assertStringContainsString('last push 2015-03-05', Summaries::of($f['bantu/ini-get-wrapper']));
     }
 
     public function testLaravelSkeletonIsClean(): void
     {
         $report = $this->analyze('skeletons/laravel');
-        self::assertSame(0, $report->byVerdict()[Verdict::ABANDONED]);
-        self::assertSame(0, $report->byVerdict()[Verdict::SILENT]);
+        self::assertSame([], array_values(array_filter(array_map(static fn (Finding $finding): ?string => $finding->lead(), $report->findings()), static fn (?string $lead): bool => \in_array($lead, [Verdict::ABANDONED, Verdict::SILENT], true))));
     }
 
     public function testMatomoXhprofIsAbandonedWithItsBranchPinUnderneath(): void
@@ -268,8 +248,8 @@ final class AcceptanceTest extends TestCase
         $f = $this->byName($this->analyze('apps/matomo-org_matomo'));
         // lox/xhprof carries S1 (abandoned on Packagist) and S3 (archived) as well as S6 (a
         // dev-master pin). abandoned outranks pinned in the severity order, so S6 stays underneath.
-        self::assertSame(Verdict::ABANDONED, $f['lox/xhprof']->verdict());
-        self::assertStringContainsString('dev-master', $f['lox/xhprof']->evidence());
+        self::assertSame(Verdict::ABANDONED, $f['lox/xhprof']->lead());
+        self::assertStringContainsString('dev-master', Summaries::of($f['lox/xhprof']));
         $ids = array_map(static fn ($s) => $s->id(), $f['lox/xhprof']->signals());
         self::assertContains('S6', $ids, 'the pinned-to-branch signal fires under the abandoned verdict');
         $s6 = self::signal($f['lox/xhprof'], Signal::S6);

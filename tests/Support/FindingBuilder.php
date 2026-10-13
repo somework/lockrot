@@ -8,14 +8,15 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Advisory\AdvisoryFeed;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\ReleaseBranch;
-use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\Data\ArchivedData;
@@ -55,7 +56,6 @@ final class FindingBuilder
     private ?LibyearsMeasurement $libyears = null;
     private ?PackageOrigin $origin = null;
     private ?string $replacementNamedBy = null;
-    private ?AdvisoryFacts013 $advisoryFacts013 = null;
     private ?FlagSet $flags = null;
     private bool $maintenanceJudged = true;
     private bool $unscored = false;
@@ -183,15 +183,6 @@ final class FindingBuilder
         return $clone;
     }
 
-    /** report-1's S9 facts, which the priority and the no-fix clause read. */
-    public function withAdvisoryFacts013(AdvisoryFacts013 $facts): self
-    {
-        $clone = clone $this;
-        $clone->advisoryFacts013 = $facts;
-
-        return $clone;
-    }
-
     /**
      * The composer.json sections that name the package. Without a call, a direct finding is named in
      * `require` (`require-dev` for a packages-dev one), and any other in none.
@@ -240,7 +231,7 @@ final class FindingBuilder
     public function build(): Finding
     {
         $namedIn = $this->namedIn ?? (\count($this->chain) === 1 ? [$this->dev ? ProjectConfig::REQUIRE_DEV : ProjectConfig::REQUIRE] : []);
-        $finding = (new Finding($this->package, $this->version, $this->verdict, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy, $this->advisoryFacts013))
+        $finding = (new Finding($this->package, $this->version, $this->signals, $this->chain, $this->allowlistReason, $this->dataDate, $this->note, $this->dev, $this->directDependents, $this->libyears, $this->origin, $this->replacementNamedBy))
             ->withComposerJson($this->composerJsonRead, $namedIn);
         if ($this->flags !== null) {
             return $finding->withFlags($this->flags, $this->maintenanceJudged)->withDetails(self::detailsOf($finding, $this->maintenanceJudged));
@@ -261,7 +252,8 @@ final class FindingBuilder
      * The details of a finding whose advisory lookup answered and whose release scan found no
      * branch: the metadata is read exactly when maintenance is judged.
      */
-    public static function detailsOf(Finding $finding, bool $maintenanceJudged, ?AllowlistEntry $entry = null): FindingDetails
+    /** @param list<IgnoredAdvisory> $ignored the advisories that Composer's audit ignore lists keep out */
+    public static function detailsOf(Finding $finding, bool $maintenanceJudged, ?AllowlistEntry $entry = null, ?AdvisoryNameCoverage $lookup = null, ?AbandonedIgnored $abandonedIgnored = null, array $ignored = []): FindingDetails
     {
         $status = $maintenanceJudged ? 'read' : (!$finding->isFromComposerRepository() ? 'not_from_composer_repository' : ($finding->note() === 'not found in the repository' ? 'not_found' : 'unavailable'));
         $skipped = [];
@@ -275,7 +267,7 @@ final class FindingBuilder
 
         $activity = self::activityOf($finding);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity), new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null), null);
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, $ignored, null, $activity, self::ageOf($finding, $status, $activity), $lookup ?? new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null), $abandonedIgnored);
     }
 
     /**

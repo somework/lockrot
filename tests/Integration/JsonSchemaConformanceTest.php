@@ -11,7 +11,6 @@ use JsonSchema\Validator;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
-use Lockrot\Analyzer\ChangedVerdict;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunNote;
@@ -38,7 +37,6 @@ use Lockrot\Explain\Explanation;
 use Lockrot\Graph\DependencyGraph;
 use Lockrot\Html\PageData;
 use Lockrot\Json\Schemas;
-use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
@@ -64,7 +62,6 @@ use Lockrot\Verdict\MoveFact;
 use Lockrot\Verdict\Moves;
 use Lockrot\Verdict\MoveSubject;
 use Lockrot\Verdict\Verdict;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -170,7 +167,6 @@ final class JsonSchemaConformanceTest extends TestCase
             new RepoLocator(),
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            new VerdictEngine(),
             $clock,
             false,
             new RepositoryAdvisoryLoader($server->repositories())
@@ -920,7 +916,6 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
             RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
             RunNote::notFromComposerRepository(2, true),
-            RunNote::verdictRulesChanged('high', [new ChangedVerdict('symfony/yaml', 'v3.4.47', 'left-behind', PriorityBasis013::startingAt('high')->withStep('no_fix_expected', 'critical'), 'medium', 14, '14 = left-behind 12 + vulnerable 2 [low advisory]')]),
             RunNote::baselineTargetDiffers('8.3', 'option', '8.4', 'runtime'),
             RunNote::baselineFixModelDiffers(2, 1),
             RunNote::ignoreDoesNotCoverAdvisories([new UncoveredAdvisories('symfony/yaml', 'symfony/*', ['PKSA-1'])]),

@@ -189,6 +189,15 @@ final class GateTest extends TestCase
         return [$standing->reachesFailOn(), $standing->fails(), $standing->exemptBy()];
     }
 
+    public function testAPackageFailsOnlyWhenItsFindingFailsTheGate(): void
+    {
+        $gate = self::gate(self::report(self::vulnerable('a/high', [], ['high']), self::vulnerable('a/medium', [], ['medium'])), 'vulnerable-high');
+
+        self::assertTrue($gate->packageFails('a/high'));
+        self::assertFalse($gate->packageFails('a/medium'));
+        self::assertFalse($gate->packageFails('a/absent'), 'a package the report does not hold');
+    }
+
     public function testAVulnerableValueReadsTheRawSeverityOfACountedAdvisory(): void
     {
         $report = self::report(self::vulnerable('a/high', [], ['high']), self::vulnerable('a/medium', [], ['medium']), self::vulnerable('a/none', ['stale'], []));

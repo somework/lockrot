@@ -6,7 +6,6 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Analyzer\TransitiveExposure;
 use Lockrot\Graph\DependencyGraph;
-use Lockrot\Legacy\Priority013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\CountedAdvisory;
@@ -14,6 +13,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Support\Summaries;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
@@ -116,10 +116,9 @@ final class TransitiveExposureTest extends TestCase
 
         $f = $this->byName(TransitiveExposure::attach($findings, $graph));
 
-        self::assertSame(Verdict::PINNED, $f['root/a']->verdict());
-        self::assertSame(Priority013::HIGH, $f['root/a']->priority());
+        self::assertSame(Verdict::PINNED, $f['root/a']->lead());
         self::assertSame([Signal::S6, Signal::S7], array_map(static fn (Signal $s): string => $s->id(), $f['root/a']->signals()));
-        self::assertSame('pinned to branch snapshot dev-main; pulls in 1 flagged package: vendor/leaf (abandoned)', $f['root/a']->evidence());
+        self::assertSame('pinned to branch snapshot dev-main; pulls in 1 flagged package: vendor/leaf (abandoned)', Summaries::of($f['root/a']));
     }
 
     public function testAFlaggedDirectPackageIsNobodysExposureEvenWhenAnotherRootReachesIt(): void
@@ -177,9 +176,9 @@ final class TransitiveExposureTest extends TestCase
         $f = $this->byName(TransitiveExposure::attach($findings, $graph));
         $s7 = self::s7($f['root/a']);
         self::assertNotNull($s7);
-        // Report order: priority (abandoned/silent transitive -> high, stale transitive -> low), then severity, then name.
+        // Report order (`Report::compareGraded()`): the verdict order, the score, then the name.
         self::assertSame(
-            'pulls in 7 flagged packages: vendor/z-abandoned (abandoned), vendor/f-silent (silent), vendor/a-stale (stale), vendor/b-stale (stale), vendor/c-stale (stale) and 2 more',
+            'pulls in 7 flagged packages: vendor/f-silent (silent), vendor/z-abandoned (abandoned), vendor/a-stale (stale), vendor/b-stale (stale), vendor/c-stale (stale) and 2 more',
             $s7->summary()
         );
         self::assertSame(7, JsonPath::decoded($s7->data())['flagged']);

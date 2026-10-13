@@ -81,7 +81,45 @@ final class RotDepth implements \JsonSerializable
         return $this->flagged;
     }
 
-    private function maxDepth(): ?int
+    /** The graded findings whose depth is not measured because the run read no composer.json. */
+    public function unmeasuredNoComposerJson(): int
+    {
+        return $this->unmeasured[Finding::NO_COMPOSER_JSON];
+    }
+
+    public function notInComposerJson(): int
+    {
+        return $this->notInComposerJson;
+    }
+
+    public function requireDevNotWalked(): int
+    {
+        return $this->requireDevNotWalked;
+    }
+
+    public function development(): int
+    {
+        return $this->development;
+    }
+
+    public function unreached(): int
+    {
+        return $this->byReach[Score::UNREACHED];
+    }
+
+    /** @return array<int, int> depth => graded findings, every depth from 0 to {@see maxDepth()} */
+    public function byDepth(): array
+    {
+        $max = $this->maxDepth();
+        $out = [];
+        foreach ($max === null ? [] : range(0, $max) as $depth) {
+            $out[$depth] = $this->byDepth[$depth] ?? 0;
+        }
+
+        return $out;
+    }
+
+    public function maxDepth(): ?int
     {
         return $this->byDepth === [] ? null : max(array_keys($this->byDepth));
     }
@@ -95,10 +133,9 @@ final class RotDepth implements \JsonSerializable
     /** @return array{flagged: int, measured: int, unmeasured: array<string, int>, by_reach: array<string, int>, not_in_composer_json: int, require_dev_not_walked: int, production: int, development: int, by_depth: list<array{depth: int, flagged: int}>, max_depth: ?int, deepest: list<array{package: string, chain: list<string>}>} */
     public function jsonSerialize(): array
     {
-        $max = $this->maxDepth();
         $byDepth = [];
-        foreach ($max === null ? [] : range(0, $max) as $depth) {
-            $byDepth[] = ['depth' => $depth, 'flagged' => $this->byDepth[$depth] ?? 0];
+        foreach ($this->byDepth() as $depth => $flagged) {
+            $byDepth[] = ['depth' => $depth, 'flagged' => $flagged];
         }
 
         return [
@@ -111,7 +148,7 @@ final class RotDepth implements \JsonSerializable
             'production' => $this->flagged - $this->development,
             'development' => $this->development,
             'by_depth' => $byDepth,
-            'max_depth' => $max,
+            'max_depth' => $this->maxDepth(),
             'deepest' => array_map(static fn (Finding $finding): array => ['package' => $finding->package(), 'chain' => $finding->chain()], $this->deepest),
         ];
     }

@@ -1090,8 +1090,7 @@
  },
  "data_date": "2026-10-01T17:41:33+00:00",
  "notes": [
-  "1 package is not from a Composer repository: their release metadata and repository activity were not read",
-  "1 finding reached --fail-on=critical under 0.13's rules and no longer does: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity."
+  "1 package is not from a Composer repository: their release metadata and repository activity were not read"
  ],
  "note_details": [
   {
@@ -1102,38 +1101,6 @@
    "data": {
     "package_count": 1,
     "advisories_asked": true
-   }
-  },
-  {
-   "code": "verdict_rules_changed",
-   "text": "1 finding reached --fail-on=critical under 0.13's rules and no longer does: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity.",
-   "docs_url": "https://lockrot.dev/notes/#verdict_rules_changed",
-   "sets_network_failures": false,
-   "data": {
-    "fail_on": "critical",
-    "findings": [
-     {
-      "package": "enshrined/svg-sanitize",
-      "version": "0.15.4",
-      "legacy": {
-       "verdict": "left-behind",
-       "priority": "critical",
-       "basis": {
-        "base": "high",
-        "steps": [
-         {
-          "reason": "no_fix_expected",
-          "from": "high",
-          "to": "critical"
-         }
-        ]
-       }
-      },
-      "verdict": "high",
-      "score_total": 24,
-      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
-     }
-    ]
    }
   }
  ],

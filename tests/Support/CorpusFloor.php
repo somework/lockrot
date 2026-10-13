@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support;
 
 use Lockrot\Allowlist\AllowlistEntry;
-use Lockrot\Legacy\AdvisoryFacts013;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\Fix;
@@ -15,7 +14,6 @@ use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
-use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -53,8 +51,7 @@ final class CorpusFloor
 
     /**
      * The signals with their ids and levels. No reader of the floor reads their data, except
-     * report-2's S9 rows: each advisory with its severity bucket and an `unknown` fix. S9's
-     * report-1 rows are {@see legacy()}.
+     * report-2's S9 rows: each advisory with its severity bucket and an `unknown` fix.
      *
      * @param FloorFinding $finding
      *
@@ -77,25 +74,6 @@ final class CorpusFloor
         }
 
         return $signals;
-    }
-
-    /**
-     * report-1's advisory facts of the finding's S9.
-     *
-     * @param FloorFinding $finding
-     */
-    public static function legacy(array $finding): AdvisoryFacts013
-    {
-        foreach ($finding['signals'] as $signal) {
-            if ($signal['id'] === Signal::S9) {
-                $rows = $signal['data']['advisories'];
-                Assert::assertIsArray($rows);
-                /** @var list<array<string, mixed>> $rows */
-                return SignalDataStub::legacy($rows, ($signal['data']['releases_read'] ?? false) === true);
-            }
-        }
-
-        return AdvisoryFacts013::none();
     }
 
     /**
@@ -127,10 +105,9 @@ final class CorpusFloor
     }
 
     /**
-     * The finding of these facts, with the report-1 verdict that {@see VerdictEngine} decides. An
-     * allowlist reason becomes an entry that accepts the whole package. Report-1 has no entry that
-     * accepts some flags only. The verdict `unknown` is the one trace of release metadata that
-     * lockrot did not read.
+     * The finding of these facts. An allowlist reason becomes an entry that accepts the whole
+     * package. Report-1 has no entry that accepts some flags only. The verdict `unknown` is the one
+     * trace of release metadata that lockrot did not read.
      *
      * @param FloorFinding $finding
      * @param list<CountedAdvisory> $advisories
@@ -141,9 +118,8 @@ final class CorpusFloor
         $reason = $finding['allowlist_reason'];
         $entry = $reason === null ? null : new AllowlistEntry($finding['package'], null, $reason, null, 'builtin');
         $judged = $finding['verdict'] !== 'unknown';
-        $verdict = (new VerdictEngine())->decide($signals, $entry !== null, $judged);
 
-        $built = (new Finding($finding['package'], $finding['version'], $verdict, $signals, $finding['chain'], $reason, null, null, $finding['dev'], [], null, null, null, self::legacy($finding)))
+        $built = (new Finding($finding['package'], $finding['version'], $signals, $finding['chain'], $reason, null, null, $finding['dev'], [], null, null, null))
             ->withComposerJson(true, \count($finding['chain']) === 1 ? [$finding['dev'] ? ProjectConfig::REQUIRE_DEV : ProjectConfig::REQUIRE] : []);
 
         return $built->withFlags(FlagSet::fromSignals($signals, $entry, $advisories), $judged)->withDetails(FindingBuilder::detailsOf($built, $judged));

@@ -90,6 +90,12 @@ final class AdvisoryRow implements \JsonSerializable
         return $this->title;
     }
 
+    /** An ISO 8601 date and time, null when the repository gives none. */
+    public function reportedAt(): ?string
+    {
+        return $this->reportedAt;
+    }
+
     public function severity(): string
     {
         return $this->severity;

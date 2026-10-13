@@ -10,32 +10,42 @@
                     "informationUri": "https://github.com/somework/lockrot",
                     "rules": [
                         {
-                            "id": "lockrot/abandoned",
-                            "name": "abandoned",
-                            "shortDescription": {
-                                "text": "abandoned: Package is marked abandoned by its repository, or its repository is archived"
-                            },
-                            "fullDescription": {
-                                "text": "The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab."
-                            },
-                            "defaultConfiguration": {
-                                "level": "warning"
-                            },
-                            "helpUri": "https://lockrot.dev/verdicts/"
-                        },
-                        {
                             "id": "lockrot/silent",
                             "name": "silent",
                             "shortDescription": {
                                 "text": "silent: No stable release and no repository push for a long time"
                             },
                             "fullDescription": {
-                                "text": "No stable release for at least release-high-years (default 5 years) and no repository push for at least push-high-years (default 5 years); an archived repository is reported as abandoned instead."
+                                "text": "No stable release for release-high-years and no repository push for push-high-years."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"
                             },
-                            "helpUri": "https://lockrot.dev/verdicts/"
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/abandoned",
+                            "name": "abandoned",
+                            "shortDescription": {
+                                "text": "abandoned: Package is marked abandoned, or its repository is archived"
+                            },
+                            "fullDescription": {
+                                "text": "The package's registry or composer.lock marks it abandoned, or its repository is archived."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
                         },
                         {
                             "id": "lockrot/stale",
@@ -44,12 +54,17 @@
                                 "text": "stale: Old release or old push, below the silent thresholds"
                             },
                             "fullDescription": {
-                                "text": "Old release or old push, but not old enough \u2014 or not on both fronts \u2014 for silent."
+                                "text": "No stable release or no repository push for release-warn-years or push-warn-years."
                             },
                             "defaultConfiguration": {
                                 "level": "warning"
                             },
-                            "helpUri": "https://lockrot.dev/verdicts/"
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
                         },
                         {
                             "id": "lockrot/advisories-unchecked",
@@ -63,7 +78,12 @@
                             "defaultConfiguration": {
                                 "level": "note"
                             },
-                            "helpUri": "https://lockrot.dev/verdicts/"
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
                         }
                     ]
                 }
@@ -71,95 +91,85 @@
             "columnKind": "utf16CodeUnits",
             "results": [
                 {
-                    "ruleId": "lockrot/abandoned",
+                    "ruleId": "lockrot/silent",
                     "ruleIndex": 0,
                     "level": "error",
                     "rank": 100.0,
                     "message": {
-                        "text": "microsoft/azure-storage-blob 1.5.4: marked abandoned by its repository; repository archived on GitHub; last release 2022-09-02 (4.0 years ago); last push 2023-07-18 (3.2 years ago); pulls in 1 flagged package: microsoft/azure-storage-common (stale)"
+                        "text": "bantu/ini-get-wrapper v1.0.1 \u2014 finding critical, 32 = silent 32 \u2014 silent: last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago). Do: find a maintained alternative: nothing released for 12.0 years."
                     },
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "composer.lock"
-                                }
-                            }
-                        }
-                    ],
-                    "partialFingerprints": {
-                        "lockrot/package": "microsoft/azure-storage-blob"
-                    },
-                    "properties": {
-                        "package": "microsoft/azure-storage-blob",
-                        "version": "1.5.4",
-                        "verdict": "abandoned",
-                        "priority": "critical",
-                        "direct": true,
-                        "dev": false,
-                        "signals": [
-                            "S1",
-                            "S2",
-                            "S3",
-                            "S4",
-                            "S7"
-                        ],
-                        "chain": [
-                            "microsoft/azure-storage-blob"
-                        ],
-                        "direct_dependents": [
-                            "microsoft/azure-storage-blob"
-                        ],
-                        "data_date": "2026-09-14T18:52:05+00:00"
-                    }
-                },
-                {
-                    "ruleId": "lockrot/silent",
-                    "ruleIndex": 1,
-                    "level": "error",
-                    "rank": 100.0,
-                    "message": {
-                        "text": "bantu/ini-get-wrapper v1.0.1: last release 2014-09-15 (12.0 years ago); last push 2015-03-05 (11.5 years ago)"
-                    },
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "composer.lock"
-                                }
-                            }
-                        }
-                    ],
                     "partialFingerprints": {
                         "lockrot/package": "bantu/ini-get-wrapper"
                     },
                     "properties": {
                         "package": "bantu/ini-get-wrapper",
                         "version": "v1.0.1",
-                        "verdict": "silent",
+                        "verdict": "critical",
                         "priority": "critical",
+                        "lead": "silent",
+                        "score_total": 32,
+                        "score_text": "32 = silent 32",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "silent"
+                        ],
                         "direct": true,
                         "dev": false,
-                        "signals": [
-                            "S2",
-                            "S4"
+                        "data_date": "2026-09-14T18:51:44+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
                         ],
                         "chain": [
                             "bantu/ini-get-wrapper"
                         ],
+                        "depth": 0,
                         "direct_dependents": [
                             "bantu/ini-get-wrapper"
                         ],
-                        "data_date": "2026-09-14T18:51:44+00:00"
-                    }
-                },
-                {
-                    "ruleId": "lockrot/silent",
-                    "ruleIndex": 1,
-                    "level": "error",
-                    "rank": 75.0,
-                    "message": {
-                        "text": "pear/console_getopt v1.4.3: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)"
+                        "signal_ids": [
+                            "S2",
+                            "S4"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2014-09-15T13:12:35+00:00",
+                                "years": 12.0,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v1.0.1",
+                                "at": "2014-09-15T13:12:35+00:00",
+                                "years": 12.0,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.0.1",
+                                "at": "2014-09-15T13:12:35+00:00",
+                                "years": 12.0,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2015-03-05T19:23:44+00:00",
+                                "years": 11.5,
+                                "level": "high"
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "silent",
+                            "role": "lead",
+                            "weight": 32,
+                            "divisor": 1,
+                            "points": 32,
+                            "contribution": 32
+                        }
                     },
                     "locations": [
                         {
@@ -169,39 +179,184 @@
                                 }
                             }
                         }
-                    ],
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "microsoft/azure-storage-blob 1.5.4 \u2014 finding critical, 32 = abandoned 32 \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-09-02 (4.0 years ago); last push 2023-07-18 (3.2 years ago). Do: find a replacement (none named)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "microsoft/azure-storage-blob"
+                    },
+                    "properties": {
+                        "package": "microsoft/azure-storage-blob",
+                        "version": "1.5.4",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "abandoned",
+                        "score_total": 32,
+                        "score_text": "32 = abandoned 32",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "abandoned"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-09-14T18:52:05+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "microsoft/azure-storage-blob"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "microsoft/azure-storage-blob"
+                        ],
+                        "signal_ids": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4",
+                            "S7"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2022-09-02T02:13:06+00:00",
+                                "years": 4.0,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "1.5.4",
+                                "at": "2022-09-02T02:13:06+00:00",
+                                "years": 4.0,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "1.5.4",
+                                "at": "2022-09-02T02:13:06+00:00",
+                                "years": 4.0,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2023-07-18T15:44:10+00:00",
+                                "years": 3.2,
+                                "level": "warn"
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "abandoned",
+                            "role": "lead",
+                            "weight": 32,
+                            "divisor": 1,
+                            "points": 32,
+                            "contribution": 32
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "pear/console_getopt v1.4.3 \u2014 finding high, 16 = silent 32 \u00f7 2 transitive \u2014 silent: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago). Do: find a maintained alternative: nothing released for 6.8 years; it comes in through pear/archive_tar, pear/pear-core-minimal: replace or update them; the newest release of pear/pear-core-minimal (v1.10.18) still requires it."
+                    },
                     "partialFingerprints": {
                         "lockrot/package": "pear/console_getopt"
                     },
                     "properties": {
                         "package": "pear/console_getopt",
                         "version": "v1.4.3",
-                        "verdict": "silent",
+                        "verdict": "high",
                         "priority": "high",
+                        "lead": "silent",
+                        "score_total": 16,
+                        "score_text": "16 = silent 32 \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "silent"
+                        ],
                         "direct": false,
                         "dev": false,
-                        "signals": [
-                            "S2",
-                            "S4"
+                        "data_date": "2026-09-14T18:52:11+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
                         ],
                         "chain": [
                             "pear/pear-core-minimal",
                             "pear/console_getopt"
                         ],
+                        "depth": 1,
                         "direct_dependents": [
                             "pear/archive_tar",
                             "pear/pear-core-minimal"
                         ],
-                        "data_date": "2026-09-14T18:52:11+00:00"
-                    }
-                },
-                {
-                    "ruleId": "lockrot/stale",
-                    "ruleIndex": 2,
-                    "level": "warning",
-                    "rank": 50.0,
-                    "message": {
-                        "text": "deepdiver1975/tarstreamer v2.1.0: last release 2023-06-16 (3.2 years ago)"
+                        "signal_ids": [
+                            "S2",
+                            "S4"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2019-11-20T18:27:48+00:00",
+                                "years": 6.8,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v1.4.3",
+                                "at": "2019-11-20T18:27:48+00:00",
+                                "years": 6.8,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.4.3",
+                                "at": "2019-11-20T18:27:48+00:00",
+                                "years": 6.8,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2021-08-11T00:08:37+00:00",
+                                "years": 5.1,
+                                "level": "high"
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "silent",
+                            "role": "lead",
+                            "weight": 32,
+                            "divisor": 1,
+                            "points": 32,
+                            "contribution": 16
+                        }
                     },
                     "locations": [
                         {
@@ -211,36 +366,85 @@
                                 }
                             }
                         }
-                    ],
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "deepdiver1975/tarstreamer v2.1.0 \u2014 finding medium, 8 = stale 8 \u2014 stale: last release 2023-06-16 (3.2 years ago). Do: \u2014."
+                    },
                     "partialFingerprints": {
                         "lockrot/package": "deepdiver1975/tarstreamer"
                     },
                     "properties": {
                         "package": "deepdiver1975/tarstreamer",
                         "version": "v2.1.0",
-                        "verdict": "stale",
+                        "verdict": "medium",
                         "priority": "medium",
+                        "lead": "stale",
+                        "score_total": 8,
+                        "score_text": "8 = stale 8",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale"
+                        ],
                         "direct": true,
                         "dev": false,
-                        "signals": [
-                            "S2"
-                        ],
+                        "data_date": "2026-09-14T18:51:50+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
                         "chain": [
                             "deepdiver1975/tarstreamer"
                         ],
+                        "depth": 0,
                         "direct_dependents": [
                             "deepdiver1975/tarstreamer"
                         ],
-                        "data_date": "2026-09-14T18:51:50+00:00"
-                    }
-                },
-                {
-                    "ruleId": "lockrot/stale",
-                    "ruleIndex": 2,
-                    "level": "warning",
-                    "rank": 50.0,
-                    "message": {
-                        "text": "kornrunner/blurhash v1.2.2: last release 2022-07-13 (4.2 years ago)"
+                        "signal_ids": [
+                            "S2"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-06-16T08:01:55+00:00",
+                                "years": 3.2,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v2.1.0",
+                                "at": "2023-06-16T08:01:55+00:00",
+                                "years": 3.2,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v2.1.0",
+                                "at": "2023-06-16T08:01:55+00:00",
+                                "years": 3.2,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-11T10:06:25+00:00",
+                                "years": 0.0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 8
+                        }
                     },
                     "locations": [
                         {
@@ -250,28 +454,95 @@
                                 }
                             }
                         }
-                    ],
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "kornrunner/blurhash v1.2.2 \u2014 finding medium, 8 = stale 8 \u2014 stale: last release 2022-07-13 (4.2 years ago). Do: \u2014."
+                    },
                     "partialFingerprints": {
                         "lockrot/package": "kornrunner/blurhash"
                     },
                     "properties": {
                         "package": "kornrunner/blurhash",
                         "version": "v1.2.2",
-                        "verdict": "stale",
+                        "verdict": "medium",
                         "priority": "medium",
+                        "lead": "stale",
+                        "score_total": 8,
+                        "score_text": "8 = stale 8",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale"
+                        ],
                         "direct": true,
                         "dev": false,
-                        "signals": [
-                            "S2"
-                        ],
+                        "data_date": "2026-09-14T18:52:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
                         "chain": [
                             "kornrunner/blurhash"
                         ],
+                        "depth": 0,
                         "direct_dependents": [
                             "kornrunner/blurhash"
                         ],
-                        "data_date": "2026-09-14T18:52:00+00:00"
-                    }
+                        "signal_ids": [
+                            "S2"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2022-07-13T19:38:39+00:00",
+                                "years": 4.2,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v1.2.2",
+                                "at": "2022-07-13T19:38:39+00:00",
+                                "years": 4.2,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.2.2",
+                                "at": "2022-07-13T19:38:39+00:00",
+                                "years": 4.2,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-03-11T10:10:15+00:00",
+                                "years": 0.5,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
                 },
                 {
                     "ruleId": "lockrot/stale",
@@ -279,47 +550,78 @@
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
-                        "text": "mexitek/phpcolors v1.0.4: last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago)"
+                        "text": "mexitek/phpcolors v1.0.4 \u2014 finding medium, 8 = stale 8 \u2014 stale: last release 2021-11-26 (4.8 years ago); last push 2022-07-29 (4.1 years ago). Do: \u2014."
                     },
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "composer.lock"
-                                }
-                            }
-                        }
-                    ],
                     "partialFingerprints": {
                         "lockrot/package": "mexitek/phpcolors"
                     },
                     "properties": {
                         "package": "mexitek/phpcolors",
                         "version": "v1.0.4",
-                        "verdict": "stale",
+                        "verdict": "medium",
                         "priority": "medium",
+                        "lead": "stale",
+                        "score_total": 8,
+                        "score_text": "8 = stale 8",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale"
+                        ],
                         "direct": true,
                         "dev": false,
-                        "signals": [
-                            "S2",
-                            "S4"
-                        ],
+                        "data_date": "2026-09-14T18:52:03+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
                         "chain": [
                             "mexitek/phpcolors"
                         ],
+                        "depth": 0,
                         "direct_dependents": [
                             "mexitek/phpcolors"
                         ],
-                        "data_date": "2026-09-14T18:52:03+00:00"
-                    }
-                },
-                {
-                    "ruleId": "lockrot/stale",
-                    "ruleIndex": 2,
-                    "level": "warning",
-                    "rank": 25.0,
-                    "message": {
-                        "text": "cweagans/composer-configurable-plugin 2.0.0: last release 2023-02-12 (3.6 years ago)"
+                        "signal_ids": [
+                            "S2",
+                            "S4"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2021-11-26T13:19:08+00:00",
+                                "years": 4.8,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v1.0.4",
+                                "at": "2021-11-26T13:19:08+00:00",
+                                "years": 4.8,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.0.4",
+                                "at": "2021-11-26T13:19:08+00:00",
+                                "years": 4.8,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2022-07-29T10:53:35+00:00",
+                                "years": 4.1,
+                                "level": "warn"
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 8
+                        }
                     },
                     "locations": [
                         {
@@ -329,37 +631,86 @@
                                 }
                             }
                         }
-                    ],
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "cweagans/composer-configurable-plugin 2.0.0 \u2014 finding low, 4 = stale 8 \u00f7 2 transitive \u2014 stale: last release 2023-02-12 (3.6 years ago). Do: \u2014."
+                    },
                     "partialFingerprints": {
                         "lockrot/package": "cweagans/composer-configurable-plugin"
                     },
                     "properties": {
                         "package": "cweagans/composer-configurable-plugin",
                         "version": "2.0.0",
-                        "verdict": "stale",
+                        "verdict": "low",
                         "priority": "low",
+                        "lead": "stale",
+                        "score_total": 4,
+                        "score_text": "4 = stale 8 \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale"
+                        ],
                         "direct": false,
                         "dev": false,
-                        "signals": [
-                            "S2"
-                        ],
+                        "data_date": "2026-09-14T18:51:47+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
                         "chain": [
                             "cweagans/composer-patches",
                             "cweagans/composer-configurable-plugin"
                         ],
+                        "depth": 1,
                         "direct_dependents": [
                             "cweagans/composer-patches"
                         ],
-                        "data_date": "2026-09-14T18:51:47+00:00"
-                    }
-                },
-                {
-                    "ruleId": "lockrot/stale",
-                    "ruleIndex": 2,
-                    "level": "warning",
-                    "rank": 25.0,
-                    "message": {
-                        "text": "microsoft/azure-storage-common 1.5.2: last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago)"
+                        "signal_ids": [
+                            "S2"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-02-12T04:58:58+00:00",
+                                "years": 3.6,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "2.0.0",
+                                "at": "2023-02-12T04:58:58+00:00",
+                                "years": 3.6,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "2.0.0",
+                                "at": "2023-02-12T04:58:58+00:00",
+                                "years": 3.6,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2024-12-16T10:59:03+00:00",
+                                "years": 1.7,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 4
+                        }
                     },
                     "locations": [
                         {
@@ -369,38 +720,87 @@
                                 }
                             }
                         }
-                    ],
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "microsoft/azure-storage-common 1.5.2 \u2014 finding low, 4 = stale 8 \u00f7 2 transitive \u2014 stale: last release 2021-10-09 (4.9 years ago); last push 2023-07-18 (3.2 years ago). Do: \u2014."
+                    },
                     "partialFingerprints": {
                         "lockrot/package": "microsoft/azure-storage-common"
                     },
                     "properties": {
                         "package": "microsoft/azure-storage-common",
                         "version": "1.5.2",
-                        "verdict": "stale",
+                        "verdict": "low",
                         "priority": "low",
+                        "lead": "stale",
+                        "score_total": 4,
+                        "score_text": "4 = stale 8 \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale"
+                        ],
                         "direct": false,
                         "dev": false,
-                        "signals": [
-                            "S2",
-                            "S4"
-                        ],
+                        "data_date": "2026-09-14T18:52:06+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
                         "chain": [
                             "microsoft/azure-storage-blob",
                             "microsoft/azure-storage-common"
                         ],
+                        "depth": 1,
                         "direct_dependents": [
                             "microsoft/azure-storage-blob"
                         ],
-                        "data_date": "2026-09-14T18:52:06+00:00"
-                    }
-                },
-                {
-                    "ruleId": "lockrot/stale",
-                    "ruleIndex": 2,
-                    "level": "warning",
-                    "rank": 25.0,
-                    "message": {
-                        "text": "pear/pear_exception v1.0.2: last release 2021-03-21 (5.5 years ago)"
+                        "signal_ids": [
+                            "S2",
+                            "S4"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2021-10-09T03:03:47+00:00",
+                                "years": 4.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "1.5.2",
+                                "at": "2021-10-09T03:03:47+00:00",
+                                "years": 4.9,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "1.5.2",
+                                "at": "2021-10-09T03:03:47+00:00",
+                                "years": 4.9,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2023-07-18T15:44:02+00:00",
+                                "years": 3.2,
+                                "level": "warn"
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 4
+                        }
                     },
                     "locations": [
                         {
@@ -410,30 +810,97 @@
                                 }
                             }
                         }
-                    ],
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "pear/pear_exception v1.0.2 \u2014 finding low, 4 = stale 8 \u00f7 2 transitive \u2014 stale: last release 2021-03-21 (5.5 years ago). Do: \u2014."
+                    },
                     "partialFingerprints": {
                         "lockrot/package": "pear/pear_exception"
                     },
                     "properties": {
                         "package": "pear/pear_exception",
                         "version": "v1.0.2",
-                        "verdict": "stale",
+                        "verdict": "low",
                         "priority": "low",
+                        "lead": "stale",
+                        "score_total": 4,
+                        "score_text": "4 = stale 8 \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale"
+                        ],
                         "direct": false,
                         "dev": false,
-                        "signals": [
-                            "S2"
-                        ],
+                        "data_date": "2026-09-14T18:52:13+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
                         "chain": [
                             "pear/pear-core-minimal",
                             "pear/pear_exception"
                         ],
+                        "depth": 1,
                         "direct_dependents": [
                             "pear/archive_tar",
                             "pear/pear-core-minimal"
                         ],
-                        "data_date": "2026-09-14T18:52:13+00:00"
-                    }
+                        "signal_ids": [
+                            "S2"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2021-03-21T15:43:46+00:00",
+                                "years": 5.5,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v1.0.2",
+                                "at": "2021-03-21T15:43:46+00:00",
+                                "years": 5.5,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.0.2",
+                                "at": "2021-03-21T15:43:46+00:00",
+                                "years": 5.5,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-01-31T21:47:48+00:00",
+                                "years": 0.6,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 4
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
                 },
                 {
                     "ruleId": "lockrot/advisories-unchecked",
@@ -459,6 +926,47 @@
             "invocations": [
                 {
                     "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 3 findings fail it \u00b7 advisories not applied to 94 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 3,
+                            "failing": 3,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 3
+                                }
+                            ],
+                            "not_applied": [
+                                {
+                                    "check": "advisories",
+                                    "packages": 94,
+                                    "reason": "composer_too_old"
+                                }
+                            ],
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 3 findings fail it \u00b7 advisories not applied to 94 packages: not checked (Composer below 2.4) \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    },
                     "toolExecutionNotifications": [
                         {
                             "level": "note",
@@ -468,7 +976,22 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 0,
+                    "packages_not_asked": 94,
+                    "other_repositories": 0,
+                    "repositories": []
+                }
+            }
         }
     ]
 }

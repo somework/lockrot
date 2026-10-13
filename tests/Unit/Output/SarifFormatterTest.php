@@ -6,18 +6,26 @@ namespace Lockrot\Tests\Unit\Output;
 
 use JsonSchema\Validator;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
+use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\SarifFormatter;
+use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
+use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Support\TextGolden;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Version;
@@ -123,6 +131,19 @@ final class SarifFormatterTest extends TestCase
         self::assertTrue($validator->isValid(), implode("\n", $messages));
     }
 
+    /** In case either-critical‡ only the other move of symfony/debug clears its critical advisory. */
+    public function testAnAdvisoryThatOnlyAnOtherMoveClearsNamesThatMove(): void
+    {
+        $sarif = JsonPath::decoded(json_decode((new SarifFormatter(FormatContext::create(null, 'high')))->format(CaseHydrator::report(CaseHydrator::case('either-critical‡')), true), true));
+        $texts = [];
+        foreach (JsonPath::arrayAt($sarif, ['runs', 0, 'results']) as $result) {
+            self::assertIsArray($result);
+            $texts[JsonPath::stringAt($result, ['ruleId'])] = JsonPath::stringAt($result, ['message', 'text']);
+        }
+
+        self::assertStringContainsString('. Do: require symfony/debug ^4.4.0 — clears the advisory;', $texts['lockrot/advisory/PKSA-eith-0000-0001'] ?? '');
+    }
+
     public function testFlaggedReportIsValidSarif(): void
     {
         $this->assertValidSarif($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));
@@ -183,25 +204,6 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(['lockrot/abandoned', 'lockrot/abandoned', 'lockrot/silent'], JsonPath::column($run, ['results'], 'ruleId'));
     }
 
-    /**
-     * Rules follow the order the results first use them, which is the report's order, not
-     * Verdict::all(): `finished` and `ok` tie, so a direct `ok` package comes before a `finished`
-     * one. docs/compatibility.md says so. Changing it changes machine-readable output.
-     */
-    public function testRulesFollowTheOrderTheResultsFirstUseThem(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([
-            (new FindingBuilder())->withPackage('z/z')->withVerdict(Verdict::FINISHED)->withChain(['a/parent', 'z/z'])->withDataDate($at)->build(),
-            (new FindingBuilder())->withPackage('a/a')->withChain(['a/a'])->withDataDate($at)->build(),
-        ], [], $at, 2, 0);
-
-        $run = $this->singleRun($this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true));
-
-        self::assertSame(['lockrot/ok', 'lockrot/finished'], JsonPath::column($run, ['tool', 'driver', 'rules'], 'id'));
-        self::assertSame('note', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'defaultConfiguration', 'level']), 'a rule for a verdict that is never flagged defaults to note');
-        self::assertSame('note', JsonPath::stringAt($run, ['tool', 'driver', 'rules', 1, 'defaultConfiguration', 'level']));
-    }
 
     public function testLevelMappingAtTheFailOnBoundary(): void
     {
@@ -217,40 +219,6 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(['warning', 'warning', 'warning', 'note'], JsonPath::column($atNone, ['results'], 'level'));
     }
 
-    public function testResultLocationsRegionsAndProperties(): void
-    {
-        $lockPath = $this->lockPath();
-        $run = $this->singleRun($this->formatter(Verdict::SILENT, $lockPath)->format($this->report()));
-
-        self::assertSame('acme/abandoned 1.0.0: marked abandoned by its repository', JsonPath::stringAt($run, ['results', 0, 'message', 'text']));
-        self::assertSame('composer.lock', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uri']));
-        self::assertSame('%SRCROOT%', JsonPath::stringAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'artifactLocation', 'uriBaseId']));
-        self::assertSame(4, JsonPath::intAt($run, ['results', 0, 'locations', 0, 'physicalLocation', 'region', 'startLine']));
-        self::assertSame(8, JsonPath::intAt($run, ['results', 2, 'locations', 0, 'physicalLocation', 'region', 'startLine']));
-        self::assertSame(['lockrot/package' => 'acme/abandoned'], JsonPath::arrayAt($run, ['results', 0, 'partialFingerprints']));
-        self::assertSame([
-            'package' => 'acme/abandoned',
-            'version' => '1.0.0',
-            'verdict' => 'abandoned',
-            'priority' => 'critical',
-            'direct' => true,
-            'dev' => false,
-            'signals' => ['S1'],
-            'chain' => ['acme/abandoned'],
-            'direct_dependents' => [],
-            'data_date' => '2026-09-14T06:00:00+00:00',
-        ], JsonPath::arrayAt($run, ['results', 0, 'properties']));
-        self::assertSame(['S2', 'S4'], JsonPath::arrayAt($run, ['results', 2, 'properties', 'signals']));
-        self::assertSame(['a/parent', 'acme/silent'], JsonPath::arrayAt($run, ['results', 2, 'properties', 'chain']));
-
-        // acme/also-abandoned is not in the lock, so its location carries no region at all.
-        self::assertFalse(JsonPath::has($run, ['results', 1, 'locations', 0, 'physicalLocation', 'region']));
-
-        self::assertSame(
-            'file://'.rtrim(str_replace('\\', '/', \dirname($lockPath)), '/').'/',
-            JsonPath::stringAt($run, ['originalUriBaseIds', '%SRCROOT%', 'uri'])
-        );
-    }
 
     /**
      * A report whose five rows land on all five priorities: critical, high (transitive production),
@@ -270,25 +238,6 @@ final class SarifFormatterTest extends TestCase
         ], [], $at, 5, 0);
     }
 
-    /**
-     * SARIF 2.1.0 §3.27.20: `rank` is a number from 0.0 to 100.0. The five priority levels map onto
-     * it in even steps of 25, so a consumer that sorts by rank sees the same order the report does.
-     */
-    public function testResultRankFollowsThePriority(): void
-    {
-        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($this->priorityReport(), true);
-        $this->assertValidSarif($sarif);
-        $run = $this->singleRun($sarif);
-
-        self::assertSame(['acme/abandoned', 'acme/transitive', 'acme/dev-only', 'acme/stale', 'acme/fine'], self::propertyColumn($run, 'package'));
-        self::assertSame([100.0, 75.0, 50.0, 25.0, 0.0], JsonPath::column($run, ['results'], 'rank'));
-
-        // A whole number is still a JSON float here: SARIF types rank as a number, and an integer
-        // 100 reads as a different type to a strict consumer.
-        self::assertStringContainsString('"rank": 100.0', $sarif);
-        self::assertStringContainsString('"rank": 75.0', $sarif);
-        self::assertStringContainsString('"rank": 0.0', $sarif);
-    }
 
     public function testPriorityDirectAndDevAreCarriedAsResultProperties(): void
     {
@@ -426,23 +375,12 @@ final class SarifFormatterTest extends TestCase
         }
     }
 
-    public function testEveryVerdictProducesAValidDocumentWithItsOwnRule(): void
-    {
-        $sarif = $this->formatter(Verdict::STALE, $this->lockPath())->format($this->allVerdictsReport(), true);
-        $this->assertValidSarif($sarif);
-
-        $expected = [];
-        foreach (Verdict::all() as $verdict) {
-            $expected[] = 'lockrot/'.$verdict;
-        }
-        self::assertSame($expected, JsonPath::column($this->singleRun($sarif), ['tool', 'driver', 'rules'], 'id'));
-    }
 
     private function allVerdictsReport(): Report
     {
         $at = new \DateTimeImmutable(self::AT);
         $findings = [];
-        foreach (Verdict::all() as $index => $verdict) {
+        foreach ([Verdict::ABANDONED, Verdict::SILENT, Verdict::PINNED, Verdict::LEFT_BEHIND, Verdict::OLD_PROMISE, Verdict::STALE, Verdict::UNKNOWN, Verdict::FINISHED, Verdict::OK] as $index => $verdict) {
             $findings[] = (new FindingBuilder())->withPackage('acme/pkg'.$index)->withVersion('1.0.'.$index)->withVerdict($verdict)->withSignals([new Signal('warn', 'last release 2015-11-16', SignalDataStub::of('S2', []))])->withChain(['acme/pkg'.$index])->withDataDate($at)->build();
         }
 
@@ -476,21 +414,6 @@ final class SarifFormatterTest extends TestCase
         return $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
     }
 
-    public function testBaselineStatusIsCarriedAsAResultProperty(): void
-    {
-        $run = $this->singleRun($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->baselinedReport()));
-        $statuses = [];
-        foreach (JsonPath::arrayAt($run, ['results']) as $result) {
-            self::assertIsArray($result);
-            $statuses[JsonPath::stringAt($result, ['properties', 'package'])] = JsonPath::stringAt($result, ['properties', 'baseline']);
-        }
-
-        self::assertSame([
-            'acme/abandoned' => 'known',
-            'acme/also-abandoned' => 'new',
-            'acme/silent' => 'worsened',
-        ], $statuses);
-    }
 
     public function testABaselinedResultIsReportedAtNoteLevel(): void
     {
@@ -506,6 +429,36 @@ final class SarifFormatterTest extends TestCase
             'acme/also-abandoned' => FormatContext::LEVEL_ERROR,
             'acme/silent' => FormatContext::LEVEL_ERROR,
         ], $levels);
+    }
+
+    public function testTheAdvisoryResultThatDecidesTheScoreIsTheOneMarkedDeciding(): void
+    {
+        $deciding = [];
+        foreach (JsonPath::arrayAt($this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite())), ['results']) as $result) {
+            self::assertIsArray($result);
+            if (JsonPath::arrayAt($result, ['properties'])['deciding'] ?? false) {
+                $deciding[] = JsonPath::stringAt($result, ['properties', 'package']).' '.JsonPath::stringAt($result, ['properties', 'advisory']).' '.JsonPath::stringAt($result, ['properties', 'severity']);
+            }
+        }
+
+        self::assertContains('twig/twig PKSA-h8hf-ytnd-5t9q critical', $deciding);
+        self::assertSame(\count($deciding), \count(array_unique(array_map(static fn (string $row): string => explode(' ', $row)[0], $deciding))), 'one deciding advisory per package');
+    }
+
+    public function testOnlyAResultWhoseFactTheBaselineKnowsCarriesTheSuppressionThatNamesTheFileAndTheDate(): void
+    {
+        $run = $this->singleRun($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->baselinedReport()));
+        $suppressions = [];
+        foreach (JsonPath::arrayAt($run, ['results']) as $result) {
+            self::assertIsArray($result);
+            $suppressions[JsonPath::stringAt($result, ['properties', 'package'])] = $result['suppressions'] ?? null;
+        }
+
+        self::assertSame([
+            'acme/abandoned' => [['kind' => 'external', 'status' => 'accepted', 'justification' => 'covered by lockrot-baseline.json (known since 2026-01-15)']],
+            'acme/also-abandoned' => null,
+            'acme/silent' => null,
+        ], $suppressions);
     }
 
     public function testABaselinedReportIsStillValidSarif(): void
@@ -567,45 +520,8 @@ final class SarifFormatterTest extends TestCase
         self::assertSame(['a/parent', 'b/parent'], JsonPath::arrayAt($this->singleRun($sarif), ['results', 0, 'properties', 'direct_dependents']));
     }
 
-    public function testS7RidesInTheMessageAndTheSignalListLikeAnyOtherSignal(): void
-    {
-        $at = new \DateTimeImmutable('2026-09-14T06:00:00+00:00');
-        $report = new Report([
-            (new FindingBuilder())->withPackage('acme/root')->withVerdict(Verdict::STALE)->withSignals([new Signal('warn', 'old', SignalDataStub::of('S2', [])), new Signal(Signal::LEVEL_INFO, 'pulls in 1 flagged package: acme/leaf (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 1, 'packages' => []]))])->withChain(['acme/root'])->withDataDate($at)->withDirectDependents(['acme/root'])->build(),
-        ], [], $at, 1, 0);
-        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report);
-        $this->assertValidSarif($sarif);
-        $run = $this->singleRun($sarif);
 
-        self::assertSame('acme/root 1.0.0: old; pulls in 1 flagged package: acme/leaf (stale)', JsonPath::stringAt($run, ['results', 0, 'message', 'text']));
-        self::assertSame(['S2', 'S7'], JsonPath::arrayAt($run, ['results', 0, 'properties', 'signals']));
-        self::assertSame('lockrot/stale', JsonPath::stringAt($run, ['results', 0, 'ruleId']));
-    }
 
-    public function testARuleDescribesItsVerdictInOneLine(): void
-    {
-        $run = $this->singleRun($this->formatter(Verdict::SILENT, null)->format($this->report()));
-
-        self::assertSame(
-            'abandoned: Package is marked abandoned by its repository, or its repository is archived',
-            JsonPath::stringAt($run, ['tool', 'driver', 'rules', 0, 'shortDescription', 'text'])
-        );
-    }
-
-    /** Every result needs a rule for the document to validate, whatever verdict a finding carries. */
-    public function testAVerdictWithoutADescriptionStillGetsAValidRule(): void
-    {
-        $at = new \DateTimeImmutable(self::AT);
-        $report = new Report([(new FindingBuilder())->withPackage('acme/odd')->withVerdict('unheard-of')->withChain(['acme/odd'])->withDataDate($at)->build()], [], $at, 1, 0);
-
-        $sarif = $this->formatter(LockrotConfig::FAIL_ON_NONE, null)->format($report, true);
-
-        $this->assertValidSarif($sarif);
-        $rule = JsonPath::arrayAt($this->singleRun($sarif), ['tool', 'driver', 'rules', 0]);
-        self::assertSame('lockrot/unheard-of', $rule['id']);
-        self::assertSame(['text' => 'unheard-of: Dependency rot'], $rule['shortDescription']);
-        self::assertSame(['text' => 'A lockrot verdict.'], $rule['fullDescription']);
-    }
 
     /**
      * A backslash is a legal character in a POSIX directory name. lockrot reads it as the separator
@@ -659,6 +575,61 @@ final class SarifFormatterTest extends TestCase
         self::assertArrayNotHasKey('lockrot/unchecked', array_column(JsonPath::arrayAt($this->singleRun($this->formatter('high', null)->format(self::uncheckedReport())), ['results']), 'level', 'ruleId'));
     }
 
+    public function testUnderAllAScoreZeroFindingWithS10KeepsItsWordResultBesideItsUncheckedResult(): void
+    {
+        $records = function (string $failOn): array {
+            $out = [];
+            foreach (JsonPath::arrayAt($this->singleRun($this->formatter($failOn, null)->format(self::uncheckedReport(), true)), ['results']) as $result) {
+                self::assertIsArray($result);
+                if ($result['ruleId'] === 'lockrot/advisories-unchecked') {
+                    continue;
+                }
+                $out[] = JsonPath::stringAt($result, ['properties', 'package']).' '.JsonPath::stringAt($result, ['ruleId']).' '.JsonPath::stringAt($result, ['level']);
+            }
+
+            return $out;
+        };
+
+        self::assertSame(['acme/offline lockrot/ok note', 'acme/offline lockrot/unchecked error', 'acme/vcs lockrot/ok note'], $records('unchecked'));
+        self::assertSame(['acme/offline lockrot/ok note', 'acme/offline lockrot/unchecked note', 'acme/vcs lockrot/ok note'], $records('high'));
+    }
+
+    public function testUnderAllAScoreZeroPackagesFirstRecordAloneCarriesItsChain(): void
+    {
+        $keys = [];
+        foreach (JsonPath::arrayAt($this->singleRun($this->formatter('unchecked', null)->format(self::uncheckedReport(), true)), ['results']) as $result) {
+            self::assertIsArray($result);
+            if (JsonPath::stringAt($result, ['ruleId']) !== 'lockrot/advisories-unchecked' && JsonPath::stringAt($result, ['properties', 'package']) === 'acme/offline') {
+                $keys[JsonPath::stringAt($result, ['ruleId'])] = [\array_key_exists('chain', JsonPath::arrayAt($result, ['properties'])), JsonPath::arrayAt($result, ['properties', 'error_by'])];
+            }
+        }
+
+        self::assertSame(['lockrot/ok' => [true, []], 'lockrot/unchecked' => [false, ['unchecked']]], $keys);
+    }
+
+    public function testAGenerateRunWritesExitCodeZeroWhateverTheFindings(): void
+    {
+        $settings = static fn (string $mode): RunSettings => new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null, null, false, $mode);
+        $check = $this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite()->withRun($settings(Gate::MODE_CHECK))));
+        $generate = $this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite()->withRun($settings(Gate::MODE_GENERATE_BASELINE))));
+
+        self::assertSame(1, JsonPath::intAt($check, ['invocations', 0, 'exitCode']));
+        self::assertSame(0, JsonPath::intAt($generate, ['invocations', 0, 'exitCode']));
+    }
+
+    public function testTheRunLevelRuleIsDescribedAndAFailedRepositoryIsANotification(): void
+    {
+        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [
+            AdvisoryRepository::of('composer repo (https://repo.packagist.org)', AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT, 'timeout'),
+            AdvisoryRepository::of('composer repo (https://repo.example.test)', AdvisoryRepository::NOT_ASKED, AdvisoryCoverage::OFFLINE),
+        ], 0, []);
+        $report = new Report([FindingBuilder::advisoriesUnchecked('acme/offline', 'offline', true)], [], new \DateTimeImmutable(self::AT), 1, 0, null, null, false, $coverage);
+        $run = $this->singleRun($this->formatter('unchecked', null)->format($report));
+
+        self::assertContains('lockrot/advisories-unchecked', array_column(JsonPath::arrayAt($run, ['tool', 'driver', 'rules']), 'id'));
+        self::assertSame([['level' => 'warning', 'message' => ['text' => 'packagist.org lookup failed (network error: timeout)']]], JsonPath::arrayAt($run, ['invocations', 0, 'toolExecutionNotifications']));
+    }
+
     /** @return array<mixed, mixed> the run-level result, or [] when the run has none */
     private function runLevel(string $sarif): array
     {
@@ -685,5 +656,102 @@ final class SarifFormatterTest extends TestCase
     private static function skippedReport(): Report
     {
         return new Report([FindingBuilder::advisoriesUnchecked('acme/vcs', 'not_from_composer_repository', false)], [], new \DateTimeImmutable(self::AT), 1, 0);
+    }
+
+    public function testTheCompositeRendersAsItsGolden(): void
+    {
+        TextGolden::assertMatches('composite.sarif.sarif', $this->formatter('high', null)->format(CaseHydrator::composite()), __METHOD__);
+    }
+
+    public function testEachCountedFlagAndEachCountedAdvisoryGetsItsResult(): void
+    {
+        $report = CaseHydrator::composite();
+        $sarif = $this->formatter('high', null)->format($report);
+        $this->assertValidSarif($sarif);
+        $actual = [];
+        foreach (JsonPath::arrayAt($this->singleRun($sarif), ['results']) as $result) {
+            self::assertIsArray($result);
+            $actual[JsonPath::stringAt($result, ['properties', 'package'])][] = JsonPath::stringAt($result, ['ruleId']);
+        }
+        $expected = [];
+        foreach ($report->graded() as $finding) {
+            foreach ($finding->scoreBasis()->maintenanceTerms() as $term) {
+                $expected[$finding->package()][] = 'lockrot/'.$term->flag();
+            }
+            $s9 = $finding->signalData(AdvisoryData::class);
+            foreach ($s9 === null ? [] : $s9->rows() as $row) {
+                $expected[$finding->package()][] = 'lockrot/advisory/'.$row->id();
+            }
+        }
+
+        self::assertNotSame([], $expected);
+        self::assertSame($expected, $actual, 'one result per counted maintenance term and per counted S9 row, and no other');
+    }
+
+    public function testAMaintenanceResultRanksByItsOwnContributionAndAnAdvisoryBySeverity(): void
+    {
+        $run = $this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite()));
+        $ranks = [];
+        foreach (JsonPath::arrayAt($run, ['results']) as $result) {
+            self::assertIsArray($result);
+            $ranks[JsonPath::stringAt($result, ['properties', 'package']).' '.JsonPath::stringAt($result, ['ruleId'])] = $result['rank'] ?? null;
+        }
+
+        self::assertSame(75.0, $ranks['symfony/monolog-bridge lockrot/left-behind']);
+        self::assertSame(25.0, $ranks['symfony/monolog-bridge lockrot/old-promise']);
+        self::assertSame(80.0, $ranks['symfony/monolog-bridge lockrot/advisory/PKSA-4wjj-gy1p-ft3r']);
+        self::assertSame(100.0, $ranks['symfony/debug lockrot/abandoned']);
+    }
+
+    public function testOnlyTheFirstResultOfEachKindCarriesTheChainDepthAndAge(): void
+    {
+        $run = $this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite()));
+        $kinds = [];
+        foreach (JsonPath::arrayAt($run, ['results']) as $result) {
+            self::assertIsArray($result);
+            $properties = JsonPath::arrayAt($result, ['properties']);
+            $kind = JsonPath::stringAt($properties, ['package']).(strpos(JsonPath::stringAt($result, ['ruleId']), 'lockrot/advisory/') === 0 ? ' advisory' : ' maintenance');
+            self::assertSame(!isset($kinds[$kind]), \array_key_exists('age', $properties), $kind);
+            self::assertSame(!isset($kinds[$kind]), \array_key_exists('depth', $properties), $kind);
+            self::assertArrayNotHasKey('baseline', $properties);
+            $kinds[$kind] = true;
+        }
+    }
+
+    public function testTheInvocationCarriesTheGateExitCodeAndItsLine(): void
+    {
+        $failing = JsonPath::arrayAt($this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite())), ['invocations', 0]);
+        $passing = JsonPath::arrayAt($this->singleRun($this->formatter('none', null)->format(CaseHydrator::composite()->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null)))), ['invocations', 0]);
+
+        self::assertTrue($failing['executionSuccessful']);
+        self::assertSame(1, $failing['exitCode']);
+        self::assertSame('gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)', $failing['exitCodeDescription']);
+        self::assertSame('high', JsonPath::stringAt($failing, ['properties', 'fail_on']));
+        self::assertTrue(JsonPath::arrayAt($failing, ['properties', 'gate'])['fails']);
+        self::assertSame(0, $passing['exitCode']);
+        self::assertSame('gate: off · --fail-on=none (default) · target php 8.4 (--target-php)', $passing['exitCodeDescription']);
+    }
+
+    public function testTheRunNamesTheSchemaAndTheGrammars(): void
+    {
+        $properties = JsonPath::arrayAt($this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite())), ['properties']);
+
+        self::assertSame(2, $properties['lockrot_schema']);
+        self::assertSame(1, $properties['score_text_grammar']);
+        self::assertSame(1, $properties['score_model_id']);
+        self::assertSame(7, JsonPath::arrayAt($properties, ['advisory_lookup'])['packages_asked']);
+    }
+
+    public function testAnAdvisoryRuleCarriesItsSecuritySeverity(): void
+    {
+        $rules = JsonPath::arrayAt($this->singleRun($this->formatter('high', null)->format(CaseHydrator::composite())), ['tool', 'driver', 'rules']);
+        $byId = [];
+        foreach ($rules as $rule) {
+            self::assertIsArray($rule);
+            $byId[JsonPath::stringAt($rule, ['id'])] = $rule;
+        }
+
+        self::assertSame('8.0', JsonPath::stringAt($byId['lockrot/advisory/PKSA-4wjj-gy1p-ft3r'], ['properties', 'security-severity']));
+        self::assertSame(['maintainability'], JsonPath::arrayAt($byId['lockrot/left-behind'], ['properties', 'tags']));
     }
 }

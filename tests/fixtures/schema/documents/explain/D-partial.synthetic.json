@@ -1139,14 +1139,6 @@
    ]
   }
  },
- "legacy": {
-  "verdict": "finished",
-  "priority": "none",
-  "basis": {
-   "base": "none",
-   "steps": []
-  }
- },
  "generated_at": "2026-10-01T17:40:04+00:00",
  "notes": [],
  "note_details": []
