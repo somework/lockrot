@@ -177,6 +177,15 @@ final class UnknownKeysTest extends TestCase
         );
     }
 
+    /** A misspelt `expires` would be a silent permanent acceptance: it warns with the nearest key. */
+    public function testAnAcceptUncheckedEntryKeyIsComparedWithItsKeys(): void
+    {
+        self::assertSame(
+            ['unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you mean expires?)'],
+            UnknownKeys::warnings(['accept-unchecked' => [['check' => 'advisories', 'host' => 'example.org', 'reason' => 'r', 'expire' => '2026-12-31']]])
+        );
+    }
+
     public function testAnIgnoreEntryKeyIsComparedWithTheIgnoreEntryKeys(): void
     {
         self::assertSame(

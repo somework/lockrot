@@ -157,6 +157,12 @@ final class LockrotConfigTest extends TestCase
         LockrotConfig::fromSources(['install-time' => 'summary'], [], [], '8.5.10', null);
     }
 
+    public function testAFailOnListFromTheConfigIsReadAndAnEmptyOneIsTheDefault(): void
+    {
+        self::assertSame('left-behind,vulnerable-high', LockrotConfig::fromSources(['fail-on' => ['vulnerable-high', 'left-behind']], [], [], '8.5.10', null)->failOn()->value());
+        self::assertSame(LockrotConfig::fromSources([], [], [], '8.5.10', null)->failOn()->value(), LockrotConfig::fromSources(['fail-on' => []], [], [], '8.5.10', null)->failOn()->value());
+    }
+
     public function testPlatformPhpBeatsRuntime(): void
     {
         self::assertSame('8.1', LockrotConfig::fromSources([], [], [], '8.5.10', '8.1.0')->targetPhp());

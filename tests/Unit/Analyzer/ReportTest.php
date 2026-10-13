@@ -20,9 +20,11 @@ use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -39,6 +41,43 @@ final class ReportTest extends TestCase
     private function transitive(string $package, string $verdict, bool $dev = false): Finding
     {
         return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain(['vendor/root', $package])->withDev($dev)->build();
+    }
+
+    /** A left-behind finding whose only counted flag is stale: 0.13 placed it high, the score reads medium. */
+    private function demoted(string $package): Finding
+    {
+        return (new FindingBuilder())->withPackage($package)->withVerdict(Verdict::LEFT_BEHIND)->withChain([$package])
+            ->withFlags(FlagSet::fromSignals(ScoreSweep::signalsOf('stale'), null, []))->build();
+    }
+
+    public function testTheVerdictRulesNoteListsItsFindingsByPackage(): void
+    {
+        $report = $this->report($this->demoted('z/last'), $this->demoted('a/first'))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::VERDICT_RULES_CHANGED));
+
+        self::assertCount(1, $notes);
+        self::assertSame(['a/first', 'z/last'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['findings'], 'package'));
+    }
+
+    public function testARunWithoutAGateValueNeverTripsOnAFailedLookup(): void
+    {
+        $report = new Report([$this->finding('a/b', Verdict::STALE)], [RunNote::metadataUnavailable(['vendor/x' => 'HTTP 503'])], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 1, 0);
+        $written = JsonPath::decoded($report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray());
+
+        self::assertFalse(JsonPath::boolAt($written, ['gate', 'fails']));
+    }
+
+    public function testTheBaselineNotesJoinTheRunNotes(): void
+    {
+        $report = new Report([$this->finding('a/b', Verdict::STALE)], [RunNote::offline()], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 1, 0);
+        $baseline = Baseline::of([BaselineEntries::of('a/b', '1.0.0', 'stale', '2026-01-01')], '2026-01-01T00:00:00+00:00', '7.1', 'option');
+        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/b']));
+
+        $codes = array_map(static fn (RunNote $note): string => $note->code(), $compared->runNotes());
+
+        self::assertContains(RunNote::OFFLINE, $codes);
+        self::assertContains(RunNote::BASELINE_TARGET_DIFFERS, $codes);
     }
 
     private function report(Finding ...$findings): Report

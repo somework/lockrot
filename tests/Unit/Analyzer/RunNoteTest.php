@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Analyzer;
 
 use Composer\Downloader\TransportException;
+use Lockrot\Analyzer\ChangedVerdict;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\UncoveredAdvisories;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
+use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -248,6 +250,33 @@ final class RunNoteTest extends TestCase
             "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision",
             false,
             ['entries' => [['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['A1', 'A2', 'A3']]]],
+        ];
+        yield 'an ignore[] pattern that is the package, beside one advisory' => [
+            static fn (): RunNote => RunNote::ignoreDoesNotCoverAdvisories([new UncoveredAdvisories('acme/one', 'acme/one', ['A1'])]),
+            'ignore_does_not_cover_advisories',
+            "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: acme/one: 1 counted advisory; accept them in Composer's audit policy if that is the decision",
+            false,
+            ['entries' => [['package' => 'acme/one', 'pattern' => 'acme/one', 'advisories' => ['A1']]]],
+        ];
+        yield 'one finding that 0.13 raised for an unfixed advisory' => [
+            static fn (): RunNote => RunNote::verdictRulesChanged('high', [new ChangedVerdict('symfony/yaml', 'v3.4.47', 'left-behind', PriorityBasis013::startingAt('high')->withStep('no_fix_expected', 'critical'), 'medium', 14, '14 = left-behind 12 + vulnerable 2')]),
+            'verdict_rules_changed',
+            "1 finding reached --fail-on=high under 0.13's rules and does not reach it under 0.14's: symfony/yaml v3.4.47 (14 = left-behind 12 + vulnerable 2). 0.13 raised each one for any advisory not fixed on its branch; in 0.14 an advisory adds its own severity.",
+            false,
+            ['fail_on' => 'high', 'findings' => [['package' => 'symfony/yaml', 'version' => 'v3.4.47', 'legacy' => ['verdict' => 'left-behind', 'priority' => 'critical', 'basis' => ['base' => 'high', 'steps' => [['reason' => 'no_fix_expected', 'from' => 'high', 'to' => 'critical']]]], 'verdict' => 'medium', 'score_total' => 14, 'score_text' => '14 = left-behind 12 + vulnerable 2']]],
+        ];
+        yield 'two findings, each step reason worded once' => [
+            static fn (): RunNote => RunNote::verdictRulesChanged('critical', [
+                new ChangedVerdict('a/one', '1.0.0', 'stale', PriorityBasis013::startingAt('critical')->withStep('dev', 'high'), 'low', 4, '4 = stale 4'),
+                new ChangedVerdict('b/two', '2.0.0', 'stale', PriorityBasis013::startingAt('critical')->withStep('dev', 'high')->withStep('some_step', 'medium'), 'low', 4, '4 = stale 4'),
+            ]),
+            'verdict_rules_changed',
+            "2 findings reached --fail-on=critical under 0.13's rules and do not reach it under 0.14's: a/one 1.0.0 (4 = stale 4), b/two 2.0.0 (4 = stale 4). 0.13 lowered a packages-dev package one step; model 1 halves its whole score. some step.",
+            false,
+            ['fail_on' => 'critical', 'findings' => [
+                ['package' => 'a/one', 'version' => '1.0.0', 'legacy' => ['verdict' => 'stale', 'priority' => 'high', 'basis' => ['base' => 'critical', 'steps' => [['reason' => 'dev', 'from' => 'critical', 'to' => 'high']]]], 'verdict' => 'low', 'score_total' => 4, 'score_text' => '4 = stale 4'],
+                ['package' => 'b/two', 'version' => '2.0.0', 'legacy' => ['verdict' => 'stale', 'priority' => 'medium', 'basis' => ['base' => 'critical', 'steps' => [['reason' => 'dev', 'from' => 'critical', 'to' => 'high'], ['reason' => 'some_step', 'from' => 'high', 'to' => 'medium']]]], 'verdict' => 'low', 'score_total' => 4, 'score_text' => '4 = stale 4'],
+            ]],
         ];
         yield 'markings that Composer\'s list ignores' => [
             static fn (): RunNote => RunNote::abandonedMarkingsIgnored('policy.abandoned', ['doctrine/cache' => ['doctrine/*']]),

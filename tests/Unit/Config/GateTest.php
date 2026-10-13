@@ -21,6 +21,7 @@ use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
@@ -134,7 +135,7 @@ final class GateTest extends TestCase
     {
         $offline = FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true);
         $skipped = FindingBuilder::advisoriesUnchecked('a/skipped', 'not_from_composer_repository', false);
-        $report = self::report($offline, $skipped);
+        $report = self::report($offline, $skipped, self::vulnerable('a/checked', ['stale'], []));
 
         self::assertSame([['check' => 'advisories', 'packages' => 1, 'reason' => 'not_from_composer_repository'], ['check' => 'advisories', 'packages' => 1, 'reason' => 'offline']], JsonPath::decoded(self::gate($report, 'high')->notAppliedEntries()));
         self::assertSame([['check' => 'advisories', 'packages' => 1, 'reason' => 'not_from_composer_repository']], JsonPath::decoded(self::gate($report, 'high,unchecked')->notAppliedEntries()), 'an S10 reason fails closed on unchecked');
@@ -148,6 +149,80 @@ final class GateTest extends TestCase
         $this->expectExceptionMessage('"pull_request"');
 
         Gate::decide(self::report(), FailOn::none(), false, 'pull_request');
+    }
+
+    /** A finding whose flags are its maintenance flags and whose counted advisories have these severities. */
+    private static function vulnerable(string $package, array $flags, array $severities): Finding
+    {
+        $signals = [];
+        foreach ($flags as $flag) {
+            $signals = array_merge($signals, ScoreSweep::signalsOf($flag));
+        }
+        $counted = [];
+        foreach ($severities as $i => $severity) {
+            $counted[] = new CountedAdvisory('A'.$i, $severity, 'update');
+        }
+
+        return (new FindingBuilder())->withPackage($package)->withChain([$package])->withFlags(FlagSet::fromSignals($signals, null, $counted))->build();
+    }
+
+    /** @return array{bool, bool, ?string} the standing's reaches_fail_on, fails and exempt_by */
+    private static function standing(Gate $gate, string $package): array
+    {
+        $standing = $gate->standingOf($package);
+        self::assertNotNull($standing);
+
+        return [$standing->reachesFailOn(), $standing->fails(), $standing->exemptBy()];
+    }
+
+    public function testAVulnerableValueReadsTheRawSeverityOfACountedAdvisory(): void
+    {
+        $report = self::report(self::vulnerable('a/high', [], ['high']), self::vulnerable('a/medium', [], ['medium']), self::vulnerable('a/none', ['stale'], []));
+        $gate = self::gate($report, 'vulnerable-high');
+
+        self::assertSame([true, true, null], self::standing($gate, 'a/high'));
+        self::assertSame([false, false, null], self::standing($gate, 'a/medium'));
+        self::assertSame([false, false, null], self::standing($gate, 'a/none'), 'no counted advisory reaches no vulnerable value');
+        self::assertSame([false, false, null], self::standing(self::gate($report, 'vulnerable'), 'a/none'));
+    }
+
+    public function testAGradeValueIsReachedAtItsFloorExactly(): void
+    {
+        $report = self::report(self::vulnerable('a/sixteen', ['left-behind'], []), self::vulnerable('a/eight', ['stale'], []));
+
+        self::assertSame(16, self::vulnerable('a/sixteen', ['left-behind'], [])->score()->total(), 'the floor of high');
+        self::assertSame([true, true, null], self::standing(self::gate($report, 'high'), 'a/sixteen'));
+        self::assertSame([false, false, null], self::standing(self::gate($report, 'high'), 'a/eight'));
+    }
+
+    public function testAFlagValueIsNotReachedByAFlagBelowIt(): void
+    {
+        $report = self::report(self::vulnerable('a/stale', ['stale'], []));
+
+        self::assertSame([false, false, null], self::standing(self::gate($report, 'left-behind'), 'a/stale'));
+        self::assertSame([true, true, null], self::standing(self::gate($report, 'stale'), 'a/stale'));
+    }
+
+    /** Only a reaching finding under an entry is exempt: one that does not reach, or has no entry, is not. */
+    public function testOnlyAReachingFindingUnderAnEntryIsExempt(): void
+    {
+        $report = self::report(self::vulnerable('a/known', ['left-behind'], []), self::vulnerable('a/quiet', ['stale'], []), self::vulnerable('a/new', ['left-behind'], []));
+        $baseline = BaselineEntries::baseline([BaselineEntries::of('a/known', '1.0.0', 'left-behind', '2026-01-01'), BaselineEntries::of('a/quiet', '1.0.0', 'stale', '2026-01-01')]);
+        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'b.json', ['a/known', 'a/quiet', 'a/new']));
+        $gate = self::gate($compared, 'high');
+
+        self::assertSame([true, false, 'baseline'], self::standing($gate, 'a/known'));
+        self::assertSame([false, false, null], self::standing($gate, 'a/quiet'));
+        self::assertSame([true, true, null], self::standing($gate, 'a/new'));
+    }
+
+    public function testAFindingWithoutS10DoesNotReachUnchecked(): void
+    {
+        $report = self::report(self::vulnerable('a/stale', ['stale'], []), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
+        $gate = self::gate($report, 'unchecked');
+
+        self::assertSame([false, false, null], self::standing($gate, 'a/stale'));
+        self::assertSame([true, true, null], self::standing($gate, 'a/offline'));
     }
 
     private static function gate(Report $report, string $failOn): Gate
