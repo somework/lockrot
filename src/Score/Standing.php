@@ -28,6 +28,7 @@ final class Standing implements \JsonSerializable
     private const LOST = ['blocked', 'none'];
 
     private ?BaselineEntry $entry;
+    // Set only with an entry: read them only where $entry is not null.
     private string $recordedTargetPhp;
     private int $recordedFixModel;
     /** @var array<string, FactState> by flag */
@@ -43,11 +44,9 @@ final class Standing implements \JsonSerializable
     /** @var list<CountedAdvisory> */
     private array $unknown = [];
 
-    private function __construct(?BaselineEntry $entry, string $recordedTargetPhp, int $recordedFixModel)
+    private function __construct(?BaselineEntry $entry)
     {
         $this->entry = $entry;
-        $this->recordedTargetPhp = $recordedTargetPhp;
-        $this->recordedFixModel = $recordedFixModel;
     }
 
     /**
@@ -58,7 +57,7 @@ final class Standing implements \JsonSerializable
      */
     public static function newPackage(array $counted, array $advisories): self
     {
-        $standing = new self(null, '', 0);
+        $standing = new self(null);
         foreach ($counted as $flag) {
             $standing->flags[$flag] = new FactState(FactState::NEW_FACT, null, null);
             $standing->worsenedBy[] = WorsenedFact::flag($flag);
@@ -66,7 +65,7 @@ final class Standing implements \JsonSerializable
         $standing->uncovered = $counted;
         foreach (self::ordered($advisories) as $advisory) {
             $standing->advisories[$advisory->id()] = new FactState(FactState::NEW_FACT, null, null);
-            $standing->worsenedBy[] = WorsenedFact::advisory($advisory, FactState::NEW_FACT, null, null);
+            $standing->worsenedBy[] = WorsenedFact::advisory($advisory, FactState::NEW_FACT, null);
             $standing->unknown[] = $advisory;
             ++$standing->advisoriesNow['new'];
         }
@@ -83,14 +82,16 @@ final class Standing implements \JsonSerializable
      */
     public static function against(BaselineEntry $entry, string $recordedTargetPhp, int $recordedFixModel, array $counted, array $advisories, bool $compareFixes): self
     {
-        $standing = new self($entry, $recordedTargetPhp, $recordedFixModel);
-        $coverage = Coverage::under($entry->recordedLead());
+        $standing = new self($entry);
+        $standing->recordedTargetPhp = $recordedTargetPhp;
+        $standing->recordedFixModel = $recordedFixModel;
+        $lead = $entry->recordedLead();
+        $coverage = Coverage::under($lead);
         $recordedFlags = $entry->flags();
         foreach ($counted as $flag) {
             if (isset($recordedFlags[$flag])) {
                 $standing->flags[$flag] = new FactState(FactState::KNOWN, $recordedFlags[$flag], null);
             } elseif ($coverage->covers($flag)) {
-                $lead = (string) $coverage->recordedLead();
                 $standing->flags[$flag] = new FactState(FactState::COVERED, $recordedFlags[$lead], $lead);
             } else {
                 $standing->flags[$flag] = new FactState(FactState::NEW_FACT, null, null);
@@ -121,7 +122,7 @@ final class Standing implements \JsonSerializable
         ++$this->advisoriesNow[$state];
         $this->advisories[$advisory->id()] = new FactState($state, $recorded === null ? null : $recorded->knownSince(), null);
         if ($state !== FactState::KNOWN) {
-            $this->worsenedBy[] = WorsenedFact::advisory($advisory, $state, $recorded === null ? null : $recorded->severity(), $recorded === null ? null : $recorded->fixKind());
+            $this->worsenedBy[] = WorsenedFact::advisory($advisory, $state, $recorded);
             $this->unknown[] = $advisory;
         }
     }

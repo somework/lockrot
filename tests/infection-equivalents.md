@@ -28,7 +28,6 @@ start the reason with `in method():`.
 - `src/Analyzer/Libyears.php` LessThan `if ($behind > 0.0 && ($worst === null || $behind > $worst[1] || ($behind === $worst[1] && strcmp($finding->package(), $worst[0]->package()) < 0))) {` — two findings of one report never share a package name, so `strcmp()` never returns 0 here.
 - `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->findings, static fn (Finding $f): bool => Verdict013::flagged($f->verdict())));` — the findings are sorted with every flagged one first, so the filter leaves the keys `0..n-1`.
 - `src/Analyzer/Report.php` UnwrapArrayValues `return array_values(array_filter($this->sorted(), static fn (Finding $f): bool => $f->isGraded()));` — `sorted()` puts every graded finding first, so the filter leaves the keys `0..n-1`.
-- `src/Analyzer/RunSettings.php` UnwrapArrayValues `'flagged_verdicts' => array_values(array_filter(Verdict::all(), [Verdict::class, 'flagged'])),` — the flagged verdicts come first in `Verdict::SEVERITY`, so the filter leaves the keys `0..n-1`. The call keeps the JSON a list if that order changes.
 - `src/Analyzer/Report.php` DecrementInteger and IncrementInteger `'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),` — `max(0, …)` clamps an age that a backwards clock makes negative, and a bound of one second either way rounds to `0.0` at one decimal.
 - `src/Analyzer/Analyzer.php` LogicalAnd `if ($fixes !== null && $facts->advisories() !== []) {` — a package with no advisory gets an empty scan, which writes the same finding as no scan: no row, no branch fix, no gets.
 - `src/Analyzer/Report.php` AssignCoalesce `$gate ??= $this->gate();` — the gate is derived from the report alone, so computing it again gives the gate that the caller passed.
@@ -37,9 +36,7 @@ start the reason with `in method():`.
 
 ## src/Baseline
 
-- `src/Baseline/BaselineSchema.php` LogicalOr x2 `if (!\is_array($error) || !\is_string($error['property'] ?? null) || !\is_string($error['message'] ?? null)) {` — a guard for PHPStan. Every error of justinrainbow/json-schema is an array with a string `property` and `message`, so every operand is false.
-- `src/Baseline/BaselineSchema.php` Ternary `$number = \is_array($envelope) ? ($envelope['schema'] ?? null) : null;` — lockrot ships one baseline schema number, and `numberOf()` gives it for every file. A test can see the mutant when a second number ships.
-- `src/Baseline/BaselineSchema.php` ReturnRemoval `return self::$schemas[$number];` — a memo. Without it the method decodes the same bundled file again.
+- `src/Baseline/BaselineSchema.php` ReturnRemoval `return self::$schema;` — a memo. Without it the method decodes the same bundled file again.
 - `src/Baseline/BaselineSchema.php` LogicalOr `if (!is_file($path) || !is_readable($path)) {` — the bundled schema file exists and is readable, so both operands are false.
 
 ## src/Clock.php
@@ -65,7 +62,6 @@ start the reason with `in method():`.
 
 ## src/Config
 
-- `src/Config/ConfigSchema.php` LogicalOr x2 `if (!\is_array($error) || !\is_string($error['property'] ?? null) || !\is_string($error['message'] ?? null)) {` — a guard for PHPStan. Every error of justinrainbow/json-schema is an array with a string `property` and `message`, so every operand is false.
 - `src/Config/ConfigSchema.php` ReturnRemoval `return self::$schema;` — a memo. Without it the method decodes the same bundled file again.
 - `src/Config/ConfigSchema.php` LogicalOr `if (!is_file($path) || !is_readable($path)) {` — the bundled schema file exists and is readable, so both operands are false.
 - `src/Config/UnknownKeys.php` GreaterThan `if (\strlen($key) > self::LONGEST_KEY) {` — a key of `LONGEST_KEY` bytes is too far from every known key for a suggestion, so the loop also gives null.

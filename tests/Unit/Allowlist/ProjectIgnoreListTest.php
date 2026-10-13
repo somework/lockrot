@@ -128,4 +128,50 @@ final class ProjectIgnoreListTest extends TestCase
         $this->expectExceptionMessage('ignore[0]');
         ProjectIgnoreList::fromExtra(['ignore' => [['package' => 'a/b', 'reason' => 'x', 'version' => 123]]]);
     }
+
+    public function testAnEntryKeepsEachListedFlagOnceInItsOrder(): void
+    {
+        $list = ProjectIgnoreList::fromExtra(['ignore' => [['package' => 'acme/legacy', 'reason' => 'kept', 'flags' => ['stale', 'pinned', 'stale']]]]);
+        $entry = $list->match(F::package(['name' => 'acme/legacy']), null, new \DateTimeImmutable(F::NOW));
+
+        self::assertNotNull($entry);
+        self::assertSame(['stale', 'pinned'], $entry->flags());
+    }
+
+    public function testAnEntryReadFromExtraRefusesAnAdvisoryFlag(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage("extra.lockrot.ignore[0] \"flags\": the allowlist accepts maintenance flags; accept advisories in Composer's audit policy");
+
+        ProjectIgnoreList::fromExtra(['ignore' => [['package' => 'acme/legacy', 'reason' => 'kept', 'flags' => ['vulnerable']]]]);
+    }
+
+    /** @return iterable<string, array{mixed}> */
+    public static function notAList(): iterable
+    {
+        yield 'an empty list' => [[]];
+        yield 'a string' => ['stale'];
+    }
+
+    /**
+     * @param mixed $flags
+     *
+     * @dataProvider notAList
+     */
+    #[DataProvider('notAList')]
+    public function testFlagsMustBeAListAfterAnEntryWithout($flags): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.ignore[1] "flags" must list at least one maintenance flag');
+
+        ProjectIgnoreList::checkFlags([['package' => 'acme/a', 'reason' => 'r'], ['package' => 'acme/b', 'reason' => 'r', 'flags' => $flags]]);
+    }
+
+    public function testALongIndexIsCutAt255Bytes(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.ignore['.str_repeat('k', 255).'…] "flags" must list at least one maintenance flag');
+
+        ProjectIgnoreList::checkFlags([str_repeat('k', 300) => ['flags' => []]]);
+    }
 }

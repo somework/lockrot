@@ -6,11 +6,14 @@ namespace Lockrot\Tests\Unit\Signal\Data;
 
 use Lockrot\Data\Repository\StableRelease;
 use Lockrot\Json\JsonWriter;
+use Lockrot\Score\CountedAdvisory;
+use Lockrot\Score\Standing;
 use Lockrot\Security\Candidate;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Holder;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\TestCase;
 
 /** The deciding S9 row of twig/twig in case A of tests/fixtures/flags/cases.json. */
@@ -48,6 +51,18 @@ final class AdvisoryDataTest extends TestCase
         );
         self::assertSame([false, false], array_map(static fn (AdvisoryRow $row): bool => $row->isDeciding(), $data->withDeciding(null)->rows()));
         self::assertSame([$row, $other], $data->rows(), 'marking returns a copy');
+    }
+
+    public function testTheBaselineStateIsSetOnACopyOfEachRow(): void
+    {
+        $row = self::row();
+        $data = new AdvisoryData([$row], true, true);
+        $standing = Standing::newPackage([], [new CountedAdvisory('PKSA-h8hf-ytnd-5t9q', 'critical', 'raise-php')]);
+
+        self::assertSame(['state' => 'new', 'since' => null, 'covered_by' => null], JsonPath::decoded($data->withBaseline($standing)->rows()[0])['baseline']);
+        self::assertNull(JsonPath::decoded($data->withBaseline(null)->rows()[0])['baseline'], 'no state without a standing');
+        self::assertNull(JsonPath::decoded($data->rows()[0])['baseline'], 'the data keeps its rows');
+        self::assertNull(JsonPath::decoded($row)['baseline'], 'the row keeps its state');
     }
 
     public function testAFixAndAHolderWriteTheS9Shapes(): void

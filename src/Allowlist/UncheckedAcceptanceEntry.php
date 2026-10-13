@@ -89,8 +89,8 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
             if (preg_match(self::HOST, $value) !== 1) {
                 throw new ConfigException($at.' "host" must be a lower-case host name with an optional port, without a scheme or a path');
             }
-            $port = strpos($value, ':') === false ? null : (int) substr($value, (int) strrpos($value, ':') + 1);
-            if ($port !== null && ($port < 1 || $port > 65535)) {
+            $colon = strrchr($value, ':');
+            if ($colon !== false && filter_var(substr($colon, 1), \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]) === false) {
                 throw new ConfigException($at.' "host" has a port outside 1 to 65535');
             }
         }
@@ -106,7 +106,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
             return null;
         }
         $m = [];
-        if (!\is_string($expires) || preg_match('{^(\d{4})-(\d{2})-(\d{2})$}D', $expires, $m) !== 1 || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+        if (!\is_string($expires) || preg_match('{^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$}D', $expires, $m) !== 1 || !checkdate((int) $m['month'], (int) $m['day'], (int) $m['year'])) {
             throw new ConfigException($at.' "expires" must be a valid YYYY-MM-DD date');
         }
 
@@ -114,33 +114,33 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
     }
 
     /**
-     * A repository URL as the `repository` scope compares it: the lower-case host with its port,
-     * then the case-sensitive path without a trailing `/` and `.git`, the query and the fragment
-     * kept. Null for a URL without a host, such as `file://`.
+     * A repository URL as the `repository` scope compares it: the lower-case host, the port, the
+     * case-sensitive path without a trailing `/` and `.git`, the query and the fragment. Null for a
+     * URL without a host, such as `file://`.
+     *
+     * @return ?array{0: string, 1: ?int, 2: string, 3: ?string, 4: ?string}
      */
-    public static function urlKey(string $url): ?string
+    private static function urlKey(string $url): ?array
     {
         if (preg_match('{^[a-z][a-z0-9+.-]*://}i', $url) === 1) {
             $parts = parse_url($url);
-            if (!\is_array($parts) || !isset($parts['host']) || $parts['host'] === '') {
+            $host = \is_array($parts) ? ($parts['host'] ?? '') : '';
+            if ($host === '') {
                 return null;
             }
-            $host = strtolower($parts['host']).(isset($parts['port']) ? ':'.$parts['port'] : '');
-            $path = $parts['path'] ?? '';
-            $suffix = (isset($parts['query']) ? '?'.$parts['query'] : '').(isset($parts['fragment']) ? '#'.$parts['fragment'] : '');
+            $key = [strtolower($host), $parts['port'] ?? null, $parts['path'] ?? '', $parts['query'] ?? null, $parts['fragment'] ?? null];
         } elseif (preg_match('{^[^@\s/]+@([^:\s/]+):(\S+)$}', $url, $m) === 1) {
-            $host = strtolower($m[1]);
-            $path = $m[2];
-            $suffix = '';
+            $key = [strtolower($m[1]), null, $m[2], null, null];
         } else {
             return null;
         }
-        $path = trim($path, '/');
+        $path = trim($key[2], '/');
         if (substr($path, -4) === '.git') {
             $path = rtrim(substr($path, 0, -4), '/');
         }
+        $key[2] = $path;
 
-        return $host.($path === '' ? '' : '/'.$path).$suffix;
+        return $key;
     }
 
     /**
@@ -164,15 +164,15 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
             case 'package':
                 return fnmatch($this->value, $package);
             case 'host':
-                return $activityHost !== null && explode('/', $activityHost, 2)[0] === $this->value;
+                return $activityHost === null ? false : strtok($activityHost, '/') === $this->value;
             default:
-                $want = self::urlKey($this->value);
-                $candidates = [$sourceUrl === null ? null : self::urlKey($sourceUrl), $composerUrl === null ? null : self::urlKey($composerUrl)];
-                if ($activityHost !== null && $activityRepo !== null) {
-                    $candidates[] = $activityHost.'/'.trim($activityRepo, '/');
+                foreach ([$sourceUrl, $composerUrl, $activityRepo === null ? null : 'https://'.$activityHost.'/'.$activityRepo] as $url) {
+                    if ($url !== null && self::urlKey($url) === self::urlKey($this->value)) {
+                        return true;
+                    }
                 }
 
-                return \in_array($want, array_filter($candidates, static fn (?string $key): bool => $key !== null), true);
+                return false;
         }
     }
 

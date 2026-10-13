@@ -177,7 +177,7 @@ final class FormatContext
      */
     public function gateOf(Report $report): Gate
     {
-        return $report->gate() ?? Gate::decide($report, $this->failOn, false, Gate::MODE_CHECK);
+        return $report->gate() ?? Gate::ofFindings($report, $this->failOn);
     }
 
     /**

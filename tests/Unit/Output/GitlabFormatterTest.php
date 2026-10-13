@@ -414,6 +414,22 @@ final class GitlabFormatterTest extends TestCase
         self::assertNull($severity('unchecked', $this->report()));
     }
 
+    /** The run-level issue is a whole Code Quality issue, which GitLab places on the lock's first line. */
+    public function testTheRunLevelAdvisoriesIssueIsACompleteCodeQualityIssue(): void
+    {
+        $issues = $this->decode($this->formatter('high', null)->format(self::uncheckedReport()));
+
+        self::assertSame([
+            'type' => 'issue',
+            'check_name' => 'lockrot/advisories-not-checked',
+            'description' => 'advisories not checked: the gate could not read the advisories of every package',
+            'categories' => ['Bug Risk'],
+            'severity' => 'minor',
+            'fingerprint' => hash('sha256', 'lockrot|advisories-not-checked'),
+            'location' => ['path' => 'composer.lock', 'lines' => ['begin' => 1]],
+        ], $issues[\count($issues) - 1]);
+    }
+
     /** SPEC §7.10: a finding with S10 and no counted fact gets one `lockrot/unchecked` issue while `unchecked` is active. */
     public function testAFindingWithS10AndNoCountedFactGetsAnUncheckedIssue(): void
     {

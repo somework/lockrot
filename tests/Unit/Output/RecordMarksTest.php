@@ -71,6 +71,16 @@ final class RecordMarksTest extends TestCase
         self::assertSame([['kind' => 'advisory', 'id' => 'A'], ['kind' => 'advisory', 'id' => 'B']], self::marks($score, null, [], $advisories, [], 'vulnerable-high')[0]['facts']);
     }
 
+    /** The marks follow the severity buckets, `moderate` as medium, then the advisory ids. */
+    public function testVulnerableMarksSortByTheBucketThenByTheId(): void
+    {
+        $advisories = [new CountedAdvisory('Z', 'critical', 'update'), new CountedAdvisory('A', 'moderate', 'update'), new CountedAdvisory('B', 'high', 'update'), new CountedAdvisory('M', 'critical', 'update')];
+        $score = Score::compute([], $advisories, 'direct', false);
+        $ids = array_map(static fn ($fact): string => JsonPath::stringAt(JsonPath::decoded($fact), ['id']), JsonPath::arrayAt(self::marks($score, null, [], $advisories, [], 'vulnerable-medium')[0], ['facts']));
+
+        self::assertSame(['M', 'Z', 'B', 'A'], $ids);
+    }
+
     /** `unchecked` names each signal that the missing checks blocked, once, and an entry with nothing new exempts it. */
     public function testUncheckedMarksTheBlockedSignals(): void
     {

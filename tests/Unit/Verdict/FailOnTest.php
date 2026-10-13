@@ -88,7 +88,7 @@ final class FailOnTest extends TestCase
         yield 'an unknown value' => ['dead', 'unknown value "dead"'];
         yield 'an empty item' => ['high,,stale', 'unknown value ""'];
         yield 'empty' => ['', 'unknown value ""'];
-        yield 'vulnerable-low' => ['vulnerable-low', 'use "vulnerable": every counted advisory is at least low'];
+        yield 'vulnerable-low' => ['vulnerable-low', 'LOCKROT_FAIL_ON: vulnerable-low is not a value: use "vulnerable": every counted advisory is at least low'];
         yield 'an array with an unknown value' => [['high', 'dead'], 'unknown value "dead"'];
     }
 

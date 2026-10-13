@@ -60,9 +60,14 @@ final class RecordMarks
                 return $missing === [] || ($gate !== null && $gate->newScore()->total() === 0) ? null : self::blocked($missing);
             case FailOn::KIND_FLAG:
                 $limit = array_search($value->threshold(), ScoreModel::FLAG_ORDER, true);
-                $hit = array_filter($uncovered, static fn (string $flag): bool => array_search($flag, ScoreModel::FLAG_ORDER, true) <= $limit);
+                $hit = [];
+                foreach ($uncovered as $flag) {
+                    if (array_search($flag, ScoreModel::FLAG_ORDER, true) <= $limit) {
+                        $hit[] = new MarkedFact(MarkedFact::FLAG, $flag);
+                    }
+                }
 
-                return $hit === [] ? null : array_values(array_map(static fn (string $flag): MarkedFact => new MarkedFact(MarkedFact::FLAG, $flag), $hit));
+                return $hit === [] ? null : $hit;
             case FailOn::KIND_VULNERABLE:
                 $hit = self::atOrAbove($unknown, (string) $value->threshold());
 
@@ -96,10 +101,10 @@ final class RecordMarks
     private static function atOrAbove(array $advisories, string $threshold): array
     {
         $rank = Severity::fromComposer($threshold)->gateRank();
-        $hit = array_values(array_filter(
+        $hit = array_filter(
             array_map(static fn (CountedAdvisory $advisory): CountedAdvisory => $advisory->bucketed(), $advisories),
             static fn (CountedAdvisory $advisory): bool => Severity::fromComposer($advisory->severity())->gateRank() >= $rank
-        ));
+        );
         usort($hit, static fn (CountedAdvisory $a, CountedAdvisory $b): int => array_search($a->severity(), Severity::DISPLAY_ORDER, true) <=> array_search($b->severity(), Severity::DISPLAY_ORDER, true) ?: strcmp($a->id(), $b->id()));
 
         return $hit;

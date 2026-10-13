@@ -53,6 +53,13 @@ final class Coverage
      */
     public function uncovered(array $counted): array
     {
-        return array_values(array_filter($counted, fn (string $flag): bool => !$this->covers($flag)));
+        $out = [];
+        foreach ($counted as $flag) {
+            if (!$this->covers($flag)) {
+                $out[] = $flag;
+            }
+        }
+
+        return $out;
     }
 }

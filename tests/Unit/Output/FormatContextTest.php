@@ -173,6 +173,17 @@ final class FormatContextTest extends TestCase
         self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'high')->advisoriesNotCheckedLevel($offline));
         self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($skipped));
         self::assertNull(FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($this->report($this->finding('a/fine', Verdict::OK))));
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($this->report($this->finding('a/fine', Verdict::OK), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true))), 'a checked finding before the gap');
+    }
+
+    /** SPEC §7.10: the own `lockrot/unchecked` record needs `unchecked` active, a missing check and no counted fact. */
+    public function testAFindingGetsTheUncheckedRecordOnlyWhileUncheckedIsActive(): void
+    {
+        $offline = FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true);
+
+        self::assertTrue(FormatContext::create(null, 'unchecked')->isUncheckedRecord($offline));
+        self::assertFalse(FormatContext::create(null, 'high')->isUncheckedRecord($offline));
+        self::assertFalse(FormatContext::create(null, 'unchecked')->isUncheckedRecord($this->finding('a/fine', Verdict::OK)), 'no missing check');
     }
 
     /** I15b: the record set holds every flagged finding, every failing one, and with `unchecked` active every one with a missing check. */

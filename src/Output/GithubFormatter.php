@@ -74,7 +74,7 @@ final class GithubFormatter implements FormatterInterface
         return $notes;
     }
 
-    private function annotation(Finding $finding, ?int $line, ?BaselineComparison $baseline, ?Gate $gate): string
+    private function annotation(Finding $finding, ?int $line, ?BaselineComparison $baseline, Gate $gate): string
     {
         $properties = ['file='.self::escapeProperty($this->context->lockName())];
         if ($line !== null) {
@@ -90,9 +90,9 @@ final class GithubFormatter implements FormatterInterface
         );
     }
 
-    private function command(Finding $finding, ?BaselineComparison $baseline, ?Gate $gate): string
+    private function command(Finding $finding, ?BaselineComparison $baseline, Gate $gate): string
     {
-        $level = $this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline);
+        $level = $this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline);
 
         return $level === FormatContext::LEVEL_NOTE ? 'notice' : $level;
     }

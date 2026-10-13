@@ -55,6 +55,16 @@ final class AcceptUncheckedTest extends TestCase
     private const FORK_REASON = "joomla's backport fork; we follow its branch (\u{2021})";
 
     /** host-accepted‡: a host that lockrot cannot ask, accepted by its host. */
+    public function testTheAcceptanceIsSetOnACopy(): void
+    {
+        $clock = Clock::fixed(self::NOW);
+        $auth = ForgeAuth::withTokens(new Tokens(null, null));
+        $analyzer = new Analyzer(self::loader([]), new ActivityClient(new FakeHttpClient([]), $auth), new ActivityFetchPlanner($auth), new RepoLocator(), new Allowlist([]), SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()), new VerdictEngine(), $clock, false);
+        $accepting = $analyzer->withUncheckedAcceptance(UncheckedAcceptance::fromConfig([['check' => 'advisories', 'package' => 'acme/pkg', 'reason' => 'r']]));
+
+        self::assertSame([true, false], [$analyzer->uncheckedAcceptance()->isEmpty(), $accepting->uncheckedAcceptance()->isEmpty()]);
+    }
+
     public function testAHostEntryAcceptsTheActivityOfAPackageOnThatHost(): void
     {
         $finding = self::written(self::codeberg('2027-03-31'), 'high,unchecked');

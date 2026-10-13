@@ -228,7 +228,8 @@ final class Analyzer
         if ($notInRepository > 0) {
             $notes[] = RunNote::notFromComposerRepository($notInRepository, $advisories->coverage()->scope() === AdvisoryCoverage::SCOPE_ALL);
         }
-        $notes = array_merge($notes, self::ignoreNotes($findings), $this->abandonedNotes($findings));
+        $uncovered = UncoveredAdvisories::of($findings);
+        $notes = array_merge($notes, $uncovered === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($uncovered)], $this->abandonedNotes($findings));
         $findings = TransitiveExposure::attach($findings, $graph);
         $graded = [];
         foreach ($findings as $finding) {
@@ -506,31 +507,6 @@ final class Analyzer
     }
 
     /**
-     * The project `ignore[]` entries that match packages with counted advisories, in report order:
-     * an entry accepts maintenance flags only.
-     *
-     * @param list<Finding> $findings
-     *
-     * @return list<RunNote>
-     */
-    private static function ignoreNotes(array $findings): array
-    {
-        usort($findings, [Report::class, 'compareGraded']);
-        $entries = [];
-        foreach ($findings as $finding) {
-            $entry = $finding->details()->entry();
-            $advisories = array_map(static fn (CountedAdvisory $advisory): string => $advisory->id(), $finding->flags()->advisories());
-            if ($entry === null || $entry->by() !== AllowlistEntry::BY_PROJECT || $advisories === []) {
-                continue;
-            }
-            usort($advisories, 'strcmp');
-            $entries[] = new UncoveredAdvisories($finding->package(), (string) $entry->pattern(), $advisories);
-        }
-
-        return $entries === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($entries)];
-    }
-
-    /**
      * @param list<IgnoredAdvisory> $ignored
      * @param list<Advisory>        $every   every advisory of the package on any version
      */
@@ -597,9 +573,6 @@ final class Analyzer
      */
     private function acceptUnchecked(array $signals, PackageFacts $facts): array
     {
-        if ($this->acceptance->isEmpty()) {
-            return [$signals, []];
-        }
         $s10 = null;
         foreach ($signals as $signal) {
             $data = $signal->data();
@@ -628,12 +601,8 @@ final class Analyzer
             }
             $accepted[] = new AcceptedCheck($check, $by);
         }
-        if ($accepted === []) {
-            return [$signals, []];
-        }
-        $host = $where->kind() === LocatedRepository::HOST_NOT_SUPPORTED ? $where->host() : null;
-
-        return [NotCheckedRule::keeping($signals, $kept, $host, $package->origin()->kind()), $accepted];
+        // With nothing accepted, keeping() gives S10 back with the words that it had.
+        return [NotCheckedRule::keeping($signals, $kept, $where->host(), $package->origin()->kind()), $accepted];
     }
 
     /**

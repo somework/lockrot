@@ -43,10 +43,10 @@ final class ReportTest extends TestCase
         return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain(['vendor/root', $package])->withDev($dev)->build();
     }
 
-    /** A left-behind finding whose only counted flag is stale: 0.13 placed it high, the score reads medium. */
-    private function demoted(string $package): Finding
+    /** A finding whose only counted flag is stale: 0.13 placed it high on its verdict, the score reads medium. */
+    private function demoted(string $package, string $verdict = Verdict::LEFT_BEHIND): Finding
     {
-        return (new FindingBuilder())->withPackage($package)->withVerdict(Verdict::LEFT_BEHIND)->withChain([$package])
+        return (new FindingBuilder())->withPackage($package)->withVerdict($verdict)->withChain([$package])
             ->withFlags(FlagSet::fromSignals(ScoreSweep::signalsOf('stale'), null, []))->build();
     }
 
@@ -57,6 +57,16 @@ final class ReportTest extends TestCase
         $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::VERDICT_RULES_CHANGED));
 
         self::assertCount(1, $notes);
+        self::assertSame(['a/first', 'z/last'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['findings'], 'package'));
+    }
+
+    public function testTheVerdictRulesNoteListsByPackageWhatTheReportListsByScore(): void
+    {
+        $report = $this->report($this->demoted('a/first'), $this->demoted('z/last', Verdict::PINNED))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
+        $notes = array_values(array_filter($report->runNotes(), static fn (RunNote $note): bool => $note->code() === RunNote::VERDICT_RULES_CHANGED));
+
+        self::assertSame(['z/last', 'a/first'], $this->names($report), '0.13 lists pinned before left-behind');
         self::assertSame(['a/first', 'z/last'], JsonPath::column(JsonPath::decoded($notes[0]->data()), ['findings'], 'package'));
     }
 

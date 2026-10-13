@@ -186,6 +186,17 @@ final class UnknownKeysTest extends TestCase
         );
     }
 
+    public function testTheAcceptUncheckedWarningsFollowTheWarningsBeforeThem(): void
+    {
+        self::assertSame(
+            [
+                'unknown key extra.lockrot.fial-on ignored (did you mean fail-on?)',
+                'unknown key extra.lockrot.accept-unchecked[0].expire ignored (did you mean expires?)',
+            ],
+            UnknownKeys::warnings(['fial-on' => 'high', 'accept-unchecked' => [['check' => 'advisories', 'host' => 'example.org', 'reason' => 'r', 'expire' => '2026-12-31']]])
+        );
+    }
+
     public function testAnIgnoreEntryKeyIsComparedWithTheIgnoreEntryKeys(): void
     {
         self::assertSame(

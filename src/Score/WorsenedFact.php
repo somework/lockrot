@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Score;
 
+use Lockrot\Baseline\RecordedAdvisory;
+
 /**
  * One counted fact that the baseline entry does not know, `finding.baseline.worsened_by[]`.
  *
@@ -20,32 +22,30 @@ final class WorsenedFact implements \JsonSerializable
     private string $kind;
     private string $id;
     private string $why;
-    private ?string $recordedSeverity;
-    private ?string $recordedFixKind;
+    private ?RecordedAdvisory $recorded;
     private ?CountedAdvisory $now;
 
-    private function __construct(string $kind, string $id, string $why, ?string $recordedSeverity, ?string $recordedFixKind, ?CountedAdvisory $now)
+    private function __construct(string $kind, string $id, string $why, ?RecordedAdvisory $recorded, ?CountedAdvisory $now)
     {
         $this->kind = $kind;
         $this->id = $id;
         $this->why = $why;
-        $this->recordedSeverity = $recordedSeverity;
-        $this->recordedFixKind = $recordedFixKind;
+        $this->recorded = $recorded;
         $this->now = $now;
     }
 
     public static function flag(string $flag): self
     {
-        return new self(self::FLAG, $flag, FactState::NEW_FACT, null, null, null);
+        return new self(self::FLAG, $flag, FactState::NEW_FACT, null, null);
     }
 
     /**
-     * @param CountedAdvisory $now  with the severity bucket
-     * @param string          $why  `new`, `re_rated` or `fix_lost`
+     * @param CountedAdvisory $now with the severity bucket
+     * @param string          $why `new`, `re_rated` or `fix_lost`
      */
-    public static function advisory(CountedAdvisory $now, string $why, ?string $recordedSeverity, ?string $recordedFixKind): self
+    public static function advisory(CountedAdvisory $now, string $why, ?RecordedAdvisory $recorded): self
     {
-        return new self(self::ADVISORY, $now->id(), $why, $recordedSeverity, $recordedFixKind, $now);
+        return new self(self::ADVISORY, $now->id(), $why, $recorded, $now);
     }
 
     public function kind(): string
@@ -70,7 +70,7 @@ final class WorsenedFact implements \JsonSerializable
             'kind' => $this->kind,
             'id' => $this->id,
             'why' => $this->why,
-            'recorded' => $this->recordedSeverity === null || $this->recordedFixKind === null ? null : ['severity' => $this->recordedSeverity, 'fix_kind' => $this->recordedFixKind],
+            'recorded' => $this->recorded === null ? null : ['severity' => $this->recorded->severity(), 'fix_kind' => $this->recorded->fixKind()],
             'now' => $this->now === null ? null : ['severity' => $this->now->severity(), 'fix_kind' => $this->now->fixKind()],
         ];
     }

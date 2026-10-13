@@ -297,6 +297,21 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([$s2], NotCheckedRule::withoutMaintenanceGaps([$s2, $s10]));
     }
 
+    /** `accept-unchecked`: S10 keeps the entries left, worded again, and every other signal stays in its place. */
+    public function testKeepingNarrowsS10AndKeepsTheSignalsAroundIt(): void
+    {
+        $s2 = new Signal(Signal::LEVEL_WARN, 'last release 2021-05-05 (5.4 years ago)', SignalDataStub::of(Signal::S2, []));
+        $s8 = new Signal(Signal::LEVEL_WARN, 'left behind', SignalDataStub::of(Signal::S8, []));
+        $activity = new Check('repository_activity', 'host_not_supported', [Signal::S3, Signal::S4]);
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', new NotCheckedData([$activity, new Check('advisories', 'no_feed', [Signal::S9])]));
+
+        $kept = NotCheckedRule::keeping([$s2, $s10, $s8], [$activity], 'codeberg.org', null);
+
+        self::assertSame([Signal::S2, Signal::S10, Signal::S8], array_map(static fn (Signal $signal): string => $signal->id(), $kept));
+        self::assertSame('repository activity not checked (lockrot cannot ask codeberg.org), so S3 and S4 could not be read', $kept[1]->summary());
+        self::assertSame([$s2, $s8], NotCheckedRule::keeping([$s2, $s10, $s8], [], null, null), 'S10 goes with no entry left');
+    }
+
     /**
      * Release data that a Composer repository listing the package did not serve
      * leaves every fix unknown, so S9 is incomplete. Computed here, written by report-2 only:

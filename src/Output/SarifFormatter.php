@@ -164,7 +164,7 @@ final class SarifFormatter implements FormatterInterface
     }
 
     /** @return array<string, mixed> */
-    private function result(Finding $finding, string $rule, int $ruleIndex, ?int $line, ?BaselineComparison $baseline, ?Gate $gate): array
+    private function result(Finding $finding, string $rule, int $ruleIndex, ?int $line, ?BaselineComparison $baseline, Gate $gate): array
     {
         $physicalLocation = ['artifactLocation' => $this->artifactLocation()];
         if ($line !== null) {
@@ -198,7 +198,7 @@ final class SarifFormatter implements FormatterInterface
         return [
             'ruleId' => 'lockrot/'.$rule,
             'ruleIndex' => $ruleIndex,
-            'level' => $this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline),
+            'level' => $this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline),
             'rank' => Priority013::rank($finding->priority()) * self::RANK_STEP,
             'message' => ['text' => $this->message($finding)],
             'locations' => [['physicalLocation' => $physicalLocation]],

@@ -63,7 +63,7 @@ final class GitlabFormatter implements FormatterInterface
     }
 
     /** @return array<string, mixed> */
-    private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline, ?Gate $gate): array
+    private function issue(Finding $finding, ?int $line, ?BaselineComparison $baseline, Gate $gate): array
     {
         $check = $this->context->isUncheckedRecord($finding) ? 'unchecked' : $finding->verdict();
 
@@ -81,9 +81,9 @@ final class GitlabFormatter implements FormatterInterface
         ];
     }
 
-    private function severity(Finding $finding, ?BaselineComparison $baseline, ?Gate $gate): string
+    private function severity(Finding $finding, ?BaselineComparison $baseline, Gate $gate): string
     {
-        switch ($this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline)) {
+        switch ($this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline)) {
             case FormatContext::LEVEL_ERROR:
                 return 'major';
             case FormatContext::LEVEL_WARNING:

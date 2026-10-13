@@ -49,6 +49,15 @@ final class RunGateTextTest extends TestCase
         self::assertSame('gate: passes · --fail-on=stale · no finding fails it; 1 reaches it and is known to the baseline · target php 8.4 (--target-php)', self::text($known, 'stale'));
     }
 
+    public function testTwoKnownFindingsAndTwoValuesThatNothingFailsAreCountedWithoutValues(): void
+    {
+        $report = self::report(self::finding('a/stale', Verdict::STALE), self::finding('b/stale', Verdict::STALE));
+        $entries = [BaselineEntries::of('a/stale', '1.0.0', Verdict::STALE, '2026-01-01'), BaselineEntries::of('b/stale', '1.0.0', Verdict::STALE, '2026-01-01')];
+        $known = $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline($entries), $report, 'lockrot-baseline.json', ['a/stale', 'b/stale']));
+
+        self::assertSame('gate: passes · --fail-on=stale,vulnerable · no finding fails it; 2 reach it and are known to the baseline · target php 8.4 (--target-php)', self::text($known, 'stale,vulnerable'));
+    }
+
     public function testAGenerateRunSaysHowManyFindingsReachIt(): void
     {
         self::assertSame('gate: not applied (--generate-baseline) · --fail-on=high · 1 finding reaches it · target php 8.4 (--target-php)', self::text(self::report(self::finding('a/gone', Verdict::ABANDONED)), 'high', RunSettings::SOURCE_OPTION, Gate::MODE_GENERATE_BASELINE));

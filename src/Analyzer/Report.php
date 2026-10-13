@@ -541,7 +541,7 @@ final class Report
             'rot_depth' => RotDepth::of($sorted),
             'libyears' => Report2Root::toLibyearsArray($this->libyears(), $sorted),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
-            'gate' => ($gate ?? Gate::decide($this, FailOn::none(), false, $run->mode()))->toArray($run),
+            'gate' => ($gate ?? Gate::ofFindings($this, FailOn::none()))->toArray($run),
             'security' => Report2Root::toSecurityArray($sorted),
             'data_date' => Report2Root::dataDate($sorted),
             'notes' => $this->notes(),

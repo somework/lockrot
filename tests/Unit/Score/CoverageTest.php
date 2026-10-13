@@ -54,6 +54,7 @@ final class CoverageTest extends TestCase
     public function testAFlagOutsideTheMaintenanceOrderIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^not a maintenance flag: vulnerable$/');
 
         Coverage::under('vulnerable');
     }

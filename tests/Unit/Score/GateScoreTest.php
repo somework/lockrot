@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Score;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Score\Coverage;
 use Lockrot\Score\GateScore;
+use Lockrot\Score\MaintenanceTerm;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
@@ -114,5 +115,19 @@ final class GateScoreTest extends TestCase
 
         /** @var array<string, mixed> $value */
         return $value;
+    }
+
+    /**
+     * SPEC §6.2, "Record marks": at `high` (floor 16, 32 halves) a term reaches with 16 halves, a
+     * quarter of the floor under an entry with 8. A corroborating term never reaches.
+     */
+    public function testATermReachesHalfTheFloorOrAQuarterUnderAnEntry(): void
+    {
+        $term = static fn (string $flag, string $role, int $halves): MaintenanceTerm => new MaintenanceTerm($flag, $role, 1, 1, $halves, $halves);
+        $flags = static fn (array $terms): array => array_map(static fn ($t): string => $t instanceof MaintenanceTerm ? $t->flag() : 'not a maintenance term', $terms);
+
+        self::assertSame(['half'], $flags(GateScore::termsReaching([$term('half', Score::LEAD, 16), $term('below', Score::LEAD, 12)], 'high', false)));
+        self::assertSame(['quarter'], $flags(GateScore::termsReaching([$term('quarter', Score::LEAD, 8), $term('below', Score::LEAD, 7)], 'high', true)));
+        self::assertSame([0 => 'first', 1 => 'last'], $flags(GateScore::termsReaching([$term('first', Score::LEAD, 16), $term('beside', Score::CORROBORATING, 64), $term('last', Score::LEAD, 16)], 'high', false)), 'a list without gaps');
     }
 }

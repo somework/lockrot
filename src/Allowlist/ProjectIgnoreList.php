@@ -42,22 +42,40 @@ final class ProjectIgnoreList
     public static function checkFlags($rows): void
     {
         foreach (\is_array($rows) ? $rows : [] as $index => $row) {
-            $flags = \is_array($row) ? ($row['flags'] ?? null) : null;
-            if ($flags === null) {
-                continue;
+            self::flags((string) $index, \is_array($row) ? ($row['flags'] ?? null) : null);
+        }
+    }
+
+    /**
+     * @param mixed $flags an entry's `flags`
+     *
+     * @return ?list<string> each flag once, null for an entry without `flags`
+     *
+     * @throws ConfigException for a flag that is not a maintenance flag, or an empty list
+     */
+    private static function flags(string $index, $flags): ?array
+    {
+        if ($flags === null) {
+            return null;
+        }
+        $at = TerminalText::escape($index, 255);
+        if (!\is_array($flags) || $flags === []) {
+            throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list at least one maintenance flag', $at));
+        }
+        $out = [];
+        foreach ($flags as $flag) {
+            if ($flag === FlagSet::VULNERABLE) {
+                throw new ConfigException(\sprintf("extra.lockrot.ignore[%s] \"flags\": the allowlist accepts maintenance flags; accept advisories in Composer's audit policy (config.policy.advisories), which composer audit reads too", $at));
             }
-            if (!\is_array($flags) || $flags === []) {
-                throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list at least one maintenance flag', TerminalText::escape((string) $index, 255)));
+            if (!\is_string($flag) || !isset(ScoreModel::POINTS[$flag])) {
+                throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list maintenance flags only: %s', $at, implode(', ', array_keys(ScoreModel::POINTS))));
             }
-            foreach ($flags as $flag) {
-                if ($flag === FlagSet::VULNERABLE) {
-                    throw new ConfigException(\sprintf("extra.lockrot.ignore[%s] \"flags\": the allowlist accepts maintenance flags; accept advisories in Composer's audit policy (config.policy.advisories), which composer audit reads too", TerminalText::escape((string) $index, 255)));
-                }
-                if (!\is_string($flag) || !isset(ScoreModel::POINTS[$flag])) {
-                    throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list maintenance flags only: %s', TerminalText::escape((string) $index, 255), implode(', ', array_keys(ScoreModel::POINTS))));
-                }
+            if (!\in_array($flag, $out, true)) {
+                $out[] = $flag;
             }
         }
+
+        return $out;
     }
 
     /**
@@ -86,12 +104,7 @@ final class ProjectIgnoreList
             throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] (%s) "version" must be a string', $index, $package));
         }
 
-        $flags = $row['flags'] ?? null;
-        if ($flags !== null) {
-            self::checkFlags([$index => $row]);
-        }
-
-        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), AllowlistEntry::BY_PROJECT, \is_array($flags) ? array_values(array_unique(array_filter($flags, 'is_string'))) : null);
+        return new AllowlistEntry($package, $version, $reason, self::expires($index, $package, $row['expires'] ?? null), AllowlistEntry::BY_PROJECT, self::flags($index, $row['flags'] ?? null));
     }
 
     /** @param mixed $expires */

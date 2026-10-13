@@ -22,6 +22,7 @@ final class ConfigErrorOrderTest extends TestCase
     {
         yield 'vulnerable-low' => [['fail-on' => 'vulnerable-low'], 'use "vulnerable": every counted advisory is at least low'];
         yield 'an unknown value' => [['fail-on' => 'high,dead'], 'unknown value "dead"'];
+        yield 'an unknown value in a list' => [['fail-on' => ['high', 'dead']], 'extra.lockrot.fail-on: unknown value "dead"'];
         yield 'ignore[].flags naming vulnerable' => [['ignore' => [['package' => 'a/b', 'reason' => 'r', 'flags' => ['vulnerable']]]], "accept advisories in Composer's audit policy"];
     }
 
@@ -37,6 +38,25 @@ final class ConfigErrorOrderTest extends TestCase
 
         self::assertStringContainsString($message, $error->getMessage());
         self::assertStringNotContainsString('extra.lockrot is invalid', $error->getMessage(), 'the schema did not speak first');
+    }
+
+    /** @return iterable<string, array{mixed}> a `fail-on` that is no string and no list of strings */
+    public static function notAFailOnList(): iterable
+    {
+        yield 'a list with a number' => [['high', 5]];
+        yield 'an object' => [['x' => 'dead']];
+        yield 'an empty list' => [[]];
+    }
+
+    /**
+     * @param mixed $failOn
+     *
+     * @dataProvider notAFailOnList
+     */
+    #[DataProvider('notAFailOnList')]
+    public function testTheSchemaJudgesAFailOnThatIsNoListOfStrings($failOn): void
+    {
+        self::assertStringStartsWith('extra.lockrot is invalid:', self::configError(['fail-on' => $failOn])->getMessage());
     }
 
     public function testABrokenConfigGroupIsNamedByItsPathAndDescription(): void

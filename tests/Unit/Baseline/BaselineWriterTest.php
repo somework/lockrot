@@ -8,11 +8,14 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
+use Lockrot\Baseline\RecordedAdvisory;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
 use PHPUnit\Framework\TestCase;
 
@@ -66,6 +69,63 @@ final class BaselineWriterTest extends TestCase
         $entry = $read->entryFor('acme/pkg');
         self::assertNotNull($entry);
         self::assertSame(['0', '123'], array_map(static fn (\Lockrot\Baseline\RecordedAdvisory $a): string => $a->id(), $entry->advisories()));
+    }
+
+    /** An advisory that an incomplete lookup did not see stays, with its date. A complete lookup drops it. */
+    public function testOnlyAnIncompleteLookupCarriesARecordedAdvisoryForward(): void
+    {
+        $before = Baseline::fromReport(self::report('2026-06-01', [self::finding(['stale'], [['A1', 'high', 'update']])]));
+
+        $carried = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding(['stale'], []))]), $before);
+        $dropped = Baseline::fromReport(self::report('2026-10-01', [self::finding(['stale'], [])]), $before);
+        $counted = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding(['stale'], [['A1', 'high', 'update']]))]), $before);
+
+        self::assertSame([['A1', '2026-06-01']], self::advisories($carried->entryFor('acme/pkg')));
+        self::assertSame(['acme/pkg'], $carried->carriedForward());
+        self::assertSame([], self::advisories($dropped->entryFor('acme/pkg')));
+        self::assertSame([], $dropped->carriedForward());
+        self::assertSame([['A1', '2026-06-01']], self::advisories($counted->entryFor('acme/pkg')));
+        self::assertSame([], $counted->carriedForward(), 'an advisory counted again is no carry');
+    }
+
+    /** A package that no longer grades keeps its entry only while its lookup is incomplete. */
+    public function testAnUngradedPackageKeepsItsEntryOnlyOnAnIncompleteLookup(): void
+    {
+        $before = Baseline::fromReport(self::report('2026-06-01', [self::finding(['stale'], [['A1', 'high', 'update']])]));
+
+        $kept = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding([], []))]), $before);
+        $gone = Baseline::fromReport(self::report('2026-10-01', [self::finding([], [])]), $before);
+
+        self::assertSame([['A1', '2026-06-01']], self::advisories($kept->entryFor('acme/pkg')));
+        self::assertSame(['acme/pkg'], $kept->carriedForward());
+        self::assertNull($gone->entryFor('acme/pkg'));
+        self::assertSame([], $gone->carriedForward());
+    }
+
+    public function testAFirstEntryOnAnIncompleteLookupHoldsWhatItCountsAsAList(): void
+    {
+        $baseline = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding(['stale'], [['B2', 'high', 'update'], ['A1', 'low', 'update']]))]));
+        $entry = $baseline->entryFor('acme/pkg');
+
+        self::assertNotNull($entry);
+        self::assertSame([0, 1], array_keys($entry->advisories()));
+        self::assertSame([], $baseline->carriedForward());
+    }
+
+    /** @return list<array{string, string}> each advisory id with its date */
+    private static function advisories(?BaselineEntry $entry): array
+    {
+        self::assertNotNull($entry);
+
+        return array_map(static fn (RecordedAdvisory $a): array => [$a->id(), $a->knownSince()], $entry->advisories());
+    }
+
+    /** The finding with an advisory lookup that ran offline. */
+    private static function incomplete(Finding $finding): Finding
+    {
+        $details = FindingBuilder::detailsOf($finding, true);
+
+        return $finding->withDetails(new FindingDetails('read', null, null, $details->skipped(), ['requires' => null, 'target_runs' => null, 'project_allows' => null], null, 'not_run', 'offline', [], null, FindingBuilder::activityOf($finding), FindingBuilder::unmeasuredAge(), null, null));
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Baseline;
 
 use Lockrot\Baseline\BaselineSchema;
 use Lockrot\Exception\ConfigException;
+use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -62,6 +63,28 @@ final class BaselineSchemaTest extends TestCase
         foreach ($paths as $path) {
             BaselineSchema::validate(self::read($path));
         }
+    }
+
+    /** `json_decode()` reads the advisory ids `"0"` and `"1"` as a list. The reader validates them as the map that the file holds. */
+    public function testAdvisoryIdsThatDecodeAsAListAreReadAsAMap(): void
+    {
+        $fact = ['known_since' => '2026-06-01', 'severity' => 'high', 'fix_kind' => 'update'];
+        $document = json_decode((string) json_encode([
+            '$schema' => 'https://lockrot.dev/schema/baseline-2.json',
+            'lockrot' => ['version' => '0.14.0', 'schema' => 2],
+            'generated_at' => '2026-06-01T00:00:00+00:00',
+            'target_php' => '8.4',
+            'target_php_source' => 'option',
+            'score_model_id' => 1,
+            'fix_model' => 1,
+            'findings' => ['acme/a' => ['version' => '1.0.0', 'first_seen' => '2026-06-01', 'advisories' => ['0' => $fact, '1' => $fact]]],
+        ]), true);
+        self::assertIsArray($document);
+        self::assertSame([0, 1], array_keys(JsonPath::arrayAt($document, ['findings', 'acme/a', 'advisories'])), 'the case under test');
+
+        /** @var array<string, mixed> $document */
+        BaselineSchema::validate($document);
+        $this->addToAssertionCount(1);
     }
 
     /** @return array<string, mixed> */

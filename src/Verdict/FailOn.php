@@ -66,16 +66,16 @@ final class FailOn
             if ($kind === null) {
                 throw new ConfigException(\sprintf('%s: unknown value "%s". The values are: %s', $source, $value, implode(', ', self::allowed())));
             }
-            if (isset($seen[$value])) {
+            if (\in_array($value, $seen, true)) {
                 throw new ConfigException(\sprintf('%s: "%s" is given twice', $source, $value));
             }
-            if ($seen !== [] && ($value === self::NONE || isset($seen[self::NONE]))) {
+            if ($seen !== [] && ($value === self::NONE || \in_array(self::NONE, $seen, true))) {
                 throw new ConfigException(\sprintf('%s: "none" stands alone: drop it, or drop every other value', $source));
             }
             if ($kind !== self::NONE && isset($byKind[$kind])) {
                 throw new ConfigException(\sprintf('%s: "%s" and "%s" are both %s. A list holds one value per kind', $source, $byKind[$kind]->value(), $value, self::KIND_NOUNS[$kind]));
             }
-            $seen[$value] = true;
+            $seen[] = $value;
             if ($kind !== self::NONE) {
                 $byKind[$kind] = new FailOnValue($value, $kind, self::thresholdOf($value, $kind));
             }

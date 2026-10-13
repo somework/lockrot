@@ -74,5 +74,16 @@ final class StandingTest extends TestCase
 
         self::assertSame(['new', null], [$written['status'], $written['recorded']]);
         self::assertSame(['known' => 0, 'new' => 1, 're_rated' => 0, 'fix_lost' => 0], $written['advisories_now']);
+        self::assertSame([['kind' => 'flag', 'id' => 'stale'], ['kind' => 'advisory', 'id' => 'A']], array_map(static fn ($fact): array => \array_slice(JsonPath::decoded($fact), 0, 2, true), $standing->worsenedBy()));
+        self::assertSame(['state' => 'new', 'since' => null, 'covered_by' => null], JsonPath::decoded($standing->flagState('stale')));
+        self::assertSame(['stale'], $standing->uncoveredFlags());
+    }
+
+    /** The advisories come in the score's order: points, then the severity order of the buckets, then the id. */
+    public function testAdvisoriesOfEqualPointsFollowTheSeverityOrderOfTheirBuckets(): void
+    {
+        $standing = Standing::newPackage([], [new CountedAdvisory('A', 'unrated', 'update'), new CountedAdvisory('B', 'moderate', 'update')]);
+
+        self::assertSame([['id' => 'B', 'severity' => 'medium'], ['id' => 'A', 'severity' => 'unrated']], array_map(static fn ($fact): array => ['id' => JsonPath::stringAt(JsonPath::decoded($fact), ['id']), 'severity' => JsonPath::stringAt(JsonPath::decoded($fact), ['now', 'severity'])], $standing->worsenedBy()));
     }
 }

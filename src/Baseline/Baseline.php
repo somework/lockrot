@@ -80,7 +80,7 @@ final class Baseline
             if ($finding->isGraded()) {
                 $entry = self::entryOf($finding, $before, $today, $incomplete);
                 $entries[] = $entry;
-                if ($before !== null && \count($entry->advisories()) > self::countedCount($finding)) {
+                if (self::keepsUncounted($entry, $finding)) {
                     $carried[] = $finding->package();
                 }
             } elseif ($before !== null && $incomplete) {
@@ -118,9 +118,12 @@ final class Baseline
         return new BaselineEntry($finding->package(), $finding->version(), $before === null ? $today : $before->firstSeen(), $flags, array_values($advisories));
     }
 
-    private static function countedCount(Finding $finding): int
+    /** Whether the entry keeps an advisory id that the finding does not count. */
+    private static function keepsUncounted(BaselineEntry $entry, Finding $finding): bool
     {
-        return \count(array_unique(array_map(static fn (CountedAdvisory $advisory): string => $advisory->id(), $finding->flags()->advisories())));
+        $counted = array_map(static fn (CountedAdvisory $advisory): string => $advisory->id(), $finding->flags()->advisories());
+
+        return array_diff(array_map(static fn (RecordedAdvisory $advisory): string => $advisory->id(), $entry->advisories()), $counted) !== [];
     }
 
     /**
@@ -166,10 +169,7 @@ final class Baseline
     private static function entryFromArray(string $package, $entry): BaselineEntry
     {
         $entry = self::object($entry);
-        $flags = [];
-        foreach (self::object($entry['flags'] ?? []) as $flag => $fact) {
-            $flags[(string) $flag] = self::text(self::object($fact), 'known_since');
-        }
+        $flags = array_map(static fn ($fact): string => self::text(self::object($fact), 'known_since'), JsonReader::stringKeyed(self::object($entry['flags'] ?? [])));
         $advisories = [];
         foreach (self::object($entry['advisories'] ?? []) as $id => $fact) {
             $fact = self::object($fact);
@@ -230,7 +230,7 @@ final class Baseline
     /** @return list<string> the baselined package names, sorted */
     public function packages(): array
     {
-        return array_map('strval', array_keys($this->entries));
+        return array_keys($this->entries);
     }
 
     public function count(): int

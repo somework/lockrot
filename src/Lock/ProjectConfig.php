@@ -135,8 +135,8 @@ final class ProjectConfig
         try {
             // lockrot's own checks speak before the schema's enum and pattern errors.
             $failOn = $lockrotExtra['fail-on'] ?? null;
-            if (\is_string($failOn) || (\is_array($failOn) && $failOn !== [] && array_filter($failOn, 'is_string') === $failOn)) {
-                FailOn::parse(\is_string($failOn) ? $failOn : array_values($failOn), 'extra.lockrot.fail-on');
+            if (\is_string($failOn) || (\is_array($failOn) && JsonReader::isList($failOn) && array_filter($failOn, 'is_string') === $failOn)) {
+                FailOn::parse($failOn, 'extra.lockrot.fail-on');
             }
             ProjectIgnoreList::checkFlags($lockrotExtra['ignore'] ?? null);
             ConfigSchema::validate($lockrotExtra);

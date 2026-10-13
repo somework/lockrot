@@ -143,6 +143,15 @@ final class GateTest extends TestCase
         self::assertSame([], Gate::decide($report, FailOn::parse('high'), false, Gate::MODE_GENERATE_BASELINE)->notAppliedEntries());
     }
 
+    public function testTheGateOfAReportWithoutRunSettingsChecksAndIgnoresNetworkFailures(): void
+    {
+        $report = new Report([self::finding('a/gone', Verdict::ABANDONED)], Notes::texts(['the network failed'], true), new \DateTimeImmutable(self::AT), 1, 0);
+        $gate = Gate::ofFindings($report, FailOn::none());
+
+        self::assertTrue($report->hadNetworkFailures());
+        self::assertSame([[], true, false], [$gate->trippedBy(), $gate->failOnApplied(), $gate->fails()]);
+    }
+
     public function testAModeTheGateDoesNotKnowIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);

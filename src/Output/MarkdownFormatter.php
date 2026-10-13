@@ -84,9 +84,9 @@ final class MarkdownFormatter implements FormatterInterface
         return \sprintf('### lockrot: dependency rot in %d of %d packages', $flagged, $report->packagesChecked());
     }
 
-    private function row(Finding $finding, ?BaselineComparison $baseline, ?Gate $gate): string
+    private function row(Finding $finding, ?BaselineComparison $baseline, Gate $gate): string
     {
-        $level = $this->context->levelOf($finding, $gate === null ? null : $gate->standingOf($finding->package()), $baseline);
+        $level = $this->context->levelOf($finding, $gate->standingOf($finding->package()), $baseline);
         $verdict = $level === FormatContext::LEVEL_NOTE ? $finding->verdict() : '**'.$finding->verdict().'**';
 
         return '| '.$finding->priority().' | '.self::code($finding->package()).' | '.self::text($finding->version())

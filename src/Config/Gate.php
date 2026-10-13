@@ -106,6 +106,14 @@ final class Gate
         return $gate;
     }
 
+    /**
+     * The gate of a report without run settings: check mode, and a network failure never trips it.
+     */
+    public static function ofFindings(Report $report, FailOn $failOn): self
+    {
+        return self::decide($report, $failOn, false, self::MODE_CHECK);
+    }
+
     /** @param list<FailOnValue> $values */
     private static function judge(Finding $finding, ?Standing $baseline, array $values, bool $applied): GateStanding
     {
@@ -138,7 +146,6 @@ final class Gate
      */
     private static function reaches(Finding $finding, array $counted, FailOnValue $value, bool $unchecked): bool
     {
-        $total = $finding->score()->total();
         switch ($value->kind()) {
             case FailOn::KIND_UNCHECKED:
                 return $unchecked;
@@ -147,9 +154,9 @@ final class Gate
 
                 return array_filter($counted, static fn (string $flag): bool => array_search($flag, ScoreModel::FLAG_ORDER, true) <= $limit) !== [];
             case FailOn::KIND_VULNERABLE:
-                return $total > 0 && RecordMarks::anyAtOrAbove($finding->flags()->advisories(), (string) $value->threshold());
+                return RecordMarks::anyAtOrAbove($finding->flags()->advisories(), (string) $value->threshold());
             default:
-                return $total >= ScoreModel::floorOf((string) $value->threshold());
+                return $finding->score()->total() >= ScoreModel::floorOf((string) $value->threshold());
         }
     }
 
@@ -175,7 +182,7 @@ final class Gate
             if ($failOn->has(FailOn::KIND_UNCHECKED) && self::advisoriesInS10($finding)) {
                 continue;
             }
-            $reason = (string) $finding->details()->uncheckedReason();
+            $reason = $finding->details()->uncheckedReason() ?? '';
             $byReason[$reason] = ($byReason[$reason] ?? 0) + 1;
         }
         uksort($byReason, static fn ($a, $b): int => $byReason[$b] <=> $byReason[$a] ?: strcmp((string) $a, (string) $b));

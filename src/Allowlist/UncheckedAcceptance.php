@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Allowlist;
 
 use Lockrot\Exception\ConfigException;
+use Lockrot\Json\JsonReader;
 use Lockrot\Signal\Data\Check;
 
 /**
@@ -39,11 +40,11 @@ final class UncheckedAcceptance
     public static function fromConfig($rows): self
     {
         $rows ??= [];
-        if (!\is_array($rows) || ($rows !== [] && array_keys($rows) !== range(0, \count($rows) - 1))) {
+        if (!\is_array($rows) || ($rows !== [] && !JsonReader::isList($rows))) {
             throw new ConfigException('extra.lockrot.accept-unchecked must be an array');
         }
         $entries = [];
-        foreach (array_values($rows) as $index => $row) {
+        foreach ($rows as $index => $row) {
             $entries[] = UncheckedAcceptanceEntry::fromConfig($index, $row);
         }
 
