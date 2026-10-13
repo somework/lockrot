@@ -176,6 +176,16 @@ final class FormatContextTest extends TestCase
         self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($this->report($this->finding('a/fine', Verdict::OK), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true))), 'a checked finding before the gap');
     }
 
+    /** A gap of a finding that the baseline knows exempts it from `unchecked`: the gate passes, so the record is a `warning`. */
+    public function testTheAdvisoriesRecordIsAWarningWhenTheBaselineKnowsTheFinding(): void
+    {
+        $report = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
+        $known = $report->withBaseline($this->comparison([['a/offline', 'stale']], $report));
+
+        self::assertFalse(FormatContext::create(null, 'unchecked')->gateOf($known)->fails());
+        self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($known));
+    }
+
     /** SPEC §7.10: the own `lockrot/unchecked` record needs `unchecked` active, a missing check and no counted fact. */
     public function testAFindingGetsTheUncheckedRecordOnlyWhileUncheckedIsActive(): void
     {

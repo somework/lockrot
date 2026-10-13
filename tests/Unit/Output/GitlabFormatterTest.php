@@ -403,7 +403,7 @@ final class GitlabFormatterTest extends TestCase
     public function testTheRunLevelAdvisoriesIssueIsMajorOnlyWhenUncheckedFailsOnTheGap(): void
     {
         $severity = function (string $failOn, Report $report): ?string {
-            $severity = array_column($this->decode($this->formatter($failOn, null)->format($report)), 'severity', 'check_name')['lockrot/advisories-not-checked'] ?? null;
+            $severity = array_column($this->decode($this->formatter($failOn, null)->format($report)), 'severity', 'check_name')['lockrot/advisories-unchecked'] ?? null;
 
             return \is_string($severity) ? $severity : null;
         };
@@ -421,11 +421,11 @@ final class GitlabFormatterTest extends TestCase
 
         self::assertSame([
             'type' => 'issue',
-            'check_name' => 'lockrot/advisories-not-checked',
+            'check_name' => 'lockrot/advisories-unchecked',
             'description' => 'advisories not checked: the gate could not read the advisories of every package',
             'categories' => ['Bug Risk'],
             'severity' => 'minor',
-            'fingerprint' => hash('sha256', 'lockrot|advisories-not-checked'),
+            'fingerprint' => hash('sha256', 'lockrot|advisories-unchecked'),
             'location' => ['path' => 'composer.lock', 'lines' => ['begin' => 1]],
         ], $issues[\count($issues) - 1]);
     }

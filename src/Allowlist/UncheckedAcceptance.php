@@ -56,11 +56,15 @@ final class UncheckedAcceptance
         return $this->entries === [];
     }
 
-    /** The first entry that accepts the S10 entry of the package, null when none does. */
-    public function acceptedBy(Check $unchecked, string $package, ?string $activityHost, ?string $activityRepo, ?string $sourceUrl, ?string $composerUrl, \DateTimeImmutable $now): ?UncheckedAcceptanceEntry
+    /**
+     * The first entry that accepts the S10 entry of the package, null when none does.
+     *
+     * @param list<?string> $composerUrls the URLs that name the Composer repository that served the package
+     */
+    public function acceptedBy(Check $unchecked, string $package, ?string $activityHost, ?string $activityRepo, ?string $sourceUrl, array $composerUrls, \DateTimeImmutable $now): ?UncheckedAcceptanceEntry
     {
         foreach ($this->entries as $entry) {
-            if ($entry->accepts($unchecked, $package, $activityHost, $activityRepo, $sourceUrl, $composerUrl, $now)) {
+            if ($entry->accepts($unchecked, $package, $activityHost, $activityRepo, $sourceUrl, $composerUrls, $now)) {
                 return $entry;
             }
         }

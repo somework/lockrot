@@ -72,7 +72,8 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/activityEvent' => [array_values(array_unique(array_map(static fn (string $forge): string => (new RepoRef($forge, 'example.test', 'a/b'))->event(), RepoRef::FORGES))), 'RepoRef::event()'],
             '#/definitions/metadataFailureReason' => [MetadataFailure::REASONS, 'MetadataFailure'],
             '#/definitions/repositoryActivityNotCheckedReason' => [RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS, 'RunNote'],
-            '#/definitions/advisoriesNotCheckedReason' => [RunNote::ADVISORIES_NOT_CHECKED_REASONS, 'RunNote'],
+            // lockrot writes `advisories_unavailable` when every feed throws, r3 lists `lookup_failed` for it (§5.7).
+            '#/definitions/advisoriesNotCheckedReason' => [array_merge(RunNote::ADVISORIES_NOT_CHECKED_REASONS, [AdvisoryCoverage::LOOKUP_FAILED]), 'RunNote and r3'],
             '#/definitions/noteCode' => [RunNote::CODES, 'RunNote'],
             '#/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key' => [['policy', 'policy.advisories', 'policy.advisories.audit', 'COMPOSER_POLICY'], 'RunNote::advisoriesDisabledByPolicy()'],
             '#/definitions/originKind' => [PackageOrigin::KINDS, 'PackageOrigin'],

@@ -26,6 +26,10 @@ use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Output\FormatContext;
+use Lockrot\Output\GithubFormatter;
+use Lockrot\Output\GitlabFormatter;
+use Lockrot\Output\SarifFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FakeHttpClient;
@@ -78,6 +82,20 @@ final class AnalyzerGradeTest extends TestCase
         self::assertContains('vendor/partly', array_map(static fn (Finding $f): string => $f->package(), $report->flagged()));
     }
 
+    /** An entry that names every flag that fired leaves no record in any format, at any gate. */
+    public function testAnEntryThatNamesEveryFiredFlagLeavesNoRecord(): void
+    {
+        $report = self::report();
+
+        self::assertSame([], self::named($report, 'vendor/covered')->flags()->countedMaintenance());
+        foreach (['none', 'medium', 'low'] as $failOn) {
+            $context = FormatContext::create(null, $failOn);
+            self::assertStringNotContainsString('vendor/covered', (new GithubFormatter($context))->format($report), $failOn);
+            self::assertStringNotContainsString('vendor/covered', (new GitlabFormatter($context))->format($report), $failOn);
+            self::assertStringNotContainsString('vendor/covered', (new SarifFormatter($context))->format($report), $failOn);
+        }
+    }
+
     private static function report(): Report
     {
         $lock = LockFile::fromArray([
@@ -90,12 +108,13 @@ final class AnalyzerGradeTest extends TestCase
                 self::locked('vendor/orphan'),
                 self::locked('vendor/stale'),
                 self::locked('vendor/partly'),
+                self::locked('vendor/covered'),
                 self::locked('vendor/two'),
             ],
             'packages-dev' => [self::locked('vendor/devtool')],
         ]);
         $project = ProjectConfig::fromArray([
-            'require' => ['vendor/update' => '^1.0', 'vendor/none' => '^1.0', 'vendor/blocked' => '^1.0', 'vendor/absent' => '^1.0', 'vendor/accepted' => '^1.0', 'vendor/stale' => '^1.0', 'vendor/partly' => '^1.0', 'vendor/two' => '^1.0'],
+            'require' => ['vendor/update' => '^1.0', 'vendor/none' => '^1.0', 'vendor/blocked' => '^1.0', 'vendor/absent' => '^1.0', 'vendor/accepted' => '^1.0', 'vendor/stale' => '^1.0', 'vendor/partly' => '^1.0', 'vendor/covered' => '^1.0', 'vendor/two' => '^1.0'],
             'require-dev' => ['vendor/devtool' => '^1.0'],
         ]);
         $metadata = [
@@ -106,6 +125,7 @@ final class AnalyzerGradeTest extends TestCase
             'vendor/orphan' => self::metadata('vendor/orphan', [['1.0.0', null, self::OLD]]),
             'vendor/stale' => self::metadata('vendor/stale', [['1.0.0', null, self::OLD]]),
             'vendor/partly' => self::metadata('vendor/partly', [['1.0.0', null, self::OLD]]),
+            'vendor/covered' => self::metadata('vendor/covered', [['1.0.0', null, self::OLD]]),
             'vendor/two' => self::metadata('vendor/two', [['1.0.0', null, self::RECENT], ['1.1.0', null, self::RECENT]]),
             'vendor/devtool' => self::metadata('vendor/devtool', [['1.0.0', null, self::RECENT], ['1.1.0', null, self::RECENT]]),
         ];
@@ -126,6 +146,7 @@ final class AnalyzerGradeTest extends TestCase
             new Allowlist([
                 new AllowlistEntry('vendor/accepted', null, 'interfaces', null, 'builtin'),
                 new AllowlistEntry('vendor/partly', null, 'behind on purpose', null, AllowlistEntry::BY_PROJECT, ['left-behind']),
+                new AllowlistEntry('vendor/covered', null, 'kept on purpose', null, AllowlistEntry::BY_PROJECT, ['stale']),
             ]),
             SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
             new VerdictEngine(),

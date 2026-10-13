@@ -38,14 +38,14 @@ final class UncheckedAcceptanceTest extends TestCase
     {
         $list = UncheckedAcceptance::fromConfig([['check' => 'repository_activity', 'reason' => 'by hand'] + $scope]);
 
-        self::assertNotNull($list->acceptedBy(new Check('repository_activity', 'host_not_supported', ['S3', 'S4']), 'acme/x', $host, $repo, $source, $composer, new \DateTimeImmutable(self::NOW)));
+        self::assertNotNull($list->acceptedBy(new Check('repository_activity', 'host_not_supported', ['S3', 'S4']), 'acme/x', $host, $repo, $source, [$composer], new \DateTimeImmutable(self::NOW)));
     }
 
     public function testAMirrorEntryNeverAcceptsAPackageFromAnotherMirror(): void
     {
         $list = UncheckedAcceptance::fromConfig([['check' => 'advisories', 'repository' => 'https://mirror-a.example', 'reason' => 'no feed']]);
 
-        self::assertNull($list->acceptedBy(new Check('advisories', 'no_feed', ['S9']), 'acme/x', null, null, null, 'https://mirror-b.example', new \DateTimeImmutable(self::NOW)));
+        self::assertNull($list->acceptedBy(new Check('advisories', 'no_feed', ['S9']), 'acme/x', null, null, null, ['https://mirror-b.example'], new \DateTimeImmutable(self::NOW)));
     }
 
     public function testAReasonThatARerunCanCloseStaysUnchecked(): void
@@ -53,7 +53,7 @@ final class UncheckedAcceptanceTest extends TestCase
         $list = UncheckedAcceptance::fromConfig([['check' => 'repository_activity', 'package' => 'acme/*', 'reason' => 'by hand']]);
 
         foreach (['offline', 'rate_limit', 'undated_releases'] as $reason) {
-            self::assertNull($list->acceptedBy(new Check('repository_activity', $reason, ['S3', 'S4']), 'acme/x', null, null, null, null, new \DateTimeImmutable(self::NOW)), $reason);
+            self::assertNull($list->acceptedBy(new Check('repository_activity', $reason, ['S3', 'S4']), 'acme/x', null, null, null, [], new \DateTimeImmutable(self::NOW)), $reason);
         }
     }
 
@@ -62,9 +62,9 @@ final class UncheckedAcceptanceTest extends TestCase
         $list = UncheckedAcceptance::fromConfig([['check' => 'release_metadata', 'package' => 'acme/*', 'reason' => 'ours', 'expires' => '2026-09-14']]);
         $check = new Check('release_metadata', 'not_from_composer_repository', ['S2', 'S8']);
 
-        self::assertNotNull($list->acceptedBy($check, 'acme/x', null, null, null, null, new \DateTimeImmutable('2026-09-14T23:59:59+00:00')));
-        self::assertNull($list->acceptedBy($check, 'acme/x', null, null, null, null, new \DateTimeImmutable('2026-09-15T00:00:00+00:00')));
-        self::assertNull($list->acceptedBy($check, 'acme/x', null, null, null, null, new \DateTimeImmutable('2026-09-14T22:00:00-05:00')), 'the UTC date decides');
+        self::assertNotNull($list->acceptedBy($check, 'acme/x', null, null, null, [], new \DateTimeImmutable('2026-09-14T23:59:59+00:00')));
+        self::assertNull($list->acceptedBy($check, 'acme/x', null, null, null, [], new \DateTimeImmutable('2026-09-15T00:00:00+00:00')));
+        self::assertNull($list->acceptedBy($check, 'acme/x', null, null, null, [], new \DateTimeImmutable('2026-09-14T22:00:00-05:00')), 'the UTC date decides');
     }
 
     public function testTheFirstMatchingEntryIsTheOneEchoed(): void
@@ -74,7 +74,7 @@ final class UncheckedAcceptanceTest extends TestCase
             ['check' => 'advisories', 'package' => 'acme/*', 'reason' => 'the first match'],
             ['check' => 'advisories', 'package' => 'acme/x', 'reason' => 'the second match'],
         ]);
-        $entry = $list->acceptedBy(new Check('advisories', 'no_feed', ['S9']), 'acme/x', null, null, null, null, new \DateTimeImmutable(self::NOW));
+        $entry = $list->acceptedBy(new Check('advisories', 'no_feed', ['S9']), 'acme/x', null, null, null, [], new \DateTimeImmutable(self::NOW));
 
         self::assertSame(['scope' => 'package', 'value' => 'acme/*', 'reason' => 'the first match', 'expires' => null], JsonPath::decoded($entry));
     }
@@ -168,14 +168,14 @@ final class UncheckedAcceptanceTest extends TestCase
     {
         $list = UncheckedAcceptance::fromConfig([['check' => 'repository_activity', 'repository' => $entry, 'reason' => 'by hand']]);
 
-        self::assertSame($accepted, $list->acceptedBy(new Check('repository_activity', 'host_not_supported', ['S3', 'S4']), 'acme/x', $host, $repo, $source, null, new \DateTimeImmutable(self::NOW)) !== null);
+        self::assertSame($accepted, $list->acceptedBy(new Check('repository_activity', 'host_not_supported', ['S3', 'S4']), 'acme/x', $host, $repo, $source, [], new \DateTimeImmutable(self::NOW)) !== null);
     }
 
     public function testAHostEntryNamesTheHostWithoutItsPathAndWithItsPort(): void
     {
         $check = new Check('repository_activity', 'host_not_supported', ['S3', 'S4']);
         $now = new \DateTimeImmutable(self::NOW);
-        $accepts = static fn (string $entry, ?string $host): bool => UncheckedAcceptance::fromConfig([['check' => 'repository_activity', 'host' => $entry, 'reason' => 'x']])->acceptedBy($check, 'acme/x', $host, null, null, null, $now) !== null;
+        $accepts = static fn (string $entry, ?string $host): bool => UncheckedAcceptance::fromConfig([['check' => 'repository_activity', 'host' => $entry, 'reason' => 'x']])->acceptedBy($check, 'acme/x', $host, null, null, [], $now) !== null;
 
         self::assertSame([true, true, false, false, false], [
             $accepts('git.example.com', 'git.example.com'),

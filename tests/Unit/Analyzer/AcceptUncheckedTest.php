@@ -128,10 +128,24 @@ final class AcceptUncheckedTest extends TestCase
     }
 
     /** A named registry is compared by its name, so the URL of the repository that answered does not match. */
-    public function testARepositoryEntryMatchesANamedRegistryByItsName(): void
+    /** SPEC §6.7: a named registry matches by its name and by the URL that served the package, never another organisation's URL. */
+    public function testARepositoryEntryMatchesANamedRegistryByItsNameOrTheUrlThatAnswered(): void
     {
         self::assertNotSame([], self::written(self::registryPackage('https://repo.packagist.com'), 'unchecked')['unchecked_accepted']);
-        self::assertSame([], self::written(self::registryPackage('https://repo.packagist.com/acme'), 'unchecked')['unchecked_accepted']);
+        self::assertNotSame([], self::written(self::registryPackage('https://repo.packagist.com/acme'), 'unchecked')['unchecked_accepted']);
+        self::assertSame([], self::written(self::registryPackage('https://repo.packagist.com/other'), 'unchecked')['unchecked_accepted']);
+    }
+
+    /** SPEC §6.7: `https://repo.packagist.org` matches every package that lockrot attributes to packagist.org. */
+    public function testTheRepoPackagistOrgEntryMatchesAPackagistOrgPackage(): void
+    {
+        $inputs = self::registryPackage('https://repo.packagist.org');
+        $inputs['lock'] = ['name' => 'acme/private', 'version' => '1.0.0', 'notification-url' => 'https://packagist.org/downloads/'];
+        $inputs['meta'] = self::metadata('acme/private', '1.0.0', null, 'https://repo.packagist.org');
+
+        self::assertNotSame([], self::written($inputs, 'unchecked')['unchecked_accepted']);
+        $inputs['meta'] = self::metadata('acme/private', '1.0.0', null, null);
+        self::assertNotSame([], self::written($inputs, 'unchecked')['unchecked_accepted'], 'by the registry name alone');
     }
 
     /** vcs-accepted‡: a vcs fork whose two checks are accepted by its package and by its repository. */

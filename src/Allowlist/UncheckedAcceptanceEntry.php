@@ -149,9 +149,9 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
      * @param ?string $activityHost   `activity.host`, its GitLab path prefix included
      * @param ?string $activityRepo   `activity.repo`
      * @param ?string $sourceUrl      the lock entry's repository URL
-     * @param ?string $composerUrl    the URL of the Composer repository the run read the package from
+     * @param list<?string> $composerUrls the URLs that name the Composer repository that served the package
      */
-    public function accepts(Check $unchecked, string $package, ?string $activityHost, ?string $activityRepo, ?string $sourceUrl, ?string $composerUrl, \DateTimeImmutable $now): bool
+    public function accepts(Check $unchecked, string $package, ?string $activityHost, ?string $activityRepo, ?string $sourceUrl, array $composerUrls, \DateTimeImmutable $now): bool
     {
         if (!\in_array($unchecked->reason(), self::ACCEPTABLE_REASONS, true) || $unchecked->check() !== $this->check) {
             return false;
@@ -165,7 +165,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
             case 'host':
                 return $activityHost === null ? false : strtok($activityHost, '/') === $this->value;
             default:
-                foreach ([$sourceUrl, $composerUrl, $activityRepo === null ? null : 'https://'.$activityHost.'/'.$activityRepo] as $url) {
+                foreach (array_merge([$sourceUrl, $activityRepo === null ? null : 'https://'.$activityHost.'/'.$activityRepo], $composerUrls) as $url) {
                     if ($url !== null && self::urlKey($url) === self::urlKey($this->value)) {
                         return true;
                     }

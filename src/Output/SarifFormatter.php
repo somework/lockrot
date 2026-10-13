@@ -81,14 +81,14 @@ final class SarifFormatter implements FormatterInterface
             'A check did not run, and nothing else grades the package',
             'A check that the package needs did not run (S10), and no counted fact grades it. --fail-on=unchecked fails on it.',
         ],
-        self::ADVISORIES_NOT_CHECKED => [
+        self::ADVISORIES_UNCHECKED => [
             'The advisories of some packages were not checked',
             'The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap.',
         ],
     ];
 
     private const UNCHECKED = 'unchecked';
-    private const ADVISORIES_NOT_CHECKED = 'advisories-not-checked';
+    private const ADVISORIES_UNCHECKED = 'advisories-unchecked';
 
     private FormatContext $context;
 
@@ -117,15 +117,15 @@ final class SarifFormatter implements FormatterInterface
         }
         $gap = $this->context->advisoriesNotCheckedLevel($report);
         if ($gap !== null) {
-            $ruleIndexes[self::ADVISORIES_NOT_CHECKED] = \count($rules);
-            $rules[] = $this->rule(self::ADVISORIES_NOT_CHECKED);
+            $ruleIndexes[self::ADVISORIES_UNCHECKED] = \count($rules);
+            $rules[] = $this->rule(self::ADVISORIES_UNCHECKED);
             $results[] = [
-                'ruleId' => 'lockrot/'.self::ADVISORIES_NOT_CHECKED,
-                'ruleIndex' => $ruleIndexes[self::ADVISORIES_NOT_CHECKED],
+                'ruleId' => 'lockrot/'.self::ADVISORIES_UNCHECKED,
+                'ruleIndex' => $ruleIndexes[self::ADVISORIES_UNCHECKED],
                 'level' => $gap,
                 'message' => ['text' => 'advisories not checked: the gate could not read the advisories of every package'],
                 'locations' => [['physicalLocation' => ['artifactLocation' => $this->artifactLocation()]]],
-                'partialFingerprints' => ['lockrot/run' => self::ADVISORIES_NOT_CHECKED],
+                'partialFingerprints' => ['lockrot/run' => self::ADVISORIES_UNCHECKED],
             ];
         }
 

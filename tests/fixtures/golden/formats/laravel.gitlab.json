@@ -17,13 +17,13 @@
     },
     {
         "type": "issue",
-        "check_name": "lockrot/advisories-not-checked",
+        "check_name": "lockrot/advisories-unchecked",
         "description": "advisories not checked: the gate could not read the advisories of every package",
         "categories": [
             "Bug Risk"
         ],
         "severity": "minor",
-        "fingerprint": "da9f53d83432ec33bba87b169fa7ea36522e50ef1dc3eb4d1876cc7fb5afe024",
+        "fingerprint": "aa6972ef903020f362b3f39114d8c697dd621f85b3eb09e4a07ad2d966294e3f",
         "location": {
             "path": "composer.lock",
             "lines": {

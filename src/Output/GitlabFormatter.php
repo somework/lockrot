@@ -50,11 +50,11 @@ final class GitlabFormatter implements FormatterInterface
         if ($gap !== null) {
             $issues[] = [
                 'type' => 'issue',
-                'check_name' => 'lockrot/advisories-not-checked',
+                'check_name' => 'lockrot/advisories-unchecked',
                 'description' => 'advisories not checked: the gate could not read the advisories of every package',
                 'categories' => self::CATEGORIES,
                 'severity' => $gap === FormatContext::LEVEL_ERROR ? 'major' : 'minor',
-                'fingerprint' => hash('sha256', 'lockrot|advisories-not-checked'),
+                'fingerprint' => hash('sha256', 'lockrot|advisories-unchecked'),
                 'location' => ['path' => $this->context->lockName(), 'lines' => ['begin' => self::FALLBACK_LINE]],
             ];
         }

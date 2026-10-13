@@ -641,7 +641,7 @@ final class SarifFormatterTest extends TestCase
         $passing = $this->runLevel($this->formatter('high', null)->format(self::uncheckedReport()));
         $skipped = $this->runLevel($this->formatter('unchecked', null)->format(self::skippedReport()));
 
-        self::assertSame(['lockrot/advisories-not-checked', 'error'], [$failing['ruleId'] ?? null, $failing['level'] ?? null]);
+        self::assertSame(['lockrot/advisories-unchecked', 'error'], [$failing['ruleId'] ?? null, $failing['level'] ?? null]);
         self::assertSame('warning', $passing['level'] ?? null);
         self::assertSame('warning', $skipped['level'] ?? null, 'a skip is a gap that the gate does not fail on');
         self::assertSame([], $this->runLevel($this->formatter('unchecked', null)->format($this->report())), 'every lookup ran');
@@ -663,7 +663,7 @@ final class SarifFormatterTest extends TestCase
     private function runLevel(string $sarif): array
     {
         foreach (JsonPath::arrayAt($this->singleRun($sarif), ['results']) as $result) {
-            if (\is_array($result) && ($result['ruleId'] ?? null) === 'lockrot/advisories-not-checked') {
+            if (\is_array($result) && ($result['ruleId'] ?? null) === 'lockrot/advisories-unchecked') {
                 return $result;
             }
         }

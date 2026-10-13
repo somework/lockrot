@@ -150,19 +150,25 @@ final class FormatContext
 
     /**
      * The level of the run-level `advisories not checked` record, null when every lookup ran. It is
-     * `error` only when `unchecked` is active and a finding carries S10 for its advisories: the gate
-     * then fails on that gap. A skip or an accepted gap is a `warning` (SPEC §6.2).
+     * `error` only when a finding fails the `unchecked` value with S10 for its advisories: the gate
+     * then fails on that gap. A skip, an accepted gap or a gap that the baseline knows is a
+     * `warning` (SPEC §6.2).
      */
     public function advisoriesNotCheckedLevel(Report $report): ?string
     {
+        $gate = $this->gateOf($report);
         $gap = false;
         foreach ($report->findings() as $finding) {
             if ($finding->securityStanding()->status() !== SecurityStanding::UNCHECKED) {
                 continue;
             }
             $gap = true;
+            $standing = $gate->standingOf($finding->package());
+            if ($standing === null || !$standing->failsValue(FailOn::UNCHECKED)) {
+                continue;
+            }
             foreach ($finding->checksMissing() as $check) {
-                if ($check->check() === 'advisories' && $this->failOn->has(FailOn::KIND_UNCHECKED)) {
+                if ($check->check() === 'advisories') {
                     return self::LEVEL_ERROR;
                 }
             }

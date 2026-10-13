@@ -11,6 +11,7 @@ use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Baseline\BaselineEntry;
 use Lockrot\Clock;
 use Lockrot\Config\Gate;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
@@ -40,6 +41,7 @@ use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -148,6 +150,32 @@ final class GateAgreementTest extends TestCase
         self::assertTrue($report->gate()->fails());
         foreach (['github', 'gitlab', 'sarif'] as $format) {
             self::assertArrayHasKey($format.' run-level error', $this->seen);
+        }
+    }
+
+    /** I15b under a baseline: an offline run whose every finding the baseline knows passes, with no `error` record. */
+    public function testAnOfflineRunThatTheBaselineKnowsWritesNoErrorRecord(): void
+    {
+        $server = FixtureRepositoryServer::fromLockFiles([self::FIXTURES.'mini/composer.lock']);
+        $server->start();
+        try {
+            $loader = new RepositoryMetadataLoader($server->repositories(), Clock::fixed(self::NOW));
+            $analysed = $this->analyse($loader, 'mini', new RepositoryAdvisoryLoader($server->repositories(), true));
+        } finally {
+            $server->stop();
+        }
+        $report = $analysed->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('unchecked'), RunSettings::SOURCE_OPTION, new Thresholds()));
+        $generated = Baseline::fromReport($report);
+        $entries = array_map(static fn (Finding $f): BaselineEntry => $generated->entryFor($f->package()) ?? new BaselineEntry($f->package(), $f->version(), '2026-01-01', [], []), $report->findings());
+        $names = array_map(static fn (Finding $f): string => $f->package(), $report->findings());
+        $known = $report->withBaseline(BaselineComparison::compare(Baseline::of($entries, self::NOW, '8.4', 'option'), $report, 'lockrot-baseline.json', $names));
+        $this->recorded($known, FormatContext::create(null, 'unchecked'), 'mini offline fail-on=unchecked, every finding known');
+
+        self::assertSame([], $this->mismatches);
+        self::assertNotNull($known->gate());
+        self::assertFalse($known->gate()->fails());
+        foreach (['github', 'gitlab', 'sarif'] as $format) {
+            self::assertArrayNotHasKey($format.' run-level error', $this->seen);
         }
     }
 
@@ -293,7 +321,7 @@ final class GateAgreementTest extends TestCase
             if (!\is_array($issue) || $issue['severity'] !== 'major') {
                 continue;
             }
-            if ($issue['check_name'] === 'lockrot/advisories-not-checked') {
+            if ($issue['check_name'] === 'lockrot/advisories-unchecked') {
                 $gitlab[1] = true;
             } else {
                 $gitlab[0][] = explode(' ', JsonPath::stringAt($issue, ['description']))[0];
@@ -306,7 +334,7 @@ final class GateAgreementTest extends TestCase
             if (!\is_array($result) || $result['level'] !== FormatContext::LEVEL_ERROR) {
                 continue;
             }
-            if ($result['ruleId'] === 'lockrot/advisories-not-checked') {
+            if ($result['ruleId'] === 'lockrot/advisories-unchecked') {
                 $sarif[1] = true;
             } else {
                 $sarif[0][] = JsonPath::stringAt($result, ['properties', 'package']);

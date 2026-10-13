@@ -529,7 +529,9 @@ final class Analyzer
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
         [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
-        $verdict = $this->engine->decide($signals, $entry !== null && $entry->acceptsAll(), $meta !== null);
+        $flags = FlagSet::fromSignals($signals, $entry, $counted);
+        // An entry that accepts every flag that fired accepts the package, as a 0.13 entry did.
+        $verdict = $this->engine->decide($signals, $entry !== null && $flags->countedMaintenance() === [], $meta !== null);
 
         $note = null;
         if (!$package->isFromComposerRepository()) {
@@ -559,7 +561,7 @@ final class Analyzer
 
         return $finding
             ->withComposerJson($composerJsonRead, $graph->namedIn($package->name()))
-            ->withFlags(FlagSet::fromSignals($signals, $entry, $counted), $facts->metadataStatus() === PackageFacts::METADATA_READ)
+            ->withFlags($flags, $facts->metadataStatus() === PackageFacts::METADATA_READ)
             ->withDetails(FindingDetails::of($facts, $entry, $this->signals->phpFloor(), $ignored, $signals, $batch->failed()[$package->name()] ?? null, Age::of(new AgeMeasure($this->clock, $this->signals->thresholds()), $facts), $accepted));
     }
 
@@ -586,11 +588,13 @@ final class Analyzer
         $ref = $where->ref();
         $meta = $facts->metadata();
         $now = $this->clock->now();
-        // A named registry is compared by its name, an unnamed one by the URL that answered. A
-        // package of no Composer repository kind has neither: only its source or its name matches.
+        // A Composer repository is named by the URL that answered, and a named registry also by its
+        // name. A package of no Composer repository kind has neither: only its source or its name matches.
         $origin = $package->origin();
-        $registry = $origin->registry();
-        $composer = !$origin->isComposerRepository() ? null : ($registry !== null ? 'https://'.$registry : ($meta === null ? null : $meta->composerRepositoryUrl()));
+        $composer = [];
+        if ($origin->isComposerRepository()) {
+            $composer = array_merge($meta === null ? [] : [$meta->composerRepositoryUrl()], self::registryUrls($origin->registry()));
+        }
         $kept = [];
         $accepted = [];
         foreach ($s10->checks() as $check) {
@@ -603,6 +607,21 @@ final class Analyzer
         }
         // With nothing accepted, keeping() gives S10 back with the words that it had.
         return [NotCheckedRule::keeping($signals, $kept, $where->host(), $package->origin()->kind()), $accepted];
+    }
+
+    /**
+     * The URLs that name a registry in `accept-unchecked`: its host, and repo.packagist.org for
+     * packagist.org.
+     *
+     * @return list<string>
+     */
+    private static function registryUrls(?string $registry): array
+    {
+        if ($registry === null) {
+            return [];
+        }
+
+        return $registry === 'packagist.org' ? ['https://packagist.org', 'https://repo.packagist.org'] : ['https://'.$registry];
     }
 
     /**
