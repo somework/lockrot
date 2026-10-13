@@ -170,8 +170,11 @@ final class CaseHydrator
             $case = self::case($id);
             $report = self::report($case);
             $package = JsonPath::stringAt($case, ['finding', 'package']);
+            if (isset($findings[$package])) {
+                continue;
+            }
             foreach ($report->findings() as $finding) {
-                if ($finding->package() === $package && !isset($findings[$package])) {
+                if ($finding->package() === $package) {
                     $findings[$package] = $finding;
                 }
             }

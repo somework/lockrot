@@ -51,7 +51,7 @@ depth: 17 of 37 flagged packages are named by no line of composer.json · direct
 security: 14 vulnerable packages · 51 advisories: 1 critical, 11 high, 24 medium, 3 unrated, 12 low
 libyears: 90.1 behind across 35 of 41 packages · 45.9 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: `mautic/core-lib` 4 · `guzzlehttp/guzzle` 2 · `akaunting/laravel-apexcharts` 1 · `genealabs/laravel-model-caching` 1 · `jfcherng/php-diff` 1 · … and 5 more
-advisories: 41 packages asked · packagist.org answered (224 on record for 40 packages)
+advisories: 41 packages asked · packagist.org answered (51 on record for 14 packages)
 
 **Update now:** `composer update robrichards/xmlseclibs league/commonmark symfony/routing league/flysystem symfony/yaml symfony/polyfill-intl-idn`
 
