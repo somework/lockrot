@@ -200,7 +200,7 @@ final class SarifFormatter implements FormatterInterface
             throw new \RuntimeException('Cannot encode report as SARIF: '.json_last_error_msg());
         }
 
-        // `rank` is the float that SARIF types it as (100.0); every other whole number reads as report-2 writes it (SPEC-0.14.md §8.5.4).
+        // SARIF types `rank` as a float (100.0). Every other whole number reads as report-2 writes it (SPEC-0.14.md §8.5.4).
         return (string) preg_replace('{^(\s*"rank": -?\d+)(,?)$}m', '$1.0$2', $json)."\n";
     }
 }

@@ -131,14 +131,15 @@ final class ContractBundle
     }
 
     /**
-     * A PowerShell rendering of $argv: a word outside the plain set is single-quoted, its quotes doubled.
+     * A PowerShell rendering of $argv (SPEC-0.14.md §5.6): a word with a character outside the POSIX set
+     * is single-quoted, its quotes doubled.
      *
      * @param list<string> $argv
      */
     public static function powershell(array $argv): string
     {
         return implode(' ', array_map(static function (string $word): string {
-            return preg_match('{^[A-Za-z0-9_./:=+^~-]+$}', $word) === 1 ? $word : "'".str_replace("'", "''", $word)."'";
+            return preg_match('{^[A-Za-z0-9/._:@%+=,-]+$}', $word) === 1 ? $word : "'".str_replace("'", "''", $word)."'";
         }, $argv));
     }
 

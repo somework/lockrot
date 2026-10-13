@@ -7,8 +7,8 @@ $paths = array_filter(
     'is_dir'
 );
 
-// bin/lockrot, bin/record-fixtures and tools/report/record are extensionless PHP scripts; Finder only
-// picks up *.php by default, so they are named explicitly.
+// bin/lockrot, bin/record-fixtures and tools/report/record are extensionless PHP scripts. Finder
+// picks up *.php only, so the list names them.
 $finder = PhpCsFixer\Finder::create()
     ->in($paths)
     ->name('lockrot')

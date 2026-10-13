@@ -12,7 +12,7 @@ declare(strict_types=1);
 // The bundle is lockrot's own output for the cases of tests/fixtures/flags/cases.json, hydrated with
 // the clock of tests/fixtures/flags/provenance.json and no network. Before it writes, it compares
 // the strings that the PHP grammars own with the model's goldens and stops on a difference. Every
-// file carries the tool version 0.14.0 (Lockrot\Tests\Support\VersionMask).
+// file carries the release that Lockrot\Tests\Support\VersionMask names as the tool version.
 require __DIR__.'/../../vendor/autoload.php';
 
 use Lockrot\Analyzer\RunSettings;
@@ -72,6 +72,8 @@ if (\in_array($argv[1] ?? null, ['--baselined', '--all-baselined'], true)) {
         }
         fwrite(STDOUT, \sprintf("record: %s, %d files\n", $scenario, \count($files)));
     }
+    // bundle_sha256 covers each scenario's check/report.bundle.json.
+    write(FIXTURES.'contract/bundle_sha256', ContractBundle::sha256(bundleFiles())."\n");
     exit(0);
 }
 if (\count($argv) > 1) {

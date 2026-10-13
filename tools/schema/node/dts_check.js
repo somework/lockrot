@@ -1,10 +1,10 @@
 // The TypeScript contract of report-2 under tsc --strict:
 //   1. types/lockrot-report-2.d.ts with ../ts/probes.generated.ts compiles clean;
-//   2. tests/fixtures/bundle.generated.ts and every report-2 fixture document, written as an object literal
-//      `satisfies Report2`, compile (a literal keeps each string's literal type, so a value outside a closed set fails;
-//      a JSON import widens every string and would not catch it);
-//   3. three planted regressions fail: a closed set typed `string` in the shapes (the probes catch it), a known value
-//      dropped from a union (union_parity.js catches it), a value outside a closed set in a document.
+//   2. tests/fixtures/bundle.generated.ts and every report-2 fixture document compile, each written as an object
+//      literal `satisfies Report2`. A literal keeps each string's literal type, so a value outside a closed set fails.
+//      A JSON import widens every string and cannot catch it.
+//   3. three planted regressions fail: a closed set typed `string` in the shapes, a known value dropped from a union,
+//      and a value outside a closed set in a document.
 'use strict';
 const fs = require('fs');
 const os = require('os');

@@ -7,17 +7,10 @@ namespace Lockrot\Tests\Support\Contract;
 use Lockrot\Tests\Support\ScoreLineFromJson;
 
 /**
- * The strings of SPEC-0.14.md §7.11, rendered again from a decoded document alone. It shares no code
- * with lockrot's grammars and follows the reference model (`spec_flags_r3.py`: `step_text`,
- * `run_gate_text`, `gate_text`, `age_line`, `baseline_suffix`). Each renderer takes the inputs that
- * {@see Fields::only()} keeps, so a renderer that reads a field outside its list fails and names it.
- *
- * FlagSentence, SignalSentence and NoteSentence are held by their goldens, not rendered here:
- *   flag     = clause (" and " clause)*                         one clause per signal of flags[].signal_ids
- *   signal   = SignalSentence of S1 … S10 from signals[].data    S9 from security and the S9 rows
- *   note     = NoteSentence of note_details[].code and .data      one golden per code
- *
- * The words come from the bundle (tests/fixtures/contract/en/), never from lockrot's classes.
+ * The strings of SPEC-0.14.md §7.11, rendered again from a decoded document alone, as the reference
+ * model renders them. It shares no code with lockrot's grammars. Each renderer reads only the fields
+ * that {@see Fields::only()} keeps. The words come from tests/fixtures/contract/en/. FlagSentence,
+ * SignalSentence and NoteSentence are held by their goldens, not rendered here.
  */
 final class ReferenceText
 {
@@ -315,7 +308,7 @@ final class ReferenceText
             }
         }
 
-        return $value === 0.0 ? 'less than three weeks ago' : \sprintf('%.1F years ago', $value);
+        throw new MissingField('years-phrases.json pair '.$value);
     }
 
     /**

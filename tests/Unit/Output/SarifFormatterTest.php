@@ -132,7 +132,6 @@ final class SarifFormatterTest extends TestCase
         self::assertTrue($validator->isValid(), implode("\n", $messages));
     }
 
-    /** In case either-critical‡ only the other move of symfony/debug clears its critical advisory. */
     /** SPEC-0.14.md §8.5.4: a whole number reads `0`, never `0.0`; only `rank` keeps its zero fraction. */
     public function testOnlyTheRankKeepsAZeroFraction(): void
     {
@@ -144,6 +143,7 @@ final class SarifFormatterTest extends TestCase
         self::assertStringNotContainsString('"years": 0.0', $sarif);
     }
 
+    /** In case either-critical‡ only the other move of symfony/debug clears its critical advisory. */
     public function testAnAdvisoryThatOnlyAnOtherMoveClearsNamesThatMove(): void
     {
         $sarif = JsonPath::decoded(json_decode((new SarifFormatter(FormatContext::create(null, 'high')))->format(CaseHydrator::report(CaseHydrator::case('either-critical‡')), true), true));

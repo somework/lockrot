@@ -22,7 +22,7 @@ recorded file. Re-record them when lockrot's output changes, and review the diff
 
 The recorder runs every scenario twice and writes only when both runs agree byte for byte. It
 refuses a scenario that misses a coverage floor (`BaselinedFloors`). Every recorded file carries the
-tool version `0.14.0`, and the address of the fixture server loses its port.
+tool version that `VersionMask` names, and the address of the fixture server loses its port.
 
 Record the answers of a new lock once, with the network:
 

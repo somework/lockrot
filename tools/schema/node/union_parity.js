@@ -1,8 +1,8 @@
 // Reads every union of types/lockrot-report-2.known.d.ts through the TypeScript compiler API and asserts that
-//   1. each union's literal members equal its schema node's `enum` or `x-known-values`, and an open set (and only an open
-//      set) also admits `string & {}` (`number & {}` for an integer set);
-//   2. every `enum` and `x-known-values` node of report-2 (`$ref`s resolved, relation `allOf` and `not` excluded) is one
-//      of those unions' pointers, so no closed or open set is left typed as a bare string.
+//   1. each union's literal members equal its schema node's `enum` or `x-known-values`. Only an open set also admits
+//      `string & {}`, or `number & {}` for an integer set.
+//   2. every `enum` and `x-known-values` node of report-2 is the pointer of one union. So no set is typed as a bare
+//      string. The walk resolves each `$ref` and leaves out the relation `allOf` and `not` groups.
 // The probes (../ts/probes.generated.ts, compiled by dts_check.js) hold the shapes to the unions. This holds the unions to
 // the schema.
 'use strict';
