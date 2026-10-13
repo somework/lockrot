@@ -194,7 +194,6 @@ final class JsonSchemaConformanceTest extends TestCase
         $json = (new JsonFormatter())->format(self::analysis($dir)->report());
 
         self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/report-2.json\",\n", $json);
-        $this->assertValid(Schemas::REPORT, $json, $dir);
         $this->assertValid(Schemas::REPORT, $json, $dir, true);
         self::assertNoteDetailsAgree(self::decoded($json), $dir);
     }
@@ -218,7 +217,6 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertInstanceOf(\stdClass::class, $payload, $dir.': '.json_last_error_msg());
 
         $report = json_encode($payload->report, \JSON_THROW_ON_ERROR);
-        $this->assertValid(Schemas::REPORT, $report, $dir.' (html payload)');
         $this->assertValid(Schemas::REPORT, $report, $dir.' (html payload)', true);
 
         self::assertNotSame([], (array) $payload->details, $dir.' explains the packages it flagged');
@@ -255,7 +253,6 @@ final class JsonSchemaConformanceTest extends TestCase
 
         $json = (new JsonFormatter())->format($report);
 
-        $this->assertValid(Schemas::REPORT, $json, 'a report that knows its run');
         $this->assertValid(Schemas::REPORT, $json, 'a report that knows its run', true);
         self::assertNoteDetailsAgree(self::decoded($json), 'a report that knows its run');
 
@@ -313,7 +310,6 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame([['package' => 'vendor/shared', 'verdict' => 'low', 'lead' => 'stale', 'flag_ids' => ['stale'], 'fan_in' => 9]], $decoded['unattributed']);
         self::assertSame(['max_fan_in' => 8], $decoded['exposure_rule']);
         self::assertSame([['package' => 'root/r01', 'flagged' => 1]], $decoded['exposure']);
-        $this->assertValid(Schemas::REPORT, $json, 'a report with an unattributed package');
         $this->assertValid(Schemas::REPORT, $json, 'a report with an unattributed package', true);
 
         // And the strict twin does close the items: a renamed member fails.
@@ -541,7 +537,6 @@ final class JsonSchemaConformanceTest extends TestCase
         };
 
         foreach (array_merge($known, [null]) as $value) {
-            $this->assertValid(Schemas::EXPLAIN, $withValue($value), $field.' '.(string) $value);
             $this->assertValid(Schemas::EXPLAIN, $withValue($value), $field.' '.(string) $value, true);
         }
         $unknown = $withValue('extension');
@@ -698,7 +693,6 @@ final class JsonSchemaConformanceTest extends TestCase
         ];
         foreach ($valid as $what => $change) {
             $document = self::withRulerzS6($json, $change);
-            $this->assertValid(Schemas::REPORT, $document, $what);
             $this->assertValid(Schemas::REPORT, $document, $what, true);
         }
         $invalid = [
@@ -727,7 +721,6 @@ final class JsonSchemaConformanceTest extends TestCase
         foreach (self::documentsFor('doctrine/cache') as $schema => [$decoded, $path]) {
             self::assertTrue(JsonPath::arrayAt($decoded, $path)['from_composer_repository'], $schema.': wallabag\'s packages all come from Packagist');
             $changed = self::withFindingKey($decoded, $path, 'from_composer_repository', true);
-            $this->assertValid($schema, $changed, $schema.' true');
             $this->assertValid($schema, $changed, $schema.' true', true);
             foreach ([false, self::ABSENT, null, 'yes', 1] as $value) {
                 self::assertNotSame([], $this->errors($schema, self::withFindingKey($decoded, $path, 'from_composer_repository', $value), false), $schema.' '.var_export($value, true));
@@ -749,7 +742,6 @@ final class JsonSchemaConformanceTest extends TestCase
             foreach (array_diff(Libyears::REASONS, [Libyears::NOT_FROM_COMPOSER_REPOSITORY, Libyears::UNAVAILABLE, Libyears::NOT_FOUND]) as $value) {
                 $what = $schema.' '.var_export($value, true);
                 $changed = self::withFindingKey($decoded, $path, 'libyears_unmeasured', $value);
-                $this->assertValid($schema, $changed, $what);
                 $this->assertValid($schema, $changed, $what, true);
             }
             foreach (['some_future_reason', 'branch_snapshots'] as $value) {
@@ -833,7 +825,6 @@ final class JsonSchemaConformanceTest extends TestCase
             return (string) json_encode($report);
         };
         foreach ([true, false] as $value) {
-            $this->assertValid(Schemas::REPORT, $withValue($value), var_export($value, true));
             $this->assertValid(Schemas::REPORT, $withValue($value), var_export($value, true), true);
         }
         foreach ([null, 'yes', 1, self::ABSENT] as $value) {
@@ -868,7 +859,6 @@ final class JsonSchemaConformanceTest extends TestCase
         }
         self::assertIsInt($at, 'a wallabag finding reaches --fail-on=stale');
         self::assertSame(['reaches_fail_on' => true, 'fails' => false, 'exempt_by' => 'baseline'], array_intersect_key(JsonPath::arrayAt($decoded, ['findings', $at, 'gate']), array_flip(['reaches_fail_on', 'fails', 'exempt_by'])));
-        $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'the gate');
         $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'the gate', true);
 
         // A failing gate names its cause, and a cause other than `fail_on` needs no failing finding.
@@ -944,7 +934,6 @@ final class JsonSchemaConformanceTest extends TestCase
         // Decoded to arrays, the offline note's `{}` comes back as a list.
         $details[0] = array_merge(JsonPath::arrayAt($details, [0]), ['data' => new \stdClass()]);
         $decoded['note_details'] = $details;
-        $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'every code');
         $this->assertValid(Schemas::REPORT, (string) json_encode($decoded), 'every code', true);
 
         $open = [
@@ -1132,7 +1121,6 @@ final class JsonSchemaConformanceTest extends TestCase
             $json = (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()));
 
             self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/explain-2.json\",\n", $json);
-            $this->assertValid(Schemas::EXPLAIN, $json, $package);
             $this->assertValid(Schemas::EXPLAIN, $json, $package, true);
             self::assertNoteDetailsAgree(self::decoded($json), $package);
         }
@@ -1149,7 +1137,6 @@ final class JsonSchemaConformanceTest extends TestCase
                 $json = (string) file_get_contents($file->path());
 
                 self::assertStringStartsWith("{\n    \"\$schema\": \"https://lockrot.dev/schema/baseline-2.json\",\n", $json);
-                $this->assertValid(Schemas::BASELINE, $json, $fixture);
                 $this->assertValid(Schemas::BASELINE, $json, $fixture, true);
                 // And what lockrot wrote, lockrot reads back through the same schema.
                 self::assertSame(\count(self::analysis($fixture)->report()->graded()), $file->read()->count(), $fixture);
@@ -1257,7 +1244,6 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame([], $decoded['exposure']);
         self::assertSame([], $decoded['unattributed']);
         self::assertSame(['max_fan_in' => 8], $decoded['exposure_rule']);
-        $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json');
         $this->assertValid(Schemas::REPORT, $json, 'a lock without its composer.json', true);
         self::assertNoteDetailsAgree($decoded, 'a lock without its composer.json');
         $run = JsonPath::arrayAt($decoded, ['run']);

@@ -99,7 +99,6 @@ final class RunNoteAgreementTest extends TestCase
     {
         $report = $analysis->report();
         $json = (new JsonFormatter())->format($report);
-        $this->assertValid(Schemas::REPORT, $json, $what);
         $this->assertValid(Schemas::REPORT, $json, $what, true);
         $document = json_decode($json, true);
         self::assertIsArray($document);

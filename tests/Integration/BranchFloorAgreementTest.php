@@ -140,7 +140,6 @@ final class BranchFloorAgreementTest extends TestCase
     private function validate(Explanation $explanation, string $what): array
     {
         $json = (new ExplainFormatter())->json($explanation);
-        $this->assertValid(Schemas::EXPLAIN, $json, $what);
         $this->assertValid(Schemas::EXPLAIN, $json, $what, true);
         $seen = [];
         $metadata = $explanation->toArray()['metadata'];

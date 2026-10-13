@@ -139,7 +139,6 @@ final class OriginAgreementTest extends TestCase
         $document = json_decode($json, true);
         self::assertIsArray($document);
         $sample = ReportSample::json($json);
-        $this->assertValid(Schemas::REPORT, $sample, $dir);
         $this->assertValid(Schemas::REPORT, $sample, $dir, true);
         $page = (new ReportDocument($report, new PageData($analysis, new Thresholds(), '8.4')))->toArray(true);
         $pageFindings = JsonPath::arrayAt($page, ['report', 'findings']);

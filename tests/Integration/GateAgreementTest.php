@@ -203,7 +203,6 @@ final class GateAgreementTest extends TestCase
                             // does not depend on the threshold, and validating every document is slow.
                             if ($value === 'medium' && $strict && $networkFailures && ($baseline !== null) === ($mode === Gate::MODE_CHECK)) {
                                 $json = (new JsonFormatter())->format($withRun);
-                                $this->assertValid(Schemas::REPORT, $json, $what);
                                 $this->assertValid(Schemas::REPORT, $json, $what, true);
                             }
                         }

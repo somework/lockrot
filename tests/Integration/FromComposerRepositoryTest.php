@@ -130,7 +130,6 @@ final class FromComposerRepositoryTest extends TestCase
         $document = json_decode($json, true);
         self::assertIsArray($document);
         $sample = ReportSample::json($json);
-        $this->assertValid(Schemas::REPORT, $sample, $dir);
         $this->assertValid(Schemas::REPORT, $sample, $dir, true);
         $page = (new ReportDocument($report, new PageData($analysis, new Thresholds(), '8.4')))->toArray(true);
         $details = $page['details'];
@@ -184,7 +183,6 @@ final class FromComposerRepositoryTest extends TestCase
             $facts = $analysis->facts($finding->package());
             self::assertNotNull($facts);
             $json = (new ExplainFormatter())->json(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report()));
-            $this->assertValid(Schemas::EXPLAIN, $json, $finding->package());
             $this->assertValid(Schemas::EXPLAIN, $json, $finding->package(), true);
             ++$explained;
         }
