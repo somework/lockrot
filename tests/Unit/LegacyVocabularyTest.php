@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Live code reads the grade, the lead and the flags, never 0.13's verdict predicate, its verdict
- * counts or its order (DECISIONS 2.31).
+ * counts or its order.
  */
 final class LegacyVocabularyTest extends TestCase
 {
