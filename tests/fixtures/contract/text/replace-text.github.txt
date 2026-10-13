@@ -1,0 +1,4 @@
+::error file=composer.lock,title=lockrot%3A critical — abandoned::sensio/framework-extra-bundle v6.2.10: 32 = abandoned 32. Do: replace it: its registry suggests "Symfony". abandoned: marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago).
+flags: abandoned 1
+depth: every flagged package is named in composer.json · direct 1
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

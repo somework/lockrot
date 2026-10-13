@@ -428,7 +428,7 @@
         ],
         "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; left-behind: branch 4.x last released 2022-09-23 (4.1 years ago); 5.x released v5.4.45 (2024-09-25)",
         "allowlist_reason": null,
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "libyears": 2.01,
         "age": {
             "installed": {
@@ -523,7 +523,7 @@
         "installed_release_dated_by": null,
         "repository": "https://github.com/symfony/security-guard.git",
         "type": "library",
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "branches": [
             {
                 "branch": "5.x",
@@ -1351,7 +1351,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],
     "note_details": []
 }

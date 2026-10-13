@@ -1430,7 +1430,7 @@
                             "release": {
                                 "version": "2.17.08.29",
                                 "at": "2017-08-29T13:46:07+00:00",
-                                "years": 9.0,
+                                "years": 9,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -1973,7 +1973,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2026-09-13T01:49:25+00:00",
-                                "years": 0.0,
+                                "years": 0,
                                 "level": null
                             },
                             "push_unmeasured": null
@@ -2731,14 +2731,14 @@
                         "age": {
                             "installed": {
                                 "at": "2024-09-05T10:17:24+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "2.0.2",
                                 "at": "2024-09-05T10:17:24+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -2746,7 +2746,7 @@
                             "branch_release": {
                                 "version": "2.0.2",
                                 "at": "2024-09-05T10:17:24+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -3028,7 +3028,7 @@
                             "release": {
                                 "version": "2.17.08.30",
                                 "at": "2017-08-30T12:19:49+00:00",
-                                "years": 9.0,
+                                "years": 9,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -3124,7 +3124,7 @@
                             "release": {
                                 "version": "2.17.08.30",
                                 "at": "2017-08-30T12:12:32+00:00",
-                                "years": 9.0,
+                                "years": 9,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -4183,14 +4183,14 @@
                         "age": {
                             "installed": {
                                 "at": "2024-09-25T14:11:13+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "v5.4.45",
                                 "at": "2024-09-25T14:11:13+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -4198,7 +4198,7 @@
                             "branch_release": {
                                 "version": "v5.4.45",
                                 "at": "2024-09-25T14:11:13+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -4294,7 +4294,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2026-09-03T09:20:31+00:00",
-                                "years": 0.0,
+                                "years": 0,
                                 "level": null
                             },
                             "push_unmeasured": null
@@ -4738,7 +4738,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2026-09-01T09:05:18+00:00",
-                                "years": 0.0,
+                                "years": 0,
                                 "level": null
                             },
                             "push_unmeasured": null

@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "doctrine/cache 2.1.1 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2022-05-20 (4.4 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "a3509aa32b12761360cb5ffc048ead9659b7b811cb7cc2e5a53ab42fcd1fc84c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

@@ -1,0 +1,22 @@
+<options=bold><fg=red>critical (1)</fg=red></options=bold>
+  guzzlehttp/guzzle 6.5.8  direct  ·  left-behind · vulnerable
+      32 = left-behind 16 + vulnerable 16 [high advisory]
+      do: raise require.php to \>=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 9 advisories;
+          7.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; a new major
+          brings its own requirements, which lockrot does not solve
+      left-behind  branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4
+                   || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach
+      vulnerable   9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host
+                   can bypass host-based checks
+
+1 package checked · 1 flagged: critical 1
+flags: left-behind 1 · vulnerable 1 · 1 package carries more than one
+depth: every flagged package is named in composer.json · direct 1
+security: 1 vulnerable package · 9 advisories: 1 high, 8 medium · packages-dev not checked (pass --dev)
+fix, by package: php floor raise 1
+libyears: 4.2 behind across the one package · 4.2 from direct requirements ·
+furthest behind guzzlehttp/guzzle 6.5.8 at 4.2
+advisories: 1 package asked · packagist.org answered (9 on record for 1 package)
+<fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
+Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+details.

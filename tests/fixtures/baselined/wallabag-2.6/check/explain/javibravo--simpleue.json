@@ -287,7 +287,7 @@
         ],
         "evidence": "silent: last release 2017-11-15 (8.9 years ago); last push 2017-11-18 (8.9 years ago); old-promise: released 2017-11-15 for PHP 5 (php \">=5.5\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
         "allowlist_reason": null,
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "libyears": 0,
         "age": {
             "installed": {
@@ -385,7 +385,7 @@
         "installed_release_dated_by": null,
         "repository": "https://github.com/javibravo/simpleue.git",
         "type": "library",
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "branches": [
             {
                 "branch": "2.x",
@@ -1177,7 +1177,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],
     "note_details": []
 }

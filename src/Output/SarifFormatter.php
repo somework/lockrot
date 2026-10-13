@@ -194,13 +194,13 @@ final class SarifFormatter implements FormatterInterface
     /** @param array<string, mixed> $document */
     private static function encode(array $document): string
     {
-        // PRESERVE_ZERO_FRACTION writes `rank` as 100.0, not 100, the float that SARIF types it as.
-        $json = JsonWriter::encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION);
+        $json = JsonWriter::encode($document, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
         // Report data always encodes. Without this guard, a failure prints an empty document.
         if ($json === null) {
             throw new \RuntimeException('Cannot encode report as SARIF: '.json_last_error_msg());
         }
 
-        return $json."\n";
+        // `rank` is the float that SARIF types it as (100.0); every other whole number reads as report-2 writes it (SPEC-0.14.md §8.5.4).
+        return (string) preg_replace('{^(\s*"rank": -?\d+)(,?)$}m', '$1.0$2', $json)."\n";
     }
 }

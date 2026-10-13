@@ -4,7 +4,7 @@ twig/twig v2.16.1 — critical: vulnerable
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -469,7 +469,7 @@ twig/twig v1.43.1 — critical: old-promise · vulnerable
 
 age       installed  v1.43.1   2020-08-05   6.2 years ago
           1.x        v1.44.8   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 6.1 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -1321,13 +1321,43 @@ repository metadata
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 1 of 1 · upgrade; held by composer.json; after it: 20, high, if Composer resolves it
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    1 of 1 · composer update (lowest fix); after it: 20, high, if Composer resolves it
 
+== case affected-range-unknown‡
+symfony/polyfill-intl-idn v1.37.0 — low: vulnerable
+  via guzzlehttp/guzzle > symfony/polyfill-intl-idn: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  v1.37.0   not read (no date)
+          1.x        v1.43.0   2026-09-23   0.1 years ago                 below release-warn-years 3
+          newest     v1.43.0   2026-09-23   0.1 years ago                 below release-warn-years 3
+          last push            not read (allowlisted)
+          libyears not measured: no date
+repository repository activity not asked (allowlisted)
+
+score     2 = vulnerable 2 [low advisory]     low from 1
+  security     vulnerable 2 (low advisory CVE-2026-46644)
+  reach        via guzzlehttp/guzzle: maintenance would be halved (none counts); security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        no move: no advisory names the versions it affects, so lockrot names no fix
+
+flags
+  vulnerable   S9 · 1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence · lookup complete
+    low        CVE-2026-46644  symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
+               PKSA-dwsq-ppd2-mb1x · reported 2026-05-26 · 2 points · fix: fix unknown
+  feeds        packagist.org: 1 on record, 1 affects v1.37.0
+  accepted     none
+  not checked  S3, S4 (allowlisted)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 1.x      v1.43.0       2026-09-23   >=7.2      0 of 1
+
 == case A-blocked‡
 twig/twig v2.16.1 — critical: vulnerable
   direct requirement (composer.json require)
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -1387,7 +1417,7 @@ twig/twig v2.16.1 — critical: vulnerable
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -1448,7 +1478,7 @@ twig/twig v2.16.1 — critical: vulnerable
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -1837,7 +1867,7 @@ twig/twig v2.16.1 — high: vulnerable
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -2295,8 +2325,8 @@ note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: sym
 bacon/bacon-qr-code 2.0.8 — medium: left-behind
   unreached: lockrot found no path from your require or require-dev to it
 
-age       installed  2.0.8     2022-12-07   3.8 years ago
-          2.x        2.0.8     2022-12-07   3.8 years ago                 past release-warn-years 3
+age       installed  2.0.8     2022-12-07   3.9 years ago
+          2.x        2.0.8     2022-12-07   3.9 years ago                 past release-warn-years 3
           newest     v3.1.1    2026-04-05   0.5 years ago                 below release-warn-years 3
           last push            2026-09-16   0.1 years ago                 below push-warn-years 3
           libyears 3.3 behind the newest stable release
@@ -2311,7 +2341,7 @@ do        raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 — 
           clears left-behind
 
 flags
-  left-behind  S8 · branch 2.x last released 2022-12-07 (3.8 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach
+  left-behind  S8 · branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach
   feeds        packagist.org: none on record
   accepted     none
   not checked  nothing
@@ -2329,7 +2359,7 @@ symfony/event-dispatcher 5.4.x-dev — medium: pinned
 age       installed  5.4.x-dev not read (a branch snapshot has no release branch)
           5.x        v5.4.45   2024-09-25   2.0 years ago                 below release-warn-years 3
           newest     v8.1.5    2026-08-21   0.1 years ago                 below release-warn-years 3
-          last push            2026-09-25   less than three weeks ago     below push-warn-years 3
+          last push            2026-09-25   0.1 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/symfony/event-dispatcher: last push 2026-09-25 · fetched 2026-09-14
 
@@ -2365,7 +2395,7 @@ symfony/event-dispatcher 4.4.x-dev — medium: pinned
 age       installed  4.4.x-dev not read (a branch snapshot has no release branch)
           4.x        v4.4.44   2022-07-20   4.2 years ago                 past release-warn-years 3
           newest     v8.1.5    2026-08-21   0.1 years ago                 below release-warn-years 3
-          last push            2026-09-25   less than three weeks ago     below push-warn-years 3
+          last push            2026-09-25   0.1 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/symfony/event-dispatcher: last push 2026-09-25 · fetched 2026-09-14
 
@@ -2401,7 +2431,7 @@ symfony/event-dispatcher 4.4.x-dev — medium: pinned
 age       installed  4.4.x-dev not read (a branch snapshot has no release branch)
           4.x                  not read (undated releases)
           newest     v8.1.5    2026-08-21   0.1 years ago                 below release-warn-years 3
-          last push            2026-09-25   less than three weeks ago     below push-warn-years 3
+          last push            2026-09-25   0.1 years ago                 below push-warn-years 3
           libyears not measured: a branch snapshot has no release branch
 repository GitHub github.com/symfony/event-dispatcher: last push 2026-09-25 · fetched 2026-09-14
 
@@ -2873,7 +2903,7 @@ twig/twig v2.16.1 — critical: vulnerable
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -3155,7 +3185,7 @@ twig/twig v2.16.1 — critical: vulnerable
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14
@@ -3296,7 +3326,7 @@ twig/twig v2.16.1 — critical: vulnerable
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
-          newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3
+          newest     v3.30.0   2026-09-25   0.1 years ago                 below release-warn-years 3
           last push            2026-09-30   less than three weeks ago     below push-warn-years 3
           libyears 2.0 behind the newest stable release
 repository GitHub github.com/twigphp/Twig: last push 2026-09-30 · fetched 2026-09-14

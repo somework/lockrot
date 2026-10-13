@@ -1,0 +1,223 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/advisory/PKSA-5x9t-bkbj-vmgp",
+                            "name": "advisory/PKSA-5x9t-bkbj-vmgp",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-5x9t-bkbj-vmgp affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/advisory/PKSA-5x9t-bkbj-vmgp",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "joomla/filter 2.0.5 is affected by CVE-2025-54476 (medium advisory): Joomla! CMS vulnerable to XSS via the input filter. Do: raise require.php to >=8.1, then require joomla/filter ^3.0.5 \u2014 clears the advisory; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "joomla/filter",
+                        "lockrot/advisory": "PKSA-5x9t-bkbj-vmgp"
+                    },
+                    "properties": {
+                        "package": "joomla/filter",
+                        "version": "2.0.5",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": null,
+                        "score_total": 8,
+                        "score_text": "8 = vulnerable 8 [medium advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "joomla/filter"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "joomla/filter",
+                            "joomla/input",
+                            "joomla/oauth1",
+                            "joomla/oauth2"
+                        ],
+                        "signal_ids": [
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2024-08-20T15:37:30+00:00",
+                                "years": 2.1,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "3.0.7",
+                                "at": "2026-09-29T16:10:51+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "2.0.6",
+                                "at": "2025-09-30T15:42:11+00:00",
+                                "years": 1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-29T16:11:19+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-5x9t-bkbj-vmgp",
+                        "cve": "CVE-2025-54476",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "3.0.5",
+                            "newest": "3.0.7",
+                            "on_installed_branch": false,
+                            "php": "^8.1.0",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-5x9t-bkbj-vmgp",
+                            "severity": "medium",
+                            "fix_kind": "raise-php",
+                            "weight": 8,
+                            "multiplier": 1,
+                            "points": 8,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                },
+                                {
+                                    "value": "unchecked",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high,unchecked \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high,unchecked",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            },
+                            {
+                                "value": "unchecked",
+                                "kind": "unchecked",
+                                "threshold": null
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 1,
+                            "records": 1
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

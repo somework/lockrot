@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high (18 = pinned 16 + stale 2 [\u00bc of 8]) \u2014 pinned: pinned to branch snapshot dev-master. Do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "5c76bac52e93c068b6abb03ecd5e1dca10eb7582ab62abea9af66e6c2e944c3c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high (18 = pinned 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2019-01-23 (7.7 years ago). Do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "d6a99a491c8912a16186959d72b7872e8647564c9ccd2868a54a297da3160912",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

@@ -1,10 +1,10 @@
 {
  "pr": "6b",
  "source": {
-  "cases.json": "f90d69c457bdc04e6b31198c59573bb0532c512feac3235753c9ce57ad4a1939",
-  "model_run_date": "2026-10-13"
+  "cases.json": "0c2af924eb3d0d0fd329155a7439ddbc090773aaa8d67ac7cc92d38dc2099228",
+  "model_run_date": "2026-10-14"
  },
- "suite": "spec_flags_r3.py cases, spec_flags_r3_docs_coverage.py and relations_round4.py pass (run_all.sh not run)",
+ "suite": "run_all.sh (pending)",
  "dropped": [],
  "reverted": {},
  "cases_without_inputs": [

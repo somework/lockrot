@@ -1,0 +1,195 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/pinned",
+                            "name": "pinned",
+                            "shortDescription": {
+                                "text": "pinned: Installed version is a branch snapshot, or the package has no stable release"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "symfony/event-dispatcher 5.4.x-dev \u2014 finding medium, 8 = pinned 16 \u00f7 2 transitive \u2014 pinned: pinned to branch snapshot 5.4.x-dev. Do: move it to a tag \u2014 the newest on its own line is v5.4.45, through mautic/core-lib (2024-09-25); 5.x needs php >=7.2.5; what requires it must allow it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/event-dispatcher"
+                    },
+                    "properties": {
+                        "package": "symfony/event-dispatcher",
+                        "version": "5.4.x-dev",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": "pinned",
+                        "score_total": 8,
+                        "score_text": "8 = pinned 16 \u00f7 2 transitive",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "mautic/core-lib",
+                            "symfony/event-dispatcher"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "mautic/core-lib"
+                        ],
+                        "signal_ids": [
+                            "S6"
+                        ],
+                        "age": {
+                            "installed": null,
+                            "installed_unmeasured": "branch_snapshot",
+                            "release": {
+                                "version": "v8.1.5",
+                                "at": "2026-08-21T17:47:34+00:00",
+                                "years": 0.1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v5.4.45",
+                                "at": "2024-09-25T14:11:13+00:00",
+                                "years": 2,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-25T06:27:20+00:00",
+                                "years": 0.1,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "pinned",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

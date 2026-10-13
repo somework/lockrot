@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -1183,7 +1183,7 @@
         ],
         "fix_unknown": 0
     },
-    "data_date": "2026-10-13T00:00:00+00:00",
+    "data_date": "2026-10-14T00:00:00+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1468,7 +1468,7 @@
             ],
             "evidence": "silent: last release 2017-11-15 (8.9 years ago); last push 2017-11-18 (8.9 years ago); old-promise: released 2017-11-15 for PHP 5 (php \">=5.5\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -1564,7 +1564,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -1826,7 +1826,7 @@
             ],
             "evidence": "silent: last release 2020-04-24 (6.5 years ago); last push 2020-04-28 (6.5 years ago); old-promise: released 2020-04-24 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -1864,7 +1864,7 @@
                     "lead": "silent",
                     "flags": {
                         "silent": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         },
                         "old-promise": {
                             "known_since": "2024-05-17"
@@ -2168,7 +2168,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -2261,7 +2261,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -2662,7 +2662,7 @@
                                 },
                                 "baseline": {
                                     "state": "known",
-                                    "since": "2026-10-13",
+                                    "since": "2026-10-14",
                                     "covered_by": null
                                 }
                             },
@@ -2711,7 +2711,7 @@
                                 },
                                 "baseline": {
                                     "state": "known",
-                                    "since": "2026-10-13",
+                                    "since": "2026-10-14",
                                     "covered_by": null
                                 }
                             }
@@ -2723,7 +2723,7 @@
             ],
             "evidence": "left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06); vulnerable: 2 advisories: 1 high, 1 medium \u2014 none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.22,
             "age": {
                 "installed": {
@@ -2761,11 +2761,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 2,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -3121,7 +3121,7 @@
             ],
             "evidence": "pinned: pinned to branch snapshot dev-master; stale: last release 2019-01-23 (7.7 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -3475,7 +3475,7 @@
             ],
             "evidence": "old-promise: released 2014-01-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2014-01-05 (12.8 years ago); last push 2022-08-04 (4.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -3855,7 +3855,7 @@
             ],
             "evidence": "silent: last release 2015-08-13 (11.2 years ago); last push 2015-08-13 (11.2 years ago); old-promise: released 2015-08-13 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -4234,7 +4234,7 @@
             ],
             "evidence": "silent: last release 2015-05-10 (11.4 years ago); last push 2015-08-13 (11.2 years ago); old-promise: released 2015-05-10 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -4614,7 +4614,7 @@
             ],
             "evidence": "silent: last release 2015-08-18 (11.2 years ago); last push 2015-08-18 (11.2 years ago); old-promise: released 2015-08-18 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -4710,7 +4710,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -4993,7 +4993,7 @@
             ],
             "evidence": "silent: last release 2015-05-14 (11.4 years ago); last push 2020-04-01 (6.5 years ago); old-promise: released 2015-05-14 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -5031,7 +5031,7 @@
                     "lead": "silent",
                     "flags": {
                         "silent": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         },
                         "old-promise": {
                             "known_since": "2024-05-17"
@@ -5409,7 +5409,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.5 years ago); old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.33,
             "age": {
                 "installed": {
@@ -5788,7 +5788,7 @@
             ],
             "evidence": "silent: last release 2015-11-16 (10.9 years ago); last push 2015-11-16 (10.9 years ago); old-promise: released 2015-11-16 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -6167,7 +6167,7 @@
             ],
             "evidence": "silent: last release 2017-11-21 (8.9 years ago); last push 2017-12-18 (8.8 years ago); old-promise: released 2017-11-21 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -6263,7 +6263,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -6522,7 +6522,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2022-10-12 (4.0 years ago); 2.x released 2.1.1 (2026-01-29)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.3,
             "age": {
                 "installed": {
@@ -6560,11 +6560,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -6615,7 +6615,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -6866,7 +6866,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.79,
             "age": {
                 "installed": {
@@ -6904,11 +6904,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -6959,7 +6959,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -7242,7 +7242,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.06,
             "age": {
                 "installed": {
@@ -7274,11 +7274,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -7329,7 +7329,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -7666,7 +7666,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=8.2; 7.x released v7.14.0 (2026-06-12)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.23,
             "age": {
                 "installed": {
@@ -7704,11 +7704,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -7759,7 +7759,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -8012,7 +8012,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.43,
             "age": {
                 "installed": {
@@ -8050,11 +8050,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -8105,7 +8105,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -8414,7 +8414,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.06,
             "age": {
                 "installed": {
@@ -8446,11 +8446,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -8501,7 +8501,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -8784,7 +8784,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.06,
             "age": {
                 "installed": {
@@ -8816,11 +8816,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -9097,7 +9097,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-06-27 (4.3 years ago); last push 2022-07-29 (4.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -9190,7 +9190,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -9419,7 +9419,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2023-09-26 (3.0 years ago); 2.x released v2.4.1 (2026-06-24)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.74,
             "age": {
                 "installed": {
@@ -9457,11 +9457,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -9901,7 +9901,7 @@
             ],
             "evidence": "pinned: pinned to branch snapshot dev-master",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -10392,7 +10392,7 @@
             ],
             "evidence": "pinned: pinned to branch snapshot dev-master",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -10695,7 +10695,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-03-30 (4.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -10989,7 +10989,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -11392,7 +11392,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; last release 2022-05-20 (4.4 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -11731,7 +11731,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.2 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -12071,7 +12071,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.63,
             "age": {
                 "installed": {
@@ -12410,7 +12410,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.62,
             "age": {
                 "installed": {
@@ -12749,7 +12749,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.3 years ago); last push 2018-01-23 (8.7 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -13089,7 +13089,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -13429,7 +13429,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -13768,7 +13768,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -14108,7 +14108,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -14446,7 +14446,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-07-10 (5.3 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -14786,7 +14786,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -15127,7 +15127,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -15466,7 +15466,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -15807,7 +15807,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2018-02-12 (8.7 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -16204,7 +16204,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -16587,7 +16587,7 @@
                                 },
                                 "baseline": {
                                     "state": "known",
-                                    "since": "2026-10-13",
+                                    "since": "2026-10-14",
                                     "covered_by": null
                                 }
                             }
@@ -16599,7 +16599,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 medium \u2014 all fixed on 3.x; advisory: CVE-2026-84308 phpseclib \u2014 non-constant-time X25519 scalar multiplication permits full private-key recovery",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.2,
             "age": {
                 "installed": {
@@ -16637,7 +16637,7 @@
                     "lead": null,
                     "flags": null,
                     "advisory_count": 1,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -16688,7 +16688,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -16889,7 +16889,7 @@
             ],
             "evidence": "stale: last release 2023-08-06 (3.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -16927,11 +16927,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -16982,7 +16982,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -17160,7 +17160,7 @@
             ],
             "evidence": "stale: last release 2023-06-19 (3.3 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -17198,11 +17198,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -17253,7 +17253,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -17454,7 +17454,7 @@
             ],
             "evidence": "stale: last release 2021-08-15 (5.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -17492,11 +17492,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -17547,7 +17547,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -17802,7 +17802,7 @@
             ],
             "evidence": "stale: last release 2022-03-21 (4.6 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -17840,11 +17840,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -18110,7 +18110,7 @@
             ],
             "evidence": "abandoned: its repository is archived on GitHub",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -18203,7 +18203,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -18452,7 +18452,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2021-08-03 (5.2 years ago); 2.x released v2.12.5 (2026-04-17)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.7,
             "age": {
                 "installed": {
@@ -18490,11 +18490,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -18545,7 +18545,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -18779,7 +18779,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2023-07-26 (3.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=8.2; 7.x released v7.4.8 (2026-03-24)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.84,
             "age": {
                 "installed": {
@@ -18817,11 +18817,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -19129,7 +19129,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2023-04-05 (3.5 years ago); 3.x released v3.4.0 (2026-02-04)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.84,
             "age": {
                 "installed": {
@@ -19426,7 +19426,7 @@
             ],
             "evidence": "pinned: pinned to branch snapshot dev-master",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -19830,7 +19830,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.0 (2026-02-06), needs php >=8.4 above the project's php >=8.2; 5.x released 5.0.1 (2024-07-03); old-promise: released 2020-09-28 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.36,
             "age": {
                 "installed": {
@@ -20267,7 +20267,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2020-10-26 (6.0 years ago); 6.x released 6.0.1 (2026-10-03), needs php >=8.4 above the project's php >=8.2; 4.x released 4.0.1 (2024-07-03); old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.94,
             "age": {
                 "installed": {
@@ -20690,7 +20690,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2020-10-26 (6.0 years ago); 9.x released 9.0.0 (2026-02-06), needs php >=8.4 above the project's php >=8.2; 7.x released 7.0.1 (2024-07-03); old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.28,
             "age": {
                 "installed": {
@@ -21120,7 +21120,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2020-10-26 (6.0 years ago); 3.x released 3.0.3 (2025-03-19); old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.39,
             "age": {
                 "installed": {
@@ -21544,7 +21544,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2020-09-28 (6.0 years ago); 4.x released 4.0.1 (2024-07-03); old-promise: released 2020-09-28 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.76,
             "age": {
                 "installed": {
@@ -21967,7 +21967,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2020-10-26 (6.0 years ago); 8.x released 8.1.0 (2026-08-13), needs php >=8.4 above the project's php >=8.2; 6.x released 6.0.1 (2024-07-03); old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.8,
             "age": {
                 "installed": {
@@ -22412,7 +22412,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2020-10-26 (6.0 years ago); 6.x released 6.1.0 (2026-08-13), needs php >=8.4 above the project's php >=8.2; 4.x released 4.0.1 (2024-07-03); old-promise: released 2020-10-26 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.8,
             "age": {
                 "installed": {
@@ -22849,7 +22849,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2020-09-28 (6.0 years ago); 7.x released 7.0.1 (2026-10-04), needs php >=8.4 above the project's php >=8.2; 5.x released 5.0.2 (2024-10-09); old-promise: released 2020-09-28 for PHP 7 (php \">=7.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 6.01,
             "age": {
                 "installed": {
@@ -22945,7 +22945,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -22957,10 +22957,10 @@
                     },
                     "headline": {
                         "unit": "years",
-                        "value": 3.4,
+                        "value": 3.5,
                         "source": "release"
                     },
-                    "summary": "last release 2023-05-02 (3.4 years ago); last push 2023-05-02 (3.4 years ago)"
+                    "summary": "last release 2023-05-02 (3.5 years ago); last push 2023-05-02 (3.5 years ago)"
                 }
             ],
             "score": {
@@ -23121,43 +23121,43 @@
                 {
                     "id": "S2",
                     "level": "warn",
-                    "summary": "last release 2023-05-02 (3.4 years ago)",
+                    "summary": "last release 2023-05-02 (3.5 years ago)",
                     "data": {
                         "last_release": "2023-05-02T19:20:41+00:00",
                         "last_version": "v5.6.0",
-                        "years": 3.4,
+                        "years": 3.5,
                         "dated_by": null
                     }
                 },
                 {
                     "id": "S4",
                     "level": "warn",
-                    "summary": "last push 2023-05-02 (3.4 years ago)",
+                    "summary": "last push 2023-05-02 (3.5 years ago)",
                     "data": {
                         "last_push": "2023-05-02T19:24:01+00:00",
                         "repo": "BedrockStreaming/RedisMock",
                         "host": "github.com",
-                        "years": 3.4,
+                        "years": 3.5,
                         "forge": "github",
                         "event": "push"
                     }
                 }
             ],
-            "evidence": "stale: last release 2023-05-02 (3.4 years ago); last push 2023-05-02 (3.4 years ago)",
+            "evidence": "stale: last release 2023-05-02 (3.5 years ago); last push 2023-05-02 (3.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2023-05-02T19:20:41+00:00",
-                    "years": 3.4,
+                    "years": 3.5,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
                 "release": {
                     "version": "v5.6.0",
                     "at": "2023-05-02T19:20:41+00:00",
-                    "years": 3.4,
+                    "years": 3.5,
                     "level": "warn",
                     "dated_by": null
                 },
@@ -23165,14 +23165,14 @@
                 "branch_release": {
                     "version": "v5.6.0",
                     "at": "2023-05-02T19:20:41+00:00",
-                    "years": 3.4,
+                    "years": 3.5,
                     "level": "warn",
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2023-05-02T19:24:01+00:00",
-                    "years": 3.4,
+                    "years": 3.5,
                     "level": "warn"
                 },
                 "push_unmeasured": null
@@ -23183,11 +23183,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -23435,7 +23435,7 @@
             ],
             "evidence": "stale: last release 2021-04-06 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -23726,7 +23726,7 @@
             ],
             "evidence": "stale: last release 2020-06-27 (6.3 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -23819,7 +23819,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -24089,7 +24089,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2021-12-02 (4.9 years ago); 7.x released 7.0.2 (2026-08-25), needs php >=8.4 above the project's php >=8.2; 5.x released 5.1.1 (2026-02-02)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.73,
             "age": {
                 "installed": {
@@ -24127,11 +24127,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -24182,7 +24182,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -24452,7 +24452,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2023-02-03 (3.7 years ago); 9.x released 9.3.3 (2026-10-01), needs php >=8.4 above the project's php >=8.2; 7.x released 7.2.1 (2025-05-21)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.66,
             "age": {
                 "installed": {
@@ -24490,11 +24490,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -24545,7 +24545,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -24801,7 +24801,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2023-02-03 (3.7 years ago); 7.x released 7.0.2 (2026-08-10), needs php >=8.4 above the project's php >=8.2; 5.x released 5.1.3 (2025-08-09)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.52,
             "age": {
                 "installed": {
@@ -24839,11 +24839,11 @@
                     "lead": "left-behind",
                     "flags": {
                         "left-behind": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -24894,7 +24894,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -25117,7 +25117,7 @@
             ],
             "evidence": "stale: last release 2022-01-30 (4.7 years ago); last push 2023-07-29 (3.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -25155,7 +25155,7 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
@@ -25210,7 +25210,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -25421,7 +25421,7 @@
             ],
             "evidence": "stale: last release 2022-01-30 (4.7 years ago); last push 2023-08-03 (3.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -25459,11 +25459,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -25514,7 +25514,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -25718,7 +25718,7 @@
             ],
             "evidence": "stale: last release 2022-12-23 (3.8 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -25756,11 +25756,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -25811,7 +25811,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -26016,7 +26016,7 @@
             ],
             "evidence": "stale: last release 2023-08-08 (3.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -26054,11 +26054,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -26109,7 +26109,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -26313,7 +26313,7 @@
             ],
             "evidence": "stale: last release 2022-02-21 (4.6 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -26351,11 +26351,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -26406,7 +26406,7 @@
                     "role": "lead",
                     "baseline": {
                         "state": "known",
-                        "since": "2026-10-13",
+                        "since": "2026-10-14",
                         "covered_by": null
                     },
                     "signal_ids": [
@@ -26612,7 +26612,7 @@
             ],
             "evidence": "stale: last release 2022-11-30 (3.9 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -26650,11 +26650,11 @@
                     "lead": "stale",
                     "flags": {
                         "stale": {
-                            "known_since": "2026-10-13"
+                            "known_since": "2026-10-14"
                         }
                     },
                     "advisory_count": 0,
-                    "first_seen": "2026-10-13",
+                    "first_seen": "2026-10-14",
                     "target_php": "8.4",
                     "fix_model": 1
                 },
@@ -26777,7 +26777,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -26933,7 +26933,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.96,
             "age": {
                 "installed": {
@@ -27070,7 +27070,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.29,
             "age": {
                 "installed": {
@@ -27206,7 +27206,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -27339,7 +27339,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -27480,7 +27480,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.4,
             "age": {
                 "installed": {
@@ -27639,7 +27639,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.48,
             "age": {
                 "installed": {
@@ -27795,7 +27795,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1,
             "age": {
                 "installed": {
@@ -27951,7 +27951,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.78,
             "age": {
                 "installed": {
@@ -28084,7 +28084,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -28242,7 +28242,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.79,
             "age": {
                 "installed": {
@@ -28386,7 +28386,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.64,
             "age": {
                 "installed": {
@@ -28520,7 +28520,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -28652,7 +28652,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.05,
             "age": {
                 "installed": {
@@ -28784,7 +28784,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.36,
             "age": {
                 "installed": {
@@ -28796,7 +28796,7 @@
                 "release": {
                     "version": "2.54.0",
                     "at": "2026-09-24T19:41:19+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -28804,7 +28804,7 @@
                 "branch_release": {
                     "version": "2.54.0",
                     "at": "2026-09-24T19:41:19+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -28966,7 +28966,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.07,
             "age": {
                 "installed": {
@@ -29099,7 +29099,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.61,
             "age": {
                 "installed": {
@@ -29254,7 +29254,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -29421,7 +29421,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -29577,7 +29577,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.64,
             "age": {
                 "installed": {
@@ -29709,7 +29709,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -29841,7 +29841,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.49,
             "age": {
                 "installed": {
@@ -29976,7 +29976,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.11,
             "age": {
                 "installed": {
@@ -30108,7 +30108,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -30263,7 +30263,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.19,
             "age": {
                 "installed": {
@@ -30396,7 +30396,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.09,
             "age": {
                 "installed": {
@@ -30529,7 +30529,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.29,
             "age": {
                 "installed": {
@@ -30664,7 +30664,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.48,
             "age": {
                 "installed": {
@@ -30797,7 +30797,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -30824,7 +30824,7 @@
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2026-03-26T22:03:55+00:00",
-                    "years": 0.5,
+                    "years": 0.6,
                     "level": null
                 },
                 "push_unmeasured": null
@@ -30931,7 +30931,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -31063,7 +31063,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.16,
             "age": {
                 "installed": {
@@ -31197,7 +31197,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.69,
             "age": {
                 "installed": {
@@ -31353,7 +31353,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.52,
             "age": {
                 "installed": {
@@ -31485,19 +31485,19 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2026-01-12T15:59:08+00:00",
-                    "years": 0.7,
+                    "years": 0.8,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
                 "release": {
                     "version": "2.6.1",
                     "at": "2026-01-12T15:59:08+00:00",
-                    "years": 0.7,
+                    "years": 0.8,
                     "level": null,
                     "dated_by": null
                 },
@@ -31505,7 +31505,7 @@
                 "branch_release": {
                     "version": "2.6.1",
                     "at": "2026-01-12T15:59:08+00:00",
-                    "years": 0.7,
+                    "years": 0.8,
                     "level": null,
                     "dated_by": null
                 },
@@ -31620,7 +31620,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.63,
             "age": {
                 "installed": {
@@ -31776,7 +31776,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.63,
             "age": {
                 "installed": {
@@ -31939,7 +31939,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -32079,7 +32079,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -32235,7 +32235,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.45,
             "age": {
                 "installed": {
@@ -32367,19 +32367,19 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2024-10-31T10:30:18+00:00",
-                    "years": 1.9,
+                    "years": 2,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
                 "release": {
                     "version": "1.6.1",
                     "at": "2024-10-31T10:30:18+00:00",
-                    "years": 1.9,
+                    "years": 2,
                     "level": null,
                     "dated_by": null
                 },
@@ -32387,14 +32387,14 @@
                 "branch_release": {
                     "version": "1.6.1",
                     "at": "2024-10-31T10:30:18+00:00",
-                    "years": 1.9,
+                    "years": 2,
                     "level": null,
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2024-10-31T10:30:45+00:00",
-                    "years": 1.9,
+                    "years": 2,
                     "level": null
                 },
                 "push_unmeasured": null
@@ -32499,7 +32499,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -32636,7 +32636,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.59,
             "age": {
                 "installed": {
@@ -32768,7 +32768,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.61,
             "age": {
                 "installed": {
@@ -32900,7 +32900,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.8,
             "age": {
                 "installed": {
@@ -33032,7 +33032,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.74,
             "age": {
                 "installed": {
@@ -33341,7 +33341,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.69,
             "age": {
                 "installed": {
@@ -33473,7 +33473,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -33667,7 +33667,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -33818,7 +33818,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -34014,7 +34014,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -34273,7 +34273,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.36,
             "age": {
                 "installed": {
@@ -34401,7 +34401,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.91,
             "age": {
                 "installed": {
@@ -34533,7 +34533,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -34688,7 +34688,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.06,
             "age": {
                 "installed": {
@@ -34820,7 +34820,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -34976,7 +34976,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.04,
             "age": {
                 "installed": {
@@ -35132,7 +35132,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.04,
             "age": {
                 "installed": {
@@ -35265,7 +35265,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.6,
             "age": {
                 "installed": {
@@ -35397,7 +35397,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.83,
             "age": {
                 "installed": {
@@ -35564,7 +35564,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.8,
             "age": {
                 "installed": {
@@ -35713,7 +35713,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.8,
             "age": {
                 "installed": {
@@ -35845,7 +35845,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.91,
             "age": {
                 "installed": {
@@ -35977,7 +35977,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.67,
             "age": {
                 "installed": {
@@ -36144,7 +36144,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.75,
             "age": {
                 "installed": {
@@ -36352,7 +36352,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -36489,7 +36489,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.78,
             "age": {
                 "installed": {
@@ -36622,7 +36622,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.35,
             "age": {
                 "installed": {
@@ -36754,7 +36754,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.66,
             "age": {
                 "installed": {
@@ -36924,7 +36924,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.79,
             "age": {
                 "installed": {
@@ -37098,7 +37098,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.9,
             "age": {
                 "installed": {
@@ -37274,7 +37274,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.69,
             "age": {
                 "installed": {
@@ -37408,7 +37408,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.9,
             "age": {
                 "installed": {
@@ -37581,7 +37581,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.83,
             "age": {
                 "installed": {
@@ -37744,7 +37744,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.89,
             "age": {
                 "installed": {
@@ -37881,7 +37881,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.89,
             "age": {
                 "installed": {
@@ -38039,7 +38039,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.85,
             "age": {
                 "installed": {
@@ -38171,7 +38171,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.67,
             "age": {
                 "installed": {
@@ -38303,7 +38303,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.27,
             "age": {
                 "installed": {
@@ -38436,7 +38436,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.68,
             "age": {
                 "installed": {
@@ -38606,7 +38606,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.82,
             "age": {
                 "installed": {
@@ -38775,7 +38775,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.26,
             "age": {
                 "installed": {
@@ -38907,7 +38907,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.78,
             "age": {
                 "installed": {
@@ -39040,7 +39040,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.28,
             "age": {
                 "installed": {
@@ -39172,7 +39172,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.18,
             "age": {
                 "installed": {
@@ -39306,7 +39306,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.3,
             "age": {
                 "installed": {
@@ -39438,7 +39438,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.84,
             "age": {
                 "installed": {
@@ -39581,7 +39581,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.67,
             "age": {
                 "installed": {
@@ -39713,7 +39713,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.02,
             "age": {
                 "installed": {
@@ -39848,7 +39848,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.57,
             "age": {
                 "installed": {
@@ -39980,7 +39980,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.1,
             "age": {
                 "installed": {
@@ -40140,7 +40140,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.24,
             "age": {
                 "installed": {
@@ -40272,7 +40272,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.03,
             "age": {
                 "installed": {
@@ -40434,7 +40434,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.93,
             "age": {
                 "installed": {
@@ -40576,7 +40576,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.75,
             "age": {
                 "installed": {
@@ -40716,7 +40716,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.27,
             "age": {
                 "installed": {
@@ -40848,7 +40848,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.71,
             "age": {
                 "installed": {
@@ -40996,7 +40996,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.69,
             "age": {
                 "installed": {
@@ -41137,7 +41137,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.82,
             "age": {
                 "installed": {
@@ -41272,7 +41272,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.75,
             "age": {
                 "installed": {
@@ -41443,7 +41443,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.81,
             "age": {
                 "installed": {
@@ -41575,7 +41575,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.86,
             "age": {
                 "installed": {
@@ -41707,7 +41707,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.4,
             "age": {
                 "installed": {
@@ -41839,7 +41839,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -41971,7 +41971,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.1,
             "age": {
                 "installed": {
@@ -42118,7 +42118,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -42251,7 +42251,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -42383,7 +42383,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.69,
             "age": {
                 "installed": {
@@ -42515,7 +42515,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.9,
             "age": {
                 "installed": {
@@ -42648,7 +42648,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -42780,7 +42780,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.57,
             "age": {
                 "installed": {
@@ -42792,7 +42792,7 @@
                 "release": {
                     "version": "3.4.0",
                     "at": "2026-06-07T11:47:49+00:00",
-                    "years": 0.3,
+                    "years": 0.4,
                     "level": null,
                     "dated_by": null
                 },
@@ -42800,7 +42800,7 @@
                 "branch_release": {
                     "version": "3.4.0",
                     "at": "2026-06-07T11:47:49+00:00",
-                    "years": 0.3,
+                    "years": 0.4,
                     "level": null,
                     "dated_by": null
                 },
@@ -42911,7 +42911,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -43042,7 +43042,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -43190,7 +43190,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -43325,7 +43325,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -43464,7 +43464,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.02,
             "age": {
                 "installed": {
@@ -43606,7 +43606,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -43741,7 +43741,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.29,
             "age": {
                 "installed": {
@@ -43872,7 +43872,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -44003,7 +44003,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.05,
             "age": {
                 "installed": {
@@ -44015,7 +44015,7 @@
                 "release": {
                     "version": "1.7.0",
                     "at": "2026-09-24T19:42:16+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44023,7 +44023,7 @@
                 "branch_release": {
                     "version": "1.7.0",
                     "at": "2026-09-24T19:42:16+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44134,7 +44134,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.05,
             "age": {
                 "installed": {
@@ -44146,7 +44146,7 @@
                 "release": {
                     "version": "4.11.0",
                     "at": "2026-09-24T19:42:25+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44154,7 +44154,7 @@
                 "branch_release": {
                     "version": "4.11.0",
                     "at": "2026-09-24T19:42:25+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44266,7 +44266,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.47,
             "age": {
                 "installed": {
@@ -44278,7 +44278,7 @@
                 "release": {
                     "version": "3.9.0",
                     "at": "2026-09-24T19:42:34+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44286,7 +44286,7 @@
                 "branch_release": {
                     "version": "3.9.0",
                     "at": "2026-09-24T19:42:34+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44397,7 +44397,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.05,
             "age": {
                 "installed": {
@@ -44409,7 +44409,7 @@
                 "release": {
                     "version": "3.9.0",
                     "at": "2026-09-24T19:42:43+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44417,7 +44417,7 @@
                 "branch_release": {
                     "version": "3.9.0",
                     "at": "2026-09-24T19:42:43+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44529,7 +44529,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.05,
             "age": {
                 "installed": {
@@ -44541,7 +44541,7 @@
                 "release": {
                     "version": "4.6.0",
                     "at": "2026-09-24T19:42:52+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44549,7 +44549,7 @@
                 "branch_release": {
                     "version": "4.6.0",
                     "at": "2026-09-24T19:42:52+00:00",
-                    "years": 0,
+                    "years": 0.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -44660,7 +44660,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.13,
             "age": {
                 "installed": {
@@ -44791,7 +44791,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -44922,7 +44922,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.43,
             "age": {
                 "installed": {
@@ -45053,7 +45053,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.18,
             "age": {
                 "installed": {
@@ -45185,7 +45185,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -45316,7 +45316,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -45447,7 +45447,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -45581,7 +45581,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -45712,7 +45712,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.33,
             "age": {
                 "installed": {
@@ -45844,12 +45844,12 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.55,
             "age": {
                 "installed": {
                     "at": "2024-09-24T20:45:14+00:00",
-                    "years": 2,
+                    "years": 2.1,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
@@ -45975,7 +45975,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.32,
             "age": {
                 "installed": {
@@ -46106,7 +46106,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.3,
             "age": {
                 "installed": {
@@ -46237,7 +46237,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -46369,7 +46369,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -46502,7 +46502,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.15,
             "age": {
                 "installed": {
@@ -46633,7 +46633,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.03,
             "age": {
                 "installed": {
@@ -46766,7 +46766,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.77,
             "age": {
                 "installed": {
@@ -46899,19 +46899,19 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2025-09-24T15:12:37+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
                 "release": {
                     "version": "v2.8.2",
                     "at": "2025-09-24T15:12:37+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -46919,14 +46919,14 @@
                 "branch_release": {
                     "version": "v2.8.2",
                     "at": "2025-09-24T15:12:37+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "level": null,
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2025-09-24T15:13:01+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "level": null
                 },
                 "push_unmeasured": null
@@ -47147,7 +47147,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "intentionally empty package: PHP 7+ has random_bytes() built in",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.34,
             "age": {
                 "installed": {
@@ -47274,7 +47274,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -47406,7 +47406,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -47538,7 +47538,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -47670,7 +47670,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -47802,7 +47802,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -47935,7 +47935,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.65,
             "age": {
                 "installed": {
@@ -48066,7 +48066,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.28,
             "age": {
                 "installed": {
@@ -48197,7 +48197,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.16,
             "age": {
                 "installed": {
@@ -48332,7 +48332,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.6,
             "age": {
                 "installed": {
@@ -48463,7 +48463,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.11,
             "age": {
                 "installed": {
@@ -48700,7 +48700,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -48898,7 +48898,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -49143,7 +49143,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -49429,7 +49429,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -49624,7 +49624,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -49869,7 +49869,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "single-function polyfill for getallheaders(); complete",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -49996,7 +49996,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -50128,7 +50128,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -50259,7 +50259,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -50391,19 +50391,19 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2025-08-19T18:57:03+00:00",
-                    "years": 1.1,
+                    "years": 1.2,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
                 "release": {
                     "version": "v3.3.0",
                     "at": "2025-08-19T18:57:03+00:00",
-                    "years": 1.1,
+                    "years": 1.2,
                     "level": null,
                     "dated_by": null
                 },
@@ -50411,7 +50411,7 @@
                 "branch_release": {
                     "version": "v3.3.0",
                     "at": "2025-08-19T18:57:03+00:00",
-                    "years": 1.1,
+                    "years": 1.2,
                     "level": null,
                     "dated_by": null
                 },
@@ -50522,7 +50522,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -50653,7 +50653,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -50784,7 +50784,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -50915,7 +50915,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.41,
             "age": {
                 "installed": {
@@ -51046,7 +51046,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.53,
             "age": {
                 "installed": {
@@ -51178,7 +51178,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.13,
             "age": {
                 "installed": {
@@ -51310,7 +51310,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.48,
             "age": {
                 "installed": {
@@ -51441,7 +51441,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.88,
             "age": {
                 "installed": {
@@ -51572,7 +51572,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.81,
             "age": {
                 "installed": {
@@ -51704,7 +51704,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.55,
             "age": {
                 "installed": {
@@ -51836,7 +51836,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1,
             "age": {
                 "installed": {
@@ -51967,7 +51967,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.06,
             "age": {
                 "installed": {
@@ -52098,7 +52098,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -52258,7 +52258,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.27,
             "age": {
                 "installed": {
@@ -52419,7 +52419,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -52550,7 +52550,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.28,
             "age": {
                 "installed": {
@@ -52691,7 +52691,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.4,
             "age": {
                 "installed": {
@@ -52899,7 +52899,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -53061,7 +53061,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -53211,7 +53211,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.71,
             "age": {
                 "installed": {
@@ -53360,7 +53360,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.25,
             "age": {
                 "installed": {
@@ -53543,7 +53543,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -53753,7 +53753,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -53904,7 +53904,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -54046,7 +54046,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.84,
             "age": {
                 "installed": {
@@ -54193,7 +54193,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.54,
             "age": {
                 "installed": {
@@ -54331,7 +54331,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.67,
             "age": {
                 "installed": {
@@ -54462,7 +54462,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.93,
             "age": {
                 "installed": {
@@ -54643,7 +54643,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.83,
             "age": {
                 "installed": {
@@ -54776,7 +54776,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.18,
             "age": {
                 "installed": {
@@ -54939,7 +54939,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -55071,7 +55071,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.52,
             "age": {
                 "installed": {
@@ -55212,7 +55212,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.75,
             "age": {
                 "installed": {
@@ -55373,7 +55373,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.36,
             "age": {
                 "installed": {
@@ -55506,7 +55506,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.11,
             "age": {
                 "installed": {
@@ -55638,7 +55638,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.06,
             "age": {
                 "installed": {
@@ -55770,7 +55770,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.03,
             "age": {
                 "installed": {
@@ -55901,7 +55901,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.53,
             "age": {
                 "installed": {

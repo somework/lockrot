@@ -16,7 +16,7 @@
     },
     "clocks": {
         "t0": "2024-05-17T00:00:00+00:00",
-        "t1": "2026-10-13T00:00:00+00:00"
+        "t1": "2026-10-14T00:00:00+00:00"
     },
     "options": [
         "--target-php=8.4",
@@ -3406,21 +3406,21 @@
     "files": {
         "t0/report.json": "51127c8846da806c71893c71755534efbb9f913d0d6ac141914dfb53d287c3ef",
         "lockrot-baseline.json": "e341e32e57bad95d3b1aa662bbb7c6ea9217f5062ad55788814610c993042150",
-        "check/report.json": "3d87862007d24e004d6c30c28fe0ea7ac86b4396a06cde2896eb93d74052f2ee",
-        "check/report.table.txt": "45f8ab401949610bb7cc7b6bac60f7b44b4531938b825d973e1ed02d8d22b71e",
-        "check/report.md": "d937b43ae3e7c5ce7d1fbfce0b7411bef5305d5d038762c2d4fa92fdfd8cc01b",
-        "check/report.github.txt": "45977717e46445474f5d5d148dca513c0002defcfadc664ae8261cd9b307787e",
-        "check/report.gitlab.json": "1e90b4375b4a58de432316bd8b1377cdf8af43bce0ff0ae59e2d48953ed8bbca",
-        "check/report.sarif.json": "43b6c91f94f964ee6e15f65f7a5b2d723f2cad842fcd02317d6ec55512b7a6d6",
-        "check/report.bundle.json": "90e470355548dc519adcfad5286c86dfc1cc40053797ad7d3b558f975f90f4c9",
-        "check/explain/javibravo--simpleue.json": "36292a9d5f534e63935bf4c8246a2c52bb252a6f2e954ff0bf235c09bc8b9d16",
-        "check/explain/mnapoli--piwik-twig-extension.json": "c01c3a9ffd1f8485f4de85c2326a003a1ac9b3e1a21cf0d024b649248de3badd",
-        "check/explain/spomky-labs--otphp.json": "73cbcb47f7d35dcd05670391d73cbaae4d5a62e3fe1925ba9486608c20ff90fe",
-        "check/explain/symfony--web-server-bundle.json": "ad68b79c604dd23406a4084a65b3d595604872c072c20773df3921a6f35a8a96",
-        "check/explain/willdurand--jsonp-callback-validator.json": "e01f594f9798668ef05fda748402fd74fa5e9dc48b1cbe9da181a51aaffd3437",
-        "check/gates-left-behind-vulnerable-high.json": "90ab067ad2ad8b8eb67eb9a54a390088df12a59c1addceec1a93e01d7155ed7a",
-        "check/gates-left-behind-vulnerable-high.sarif.json": "ab67195f2a128d033bb4107579be42b61d8307d4e36839e949ea16f0a4a33ae4",
-        "regenerate/lockrot-baseline.json": "c471739f78f3fd26966c731baf6673e702eb29fb9c18ae836b23559def1d5a66",
-        "regenerate/report.json": "4798c38a3584eafa759746cf58625f9c9dcd1bc27aa301aaf6ad1c0b8398ec71"
+        "check/report.json": "5e29748d397111c754c6439584d761867684a31b7dfc8332f702c3c765461e53",
+        "check/report.table.txt": "bde72a5efbf35b9fa9a743da76c5aeb16cd1772193127c3fac836fc8c4810ac3",
+        "check/report.md": "15e92eb6cbacf614d5ffede48a094b22617de04c487dac11a182092fa027f982",
+        "check/report.github.txt": "25fde45017cfe9a7f9c3e35d9e8a116308609107700ab3c3ce12bb8130224306",
+        "check/report.gitlab.json": "cd157769dab09a0fade3559f6dd1f6242ef0502a1c73f7e829cffe6bbb782750",
+        "check/report.sarif.json": "dffa42bec4be78d3e36ba6fe9625612f3a7a94413ba787a062b3661324ed56fc",
+        "check/report.bundle.json": "520a3781dadb4f1b2a160b2e8ad5991586d55a2b87ba278fa05d0698193badd3",
+        "check/explain/javibravo--simpleue.json": "c131bb715dab514066b53878b1853fd2a93545a8ccec942413cf71ad76d9d947",
+        "check/explain/mnapoli--piwik-twig-extension.json": "fec2c5fb05af8416f8d9329764199aa698e40db1cc27634c69a134ad3117b59a",
+        "check/explain/spomky-labs--otphp.json": "83be0334f1737d3f0b47747b552b3af8320f63190f9063d1e42e1d05137ad1b0",
+        "check/explain/symfony--web-server-bundle.json": "50b7b195fd2473adaddf5227771cbf795c3bc752f2fd2a856446099f3d1eb3f9",
+        "check/explain/willdurand--jsonp-callback-validator.json": "57c4a7006bc6b981ab9f7c123d103b24a531146d5daa1dd019db7dfad127da14",
+        "check/gates-left-behind-vulnerable-high.json": "2a3f967b0653ab87c6e5030a17837df26c28793897a50d003c1d980dcf95603c",
+        "check/gates-left-behind-vulnerable-high.sarif.json": "2d075ec6f276e5cff0a921aa381d66eb7fe08b2ece4d37efe63ac2811dee187d",
+        "regenerate/lockrot-baseline.json": "089841caa85602f5e033a50ded61a7369ec7de8a319bc1e864b0f389e7827c58",
+        "regenerate/report.json": "edc23ae1a96cf7309104cdfb301c4e97cdf2ab9e1c1aff78d50f0c688af9343e"
     }
 }

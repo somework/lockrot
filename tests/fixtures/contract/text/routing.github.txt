@@ -1,0 +1,7 @@
+::error file=composer.lock,title=lockrot%3A high — left-behind · vulnerable (medium advisory)::symfony/routing v4.4.41: 16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory]. Do: move symfony/routing to ^5.4.53 through mautic/core-lib — clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it. left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28). vulnerable: 2 advisories: 2 medium — none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization. (via mautic/core-lib)
+::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+flags: left-behind 1 · vulnerable 1 · 1 package carries more than one
+depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: symfony/routing, 1 hop (mautic/core-lib › symfony/routing)
+security: 1 vulnerable package · 2 advisories: 2 medium
+update now: composer update symfony/routing
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

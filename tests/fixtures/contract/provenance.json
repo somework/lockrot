@@ -1,0 +1,74 @@
+{
+    "recorded_by": "tools/report/record",
+    "clock": "2026-10-14T00:00:00+00:00",
+    "inputs": {
+        "tests/fixtures/flags/cases.json": "92727220b0768f58f5d49f4276d72f2af6a5a76e815012e8f04efb61ca30f5cb",
+        "tests/fixtures/flags/composite.json": "ec59fa67eb480bc91772e4c4f9fba1736e6a338042ff9eba28e4238a9cf15d39",
+        "tests/fixtures/flags/provenance.json": "2ddc78cfa893d0d58e766d956b70d78cba0210864ee64469decb303a24c9a208"
+    },
+    "version_mask": {
+        "paths": [
+            "lockrot.version",
+            "report.lockrot.version",
+            "runs[].tool.driver.version"
+        ],
+        "value": "0.14.0"
+    },
+    "text_grammar": 1,
+    "score_text_grammar": 1,
+    "formats": [
+        "json",
+        "table",
+        "markdown",
+        "github",
+        "gitlab",
+        "sarif"
+    ],
+    "format_options": [
+        "--all"
+    ],
+    "cases_without_inputs": [
+        "psr-log",
+        "pinned-unread",
+        "unknown",
+        "ok-ignored‡",
+        "unknown-vuln‡",
+        "ok-offline‡",
+        "finished-offline‡",
+        "no-tag‡",
+        "B-accepted-unread‡",
+        "host-unsupported",
+        "scope-registries‡",
+        "no-feed‡",
+        "unparseable-version‡",
+        "local-path-advisory",
+        "unknown-origin",
+        "host-accepted‡",
+        "host-accept-expired‡",
+        "no-feed-accepted‡",
+        "vcs-accepted‡"
+    ],
+    "model_goldens": {
+        "compared": {
+            "age_line": 18,
+            "baseline_suffix": 14,
+            "commands_cmd": 87,
+            "commands_posix": 87,
+            "gate_line": 84,
+            "next_step_text": 50,
+            "run_gate_line": 86,
+            "score_text": 73
+        },
+        "inputs_differ": {
+            "age_line": 70,
+            "baseline_suffix": 74,
+            "commands_cmd": 1,
+            "commands_posix": 1,
+            "gate_line": 4,
+            "next_step_text": 38,
+            "run_gate_line": 2,
+            "score_text": 15
+        }
+    },
+    "bundle_sha256": "sha256 of the lines \"<sha256>  <path>\", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json"
+}

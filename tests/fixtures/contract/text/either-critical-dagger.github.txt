@@ -1,0 +1,6 @@
+::error file=composer.lock,title=lockrot%3A critical — abandoned · old-promise · vulnerable (critical advisory)::symfony/debug v3.4.47: 68 = abandoned 32 + old-promise 4 [¼ of 16] + vulnerable 32 [critical advisory]. Do: replace with symfony/error-handler (named by its registry). abandoned: marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago). old-promise: released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. vulnerable: 1 advisory: 1 critical — none fixed on 3.x; advisory: CVE-2026-00003 an advisory added to show the either opening (‡).
+flags: abandoned 1 · old-promise 1 · vulnerable 1 · 1 package carries more than one
+depth: every flagged package is named in composer.json · direct 1
+security: 1 vulnerable package · 1 advisory: 1 critical
+update now: composer update symfony/debug
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

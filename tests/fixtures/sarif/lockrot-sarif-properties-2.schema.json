@@ -1617,8 +1617,7 @@
       "type": "object",
       "required": [
         "ruleId",
-        "level",
-        "properties"
+        "level"
       ],
       "additionalProperties": true,
       "properties": {
@@ -1752,6 +1751,25 @@
                       "maxItems": 0
                     }
                   }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "A bag on every result but the run-level `lockrot/advisories-unchecked` one.",
+          "anyOf": [
+            {
+              "required": [
+                "properties"
+              ]
+            },
+            {
+              "properties": {
+                "ruleId": {
+                  "enum": [
+                    "lockrot/advisories-unchecked"
+                  ]
                 }
               }
             }
@@ -2501,12 +2519,7 @@
         "dev",
         "data_date",
         "baseline_status",
-        "error_by",
-        "chain",
-        "depth",
-        "direct_dependents",
-        "signal_ids",
-        "age"
+        "error_by"
       ],
       "properties": {
         "package": {

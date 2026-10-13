@@ -1,0 +1,1519 @@
+{
+    "$schema": "https://lockrot.dev/schema/explain-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "package": "guzzlehttp/psr7",
+    "version": "1.9.1",
+    "finding": {
+        "package": "guzzlehttp/psr7",
+        "version": "1.9.1",
+        "branch": "1.x",
+        "installed_php": {
+            "requires": ">=5.4.0",
+            "target_runs": true,
+            "project_allows": true
+        },
+        "verdict": "high",
+        "priority": "high",
+        "lead": "left-behind",
+        "rank": 1,
+        "flags": [
+            {
+                "id": "left-behind",
+                "role": "lead",
+                "baseline": null,
+                "signal_ids": [
+                    "S8"
+                ],
+                "degree": null,
+                "headline": {
+                    "unit": "years",
+                    "value": 3.5,
+                    "source": "branch"
+                },
+                "summary": "branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach"
+            },
+            {
+                "id": "vulnerable",
+                "role": "security",
+                "baseline": null,
+                "signal_ids": [
+                    "S9"
+                ],
+                "degree": null,
+                "headline": {
+                    "unit": "advisories",
+                    "value": 4,
+                    "source": null
+                },
+                "summary": "4 advisories: 4 medium \u2014 none fixed on 1.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization"
+            }
+        ],
+        "score": {
+            "model": 1,
+            "total": 16,
+            "exact": 16,
+            "rounded_down": false,
+            "band": {
+                "floor": 16,
+                "next": "critical",
+                "to_next": 16
+            },
+            "decided_by": "combination",
+            "parts": {
+                "maintenance": {
+                    "status": "counted",
+                    "contribution": 8,
+                    "alone": {
+                        "total": 8,
+                        "verdict": "medium"
+                    }
+                },
+                "security": {
+                    "status": "counted",
+                    "contribution": 8,
+                    "alone": {
+                        "total": 8,
+                        "verdict": "medium"
+                    },
+                    "of": 4,
+                    "tied": [
+                        "PKSA-gm5x-j3mz-71n9",
+                        "PKSA-jj5t-2zs1-dcfm",
+                        "PKSA-vznr-tgp9-fd7d"
+                    ]
+                }
+            },
+            "terms": [
+                {
+                    "part": "maintenance",
+                    "flag": "left-behind",
+                    "role": "lead",
+                    "weight": 16,
+                    "divisor": 1,
+                    "points": 16,
+                    "contribution": 8
+                },
+                {
+                    "part": "security",
+                    "flag": "vulnerable",
+                    "role": "security",
+                    "advisory": "PKSA-7qs6-zvnz-h66r",
+                    "severity": "medium",
+                    "fix_kind": "raise-php",
+                    "weight": 8,
+                    "multiplier": 1,
+                    "points": 8,
+                    "contribution": 8
+                }
+            ],
+            "modifiers": [
+                {
+                    "reason": "transitive",
+                    "applies_to": "maintenance",
+                    "divide_by": 2,
+                    "before": 16,
+                    "after": 8
+                }
+            ],
+            "accepted": [],
+            "without": [
+                {
+                    "remove": {
+                        "kind": "flag",
+                        "id": "left-behind"
+                    },
+                    "revealed": [],
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": null,
+                    "deciding_advisory": "PKSA-7qs6-zvnz-h66r",
+                    "at_least": false
+                },
+                {
+                    "remove": {
+                        "kind": "flag",
+                        "id": "vulnerable"
+                    },
+                    "revealed": [],
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": "left-behind",
+                    "deciding_advisory": null,
+                    "at_least": false
+                },
+                {
+                    "remove": {
+                        "kind": "advisory",
+                        "id": "PKSA-7qs6-zvnz-h66r"
+                    },
+                    "revealed": [],
+                    "total": 16,
+                    "verdict": "high",
+                    "lead": "left-behind",
+                    "deciding_advisory": "PKSA-gm5x-j3mz-71n9",
+                    "at_least": false
+                }
+            ],
+            "text": "16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]"
+        },
+        "next_step": {
+            "kind": "raise-php",
+            "source": "vulnerable",
+            "merged": [
+                "left-behind"
+            ],
+            "fix_kind": "raise-php",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "2.13.1",
+            "newest": "2.13.1",
+            "constraint": "^2.13",
+            "latest": null,
+            "php_check": {
+                "requires": "^7.2.5 || ^8.0",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=7.2.5",
+                "raise_size": "patch"
+            },
+            "crosses_major": true,
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "guzzlehttp/guzzle",
+                    "version": "6.5.8",
+                    "link": "require",
+                    "constraint": "^1.9",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-7qs6-zvnz-h66r",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-gm5x-j3mz-71n9",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-jj5t-2zs1-dcfm",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-vznr-tgp9-fd7d",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "holders",
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=7.2.5",
+                    "--no-update"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "guzzlehttp/guzzle",
+                    "installed_version": "6.5.8",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "8.2.0",
+                        "released": "2026-09-06T13:55:09+00:00"
+                    },
+                    "newest_requires": true,
+                    "newest_requires_unmeasured": null
+                }
+            ],
+            "also": [],
+            "text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+        },
+        "security": {
+            "status": "vulnerable",
+            "check": "complete",
+            "complete": true,
+            "unchecked_reason": null,
+            "records": 4,
+            "feeds": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "answer": "answered",
+                    "records": 4,
+                    "reason": null
+                }
+            ],
+            "worst": "medium",
+            "counts": {
+                "critical": 0,
+                "high": 0,
+                "medium": 4,
+                "unrated": 0,
+                "low": 0
+            },
+            "ignored": [],
+            "ignored_count": 0,
+            "fix_kind": "raise-php",
+            "installed_branch_fixes": {
+                "fixed": 0,
+                "unknown": 0,
+                "of": 4,
+                "fix_kind": null,
+                "lowest": null,
+                "newest": "1.9.1",
+                "held_by": [],
+                "if_applied": null
+            },
+            "move_in": "next_step",
+            "gets": null,
+            "partial": null
+        },
+        "checks_missing": [],
+        "checks_skipped": [],
+        "unchecked_accepted": [],
+        "maintenance_judged": true,
+        "metadata": {
+            "status": "read",
+            "reason": null,
+            "message": null
+        },
+        "activity": {
+            "status": "read",
+            "reason": null,
+            "forge": "github",
+            "host": "github.com",
+            "repo": "guzzle/psr7",
+            "event": "push",
+            "archived": false,
+            "fetched_at": "2026-09-14T00:00:00+00:00",
+            "cached_at": null
+        },
+        "allowlist": null,
+        "abandoned_ignored": null,
+        "from_composer_repository": true,
+        "origin": {
+            "kind": "packagist",
+            "registry": "packagist.org",
+            "package_url": "https://packagist.org/packages/guzzlehttp/psr7",
+            "local": false
+        },
+        "replacement": null,
+        "replacement_url": null,
+        "note": null,
+        "libyears_unmeasured": null,
+        "libyears_at_least": false,
+        "direct": false,
+        "dev": false,
+        "reach": "transitive",
+        "chain": [
+            "guzzlehttp/guzzle",
+            "guzzlehttp/psr7"
+        ],
+        "depth": 1,
+        "depth_unmeasured": null,
+        "named_in": [],
+        "direct_dependents": [
+            "guzzlehttp/guzzle"
+        ],
+        "signals": [
+            {
+                "id": "S8",
+                "level": "warn",
+                "summary": "branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach",
+                "data": {
+                    "branch": "1.x",
+                    "branch_last_release": "2023-04-17T16:00:37+00:00",
+                    "branch_last_version": "1.9.1",
+                    "years": 3.5,
+                    "newest_branch": "3.x",
+                    "newest_version": "3.1.0",
+                    "newest_release": "2026-08-24T11:02:13+00:00",
+                    "newest_php": "^7.4 || ^8.0",
+                    "newest_within_reach": false,
+                    "floor_php": "^7.2 || ^8.0.0",
+                    "floor_source": "project",
+                    "reachable_branch": null,
+                    "reachable_version": null,
+                    "reachable_release": null,
+                    "suggested_constraint": null,
+                    "dated_by": null,
+                    "reachable_php": null,
+                    "reachable_admits": null,
+                    "newest_years": 0.1,
+                    "reachable_years": null
+                }
+            },
+            {
+                "id": "S9",
+                "level": "warn",
+                "summary": "4 security advisories affect 1.9.1 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); fixed by 3.1.0",
+                "data": {
+                    "advisories": [
+                        {
+                            "id": "PKSA-7qs6-zvnz-h66r",
+                            "cve": "CVE-2026-55766",
+                            "title": "CRLF injection in HTTP start-line serialization",
+                            "link": "https://github.com/guzzle/psr7/security/advisories/GHSA-vm85-hxw5-5432",
+                            "reported_at": "2026-06-18T09:49:37+00:00",
+                            "severity": "medium",
+                            "severity_published": "medium",
+                            "affected_versions": "<2.12.1",
+                            "counted": true,
+                            "points": 8,
+                            "deciding": true,
+                            "fix": {
+                                "kind": "raise-php",
+                                "to_branch": "2.x",
+                                "version": "2.12.1",
+                                "newest": "2.13.1",
+                                "on_installed_branch": false,
+                                "php": "^7.2.5 || ^8.0",
+                                "held_by": [
+                                    {
+                                        "source": "package",
+                                        "package": "guzzlehttp/guzzle",
+                                        "version": "6.5.8",
+                                        "link": "require",
+                                        "constraint": "^1.9",
+                                        "holder": {
+                                            "verdict": "ok",
+                                            "lead": null,
+                                            "flag_ids": [],
+                                            "replacement": null,
+                                            "next_step": null
+                                        }
+                                    }
+                                ],
+                                "reason": null
+                            },
+                            "baseline": null
+                        },
+                        {
+                            "id": "PKSA-gm5x-j3mz-71n9",
+                            "cve": "CVE-2026-49214",
+                            "title": "CRLF injection via URI host component",
+                            "link": "https://github.com/guzzle/psr7/security/advisories/GHSA-hq7v-mx3g-29hw",
+                            "reported_at": "2026-05-25T22:58:15+00:00",
+                            "severity": "medium",
+                            "severity_published": "medium",
+                            "affected_versions": "<2.10.2",
+                            "counted": true,
+                            "points": 8,
+                            "deciding": false,
+                            "fix": {
+                                "kind": "raise-php",
+                                "to_branch": "2.x",
+                                "version": "2.10.2",
+                                "newest": "2.13.1",
+                                "on_installed_branch": false,
+                                "php": "^7.2.5 || ^8.0",
+                                "held_by": [
+                                    {
+                                        "source": "package",
+                                        "package": "guzzlehttp/guzzle",
+                                        "version": "6.5.8",
+                                        "link": "require",
+                                        "constraint": "^1.9",
+                                        "holder": {
+                                            "verdict": "ok",
+                                            "lead": null,
+                                            "flag_ids": [],
+                                            "replacement": null,
+                                            "next_step": null
+                                        }
+                                    }
+                                ],
+                                "reason": null
+                            },
+                            "baseline": null
+                        },
+                        {
+                            "id": "PKSA-jj5t-2zs1-dcfm",
+                            "cve": "CVE-2026-48998",
+                            "title": "Host confusion via authority reinterpretation",
+                            "link": "https://github.com/guzzle/psr7/security/advisories/GHSA-34xg-wgjx-8xph",
+                            "reported_at": "2026-05-25T22:58:15+00:00",
+                            "severity": "medium",
+                            "severity_published": "medium",
+                            "affected_versions": "<2.10.2",
+                            "counted": true,
+                            "points": 8,
+                            "deciding": false,
+                            "fix": {
+                                "kind": "raise-php",
+                                "to_branch": "2.x",
+                                "version": "2.10.2",
+                                "newest": "2.13.1",
+                                "on_installed_branch": false,
+                                "php": "^7.2.5 || ^8.0",
+                                "held_by": [
+                                    {
+                                        "source": "package",
+                                        "package": "guzzlehttp/guzzle",
+                                        "version": "6.5.8",
+                                        "link": "require",
+                                        "constraint": "^1.9",
+                                        "holder": {
+                                            "verdict": "ok",
+                                            "lead": null,
+                                            "flag_ids": [],
+                                            "replacement": null,
+                                            "next_step": null
+                                        }
+                                    }
+                                ],
+                                "reason": null
+                            },
+                            "baseline": null
+                        },
+                        {
+                            "id": "PKSA-vznr-tgp9-fd7d",
+                            "cve": "CVE-2026-59882",
+                            "title": "guzzlehttp/psr7: Host Confusion via Weak URI Host Validation",
+                            "link": "https://github.com/advisories/GHSA-c2w2-prh8-qm98",
+                            "reported_at": "2026-07-21T18:35:25+00:00",
+                            "severity": "medium",
+                            "severity_published": "medium",
+                            "affected_versions": "<2.12.3",
+                            "counted": true,
+                            "points": 8,
+                            "deciding": false,
+                            "fix": {
+                                "kind": "raise-php",
+                                "to_branch": "2.x",
+                                "version": "2.12.3",
+                                "newest": "2.13.1",
+                                "on_installed_branch": false,
+                                "php": "^7.2.5 || ^8.0",
+                                "held_by": [
+                                    {
+                                        "source": "package",
+                                        "package": "guzzlehttp/guzzle",
+                                        "version": "6.5.8",
+                                        "link": "require",
+                                        "constraint": "^1.9",
+                                        "holder": {
+                                            "verdict": "ok",
+                                            "lead": null,
+                                            "flag_ids": [],
+                                            "replacement": null,
+                                            "next_step": null
+                                        }
+                                    }
+                                ],
+                                "reason": null
+                            },
+                            "baseline": null
+                        }
+                    ],
+                    "releases_read": true,
+                    "complete": true
+                }
+            }
+        ],
+        "evidence": "left-behind: branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach; vulnerable: 4 advisories: 4 medium \u2014 none fixed on 1.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization",
+        "allowlist_reason": null,
+        "data_date": "2026-10-14T00:00:00+00:00",
+        "libyears": 3.35,
+        "age": {
+            "installed": {
+                "at": "2023-04-17T16:00:37+00:00",
+                "years": 3.5,
+                "dated_by": null
+            },
+            "installed_unmeasured": null,
+            "release": {
+                "version": "3.1.0",
+                "at": "2026-08-24T11:02:13+00:00",
+                "years": 0.1,
+                "level": null,
+                "dated_by": null
+            },
+            "release_unmeasured": null,
+            "branch_release": {
+                "version": "1.9.1",
+                "at": "2023-04-17T16:00:37+00:00",
+                "years": 3.5,
+                "level": "warn",
+                "dated_by": null
+            },
+            "branch_release_unmeasured": null,
+            "push": {
+                "at": "2026-08-24T11:03:20+00:00",
+                "years": 0.1,
+                "level": null
+            },
+            "push_unmeasured": null
+        },
+        "baseline": null,
+        "gate": {
+            "reaches_fail_on": true,
+            "fails": true,
+            "exempt_by": null,
+            "by": [
+                {
+                    "value": "high",
+                    "kind": "grade",
+                    "facts": [
+                        {
+                            "kind": "flag",
+                            "id": "left-behind"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-7qs6-zvnz-h66r"
+                        }
+                    ]
+                }
+            ],
+            "basis": null
+        }
+    },
+    "lock": {
+        "php": ">=5.4.0",
+        "released": "2023-04-17T16:00:37+00:00",
+        "repository": "https://github.com/guzzle/psr7.git",
+        "from_composer_repository": true,
+        "dev": false,
+        "branch_snapshot": false,
+        "type": "library"
+    },
+    "metadata": {
+        "abandoned": false,
+        "replacement": null,
+        "releases_listed": 6,
+        "has_stable_release": true,
+        "last_stable_release": "2026-08-24T11:02:13+00:00",
+        "last_stable_version": "3.1.0",
+        "last_stable_dated_by": null,
+        "installed_release": "2023-04-17T16:00:37+00:00",
+        "installed_release_dated_by": null,
+        "repository": null,
+        "type": "library",
+        "data_date": "2026-10-14T00:00:00+00:00",
+        "branches": [
+            {
+                "branch": "3.x",
+                "installed": false,
+                "highest": "3.1.0",
+                "highest_released": "2026-08-24T11:02:13+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "3.1.0",
+                "newest_dated_released": "2026-08-24T11:02:13+00:00",
+                "dated_by": null,
+                "php": "^7.4 || ^8.0",
+                "admits_target_php": true,
+                "admits_project_php": false,
+                "php_blocked_by": "project",
+                "misses_target_php": null,
+                "misses_project_php": "needs_newer",
+                "released_years": 0.1,
+                "fixes": {
+                    "fixed": 4,
+                    "unknown": 0,
+                    "of": 4,
+                    "fix_kind": "raise-php",
+                    "lowest": "3.1.0",
+                    "newest": "3.1.0",
+                    "held_by": [
+                        {
+                            "source": "package",
+                            "package": "guzzlehttp/guzzle",
+                            "version": "6.5.8",
+                            "link": "require",
+                            "constraint": "^1.9",
+                            "holder": {
+                                "verdict": "ok",
+                                "lead": null,
+                                "flag_ids": [],
+                                "replacement": null,
+                                "next_step": null
+                            }
+                        }
+                    ],
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold",
+                            "composer_resolves"
+                        ]
+                    }
+                }
+            },
+            {
+                "branch": "2.x",
+                "installed": false,
+                "highest": "2.13.1",
+                "highest_released": "2026-08-24T09:13:11+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "2.13.1",
+                "newest_dated_released": "2026-08-24T09:13:11+00:00",
+                "dated_by": null,
+                "php": "^7.2.5 || ^8.0",
+                "admits_target_php": true,
+                "admits_project_php": false,
+                "php_blocked_by": "project",
+                "misses_target_php": null,
+                "misses_project_php": "needs_newer",
+                "released_years": 0.1,
+                "fixes": {
+                    "fixed": 4,
+                    "unknown": 0,
+                    "of": 4,
+                    "fix_kind": "raise-php",
+                    "lowest": "2.12.3",
+                    "newest": "2.13.1",
+                    "held_by": [
+                        {
+                            "source": "package",
+                            "package": "guzzlehttp/guzzle",
+                            "version": "6.5.8",
+                            "link": "require",
+                            "constraint": "^1.9",
+                            "holder": {
+                                "verdict": "ok",
+                                "lead": null,
+                                "flag_ids": [],
+                                "replacement": null,
+                                "next_step": null
+                            }
+                        }
+                    ],
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold",
+                            "composer_resolves"
+                        ]
+                    }
+                }
+            },
+            {
+                "branch": "1.x",
+                "installed": true,
+                "highest": "1.9.1",
+                "highest_released": "2023-04-17T16:00:37+00:00",
+                "highest_commit_date": null,
+                "newest_dated": "1.9.1",
+                "newest_dated_released": "2023-04-17T16:00:37+00:00",
+                "dated_by": null,
+                "php": ">=5.4.0",
+                "admits_target_php": true,
+                "admits_project_php": true,
+                "php_blocked_by": null,
+                "misses_target_php": null,
+                "misses_project_php": null,
+                "released_years": 3.5,
+                "fixes": {
+                    "fixed": 0,
+                    "unknown": 0,
+                    "of": 4,
+                    "fix_kind": null,
+                    "lowest": null,
+                    "newest": "1.9.1",
+                    "held_by": [],
+                    "if_applied": null
+                }
+            }
+        ],
+        "installed_branch": "1.x"
+    },
+    "run": {
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^7.2 || ^8.0.0",
+        "project_php_lowest": "7.2.0",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 1,
+                    "records": 4
+                }
+            ]
+        }
+    },
+    "generated_at": "2026-10-14T00:00:00+00:00",
+    "notes": [],
+    "note_details": []
+}

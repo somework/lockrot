@@ -1,0 +1,5 @@
+::warning file=composer.lock,title=lockrot%3A medium — vulnerable (medium advisory)::joomla/filter 2.0.5: 8 = vulnerable 8 [medium advisory]. Do: raise require.php to >=8.1, then require joomla/filter ^3.0.5 — clears the advisory; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve. vulnerable: 1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter.
+flags: vulnerable 1
+depth: every flagged package is named in composer.json · direct 1
+security: 1 vulnerable package · 1 advisory: 1 medium
+gate: passes · --fail-on=high,unchecked · no finding fails it · target php 8.4 (--target-php)

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Lockrot\Baseline\BaselineFile;
 use JsonSchema\Validator;
+use Lockrot\Baseline\BaselineFile;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Tests\Support\Contract\BaselinedFloors;
 use Lockrot\Tests\Support\Contract\BaselinedScenario;

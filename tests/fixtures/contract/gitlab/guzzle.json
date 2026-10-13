@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "guzzlehttp/guzzle 6.5.8 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 left-behind: branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 9 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "a67fb8ff9051acb6744cddbaabab369f62ec9cecc843d9fd683e14f398fe0164",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "guzzlehttp/guzzle 6.5.8 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 vulnerable: 9 advisories: 1 high, 8 medium \u2014 none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 9 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "fcd305e238194c96b8c24faf6bca1c516bf0637590e0a9e467b249ed1b5b4276",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

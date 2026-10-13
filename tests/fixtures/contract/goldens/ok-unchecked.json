@@ -1,0 +1,17 @@
+{
+    "score_text": "0",
+    "next_step_text": null,
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high,unchecked · 1 finding fails it (unchecked 1) · target php 8.4 (--target-php)",
+    "age_line": "age: installed v8.6.1, release date not known (no date); last push 2026-07-10 (0.3 years ago)",
+    "explain_age": [
+        "installed  v8.6.1    not read (no date)",
+        "8.x                  not read (undated releases)",
+        "newest               not read (undated releases)",
+        "last push            2026-07-10   0.3 years ago                 below push-warn-years 3",
+        "libyears not measured: no date"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

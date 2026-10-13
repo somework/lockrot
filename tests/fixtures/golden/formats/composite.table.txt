@@ -8,7 +8,7 @@ critical (3)
       vulnerable   15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst:
                    CVE-2026-46633 PHP code injection via `{% use %}` template name
       age: installed v2.16.1 released 2024-09-09 (2.1 years ago), the newest on 2.x; newest release v3.30.0
-           2026-09-25 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago)
+           2026-09-25 (0.1 years ago); last push 2026-09-30 (less than three weeks ago)
   symfony/monolog-bridge v2.6.13  direct  ·  left-behind · old-promise · vulnerable
       36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]
       do: require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php
@@ -75,5 +75,5 @@ furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: guzzlehttp/guzzle 1
 advisories: 7 packages asked · packagist.org answered (20 on record for 4 packages)
 gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)
-Data as of 2026-10-13 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

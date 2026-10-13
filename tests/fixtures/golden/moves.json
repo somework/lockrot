@@ -2760,6 +2760,73 @@
             "text": "replace with symfony/error-handler (named by its registry)"
         }
     },
+    "affected-range-unknown\u2021": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "unknown",
+            "reason": "affected_range_unknown",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-dwsq-ppd2-mb1x"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "why-not",
+                    "guzzlehttp/guzzle",
+                    "8.2.0"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "guzzlehttp/guzzle",
+                    "installed_version": "6.5.8",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "8.2.0",
+                        "released": "2026-09-06T13:55:09+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                }
+            ],
+            "also": [],
+            "text": "no move: no advisory names the versions it affects, so lockrot names no fix"
+        },
+        "fix_kind": "unknown",
+        "installed_branch_fixes": {
+            "fixed": 0,
+            "unknown": 1,
+            "of": 1,
+            "fix_kind": null,
+            "lowest": null,
+            "newest": "v1.43.0",
+            "held_by": [],
+            "if_applied": null
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "cache-subscriber": {
         "next_step": {
             "kind": "find-alternative",

@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "matomo/network 2.0.1 \u2014 finding high (16 = old-promise 16) \u2014 old-promise: released 2020-10-05 for PHP 5 (php \">=5.4\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: composer update matomo/network (gets 2.0.3) \u2014 clears old-promise.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "0493394808e40861c93b060d5b8320599408b9b0408215c06e2f1a6da0f040c7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

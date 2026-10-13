@@ -1184,6 +1184,25 @@
    ]
   }
  },
+ "legacy": {
+  "verdict": "old-promise",
+  "priority": "low",
+  "basis": {
+   "base": "high",
+   "steps": [
+    {
+     "reason": "transitive",
+     "from": "high",
+     "to": "medium"
+    },
+    {
+     "reason": "dev",
+     "from": "medium",
+     "to": "low"
+    }
+   ]
+  }
+ },
  "generated_at": "2026-10-01T17:41:33+00:00",
  "notes": [
   "1 package is not from a Composer repository: their release metadata and repository activity were not read"

@@ -1,0 +1,234 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/ok",
+                            "name": "ok",
+                            "shortDescription": {
+                                "text": "ok: Nothing counts"
+                            },
+                            "fullDescription": {
+                                "text": "No flag counts and no counted advisory affects the installed version."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/unchecked",
+                            "name": "unchecked",
+                            "shortDescription": {
+                                "text": "unchecked: A check did not run, and nothing else grades the package"
+                            },
+                            "fullDescription": {
+                                "text": "A check that the package needs did not run (S10), and no counted fact grades it. --fail-on=unchecked fails on it."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/ok",
+                    "ruleIndex": 0,
+                    "level": "note",
+                    "message": {
+                        "text": "scheb/2fa-google-authenticator v8.6.1 \u2014 finding ok, 0"
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "scheb/2fa-google-authenticator"
+                    },
+                    "properties": {
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "v8.6.1",
+                        "verdict": "ok",
+                        "priority": "none",
+                        "lead": null,
+                        "score_total": 0,
+                        "score_text": "0",
+                        "score_model_id": 1,
+                        "flag_ids": [],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "pimcore/pimcore",
+                            "scheb/2fa-google-authenticator"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "pimcore/pimcore",
+                            "pimcore/quill-bundle",
+                            "pimcore/studio-backend-bundle",
+                            "pimcore/studio-ui-bundle"
+                        ],
+                        "signal_ids": [
+                            "S10"
+                        ],
+                        "age": {
+                            "installed": null,
+                            "installed_unmeasured": "undated",
+                            "release": null,
+                            "release_unmeasured": "undated_releases",
+                            "branch_release": null,
+                            "branch_release_unmeasured": "undated_releases",
+                            "push": {
+                                "at": "2026-07-10T18:36:02+00:00",
+                                "years": 0.3,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/unchecked",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "message": {
+                        "text": "scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it. checks missing: S2, S8 (undated releases)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "scheb/2fa-google-authenticator"
+                    },
+                    "properties": {
+                        "package": "scheb/2fa-google-authenticator",
+                        "version": "v8.6.1",
+                        "verdict": "ok",
+                        "priority": "none",
+                        "lead": null,
+                        "score_total": 0,
+                        "score_text": "0",
+                        "score_model_id": 1,
+                        "flag_ids": [],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "unchecked"
+                        ]
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (unchecked 1) \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 1,
+                            "failing": 1,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                },
+                                {
+                                    "value": "unchecked",
+                                    "failing": 1
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (unchecked 1) \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high,unchecked",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            },
+                            {
+                                "value": "unchecked",
+                                "kind": "unchecked",
+                                "threshold": null
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

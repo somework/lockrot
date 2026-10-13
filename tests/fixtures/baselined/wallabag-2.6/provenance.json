@@ -16,7 +16,7 @@
     },
     "clocks": {
         "t0": "2024-11-03T15:02:01+00:00",
-        "t1": "2026-10-13T00:00:00+00:00"
+        "t1": "2026-10-14T00:00:00+00:00"
     },
     "options": [
         "--target-php=8.4"
@@ -2198,21 +2198,21 @@
     "files": {
         "t0/report.json": "7793d3e586dd8509bdd8acfb0b0777f2b11cd5c4d1dc1df86078a2a0205143b6",
         "lockrot-baseline.json": "54fcceafdea65b1da80b5c97a7e66021e77a34b0f9ee9301a58068ef50da8f64",
-        "check/report.json": "be158aea712c15aaa80e77dfd88937abea13a83a28620d2abe5eb80c9d63578b",
-        "check/report.table.txt": "291dd06abe4640970579618d831306b0ead1bfeddbde306c5796c77c92ecf124",
-        "check/report.md": "235e81e22d3931d42eb147163a76f2c5ceb87ff1d113aaecbedf6b2e57756235",
-        "check/report.github.txt": "d8e4ccf813d422d4952ccb72afd208e16ecbbc9ac368d16d9fdae1d691e3a212",
-        "check/report.gitlab.json": "3424f08a0d5a4ef21ee5875d7a82aeb0bea613f837bbb63032b6574f997a0d81",
-        "check/report.sarif.json": "2b7ee4cc6e4cfe3650d73629c85c4aedce629abc61021a27287fdd901adcacce",
-        "check/report.bundle.json": "774d9f610ec01a7f21b2f02418fa9a6cea7e727cf8307cc2685a04d79c8e4168",
-        "check/explain/javibravo--simpleue.json": "4e27a9b891aa335f602b9fd1f674564c19b191a5dda53b58f7c2c4d092d65bf6",
-        "check/explain/symfony--http-foundation.json": "60e2b4ab2b184e3d58f0d2a8b913b037405bb00b9108baddfa655e98f24aee7f",
-        "check/explain/symfony--security-guard.json": "815f66813a75e04c3b0675b3a574ee956f7a5664c57900a0631e8db49dc2eefd",
-        "check/explain/twig--twig.json": "ffbba3a0d01d1be47e10b32a8f8a4f319f7c437f09527cabfb9a8505114c7e1d",
-        "check/gates-left-behind-vulnerable-high.json": "da9e1b60d1a9da796feae6546890c94f08a30b7ef3069dd70ff0e2edaead38df",
-        "check/gates-left-behind-vulnerable-high.sarif.json": "72e4e9368d9cd195c1073f454001223ccacc7768406b0fc3cb2e58f318567300",
-        "check/target-8.3.json": "201c1956cfef898f711e13b7368b7887206f3ca3e46ab17f1890a26dd8fed450",
-        "regenerate/lockrot-baseline.json": "2469c2c1caaed260ddc7b31d63bb041eacadedc2863a70977bbc68874cffe4fb",
-        "regenerate/report.json": "d1e0a31e8445e59944751f04a5256d16bf5cb9a523536c7fcf144910657ab5e7"
+        "check/report.json": "4a4aad41e12e083ef5bc46c87ec80a3fbbfc451d0a76ccdb06e25e39aa9fea0a",
+        "check/report.table.txt": "0467db1add9de27220596793e66061ddc559205fe3738fdc3e5501d8e00d5cf4",
+        "check/report.md": "ba89498306256ae718250dbbb2fc90f3f53d3b98c326521b802039cc962e2fb2",
+        "check/report.github.txt": "7ba79afe270b9fe99876cfb9390c91e022b1ad85edecbf9b4a94d7d6d04302ce",
+        "check/report.gitlab.json": "fd5f0e90ad35142dd87ff14b5e0f20d1cf909bcb86b616e59ace1527c5ab2469",
+        "check/report.sarif.json": "d46ed516fc6cb0d2c01611902726057c16952b68272fd8fb5aa24634540b7f3d",
+        "check/report.bundle.json": "14c71105641821d23c5fe01601c2d176a1e748eee0aa64922a59bcbd5858ab6b",
+        "check/explain/javibravo--simpleue.json": "8a0ee7641bf41ed890c1eee68c25fdc160b097e52e534a70c42e6134ee7b47c7",
+        "check/explain/symfony--http-foundation.json": "198c457cffe6d598b2325ab6ae486816fc27eab1a0bf3e97e3e8612ae678a9fb",
+        "check/explain/symfony--security-guard.json": "c67898550cc1ca74a339228c2f5afed64514cd27277596fcabc599279960e5a9",
+        "check/explain/twig--twig.json": "e1b9eac5fa2ab24c712da97666830635fa7321fb7b8f8476e6bd6faed91b76ce",
+        "check/gates-left-behind-vulnerable-high.json": "1168bce0c0a920e2569be4df5b4853c8771a669983c7177663bab620a0b7e9ce",
+        "check/gates-left-behind-vulnerable-high.sarif.json": "dc227f0afbfc5ec57c75ef326533d5aa940982a4894af1b4ffce72d12f9df253",
+        "check/target-8.3.json": "2a8e7d437defa0d7810e09cca7521f6221f782a3b7cf7a5b7e749d115c305431",
+        "regenerate/lockrot-baseline.json": "00d00bc39e0015b14cf70867704506139a0aa922c1c57e6c591bc7995db8f450",
+        "regenerate/report.json": "af8ba02b9dcaf33cefe3bed1f8c99a0c5542921cfdd1c833ae2b505b0ffb161c"
     }
 }

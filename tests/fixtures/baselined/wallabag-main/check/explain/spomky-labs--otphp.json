@@ -487,7 +487,7 @@
         ],
         "evidence": "left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06); vulnerable: 2 advisories: 1 high, 1 medium \u2014 none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
         "allowlist_reason": null,
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "libyears": 4.22,
         "age": {
             "installed": {
@@ -602,7 +602,7 @@
         "installed_release_dated_by": null,
         "repository": "https://github.com/Spomky-Labs/otphp.git",
         "type": "library",
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "branches": [
             {
                 "branch": "11.x",
@@ -1684,7 +1684,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],
     "note_details": []
 }

@@ -1,0 +1,6 @@
+::warning file=composer.lock,title=lockrot%3A low — vulnerable (low advisory)::symfony/yaml v5.4.23: 2 = vulnerable 2 [low advisory]. Do: composer update symfony/yaml (gets v5.4.53) — clears 3 advisories. vulnerable: 3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings.
+flags: vulnerable 1
+depth: every flagged package is named in composer.json · direct 1
+security: 1 vulnerable package · 3 advisories: 3 low
+update now: composer update symfony/yaml
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

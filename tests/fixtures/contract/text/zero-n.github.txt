@@ -1,0 +1,4 @@
+::warning file=composer.lock,title=lockrot%3A medium — stale::hyvor/php-json-exporter 0.0.3: 8 = stale 8. Do: —. stale: last release 2023-04-11 (3.5 years ago).
+flags: stale 1
+depth: every flagged package is named in composer.json · direct 1
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

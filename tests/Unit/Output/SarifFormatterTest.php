@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Unit\Output;
 
 use JsonSchema\Validator;
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
@@ -132,6 +133,17 @@ final class SarifFormatterTest extends TestCase
     }
 
     /** In case either-critical‡ only the other move of symfony/debug clears its critical advisory. */
+    /** SPEC-0.14.md §8.5.4: a whole number reads `0`, never `0.0`; only `rank` keeps its zero fraction. */
+    public function testOnlyTheRankKeepsAZeroFraction(): void
+    {
+        $finding = (new FindingBuilder())->withVerdict(Verdict::STALE)->withLibyears(LibyearsMeasurement::of(1.0))->build();
+        $sarif = Formatters::for('sarif', FormatContext::create(null, 'none'))->format(new Report([$finding], [], new \DateTimeImmutable('2026-10-14T00:00:00+00:00'), 1, 0));
+
+        self::assertMatchesRegularExpression('{"rank": \d+\.0,}', $sarif);
+        self::assertStringContainsString('"years": 0,', $sarif);
+        self::assertStringNotContainsString('"years": 0.0', $sarif);
+    }
+
     public function testAnAdvisoryThatOnlyAnOtherMoveClearsNamesThatMove(): void
     {
         $sarif = JsonPath::decoded(json_decode((new SarifFormatter(FormatContext::create(null, 'high')))->format(CaseHydrator::report(CaseHydrator::case('either-critical‡')), true), true));

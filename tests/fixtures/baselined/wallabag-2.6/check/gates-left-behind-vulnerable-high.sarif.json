@@ -1503,7 +1503,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "vulnerable-high"
@@ -1626,7 +1626,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "vulnerable-high"
@@ -1684,7 +1684,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "vulnerable-high"
@@ -1742,7 +1742,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "vulnerable-high"
@@ -1800,7 +1800,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-1tmc-rt7x-12w6",
@@ -1856,7 +1856,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-21g2-dzjv-sky5",
@@ -1912,7 +1912,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-3mcc-k66d-pydb",
@@ -1968,7 +1968,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-fbvq-z33h-r2np",
@@ -2024,7 +2024,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-xx6c-6d96-db2w",
@@ -2080,7 +2080,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-kvv6-36cr-fkzb",
@@ -2136,7 +2136,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-yd6k-t2gh-1m43",
@@ -2192,7 +2192,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-g9zw-qxh8-pq8w",
@@ -2248,7 +2248,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-n14z-jjjg-g8vd",
@@ -2304,7 +2304,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-sjvz-tbbr-vwth",
@@ -2360,7 +2360,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-wwb1-81rc-pd65",
@@ -2424,7 +2424,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "chain": [
@@ -2446,7 +2446,7 @@
                         "age": {
                             "installed": {
                                 "at": "2019-10-30T09:32:00+00:00",
-                                "years": 7.0,
+                                "years": 7,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -2461,7 +2461,7 @@
                             "branch_release": {
                                 "version": "5.3.4",
                                 "at": "2019-10-30T09:32:00+00:00",
-                                "years": 7.0,
+                                "years": 7,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -2528,7 +2528,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "term": {
@@ -2587,7 +2587,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "chain": [
@@ -2609,7 +2609,7 @@
                         "age": {
                             "installed": {
                                 "at": "2019-10-30T09:32:00+00:00",
-                                "years": 7.0,
+                                "years": 7,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -2624,7 +2624,7 @@
                             "branch_release": {
                                 "version": "5.3.4",
                                 "at": "2019-10-30T09:32:00+00:00",
-                                "years": 7.0,
+                                "years": 7,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -2759,7 +2759,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-6d8m-6kgw-18zr",
@@ -2873,7 +2873,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-fvw5-9t6n-nwvr",
@@ -2980,7 +2980,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "vulnerable-high"
@@ -3096,7 +3096,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-k1b4-kshy-xgbh",
@@ -3210,7 +3210,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-yfw5-9gnj-n2c7",
@@ -3317,7 +3317,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-93qv-9n9h-6k6p",
@@ -3424,7 +3424,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-bbs6-q5q9-f3t4",
@@ -3531,7 +3531,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-bcdd-5xc7-gwfb",
@@ -3638,7 +3638,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-cnw1-2ytm-cgr8",
@@ -3745,7 +3745,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-fy2t-3c5f-827y",
@@ -3852,7 +3852,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-k22t-f949-t9g6",
@@ -3959,7 +3959,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-pwsk-hy21-4gby",
@@ -4066,7 +4066,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "advisory": "PKSA-qxvb-2bpp-dnk6",
@@ -4171,7 +4171,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -4298,7 +4298,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -4452,7 +4452,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-b35n-565h-rs4q",
@@ -4517,7 +4517,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -4572,7 +4572,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -4587,7 +4587,7 @@
                             "branch_release": {
                                 "version": "v4.4.47",
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -4647,7 +4647,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -4702,7 +4702,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -4717,7 +4717,7 @@
                             "branch_release": {
                                 "version": "v4.4.47",
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -4804,7 +4804,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-wtxr-p26d-nn42",
@@ -4869,7 +4869,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -4973,7 +4973,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -5145,7 +5145,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -5260,7 +5260,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -5359,7 +5359,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -5416,7 +5416,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:23+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -5457,7 +5457,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2018-10-01T14:10:31+00:00",
-                                "years": 8.0,
+                                "years": 8,
                                 "level": "high"
                             },
                             "push_unmeasured": null
@@ -5516,7 +5516,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:23+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -5566,7 +5566,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "left-behind"
@@ -5667,7 +5667,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "term": {
@@ -5723,7 +5723,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:24+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -5822,7 +5822,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:26+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -5922,7 +5922,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:29+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -6023,7 +6023,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:32+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -6122,7 +6122,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -6222,7 +6222,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:35+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -6355,7 +6355,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:42+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -6448,7 +6448,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -6543,7 +6543,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -6677,7 +6677,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-qv5y-crcz-9nxw",
@@ -6754,7 +6754,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "chain": [
@@ -6863,7 +6863,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -6975,7 +6975,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -7033,7 +7033,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-12sz-bcny-pk4m",
@@ -7089,7 +7089,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-432p-hv1d-chf7",
@@ -7145,7 +7145,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-zh4j-by9m-7mz8",
@@ -7201,7 +7201,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "vulnerable-high"
@@ -7312,7 +7312,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -7406,7 +7406,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -7525,7 +7525,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-6j95-1jtb-x6wc",
@@ -7591,7 +7591,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-8j6w-3kr7-s9xk",
@@ -7657,7 +7657,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-cbx2-m9db-bmzd",
@@ -7722,7 +7722,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -7817,7 +7817,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -7936,7 +7936,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -8054,7 +8054,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -8197,7 +8197,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-yc7t-91v9-99xs",
@@ -8262,7 +8262,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -8356,7 +8356,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -8474,7 +8474,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "left-behind"
@@ -8496,7 +8496,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-25T13:54:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -8511,7 +8511,7 @@
                             "branch_release": {
                                 "version": "v4.4.48",
                                 "at": "2022-10-25T13:54:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -8578,7 +8578,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "chain": [
@@ -8598,7 +8598,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-25T13:54:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -8613,7 +8613,7 @@
                             "branch_release": {
                                 "version": "v4.4.48",
                                 "at": "2022-10-25T13:54:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -8727,7 +8727,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -8816,7 +8816,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -8873,7 +8873,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:20+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -8974,7 +8974,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:20+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -9031,7 +9031,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -9130,7 +9130,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -9187,7 +9187,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -9288,7 +9288,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -9345,7 +9345,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -9445,7 +9445,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -9502,7 +9502,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -9603,7 +9603,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -9653,7 +9653,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [
                             "left-behind"
@@ -9755,7 +9755,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "worsened",
                         "error_by": [],
                         "term": {
@@ -9812,7 +9812,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:16+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -9917,7 +9917,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:16+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -9974,7 +9974,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:17+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -9999,14 +9999,14 @@
                         "age": {
                             "installed": {
                                 "at": "2014-10-12T19:18:40+00:00",
-                                "years": 12.0,
+                                "years": 12,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "3.0.0",
                                 "at": "2014-10-12T19:18:40+00:00",
-                                "years": 12.0,
+                                "years": 12,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -10014,7 +10014,7 @@
                             "branch_release": {
                                 "version": "3.0.0",
                                 "at": "2014-10-12T19:18:40+00:00",
-                                "years": 12.0,
+                                "years": 12,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -10080,7 +10080,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:17+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -10137,7 +10137,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -10241,7 +10241,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -10298,7 +10298,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:22+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -10317,14 +10317,14 @@
                         "age": {
                             "installed": {
                                 "at": "2018-10-01T14:17:27+00:00",
-                                "years": 8.0,
+                                "years": 8,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "1.1.1",
                                 "at": "2018-10-01T14:17:27+00:00",
-                                "years": 8.0,
+                                "years": 8,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -10332,14 +10332,14 @@
                             "branch_release": {
                                 "version": "1.1.1",
                                 "at": "2018-10-01T14:17:27+00:00",
-                                "years": 8.0,
+                                "years": 8,
                                 "level": "high",
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2018-10-01T14:17:36+00:00",
-                                "years": 8.0,
+                                "years": 8,
                                 "level": "high"
                             },
                             "push_unmeasured": null
@@ -10398,7 +10398,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:22+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -10455,7 +10455,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -10555,7 +10555,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -10612,7 +10612,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -10712,7 +10712,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -10769,7 +10769,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -10803,7 +10803,7 @@
                             "release": {
                                 "version": "v5.4.45",
                                 "at": "2024-09-25T14:11:13+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -10818,7 +10818,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2024-10-27T12:57:05+00:00",
-                                "years": 2.0,
+                                "years": 2,
                                 "level": null
                             },
                             "push_unmeasured": null
@@ -10877,7 +10877,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -10926,7 +10926,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11018,7 +11018,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11113,7 +11113,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11143,7 +11143,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-12T20:51:15+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -11158,7 +11158,7 @@
                             "branch_release": {
                                 "version": "1.2.0",
                                 "at": "2022-10-12T20:51:15+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -11216,7 +11216,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11309,7 +11309,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11401,7 +11401,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11421,14 +11421,14 @@
                         "age": {
                             "installed": {
                                 "at": "2021-09-28T19:34:56+00:00",
-                                "years": 5.0,
+                                "years": 5,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "5.6.0",
                                 "at": "2025-10-17T11:30:53+00:00",
-                                "years": 1.0,
+                                "years": 1,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -11494,7 +11494,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11586,7 +11586,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11673,7 +11673,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11759,7 +11759,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11855,7 +11855,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -11946,7 +11946,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12033,7 +12033,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12120,7 +12120,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12211,7 +12211,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12332,7 +12332,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12437,7 +12437,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12559,7 +12559,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12580,7 +12580,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-14T11:24:01+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -12595,7 +12595,7 @@
                             "branch_release": {
                                 "version": "v4.4.48",
                                 "at": "2022-10-14T11:24:01+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -12653,7 +12653,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12777,7 +12777,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -12907,7 +12907,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13025,7 +13025,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13047,7 +13047,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-22T05:50:33+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -13062,7 +13062,7 @@
                             "branch_release": {
                                 "version": "v4.4.48",
                                 "at": "2022-10-22T05:50:33+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -13120,7 +13120,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13233,7 +13233,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13324,7 +13324,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13429,7 +13429,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13520,7 +13520,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13619,7 +13619,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13649,7 +13649,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-22T05:50:33+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -13664,7 +13664,7 @@
                             "branch_release": {
                                 "version": "v4.4.48",
                                 "at": "2022-10-22T05:50:33+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -13722,7 +13722,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13813,7 +13813,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -13920,7 +13920,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14023,7 +14023,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14068,7 +14068,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2025-10-08T08:10:50+00:00",
-                                "years": 1.0,
+                                "years": 1,
                                 "level": null
                             },
                             "push_unmeasured": null
@@ -14126,7 +14126,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14228,7 +14228,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14331,7 +14331,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14433,7 +14433,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14535,7 +14535,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14638,7 +14638,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14741,7 +14741,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14843,7 +14843,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -14946,7 +14946,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -15047,7 +15047,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -15150,7 +15150,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -15254,7 +15254,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -15356,7 +15356,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -15460,7 +15460,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:36+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -15569,7 +15569,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -15679,7 +15679,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-gm5x-j3mz-71n9",
@@ -15735,7 +15735,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-jj5t-2zs1-dcfm",
@@ -15791,7 +15791,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-vznr-tgp9-fd7d",
@@ -15847,7 +15847,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -15981,7 +15981,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -16098,7 +16098,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -16117,7 +16117,7 @@
                         "age": {
                             "installed": {
                                 "at": "2020-10-28T17:51:34+00:00",
-                                "years": 6.0,
+                                "years": 6,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -16132,7 +16132,7 @@
                             "branch_release": {
                                 "version": "v1.3.3",
                                 "at": "2020-10-28T17:51:34+00:00",
-                                "years": 6.0,
+                                "years": 6,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -16198,7 +16198,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -16255,7 +16255,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -16356,7 +16356,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "term": {
@@ -16405,7 +16405,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:14+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -16496,7 +16496,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -16586,7 +16586,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -16682,7 +16682,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -16772,7 +16772,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -16843,7 +16843,7 @@
                     "level": "error",
                     "rank": 50.0,
                     "message": {
-                        "text": "bacon/bacon-qr-code 2.0.8 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2022-12-07 (3.8 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "bacon/bacon-qr-code 2.0.8 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 transitive \u2014 left-behind: branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "bacon/bacon-qr-code"
@@ -16862,7 +16862,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -16882,7 +16882,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-12-07T17:46:57+00:00",
-                                "years": 3.8,
+                                "years": 3.9,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -16897,7 +16897,7 @@
                             "branch_release": {
                                 "version": "2.0.8",
                                 "at": "2022-12-07T17:46:57+00:00",
-                                "years": 3.8,
+                                "years": 3.9,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -16955,7 +16955,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17060,7 +17060,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:15+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -17150,7 +17150,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T19:51:19+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17243,7 +17243,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17336,7 +17336,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17437,7 +17437,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -17527,7 +17527,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17659,7 +17659,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17767,7 +17767,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17859,7 +17859,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -17878,7 +17878,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -17893,7 +17893,7 @@
                             "branch_release": {
                                 "version": "v4.4.47",
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -17951,7 +17951,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [
                             "left-behind"
@@ -18003,7 +18003,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -18018,7 +18018,7 @@
                             "branch_release": {
                                 "version": "v4.4.47",
                                 "at": "2022-10-03T15:15:11+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -18077,7 +18077,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -18094,7 +18094,7 @@
                         "age": {
                             "installed": {
                                 "at": "2025-09-26T10:59:41+00:00",
-                                "years": 1.0,
+                                "years": 1,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -18186,7 +18186,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -18325,7 +18325,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [
@@ -18436,7 +18436,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-ft77-7h5f-p3r6",
@@ -18492,7 +18492,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "advisory": "PKSA-v5yj-8nmz-sk2q",
@@ -18554,7 +18554,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -18651,7 +18651,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "known",
                         "error_by": [],
                         "chain": [
@@ -18742,7 +18742,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-13T00:00:00+00:00",
+                        "data_date": "2026-10-14T00:00:00+00:00",
                         "baseline_status": "new",
                         "error_by": [],
                         "chain": [

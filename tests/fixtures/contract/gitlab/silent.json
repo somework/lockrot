@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "yosymfony/toml v1.0.4 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 silent: last release 2018-08-08 (8.2 years ago); last push 2020-08-08 (6.2 years ago). Do: find a maintained alternative: nothing released for 8.2 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "c0909822b67a07f548e0e1541560d5fee08006fc84c8c08a6f0bef9eddc7fc3e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "yosymfony/toml v1.0.4 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 old-promise: released 2018-08-08 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 8.2 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "b06441057be046ef1fc6d27672b292ec77157276d3e95908508d59ee6a999c81",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

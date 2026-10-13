@@ -1,0 +1,17 @@
+{
+    "score_text": "32 = abandoned 32",
+    "next_step_text": "replace it: its registry suggests \"Symfony\"",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v6.2.10 released 2023-02-24 (3.6 years ago), its newest release; last push 2023-02-24 (3.6 years ago)",
+    "explain_age": [
+        "installed  v6.2.10   2023-02-24   3.6 years ago",
+        "6.x        v6.2.10   2023-02-24   3.6 years ago                 past release-warn-years 3",
+        "newest     v6.2.10   2023-02-24   3.6 years ago                 past release-warn-years 3",
+        "last push            2023-02-24   3.6 years ago                 past push-warn-years 3",
+        "libyears 0.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

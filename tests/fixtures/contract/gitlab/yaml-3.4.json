@@ -1,0 +1,50 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/yaml v3.4.47 \u2014 finding high (22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]) \u2014 left-behind: branch 3.x last released 2020-10-24 (6.0 years ago); 8.x released v8.1.8 (2026-09-26), needs php >=8.4.1 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach. Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "426f755b28a58dab49e20a2a64b4bb00aade6213f92b6abfdabd9456d1503cd4",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "symfony/yaml v3.4.47 \u2014 finding high (22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]) \u2014 old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "492ceabae9a44695aaced062f31050246cb7d0796e2c4aa44b000997967f8440",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/yaml v3.4.47 \u2014 finding high (22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]) \u2014 vulnerable: 3 advisories: 3 low \u2014 none fixed on 3.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings. Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "24be27cc46819fdc46571f6f45cb5585819e240c6b816ba647d2156c6faeae6b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

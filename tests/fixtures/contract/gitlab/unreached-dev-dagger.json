@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "bacon/bacon-qr-code 2.0.8 \u2014 finding medium (8 = left-behind 16 \u00f7 2 unreached) \u2014 left-behind: branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach. Do: raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "5b0e680527cab1739b268a83ebb225339c3d1f31e9ad2e347af460bc203a1e9c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

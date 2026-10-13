@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "doctrine/annotations 2.0.2 \u2014 finding ok (0). (via mautic/core-lib)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "c6c7ef1ce0de5bcb03e5bd4d0f67c3d21fed542cb2a5ee9fb43274e9f412e23d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

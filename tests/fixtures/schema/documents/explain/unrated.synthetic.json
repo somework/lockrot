@@ -121,11 +121,11 @@
    "leaves": [
     {
      "kind": "advisory",
-     "id": "PKSA-v5yj-8nmz-sk2q"
+     "id": "PKSA-ft77-7h5f-p3r6"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-ft77-7h5f-p3r6"
+     "id": "PKSA-v5yj-8nmz-sk2q"
     },
     {
      "kind": "advisory",
@@ -1415,6 +1415,14 @@
      "records": 5
     }
    ]
+  }
+ },
+ "legacy": {
+  "verdict": "ok",
+  "priority": "none",
+  "basis": {
+   "base": "none",
+   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:41:33+00:00",

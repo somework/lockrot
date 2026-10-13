@@ -135,15 +135,11 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-gw7n-z4yx-7xjt"
-    },
-    {
-     "kind": "advisory",
      "id": "PKSA-dpx1-78wg-1kqs"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-fbvq-z33h-r2np"
+     "id": "PKSA-gw7n-z4yx-7xjt"
     },
     {
      "kind": "advisory",
@@ -151,31 +147,19 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-xx6c-6d96-db2w"
-    },
-    {
-     "kind": "advisory",
      "id": "PKSA-3mcc-k66d-pydb"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-g9zw-qxh8-pq8w"
+     "id": "PKSA-fbvq-z33h-r2np"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-sjvz-tbbr-vwth"
+     "id": "PKSA-xx6c-6d96-db2w"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-n14z-jjjg-g8vd"
-    },
-    {
-     "kind": "advisory",
-     "id": "PKSA-yhcn-xrg3-68b1"
-    },
-    {
-     "kind": "advisory",
-     "id": "PKSA-2wrf-1xmk-1pky"
+     "id": "PKSA-kvv6-36cr-fkzb"
     },
     {
      "kind": "advisory",
@@ -183,7 +167,23 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-kvv6-36cr-fkzb"
+     "id": "PKSA-2wrf-1xmk-1pky"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-g9zw-qxh8-pq8w"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-n14z-jjjg-g8vd"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-sjvz-tbbr-vwth"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-yhcn-xrg3-68b1"
     }
    ],
    "clears_all": false,
@@ -1566,6 +1566,14 @@
      "records": 26
     }
    ]
+  }
+ },
+ "legacy": {
+  "verdict": "ok",
+  "priority": "none",
+  "basis": {
+   "base": "none",
+   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:41:20+00:00",

@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -1287,7 +1287,7 @@
         ],
         "fix_unknown": 0
     },
-    "data_date": "2026-10-13T00:00:00+00:00",
+    "data_date": "2026-10-14T00:00:00+00:00",
     "notes": [
         "the baseline was written for php 8.4 (--target-php) and this run targets php 8.3 (--target-php): fix changes against the baseline are not compared"
     ],
@@ -2160,7 +2160,7 @@
             ],
             "evidence": "vulnerable: 15 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 4 low \u2014 all fixed on 3.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.65,
             "age": {
                 "installed": {
@@ -4043,7 +4043,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2019-10-30 (7.0 years ago); 8.x released 8.2.0 (2026-09-06); old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested; vulnerable: 14 advisories: 6 high, 8 medium \u2014 none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 6.85,
             "age": {
                 "installed": {
@@ -4699,7 +4699,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-11-04 (3.9 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.50 (2025-11-03); vulnerable: 2 advisories: 1 high, 1 low \u2014 none fixed on 4.x; worst: CVE-2025-64500 Incorrect parsing of PATH_INFO can lead to limited authorization bypass",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.82,
             "age": {
                 "installed": {
@@ -5260,7 +5260,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.6 (2026-08-22), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.52 (2026-05-05); vulnerable: 2 advisories: 1 high, 1 medium \u2014 none fixed on 4.x; worst: CVE-2026-45067 Email Header / SMTP Command Injection via CRLF in Symfony\\Component\\Mime\\Address",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.88,
             "age": {
                 "installed": {
@@ -5921,7 +5921,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2023-01-24 (3.7 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.53 (2026-05-24); vulnerable: 2 advisories: 2 high \u2014 none fixed on 4.x; worst: CVE-2026-48489 Security Firewall Bypass via failure_forward Subrequest: Unauthenticated Access to access_control-Protected GET Routes",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.6,
             "age": {
                 "installed": {
@@ -6296,7 +6296,7 @@
             ],
             "evidence": "silent: last release 2017-11-15 (8.9 years ago); last push 2017-11-18 (8.9 years ago); old-promise: released 2017-11-15 for PHP 5 (php \">=5.5\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -6882,7 +6882,7 @@
             ],
             "evidence": "silent: last release 2018-09-17 (8.1 years ago); last push 2018-10-01 (8.0 years ago); old-promise: released 2018-09-17 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:23+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -7240,7 +7240,7 @@
             ],
             "evidence": "silent: last release 2020-04-24 (6.5 years ago); last push 2020-04-28 (6.5 years ago); old-promise: released 2020-04-24 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -7611,7 +7611,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: spiriitlabs/form-filter-bundle; its repository is archived on GitHub; last release 2023-05-19 (3.4 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:24+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.81,
             "age": {
                 "installed": {
@@ -7954,7 +7954,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:26+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -8273,7 +8273,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: psr/http-factory; its repository is archived on GitHub; last release 2023-04-14 (3.5 years ago); last push 2023-04-14 (3.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:29+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -8618,7 +8618,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-01-03 (4.8 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:32+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -8957,7 +8957,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -9314,7 +9314,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:35+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -9625,7 +9625,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-03-22 (4.6 years ago); last push 2022-03-22 (4.6 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:42+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -10184,7 +10184,7 @@
             ],
             "evidence": "left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06), needs php >=8.1 above the project's php >=7.4; no releasing branch within reach; vulnerable: 2 advisories: 1 high, 1 medium \u2014 none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.22,
             "age": {
                 "installed": {
@@ -10541,7 +10541,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 unrated \u2014 none fixed on 3.x; advisory: PKSA-px1b-j2dd-31r6 Server-side Request Forgery (SSRF)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -11149,7 +11149,7 @@
             ],
             "evidence": "vulnerable: 5 advisories: 2 high, 2 medium, 1 low \u2014 all fixed on 3.x; worst: CVE-2026-32935 phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.17,
             "age": {
                 "installed": {
@@ -11571,7 +11571,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 high \u2014 all fixed on 5.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.1,
             "age": {
                 "installed": {
@@ -12163,7 +12163,7 @@
             ],
             "evidence": "left-behind: branch 0.15.x last released 2022-02-21 (4.6 years ago); 1.x released 1.0.0 (2026-09-01); vulnerable: 4 advisories: 4 medium \u2014 none fixed on 0.15.x; worst: CVE-2025-55166 svg-sanitizer Bypasses Attribute Sanitization",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.53,
             "age": {
                 "installed": {
@@ -12655,7 +12655,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-11-04 (3.9 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.52 (2026-05-11); vulnerable: 1 advisory: 1 medium \u2014 none fixed on 4.x; advisory: CVE-2026-45068 Argument Injection in SendmailTransport via Dash-Prefixed Recipient Address",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.8,
             "age": {
                 "installed": {
@@ -13196,7 +13196,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.6 (2026-08-17), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.53 (2026-05-22); vulnerable: 2 advisories: 2 medium \u2014 none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.08,
             "age": {
                 "installed": {
@@ -13667,7 +13667,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-08-03 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.52 (2026-04-17); vulnerable: 1 advisory: 1 low \u2014 none fixed on 4.x; advisory: CVE-2026-45071 XXE (Local File Disclosure) in DomCrawler::addXmlContent() via validateOnParse = true",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.05,
             "age": {
                 "installed": {
@@ -14170,7 +14170,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-10-25 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-27); vulnerable: 1 advisory: 1 low \u2014 none fixed on 4.x; advisory: CVE-2024-50343 Incorrect response from Validator when input ends with ` `",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.85,
             "age": {
                 "installed": {
@@ -14580,7 +14580,7 @@
             ],
             "evidence": "pinned: pinned to branch snapshot dev-master; stale: last release 2019-01-23 (7.7 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -15136,7 +15136,7 @@
             ],
             "evidence": "old-promise: released 2018-09-18 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested; stale: last release 2018-09-18 (8.1 years ago); last push 2022-09-02 (4.1 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:20+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -15500,7 +15500,7 @@
             ],
             "evidence": "old-promise: released 2014-01-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested; stale: last release 2014-01-05 (12.8 years ago); last push 2022-08-04 (4.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -15880,7 +15880,7 @@
             ],
             "evidence": "silent: last release 2015-08-13 (11.2 years ago); last push 2015-08-13 (11.2 years ago); old-promise: released 2015-08-13 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -16259,7 +16259,7 @@
             ],
             "evidence": "silent: last release 2015-05-10 (11.4 years ago); last push 2015-08-13 (11.2 years ago); old-promise: released 2015-05-10 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -16639,7 +16639,7 @@
             ],
             "evidence": "silent: last release 2015-08-18 (11.2 years ago); last push 2015-08-18 (11.2 years ago); old-promise: released 2015-08-18 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -17018,7 +17018,7 @@
             ],
             "evidence": "silent: last release 2015-05-14 (11.4 years ago); last push 2020-04-01 (6.5 years ago); old-promise: released 2015-05-14 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -17508,7 +17508,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2018-07-31 (8.2 years ago); last push 2019-07-31 (7.2 years ago); old-promise: released 2018-07-31 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:16+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -17955,7 +17955,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2014-10-12 (12.0 years ago); last push 2019-11-11 (6.9 years ago); old-promise: released 2014-10-12 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:17+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -18378,7 +18378,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.5 years ago); old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.33,
             "age": {
                 "installed": {
@@ -18757,7 +18757,7 @@
             ],
             "evidence": "silent: last release 2018-10-01 (8.0 years ago); last push 2018-10-01 (8.0 years ago); old-promise: released 2018-10-01 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:22+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -19136,7 +19136,7 @@
             ],
             "evidence": "silent: last release 2015-11-16 (10.9 years ago); last push 2015-11-16 (10.9 years ago); old-promise: released 2015-11-16 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -19515,7 +19515,7 @@
             ],
             "evidence": "silent: last release 2017-11-21 (8.9 years ago); last push 2017-12-18 (8.8 years ago); old-promise: released 2017-11-21 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -20014,7 +20014,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; left-behind: branch 4.x last released 2022-09-23 (4.1 years ago); 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.01,
             "age": {
                 "installed": {
@@ -20361,7 +20361,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2023-06-01 (3.4 years ago); 4.x released v4.6.0 (2025-11-29), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.5,
             "age": {
                 "installed": {
@@ -20686,7 +20686,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2022-09-01 (4.1 years ago); 3.x released 3.1.0 (2026-04-29), needs php ^8.4 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.66,
             "age": {
                 "installed": {
@@ -21040,7 +21040,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2022-10-12 (4.0 years ago); 2.x released 2.1.1 (2026-01-29), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.3,
             "age": {
                 "installed": {
@@ -21385,7 +21385,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2023-06-01 (3.4 years ago); 4.x released 4.0.4 (2025-03-06), needs php >=8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.76,
             "age": {
                 "installed": {
@@ -21729,7 +21729,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2021-12-15 (4.8 years ago); 3.x released 3.6.1 (2025-11-04), needs php ^8.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.89,
             "age": {
                 "installed": {
@@ -22094,7 +22094,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.05,
             "age": {
                 "installed": {
@@ -22463,7 +22463,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2026-09-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.4,
             "age": {
                 "installed": {
@@ -22836,7 +22836,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.9,
             "age": {
                 "installed": {
@@ -23181,7 +23181,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.06,
             "age": {
                 "installed": {
@@ -23602,7 +23602,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.23,
             "age": {
                 "installed": {
@@ -23923,7 +23923,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.43,
             "age": {
                 "installed": {
@@ -24311,7 +24311,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.06,
             "age": {
                 "installed": {
@@ -24679,7 +24679,7 @@
             ],
             "evidence": "left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.06,
             "age": {
                 "installed": {
@@ -24991,7 +24991,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-08-30 (4.1 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-22)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.74,
             "age": {
                 "installed": {
@@ -25360,7 +25360,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-20), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.46 (2024-10-30)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.08,
             "age": {
                 "installed": {
@@ -25704,7 +25704,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-11-05 (3.9 years ago); 8.x released v8.1.6 (2026-08-25), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.47 (2024-11-06)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.8,
             "age": {
                 "installed": {
@@ -26053,7 +26053,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-11-16 (3.9 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-20)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.76,
             "age": {
                 "installed": {
@@ -26374,7 +26374,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-10-14 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-20)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.88,
             "age": {
                 "installed": {
@@ -26740,7 +26740,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-07-28 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.46 (2024-11-05)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.07,
             "age": {
                 "installed": {
@@ -27211,7 +27211,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.09,
             "age": {
                 "installed": {
@@ -27553,7 +27553,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-07-29 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-28)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.06,
             "age": {
                 "installed": {
@@ -27897,7 +27897,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-10-22 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-08)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.85,
             "age": {
                 "installed": {
@@ -28259,7 +28259,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-11-05 (3.9 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-22)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.82,
             "age": {
                 "installed": {
@@ -28577,7 +28577,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.13,
             "age": {
                 "installed": {
@@ -28906,7 +28906,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.86,
             "age": {
                 "installed": {
@@ -29224,7 +29224,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-02-25 (4.6 years ago); 6.x released v6.4.28 (2025-11-02), needs php >=8.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.69,
             "age": {
                 "installed": {
@@ -29550,7 +29550,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2023-01-24 (3.7 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.6,
             "age": {
                 "installed": {
@@ -29922,7 +29922,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-10-22 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-27)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.85,
             "age": {
                 "installed": {
@@ -30240,7 +30240,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-06-27 (4.3 years ago); 6.x released v6.4.24 (2025-07-10), needs php >=8.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-22)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.04,
             "age": {
                 "installed": {
@@ -30567,7 +30567,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 7.x released v7.4.15 (2026-07-21), needs php >=8.2 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.27,
             "age": {
                 "installed": {
@@ -30948,7 +30948,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -31327,7 +31327,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; last release 2022-05-20 (4.4 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -31672,7 +31672,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.2 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -32018,7 +32018,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.63,
             "age": {
                 "installed": {
@@ -32363,7 +32363,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.62,
             "age": {
                 "installed": {
@@ -32708,7 +32708,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.3 years ago); last push 2018-01-23 (8.7 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -33054,7 +33054,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -33400,7 +33400,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -33745,7 +33745,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -34091,7 +34091,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -34435,7 +34435,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-07-10 (5.3 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -34781,7 +34781,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -35128,7 +35128,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -35473,7 +35473,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -35820,7 +35820,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2018-02-12 (8.7 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -36325,7 +36325,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: EnglishInflector from the String component; its repository is archived on GitHub",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:36+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -36822,7 +36822,7 @@
             ],
             "evidence": "vulnerable: 4 advisories: 4 medium \u2014 all fixed on 2.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1,
             "age": {
                 "installed": {
@@ -37523,7 +37523,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 medium \u2014 all fixed on 5.x; advisory: CVE-2026-45073 SQL Injection in PdoAdapter::doClear() via Unsanitized $prefix",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.82,
             "age": {
                 "installed": {
@@ -37906,7 +37906,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 medium \u2014 all fixed on 5.x; advisory: CVE-2026-48736 IpUtils::PRIVATE_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.75,
             "age": {
                 "installed": {
@@ -38319,7 +38319,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2020-10-28 (6.0 years ago); 3.x released v3.4.0 (2026-02-04), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach; old-promise: released 2020-10-28 for PHP 7 (php \">=7.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.27,
             "age": {
                 "installed": {
@@ -38750,7 +38750,7 @@
             ],
             "evidence": "old-promise: released 2014-01-20 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.3 untested; stale: last release 2022-01-30 (4.7 years ago); last push 2023-07-29 (3.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 8.03,
             "age": {
                 "installed": {
@@ -39077,7 +39077,7 @@
             ],
             "evidence": "stale: last release 2023-08-21 (3.1 years ago); last push 2023-08-21 (3.1 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:14+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -39369,7 +39369,7 @@
             ],
             "evidence": "stale: last release 2023-08-06 (3.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -39625,7 +39625,7 @@
             ],
             "evidence": "stale: last release 2023-06-19 (3.3 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -39904,7 +39904,7 @@
             ],
             "evidence": "stale: last release 2021-08-15 (5.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -40252,7 +40252,7 @@
             ],
             "evidence": "stale: last release 2022-03-21 (4.6 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -40339,10 +40339,10 @@
                     "degree": null,
                     "headline": {
                         "unit": "years",
-                        "value": 3.8,
+                        "value": 3.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2022-12-07 (3.8 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach"
+                    "summary": "branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach"
                 }
             ],
             "score": {
@@ -40563,12 +40563,12 @@
                 {
                     "id": "S8",
                     "level": "warn",
-                    "summary": "branch 2.x last released 2022-12-07 (3.8 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
+                    "summary": "branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2022-12-07T17:46:57+00:00",
                         "branch_last_version": "2.0.8",
-                        "years": 3.8,
+                        "years": 3.9,
                         "newest_branch": "3.x",
                         "newest_version": "v3.1.1",
                         "newest_release": "2026-04-05T21:06:35+00:00",
@@ -40588,14 +40588,14 @@
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2022-12-07 (3.8 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
+            "evidence": "left-behind: branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.33,
             "age": {
                 "installed": {
                     "at": "2022-12-07T17:46:57+00:00",
-                    "years": 3.8,
+                    "years": 3.9,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
@@ -40610,7 +40610,7 @@
                 "branch_release": {
                     "version": "2.0.8",
                     "at": "2022-12-07T17:46:57+00:00",
-                    "years": 3.8,
+                    "years": 3.9,
                     "level": "warn",
                     "dated_by": null
                 },
@@ -40957,7 +40957,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2022-12-30 (3.8 years ago); 2.x released 2.1.0 (2026-01-05), needs php ^8.4 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.02,
             "age": {
                 "installed": {
@@ -41294,7 +41294,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2021-04-20 (5.5 years ago); 6.x released 6.1.3 (2026-02-05), needs php ^8.4 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:15+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.8,
             "age": {
                 "installed": {
@@ -41647,7 +41647,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2022-06-29 (4.3 years ago); 2.x released 2.0.3 (2025-06-10), needs php >=8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:19+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.95,
             "age": {
                 "installed": {
@@ -41961,7 +41961,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2022-12-19 (3.8 years ago); 3.x released 3.6.0 (2026-04-13), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 5.63,
             "age": {
                 "installed": {
@@ -42362,7 +42362,7 @@
             ],
             "evidence": "left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2026-09-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.4,
             "age": {
                 "installed": {
@@ -42695,7 +42695,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2021-08-03 (5.2 years ago); 2.x released v2.12.5 (2026-04-17)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.7,
             "age": {
                 "installed": {
@@ -43487,7 +43487,7 @@
             ],
             "evidence": "left-behind: branch 1.x last released 2022-07-20 (4.2 years ago); 3.x released v3.7.1 (2026-06-05), needs php >=8.1 above the project's php >=7.4; 2.x released v2.5.4 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.88,
             "age": {
                 "installed": {
@@ -44013,7 +44013,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-06-27 (4.3 years ago); 8.x released v8.1.4 (2026-07-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.09,
             "age": {
                 "installed": {
@@ -44329,7 +44329,7 @@
             ],
             "evidence": "left-behind: branch 2.x last released 2023-07-26 (3.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.5,
             "age": {
                 "installed": {
@@ -44663,7 +44663,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.88,
             "age": {
                 "installed": {
@@ -45382,7 +45382,7 @@
             ],
             "evidence": "left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-08)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.91,
             "age": {
                 "installed": {
@@ -45765,7 +45765,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 low \u2014 all fixed on 2.x; advisory: PKSA-j5hk-b83d-1p4h Graby has stored XSS via iframe srcdoc Attribute in htmLawed Sanitization Config",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.97,
             "age": {
                 "installed": {
@@ -46610,7 +46610,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 low \u2014 all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -47089,7 +47089,7 @@
             ],
             "evidence": "vulnerable: 3 advisories: 3 low \u2014 all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.59,
             "age": {
                 "installed": {
@@ -47387,7 +47387,7 @@
             ],
             "evidence": "stale: last release 2021-04-06 (5.5 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -47678,7 +47678,7 @@
             ],
             "evidence": "stale: last release 2020-06-27 (6.3 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -47982,7 +47982,7 @@
             ],
             "evidence": "stale: last release 2022-01-30 (4.7 years ago); last push 2023-08-03 (3.2 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -48135,7 +48135,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -48274,7 +48274,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.88,
             "age": {
                 "installed": {
@@ -48443,12 +48443,12 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.76,
             "age": {
                 "installed": {
                     "at": "2022-12-07T12:07:11+00:00",
-                    "years": 3.8,
+                    "years": 3.9,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
@@ -48612,7 +48612,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.78,
             "age": {
                 "installed": {
@@ -48745,7 +48745,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.26,
             "age": {
                 "installed": {
@@ -48914,7 +48914,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.1,
             "age": {
                 "installed": {
@@ -49055,7 +49055,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.71,
             "age": {
                 "installed": {
@@ -49190,7 +49190,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.61,
             "age": {
                 "installed": {
@@ -49358,7 +49358,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.1,
             "age": {
                 "installed": {
@@ -49513,7 +49513,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.64,
             "age": {
                 "installed": {
@@ -49645,7 +49645,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -49800,7 +49800,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:18+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.51,
             "age": {
                 "installed": {
@@ -49933,7 +49933,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.79,
             "age": {
                 "installed": {
@@ -50091,7 +50091,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.28,
             "age": {
                 "installed": {
@@ -50248,7 +50248,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.45,
             "age": {
                 "installed": {
@@ -50275,7 +50275,7 @@
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2026-03-26T22:03:55+00:00",
-                    "years": 0.5,
+                    "years": 0.6,
                     "level": null
                 },
                 "push_unmeasured": null
@@ -50384,7 +50384,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.95,
             "age": {
                 "installed": {
@@ -50565,7 +50565,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.62,
             "age": {
                 "installed": {
@@ -50697,7 +50697,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.91,
             "age": {
                 "installed": {
@@ -50709,7 +50709,7 @@
                 "release": {
                     "version": "2.6.1",
                     "at": "2026-01-12T15:59:08+00:00",
-                    "years": 0.7,
+                    "years": 0.8,
                     "level": null,
                     "dated_by": null
                 },
@@ -50717,7 +50717,7 @@
                 "branch_release": {
                     "version": "2.6.1",
                     "at": "2026-01-12T15:59:08+00:00",
-                    "years": 0.7,
+                    "years": 0.8,
                     "level": null,
                     "dated_by": null
                 },
@@ -50853,7 +50853,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.76,
             "age": {
                 "installed": {
@@ -51021,7 +51021,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.45,
             "age": {
                 "installed": {
@@ -51156,12 +51156,12 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.18,
             "age": {
                 "installed": {
                     "at": "2024-09-24T06:21:48+00:00",
-                    "years": 2,
+                    "years": 2.1,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
@@ -51292,7 +51292,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -51429,7 +51429,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -51615,7 +51615,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:27+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.65,
             "age": {
                 "installed": {
@@ -51751,7 +51751,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -51883,7 +51883,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.29,
             "age": {
                 "installed": {
@@ -52084,7 +52084,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -52331,7 +52331,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 3.36,
             "age": {
                 "installed": {
@@ -52495,7 +52495,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.5,
             "age": {
                 "installed": {
@@ -52627,7 +52627,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.67,
             "age": {
                 "installed": {
@@ -52791,7 +52791,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.8,
             "age": {
                 "installed": {
@@ -52946,7 +52946,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.34,
             "age": {
                 "installed": {
@@ -53078,7 +53078,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.3,
             "age": {
                 "installed": {
@@ -53239,7 +53239,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.76,
             "age": {
                 "installed": {
@@ -53371,7 +53371,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.42,
             "age": {
                 "installed": {
@@ -53540,7 +53540,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.24,
             "age": {
                 "installed": {
@@ -53710,7 +53710,7 @@
             ],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.59,
             "age": {
                 "installed": {
@@ -53842,7 +53842,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.9,
             "age": {
                 "installed": {
@@ -53977,7 +53977,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -54110,7 +54110,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -54263,7 +54263,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.84,
             "age": {
                 "installed": {
@@ -54396,7 +54396,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -54541,7 +54541,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -54674,7 +54674,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.76,
             "age": {
                 "installed": {
@@ -54805,7 +54805,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.96,
             "age": {
                 "installed": {
@@ -54936,7 +54936,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.86,
             "age": {
                 "installed": {
@@ -55068,7 +55068,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1,
             "age": {
                 "installed": {
@@ -55200,7 +55200,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.4,
             "age": {
                 "installed": {
@@ -55331,7 +55331,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.92,
             "age": {
                 "installed": {
@@ -55462,7 +55462,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -55596,7 +55596,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.79,
             "age": {
                 "installed": {
@@ -55729,7 +55729,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.06,
             "age": {
                 "installed": {
@@ -55861,7 +55861,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.82,
             "age": {
                 "installed": {
@@ -55993,7 +55993,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:25+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -56126,19 +56126,19 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2025-09-24T15:12:37+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
                 "release": {
                     "version": "v2.8.2",
                     "at": "2025-09-24T15:12:37+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "level": null,
                     "dated_by": null
                 },
@@ -56146,14 +56146,14 @@
                 "branch_release": {
                     "version": "v2.8.2",
                     "at": "2025-09-24T15:12:37+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "level": null,
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2025-09-24T15:13:01+00:00",
-                    "years": 1,
+                    "years": 1.1,
                     "level": null
                 },
                 "push_unmeasured": null
@@ -56374,7 +56374,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "intentionally empty package: PHP 7+ has random_bytes() built in",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.34,
             "age": {
                 "installed": {
@@ -56501,7 +56501,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:28+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.34,
             "age": {
                 "installed": {
@@ -56637,7 +56637,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.65,
             "age": {
                 "installed": {
@@ -56768,7 +56768,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T19:51:31+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.01,
             "age": {
                 "installed": {
@@ -56899,7 +56899,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0.63,
             "age": {
                 "installed": {
@@ -57031,7 +57031,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.16,
             "age": {
                 "installed": {
@@ -57166,7 +57166,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1,
             "age": {
                 "installed": {
@@ -57445,7 +57445,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.5,
             "age": {
                 "installed": {
@@ -57641,7 +57641,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -57878,7 +57878,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -58078,7 +58078,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -58227,7 +58227,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -58469,7 +58469,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "PHP-FIG interface packages are complete by design; versions change only when the interface changes",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.02,
             "age": {
                 "installed": {
@@ -58713,7 +58713,7 @@
             ],
             "evidence": "",
             "allowlist_reason": "single-function polyfill for getallheaders(); complete",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -58843,7 +58843,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.76,
             "age": {
                 "installed": {
@@ -58855,7 +58855,7 @@
                 "release": {
                     "version": "v3.3.0",
                     "at": "2025-08-19T18:57:03+00:00",
-                    "years": 1.1,
+                    "years": 1.2,
                     "level": null,
                     "dated_by": null
                 },
@@ -58992,7 +58992,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "package type \"metapackage\" only lists dependencies",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -59119,7 +59119,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.79,
             "age": {
                 "installed": {
@@ -59250,7 +59250,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -59407,7 +59407,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.69,
             "age": {
                 "installed": {
@@ -59587,7 +59587,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.69,
             "age": {
                 "installed": {
@@ -59720,7 +59720,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.9,
             "age": {
                 "installed": {
@@ -59884,7 +59884,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.83,
             "age": {
                 "installed": {
@@ -60047,7 +60047,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.68,
             "age": {
                 "installed": {
@@ -60215,7 +60215,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.78,
             "age": {
                 "installed": {
@@ -60411,7 +60411,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -60560,7 +60560,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.08,
             "age": {
                 "installed": {
@@ -60747,7 +60747,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -60943,7 +60943,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.42,
             "age": {
                 "installed": {
@@ -61123,7 +61123,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
@@ -61305,7 +61305,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -61497,7 +61497,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.27,
             "age": {
                 "installed": {
@@ -61665,7 +61665,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": "polyfills for older PHP versions; intentionally frozen once the target PHP is covered",
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -61788,7 +61788,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.76,
             "age": {
                 "installed": {
@@ -61927,7 +61927,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.85,
             "age": {
                 "installed": {
@@ -62058,7 +62058,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.76,
             "age": {
                 "installed": {
@@ -62231,7 +62231,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.83,
             "age": {
                 "installed": {
@@ -62364,7 +62364,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.67,
             "age": {
                 "installed": {
@@ -62514,7 +62514,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.71,
             "age": {
                 "installed": {
@@ -62658,7 +62658,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.69,
             "age": {
                 "installed": {
@@ -62798,7 +62798,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 2.78,
             "age": {
                 "installed": {
@@ -62955,7 +62955,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.92,
             "age": {
                 "installed": {
@@ -63087,7 +63087,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 4.03,
             "age": {
                 "installed": {
@@ -63218,7 +63218,7 @@
             "signals": [],
             "evidence": "",
             "allowlist_reason": null,
-            "data_date": "2026-10-13T00:00:00+00:00",
+            "data_date": "2026-10-14T00:00:00+00:00",
             "libyears": 1.91,
             "age": {
                 "installed": {

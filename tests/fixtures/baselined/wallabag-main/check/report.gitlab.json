@@ -1266,7 +1266,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "m6web/redis-mock v5.6.0 \u2014 finding low (4 = stale 8 \u00f7 2 dev) \u2014 stale: last release 2023-05-02 (3.4 years ago); last push 2023-05-02 (3.4 years ago). Do: \u2014.",
+        "description": "m6web/redis-mock v5.6.0 \u2014 finding low (4 = stale 8 \u00f7 2 dev) \u2014 stale: last release 2023-05-02 (3.5 years ago); last push 2023-05-02 (3.5 years ago). Do: \u2014.",
         "categories": [
             "Bug Risk"
         ],

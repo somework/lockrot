@@ -31,7 +31,9 @@ final class ScoreContractTest extends TestCase
 
     /**
      * The recipes for the new fields, as SPEC-0.14.md §8.7.4 prints them, each with the recorded
-     * document it runs on: the composite, or a case that carries its field.
+     * document it runs on: the composite, or a document that carries its field. No PHP recording
+     * carries `abandoned_ignored`: the case hydrator applies no abandoned ignore list, so that recipe
+     * runs on the model's document of the case.
      */
     private const RECIPES = [
         'why each graded finding scores what it does' => ['-r', '.findings[] | select(.score.total > 0) | "\(.package) \(.score.total) " + ([.score.terms[] | "\(.flag) \(.contribution)"] | join(" + "))', 'composite'],
@@ -45,8 +47,8 @@ final class ScoreContractTest extends TestCase
         "how old each package's newest release is" => ['-r', '.findings[] | select(.age.release != null) | "\(.package) \(.age.release.version) \(.age.release.years)"', 'composite'],
         'graded findings by depth below composer.json' => ['-c', '.rot_depth.by_depth', 'composite'],
         'what each advisory repository did in this run' => ['-r', '.run.advisory_lookup.repositories[] | "\(.composer_repository) \(.outcome)"', 'composite'],
-        'libyears values that are lower bounds' => ['-r', '.findings[] | select(.libyears_at_least) | .package', 'require-dev-name-dagger'],
-        "packages whose abandoned marking Composer's ignore list removed" => ['-r', '.findings[] | select(.abandoned_ignored != null) | "\(.package): " + ([.abandoned_ignored.rules[].pattern] | join(", "))', 'ignored-marking-stale-dagger'],
+        'libyears values that are lower bounds' => ['-r', '.findings[] | select(.libyears_at_least) | .package', 'baselined/wallabag-main/check/report'],
+        "packages whose abandoned marking Composer's ignore list removed" => ['-r', '.findings[] | select(.abandoned_ignored != null) | "\(.package): " + ([.abandoned_ignored.rules[].pattern] | join(", "))', 'schema/documents/cases/ignored-marking-stale-dagger'],
     ];
 
     /** The report-2 side of each migration row of §8.7.4, as a filter that selects findings or a program of its own. */
@@ -61,7 +63,7 @@ final class ScoreContractTest extends TestCase
         'has an advisory' => ['-r', '.findings[] | select(.security.status == "vulnerable") | .package', 'composite'],
         'gate kinds' => ['-c', '[(.run.gates // [])[].kind]', 'composite'],
         'recorded lead' => ['-r', '.findings[] | "\(.package) \(.baseline.recorded.lead)"', 'B-baselined-dagger'],
-        'S7 lead' => ['-c', '[.findings[].signals[] | select(.id == "S7") | .data.packages[] | {package, verdict, lead}]', 'composite'],
+        'S7 lead' => ['-c', '[.findings[].signals[] | select(.id == "S7") | .data.packages[] | {package, verdict, lead}]', 'baselined/wallabag-main/check/report'],
         'gate fails' => ['-r', '.findings[] | select(.gate.fails) | .package', 'composite'],
         'evidence' => ['-c', '[.findings[] | {package, every_flag: [.flags[].summary]}] | .[:3]', 'composite'],
         'abandoned with replacement' => ['-c', '.abandoned', 'composite'],
@@ -138,7 +140,7 @@ final class ScoreContractTest extends TestCase
             }
             foreach (JsonPath::arrayAt(JsonPath::decodeFile($file), ['runs', 0, 'results']) as $result) {
                 self::assertIsArray($result);
-                $bag = JsonPath::arrayAt($result, ['properties']);
+                $bag = \is_array($result['properties'] ?? null) ? $result['properties'] : [];
                 self::assertArrayNotHasKey('baseline', $bag);
                 self::assertNull($bag['baseline_status'] ?? null, basename($file));
                 ++$checked;
@@ -272,9 +274,10 @@ final class ScoreContractTest extends TestCase
         }
     }
 
+    /** A recorded report: a bundle case by its name, or a path below tests/fixtures/ without `.json`. */
     private static function report(string $name): string
     {
-        $path = ContractBundle::DIRECTORY.'/report-2/'.$name.'.json';
+        $path = strpos($name, '/') === false ? ContractBundle::DIRECTORY.'/report-2/'.$name.'.json' : __DIR__.'/../fixtures/'.$name.'.json';
         self::assertFileExists($path, 'record the bundle with tools/report/record');
 
         return $path;

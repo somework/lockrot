@@ -1,0 +1,261 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/old-promise",
+                            "name": "old-promise",
+                            "shortDescription": {
+                                "text": "old-promise: Released before the target PHP's major with an open-ended php constraint"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version was released before the target PHP's GA date, and its php constraint admits that target untested."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release or no repository push for release-warn-years or push-warn-years."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "jfcherng/php-color-output 2.0.2 \u2014 finding low, 4 = ((old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u00f7 2 dev (4.5, rounded down) \u2014 old-promise: released 2020-05-27 for PHP 7 (php \">=7.1.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move jfcherng/php-color-output to ^3.0.0 through jfcherng/php-diff \u2014 clears old-promise; 3.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of jfcherng/php-diff (7.0.1) still requires it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "jfcherng/php-color-output"
+                    },
+                    "properties": {
+                        "package": "jfcherng/php-color-output",
+                        "version": "2.0.2",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": "old-promise",
+                        "score_total": 4,
+                        "score_text": "4 = ((old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u00f7 2 dev (4.5, rounded down)",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "old-promise",
+                            "stale"
+                        ],
+                        "direct": false,
+                        "dev": true,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "jfcherng/php-diff",
+                            "jfcherng/php-color-output"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "jfcherng/php-diff"
+                        ],
+                        "signal_ids": [
+                            "S2",
+                            "S5"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2020-05-27T19:24:44+00:00",
+                                "years": 6.4,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "3.0.0",
+                                "at": "2021-05-27T02:45:54+00:00",
+                                "years": 5.4,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "2.0.2",
+                                "at": "2020-05-27T19:24:44+00:00",
+                                "years": 6.4,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-08-08T09:54:48+00:00",
+                                "years": 0.2,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 4
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "jfcherng/php-color-output 2.0.2 \u2014 finding low, 4 = ((old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u00f7 2 dev (4.5, rounded down) \u2014 stale: last release 2021-05-27 (5.4 years ago). Do: move jfcherng/php-color-output to ^3.0.0 through jfcherng/php-diff \u2014 clears old-promise; 3.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of jfcherng/php-diff (7.0.1) still requires it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "jfcherng/php-color-output"
+                    },
+                    "properties": {
+                        "package": "jfcherng/php-color-output",
+                        "version": "2.0.2",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": "old-promise",
+                        "score_total": 4,
+                        "score_text": "4 = ((old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u00f7 2 dev (4.5, rounded down)",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "old-promise",
+                            "stale"
+                        ],
+                        "direct": false,
+                        "dev": true,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "corroborating",
+                            "weight": 8,
+                            "divisor": 4,
+                            "points": 2,
+                            "contribution": 0.5
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "tubalmartin/cssmin v4.1.1 \u2014 finding high (16 = old-promise 16 (stale accepted)) \u2014 old-promise: released 2018-01-15 for PHP 5 (php \">=5.3.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 v4.1.1 is its newest release.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "0e2e805402d9de350578955775f44c78b60b3350b8886487f961272ae0bd2be6",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

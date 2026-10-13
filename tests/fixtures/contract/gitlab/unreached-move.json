@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "league/uri 6.4.0 \u2014 finding medium (10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 unreached) \u2014 left-behind: branch 6.x last released 2022-09-13 (4.1 years ago); 7.x released 7.8.1 (2026-03-15), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach. Do: raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "223831b486603223f267ddf786d36eac5ba3b1e09138892890b9ad2c0b194ec6",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "league/uri 6.4.0 \u2014 finding medium (10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 unreached) \u2014 old-promise: released 2020-11-22 for PHP 7 (php \">=7.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "d5d662ad757422d21d3487968d61b9fbf4af84d1ae61d1a76152b12dd7e4c0ac",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

@@ -1,0 +1,21 @@
+{
+    "score_text": "16 = old-promise 16",
+    "next_step_text": "composer update matomo/network (gets 2.0.3) — clears old-promise",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 2.0.1 released 2020-10-05 (6.0 years ago); 2.x last released 2.0.3 2026-04-17 (0.5 years ago), its newest release; last push 2026-04-17 (0.5 years ago)",
+    "explain_age": [
+        "installed  2.0.1     2020-10-05   6.0 years ago",
+        "2.x        2.0.3     2026-04-17   0.5 years ago                 below release-warn-years 3",
+        "newest     2.0.3     2026-04-17   0.5 years ago                 below release-warn-years 3",
+        "last push            2026-04-17   0.5 years ago                 below push-warn-years 3",
+        "libyears 5.5 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update matomo/network"
+    ],
+    "commands_cmd": [
+        "composer update matomo/network"
+    ]
+}

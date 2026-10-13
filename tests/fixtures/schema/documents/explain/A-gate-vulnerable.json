@@ -165,17 +165,12 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-gw7n-z4yx-7xjt",
-     "basis": "outside_range"
-    },
-    {
-     "kind": "advisory",
      "id": "PKSA-dpx1-78wg-1kqs",
      "basis": "outside_range"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-fbvq-z33h-r2np",
+     "id": "PKSA-gw7n-z4yx-7xjt",
      "basis": "outside_range"
     },
     {
@@ -185,37 +180,22 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-xx6c-6d96-db2w",
-     "basis": "outside_range"
-    },
-    {
-     "kind": "advisory",
      "id": "PKSA-3mcc-k66d-pydb",
      "basis": "outside_range"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-g9zw-qxh8-pq8w",
+     "id": "PKSA-fbvq-z33h-r2np",
      "basis": "outside_range"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-sjvz-tbbr-vwth",
+     "id": "PKSA-xx6c-6d96-db2w",
      "basis": "outside_range"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-n14z-jjjg-g8vd",
-     "basis": "outside_range"
-    },
-    {
-     "kind": "advisory",
-     "id": "PKSA-yhcn-xrg3-68b1",
-     "basis": "outside_range"
-    },
-    {
-     "kind": "advisory",
-     "id": "PKSA-2wrf-1xmk-1pky",
+     "id": "PKSA-kvv6-36cr-fkzb",
      "basis": "outside_range"
     },
     {
@@ -225,7 +205,27 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-kvv6-36cr-fkzb",
+     "id": "PKSA-2wrf-1xmk-1pky",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-g9zw-qxh8-pq8w",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-n14z-jjjg-g8vd",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-sjvz-tbbr-vwth",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-yhcn-xrg3-68b1",
      "basis": "outside_range"
     }
    ],
@@ -2153,6 +2153,14 @@
      "records": 26
     }
    ]
+  }
+ },
+ "legacy": {
+  "verdict": "ok",
+  "priority": "none",
+  "basis": {
+   "base": "none",
+   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:41:20+00:00",

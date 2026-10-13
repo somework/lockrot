@@ -40,6 +40,11 @@ final class RenderedFromTest extends TestCase
         'gate.text' => 'rootGate/properties/text',
     ];
 
+    /** A listed field that no rendering needs, because other listed fields decide it. */
+    private const NOT_DECIDING = [
+        'score.text' => ['score.rounded_down' => 'it is `exact` != `total`, which the line reads'],
+    ];
+
     public function testEachListOfTheSchemasIsTheInputsOfItsRenderer(): void
     {
         foreach (self::SCHEMAS as $file) {
@@ -59,7 +64,12 @@ final class RenderedFromTest extends TestCase
         $unread = [];
         foreach (ReferenceText::INPUTS as $key => $paths) {
             foreach ($paths as $path) {
-                if (!self::someRenderingNeeds($key, $path)) {
+                if (isset(self::NOT_DECIDING[$key][$path])) {
+                    continue;
+                }
+                // also[] moves render by the grammar of next_step: a field that next_step reads counts.
+                $as = $key === 'also.text' && $path !== 'next_step.also[]' ? 'next_step.text' : $key;
+                if (!self::someRenderingNeeds($as, $path)) {
                     $unread[] = $key.': '.$path;
                 }
             }
@@ -94,17 +104,21 @@ final class RenderedFromTest extends TestCase
         foreach (self::inputsOf($key) as $in) {
             try {
                 $full = self::render($key, Fields::only($in, $inputs));
-            } catch (MissingField $missing) {
+            } catch (MissingField|\UnexpectedValueException $absent) {
                 continue;
             }
+            // A renderer that meets a pruned field fails, whether it throws or only warns.
+            set_error_handler(static function (int $severity, string $message): bool {
+                throw new \ErrorException($message, 0, $severity);
+            });
             try {
                 if (self::render($key, Fields::only($in, $without)) !== $full) {
                     return true;
                 }
-            } catch (MissingField $missing) {
+            } catch (\Throwable $broken) {
                 return true;
-            } catch (\UnexpectedValueException $broken) {
-                return true;
+            } finally {
+                restore_error_handler();
             }
         }
 

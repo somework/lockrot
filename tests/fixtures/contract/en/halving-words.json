@@ -1,0 +1,8 @@
+{
+    "reason": {
+        "transitive": "its maintenance counts half: not required directly",
+        "unreached": "its maintenance counts half: lockrot found no path to it",
+        "dev": "its whole score counts half: packages-dev"
+    },
+    "other": "divided by {divide_by}: {reason}"
+}

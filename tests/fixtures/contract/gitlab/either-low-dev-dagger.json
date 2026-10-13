@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "balping/json-raw-encoder v1.0.2 \u2014 finding low (4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev) \u2014 stale: last release 2023-03-27 (3.5 years ago). Do: no release fixes it. (via akaunting/laravel-apexcharts)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "01a1374399a6919b70875332996f90396a2b23bc5fbe0196d5c77d951195ffd9",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "balping/json-raw-encoder v1.0.2 \u2014 finding low (4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev) \u2014 vulnerable: 1 advisory: 1 low \u2014 none fixed on 1.x; advisory: CVE-2026-00004 an advisory added to show the either opening (\u2021). Do: no release fixes it. (via akaunting/laravel-apexcharts)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "dba754c9941504918ea3f6f20e2c701346044a2e2ef3c8cfae24818ae73d1bda",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

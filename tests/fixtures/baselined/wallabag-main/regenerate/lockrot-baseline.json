@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "target_php": "8.4",
     "target_php_source": "option",
     "score_model_id": 1,
@@ -21,28 +21,28 @@
         },
         "clue/ndjson-react": {
             "version": "v1.3.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "craue/config-bundle": {
             "version": "2.7.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "defuse/php-encryption": {
             "version": "v2.4.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -66,19 +66,19 @@
         },
         "doctrine/event-manager": {
             "version": "1.2.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "evenement/evenement": {
             "version": "v3.0.2",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -144,7 +144,7 @@
             "first_seen": "2024-05-17",
             "flags": {
                 "silent": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 },
                 "old-promise": {
                     "known_since": "2024-05-17"
@@ -294,19 +294,19 @@
         },
         "lcobucci/jwt": {
             "version": "4.3.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "m6web/redis-mock": {
             "version": "v5.6.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -327,7 +327,7 @@
             "first_seen": "2024-05-17",
             "flags": {
                 "silent": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 },
                 "old-promise": {
                     "known_since": "2024-05-17"
@@ -336,10 +336,10 @@
         },
         "phar-io/version": {
             "version": "3.2.1",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -354,10 +354,10 @@
         },
         "phpseclib/phpseclib": {
             "version": "3.0.55",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "advisories": {
                 "PKSA-12sz-bcny-pk4m": {
-                    "known_since": "2026-10-13",
+                    "known_since": "2026-10-14",
                     "severity": "medium",
                     "fix_kind": "update"
                 }
@@ -365,10 +365,10 @@
         },
         "phpunit/php-file-iterator": {
             "version": "3.0.6",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -434,64 +434,64 @@
         },
         "pragmarx/recovery": {
             "version": "v0.2.1",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "react/cache": {
             "version": "v1.2.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "scheb/2fa-backup-code": {
             "version": "v5.13.2",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "scheb/2fa-bundle": {
             "version": "v5.13.2",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "scheb/2fa-email": {
             "version": "v5.13.2",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "scheb/2fa-google-authenticator": {
             "version": "v5.13.2",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "scheb/2fa-trusted-device": {
             "version": "v5.13.2",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -521,10 +521,10 @@
         },
         "sebastian/environment": {
             "version": "5.1.5",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -563,10 +563,10 @@
         },
         "sebastian/type": {
             "version": "3.2.1",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -593,29 +593,29 @@
         },
         "smalot/pdfparser": {
             "version": "v1.1.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "spomky-labs/otphp": {
             "version": "v10.0.3",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             },
             "advisories": {
                 "PKSA-kbc7-dq62-pt7d": {
-                    "known_since": "2026-10-13",
+                    "known_since": "2026-10-14",
                     "severity": "high",
                     "fix_kind": "upgrade"
                 },
                 "PKSA-qv5y-crcz-9nxw": {
-                    "known_since": "2026-10-13",
+                    "known_since": "2026-10-14",
                     "severity": "medium",
                     "fix_kind": "upgrade"
                 }
@@ -623,10 +623,10 @@
         },
         "symfony/psr-http-message-bridge": {
             "version": "v2.3.1",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -650,10 +650,10 @@
         },
         "symfony/webpack-encore-bundle": {
             "version": "v1.17.2",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "left-behind": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -668,10 +668,10 @@
         },
         "wallabag/phpepub": {
             "version": "4.0.10",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
@@ -707,16 +707,16 @@
             "first_seen": "2024-05-17",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         },
         "willdurand/negotiation": {
             "version": "3.1.0",
-            "first_seen": "2026-10-13",
+            "first_seen": "2026-10-14",
             "flags": {
                 "stale": {
-                    "known_since": "2026-10-13"
+                    "known_since": "2026-10-14"
                 }
             }
         }

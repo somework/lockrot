@@ -1,0 +1,256 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/left-behind",
+                            "name": "left-behind",
+                            "shortDescription": {
+                                "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release on the installed branch for release-warn-years, while a higher branch has released since."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/old-promise",
+                            "name": "old-promise",
+                            "shortDescription": {
+                                "text": "old-promise: Released before the target PHP's major with an open-ended php constraint"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version was released before the target PHP's GA date, and its php constraint admits that target untested."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "league/uri 6.4.0 \u2014 finding medium, 10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 unreached \u2014 left-behind: branch 6.x last released 2022-09-13 (4.1 years ago); 7.x released 7.8.1 (2026-03-15), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach. Do: raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "league/uri"
+                    },
+                    "properties": {
+                        "package": "league/uri",
+                        "version": "6.4.0",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": "left-behind",
+                        "score_total": 10,
+                        "score_text": "10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 unreached",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [],
+                        "depth": null,
+                        "direct_dependents": [],
+                        "signal_ids": [
+                            "S5",
+                            "S8"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2020-11-22T14:29:11+00:00",
+                                "years": 5.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "7.8.1",
+                                "at": "2026-03-15T20:22:25+00:00",
+                                "years": 0.6,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "6.8.0",
+                                "at": "2022-09-13T19:58:47+00:00",
+                                "years": 4.1,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-30T18:40:34+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "left-behind",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "league/uri 6.4.0 \u2014 finding medium, 10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 unreached \u2014 old-promise: released 2020-11-22 for PHP 7 (php \">=7.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "league/uri"
+                    },
+                    "properties": {
+                        "package": "league/uri",
+                        "version": "6.4.0",
+                        "verdict": "medium",
+                        "priority": "medium",
+                        "lead": "left-behind",
+                        "score_total": 10,
+                        "score_text": "10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 unreached",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "corroborating",
+                            "weight": 16,
+                            "divisor": 4,
+                            "points": 4,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

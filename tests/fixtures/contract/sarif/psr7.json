@@ -1,0 +1,621 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/left-behind",
+                            "name": "left-behind",
+                            "shortDescription": {
+                                "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release on the installed branch for release-warn-years, while a higher branch has released since."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-7qs6-zvnz-h66r",
+                            "name": "advisory/PKSA-7qs6-zvnz-h66r",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-7qs6-zvnz-h66r affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-gm5x-j3mz-71n9",
+                            "name": "advisory/PKSA-gm5x-j3mz-71n9",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-gm5x-j3mz-71n9 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-jj5t-2zs1-dcfm",
+                            "name": "advisory/PKSA-jj5t-2zs1-dcfm",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-jj5t-2zs1-dcfm affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-vznr-tgp9-fd7d",
+                            "name": "advisory/PKSA-vznr-tgp9-fd7d",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-vznr-tgp9-fd7d affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "guzzlehttp/psr7 1.9.1 \u2014 finding high, 16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory] \u2014 left-behind: branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "guzzlehttp/psr7"
+                    },
+                    "properties": {
+                        "package": "guzzlehttp/psr7",
+                        "version": "1.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 16,
+                        "score_text": "16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "guzzlehttp/guzzle",
+                            "guzzlehttp/psr7"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "guzzlehttp/guzzle"
+                        ],
+                        "signal_ids": [
+                            "S8",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-04-17T16:00:37+00:00",
+                                "years": 3.5,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "3.1.0",
+                                "at": "2026-08-24T11:02:13+00:00",
+                                "years": 0.1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "1.9.1",
+                                "at": "2023-04-17T16:00:37+00:00",
+                                "years": 3.5,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-08-24T11:03:20+00:00",
+                                "years": 0.1,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "left-behind",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-7qs6-zvnz-h66r",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-55766 (medium advisory): CRLF injection in HTTP start-line serialization. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "guzzlehttp/psr7",
+                        "lockrot/advisory": "PKSA-7qs6-zvnz-h66r"
+                    },
+                    "properties": {
+                        "package": "guzzlehttp/psr7",
+                        "version": "1.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 16,
+                        "score_text": "16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "guzzlehttp/guzzle",
+                            "guzzlehttp/psr7"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "guzzlehttp/guzzle"
+                        ],
+                        "signal_ids": [
+                            "S8",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-04-17T16:00:37+00:00",
+                                "years": 3.5,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "3.1.0",
+                                "at": "2026-08-24T11:02:13+00:00",
+                                "years": 0.1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "1.9.1",
+                                "at": "2023-04-17T16:00:37+00:00",
+                                "years": 3.5,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-08-24T11:03:20+00:00",
+                                "years": 0.1,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-7qs6-zvnz-h66r",
+                        "cve": "CVE-2026-55766",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "2.x",
+                            "version": "2.12.1",
+                            "newest": "2.13.1",
+                            "on_installed_branch": false,
+                            "php": "^7.2.5 || ^8.0",
+                            "held_by": [
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/guzzle",
+                                    "version": "6.5.8",
+                                    "link": "require",
+                                    "constraint": "^1.9",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-7qs6-zvnz-h66r",
+                            "severity": "medium",
+                            "fix_kind": "raise-php",
+                            "weight": 8,
+                            "multiplier": 1,
+                            "points": 8,
+                            "contribution": 8
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-gm5x-j3mz-71n9",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-49214 (medium advisory): CRLF injection via URI host component. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "guzzlehttp/psr7",
+                        "lockrot/advisory": "PKSA-gm5x-j3mz-71n9"
+                    },
+                    "properties": {
+                        "package": "guzzlehttp/psr7",
+                        "version": "1.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 16,
+                        "score_text": "16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-gm5x-j3mz-71n9",
+                        "cve": "CVE-2026-49214",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "2.x",
+                            "version": "2.10.2",
+                            "newest": "2.13.1",
+                            "on_installed_branch": false,
+                            "php": "^7.2.5 || ^8.0",
+                            "held_by": [
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/guzzle",
+                                    "version": "6.5.8",
+                                    "link": "require",
+                                    "constraint": "^1.9",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-jj5t-2zs1-dcfm",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-48998 (medium advisory): Host confusion via authority reinterpretation. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "guzzlehttp/psr7",
+                        "lockrot/advisory": "PKSA-jj5t-2zs1-dcfm"
+                    },
+                    "properties": {
+                        "package": "guzzlehttp/psr7",
+                        "version": "1.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 16,
+                        "score_text": "16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-jj5t-2zs1-dcfm",
+                        "cve": "CVE-2026-48998",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "2.x",
+                            "version": "2.10.2",
+                            "newest": "2.13.1",
+                            "on_installed_branch": false,
+                            "php": "^7.2.5 || ^8.0",
+                            "held_by": [
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/guzzle",
+                                    "version": "6.5.8",
+                                    "link": "require",
+                                    "constraint": "^1.9",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-vznr-tgp9-fd7d",
+                    "ruleIndex": 4,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-59882 (medium advisory): guzzlehttp/psr7: Host Confusion via Weak URI Host Validation. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "guzzlehttp/psr7",
+                        "lockrot/advisory": "PKSA-vznr-tgp9-fd7d"
+                    },
+                    "properties": {
+                        "package": "guzzlehttp/psr7",
+                        "version": "1.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 16,
+                        "score_text": "16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-vznr-tgp9-fd7d",
+                        "cve": "CVE-2026-59882",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "2.x",
+                            "version": "2.12.3",
+                            "newest": "2.13.1",
+                            "on_installed_branch": false,
+                            "php": "^7.2.5 || ^8.0",
+                            "held_by": [
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/guzzle",
+                                    "version": "6.5.8",
+                                    "link": "require",
+                                    "constraint": "^1.9",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 1,
+                            "failing": 1,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 1
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 1,
+                            "records": 4
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

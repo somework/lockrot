@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/yaml v5.4.23 \u2014 finding low (2 = vulnerable 2 [low advisory]) \u2014 vulnerable: 3 advisories: 3 low \u2014 all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings. Do: composer update symfony/yaml (gets v5.4.53) \u2014 clears 3 advisories.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "24be27cc46819fdc46571f6f45cb5585819e240c6b816ba647d2156c6faeae6b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

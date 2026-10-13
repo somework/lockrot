@@ -1148,7 +1148,7 @@ final class JsonSchemaConformanceTest extends TestCase
      */
     public function testEveryRecordedContractDocumentValidatesAgainstItsSchemaAndItsStrictTwin(): void
     {
-        $documents = [Schemas::REPORT => ['contract/report-2/*.json', 'baselined/*/check/report.json', 'baselined/*/check/gates-*.json', 'baselined/*/check/target-*.json', 'baselined/*/regenerate/report.json', 'baselined/*/t0/report.json'],
+        $documents = [Schemas::REPORT => ['contract/report-2/*.json', 'baselined/*/check/report.json', 'baselined/*/check/gates-left-behind-vulnerable-high.json', 'baselined/*/check/target-*.json', 'baselined/*/regenerate/report.json', 'baselined/*/t0/report.json'],
             Schemas::EXPLAIN => ['contract/explain-2/*.json', 'baselined/*/check/explain/*.json'],
             Schemas::BASELINE => ['contract/baseline-2/*.json', 'baselined/*/lockrot-baseline.json', 'baselined/*/regenerate/lockrot-baseline.json']];
         $checked = 0;

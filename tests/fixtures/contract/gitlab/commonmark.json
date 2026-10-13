@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "league/commonmark 2.9.1 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 3 advisories: 2 high, 1 medium \u2014 all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan. Do: composer update league/commonmark (gets 2.10.3) \u2014 clears 3 advisories. (via laravel/framework, laravel/nightwatch, spatie/laravel-markdown)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "4c37207333c1de14a475e934eddfb7860e28acab3f91ef8bb3b4e6b4db95d90d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

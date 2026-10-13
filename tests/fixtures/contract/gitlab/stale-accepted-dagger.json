@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/finished",
+        "description": "akaunting/laravel-version 1.0.4 \u2014 finding finished (0 (stale accepted)).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "9860f35b915b5ebcd8d0420fd6fef5e8a2dd8c860ee326d91324acf725b386a3",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

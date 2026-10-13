@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "hyvor/php-json-exporter 0.0.3 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2023-04-11 (3.5 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "dec52ed6318daa0ece827aa82aab9492575a76f01342446ea0742a1658f5416f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

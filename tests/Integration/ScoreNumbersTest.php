@@ -30,7 +30,8 @@ final class ScoreNumbersTest extends TestCase
         foreach ($files as $file) {
             $json = self::withoutStrings((string) file_get_contents($file));
             if (strpos($file, '/sarif/') !== false || substr($file, -11) === '.sarif.json') {
-                $json = (string) preg_replace('{"rank":\s*\d+\.\d+}', '"rank": 0', $json);
+                $json = (string) preg_replace('{"rank":\s*\d+\.\d+}', '"rank": 0', (string) file_get_contents($file));
+                $json = self::withoutStrings($json);
             }
             if (preg_match_all(self::ZERO_FRACTION, $json, $matches) > 0) {
                 $found[basename(\dirname($file)).'/'.basename($file)] = array_values(array_unique($matches[0]));
@@ -43,6 +44,6 @@ final class ScoreNumbersTest extends TestCase
     /** The JSON text with every string replaced by "": a version or a date never reads as a number. */
     private static function withoutStrings(string $json): string
     {
-        return (string) preg_replace('{"(?:[^"\\\\]|\\\\.)*"(?!\s*:)}', '""', $json);
+        return (string) preg_replace('{"(?:[^"\\\\]|\\\\.)*"}', '""', $json);
     }
 }

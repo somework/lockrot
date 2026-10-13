@@ -1,0 +1,2 @@
+::notice file=composer.lock,title=lockrot%3A ok::doctrine/annotations 2.0.2: 0. (via mautic/core-lib)
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

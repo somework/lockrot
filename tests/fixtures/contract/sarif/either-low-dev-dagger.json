@@ -1,0 +1,326 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release or no repository push for release-warn-years or push-warn-years."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-eith-0000-0002",
+                            "name": "advisory/PKSA-eith-0000-0002",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-eith-0000-0002 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "balping/json-raw-encoder v1.0.2 \u2014 finding low, 4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev \u2014 stale: last release 2023-03-27 (3.5 years ago). Do: no release fixes it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "balping/json-raw-encoder"
+                    },
+                    "properties": {
+                        "package": "balping/json-raw-encoder",
+                        "version": "v1.0.2",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": "stale",
+                        "score_total": 4,
+                        "score_text": "4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale",
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": true,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "akaunting/laravel-apexcharts",
+                            "balping/json-raw-encoder"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "akaunting/laravel-apexcharts"
+                        ],
+                        "signal_ids": [
+                            "S2",
+                            "S9",
+                            "S10"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-03-27T18:25:07+00:00",
+                                "years": 3.5,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v1.0.2",
+                                "at": "2023-03-27T18:25:07+00:00",
+                                "years": 3.5,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.0.2",
+                                "at": "2023-03-27T18:25:07+00:00",
+                                "years": 3.5,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": null,
+                            "push_unmeasured": "fetch_failed"
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "lead",
+                            "weight": 8,
+                            "divisor": 1,
+                            "points": 8,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-eith-0000-0002",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "balping/json-raw-encoder v1.0.2 is affected by CVE-2026-00004 (low advisory): an advisory added to show the either opening (\u2021)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "balping/json-raw-encoder",
+                        "lockrot/advisory": "PKSA-eith-0000-0002"
+                    },
+                    "properties": {
+                        "package": "balping/json-raw-encoder",
+                        "version": "v1.0.2",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": "stale",
+                        "score_total": 4,
+                        "score_text": "4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "stale",
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": true,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "akaunting/laravel-apexcharts",
+                            "balping/json-raw-encoder"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "akaunting/laravel-apexcharts"
+                        ],
+                        "signal_ids": [
+                            "S2",
+                            "S9",
+                            "S10"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-03-27T18:25:07+00:00",
+                                "years": 3.5,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v1.0.2",
+                                "at": "2023-03-27T18:25:07+00:00",
+                                "years": 3.5,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.0.2",
+                                "at": "2023-03-27T18:25:07+00:00",
+                                "years": 3.5,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": null,
+                            "push_unmeasured": "fetch_failed"
+                        },
+                        "advisory": "PKSA-eith-0000-0002",
+                        "cve": "CVE-2026-00004",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "none",
+                            "to_branch": null,
+                            "version": null,
+                            "newest": null,
+                            "on_installed_branch": null,
+                            "php": null,
+                            "held_by": [],
+                            "reason": "no_release_outside_range"
+                        },
+                        "points": 4,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-eith-0000-0002",
+                            "severity": "low",
+                            "fix_kind": "none",
+                            "weight": 2,
+                            "multiplier": 2,
+                            "points": 4,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true&per_page=1"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 1,
+                            "records": 1
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

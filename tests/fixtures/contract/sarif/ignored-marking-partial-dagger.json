@@ -1,0 +1,182 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/finished",
+                            "name": "finished",
+                            "shortDescription": {
+                                "text": "finished: Accepted by an allowlist entry"
+                            },
+                            "fullDescription": {
+                                "text": "An allowlist entry accepts the package as complete by design, not neglected."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/finished",
+                    "ruleIndex": 0,
+                    "level": "note",
+                    "message": {
+                        "text": "doctrine/cache 2.1.1 \u2014 finding finished, 0 (stale accepted)"
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "doctrine/cache"
+                    },
+                    "properties": {
+                        "package": "doctrine/cache",
+                        "version": "2.1.1",
+                        "verdict": "finished",
+                        "priority": "none",
+                        "lead": null,
+                        "score_total": 0,
+                        "score_text": "0 (stale accepted)",
+                        "score_model_id": 1,
+                        "flag_ids": [],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "doctrine/cache"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "beberlei/doctrineextensions",
+                            "doctrine/cache",
+                            "doctrine/doctrine-bundle",
+                            "doctrine/orm",
+                            "prestashop/ps_distributionapiclient"
+                        ],
+                        "signal_ids": [
+                            "S2"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2021-07-17T14:49:29+00:00",
+                                "years": 5.2,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "2.2.0",
+                                "at": "2022-05-20T20:07:39+00:00",
+                                "years": 4.4,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "2.2.0",
+                                "at": "2022-05-20T20:07:39+00:00",
+                                "years": 4.4,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2025-10-08T08:10:50+00:00",
+                                "years": 1,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 0,
+                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": false,
+                            "tripped_by": [],
+                            "fail_on_applied": true,
+                            "reaching": 0,
+                            "failing": 0,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 0
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 0,
+                            "records": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

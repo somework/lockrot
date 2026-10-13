@@ -251,7 +251,7 @@
         ],
         "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-06-27 (4.3 years ago); last push 2022-07-29 (4.2 years ago)",
         "allowlist_reason": null,
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "libyears": 0,
         "age": {
             "installed": {
@@ -346,7 +346,7 @@
         "installed_release_dated_by": null,
         "repository": "https://github.com/symfony/web-server-bundle.git",
         "type": "symfony-bundle",
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "branches": [
             {
                 "branch": "4.x",
@@ -1138,7 +1138,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],
     "note_details": []
 }

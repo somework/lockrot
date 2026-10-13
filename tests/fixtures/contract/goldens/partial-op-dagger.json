@@ -1,0 +1,23 @@
+{
+    "score_text": "36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]",
+    "next_step_text": "raise require.php to >=8.1, then require geoip2/geoip2 ^3.4 — clears left-behind, old-promise and 2 advisories; 3.x needs php >=8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v2.4.5 released 2017-01-31 (9.7 years ago); 2.x last released v2.13.0 2022-08-05 (4.2 years ago); newest release v3.4.0 2026-07-16 (0.2 years ago); last push 2026-09-28 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v2.4.5    2017-01-31   9.7 years ago",
+        "2.x        v2.13.0   2022-08-05   4.2 years ago                 past release-warn-years 3",
+        "newest     v3.4.0    2026-07-16   0.2 years ago                 below release-warn-years 3",
+        "last push            2026-09-28   less than three weeks ago     below push-warn-years 3",
+        "libyears 9.5 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'php:>=8.1' --no-update",
+        "composer require 'geoip2/geoip2:^3.4'"
+    ],
+    "commands_cmd": [
+        "composer require \"php:>=8.1\" --no-update",
+        "composer require \"geoip2/geoip2:^3.4\""
+    ]
+}

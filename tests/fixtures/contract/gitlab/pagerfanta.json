@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "pagerfanta/twig v3.8.0 \u2014 finding ok (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "767a8f268c70724a8c4f61cd6dc0b73ece9884c75b04b5ac486c1406df8e53b2",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/unchecked",
+        "description": "pagerfanta/twig v3.8.0 \u2014 finding ok (0) \u2014 checks missing: S2, S8 (undated releases).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "eb99b04331e7e25235e9f53173043f9cd27766a641f9964984de866e17ee6782",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

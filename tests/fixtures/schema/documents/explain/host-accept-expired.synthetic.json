@@ -946,6 +946,14 @@
    ]
   }
  },
+ "legacy": {
+  "verdict": "ok",
+  "priority": "none",
+  "basis": {
+   "base": "none",
+   "steps": []
+  }
+ },
  "generated_at": "2026-10-01T17:39:37+00:00",
  "notes": [
   "Repository activity not checked for 1 package on hosts lockrot cannot ask: codeberg.org (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host."

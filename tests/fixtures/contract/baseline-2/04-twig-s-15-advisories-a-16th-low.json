@@ -1,0 +1,95 @@
+{
+    "$schema": "https://lockrot.dev/schema/baseline-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-06-01T00:00:00+00:00",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "score_model_id": 1,
+    "fix_model": 1,
+    "findings": {
+        "lockrot/gate-row": {
+            "version": "1.0.0",
+            "first_seen": "2026-06-01",
+            "advisories": {
+                "c": {
+                    "known_since": "2026-06-01",
+                    "severity": "critical",
+                    "fix_kind": "raise-php"
+                },
+                "h0": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h1": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h10": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h11": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h12": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h13": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h2": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h3": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h4": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h5": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h6": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h7": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h8": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                },
+                "h9": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                }
+            }
+        }
+    }
+}

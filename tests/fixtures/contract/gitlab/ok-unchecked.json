@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/ok",
+        "description": "scheb/2fa-google-authenticator v8.6.1 \u2014 finding ok (0). (via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle, pimcore/studio-ui-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "5ef9891102d6b53e9f82b8f447182cee7ccea29949ec1b240bbc1fddadaf0c3c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/unchecked",
+        "description": "scheb/2fa-google-authenticator v8.6.1 \u2014 finding ok (0) \u2014 checks missing: S2, S8 (undated releases). (via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle, pimcore/studio-ui-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "280c288cc445a0660a832dcc32d402befff57b1e5dbabc0cf554eb071eed7b92",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1
+            }
+        }
+    }
+]

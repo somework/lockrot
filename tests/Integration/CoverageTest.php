@@ -61,7 +61,7 @@ final class CoverageTest extends TestCase
                 $this->record($name, $schema, $schema, '#', json_decode((string) file_get_contents(substr($path, -3) === '.gz' ? 'compress.zlib://'.$path : $path)));
             }
         }
-        self::assertSame([Schemas::REPORT => 251, Schemas::EXPLAIN => 154, Schemas::BASELINE => 138, Schemas::CONFIG => 77], $counts, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertSame([Schemas::REPORT => 252, Schemas::EXPLAIN => 155, Schemas::BASELINE => 138, Schemas::CONFIG => 77], $counts, 'tests/fixtures/schema/documents/provenance.json');
 
         $shared = [];
         foreach ((array) $schemas[Schemas::EXPLAIN]->definitions as $definition => $node) {
@@ -301,7 +301,6 @@ final class CoverageTest extends TestCase
             [self::D.'holder/oneOf/0/properties/next_step/oneOf/0/properties/kind', ['replace', 'find-alternative', 'tag', 'update', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
                 "a holder's next_step copies the holding finding's own kind, and the finding's own next_step carries every other kind"],
             [self::D.'move/properties/reason/oneOf/0', ['no_higher_release', 'higher_undated'], self::NOT_REACHED.' (a left-behind lead with no higher branch releasing, or none dated)'],
-            [self::D.'move/properties/reason/oneOf/0', ['affected_range_unknown'], self::NOT_REACHED.' (a package whose releases were read and whose counted advisories name no affected range)'],
             [self::D.'advisoriesNotCheckedReason', ['lookup_failed'], 'lockrot writes advisories_unavailable for a feed that fails, and RunNote::advisoriesNotChecked() refuses lookup_failed'],
             [self::D.'pushUnmeasured', ['undated'], self::NOT_REACHED.' (an activity answer that carried no date)'],
             [self::D.'libyearsUnmeasured', ['undated'], self::NOT_REACHED.' (an undated installed release of a package whose metadata was read)'],

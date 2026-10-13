@@ -1,14 +1,14 @@
 {
  "source": "security-axis/r3/docs",
- "model_run_date": "2026-10-13",
- "suite": "spec_flags_r3.py cases, spec_flags_r3_docs_coverage.py and relations_round4.py pass (run_all.sh not run)",
+ "model_run_date": "2026-10-14",
+ "suite": "run_all.sh (pending)",
  "documents": {
   "corpus": 49,
   "variants": 3,
-  "cases": 111,
+  "cases": 112,
   "coverage/baselined": 49,
   "coverage/variants": 39,
-  "explain": 106,
+  "explain": 107,
   "explain/coverage": 48,
   "baseline/cases": 3,
   "baseline/corpus": 49,

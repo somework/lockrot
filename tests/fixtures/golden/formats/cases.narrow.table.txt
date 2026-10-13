@@ -15,8 +15,8 @@ critical (9)
                    injection via `{% use %}` template name
       age: installed v2.16.1 released 2024-09-09 (2.1
            years ago), the newest on 2.x; newest release
-           v3.30.0 2026-09-25 (less than three weeks ago);
-           last push 2026-09-30 (less than three weeks ago)
+           v3.30.0 2026-09-25 (0.1 years ago); last push
+           2026-09-30 (less than three weeks ago)
   geoip2/geoip2 v2.4.5  direct  ·  left-behind · old-promise · vulnerable
       36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory] (baseline: new package)
       do: raise require.php to >=8.1, then require
@@ -370,7 +370,7 @@ medium (11)
           which lockrot does not solve; lockrot found no
           path from your requirements to it, so what
           requires it must allow it
-      left-behind  branch 2.x last released 2022-12-07 (3.8
+      left-behind  branch 2.x last released 2022-12-07 (3.9
                    years ago); 3.x released v3.1.1
                    (2026-04-05), needs php ^8.1 above the
                    project's php ^7.2.5 || ^8.0; no
@@ -397,8 +397,7 @@ medium (11)
       pinned       pinned to branch snapshot 5.4.x-dev
       age: 5.x last released v5.4.45 2024-09-25 (2.0
            years ago); newest release v8.1.5 2026-08-21 (0.1
-           years ago); last push 2026-09-25 (less than three
-           weeks ago)
+           years ago); last push 2026-09-25 (0.1 years ago)
   symfony/event-dispatcher-contracts v1.10.0  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/event-dispatcher, symfony/form, symfony/framework-bundle, symfony/google-mailer, symfony/http-kernel, symfony/mailer, symfony/monolog-bundle, symfony/security-bundle, symfony/security-core, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
       do: move symfony/event-dispatcher-contracts to ^2.5
@@ -535,6 +534,6 @@ baseline: 3 known · 31 new · 4 worsened ·
 gate: fails · --fail-on=high,unchecked ·
 22 findings fail it (high 21, unchecked 1); 3 reach it and are known to the baseline ·
 target php 8.4 (--target-php)
-Data as of 2026-10-13 (package repositories, repository
+Data as of 2026-10-14 (package repositories, repository
 hosts) · score model 1. Run composer lockrot --format=json
 for details.

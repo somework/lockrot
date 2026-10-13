@@ -1,0 +1,313 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/abandoned",
+                            "name": "abandoned",
+                            "shortDescription": {
+                                "text": "abandoned: Package is marked abandoned, or its repository is archived"
+                            },
+                            "fullDescription": {
+                                "text": "The package's registry or composer.lock marks it abandoned, or its repository is archived."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/old-promise",
+                            "name": "old-promise",
+                            "shortDescription": {
+                                "text": "old-promise: Released before the target PHP's major with an open-ended php constraint"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version was released before the target PHP's GA date, and its php constraint admits that target untested."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisories-unchecked",
+                            "name": "advisories-unchecked",
+                            "shortDescription": {
+                                "text": "advisories-unchecked: The advisories of some packages were not checked"
+                            },
+                            "fullDescription": {
+                                "text": "The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "symfony/debug v3.4.47 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/debug"
+                    },
+                    "properties": {
+                        "package": "symfony/debug",
+                        "version": "v3.4.47",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "abandoned",
+                        "score_total": 36,
+                        "score_text": "36 = abandoned 32 + old-promise 4 [\u00bc of 16]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "abandoned",
+                            "old-promise"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high",
+                            "unchecked"
+                        ],
+                        "chain": [
+                            "symfony/debug"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/console",
+                            "symfony/debug",
+                            "symfony/http-kernel"
+                        ],
+                        "signal_ids": [
+                            "S1",
+                            "S2",
+                            "S5",
+                            "S10"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 6,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v4.4.44",
+                                "at": "2022-07-28T16:29:46+00:00",
+                                "years": 4.2,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v3.4.47",
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 6,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": null,
+                            "push_unmeasured": "no_repository"
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "abandoned",
+                            "role": "lead",
+                            "weight": 32,
+                            "divisor": 1,
+                            "points": 32,
+                            "contribution": 32
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "symfony/debug v3.4.47 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: replace with symfony/error-handler (named by its registry)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/debug"
+                    },
+                    "properties": {
+                        "package": "symfony/debug",
+                        "version": "v3.4.47",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "abandoned",
+                        "score_total": 36,
+                        "score_text": "36 = abandoned 32 + old-promise 4 [\u00bc of 16]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "abandoned",
+                            "old-promise"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "corroborating",
+                            "weight": 16,
+                            "divisor": 4,
+                            "points": 4,
+                            "contribution": 4
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisories-unchecked",
+                    "ruleIndex": 2,
+                    "level": "error",
+                    "message": {
+                        "text": "advisories not checked: the gate could not read the advisories of every package"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/run": "advisories-unchecked"
+                    }
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (high 1, unchecked 1) \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 1,
+                            "failing": 1,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 1
+                                },
+                                {
+                                    "value": "unchecked",
+                                    "failing": 1
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (high 1, unchecked 1) \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high,unchecked",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            },
+                            {
+                                "value": "unchecked",
+                                "kind": "unchecked",
+                                "threshold": null
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 0,
+                    "packages_not_asked": 1,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "not_asked",
+                            "reason": "offline",
+                            "message": null,
+                            "packages_with_records": null,
+                            "records": null
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

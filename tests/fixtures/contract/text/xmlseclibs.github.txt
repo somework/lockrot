@@ -1,0 +1,7 @@
+::error file=composer.lock,title=lockrot%3A high — old-promise · vulnerable (high advisory)::robrichards/xmlseclibs 3.1.1: 24 = old-promise 16 ÷ 2 transitive + vulnerable 16 [high advisory]. Do: composer update robrichards/xmlseclibs (gets 3.1.5) — clears old-promise and 2 advisories. old-promise: released 2020-09-05 for PHP 5 (php ">= 5.4"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. vulnerable: 2 advisories: 1 high, 1 medium — all fixed on 3.x; worst: CVE-2026-32313 xmlseclibs: Missing AES-GCM Authentication Tag Validation on Encrypted Nodes Allows for Unauthorized Decryption. (via mautic/core-lib)
+::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+flags: old-promise 1 · vulnerable 1 · 1 package carries more than one
+depth: 1 of 1 flagged package is named by no line of composer.json · 4 hops 1 · deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs)
+security: 1 vulnerable package · 2 advisories: 1 high, 1 medium
+update now: composer update robrichards/xmlseclibs
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

@@ -860,7 +860,7 @@
         ],
         "evidence": "vulnerable: 15 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 4 low \u2014 all fixed on 3.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name",
         "allowlist_reason": null,
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "libyears": 1.65,
         "age": {
             "installed": {
@@ -1126,7 +1126,7 @@
         "installed_release_dated_by": null,
         "repository": "https://github.com/twigphp/Twig.git",
         "type": "library",
-        "data_date": "2026-10-13T00:00:00+00:00",
+        "data_date": "2026-10-14T00:00:00+00:00",
         "branches": [
             {
                 "branch": "3.x",
@@ -1970,7 +1970,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-13T00:00:00+00:00",
+    "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],
     "note_details": []
 }

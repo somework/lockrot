@@ -1,0 +1,17 @@
+{
+    "score_text": "18 = old-promise 16 + stale 2 [¼ of 8]",
+    "next_step_text": "test it on PHP 8.4 — 1.0.0 is its newest release",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 1.0.0 released 2018-08-10 (8.2 years ago), its newest release; last push 2026-03-29 (0.5 years ago)",
+    "explain_age": [
+        "installed  1.0.0     2018-08-10   8.2 years ago",
+        "1.x        1.0.0     2018-08-10   8.2 years ago                 past release-high-years 5",
+        "newest     1.0.0     2018-08-10   8.2 years ago                 past release-high-years 5",
+        "last push            2026-03-29   0.5 years ago                 below push-warn-years 3",
+        "libyears 0.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

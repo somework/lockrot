@@ -1,0 +1,11 @@
+{
+    "forge": {
+        "github": "GitHub",
+        "gitlab": "GitLab",
+        "bitbucket": "Bitbucket"
+    },
+    "event": {
+        "push": "push",
+        "commit": "commit"
+    }
+}

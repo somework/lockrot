@@ -127,7 +127,7 @@
    "clears": [
     {
      "kind": "advisory",
-     "id": "PKSA-v5yj-8nmz-sk2q",
+     "id": "PKSA-b14r-zh1d-vdrc",
      "basis": "outside_range"
     },
     {
@@ -137,7 +137,7 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-b14r-zh1d-vdrc",
+     "id": "PKSA-v5yj-8nmz-sk2q",
      "basis": "outside_range"
     }
    ],
@@ -223,7 +223,7 @@
     "clears": [
      {
       "kind": "advisory",
-      "id": "PKSA-v5yj-8nmz-sk2q",
+      "id": "PKSA-b14r-zh1d-vdrc",
       "basis": "outside_range"
      },
      {
@@ -233,7 +233,7 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-b14r-zh1d-vdrc",
+      "id": "PKSA-v5yj-8nmz-sk2q",
       "basis": "outside_range"
      }
     ],
@@ -1426,6 +1426,14 @@
      "records": 5
     }
    ]
+  }
+ },
+ "legacy": {
+  "verdict": "ok",
+  "priority": "none",
+  "basis": {
+   "base": "none",
+   "steps": []
   }
  },
  "generated_at": "2026-10-01T17:41:33+00:00",
