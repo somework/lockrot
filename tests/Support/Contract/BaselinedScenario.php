@@ -40,10 +40,10 @@ use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Verdict\FailOn;
 
 /**
- * One real project under a committed baseline-2 (items C78): the earlier lock writes the baseline on
- * its own day, the as-of rule removes the advisories reported after that day, and the later lock is
- * checked against it in every format, then regenerated and checked again. Every answer comes from
- * the scenario's recorded HTTP; a request that no recording answers fails the run.
+ * One real project under a committed baseline-2 (items C78). The earlier lock writes the baseline on
+ * its own day. The as-of rule removes the advisories reported after that day. The recorder checks the
+ * later lock against the file in every format, regenerates the file and checks again. Every answer
+ * comes from the scenario's recorded HTTP. A request that no recording answers fails the run.
  */
 final class BaselinedScenario
 {

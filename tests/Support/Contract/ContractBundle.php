@@ -20,10 +20,10 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\ScoreModel;
 
 /**
- * The rendering contract bundle of SPEC-0.14.md §7.11, as lockrot writes it: every case of
- * tests/fixtures/flags/cases.json, the composite, the words tables and the tables of the PHP
- * grammars. tools/report/record writes it to tests/fixtures/contract/. Every file carries the
- * tool version through {@see VersionMask}.
+ * The rendering contract bundle of SPEC-0.14.md §7.11, as lockrot writes it. It holds every case of
+ * tests/fixtures/flags/cases.json, the composite, the words tables and the tables of the PHP grammars.
+ * tools/report/record writes it to tests/fixtures/contract/. Every file carries the tool version
+ * through {@see VersionMask}.
  */
 final class ContractBundle
 {

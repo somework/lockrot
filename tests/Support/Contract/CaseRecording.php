@@ -24,9 +24,10 @@ use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 
 /**
- * One case of tests/fixtures/flags/cases.json as lockrot writes it: the case package's finding in a
- * report of its own run, every format, its explain-2 document and the strings that the PHP grammars
- * own. The report keeps the run notes and the advisory lookup of the case's hydrated lock.
+ * One case of tests/fixtures/flags/cases.json as lockrot writes it. The report holds the case
+ * package's finding with the case's own run. The recording gives every format, the explain-2 document
+ * and the strings that the PHP grammars own. The report keeps the run notes and the advisory lookup
+ * of the case's hydrated lock.
  */
 final class CaseRecording
 {

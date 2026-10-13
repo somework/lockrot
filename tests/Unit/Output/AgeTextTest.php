@@ -28,7 +28,7 @@ final class AgeTextTest extends TestCase
         self::assertSame('10.0 years ago', AgeText::ago(10.0));
     }
 
-    /** SPEC-0.14.md §7.11: the line renders the published `libyears` (two decimals), never the unrounded measure. */
+    /** SPEC-0.14.md §7.11: the line formats the published `libyears` value to one decimal, never the unrounded measure. */
     public function testTheExplainLibyearsLineRendersThePublishedValue(): void
     {
         $finding = (new FindingBuilder())->withLibyears(LibyearsMeasurement::of(6.845))->build();

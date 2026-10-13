@@ -197,6 +197,8 @@ for name, node in D.items():
 root = T({k: v for k, v in S.items() if k not in ('definitions', 'allOf')}, '#', 'R.Report2')
 body.append('export type Report2 = %s;' % root)
 if '--prototype' in sys.argv:
+    if sys.argv.index('--prototype') + 1 >= len(sys.argv):
+        sys.exit('emit_dts.py: --prototype needs a file path')
     open(sys.argv[sys.argv.index('--prototype') + 1], 'w').write('\n'.join(out + body) + '\n')
 
 known = ['// GENERATED from lockrot-report-2.schema.json by tools/schema/ts/emit_dts.py: do not edit.',

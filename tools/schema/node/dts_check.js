@@ -63,6 +63,7 @@ try {
     const known = fs.readFileSync(path.join(TYPES, 'lockrot-report-2.known.d.ts'), 'utf8');
     const map = JSON.parse(fs.readFileSync(path.join(REPO, 'tools', 'schema', 'ts', 'known-map.json'), 'utf8'));
     const victim = map.find((k) => k.open && k.values.length > 2 && typeof k.values[0] === 'string');
+    if (!victim) throw new Error('no open string union with three or more values to plant a dropped value in');
     const edited = known.replace(`export type ${victim.name} = ${JSON.stringify(victim.values[0])} | `, `export type ${victim.name} = `);
     const copy = path.join(work, 'known.d.ts');
     fs.writeFileSync(copy, edited);
