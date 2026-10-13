@@ -613,15 +613,11 @@ final class Analyzer
      * The URLs that name a registry in `accept-unchecked`: its host, and repo.packagist.org for
      * packagist.org.
      *
-     * @return list<string>
+     * @return list<?string>
      */
     private static function registryUrls(?string $registry): array
     {
-        if ($registry === null) {
-            return [];
-        }
-
-        return $registry === 'packagist.org' ? ['https://packagist.org', 'https://repo.packagist.org'] : ['https://'.$registry];
+        return $registry === 'packagist.org' ? ['https://packagist.org', 'https://repo.packagist.org'] : [$registry === null ? null : 'https://'.$registry];
     }
 
     /**

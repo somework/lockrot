@@ -144,6 +144,9 @@ final class AcceptUncheckedTest extends TestCase
         $inputs['meta'] = self::metadata('acme/private', '1.0.0', null, 'https://repo.packagist.org');
 
         self::assertNotSame([], self::written($inputs, 'unchecked')['unchecked_accepted']);
+        $inputs['accept'] = [['check' => 'advisories', 'repository' => 'https://packagist.org', 'reason' => 'by the registry name']];
+        self::assertNotSame([], self::written($inputs, 'unchecked')['unchecked_accepted'], 'https://packagist.org');
+        $inputs['accept'] = [['check' => 'advisories', 'repository' => 'https://repo.packagist.org', 'reason' => 'by the registry name']];
         $inputs['meta'] = self::metadata('acme/private', '1.0.0', null, null);
         self::assertNotSame([], self::written($inputs, 'unchecked')['unchecked_accepted'], 'by the registry name alone');
     }

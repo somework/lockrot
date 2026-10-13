@@ -184,6 +184,10 @@ final class FormatContextTest extends TestCase
 
         self::assertFalse(FormatContext::create(null, 'unchecked')->gateOf($known)->fails());
         self::assertSame(FormatContext::LEVEL_WARNING, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($known));
+
+        $mixed = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true), FindingBuilder::advisoriesUnchecked('b/offline', 'offline', true));
+        $oneKnown = $mixed->withBaseline($this->comparison([['a/offline', 'stale']], $mixed));
+        self::assertSame(FormatContext::LEVEL_ERROR, FormatContext::create(null, 'unchecked')->advisoriesNotCheckedLevel($oneKnown), 'a known gap before a failing one');
     }
 
     /** SPEC §7.10: the own `lockrot/unchecked` record needs `unchecked` active, a missing check and no counted fact. */
