@@ -59,10 +59,13 @@ final class BaselineWriterTest extends TestCase
         $json = (string) json_encode(['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + $baseline->toArray());
 
         self::assertStringContainsString('"advisories":{"0":', $json);
-        $read = Baseline::fromArray(JsonPath::decoded(json_decode($json, true)));
+        $decoded = json_decode($json, true);
+        self::assertIsArray($decoded);
+        /** @var array<string, mixed> $decoded */
+        $read = Baseline::fromArray($decoded);
         $entry = $read->entryFor('acme/pkg');
         self::assertNotNull($entry);
-        self::assertSame(['0', '123'], array_map(static fn ($a): string => $a->id(), $entry->advisories()));
+        self::assertSame(['0', '123'], array_map(static fn (\Lockrot\Baseline\RecordedAdvisory $a): string => $a->id(), $entry->advisories()));
     }
 
     /**

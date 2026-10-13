@@ -36,6 +36,7 @@ use Lockrot\Explain\Explanation;
 use Lockrot\Graph\DependencyGraph;
 use Lockrot\Html\PageData;
 use Lockrot\Json\Schemas;
+use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\ExplainFormatter;
@@ -927,7 +928,7 @@ final class JsonSchemaConformanceTest extends TestCase
             RunNote::repositoryActivityNotFound(RepoRef::BITBUCKET, [new RepoRef(RepoRef::BITBUCKET, 'bitbucket.org', 'workspace/one')]),
             RunNote::repositoryActivityHostNotSupported([LocatedRepository::unsupported('codeberg.org', null), LocatedRepository::unsupported('ghe.example.com', LocatedRepository::GITHUB_DOMAINS)]),
             RunNote::notFromComposerRepository(2, true),
-            RunNote::verdictRulesChanged('high', [['package' => 'symfony/yaml', 'version' => 'v3.4.47', 'legacy' => ['verdict' => 'left-behind', 'priority' => 'critical', 'basis' => ['base' => 'high', 'steps' => [['reason' => 'no_fix_expected', 'from' => 'high', 'to' => 'critical']]]], 'verdict' => 'medium', 'score_total' => 14, 'score_text' => '14 = left-behind 12 + vulnerable 2 [low advisory]']]),
+            RunNote::verdictRulesChanged('high', [['package' => 'symfony/yaml', 'version' => 'v3.4.47', 'legacy' => ['verdict' => 'left-behind', 'priority' => 'critical', 'basis' => PriorityBasis013::startingAt('high')->withStep('no_fix_expected', 'critical')], 'verdict' => 'medium', 'score_total' => 14, 'score_text' => '14 = left-behind 12 + vulnerable 2 [low advisory]']]),
             RunNote::baselineTargetDiffers('8.3', 'option', '8.4', 'runtime'),
             RunNote::baselineFixModelDiffers(2, 1),
             RunNote::ignoreDoesNotCoverAdvisories([['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['PKSA-1']]]),

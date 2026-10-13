@@ -78,6 +78,10 @@ final class RunGateTextTest extends TestCase
         self::assertSame('gate: passes · --fail-on=high · no finding fails it · advisories not applied to 2 packages: not checked (offline) · advisories not applied to 1 package: later_reason · target php 8.4 (--target-php)', self::text($report, 'high'));
     }
 
+    /**
+     * @param RunSettings::SOURCE_* $source
+     * @param RunSettings::SOURCE_* $targetSource
+     */
     private static function text(Report $report, ?string $failOn, string $source = RunSettings::SOURCE_OPTION, string $mode = Gate::MODE_CHECK, string $targetSource = RunSettings::SOURCE_OPTION): string
     {
         $run = new RunSettings(null, null, '8.4', $targetSource, null, $failOn === null ? null : FailOn::parse($failOn), $source, null, null, false, $mode);
@@ -87,7 +91,7 @@ final class RunGateTextTest extends TestCase
 
     private static function report(Finding ...$findings): Report
     {
-        return new Report($findings, [], new \DateTimeImmutable(self::AT), \count($findings), 0);
+        return new Report(array_values($findings), [], new \DateTimeImmutable(self::AT), \count($findings), 0);
     }
 
     private static function finding(string $package, string $verdict): Finding

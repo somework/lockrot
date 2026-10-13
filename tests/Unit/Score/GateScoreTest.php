@@ -37,7 +37,10 @@ final class GateScoreTest extends TestCase
         yield 'score 0 under an entry' => [[], [], 'direct', false, 'left-behind', 0, 0, 0, 'cap'];
     }
 
-    /** @param list<array{string, string, bool}> $advisories */
+    /**
+     * @param list<string>                      $flags
+     * @param list<array{string, string, bool}> $advisories
+     */
     #[DataProvider('gateRows')]
     public function testTheGateScoreIsTheScoreBoundByTwiceWhatTheNewFactsAdd(array $flags, array $advisories, string $reach, bool $dev, ?string $lead, int $score, int $new, int $gate, string $limitedBy): void
     {

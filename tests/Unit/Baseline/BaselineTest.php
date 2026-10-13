@@ -125,7 +125,7 @@ final class BaselineTest extends TestCase
             ['acme/silent', '2.0.8', Verdict::SILENT],
         ]));
 
-        self::assertSame(JsonPath::decoded($original->toArray()), JsonPath::decoded(Baseline::fromArray(['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + JsonPath::decoded($original->toArray()))->toArray()));
+        self::assertSame(JsonPath::decoded($original->toArray()), JsonPath::decoded(Baseline::fromArray(self::stringKeys(['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + JsonPath::decoded($original->toArray())))->toArray()));
     }
 
     public function testFromArrayReadsAFixture(): void
@@ -252,5 +252,20 @@ final class BaselineTest extends TestCase
     private static function root(): array
     {
         return ['$schema' => 'https://lockrot.dev/schema/baseline-2.json', 'lockrot' => ['version' => '0.14.0', 'schema' => 2], 'generated_at' => '2026-09-14T00:00:00+00:00', 'target_php' => '8.4', 'target_php_source' => 'option', 'score_model_id' => 1, 'fix_model' => 1];
+    }
+
+    /**
+     * @param array<mixed, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    private static function stringKeys(array $data): array
+    {
+        $out = [];
+        foreach ($data as $key => $value) {
+            $out[(string) $key] = $value;
+        }
+
+        return $out;
     }
 }

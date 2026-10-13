@@ -9,6 +9,7 @@ use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\RepositoryUrl;
+use Lockrot\Legacy\PriorityBasis013;
 use Lockrot\Signal\Rule\NotCheckedRule;
 
 /**
@@ -419,7 +420,7 @@ final class RunNote
      * The findings that reached a grade value under the rules of 0.13 and no longer do. The sentence
      * quotes each `score_text` from the note's own data.
      *
-     * @param list<array{package: string, version: string, legacy: array{verdict: string, priority: string, basis: array{base: string, steps: list<array{reason: string, from: string, to: string}>}}, verdict: string, score_total: int, score_text: string}> $findings by package, then version
+     * @param list<array{package: string, version: string, legacy: array{verdict: string, priority: string, basis: PriorityBasis013}, verdict: string, score_total: int, score_text: string}> $findings by package, then version
      */
     public static function verdictRulesChanged(string $failOn, array $findings): self
     {
@@ -431,7 +432,7 @@ final class RunNote
             .implode(', ', array_map(static fn (array $f): string => \sprintf('%s %s (%s)', $f['package'], $f['version'], $f['score_text']), $findings)).'.';
         $reasons = [];
         foreach ($findings as $finding) {
-            foreach ($finding['legacy']['basis']['steps'] as $step) {
+            foreach ($finding['legacy']['basis']->steps() as $step) {
                 $reasons[$step['reason']] = self::LEGACY_STEP_WORDS[$step['reason']] ?? str_replace('_', ' ', $step['reason']);
             }
         }

@@ -67,7 +67,7 @@ final class GateTest extends TestCase
         $report = self::report(self::finding('a/quiet', Verdict::SILENT));
         $worse = $report->withBaseline(BaselineComparison::compare(BaselineEntries::baseline([BaselineEntries::of('a/quiet', '1.0.0', Verdict::STALE, '2026-01-01')]), $report, 'lockrot-baseline.json', ['a/quiet']));
 
-        self::assertSame([[['kind' => 'flag', 'id' => 'silent']]], array_map(static fn ($by): array => JsonPath::decoded($by)['facts'], self::gate($worse, 'left-behind')->standings()[0]->by()));
+        self::assertSame([[['kind' => 'flag', 'id' => 'silent']]], array_map(static fn ($by): array => JsonPath::arrayAt(JsonPath::decoded($by), ['facts']), self::gate($worse, 'left-behind')->standings()[0]->by()));
     }
 
     public function testEachValueGetsItsCountInItsOrderWithZerosWritten(): void
@@ -141,7 +141,7 @@ final class GateTest extends TestCase
 
     private static function report(Finding ...$findings): Report
     {
-        return new Report($findings, [], new \DateTimeImmutable(self::AT), \count($findings), 0);
+        return new Report(array_values($findings), [], new \DateTimeImmutable(self::AT), \count($findings), 0);
     }
 
     private static function finding(string $package, string $verdict): Finding

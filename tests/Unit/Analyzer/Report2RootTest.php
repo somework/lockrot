@@ -26,8 +26,6 @@ use PHPUnit\Framework\TestCase;
 /** The root blocks that report-2 counts from its findings. */
 final class Report2RootTest extends TestCase
 {
-    private const AT = '2026-09-14T00:00:00+00:00';
-
     public function testSecuritySumsTheVulnerableFindingsOnly(): void
     {
         $findings = [

@@ -61,7 +61,7 @@ final class SchemaRebuildTest extends TestCase
     {
         $this->build();
         $built = array_merge(['resources/lockrot-report-2.schema.json', 'resources/lockrot-explain-2.schema.json'], self::filesUnder($this->dir, 'tests/fixtures/schema/negative'));
-        $committed = array_merge(['resources/lockrot-report-2.schema.json', 'resources/lockrot-explain-2.schema.json'], self::filesUnder(self::ROOT, 'tests/fixtures/schema/negative/report-2'), self::filesUnder(self::ROOT, 'tests/fixtures/schema/negative/explain-2'));
+        $committed = array_merge(['resources/lockrot-report-2.schema.json', 'resources/lockrot-explain-2.schema.json'], ...array_map(static fn (string $kind): array => self::filesUnder(self::ROOT, 'tests/fixtures/schema/negative/'.$kind), ['report-2', 'explain-2', 'baseline-2', 'config-2']));
         sort($built);
         sort($committed);
 

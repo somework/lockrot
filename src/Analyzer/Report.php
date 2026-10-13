@@ -161,7 +161,7 @@ final class Report
             $changed[] = [
                 'package' => $finding->package(),
                 'version' => $finding->version(),
-                'legacy' => ['verdict' => $finding->verdict(), 'priority' => $finding->priority(), 'basis' => $finding->priorityBasis()->toArray()],
+                'legacy' => ['verdict' => $finding->verdict(), 'priority' => $finding->priority(), 'basis' => $finding->priorityBasis()],
                 'verdict' => $finding->grade(),
                 'score_total' => $finding->score()->total(),
                 'score_text' => ScoreText::render($finding->scoreBasis()),
