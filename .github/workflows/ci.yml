@@ -3,6 +3,9 @@ name: CI
 # on its pull_request event. A push to main or release/** runs the mutation gate over the whole
 # tree. A tag runs phar.yml, not this file. A new push to a PR cancels the run for the old head,
 # because the ruleset waits for the new head's checks. On main, every push keeps its own run.
+# A full check pushes a PR's head unchanged to release/full-check-<sha>, for the whole-tree mutation
+# gate. The PR's own run has run every other job on that commit, so a full check runs only
+# mutation-coverage and mutation.
 on:
   push:
     branches: [main, 'release/**']
@@ -13,6 +16,7 @@ concurrency:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
     strategy:
       fail-fast: false
       matrix:
@@ -53,6 +57,7 @@ jobs:
           fi
   quality:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -229,6 +234,7 @@ jobs:
   # lets through.
   docs:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -250,6 +256,7 @@ jobs:
   # stdlib-only Python.
   corpus-selftest:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -261,6 +268,7 @@ jobs:
       - run: python -m unittest discover -s tools/mutation/tests -t tools/mutation/tests
   e2e:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -277,6 +285,7 @@ jobs:
   # regression in bin/lockrot can merge green and show only at release time.
   phar:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -314,6 +323,7 @@ jobs:
   # to the release workflow's version because it writes vendor/composer/*.php from its own source.
   phar-reproducible:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
     needs: phar
     steps:
       # The commit the first job built, spelled out: on a pull request the merge ref can be
