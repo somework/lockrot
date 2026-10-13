@@ -8,6 +8,11 @@ use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Analyzer\Report;
+use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Data\Advisory\AdvisoryFeed;
+use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
+use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
@@ -294,6 +299,65 @@ final class ExplainFormatterTest extends TestCase
         $finding = (new FindingBuilder())->withVersion('v1.4.0')->build();
 
         self::assertStringContainsString("\n   * 1.x      v1.4.0        commit 2024-03-01 —\n", self::plain(new Explanation($finding, F::facts(F::package(['version' => 'v1.4.0']), $metadata), new Thresholds(), '8.4', self::report())));
+    }
+
+    /** Case B's monolog-bridge v2.6.13 holds one counted advisory. */
+    /** @param list<IgnoredAdvisory> $ignored */
+    private static function feedsOf(AdvisoryNameCoverage $lookup, array $ignored = []): string
+    {
+        $explanation = self::caseExplanation('B');
+        $finding = $explanation->finding();
+        $finding = $finding->withDetails(FindingBuilder::detailsOf($finding, true, null, $lookup, null, $ignored));
+        $text = self::plain(new Explanation($finding, $explanation->facts(), new Thresholds(), '8.4', $explanation->report()));
+
+        return preg_match('/^  feeds\s+(.*)$/m', $text, $m) === 1 ? $m[1] : '';
+    }
+
+    public function testTheFeedWithTheMostRecordsCountsTheAffectingAdvisoriesWhenItHoldsEveryRecord(): void
+    {
+        $feeds = [AdvisoryFeed::answered('a', 3), AdvisoryFeed::answered('b', 5), AdvisoryFeed::notAsked('c', 'offline'), AdvisoryFeed::failed('d', 'HTTP 500')];
+
+        self::assertSame('a: 3 on record · b: 5 on record, 1 affects v2.6.13 · c: not asked (offline) · d: lookup failed', self::feedsOf(new AdvisoryNameCoverage($feeds, 5, null)));
+        self::assertSame('a: 3 on record · b: 5 on record · c: not asked (offline) · d: lookup failed', self::feedsOf(new AdvisoryNameCoverage($feeds, 7, null)), 'two feeds answered and neither holds every record');
+    }
+
+    public function testOfTwoFeedsWithEqualRecordsTheFirstCountsTheAffectingAdvisories(): void
+    {
+        self::assertSame('a: 5 on record, 1 affects v2.6.13 · b: 5 on record', self::feedsOf(new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 5), AdvisoryFeed::answered('b', 5)], 5, null)));
+    }
+
+    public function testTheOnlyFeedThatAnsweredCountsTheAffectingAdvisoriesWhateverTheTotal(): void
+    {
+        self::assertSame('a: 5 on record, 1 affects v2.6.13 · b: lookup failed', self::feedsOf(new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 5), AdvisoryFeed::failed('b', null)], 7, null)));
+        self::assertSame('a: none on record · b: lookup failed', self::feedsOf(new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 0), AdvisoryFeed::failed('b', null)], 0, null)));
+    }
+
+    public function testTheAffectingCountAddsTheAdvisoriesThatTheAuditIgnores(): void
+    {
+        $ignored = static fn (string $id): IgnoredAdvisory => new IgnoredAdvisory(new Advisory($id, null, null, null, 'low', null), new AdvisoryIgnoreMatch(AdvisoryIgnoreMatch::ID, $id, null, AdvisoryIgnoreMatch::BY_AUDIT));
+        $lookup = new AdvisoryNameCoverage([AdvisoryFeed::answered('a', 3)], 3, null);
+        $finding = (new FindingBuilder())->withVersion('1.0.0')->build();
+        $finding = $finding->withDetails(FindingBuilder::detailsOf($finding, true, null, $lookup, null, [$ignored('PKSA-i')]));
+
+        self::assertSame('a: 3 on record, 3 affect v2.6.13', self::feedsOf($lookup, [$ignored('PKSA-i'), $ignored('PKSA-j')]), 'one counted and two ignored');
+        self::assertStringContainsString("\n  feeds        a: 3 on record, 1 affects 1.0.0\n", self::plain(self::explain($finding)), 'no S9 and one ignored');
+    }
+
+    public function testABranchRowWordsItsFixKindAndNamesEachHolderOnce(): void
+    {
+        self::assertStringContainsString(' 3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it', self::plain(self::caseExplanation('E')));
+        self::assertStringContainsString(' 15 of 15 · php floor raise (lowest fix); held by composer.json and symfony/twig-bridge; after it: 0, ok', self::plain(self::caseExplanation('A')));
+
+        $case = CaseHydrator::case('A');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['root'] = JsonPath::arrayAt($inputs, ['root']) + ['conflict' => ['twig/twig' => '>=3.0']];
+        $case['inputs'] = $inputs;
+        $analysis = CaseHydrator::analysisOf($case);
+        $finding = $analysis->finding('twig/twig');
+        $facts = $analysis->facts('twig/twig');
+        self::assertNotNull($finding);
+        self::assertNotNull($facts);
+        self::assertStringContainsString('; held by composer.json and symfony/twig-bridge; after it', self::plain(new Explanation($finding, $facts, new Thresholds(), '8.4', $analysis->report())), 'the require and the conflict of composer.json name it once');
     }
 
     public function testEveryCaseExplainsAsItsGolden(): void

@@ -7,12 +7,14 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\GithubFormatter;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -91,6 +93,22 @@ final class GithubFormatterTest extends TestCase
     private function formatter(string $failOn, ?string $lockPath): GithubFormatter
     {
         return new GithubFormatter(FormatContext::create($lockPath, $failOn));
+    }
+
+    /** doctrine/cache, graded `stale`, whose abandoned marking the project's policy ignores. */
+    private static function markedReport(): Report
+    {
+        $finding = (new FindingBuilder())->withPackage('doctrine/cache')->withVerdict(Verdict::STALE)->build();
+        $ignored = new AbandonedIgnored('policy.abandoned', [new AbandonedIgnoreRule('doctrine/*', 'kept until 9.0', [])], AbandonedIgnored::MARKED_BY_REPOSITORY, null, null);
+
+        return new Report([$finding->withDetails(FindingBuilder::detailsOf($finding, true, null, null, $ignored))], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0);
+    }
+
+    public function testTheAnnotationNamesTheIgnoredAbandonedMarking(): void
+    {
+        $out = (new GithubFormatter(FormatContext::create(null, 'none')))->format(self::markedReport(), true);
+
+        self::assertStringContainsString(' abandoned marking ignored (policy.abandoned: doctrine/*): kept until 9.0.', $out);
     }
 
     public function testTheCompositeRendersAsItsGolden(): void

@@ -6,18 +6,26 @@ namespace Lockrot\Tests\Unit\Output;
 
 use Lockrot\Allowlist\AcceptedCheck;
 use Lockrot\Allowlist\UncheckedAcceptanceEntry;
+use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
+use Lockrot\Baseline\Baseline;
+use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Lock\ConfiguredRepositories;
 use Lockrot\Lock\OriginFacts;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Output\FindingBlock;
+use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
+use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\FlagSet;
+use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
 /** The parts of a finding block that the cases do not reach. */
@@ -27,6 +35,40 @@ final class FindingBlockTest extends TestCase
     private static function unchecked(array $unchecked, ?PackageOrigin $origin = null): Finding
     {
         return (new FindingBuilder())->withOrigin($origin)->withSignals([new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => $unchecked]))])->build();
+    }
+
+    /**
+     * One package with the counted advisory `PKSA-x` at $severity with the fix $fixKind. The entry
+     * records it at medium with $recordedFix, for the run's target PHP or another one.
+     */
+    private static function suffixOf(string $severity, string $fixKind, string $baselineTarget, string $recordedFix = 'update'): ?string
+    {
+        $s9 = new Signal('high', '1 advisory', SignalDataStub::of('S9', []));
+        $finding = (new FindingBuilder())->withPackage('a/b')->withVersion('1.0.0')->withSignals([$s9])
+            ->withFlags(FlagSet::fromSignals([$s9], null, [new CountedAdvisory('PKSA-x', $severity, $fixKind)]))
+            ->build();
+        $report = (new Report([$finding], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0))
+            ->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_OPTION, null));
+        $entry = BaselineEntries::of('a/b', '1.0.0', Verdict::STALE, '2026-06-01', [['PKSA-x', 'medium', $recordedFix]]);
+        $comparison = BaselineComparison::compare(Baseline::of([$entry], '2026-09-14T00:00:00+00:00', $baselineTarget, RunSettings::SOURCE_OPTION), $report, 'lockrot-baseline.json', ['a/b']);
+
+        return FindingBlock::baselineSuffix($finding, $comparison->standingOf('a/b'));
+    }
+
+    public function testALostFixReadsTheRecordedAndTheCurrentFixKind(): void
+    {
+        self::assertSame('(baseline: PKSA-x fix lost: update → none)', self::suffixOf('medium', 'none', '8.4'));
+        self::assertSame('(baseline: PKSA-x fix lost: update → blocked)', self::suffixOf('medium', 'blocked', '8.4'));
+    }
+
+    public function testAReRatedAdvisoryAddsTheLostFixOnlyWhenTheFixesAreCompared(): void
+    {
+        self::assertSame('(baseline: PKSA-x re-rated medium → high, fix lost: update → none)', self::suffixOf('high', 'none', '8.4'));
+        self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'none', '8.3'));
+        self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'update', '8.4'));
+        self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'update', '8.3'));
+        self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'update', '8.3', 'none'), 'a fix that was lost already is not lost again');
+        self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'none', '8.4', 'none'));
     }
 
     public function testTheMissingChecksJoinByTheirWordsEachIdOnceInSignalOrder(): void

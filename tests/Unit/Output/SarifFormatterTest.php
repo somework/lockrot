@@ -131,6 +131,19 @@ final class SarifFormatterTest extends TestCase
         self::assertTrue($validator->isValid(), implode("\n", $messages));
     }
 
+    /** In case either-critical‡ only the other move of symfony/debug clears its critical advisory. */
+    public function testAnAdvisoryThatOnlyAnOtherMoveClearsNamesThatMove(): void
+    {
+        $sarif = JsonPath::decoded(json_decode((new SarifFormatter(FormatContext::create(null, 'high')))->format(CaseHydrator::report(CaseHydrator::case('either-critical‡')), true), true));
+        $texts = [];
+        foreach (JsonPath::arrayAt($sarif, ['runs', 0, 'results']) as $result) {
+            self::assertIsArray($result);
+            $texts[JsonPath::stringAt($result, ['ruleId'])] = JsonPath::stringAt($result, ['message', 'text']);
+        }
+
+        self::assertStringContainsString('. Do: require symfony/debug ^4.4.0 — clears the advisory;', $texts['lockrot/advisory/PKSA-eith-0000-0001'] ?? '');
+    }
+
     public function testFlaggedReportIsValidSarif(): void
     {
         $this->assertValidSarif($this->formatter(Verdict::SILENT, $this->lockPath())->format($this->report()));

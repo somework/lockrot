@@ -8,6 +8,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Advisory\AdvisoryFeed;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\LocatedRepository;
 use Lockrot\Data\Forge\RepoRef;
@@ -15,6 +16,7 @@ use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\AgeReading;
 use Lockrot\Signal\Data\ArchivedData;
@@ -250,7 +252,8 @@ final class FindingBuilder
      * The details of a finding whose advisory lookup answered and whose release scan found no
      * branch: the metadata is read exactly when maintenance is judged.
      */
-    public static function detailsOf(Finding $finding, bool $maintenanceJudged, ?AllowlistEntry $entry = null): FindingDetails
+    /** @param list<IgnoredAdvisory> $ignored the advisories that Composer's audit ignore lists keep out */
+    public static function detailsOf(Finding $finding, bool $maintenanceJudged, ?AllowlistEntry $entry = null, ?AdvisoryNameCoverage $lookup = null, ?AbandonedIgnored $abandonedIgnored = null, array $ignored = []): FindingDetails
     {
         $status = $maintenanceJudged ? 'read' : (!$finding->isFromComposerRepository() ? 'not_from_composer_repository' : ($finding->note() === 'not found in the repository' ? 'not_found' : 'unavailable'));
         $skipped = [];
@@ -264,7 +267,7 @@ final class FindingBuilder
 
         $activity = self::activityOf($finding);
 
-        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, [], null, $activity, self::ageOf($finding, $status, $activity), new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null), null);
+        return new FindingDetails($status, $status === 'unavailable' ? 'fetch_failed' : null, null, $skipped, ['requires' => null, 'target_runs' => null, 'project_allows' => null], $entry, 'complete', null, $ignored, null, $activity, self::ageOf($finding, $status, $activity), $lookup ?? new AdvisoryNameCoverage([AdvisoryFeed::answered('composer repo (https://repo.packagist.org)', 0)], 0, null), $abandonedIgnored);
     }
 
     /**

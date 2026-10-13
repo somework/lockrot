@@ -7,10 +7,12 @@ namespace Lockrot\Tests\Unit\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Output\MarkdownFormatter;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -37,6 +39,22 @@ final class MarkdownFormatterTest extends TestCase
     private static function formatter(string $failOn = LockrotConfig::FAIL_ON_NONE, ?int $maxBytes = null): MarkdownFormatter
     {
         return new MarkdownFormatter(FormatContext::create(null, $failOn)->withMarkdownMaxBytes($maxBytes));
+    }
+
+    /** doctrine/cache, graded `stale`, whose abandoned marking the project's policy ignores. */
+    private static function markedReport(): Report
+    {
+        $finding = (new FindingBuilder())->withPackage('doctrine/cache')->withVerdict(Verdict::STALE)->build();
+        $ignored = new AbandonedIgnored('policy.abandoned', [new AbandonedIgnoreRule('doctrine/*', 'kept until 9.0', [])], AbandonedIgnored::MARKED_BY_REPOSITORY, null, null);
+
+        return new Report([$finding->withDetails(FindingBuilder::detailsOf($finding, true, null, null, $ignored))], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0);
+    }
+
+    public function testTheIgnoredAbandonedMarkingSetsItsLabelInItalics(): void
+    {
+        $out = (new MarkdownFormatter(FormatContext::create(null, 'none')))->format(self::markedReport(), true);
+
+        self::assertStringContainsString('*abandoned marking ignored* (policy.abandoned: doctrine/\\*): kept until 9.0', $out);
     }
 
     public function testTheCompositeRendersAsItsGolden(): void

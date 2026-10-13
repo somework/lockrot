@@ -106,6 +106,8 @@ final class RunFooterTest extends TestCase
         self::assertSame('advisories: 0 packages asked, 2 not asked (packages from a Composer repository only (advisory-lookup))', RunFooter::advisories(self::report($findings, $limited)));
         self::assertSame('advisories: 0 packages asked, 2 not asked (network error) · packagist.org publishes no advisories · packagist.org lookup failed (network error: timeout)', RunFooter::advisories(self::report($findings, $offline)));
         self::assertSame('advisories: 0 packages asked, 2 not asked · packagist.org publishes no advisories', RunFooter::advisories(self::report($findings, $silent)));
+        $twoFailures = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [AdvisoryRepository::of(self::PACKAGIST, AdvisoryRepository::FAILED, AdvisoryCoverage::TRANSPORT, 'timeout'), AdvisoryRepository::of(self::PACKAGIST, AdvisoryRepository::FAILED, AdvisoryCoverage::INVALID_RESPONSE, 'bad json')], 0, []);
+        self::assertStringStartsWith('advisories: 0 packages asked, 2 not asked (network error) · ', RunFooter::advisories(self::report($findings, $twoFailures)), 'the first repository with a reason gives it');
     }
 
     public function testTheDepthLineCountsTheUnreachedTheDevAndTheRequireDevOnlyPackages(): void

@@ -23,6 +23,7 @@ use Lockrot\Tests\Support\TextGolden;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -44,9 +45,10 @@ final class CaseFormatsTest extends TestCase
 
     /**
      * Known, covered, worsened, re-rated and unchecked facts: the entries record fewer flags or
-     * another severity than the run counts.
+     * another severity than the run counts. A baseline for the run's target PHP also compares the
+     * fixes, so a lost fix shows.
      */
-    private static function baselined(): Report
+    private static function baselined(string $targetPhp, string $targetPhpSource): Report
     {
         $report = self::report();
         $baseline = Baseline::of([
@@ -57,7 +59,7 @@ final class CaseFormatsTest extends TestCase
             BaselineEntries::of('league/commonmark', '2.9.1', Verdict::STALE, '2026-06-01', [['PKSA-m4t9-vsgq-8khn', 'medium', 'update']]),
             BaselineEntries::of('balping/json-raw-encoder', 'v1.0.2', Verdict::STALE, '2026-06-01', [['PKSA-eith-0000-0002', 'low', 'none']]),
             BaselineEntries::of('scheb/2fa-google-authenticator', 'v8.6.1', Verdict::STALE, '2026-06-01'),
-        ], '2026-09-14T00:00:00+00:00', '8.5', RunSettings::SOURCE_RUNTIME);
+        ], '2026-09-14T00:00:00+00:00', $targetPhp, $targetPhpSource);
         $names = array_map(static fn (Finding $finding): string => $finding->package(), $report->findings());
 
         return $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
@@ -73,11 +75,16 @@ final class CaseFormatsTest extends TestCase
     {
         yield 'without a baseline' => ['cases'];
         yield 'with a baseline' => ['cases.baseline'];
+        yield 'with a baseline for the same target' => ['cases.baseline.same-target'];
     }
 
     private static function of(string $golden): Report
     {
-        return $golden === 'cases' ? self::report() : self::baselined();
+        if ($golden === 'cases') {
+            return self::report();
+        }
+
+        return $golden === 'cases.baseline' ? self::baselined('8.5', RunSettings::SOURCE_RUNTIME) : self::baselined('8.4', RunSettings::SOURCE_OPTION);
     }
 
     /** @dataProvider runs */
@@ -85,6 +92,14 @@ final class CaseFormatsTest extends TestCase
     public function testTheTableOfEveryCaseIsItsGolden(string $golden): void
     {
         TextGolden::assertMatches($golden.'.table.txt', ConsoleMarkup::render((new TableFormatter(self::context()))->format(self::of($golden), true), false), __FUNCTION__);
+    }
+
+    /** At 60 columns the marking, age and missing-checks lines wrap under their hang. */
+    public function testTheNarrowTableOfEveryCaseIsItsGolden(): void
+    {
+        $context = FormatContext::create(null, self::FAIL_ON, Version::STRING, 60);
+
+        TextGolden::assertMatches('cases.narrow.table.txt', ConsoleMarkup::render((new TableFormatter($context))->format(self::of('cases.baseline.same-target'), true), false), __FUNCTION__);
     }
 
     /** @dataProvider runs */

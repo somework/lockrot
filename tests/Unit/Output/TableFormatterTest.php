@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Allowlist\AcceptedCheck;
+use Lockrot\Allowlist\UncheckedAcceptanceEntry;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\TableFormatter;
+use Lockrot\Signal\AbandonedIgnored;
+use Lockrot\Signal\Data\Check;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -18,7 +24,9 @@ use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\Notes;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Support\TextGolden;
+use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -49,6 +57,37 @@ final class TableFormatterTest extends TestCase
     public function testTheCompositeRendersAsItsGolden(): void
     {
         TextGolden::assertMatches('composite.table.txt', ConsoleMarkup::render(self::formatter()->format(self::composite()), false), __METHOD__);
+    }
+
+    public function testThePullsInAndChecksAcceptedLinesWrapUnderTheBlockIndent(): void
+    {
+        $s7 = new Signal(Signal::LEVEL_INFO, 'pulls in 3 flagged packages: vendor/first (stale), vendor/second (stale), vendor/third (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 3, 'packages' => []]));
+        $finding = (new FindingBuilder())->withPackage('vendor/pkg')->withVerdict(Verdict::STALE)->withSignals([$s7])->build();
+        $accepted = new AcceptedCheck(new Check('repository_activity', 'host_not_supported', ['S3', 'S4']), UncheckedAcceptanceEntry::fromConfig(0, ['check' => 'repository_activity', 'host' => 'codeberg.org', 'reason' => 'we watch it by hand', 'expires' => '2027-03-31']));
+        $details = FindingDetails::of(F::looked(F::facts(F::package(), F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']]))), null, new PhpFloor('8.4'), [], [], null, $finding->details()->age(), [$accepted]);
+        $report = new Report([$finding->withDetails($details)], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0);
+
+        $lines = self::lines(self::formatter(50)->format($report, true));
+
+        $pullsIn = array_search('      pulls in 3 flagged packages: vendor/first', $lines, true);
+        self::assertIsInt($pullsIn, implode("\n", $lines));
+        self::assertSame('      (stale), vendor/second (stale), vendor/third', $lines[$pullsIn + 1]);
+        $accepted = array_search('      checks accepted: S3, S4 (host not supported;', $lines, true);
+        self::assertIsInt($accepted, implode("\n", $lines));
+        self::assertSame('      accepted by your accept-unchecked list: we', $lines[$accepted + 1]);
+    }
+
+    public function testTheAbandonedMarkingLineWrapsUnderItsHang(): void
+    {
+        $finding = (new FindingBuilder())->withPackage('doctrine/cache')->withVerdict(Verdict::STALE)->build();
+        $ignored = new AbandonedIgnored('policy.abandoned', [new AbandonedIgnoreRule('doctrine/*', 'the cache goes with the 9.0 upgrade', [])], AbandonedIgnored::MARKED_BY_REPOSITORY, null, null);
+        $report = new Report([$finding->withDetails(FindingBuilder::detailsOf($finding, true, null, null, $ignored))], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0);
+
+        $lines = self::lines(self::formatter(50)->format($report, true));
+
+        $marking = array_search('      abandoned marking ignored', $lines, true);
+        self::assertIsInt($marking, implode("\n", $lines));
+        self::assertSame(['        (policy.abandoned: doctrine/*): the cache', '        goes with the 9.0 upgrade'], \array_slice($lines, $marking + 1, 2));
     }
 
     public function testAWrapNeverSplitsTheCommandThatTheDataLineNames(): void

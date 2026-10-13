@@ -59,6 +59,13 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertSame('Run composer lockrot for details.', $lines[9]);
     }
 
+    public function testWithoutABaselineTheRuntimeTargetAddsNoNote(): void
+    {
+        $lines = self::lines(CaseHydrator::composite()->withRun(self::settings('high', RunSettings::SOURCE_RUNTIME)));
+
+        self::assertSame([], preg_grep('/^  note: /', $lines));
+    }
+
     public function testTheRuntimeTargetNoteTakesASlotWhenABaselineIsRead(): void
     {
         $report = CaseHydrator::composite();
