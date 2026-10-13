@@ -44,6 +44,7 @@ use Lockrot\Tests\Support\MarkupRefusingFormatter;
 use Lockrot\Tests\Support\RecordingIO;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\VerdictEngine;
+use Lockrot\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -587,6 +588,24 @@ final class InstallTimeSummaryTest extends TestCase
         $output = $io->getOutput();
         self::assertStringContainsString('lockrot: install-time check skipped:', $output);
         self::assertStringContainsString('is not valid JSON', $output);
+    }
+
+    /**
+     * SPEC-0.14.md §6.4 "Reading" (O10): at install time a baseline-1 file is an unreadable
+     * baseline. The plugin prints the skip line with the refusal, the install continues, and
+     * install-time-strict does not block on it.
+     */
+    public function testABaseline1FileSkipsTheCheckAndNeverBlocksAStrictInstall(): void
+    {
+        $dir = $this->project(['install-time-strict' => true, 'fail-on' => 'old-promise']);
+        file_put_contents($dir.'/lockrot-baseline.json', '{"lockrot": {"version": "0.13.0", "schema": 1}, "findings": {"phpzip/phpzip": {"version": "1.0.0", "verdict": "silent", "first_seen": "2025-01-01"}}}');
+        $io = new BufferIO();
+        $event = $this->event($io, new Transaction([], [$this->loadPackage(self::PHPZIP)]));
+        [$major, $minor] = explode('.', Version::STRING);
+
+        (new InstallTimeSummary($this->analyzerFactory()))->onPreOperationsExec($event);
+
+        self::assertStringContainsString('lockrot: install-time check skipped: lockrot '.$major.'.'.$minor.' reads baseline-2 only.', $io->getOutput());
     }
 
     /** @param array<string, string> $verdicts package => verdict */

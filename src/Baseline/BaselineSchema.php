@@ -7,6 +7,7 @@ namespace Lockrot\Baseline;
 use JsonSchema\Validator;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Json\SchemaErrors;
 use Lockrot\Json\SchemaPayload;
 use Lockrot\Json\Schemas;
 
@@ -38,17 +39,7 @@ final class BaselineSchema
             return;
         }
 
-        $lines = ['baseline file is invalid:'];
-        foreach ($validator->getErrors() as $error) {
-            // Narrows the error shape for PHPStan. Skipping a malformed entry cannot hide the
-            // failure: the method throws either way.
-            if (!\is_array($error) || !\is_string($error['property'] ?? null) || !\is_string($error['message'] ?? null)) {
-                continue;
-            }
-            $lines[] = \sprintf('  - %s: %s', $error['property'], $error['message']);
-        }
-
-        throw new ConfigException(implode("\n", $lines));
+        throw SchemaErrors::exception('baseline file is invalid:', self::schema(), $payload, $validator);
     }
 
     /**

@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Unit\Composer;
 use Composer\Composer;
 use Composer\Config;
 use Composer\Console\Application;
+use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginEvents;
 use Composer\Util\Platform;
@@ -1799,6 +1800,63 @@ final class LockrotCommandTest extends TestCase
         self::assertSame(2, $code);
         self::assertSame('', $stdout);
         self::assertStringContainsString('is not valid JSON', $stderr);
+    }
+
+    private const BASELINE_1 = '{"lockrot": {"version": "0.13.0", "schema": 1}, "generated_at": "2025-01-01T00:00:00+00:00", "findings": {"doctrine/annotations": {"version": "1.14.3", "verdict": "abandoned", "first_seen": "2025-01-01"}}}';
+
+    /** SPEC-0.14.md §6.4 (Q2): a check run over a baseline-1 file exits 2 with the message of the running release. */
+    public function testACheckRunOverABaseline1FileExitsTwoWithTheRefusal(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        file_put_contents($dir.'/lockrot-baseline.json', self::BASELINE_1);
+        [$major, $minor] = explode('.', Version::STRING);
+
+        [$code, $stdout, $stderr] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(2, $code, $stderr);
+        self::assertSame('', $stdout);
+        self::assertStringContainsString('lockrot '.$major.'.'.$minor.' reads baseline-2 only. Review the findings, then run --generate-baseline.', $stderr);
+    }
+
+    /** `--generate-baseline` over a baseline-1 file writes a fresh baseline-2 and carries nothing forward. */
+    public function testGenerateBaselineOverABaseline1FileWritesBaseline2(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        file_put_contents($dir.'/lockrot-baseline.json', self::BASELINE_1);
+
+        [$code, , $stderr] = $this->runWithSplitStreams(['--generate-baseline' => true, '--target-php' => '8.4'], $this->loader());
+
+        self::assertSame(0, $code, $stderr);
+        $written = $this->readJsonFile($dir.'/lockrot-baseline.json');
+        self::assertSame(2, JsonPath::intAt($written, ['lockrot', 'schema']));
+        $dates = [];
+        foreach (JsonPath::arrayAt($written, ['findings']) as $entry) {
+            self::assertIsArray($entry);
+            $dates[] = $entry['first_seen'];
+            foreach (\is_array($entry['flags'] ?? null) ? $entry['flags'] : [] as $flag) {
+                self::assertIsArray($flag);
+                $dates[] = $flag['known_since'];
+            }
+        }
+        self::assertNotSame([], $dates);
+        self::assertSame(['2026-09-14'], array_values(array_unique($dates)), 'every first_seen and known_since is the run date');
+    }
+
+    /** A broken rule group names its path and description, and only -v prints the branch errors. */
+    public function testOnlyVerbosePrintsTheBranchErrorsOfABrokenBaselineGroup(): void
+    {
+        $dir = $this->fixtureCopy(self::WALLABAG_LOCK);
+        file_put_contents($dir.'/lockrot-baseline.json', '{"$schema": "https://lockrot.dev/schema/baseline-2.json", "lockrot": {"version": "0.14.0", "schema": 2}, "generated_at": "2026-09-14T00:00:00+00:00", "target_php": "8.4", "target_php_source": "option", "score_model_id": 1, "fix_model": 1, "findings": {"acme/empty": {"version": "1.0.0", "first_seen": "2026-01-15"}}}');
+
+        [$code, , $plain] = $this->runWithSplitStreams(['--target-php' => '8.4'], $this->loader());
+        $command = $this->command($this->loader());
+        $command->setIO(new BufferIO('', OutputInterface::VERBOSITY_VERBOSE));
+        [, , $verbose] = $this->runCommandWithSplitStreams($command, ['--target-php' => '8.4']);
+
+        self::assertSame(2, $code);
+        self::assertStringContainsString('findings.acme/empty: What the baseline knows about one package', $plain);
+        self::assertStringNotContainsString('required', $plain);
+        self::assertStringContainsString('required', $verbose);
     }
 
     /** @return iterable<string, array{0: string, 1: string}> */

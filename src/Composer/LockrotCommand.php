@@ -293,6 +293,11 @@ final class LockrotCommand extends BaseCommand
             // Raw: a config error can quote the project's own keys (see ProjectConfig) or a path,
             // which are text, not console markup.
             $this->writeFailure($output, 'lockrot: '.$e->getMessage());
+            if ($io->isVerbose()) {
+                foreach ($e->details() as $detail) {
+                    $this->writeError($output, $detail);
+                }
+            }
 
             return Policy::EXIT_ERROR;
         } catch (\Throwable $e) {
