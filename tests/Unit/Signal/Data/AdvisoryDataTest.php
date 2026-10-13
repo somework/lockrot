@@ -59,10 +59,12 @@ final class AdvisoryDataTest extends TestCase
         $data = new AdvisoryData([$row], true, true);
         $standing = Standing::newPackage([], [new CountedAdvisory('PKSA-h8hf-ytnd-5t9q', 'critical', 'raise-php')]);
 
-        self::assertSame(['state' => 'new', 'since' => null, 'covered_by' => null], JsonPath::decoded($data->withBaseline($standing)->rows()[0])['baseline']);
-        self::assertNull(JsonPath::decoded($data->withBaseline(null)->rows()[0])['baseline'], 'no state without a standing');
+        $marked = $data->withBaseline($standing);
+
         self::assertNull(JsonPath::decoded($data->rows()[0])['baseline'], 'the data keeps its rows');
         self::assertNull(JsonPath::decoded($row)['baseline'], 'the row keeps its state');
+        self::assertSame(['state' => 'new', 'since' => null, 'covered_by' => null], JsonPath::decoded($marked->rows()[0])['baseline']);
+        self::assertNull(JsonPath::decoded($marked->withBaseline(null)->rows()[0])['baseline'], 'no state without a standing');
     }
 
     public function testAFixAndAHolderWriteTheS9Shapes(): void

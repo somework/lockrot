@@ -62,7 +62,7 @@ final class BaselineSchema
             foreach ($findings as $package => $entry) {
                 $advisories = \is_array($entry) ? ($entry['advisories'] ?? null) : null;
                 if (\is_array($advisories) && $advisories !== [] && JsonReader::isList($advisories)) {
-                    $entry['advisories'] = self::advisoryMap($advisories);
+                    $entry['advisories'] = SchemaPayload::of($advisories, 'baseline file');
                     $findings[$package] = $entry;
                 }
             }
@@ -70,17 +70,6 @@ final class BaselineSchema
         }
 
         return SchemaPayload::of($baseline, 'baseline file');
-    }
-
-    /** @param array<mixed, mixed> $advisories a map that json_decode() read as a list */
-    private static function advisoryMap(array $advisories): object
-    {
-        $map = new \stdClass();
-        foreach ($advisories as $id => $fact) {
-            $map->{(string) $id} = \is_array($fact) && $fact !== [] && !JsonReader::isList($fact) ? SchemaPayload::of($fact, 'baseline file') : $fact;
-        }
-
-        return $map;
     }
 
     private static function schema(): object

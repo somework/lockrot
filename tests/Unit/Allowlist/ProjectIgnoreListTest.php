@@ -167,6 +167,14 @@ final class ProjectIgnoreListTest extends TestCase
         ProjectIgnoreList::checkFlags([['package' => 'acme/a', 'reason' => 'r'], ['package' => 'acme/b', 'reason' => 'r', 'flags' => $flags]]);
     }
 
+    public function testAFlagThatIsNoMaintenanceFlagIsRefused(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('extra.lockrot.ignore[0] "flags" must list maintenance flags only: abandoned, silent, pinned, left-behind, old-promise, stale');
+
+        ProjectIgnoreList::checkFlags([['package' => 'acme/a', 'reason' => 'r', 'flags' => ['stale', 'dead']]]);
+    }
+
     public function testALongIndexIsCutAt255Bytes(): void
     {
         $this->expectException(ConfigException::class);

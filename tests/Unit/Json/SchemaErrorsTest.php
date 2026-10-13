@@ -81,6 +81,13 @@ final class SchemaErrorsTest extends TestCase
         self::assertSame("doc is invalid:\n  - a: A is a string or a number.", self::exception('{"a": true}', $schema)->getMessage());
     }
 
+    public function testAGroupInsideTheAllOfOfAnotherGroupIsNamed(): void
+    {
+        $schema = self::schema('{"properties": {"a": {"description": "A is a number.", "anyOf": [{"type": "integer"}], "allOf": [{"description": "A is small.", "oneOf": [{"maximum": 5}]}]}}}');
+
+        self::assertSame("doc is invalid:\n  - a: A is small.", self::exception('{"a": 9}', $schema)->getMessage());
+    }
+
     public function testAGroupWithoutADescriptionGivesTheValidatorErrors(): void
     {
         $error = self::exception('{"a": true}', self::schema('{"properties": {"a": {"oneOf": [{"type": "string"}, {"type": "integer"}]}}}'));

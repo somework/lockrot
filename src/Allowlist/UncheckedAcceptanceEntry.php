@@ -25,6 +25,8 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
 
     /** config-2's `host` pattern: lower case, an optional port. */
     private const HOST = '{^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(:[0-9]{1,5})?$}D';
+    /** A port from 1 to 65535 without its leading zeros, which the host pattern allows. */
+    private const PORT = '{^(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$}D';
     /** config-2's `repository` pattern: a scheme URL without userinfo, or the scp form `user@host:path`. */
     private const URL = '{^([a-z][a-z0-9+.-]*://[^\s/?#@]+([/?#]\S*)?|[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\S+)$}D';
 
@@ -90,8 +92,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
                 throw new ConfigException($at.' "host" must be a lower-case host name with an optional port, without a scheme or a path');
             }
             $colon = strrchr($value, ':');
-            // FILTER_VALIDATE_INT refuses a leading zero, which the host pattern allows.
-            if ($colon !== false && filter_var(ltrim(substr($colon, 1), '0'), \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]) === false) {
+            if ($colon !== false && preg_match(self::PORT, ltrim(substr($colon, 1), '0')) !== 1) {
                 throw new ConfigException($at.' "host" has a port outside 1 to 65535');
             }
         }
@@ -125,11 +126,8 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
     {
         if (preg_match('{^[a-z][a-z0-9+.-]*://}i', $url) === 1) {
             $parts = parse_url($url);
-            $host = \is_array($parts) ? ($parts['host'] ?? '') : '';
-            if ($host === '') {
-                return null;
-            }
-            $key = [strtolower($host), $parts['port'] ?? null, $parts['path'] ?? '', $parts['query'] ?? null, $parts['fragment'] ?? null];
+            $parts = \is_array($parts) ? $parts : [];
+            $key = [strtolower($parts['host'] ?? ''), $parts['port'] ?? null, $parts['path'] ?? '', $parts['query'] ?? null, $parts['fragment'] ?? null];
         } elseif (preg_match('{^[^@\s/]+@([^:\s/]+):(\S+)$}', $url, $m) === 1) {
             $key = [strtolower($m[1]), null, $m[2], null, null];
         } else {
@@ -141,7 +139,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
         }
         $key[2] = $path;
 
-        return $key;
+        return $key[0] === '' ? null : $key;
     }
 
     /**

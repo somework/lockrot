@@ -93,6 +93,7 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'a port of zeros' => [['check' => 'repository_activity', 'host' => 'git.example.com:00', 'reason' => 'x'], '%s "host" has a port outside 1 to 65535'];
         yield 'a port of 65536' => [['check' => 'repository_activity', 'host' => 'git.example.com:65536', 'reason' => 'x'], '%s "host" has a port outside 1 to 65535'];
         yield 'a repository that is not a URL' => [['check' => 'release_metadata', 'repository' => 'github.com:acme/x', 'reason' => 'x'], '%s "repository" must be a URL with a scheme and no user name or password, or the scp form user@host:path'];
+        yield 'a repository without a host' => [['check' => 'advisories', 'repository' => 'https://:8080/acme/x', 'reason' => 'x'], '%s "repository" must be a URL'];
         yield 'a repository with userinfo' => [['check' => 'advisories', 'repository' => 'https://deploy:secret@mirror.example', 'reason' => 'x'], '%s "repository" must be a URL'];
         yield 'advisories by host' => [['check' => 'advisories', 'host' => 'mirror.example', 'reason' => 'x'], '%s accepts "advisories" by host: scope it by repository or package, because the gap comes from the Composer repositories'];
         yield 'a date that does not exist' => [['check' => 'advisories', 'package' => 'a/*', 'reason' => 'x', 'expires' => '2026-02-30'], '%s "expires" must be a valid YYYY-MM-DD date'];

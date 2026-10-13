@@ -24,7 +24,7 @@ final class BaselineEntry implements \JsonSerializable
 
     /**
      * @param array<string, string>  $flags      maintenance flag => known_since, in any order
-     * @param list<RecordedAdvisory> $advisories in any order
+     * @param array<RecordedAdvisory> $advisories in any order
      *
      * @throws \InvalidArgumentException for a flag that is not a maintenance flag
      */

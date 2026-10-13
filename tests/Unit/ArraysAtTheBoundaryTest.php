@@ -35,7 +35,7 @@ final class ArraysAtTheBoundaryTest extends TestCase
         'Analyzer/RunSettings.php' => 3,
         'Baseline/Baseline.php' => 3,
         'Baseline/BaselineFile.php' => 1,
-        'Baseline/BaselineSchema.php' => 3,
+        'Baseline/BaselineSchema.php' => 2,
         'Clock.php' => 1,
         'Composer/AnalyzerBootstrap.php' => 1,
         'Composer/ComposerHttpClient.php' => 1,

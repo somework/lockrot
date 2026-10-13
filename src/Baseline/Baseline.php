@@ -115,7 +115,7 @@ final class Baseline
             $advisories[$recorded->id()] ??= $recorded;
         }
 
-        return new BaselineEntry($finding->package(), $finding->version(), $before === null ? $today : $before->firstSeen(), $flags, array_values($advisories));
+        return new BaselineEntry($finding->package(), $finding->version(), $before === null ? $today : $before->firstSeen(), $flags, $advisories);
     }
 
     /** Whether the entry keeps an advisory id that the finding does not count. */

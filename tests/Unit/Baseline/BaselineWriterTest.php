@@ -78,7 +78,7 @@ final class BaselineWriterTest extends TestCase
 
         $carried = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding(['stale'], []))]), $before);
         $dropped = Baseline::fromReport(self::report('2026-10-01', [self::finding(['stale'], [])]), $before);
-        $counted = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding(['stale'], [['A1', 'high', 'update']]))]), $before);
+        $counted = Baseline::fromReport(self::report('2026-10-01', [self::incomplete(self::finding(['stale'], [['A1', 'critical', 'none']]))]), $before);
 
         self::assertSame([['A1', '2026-06-01']], self::advisories($carried->entryFor('acme/pkg')));
         self::assertSame(['acme/pkg'], $carried->carriedForward());
@@ -86,6 +86,7 @@ final class BaselineWriterTest extends TestCase
         self::assertSame([], $dropped->carriedForward());
         self::assertSame([['A1', '2026-06-01']], self::advisories($counted->entryFor('acme/pkg')));
         self::assertSame([], $counted->carriedForward(), 'an advisory counted again is no carry');
+        self::assertSame(['known_since' => '2026-06-01', 'severity' => 'critical', 'fix_kind' => 'none'], JsonPath::arrayAt(JsonPath::decoded($counted->toArray()), ['findings', 'acme/pkg', 'advisories', 'A1']), 'the run refreshes what it counts');
     }
 
     /** A package that no longer grades keeps its entry only while its lookup is incomplete. */
