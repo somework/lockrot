@@ -17,6 +17,9 @@ final class BaselinedFloors
      * The floors each scenario must meet. `limited_by: equal` is the estimate's for wallabag-2.6, and
      * the recorded data does not reach it, so no floor asks for it.
      */
+    /** The floors that only an advisory lookup can meet. */
+    public const ADVISORY_FLOORS = ['worsened by a new advisory on a recorded lead', 'advisory known'];
+
     public const FLOORS = [
         'wallabag-main' => ['status known', 'status new', 'status worsened', 'worsened by a new flag', 'flag covered', 'stale entries', 'limited_by cap', 'limited_by score', 'a failing finding', 'a finding exempt by the baseline', 'a known dev finding', 'exits 1 then 0'],
         'wallabag-2.6' => ['status known', 'status new', 'status worsened', 'worsened by a new advisory on a recorded lead', 'advisory known', 'limited_by cap', 'limited_by score', 'a failing finding', 'a finding exempt by the baseline', 'exits 1 then 0', 'note baseline_target_differs'],
