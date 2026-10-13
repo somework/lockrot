@@ -93,7 +93,7 @@ final class RotDepth implements \JsonSerializable
     {
         $max = $this->maxDepth();
         $byDepth = [];
-        for ($depth = 0; $max !== null && $depth <= $max; ++$depth) {
+        foreach ($max === null ? [] : range(0, $max) as $depth) {
             $byDepth[] = ['depth' => $depth, 'flagged' => $this->byDepth[$depth] ?? 0];
         }
 
