@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Lockrot\Output;
 
+use Lockrot\Analyzer\FlagTotals;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\Report2Root;
+use Lockrot\Analyzer\SecurityTotals;
 use Lockrot\Data\Advisory\AdvisoryRepository;
+use Lockrot\Security\Severity;
 use Lockrot\Verdict\ScoreModel;
 
 /**
@@ -49,11 +52,11 @@ final class RunFooter
     /** `flags: abandoned 1 · … · 4 packages carry more than one`. */
     public static function flags(Report $report): ?string
     {
-        $sorted = $report->sorted();
+        $totals = FlagTotals::of($report->sorted());
         $parts = [];
-        foreach (Report2Root::toFlagsArray($sorted) as $flag => $row) {
-            if ($row['carrying'] > 0) {
-                $parts[] = $flag.' '.$row['carrying'];
+        foreach (ScoreModel::FLAG_ORDER as $flag) {
+            if ($totals->carrying($flag) > 0) {
+                $parts[] = $flag.' '.$totals->carrying($flag);
             }
         }
         if ($parts === []) {
@@ -114,9 +117,9 @@ final class RunFooter
     /** The `security:` line; $devPart adds the packages-dev clause of the table. */
     public static function security(Report $report, bool $devPart): ?string
     {
-        $security = Report2Root::toSecurityArray($report->sorted());
-        $vulnerable = $security['packages']['vulnerable'];
-        $lookup = self::LOOKUP_WORDS[$security['check']] ?? null;
+        $security = SecurityTotals::of($report->sorted());
+        $vulnerable = $security->vulnerablePackages();
+        $lookup = self::LOOKUP_WORDS[$security->check()] ?? null;
         if ($vulnerable === 0 && $lookup === null) {
             return null;
         }
@@ -125,13 +128,13 @@ final class RunFooter
             $parts[] = 'no vulnerable package';
         } else {
             $severities = [];
-            foreach ($security['severities'] as $severity => $count) {
-                if ($count > 0) {
-                    $severities[] = $count.' '.$severity;
+            foreach (Severity::DISPLAY_ORDER as $severity) {
+                if ($security->advisoriesOf($severity) > 0) {
+                    $severities[] = $security->advisoriesOf($severity).' '.$severity;
                 }
             }
             $parts[] = self::nOf($vulnerable, 'vulnerable package', 'vulnerable packages');
-            $parts[] = self::nOf($security['advisories']['counted'], 'advisory', 'advisories').': '.implode(', ', $severities);
+            $parts[] = self::nOf($security->countedAdvisories(), 'advisory', 'advisories').': '.implode(', ', $severities);
         }
         if ($lookup !== null) {
             $parts[] = 'advisories '.$lookup;
@@ -146,10 +149,11 @@ final class RunFooter
     /** `fix, by package: composer update 2 · upgrade 1 · …`, in fix-kind order. */
     public static function fixes(Report $report): ?string
     {
+        $security = SecurityTotals::of($report->sorted());
         $parts = [];
-        foreach (Report2Root::toSecurityArray($report->sorted())['fixes'] as $kind => $count) {
-            if ($count > 0) {
-                $parts[] = (self::FIX_WORDS[$kind] ?? $kind).' '.$count;
+        foreach (ScoreModel::FIX_KINDS as $kind) {
+            if ($security->packagesFixedBy($kind) > 0) {
+                $parts[] = self::FIX_WORDS[$kind].' '.$security->packagesFixedBy($kind);
             }
         }
 

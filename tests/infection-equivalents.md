@@ -48,7 +48,6 @@ start the reason with `in method():`.
 - `src/Composer/ComposerHttpClient.php` CastInt `$status = $e instanceof TransportException ? (int) ($e->getStatusCode() ?? 0) : 0;` — `getStatusCode() ?? 0` is already an int.
 - `src/Composer/InstallTimeSummary.php` UnwrapArrayValues `$repositories = array_values($composer->getRepositoryManager()->getRepositories());` — the repository manager only appends and prepends, so its array is already a list.
 - `src/Composer/InstallTimeSummary.php` TrueValue, Foreach_ `foreach ($lock->packages(true) as $package) {` — these names reach `BaselineComparison::compare()` for the stale list only, and the install-time summary prints no stale list.
-- `src/Composer/InstallTimeSummary.php` Coalesce `$lockrot->project() ?? $project->name(),` — the install-time block and its strict message print no project name, so no output reads which name wins.
 - `src/Composer/LockrotCommand.php` Throw_ `throw $this->bootstrapError;` — the statements after it read the same manifest and throw the same exception, so the exit code and the message stay the same.
 - `src/Composer/LockrotCommand.php` CastString `$cwd = (string) getcwd();` — `getcwd()` returns false only when the working directory is gone, and then PHPUnit cannot start.
 - `src/Composer/LockrotCommand.php` LogicalOr `if ($finding === null || $facts === null) {` — in explain(): one loop fills both, so one is null exactly when the other is.
@@ -117,39 +116,15 @@ start the reason with `in method():`.
 
 ## src/Output
 
-- `src/Output/ExplainFormatter.php` CastString `$holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json' : (string) $holder->package(), $fixes['held_by']);` — a holder that is not the root always names its package, so the cast never meets null.
-- `src/Output/MarkdownFormatter.php` DecrementInteger `return '**'.self::text($parts[0]).'**'.(isset($parts[1]) ? ' · '.self::text($parts[1]) : '');` — `gate.text` always joins two or more parts with ` · `, so both offsets are set.
+- `src/Output/ExplainFormatter.php` CastString `$holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json' : (string) $holder->package(), $candidate->heldBy());` — a holder that is not the root always names its package, so the cast never meets null.
 - `src/Output/MarkdownFormatter.php` Break_ `break;` — the room only shrinks row by row, so no row after the first that does not fit can fit.
-- `src/Output/MarkdownFormatter.php` CastInt, CastString `$lines[] = (string) preg_replace_callback('/\x00(\d+)\x00/', static fn (array $m): string => $spans[(int) $m[1]], self::text($line));` — a numeric string key reads the same array entry as its int, and the pattern is a valid regex, so the result is never null.
-- `src/Output/SarifFormatter.php` Coalesce `$rules[$result['ruleId']] = $rules[$result['ruleId']] ?? SarifRecords::rule($result['ruleId'], \is_string($severity) ? $severity : null);` — a rule id always builds the same descriptor, so building it again changes nothing.
-- `src/Output/SarifFormatter.php` Coalesce, FalseValue `'strict_network' => $runBlock['strict_network'] ?? false,` — report-2's `run` block always holds `strict_network`.
-- `src/Output/SarifRecords.php` ArrayItemRemoval `[$short, $full] = self::RULES[$name] ?? ['A lockrot record', 'A lockrot record.'];` — every rule id that `results()` writes has its row in `RULES`.
-- `src/Output/SarifRecords.php` TrueValue `$values[$failed->value()->value()] = true;` — only the keys are read.
-- `src/Output/SarifRecords.php` UnwrapArrayUnique, UnwrapArrayValues `return array_values(array_unique(array_merge($a, $b)));` — an `unchecked` value never names a flag or an advisory, so the two lists share no value and their merge is already a list.
 - `src/Output/InstallSummaryFormatter.php` LogicalAnd `$gateLine = $gate !== null && $run !== null && $gate->fails() ? '  '.self::text(RunGateText::render($gate, $run)) : null;` — a report decides its gate only from its run settings, so the gate and the run are null together.
-- `src/Output/TableFormatter.php` UnwrapRtrim `$out = [rtrim(self::escape($prefix.$first[0]))];` — `wordwrap()` drops the space it breaks at, and the texts that the table wraps end with no space, so no first line ends with one.
-- `src/Output/TableFormatter.php` UnwrapRtrim `$lines[] = self::escape(rtrim($line));` — `wordwrap()` drops the space it breaks at, and the texts that the table wraps end with no space, so no line ends with one.
 - `src/Output/AgeText.php` Coalesce `$key = ReleaseBranch::of($version) ?? ReleaseBranch::aliasLine($version);` — `ReleaseBranch::of()` answers only a release and `aliasLine()` only a branch alias, so at most one of them is not null.
 - `src/Output/HtmlFormatter.php` BitwiseOr `return htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');` — `title()` is the one caller, and its string holds no quote and no invalid byte.
 - `src/Output/JsonFormatter.php` FalseValue `public function format(Report $report, bool $showAll = false): string` — the JSON document lists every finding and does not read `$showAll`.
 - `src/Output/ReportTarget.php` GreaterThan `if (strpos($spec, $known.':') === 0 && \strlen($known) > \strlen($format)) {` — two format names of one length cannot both start a spec before its colon, so `>=` picks the same name.
 - `src/Output/TerminalWidth.php` Coalesce `$width = self::fromEnv($env) ?? self::fromConsoleTerminal($env) ?? self::fromApplication($application) ?? FormatContext::DEFAULT_WIDTH;` — `fromConsoleTerminal()` gives null when `COLUMNS` is set, so the order of the first two steps does not matter.
 - `src/Output/HtmlFormatter.php` UnwrapArrayFilter and UnwrapArrayValues `return \is_array($reads) ? array_values(array_filter($reads, 'is_int')) : [];` — the vendored manifest lists its report numbers as a JSON list of integers, so the filter keeps every item and the keys stay `0..n-1`.
-- `src/Output/ExplainFormatter.php` Concat `$lines[] = self::INDENT.str_repeat(' ', self::FLAG).self::escape(self::advisoryFacts($row));` — `self::INDENT` and the pad are both spaces, so their order does not change the line.
-- `src/Output/ExplainFormatter.php` CastInt x2 `$most = $most === null || (int) $feed->records() > (int) $most->records() ? $feed : $most;` — only an answered feed reaches the line, and `AdvisoryFeed::answered()` always sets its records.
-- `src/Output/ExplainFormatter.php` CastInt `$records = (int) $feed->records();` — only the answered branch reads `$records`, and an answered feed always has its records.
-- `src/Output/ExplainFormatter.php` LogicalOr `return $move === null || $moves->moveIn() === null ? null : $move->toBranch();` — a set `security.move_in` always has its move. When it is null, no move clears an advisory, so the next step's branch fixes none and its cell prints no `(lowest fix)`.
-- `src/Output/ExplainFormatter.php` CastString `$cell .= ' · '.(self::FIX_WORDS[(string) $fixes['fix_kind']] ?? $fixes['fix_kind']).($moveRow ? ' (lowest fix)' : '');` — a null key and the empty string read the same array entry.
-- `src/Output/FindingBlock.php` UnwrapArrayValues `$ids = array_values(array_unique($ids));` — `usort()` gives the list new keys.
-- `src/Output/FindingBlock.php` CastInt x2 `usort($ids, static fn (string $a, string $b): int => (int) substr($a, 1) <=> (int) substr($b, 1));` — a signal id is `S` and digits, and PHP compares a numeric string with an integer as numbers.
-- `src/Output/FormatContext.php` NotIdentical, LogicalAndAllSubExprNegation `if ($finding->isGraded() || ($standing !== null && $standing->fails()) || ($unchecked && $finding->checksMissing() !== [])) {` — the gate holds one standing per finding of its report. A finding without a grade fails the gate only on `unchecked`, which the third clause selects too.
-- `src/Output/GithubFormatter.php` ReturnRemoval `return '';` — with no flag the join is empty, and a score of 0 has no security term.
-- `src/Output/InstallSummaryFormatter.php` IncrementInteger, DecrementInteger `$shown = \count($graded) > $slots ? \array_slice($graded, 0, max(0, $slots - 1)) : $graded;` — `MAX_LINES` less the heading, the footer, the update line, the gate line and `MAX_NOTES` leaves at least four slots, so `$slots - 1` is above both floors.
-- `src/Output/MarkdownFormatter.php` ConcatOperandRemoval `if (strpos($line, $marking.' (') === 0) {` — only the marking line starts with `abandoned marking ignored`, and ` (` always follows it.
-- `src/Output/TableFormatter.php` ArrayItemRemoval, UnwrapArrayMerge `$groups = array_fill_keys(array_merge(ScoreModel::GRADES, [self::NOT_FLAGGED]), []);` — the loop appends a key that the fill leaves out after the grades, so the group without a grade stays last.
-- `src/Output/TableFormatter.php` Concat `$lines = array_merge($lines, $this->wrapped(self::LINE.'do: ', $move, self::LINE.'    '));` — both parts of the continuation are spaces.
-- `src/Output/TableFormatter.php` Concat `$lines = array_merge($lines, $this->wrapped(self::LINE, $text, self::LINE.str_repeat(' ', $hang)));` — both parts of the continuation are spaces.
-- `src/Output/TableFormatter.php` ConcatOperandRemoval `$lines[] = $gate->fails() ? '<fg=red>'.$line.'</fg=red>' : $line;` — each gate line is its own entry, and the console formatter ends an open style at the end of the text.
 
 ## src/Security
 

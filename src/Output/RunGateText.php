@@ -37,6 +37,16 @@ final class RunGateText
 
     public static function render(Gate $gate, RunSettings $run): string
     {
+        return implode(' · ', self::parts($gate, $run));
+    }
+
+    /**
+     * `gate.text` in its segments: the gate's state first.
+     *
+     * @return non-empty-list<string>
+     */
+    public static function parts(Gate $gate, RunSettings $run): array
+    {
         $active = $run->failOnValue() !== 'none';
         $parts = ['gate: '.self::head($gate, $run, $active)];
         $source = $run->failOnSourceOrDefault();
@@ -52,7 +62,7 @@ final class RunGateText
         }
         $parts[] = \sprintf('target php %s (%s)', $run->targetPhp(), self::TARGET_SOURCE[$run->targetPhpSource()] ?? $run->targetPhpSource());
 
-        return implode(' · ', $parts);
+        return $parts;
     }
 
     private static function head(Gate $gate, RunSettings $run, bool $active): string

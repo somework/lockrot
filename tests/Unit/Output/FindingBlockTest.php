@@ -10,11 +10,13 @@ use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Lock\ConfiguredRepositories;
 use Lockrot\Lock\OriginFacts;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Output\FindingBlock;
 use Lockrot\Score\CountedAdvisory;
+use Lockrot\Signal\AbandonedIgnored;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
@@ -69,6 +71,19 @@ final class FindingBlockTest extends TestCase
         self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'update', '8.3'));
         self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'update', '8.3', 'none'), 'a fix that was lost already is not lost again');
         self::assertSame('(baseline: PKSA-x re-rated medium → high)', self::suffixOf('high', 'none', '8.4', 'none'));
+    }
+
+    public function testTheMarkingLineNamesEachPatternAndEachConstraintOnceInOrder(): void
+    {
+        $finding = (new FindingBuilder())->withPackage('doctrine/cache')->build();
+        $rules = [new AbandonedIgnoreRule('doctrine/*', 'goes with the 9.0 upgrade', ['^3.0', '^1.0']), new AbandonedIgnoreRule('doctrine/cache', null, ['^1.0'])];
+        $ignored = new AbandonedIgnored('audit.ignore-abandoned', $rules, AbandonedIgnored::MARKED_BY_LOCK, null, null);
+
+        self::assertSame(
+            'abandoned marking ignored (audit.ignore-abandoned: doctrine/*, doctrine/cache): goes with the 9.0 upgrade (constraint ^1.0, ^3.0 not applied, as composer audit does not apply it)',
+            FindingBlock::markingLine($finding->withDetails(FindingBuilder::detailsOf($finding, true, null, null, $ignored)))
+        );
+        self::assertNull(FindingBlock::markingLine($finding));
     }
 
     public function testTheMissingChecksJoinByTheirWordsEachIdOnceInSignalOrder(): void

@@ -10,13 +10,14 @@ use Lockrot\Explain\Explanation;
 use Lockrot\Json\JsonWriter;
 use Lockrot\Json\Schemas;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Score\IfApplied;
 use Lockrot\Score\MaintenanceTerm;
+use Lockrot\Security\BranchFixes;
 use Lockrot\Security\Holder;
 use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\AdvisoryRow;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\Moves;
 use Lockrot\Verdict\ScoreModel;
 
 /**
@@ -259,7 +260,7 @@ final class ExplainFormatter
         $lines = [];
         foreach ($s9 === null ? [] : $s9->rows() as $row) {
             $lines[] = self::INDENT.self::INDENT.self::escape(str_pad($row->severity(), self::FLAG - 3).' '.($row->cve() ?? $row->id()).'  '.$row->title());
-            $lines[] = self::INDENT.str_repeat(' ', self::FLAG).self::escape(self::advisoryFacts($row));
+            $lines[] = str_repeat(' ', \strlen(self::INDENT) + self::FLAG).self::escape(self::advisoryFacts($row));
         }
 
         return $lines;
@@ -294,16 +295,16 @@ final class ExplainFormatter
         foreach ($lookup->feeds() as $feed) {
             if ($feed->answer() === AdvisoryCoverage::ANSWERED) {
                 ++$answered;
-                $most = $most === null || (int) $feed->records() > (int) $most->records() ? $feed : $most;
+                $most = $most === null || $feed->records() > $most->records() ? $feed : $most;
             }
         }
         $s9 = $finding->signalData(AdvisoryData::class);
         $affect = ($s9 === null ? 0 : \count($s9->rows())) + $finding->securityStanding()->ignoredCount();
         $parts = [];
         foreach ($lookup->feeds() as $feed) {
-            $records = (int) $feed->records();
             switch ($feed->answer()) {
                 case AdvisoryCoverage::ANSWERED:
+                    $records = $feed->records();
                     $words = $records === 0 ? 'none on record' : $records.' on record';
                     if ($feed === $most && $records > 0 && ($answered === 1 || $lookup->records() === $records)) {
                         $words .= ', '.$affect.' '.($affect === 1 ? 'affects' : 'affect').' '.$finding->version();
@@ -383,13 +384,13 @@ final class ExplainFormatter
         $fixes = [];
         $packageFixes = $finding->details()->fixes();
         foreach ($packageFixes === null ? [] : $packageFixes->branches() as $branch) {
-            $fixes[$branch->branch()] = $finding->details()->rowFixes($branch);
+            $fixes[$branch->branch()] = $branch;
         }
         $moveBranch = self::securityMoveBranch($finding);
         $lines = ['repository metadata', self::escape(\sprintf('     %-8s %-13s %-12s %-10s %s', 'branch', 'highest tag', 'released', 'php', 'fixes'))];
         foreach (\array_slice($rows, 0, Explanation::BRANCH_ROWS) as $row) {
             $released = $row['highest_released'] === null ? ($row['highest_commit_date'] === null ? 'undated' : 'commit '.$row['highest_commit_date']->format('Y-m-d')) : $row['highest_released']->format('Y-m-d');
-            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $row['branch'] === $moveBranch) : '';
+            $cell = isset($fixes[$row['branch']]) ? self::fixesCell($fixes[$row['branch']], $finding->details()->moves()->rowIfApplied($row['branch']), $row['branch'] === $moveBranch) : '';
             $lines[] = self::escape(rtrim(\sprintf('   %s %-8s %-13s %-12s %-10s %s', $row['installed'] ? '*' : ' ', $row['branch'], $row['highest'], $released, $row['php'] ?? '—', $cell)));
         }
         if (\count($rows) > Explanation::BRANCH_ROWS) {
@@ -410,33 +411,26 @@ final class ExplainFormatter
     /** The branch of the security move, where `security.move_in` names it: the next step or its first other move. */
     private static function securityMoveBranch(Finding $finding): ?string
     {
-        $moves = $finding->details()->moves();
-        $move = $moves->nextStep();
-        if ($move !== null && $moves->moveIn() === Moves::IN_ALSO) {
-            $move = $move->also()[0] ?? null;
-        }
+        $move = $finding->details()->moves()->securityMove();
 
-        return $move === null || $moves->moveIn() === null ? null : $move->toBranch();
+        return $move === null ? null : $move->toBranch();
     }
 
-    /**
-     * `{fixed} of {of}`, the fix word, `(lowest fix)` on the move's row, the holders and the score after it.
-     *
-     * @param array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?\Lockrot\Score\IfApplied} $fixes
-     */
-    private static function fixesCell(array $fixes, bool $moveRow): string
+    /** `{fixed} of {of}`, the fix word, `(lowest fix)` on the move's row, the holders and the score after it. */
+    private static function fixesCell(BranchFixes $row, ?IfApplied $after, bool $moveRow): string
     {
-        $cell = $fixes['fixed'].' of '.$fixes['of'];
-        if ($fixes['fixed'] > 0) {
-            $cell .= ' · '.(self::FIX_WORDS[(string) $fixes['fix_kind']] ?? $fixes['fix_kind']).($moveRow ? ' (lowest fix)' : '');
-            $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json' : (string) $holder->package(), $fixes['held_by']);
-            if ($holders !== []) {
-                $cell .= '; held by '.implode(' and ', array_unique($holders));
-            }
-            $after = $fixes['if_applied'];
-            if ($after !== null) {
-                $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().', if Composer resolves it';
-            }
+        $cell = $row->fixed().' of '.$row->of();
+        $candidate = $row->candidate();
+        if ($candidate === null) {
+            return $cell;
+        }
+        $cell .= ' · '.self::FIX_WORDS[$candidate->kind()].($moveRow ? ' (lowest fix)' : '');
+        $holders = array_map(static fn (Holder $holder): string => $holder->source() === Holder::ROOT ? 'composer.json' : (string) $holder->package(), $candidate->heldBy());
+        if ($holders !== []) {
+            $cell .= '; held by '.implode(' and ', array_unique($holders));
+        }
+        if ($after !== null) {
+            $cell .= '; after it: '.($after->atMost() ? 'at most ' : '').$after->total().', '.$after->verdict().', if Composer resolves it';
         }
 
         return $cell;

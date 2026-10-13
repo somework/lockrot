@@ -141,7 +141,7 @@ final class InstallTimeSummary
         // transaction brings in.
         // The run goes first: the baseline comparison reads its target PHP.
         $report = $this->withBaseline($report->withRun(new RunSettings(
-            $lockrot->project() ?? $project->name(),
+            $lockrot->project(),
             $project->name(),
             $lockrot->targetPhp(),
             $lockrot->targetPhpSource(),

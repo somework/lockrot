@@ -50,7 +50,7 @@ final class InstallSummaryFormatter
         $shownNotes = \array_slice($notes, 0, self::MAX_NOTES);
         // The header and the footer always print, `update now:` and the gate line when they apply.
         $slots = self::MAX_LINES - 2 - ($updateNow === [] ? 0 : 1) - ($gateLine === null ? 0 : 1) - \count($shownNotes);
-        $shown = \count($graded) > $slots ? \array_slice($graded, 0, max(0, $slots - 1)) : $graded;
+        $shown = \count($graded) > $slots ? \array_slice($graded, 0, $slots - 1) : $graded;
         $omitted = \count($graded) - \count($shown);
 
         $lines = [\sprintf('<warning>%s</warning>', self::text(\sprintf('lockrot: %d of %d changed %s flagged — %s', \count($graded), $report->packagesChecked(), $report->packagesChecked() === 1 ? 'package' : 'packages', RunFooter::gradeCounts($report))))];

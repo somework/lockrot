@@ -302,8 +302,8 @@ final class FindingBlock
      */
     private static function signalOrder(array $ids): array
     {
-        $ids = array_values(array_unique($ids));
-        usort($ids, static fn (string $a, string $b): int => (int) substr($a, 1) <=> (int) substr($b, 1));
+        $ids = array_unique($ids);
+        usort($ids, 'strnatcmp');
 
         return $ids;
     }

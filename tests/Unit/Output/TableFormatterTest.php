@@ -62,7 +62,8 @@ final class TableFormatterTest extends TestCase
     public function testThePullsInAndChecksAcceptedLinesWrapUnderTheBlockIndent(): void
     {
         $s7 = new Signal(Signal::LEVEL_INFO, 'pulls in 3 flagged packages: vendor/first (stale), vendor/second (stale), vendor/third (stale)', SignalDataStub::of(Signal::S7, ['flagged' => 3, 'packages' => []]));
-        $finding = (new FindingBuilder())->withPackage('vendor/pkg')->withVerdict(Verdict::STALE)->withSignals([$s7])->build();
+        $s10 = new Signal(Signal::LEVEL_INFO, 'not checked', SignalDataStub::of(Signal::S10, ['unchecked' => [['check' => 'advisories', 'reason' => 'offline', 'blocks' => ['S9']], ['check' => 'repository_activity', 'reason' => 'host_not_supported', 'blocks' => ['S3', 'S4']]]]));
+        $finding = (new FindingBuilder())->withPackage('vendor/pkg')->withVerdict(Verdict::STALE)->withSignals([$s7, $s10])->build();
         $accepted = new AcceptedCheck(new Check('repository_activity', 'host_not_supported', ['S3', 'S4']), UncheckedAcceptanceEntry::fromConfig(0, ['check' => 'repository_activity', 'host' => 'codeberg.org', 'reason' => 'we watch it by hand', 'expires' => '2027-03-31']));
         $details = FindingDetails::of(F::looked(F::facts(F::package(), F::metadata([['1.0.0', '2020-01-01T00:00:00+00:00']]))), null, new PhpFloor('8.4'), [], [], null, $finding->details()->age(), [$accepted]);
         $report = new Report([$finding->withDetails($details)], [], new \DateTimeImmutable('2026-10-01T00:00:00+00:00'), 1, 0);
@@ -75,6 +76,11 @@ final class TableFormatterTest extends TestCase
         $accepted = array_search('      checks accepted: S3, S4 (host not supported;', $lines, true);
         self::assertIsInt($accepted, implode("\n", $lines));
         self::assertSame('      accepted by your accept-unchecked list: we', $lines[$accepted + 1]);
+        $missing = array_values(preg_grep('/^      checks missing: /', $lines) ?: []);
+        self::assertCount(1, $missing, implode("\n", $lines));
+        $at = array_search($missing[0], $lines, true);
+        self::assertIsInt($at);
+        self::assertMatchesRegularExpression('/^      [^ ]/', $lines[$at + 1], 'a wrapped missing-checks line keeps the block indent');
     }
 
     public function testTheAbandonedMarkingLineWrapsUnderItsHang(): void

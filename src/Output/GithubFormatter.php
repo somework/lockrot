@@ -126,9 +126,6 @@ final class GithubFormatter implements FormatterInterface
     {
         $flags = $finding->flagIds();
         $security = $finding->scoreBasis()->securityTerm();
-        if ($flags === []) {
-            return '';
-        }
 
         return implode(' · ', $flags).($security === null ? '' : ' ('.$security->severity().' advisory)');
     }

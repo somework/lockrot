@@ -48,6 +48,8 @@ final class SarifRecords
     private ?GateStanding $gate;
     private ?Standing $standing;
     private ?string $baselinePath;
+    /** @var array<string, Rule> by rule id, the rule of each record that results() wrote */
+    private array $rules = [];
 
     public function __construct(Finding $finding, ?GateStanding $gate, ?BaselineComparison $baseline)
     {
@@ -65,6 +67,7 @@ final class SarifRecords
      */
     public function results(bool $showAll, bool $uncheckedRecord): array
     {
+        $this->rules = [];
         if (!$this->finding->isGraded()) {
             $results = [];
             $head = $this->finding->package().' '.$this->finding->version();
@@ -104,11 +107,17 @@ final class SarifRecords
                 $bag['term'] = $security;
             }
             $state = $this->standing === null ? null : $this->standing->advisoryState($row->id());
-            $results[] = $this->result('lockrot/advisory/'.$row->id(), $this->level($errorBy, $state), (float) Severity::fromComposer($row->severity())->sarifRank(), $text, ['lockrot/package' => $this->finding->package(), 'lockrot/advisory' => $row->id()], $bag, $state);
+            $results[] = $this->result('lockrot/advisory/'.$row->id(), $this->level($errorBy, $state), (float) Severity::fromComposer($row->severity())->sarifRank(), $text, ['lockrot/package' => $this->finding->package(), 'lockrot/advisory' => $row->id()], $bag, $state, $row->severity());
             $first = false;
         }
 
         return $results;
+    }
+
+    /** @return array<string, Rule> by rule id, the rules of the records that the last results() call returned */
+    public function rules(): array
+    {
+        return $this->rules;
     }
 
     /**
@@ -133,7 +142,7 @@ final class SarifRecords
                 'properties' => ['tags' => ['security', 'dependency'], 'security-severity' => $bucket->sarifSecuritySeverity()],
             ];
         }
-        [$short, $full] = self::RULES[$name] ?? ['A lockrot record', 'A lockrot record.'];
+        [$short, $full] = self::RULES[$name];
 
         return [
             'id' => $ruleId,
@@ -152,8 +161,9 @@ final class SarifRecords
      *
      * @return Result
      */
-    private function result(string $ruleId, string $level, ?float $rank, string $text, array $fingerprints, array $bag, ?FactState $state = null): array
+    private function result(string $ruleId, string $level, ?float $rank, string $text, array $fingerprints, array $bag, ?FactState $state = null, ?string $severity = null): array
     {
+        $this->rules[$ruleId] = self::rule($ruleId, $severity);
         $result = ['ruleId' => $ruleId, 'level' => $level];
         if ($rank !== null) {
             $result['rank'] = $rank;
@@ -189,12 +199,12 @@ final class SarifRecords
         foreach ($this->gate === null ? [] : $this->gate->by() as $failed) {
             foreach ($failed->facts() as $fact) {
                 if ($fact->kind() === $kind && ($id === null || $fact->id() === $id)) {
-                    $values[$failed->value()->value()] = true;
+                    $values[$failed->value()->value()] = $failed->value()->value();
                 }
             }
         }
 
-        return array_keys($values);
+        return array_values($values);
     }
 
     /**
@@ -238,6 +248,9 @@ final class SarifRecords
     }
 
     /**
+     * The values of a fact, then the `unchecked` value of the first record: only `unchecked` marks
+     * S10, so the two lists share no value.
+     *
      * @param list<string> $a
      * @param list<string> $b
      *
@@ -245,7 +258,7 @@ final class SarifRecords
      */
     public static function union(array $a, array $b): array
     {
-        return array_values(array_unique(array_merge($a, $b)));
+        return array_merge($a, $b);
     }
 
     /** The baseline state of a counted flag, null without an entry. */

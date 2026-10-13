@@ -141,8 +141,7 @@ final class FormatContext
         $unchecked = $this->failOn->has(FailOn::KIND_UNCHECKED);
         $out = [];
         foreach ($report->sorted() as $finding) {
-            $standing = $gate->standingOf($finding->package());
-            if ($finding->isGraded() || ($standing !== null && $standing->fails()) || ($unchecked && $finding->checksMissing() !== [])) {
+            if ($finding->isGraded() || $gate->packageFails($finding->package()) || ($unchecked && $finding->checksMissing() !== [])) {
                 $out[] = $finding;
             }
         }

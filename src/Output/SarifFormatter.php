@@ -47,11 +47,10 @@ final class SarifFormatter implements FormatterInterface
         foreach ($this->context->recordFindings($report, $showAll) as $finding) {
             $records = new SarifRecords($finding, $gate->standingOf($finding->package()), $report->baseline());
             foreach ($records->results($showAll, $this->context->isUncheckedRecord($finding, $showAll)) as $result) {
-                $severity = $result['properties']['severity'] ?? null;
-                $rules[$result['ruleId']] = $rules[$result['ruleId']] ?? SarifRecords::rule($result['ruleId'], \is_string($severity) ? $severity : null);
                 $result['locations'] = [['physicalLocation' => $this->physicalLocation($index->lineOf($finding->package()))]];
                 $results[] = $result;
             }
+            $rules = array_merge($rules, $records->rules());
         }
         $gap = $this->context->advisoriesNotCheckedLevel($report);
         if ($gap !== null) {
@@ -129,7 +128,7 @@ final class SarifFormatter implements FormatterInterface
                 'fail_on_source' => $runBlock['fail_on_source'] ?? null,
                 'gates' => $runBlock['gates'] ?? [],
                 'mode' => $runBlock['mode'] ?? null,
-                'strict_network' => $runBlock['strict_network'] ?? false,
+                'strict_network' => $this->context->runOf($report)->strictNetwork(),
             ],
         ];
         $notifications = [];

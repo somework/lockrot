@@ -34,7 +34,7 @@ final class MarkdownFormatter implements FormatterInterface
     public function format(Report $report, bool $showAll = false): string
     {
         $gate = $this->context->gateOf($report);
-        $head = [$this->heading($report), '', self::gateLine(RunGateText::render($gate, $this->context->runOf($report)))];
+        $head = [$this->heading($report), '', self::gateLine(RunGateText::parts($gate, $this->context->runOf($report)))];
         $rows = [];
         foreach ($this->context->recordFindings($report, $showAll) as $finding) {
             $rows[] = $this->row($finding, $report, $gate);
@@ -90,12 +90,19 @@ final class MarkdownFormatter implements FormatterInterface
         return \sprintf('### lockrot: %d of %d packages flagged — %s', $flagged, $report->packagesChecked(), RunFooter::gradeCounts($report));
     }
 
-    /** `gate.text` with its first segment in bold. */
-    private static function gateLine(string $text): string
+    /**
+     * `gate.text` with its first segment in bold.
+     *
+     * @param non-empty-list<string> $parts
+     */
+    private static function gateLine(array $parts): string
     {
-        $parts = explode(' · ', $text, 2);
+        $line = '**'.self::text(array_shift($parts)).'**';
+        foreach ($parts as $part) {
+            $line .= ' · '.self::text($part);
+        }
 
-        return '**'.self::text($parts[0]).'**'.(isset($parts[1]) ? ' · '.self::text($parts[1]) : '');
+        return $line;
     }
 
     private function row(Finding $finding, Report $report, Gate $gate): string
@@ -142,7 +149,7 @@ final class MarkdownFormatter implements FormatterInterface
             return '*age:* '.self::text(substr($line, 5));
         }
         $marking = 'abandoned marking ignored';
-        if (strpos($line, $marking.' (') === 0) {
+        if (strpos($line, $marking) === 0) {
             return '*'.$marking.'*'.self::text(substr($line, \strlen($marking)));
         }
 
@@ -154,15 +161,16 @@ final class MarkdownFormatter implements FormatterInterface
     {
         $spans = [];
         $name = static function (string $package) use (&$spans): string {
-            $spans[] = self::code($package);
+            $placeholder = "\x00".\count($spans)."\x00";
+            $spans[$placeholder] = self::code($package);
 
-            return "\x00".(\count($spans) - 1)."\x00";
+            return $placeholder;
         };
         $baseline = $report->baseline();
         $lines = [];
         foreach ([RunFooter::flags($report), RunFooter::depth($report, $name), RunFooter::security($report, false), $report->libyears()->line(), RunFooter::exposure($report, $name), RunFooter::advisories($report), $baseline === null ? null : $baseline->summaryLine()] as $line) {
             if ($line !== null) {
-                $lines[] = (string) preg_replace_callback('/\x00(\d+)\x00/', static fn (array $m): string => $spans[(int) $m[1]], self::text($line));
+                $lines[] = strtr(self::text($line), $spans);
             }
         }
         $updateNow = RunFooter::updateNow($report);

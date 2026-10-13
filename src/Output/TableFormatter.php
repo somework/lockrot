@@ -7,7 +7,6 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Config\Gate;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\ScoreModel;
 
 /**
  * The `table` format, a list grouped by grade. A row is prose, not a cell in a box,
@@ -26,6 +25,8 @@ final class TableFormatter implements FormatterInterface
     /** The block's columns: the header, the lines under it and the evidence text after its flag word. */
     private const INDENT = '  ';
     private const LINE = '      ';
+    /** A `do:` line continues under the text after `do: `. */
+    private const DO_HANG = '          ';
     private const FLAG_WIDTH = 12;
     private const NOT_FLAGGED = 'not flagged';
 
@@ -60,7 +61,7 @@ final class TableFormatter implements FormatterInterface
 
     /**
      * The grades in verdict order, then the score-0 findings under `not flagged`. Inside a group,
-     * the report's order.
+     * the report's order. The report sorts in verdict order, so the groups come in it.
      *
      * @param list<Finding> $rows
      *
@@ -68,12 +69,12 @@ final class TableFormatter implements FormatterInterface
      */
     private function groups(array $rows): array
     {
-        $groups = array_fill_keys(array_merge(ScoreModel::GRADES, [self::NOT_FLAGGED]), []);
+        $groups = [];
         foreach ($rows as $finding) {
             $groups[$finding->isGraded() ? $finding->verdict() : self::NOT_FLAGGED][] = $finding;
         }
 
-        return array_filter($groups, static fn (array $group): bool => $group !== []);
+        return $groups;
     }
 
     /** @return list<string> the finding block, in its order */
@@ -90,14 +91,14 @@ final class TableFormatter implements FormatterInterface
         }
         $move = FindingBlock::move($finding);
         if ($move !== null) {
-            $lines = array_merge($lines, $this->wrapped(self::LINE.'do: ', $move, self::LINE.'    '));
+            $lines = array_merge($lines, $this->wrapped(self::LINE.'do: ', $move, self::DO_HANG));
         }
         foreach (FindingBlock::evidence($finding) as $flag => $summary) {
             $lines = array_merge($lines, $this->wrapped(self::LINE.str_pad($flag, self::FLAG_WIDTH).' ', $summary, str_repeat(' ', \strlen(self::LINE) + self::FLAG_WIDTH + 1)));
         }
         foreach ([[FindingBlock::markingLine($finding), 2], [FindingBlock::ageLine($finding), 5], [FindingBlock::pullsIn($finding), 0], [FindingBlock::checksMissing($finding), 0], [FindingBlock::checksAccepted($finding), 0]] as [$text, $hang]) {
             if ($text !== null) {
-                $lines = array_merge($lines, $this->wrapped(self::LINE, $text, self::LINE.str_repeat(' ', $hang)));
+                $lines = array_merge($lines, $this->wrapped(self::LINE, $text, str_repeat(' ', \strlen(self::LINE) + $hang)));
             }
         }
         $allowlist = FindingBlock::allowlist($finding);
@@ -117,10 +118,9 @@ final class TableFormatter implements FormatterInterface
     private function wrapped(string $prefix, string $text, string $continuation): array
     {
         $width = $this->context->terminalWidth();
-        $first = explode("\n", wordwrap($text, max(self::MIN_WRAP_WIDTH, $width - max(\strlen($prefix), \strlen($continuation)))), 2);
-        $out = [rtrim(self::escape($prefix.$first[0]))];
-        foreach (isset($first[1]) ? self::wrap($first[1], max(self::MIN_WRAP_WIDTH, $width - \strlen($continuation))) : [] as $line) {
-            $out[] = self::escape($continuation).$line;
+        $out = [];
+        foreach (explode("\n", wordwrap($text, max(self::MIN_WRAP_WIDTH, $width - max(\strlen($prefix), \strlen($continuation))))) as $line) {
+            $out[] = self::escape(($out === [] ? $prefix : $continuation).$line);
         }
 
         return $out;
@@ -156,7 +156,7 @@ final class TableFormatter implements FormatterInterface
             }
         }
         foreach (self::wrapBetweenItems(RunGateText::render($gate, $this->context->runOf($report)), $wrap) as $line) {
-            $lines[] = $gate->fails() ? '<fg=red>'.$line.'</fg=red>' : $line;
+            $lines[] = $gate->fails() ? \sprintf('<fg=red>%s</fg=red>', $line) : $line;
         }
         foreach (self::wrapKeepingCommands(RunFooter::dataAsOf($report).'. Run composer lockrot --format=json for details.', $wrap) as $line) {
             $lines[] = $line;
@@ -187,7 +187,7 @@ final class TableFormatter implements FormatterInterface
     {
         $lines = [];
         foreach (explode("\n", wordwrap($text, $wrap, "\n")) as $line) {
-            $lines[] = self::escape(rtrim($line));
+            $lines[] = self::escape($line);
         }
 
         return $lines;
