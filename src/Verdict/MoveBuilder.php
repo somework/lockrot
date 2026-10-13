@@ -156,9 +156,10 @@ final class MoveBuilder
     }
 
     /**
-     * What a tag move raises that counts: old-promise on a tag released before the target
-     * major's GA with an open php, and left-behind on a line that stopped releasing while a higher
-     * one does (S8's rule on the tag's row). A fact lockrot cannot date is unverified.
+     * What a tag move raises that counts, in flag order: left-behind on a line that stopped
+     * releasing while a higher one does (S8's rule on the tag's row), and old-promise on a tag
+     * released before the target major's GA with an open php. A fact lockrot cannot date is
+     * unverified.
      *
      * @return array{0: list<MoveFact>, 1: list<MoveFact>}
      */
@@ -169,6 +170,14 @@ final class MoveBuilder
         $quiet = static fn (string $flag): bool => !\in_array($flag, $flags->fired(), true) && !\in_array($flag, $flags->acceptSet(), true);
         $target = $context->subject()->targetPhp();
         $php = $row === null ? null : $row->php();
+        if ($row !== null && $quiet(FlagSet::LEFT_BEHIND)) {
+            $state = self::leftBehindOn($row, $context);
+            if ($state === 'fires') {
+                $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::BRANCH_NOT_RELEASING);
+            } elseif ($state === 'unknown') {
+                $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::UNDATED);
+            }
+        }
         if ($row !== null && $row->admitsTargetPhp() !== false && $quiet(FlagSet::OLD_PROMISE) && ($php === null || ($target !== null && (new ConstraintOpenness())->isOpenEndedFor($php, $target)))) {
             $released = $latest === null ? null : $latest->released();
             $ga = $context->ga();
@@ -176,14 +185,6 @@ final class MoveBuilder
                 $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::UNDATED);
             } elseif ($ga !== null && (new \DateTimeImmutable($released))->format('Y-m-d') < $ga->format('Y-m-d')) {
                 $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::OLD_PROMISE, MoveFact::RELEASED_BEFORE_GA);
-            }
-        }
-        if ($row !== null && $quiet(FlagSet::LEFT_BEHIND)) {
-            $state = self::leftBehindOn($row, $context);
-            if ($state === 'fires') {
-                $adds[] = MoveFact::on(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::BRANCH_NOT_RELEASING);
-            } elseif ($state === 'unknown') {
-                $unverified[] = MoveFact::unchecked(MoveFact::FLAG, FlagSet::LEFT_BEHIND, MoveFact::UNDATED);
             }
         }
 

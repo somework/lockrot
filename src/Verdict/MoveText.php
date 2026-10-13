@@ -23,6 +23,7 @@ final class MoveText
         'higher_undated' => 'no move: lockrot could not date the releases of the higher branches',
         'no_higher_release' => 'no move: no higher branch released within release-warn-years',
         'releases_unknown' => 'no move: lockrot could not read its releases, so it names no fix',
+        'affected_range_unknown' => 'no move: no advisory names the versions it affects, so lockrot names no fix',
         'metadata_not_read' => 'no move: lockrot did not read its releases, so it names none',
         'local_package' => 'no move: it is installed from a local path (your own package)',
     ];

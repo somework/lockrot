@@ -3309,13 +3309,13 @@
             "adds": [
                 {
                     "kind": "flag",
-                    "id": "old-promise",
-                    "basis": "released_before_ga"
+                    "id": "left-behind",
+                    "basis": "branch_not_releasing"
                 },
                 {
                     "kind": "flag",
-                    "id": "left-behind",
-                    "basis": "branch_not_releasing"
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
                 }
             ],
             "leaves": [],
@@ -3340,7 +3340,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require a tag \u2014 the newest on its own line is 1.9.0 (2020-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; it was released before your target PHP's major, so old-promise would count; that line no longer releases while a higher line does, so left-behind would count"
+            "text": "require a tag \u2014 the newest on its own line is 1.9.0 (2020-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; that line no longer releases while a higher line does, so left-behind would count; it was released before your target PHP's major, so old-promise would count"
         }
     },
     "pinned on a line released at the snapshot": {
@@ -3741,13 +3741,13 @@
             "adds": [
                 {
                     "kind": "flag",
-                    "id": "old-promise",
-                    "basis": "released_before_ga"
+                    "id": "left-behind",
+                    "basis": "branch_not_releasing"
                 },
                 {
                     "kind": "flag",
-                    "id": "left-behind",
-                    "basis": "branch_not_releasing"
+                    "id": "old-promise",
+                    "basis": "released_before_ga"
                 }
             ],
             "leaves": [],
@@ -3772,7 +3772,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require a tag \u2014 the newest on its own line is 1.0.0 (2019-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; it was released before your target PHP's major, so old-promise would count; that line no longer releases while a higher line does, so left-behind would count"
+            "text": "require a tag \u2014 the newest on its own line is 1.0.0 (2019-01-01), older than your snapshot (2026-01-01); review, or replace; 1.x needs php >=7.2, which require.php allows; that line no longer releases while a higher line does, so left-behind would count; it was released before your target PHP's major, so old-promise would count"
         }
     },
     "an undated line below the newest one": {

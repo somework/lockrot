@@ -2,9 +2,9 @@
  "pr": "6b",
  "source": {
   "cases.json": "f90d69c457bdc04e6b31198c59573bb0532c512feac3235753c9ce57ad4a1939",
-  "model_run_date": "2026-10-08"
+  "model_run_date": "2026-10-13"
  },
- "suite": "run_all.sh: 55 of 55 steps pass (the attack-rounds step with its PHP cap raised)",
+ "suite": "spec_flags_r3.py cases, spec_flags_r3_docs_coverage.py and relations_round4.py pass (run_all.sh not run)",
  "dropped": [],
  "reverted": {},
  "cases_without_inputs": [

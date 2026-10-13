@@ -792,7 +792,7 @@
  "include_dev": false,
  "not_from_composer_repository": 0,
  "packages_unchecked_accepted": 0,
- "network_failures": false,
+ "network_failures": true,
  "counts": {
   "critical": 0,
   "high": 0,
@@ -1017,17 +1017,17 @@
  },
  "data_date": "2026-10-01T17:41:33+00:00",
  "notes": [
-  "security advisories not checked (lookup failed): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none"
+  "security advisories unavailable from https://repo.packagist.org: The \"https://repo.packagist.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
  ],
  "note_details": [
   {
-   "code": "advisories_not_checked",
-   "text": "security advisories not checked (lookup failed): no finding is graded for an advisory, and each next step's score after the move assumes its versions carry none",
-   "docs_url": "https://lockrot.dev/notes/#advisories_not_checked",
-   "sets_network_failures": false,
+   "code": "advisories_unavailable",
+   "text": "security advisories unavailable from https://repo.packagist.org: The \"https://repo.packagist.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )",
+   "docs_url": "https://lockrot.dev/notes/#advisories_unavailable",
+   "sets_network_failures": true,
    "data": {
-    "reason": "lookup_failed",
-    "composer_repositories_checked": 1
+    "composer_repository": "https://repo.packagist.org",
+    "message": "The \"https://repo.packagist.org/api/security-advisories/\" file could not be downloaded (HTTP/2 503 )"
    }
   }
  ],

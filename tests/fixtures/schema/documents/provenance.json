@@ -1,7 +1,7 @@
 {
  "source": "security-axis/r3/docs",
- "model_run_date": "2026-10-08",
- "suite": "run_all.sh: 55 of 55 steps pass (the attack-rounds step with its PHP cap raised)",
+ "model_run_date": "2026-10-13",
+ "suite": "spec_flags_r3.py cases, spec_flags_r3_docs_coverage.py and relations_round4.py pass (run_all.sh not run)",
  "documents": {
   "corpus": 49,
   "variants": 3,
@@ -19,13 +19,5 @@
   "config": 33,
   "config/coverage": 40,
   "config/repo-docs": 4
- },
- "corrections": {
-  "coverage/variants/finished-lookup-failed.json": [
-   "C75 R8: network_failures false beside a repository that failed in transport, written true"
-  ],
-  "coverage/variants/lookup-not-run-lookup-failed.json": [
-   "C75 R8: network_failures false beside a repository that failed in transport, written true"
-  ]
  }
 }

@@ -6543,12 +6543,12 @@
             "unverified": [
                 {
                     "kind": "flag",
-                    "id": "old-promise",
+                    "id": "left-behind",
                     "reason": "undated"
                 },
                 {
                     "kind": "flag",
-                    "id": "left-behind",
+                    "id": "old-promise",
                     "reason": "undated"
                 }
             ],
@@ -6581,7 +6581,7 @@
                 }
             ],
             "also": [],
-            "text": "move it to a tag \u2014 the newest on its own line is v4.4.44, through mautic/core-lib; 4.x needs php >=7.1.3; not checked: old-promise, left-behind; what requires it must allow it"
+            "text": "move it to a tag \u2014 the newest on its own line is v4.4.44, through mautic/core-lib; 4.x needs php >=7.1.3; not checked: left-behind, old-promise; what requires it must allow it"
         }
     },
     "stale-accepted\u2021": {

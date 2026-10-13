@@ -314,11 +314,22 @@ final class FindingDetails
             'gets' => $gets === null ? null : [
                 'version' => $gets->version(),
                 'php_check' => $gets->phpCheck(),
-                'clears' => array_map(static fn (string $id): array => ['kind' => 'advisory', 'id' => $id, 'basis' => 'outside_range'], $gets->clears()),
+                'clears' => array_map(static fn (string $id): array => ['kind' => 'advisory', 'id' => $id, 'basis' => 'outside_range'], self::inS9Order($gets->clears(), $rows)),
                 'clears_all' => $gets->clearsAll(),
             ],
             'partial' => $this->moves()->partial(),
         ];
+    }
+
+    /**
+     * @param list<string>      $ids
+     * @param list<AdvisoryRow> $rows
+     *
+     * @return list<string> $ids in S9 order: the feed's order changes between runs
+     */
+    private static function inS9Order(array $ids, array $rows): array
+    {
+        return array_values(array_intersect(array_map(static fn (AdvisoryRow $row): string => $row->id(), $rows), $ids));
     }
 
     /** @param list<AdvisoryRow> $rows */

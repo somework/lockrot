@@ -237,7 +237,7 @@ final class MoveContractTest extends TestCase
 
     /**
      * `security.move_in` points at the move that clears the advisories, which agrees with the
-     * security fields and with its branch row.
+     * security fields, with its branch row and with each S9 row at its release.
      *
      * @param array<mixed, mixed> $finding
      *
@@ -271,6 +271,13 @@ final class MoveContractTest extends TestCase
             return;
         }
         self::assertSame($move['fix_kind'], $security['fix_kind'], 'security.fix_kind is the fix kind of that move');
+        foreach (self::s9Advisories($finding) as $row) {
+            self::assertIsArray($row);
+            $fix = JsonPath::arrayAt($row, ['fix']);
+            if ($fix['to_branch'] === $move['to_branch'] && $fix['version'] === $move['version']) {
+                self::assertSame(self::holds($move['held_by']), self::holds($fix['held_by']), JsonPath::stringAt($row, ['id']).': an S9 row at the move\'s release has its holders (I19)');
+            }
+        }
         $gets = $security['gets'];
         if ($move['kind'] === 'update' && \is_array($gets) && $move['source'] === 'vulnerable') {
             self::assertSame(self::advisoryClears($gets), self::advisoryClears($move), 'an update clears what gets clears');
@@ -427,10 +434,20 @@ final class MoveContractTest extends TestCase
      */
     private static function advisoryIds(array $finding): array
     {
+        return self::ids(self::s9Advisories($finding), static fn (): bool => true);
+    }
+
+    /**
+     * @param array<mixed, mixed> $finding
+     *
+     * @return array<mixed, mixed> S9's advisory rows, in S9 order
+     */
+    private static function s9Advisories(array $finding): array
+    {
         foreach (JsonPath::arrayAt($finding, ['signals']) as $signal) {
             self::assertIsArray($signal);
             if ($signal['id'] === 'S9') {
-                return self::ids(JsonPath::arrayAt($signal, ['data', 'advisories']), static fn (): bool => true);
+                return JsonPath::arrayAt($signal, ['data', 'advisories']);
             }
         }
 
