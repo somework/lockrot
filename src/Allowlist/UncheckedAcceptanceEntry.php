@@ -24,9 +24,9 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
     public const ACCEPTABLE_REASONS = ['host_not_supported', 'no_feed', 'not_from_composer_repository'];
 
     /** config-2's `host` pattern: lower case, an optional port. */
-    private const HOST = '{^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(:[0-9]{1,5})?$}';
+    private const HOST = '{^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(:[0-9]{1,5})?$}D';
     /** config-2's `repository` pattern: a scheme URL without userinfo, or the scp form `user@host:path`. */
-    private const URL = '{^([a-z][a-z0-9+.-]*://[^\s/?#@]+([/?#]\S*)?|[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\S+)$}';
+    private const URL = '{^([a-z][a-z0-9+.-]*://[^\s/?#@]+([/?#]\S*)?|[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+:\S+)$}D';
 
     private string $check;
     private string $scope;
@@ -71,7 +71,6 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
         if (!\is_string($value) || trim($value) === '') {
             throw new ConfigException(\sprintf('%s "%s" must not be blank', $at, $scope));
         }
-        $at .= ' ('.$value.')';
         $reason = $row['reason'] ?? null;
         if (!\is_string($reason) || trim($reason) === '') {
             throw new ConfigException($at.' needs a non-empty "reason"');
@@ -107,7 +106,7 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
             return null;
         }
         $m = [];
-        if (!\is_string($expires) || preg_match('{^(\d{4})-(\d{2})-(\d{2})$}', $expires, $m) !== 1 || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+        if (!\is_string($expires) || preg_match('{^(\d{4})-(\d{2})-(\d{2})$}D', $expires, $m) !== 1 || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
             throw new ConfigException($at.' "expires" must be a valid YYYY-MM-DD date');
         }
 

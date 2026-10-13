@@ -6,6 +6,8 @@ namespace Lockrot\Allowlist;
 
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
+use Lockrot\Output\TerminalText;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
 
 /** @internal */
@@ -45,11 +47,14 @@ final class ProjectIgnoreList
                 continue;
             }
             if (!\is_array($flags) || $flags === []) {
-                throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list at least one maintenance flag', $index));
+                throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list at least one maintenance flag', TerminalText::escape((string) $index, 255)));
             }
             foreach ($flags as $flag) {
+                if ($flag === FlagSet::VULNERABLE) {
+                    throw new ConfigException(\sprintf("extra.lockrot.ignore[%s] \"flags\": the allowlist accepts maintenance flags; accept advisories in Composer's audit policy (config.policy.advisories), which composer audit reads too", TerminalText::escape((string) $index, 255)));
+                }
                 if (!\is_string($flag) || !isset(ScoreModel::POINTS[$flag])) {
-                    throw new ConfigException(\sprintf("extra.lockrot.ignore[%s] \"flags\": the allowlist accepts maintenance flags; accept advisories in Composer's audit policy (config.policy.advisories), which composer audit reads too", $index));
+                    throw new ConfigException(\sprintf('extra.lockrot.ignore[%s] "flags" must list maintenance flags only: %s', TerminalText::escape((string) $index, 255), implode(', ', array_keys(ScoreModel::POINTS))));
                 }
             }
         }

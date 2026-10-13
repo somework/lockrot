@@ -101,6 +101,23 @@ final class UncheckedAcceptanceTest extends TestCase
         UncheckedAcceptance::fromConfig([$entry]);
     }
 
+    public function testARefusedRepositoryNeverEchoesItsUserinfo(): void
+    {
+        try {
+            UncheckedAcceptance::fromConfig([['check' => 'advisories', 'repository' => 'https://deploy:s3cr3t@mirror.example', 'reason' => 'x']]);
+            self::fail('a URL with userinfo is accepted');
+        } catch (ConfigException $e) {
+            self::assertStringNotContainsString('s3cr3t', $e->getMessage());
+        }
+    }
+
+    public function testAValueWithATrailingNewlineIsRefused(): void
+    {
+        $this->expectException(ConfigException::class);
+
+        UncheckedAcceptance::fromConfig([['check' => 'repository_activity', 'host' => "codeberg.org\n", 'reason' => 'x']]);
+    }
+
     public function testAListThatIsNotAnArrayIsRefused(): void
     {
         $this->expectException(ConfigException::class);
