@@ -402,7 +402,11 @@ final class GitlabFormatterTest extends TestCase
     /** SPEC §6.2: one run-level issue, `major` only when `unchecked` fails on the advisories gap. */
     public function testTheRunLevelAdvisoriesIssueIsMajorOnlyWhenUncheckedFailsOnTheGap(): void
     {
-        $severity = fn (string $failOn, Report $report): ?string => array_column($this->decode($this->formatter($failOn, null)->format($report)), 'severity', 'check_name')['lockrot/advisories-not-checked'] ?? null;
+        $severity = function (string $failOn, Report $report): ?string {
+            $severity = array_column($this->decode($this->formatter($failOn, null)->format($report)), 'severity', 'check_name')['lockrot/advisories-not-checked'] ?? null;
+
+            return \is_string($severity) ? $severity : null;
+        };
 
         self::assertSame('major', $severity('unchecked', self::uncheckedReport()));
         self::assertSame('minor', $severity('high', self::uncheckedReport()));

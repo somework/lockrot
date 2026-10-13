@@ -107,21 +107,20 @@ final class BaselinedProjectTest extends TestCase
         $devKnown = false;
         foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
             self::assertIsArray($finding);
-            $status = $finding['baseline']['status'] ?? null;
-            $statuses[(string) $status] = true;
-            foreach ($finding['flags'] as $flag) {
-                $flagStates[(string) ($flag['baseline']['state'] ?? '')] = true;
+            $status = self::text($finding, ['baseline', 'status']);
+            $statuses[$status] = true;
+            foreach (JsonPath::arrayAt($finding, ['flags']) as $flag) {
+                $flagStates[\is_array($flag) ? self::text($flag, ['baseline', 'state']) : ''] = true;
             }
-            foreach ($finding['baseline']['worsened_by'] ?? [] as $worse) {
-                $why[(string) ($worse['why'] ?? '')] = true;
+            foreach (JsonPath::has($finding, ['baseline', 'worsened_by']) ? JsonPath::column($finding, ['baseline', 'worsened_by'], 'why') : [] as $reason) {
+                $why[\is_string($reason) ? $reason : ''] = true;
             }
-            $basis = $finding['gate']['basis'];
-            if (\is_array($basis)) {
-                $limitedBy[(string) $basis['limited_by']] = true;
+            if (JsonPath::has($finding, ['gate', 'basis', 'limited_by'])) {
+                $limitedBy[self::text($finding, ['gate', 'basis', 'limited_by'])] = true;
             }
-            $gate = $finding['gate'];
-            $gates[json_encode([$gate['reaches_fail_on'], $gate['fails'], $gate['exempt_by']])] = true;
-            $devKnown = $devKnown || ($finding['dev'] && $status === 'known');
+            $gate = JsonPath::arrayAt($finding, ['gate']);
+            $gates[(string) json_encode([$gate['reaches_fail_on'] ?? null, $gate['fails'] ?? null, $gate['exempt_by'] ?? null])] = true;
+            $devKnown = $devKnown || (JsonPath::boolAt($finding, ['dev']) && $status === 'known');
         }
 
         self::assertGreaterThan(0, $root['known']);
@@ -170,6 +169,15 @@ final class BaselinedProjectTest extends TestCase
     private static function settings(string $mode): RunSettings
     {
         return new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, new Thresholds(), null, false, $mode, true);
+    }
+
+    /**
+     * @param array<mixed, mixed> $data
+     * @param list<string>        $path
+     */
+    private static function text(array $data, array $path): string
+    {
+        return JsonPath::has($data, $path) ? JsonPath::stringAt($data, $path) : '';
     }
 
     /**

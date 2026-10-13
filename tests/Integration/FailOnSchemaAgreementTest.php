@@ -31,7 +31,7 @@ final class FailOnSchemaAgreementTest extends TestCase
     public function testTheBuilderListsTheValuesThatFailOnAllows(): void
     {
         self::assertSame(1, preg_match("/^FAIL_ON_VALUES = (\\[[^\\]]*\\])/m", (string) file_get_contents(self::BUILDER), $match));
-        $listed = json_decode(str_replace("'", '"', preg_replace('/\s+/', ' ', $match[1]) ?? ''), true);
+        $listed = json_decode(str_replace("'", '"', preg_replace('/\s+/', ' ', $match[1] ?? '') ?? ''), true);
 
         self::assertSame(FailOn::allowed(), $listed);
     }

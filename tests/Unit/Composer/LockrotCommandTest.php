@@ -1832,10 +1832,10 @@ final class LockrotCommandTest extends TestCase
         $dates = [];
         foreach (JsonPath::arrayAt($written, ['findings']) as $entry) {
             self::assertIsArray($entry);
-            $dates[] = $entry['first_seen'];
+            $dates[] = \is_string($entry['first_seen'] ?? null) ? $entry['first_seen'] : '';
             foreach (\is_array($entry['flags'] ?? null) ? $entry['flags'] : [] as $flag) {
                 self::assertIsArray($flag);
-                $dates[] = $flag['known_since'];
+                $dates[] = \is_string($flag['known_since'] ?? null) ? $flag['known_since'] : '';
             }
         }
         self::assertNotSame([], $dates);

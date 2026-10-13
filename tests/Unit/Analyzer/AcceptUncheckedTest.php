@@ -179,7 +179,8 @@ final class AcceptUncheckedTest extends TestCase
         $before = self::written($plain, 'high');
         $after = self::written($accepted, 'high');
         self::assertNotContains('S10', JsonPath::column($after, ['signals'], 'id'));
-        self::assertSame([$before['flags'], $before['score']['total'], $before['priority'], $before['gate']['fails']], [$after['flags'], $after['score']['total'], $after['priority'], $after['gate']['fails']]);
+        $facts = static fn (array $f): array => [JsonPath::arrayAt($f, ['flags']), JsonPath::intAt($f, ['score', 'total']), JsonPath::stringAt($f, ['priority']), JsonPath::boolAt($f, ['gate', 'fails'])];
+        self::assertSame($facts($before), $facts($after));
     }
 
     /**
@@ -189,7 +190,9 @@ final class AcceptUncheckedTest extends TestCase
     public function testARaisedS1DropsTheMaintenanceGapEvenWhenAnEntryAcceptsIt(): void
     {
         $fork = self::vcsFork([], [new AllowlistEntry('tobscure/json-api', null, 'replaced next sprint', null, AllowlistEntry::BY_PROJECT, ['abandoned'])]);
-        $fork['lock']['abandoned'] = true;
+        $lock = $fork['lock'];
+        self::assertIsArray($lock);
+        $fork['lock'] = ['abandoned' => true] + $lock;
         $finding = self::written($fork, 'unchecked');
 
         self::assertContains('S1', JsonPath::column($finding, ['signals'], 'id'));
@@ -201,7 +204,7 @@ final class AcceptUncheckedTest extends TestCase
      * The analyzer inputs of one package: the lock entry, its metadata or null, the advisory lookup's
      * gap or null, the `accept-unchecked` rows, the run's clock and the allowlist entries.
      *
-     * @phpstan-type Inputs array{lock: array<string, mixed>, meta: ?PackageMetadata, gap: ?string, accept: list<array<string, string>>, now: string, allowlist: list<AllowlistEntry>}
+     * @return array<string, mixed>
      */
     private static function codeberg(string $expires, string $now = self::NOW): array
     {
@@ -316,8 +319,10 @@ final class AcceptUncheckedTest extends TestCase
     {
         /** @var array<string, mixed> $lock */
         $lock = $inputs['lock'];
-        $name = (string) $lock['name'];
-        $clock = Clock::fixed((string) $inputs['now']);
+        self::assertIsString($lock['name']);
+        self::assertIsString($inputs['now']);
+        $name = $lock['name'];
+        $clock = Clock::fixed($inputs['now']);
         $auth = ForgeAuth::withTokens(new Tokens('t', null));
         $meta = $inputs['meta'];
         $github = 'https://api.github.com/repos/composer/ca-bundle';

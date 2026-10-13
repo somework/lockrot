@@ -27,8 +27,8 @@ final class BaselineSchemaTest extends TestCase
         foreach ($expect as $file => $field) {
             // The reader decodes to arrays, where `[]` and `{}` are one value: it reads an empty
             // findings list as the empty map. JsonSchemaConformanceTest refuses this fixture as published.
-            if ($file !== 'findings-array.json') {
-                yield (string) $file => [(string) $file, (string) $field];
+            if ($file !== 'findings-array.json' && \is_string($field)) {
+                yield (string) $file => [(string) $file, $field];
             }
         }
     }

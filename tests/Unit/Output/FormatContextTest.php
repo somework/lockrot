@@ -179,7 +179,15 @@ final class FormatContextTest extends TestCase
     public function testTheRecordSetHoldsEveryFindingThatTheGateCanFail(): void
     {
         $report = $this->report($this->finding('a/stale', Verdict::STALE), FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true), $this->finding('a/fine', Verdict::OK));
-        $names = static fn (array $findings): array => array_map(static fn (Finding $f): string => $f->package(), $findings);
+        $names = static function (array $findings): array {
+            $out = [];
+            foreach ($findings as $finding) {
+                self::assertInstanceOf(Finding::class, $finding);
+                $out[] = $finding->package();
+            }
+
+            return $out;
+        };
 
         self::assertSame(['a/stale', 'a/offline'], $names(FormatContext::create(null, 'unchecked')->recordFindings($report, false)));
         self::assertSame(['a/stale'], $names(FormatContext::create(null, 'high')->recordFindings($report, false)));

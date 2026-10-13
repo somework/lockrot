@@ -42,92 +42,61 @@ final class FindingRelationsTest extends TestCase
     }
 
     /**
-     * A change to the composite document, and the relation it breaks.
+     * A change to the composite document (a path and what the value at it becomes), and the
+     * relation it breaks.
      *
-     * @return iterable<string, array{callable(array<mixed, mixed>): array<mixed, mixed>, string}>
+     * @return iterable<string, array{list<int|string>, callable(mixed): mixed, string}>
      */
     public static function breaks(): iterable
     {
-        yield 'two not_applied entries merged into one (I34)' => [static function (array $d): array {
-            $d['gate']['not_applied'] = [['check' => 'advisories', 'packages' => 2, 'reason' => 'offline'], ['check' => 'advisories', 'packages' => 1, 'reason' => 'offline']];
-
-            return $d;
-        }, 'one entry per (check, reason)'];
-        yield 'a failing_by count off by one' => [static function (array $d): array {
-            ++$d['gate']['failing_by'][0]['failing'];
-
-            return $d;
-        }, 'gate.failing_by'];
-        yield 'failing_by without an entry for an active value' => [static function (array $d): array {
-            $d['gate']['failing_by'] = [];
-
-            return $d;
-        }, 'gate.failing_by'];
-        yield 'a note text that is not its detail' => [static function (array $d): array {
-            $d['notes'][] = 'an extra line';
-
-            return $d;
-        }, 'notes[i] is note_details[i].text'];
-        yield 'an ignored count that is not the list' => [static function (array $d): array {
-            ++$d['findings'][0]['security']['ignored_count'];
-
-            return $d;
-        }, 'security.ignored_count'];
-        yield 'a term contribution that does not add up' => [static function (array $d): array {
-            ++$d['findings'][0]['score']['terms'][0]['contribution'];
-
-            return $d;
-        }, 'score.exact'];
-        yield 'a gate.by value that is not active' => [static function (array $d): array {
-            $d['findings'][0]['gate']['by'][] = ['value' => 'stale', 'kind' => 'flag', 'facts' => [['kind' => 'signal', 'id' => 'S2']]];
-
-            return $d;
-        }, 'run.gates[] value'];
-        yield 'a flag listed twice' => [static function (array $d): array {
-            $d['findings'][0]['flags'][] = $d['findings'][0]['flags'][0];
-
-            return $d;
-        }, 'each flag once'];
-        yield 'S9 without a counted advisory' => [static function (array $d): array {
-            $d['findings'][0]['flags'] = array_values(array_filter($d['findings'][0]['flags'], static fn (array $flag): bool => $flag['id'] !== 'vulnerable'));
-
-            return $d;
-        }, 'S9 is present'];
-        yield 'the oldest cache read moved' => [static function (array $d): array {
-            $d['activity_cache_oldest_at'] = '2020-01-01T00:00:00+00:00';
-
-            return $d;
-        }, 'activity_cache_oldest_at'];
-        yield 'a score model that is not the run one' => [static function (array $d): array {
-            $d['findings'][0]['score']['model'] = 99;
-
-            return $d;
-        }, 'score.model'];
-        yield 'an ignored advisory that S9 counts' => [static function (array $d): array {
-            $id = $d['findings'][0]['score']['terms'][0]['advisory'];
-            $d['findings'][0]['security']['ignored'][] = ['id' => $id];
-            $d['findings'][0]['security']['ignored_count'] = \count($d['findings'][0]['security']['ignored']);
-
-            return $d;
-        }, 'disjoint from the S9 rows'];
+        $inc = static fn ($value): int => \is_int($value) ? $value + 1 : 1;
+        yield 'two not_applied entries for one reason (I34)' => [['gate', 'not_applied'], static fn (): array => [['check' => 'advisories', 'packages' => 2, 'reason' => 'offline'], ['check' => 'advisories', 'packages' => 1, 'reason' => 'offline']], 'one entry per (check, reason)'];
+        yield 'a failing_by count off by one' => [['gate', 'failing_by', 0, 'failing'], $inc, 'gate.failing_by'];
+        yield 'failing_by without an entry for an active value' => [['gate', 'failing_by'], static fn (): array => [], 'gate.failing_by'];
+        yield 'a note text that is not its detail' => [['notes'], static fn ($notes): array => array_merge(\is_array($notes) ? $notes : [], ['an extra line']), 'notes[i] is note_details[i].text'];
+        yield 'an ignored count that is not the list' => [['findings', 0, 'security', 'ignored_count'], $inc, 'security.ignored_count'];
+        yield 'a term contribution that does not add up' => [['findings', 0, 'score', 'terms', 0, 'contribution'], $inc, 'score.exact'];
+        yield 'a gate.by value that is not active' => [['findings', 0, 'gate', 'by'], static fn ($by): array => array_merge(\is_array($by) ? $by : [], [['value' => 'stale', 'kind' => 'flag', 'facts' => [['kind' => 'signal', 'id' => 'S2']]]]), 'run.gates[] value'];
+        yield 'a flag listed twice' => [['findings', 0, 'flags'], static fn ($flags): array => \is_array($flags) ? array_merge($flags, [$flags[0]]) : [], 'each flag once'];
+        yield 'S9 without a counted advisory' => [['findings', 0, 'flags'], static fn ($flags): array => array_values(array_filter(\is_array($flags) ? $flags : [], static fn ($flag): bool => !\is_array($flag) || $flag['id'] !== 'vulnerable')), 'S9 is present'];
+        yield 'the oldest cache read moved' => [['activity_cache_oldest_at'], static fn (): string => '2020-01-01T00:00:00+00:00', 'activity_cache_oldest_at'];
+        yield 'a score model that is not the run one' => [['findings', 0, 'score', 'model'], static fn (): int => 99, 'score.model'];
+        yield 'an ignored advisory that S9 counts' => [['findings', 0, 'security', 'ignored'], static fn (): array => [['id' => 'PKSA-h8hf-ytnd-5t9q']], 'disjoint from the S9 rows'];
     }
 
     /**
      * Each relation can fail: a change to a valid document breaks it.
      *
-     * @param callable(array<mixed, mixed>): array<mixed, mixed> $change
+     * @param list<int|string>      $path
+     * @param callable(mixed): mixed $change
      *
      * @dataProvider breaks
      */
     #[DataProvider('breaks')]
-    public function testEachRelationCatchesTheChangeThatBreaksIt(callable $change, string $relation): void
+    public function testEachRelationCatchesTheChangeThatBreaksIt(array $path, callable $change, string $relation): void
     {
         $composite = self::read(self::DOCUMENTS.'cases/composite.json');
         self::assertSame([], FindingRelations::violations($composite));
 
-        $violations = FindingRelations::violations($change($composite));
+        $violations = FindingRelations::violations(self::edit($composite, $path, $change));
 
         self::assertNotSame([], array_filter($violations, static fn (string $v): bool => strpos($v, $relation) !== false), implode("\n", $violations));
+    }
+
+    /**
+     * @param array<mixed, mixed>    $node
+     * @param list<int|string>       $path
+     * @param callable(mixed): mixed $change
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function edit(array $node, array $path, callable $change): array
+    {
+        $key = array_shift($path);
+        self::assertNotNull($key);
+        $node[$key] = $path === [] ? $change($node[$key] ?? null) : self::edit(\is_array($node[$key] ?? null) ? $node[$key] : [], $path, $change);
+
+        return $node;
     }
 
     /**
@@ -137,10 +106,10 @@ final class FindingRelationsTest extends TestCase
     public function testAMergedNotAppliedEntryBreaksTheRootCheck(): void
     {
         $mixed = self::read(self::DOCUMENTS.'coverage/variants/not-applied-mixed.json.gz');
-        self::assertSame([['check' => 'advisories', 'packages' => 2, 'reason' => 'no_feed'], ['check' => 'advisories', 'packages' => 1, 'reason' => 'not_from_composer_repository']], $mixed['gate']['not_applied']);
+        self::assertSame([['check' => 'advisories', 'packages' => 2, 'reason' => 'no_feed'], ['check' => 'advisories', 'packages' => 1, 'reason' => 'not_from_composer_repository']], JsonPath::arrayAt($mixed, ['gate', 'not_applied']));
         self::assertSame([], FindingRelations::violations($mixed));
 
-        $mixed['gate']['not_applied'] = [['check' => 'advisories', 'packages' => 3, 'reason' => 'no_feed']];
+        $mixed = self::edit($mixed, ['gate', 'not_applied'], static fn (): array => [['check' => 'advisories', 'packages' => 3, 'reason' => 'no_feed']]);
 
         self::assertContains('gate.not_applied: an entry counts the findings with its reason (I34)', FindingRelations::violations($mixed));
     }

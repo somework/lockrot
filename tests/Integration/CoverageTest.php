@@ -254,7 +254,7 @@ final class CoverageTest extends TestCase
     private static function resolve(\stdClass $root, $node, string $pointer): array
     {
         for ($hops = 0; $node instanceof \stdClass && isset($node->{'$ref'}) && $hops < 64; ++$hops) {
-            $segments = explode('/', (string) $node->{'$ref'});
+            $segments = explode('/', \is_string($node->{'$ref'}) ? $node->{'$ref'} : '');
             $name = end($segments);
             $node = $root->definitions->{$name};
             $pointer = self::D.$name;
@@ -269,8 +269,15 @@ final class CoverageTest extends TestCase
         $out = [];
         foreach (['enum', 'x-known-values'] as $keyword) {
             $values = $node->{$keyword} ?? null;
-            if (\is_array($values) && $values !== [] && array_filter($values, static fn ($v): bool => !\is_string($v) && !\is_int($v)) === []) {
-                $out[$keyword] = $values;
+            $listed = [];
+            foreach (\is_array($values) ? $values : [] as $value) {
+                if (!\is_string($value) && !\is_int($value)) {
+                    continue 2;
+                }
+                $listed[] = $value;
+            }
+            if ($listed !== []) {
+                $out[$keyword] = $listed;
             }
         }
 
