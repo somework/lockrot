@@ -30,7 +30,7 @@ final class MarkdownFormatter implements FormatterInterface
     {
         $baseline = $report->baseline();
         $gate = $this->context->gateOf($report);
-        $rows = $showAll ? $report->findings() : $report->flagged();
+        $rows = $this->context->recordFindings($report, $showAll);
 
         $lines = [$this->heading($report)];
         if ($baseline !== null) {

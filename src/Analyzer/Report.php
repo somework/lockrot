@@ -120,7 +120,7 @@ final class Report
 
     /**
      * Returns a copy, like {@see self::withBaseline()}. With a grade value active, the copy notes
-     * each finding that reached it under 0.13's rules and no longer does (`verdict_rules_changed`).
+     * each finding that reached it under 0.13's rules and does not under 0.14's (`verdict_rules_changed`).
      */
     public function withRun(RunSettings $run): self
     {

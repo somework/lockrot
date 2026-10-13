@@ -7,7 +7,7 @@ namespace Lockrot\Analyzer;
 use Lockrot\Legacy\PriorityBasis013;
 
 /**
- * A finding that reached a grade value under the rules of 0.13 and no longer does: one entry of
+ * A finding that reached a grade value under the rules of 0.13 and does not under 0.14's: one entry of
  * the `verdict_rules_changed` note's `findings`.
  *
  * @internal

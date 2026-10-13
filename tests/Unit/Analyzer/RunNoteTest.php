@@ -245,7 +245,7 @@ final class RunNoteTest extends TestCase
         yield 'an ignore[] entry beside counted advisories' => [
             static fn (): RunNote => RunNote::ignoreDoesNotCoverAdvisories([new UncoveredAdvisories('symfony/yaml', 'symfony/*', ['A1', 'A2', 'A3'])]),
             'ignore_does_not_cover_advisories',
-            "extra.lockrot.ignore[] no longer hides advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision",
+            "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision",
             false,
             ['entries' => [['package' => 'symfony/yaml', 'pattern' => 'symfony/*', 'advisories' => ['A1', 'A2', 'A3']]]],
         ];

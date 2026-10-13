@@ -410,13 +410,13 @@ final class RunNote
 
     /** Why 0.13 moved a priority, as the `verdict_rules_changed` sentence words each step reason. */
     private const LEGACY_STEP_WORDS = [
-        'no_fix_expected' => '0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity',
+        'no_fix_expected' => '0.13 raised each one for any advisory not fixed on its branch; in 0.14 an advisory adds its own severity',
         'transitive' => '0.13 lowered a transitive package one step; model 1 halves its maintenance',
         'dev' => '0.13 lowered a packages-dev package one step; model 1 halves its whole score',
     ];
 
     /**
-     * The findings that reached a grade value under the rules of 0.13 and no longer do. The sentence
+     * The findings that reached a grade value under the rules of 0.13 and do not reach it under 0.14's. The sentence
      * quotes each `score_text` from the note's own data.
      *
      * @param list<ChangedVerdict> $findings by package, then version
@@ -427,7 +427,7 @@ final class RunNote
             throw new \InvalidArgumentException('A note about changed verdict rules names at least one finding.');
         }
         $count = \count($findings);
-        $text = \sprintf("%d %s --fail-on=%s under 0.13's rules and no longer %s: ", $count, $count === 1 ? 'finding reached' : 'findings reached', $failOn, $count === 1 ? 'does' : 'do')
+        $text = \sprintf("%d %s --fail-on=%s under 0.13's rules and %s not reach it under 0.14's: ", $count, $count === 1 ? 'finding reached' : 'findings reached', $failOn, $count === 1 ? 'does' : 'do')
             .implode(', ', array_map(static fn (ChangedVerdict $f): string => \sprintf('%s %s (%s)', $f->package(), $f->version(), $f->scoreText()), $findings)).'.';
         $reasons = [];
         foreach ($findings as $finding) {
@@ -481,7 +481,7 @@ final class RunNote
             $items[] = $entry->package().($entry->pattern() !== $entry->package() ? ' (ignore[] '.$entry->pattern().')' : '').\sprintf(': %d counted %s', $count, $count === 1 ? 'advisory' : 'advisories');
         }
 
-        return self::of(self::IGNORE_DOES_NOT_COVER_ADVISORIES, "extra.lockrot.ignore[] no longer hides advisories: ".implode('; ', $items)."; accept them in Composer's audit policy if that is the decision", false, ['entries' => $entries]);
+        return self::of(self::IGNORE_DOES_NOT_COVER_ADVISORIES, "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: ".implode('; ', $items)."; accept them in Composer's audit policy if that is the decision", false, ['entries' => $entries]);
     }
 
     /**

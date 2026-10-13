@@ -33,8 +33,9 @@ final class PackageMetadata
      * The `replace` constraint of a subtree split: the component's `vX.Y.Z` is the monorepo's own.
      * Composer resolves it to an exact version, so only the written form tells it from a range.
      */
-    private ?string $composerRepositoryUrl = null;
     private const SELF_VERSION = 'self.version';
+
+    private ?string $composerRepositoryUrl = null;
 
     private string $name;
     private bool $abandoned;

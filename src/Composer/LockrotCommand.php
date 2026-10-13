@@ -400,7 +400,7 @@ final class LockrotCommand extends BaseCommand
                 'lockrot: the advisory lookup did not complete, so the baseline keeps the recorded advisories of %d %s: %s',
                 \count($carried),
                 \count($carried) === 1 ? 'package' : 'packages',
-                implode(', ', $carried)
+                TerminalText::neutralise(implode(', ', $carried))
             ));
         }
         $this->writeError($output, \sprintf(
