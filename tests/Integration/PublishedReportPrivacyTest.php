@@ -36,6 +36,7 @@ use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
+use Lockrot\Tests\Support\PhpBuiltinServer;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
 use Lockrot\Verdict\VerdictEngine;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -76,7 +77,7 @@ final class PublishedReportPrivacyTest extends TestCase
 
     public function testNoFormatAndNoExplanationCarriesACredentialOrAPathOfTheMachine(): void
     {
-        $port = self::closedPort();
+        $port = PhpBuiltinServer::closedPort();
         $urls = [
             'http://ci-user-x9:s3cr3t-x9@127.0.0.1:'.$port.'/sub?token=t0k3n-x9',
             'http://glpat-x9secretsecret@127.0.0.1:'.$port.'/other',
@@ -187,16 +188,5 @@ final class PublishedReportPrivacyTest extends TestCase
         $config->merge(['config' => ['cache-dir' => $this->dir.'/cache', 'secure-http' => false], 'repositories' => ['packagist.org' => false] + $repositories]);
 
         return array_values(RepositoryFactory::defaultRepos($io, $config, RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config))));
-    }
-
-    /** A port nothing listens on, so Composer's own "could not connect" is what the notes quote. */
-    private static function closedPort(): int
-    {
-        $socket = stream_socket_server('tcp://127.0.0.1:0');
-        self::assertNotFalse($socket);
-        $name = (string) stream_socket_get_name($socket, false);
-        fclose($socket);
-
-        return (int) substr($name, (int) strrpos($name, ':') + 1);
     }
 }
