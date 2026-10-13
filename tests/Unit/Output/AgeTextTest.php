@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\LibyearsMeasurement;
 use Lockrot\Data\Forge\ActivityLookup;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\RepositoryActivity;
 use Lockrot\Output\AgeText;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\AgeReading;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\Age;
 use Lockrot\Verdict\Finding;
@@ -24,6 +26,18 @@ final class AgeTextTest extends TestCase
         self::assertSame('less than three weeks ago', AgeText::ago(0.0));
         self::assertSame('0.1 years ago', AgeText::ago(0.1));
         self::assertSame('10.0 years ago', AgeText::ago(10.0));
+    }
+
+    /** SPEC-0.14.md §7.11: the line renders the published `libyears` (two decimals), never the unrounded measure. */
+    public function testTheExplainLibyearsLineRendersThePublishedValue(): void
+    {
+        $finding = (new FindingBuilder())->withLibyears(LibyearsMeasurement::of(6.845))->build();
+        $lines = AgeText::block($finding, new Thresholds());
+
+        self::assertSame(6.85, $finding->libyearsRounded());
+        self::assertSame('libyears 6.9 behind the newest stable release', $lines[\count($lines) - 1]);
+        $atLeast = AgeText::block((new FindingBuilder())->withLibyears(LibyearsMeasurement::atLeast(2.0))->build(), new Thresholds());
+        self::assertSame('libyears at least 2.0 behind the newest stable release', $atLeast[\count($atLeast) - 1]);
     }
 
     public function testTheBranchIsTheReleaseBranchOrTheAliasLineOrItsBranch(): void

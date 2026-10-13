@@ -1142,6 +1142,30 @@ final class JsonSchemaConformanceTest extends TestCase
         }
     }
 
+    /**
+     * The recorded contract bundle (tools/report/record) and the real baselined scenarios: every
+     * document lockrot-report vendors, against its published schema and its strict twin.
+     */
+    public function testEveryRecordedContractDocumentValidatesAgainstItsSchemaAndItsStrictTwin(): void
+    {
+        $documents = [Schemas::REPORT => ['contract/report-2/*.json', 'baselined/*/check/report.json', 'baselined/*/check/gates-*.json', 'baselined/*/check/target-*.json', 'baselined/*/regenerate/report.json', 'baselined/*/t0/report.json'],
+            Schemas::EXPLAIN => ['contract/explain-2/*.json', 'baselined/*/check/explain/*.json'],
+            Schemas::BASELINE => ['contract/baseline-2/*.json', 'baselined/*/lockrot-baseline.json', 'baselined/*/regenerate/lockrot-baseline.json']];
+        $checked = 0;
+        foreach ($documents as $document => $patterns) {
+            foreach ($patterns as $pattern) {
+                foreach (glob(self::FIXTURES.$pattern) ?: [] as $file) {
+                    $json = (string) file_get_contents($file);
+                    $this->assertValid($document, $json, $file);
+                    $this->assertValid($document, $json, $file, true);
+                    ++$checked;
+                }
+            }
+        }
+
+        self::assertGreaterThan(100, $checked, 'record the bundle with tools/report/record');
+    }
+
     /** @return iterable<string, array{string, int, string}> every ```json block in docs/, with the schema and number it must match */
     public static function docSamples(): iterable
     {

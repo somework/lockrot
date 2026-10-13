@@ -651,14 +651,6 @@ final class MoveContractTest extends TestCase
             $holders[] = $holder;
         }
         $move['held_by'] = $holders;
-        foreach (['clears', 'unverified', 'leaves', 'adds'] as $list) {
-            $keys = [];
-            foreach (JsonPath::arrayAt($move, [$list]) as $fact) {
-                $keys[] = (string) json_encode($fact);
-            }
-            sort($keys);
-            $move[$list] = $keys;
-        }
         if (\array_key_exists('also', $move)) {
             $also = [];
             foreach (JsonPath::arrayAt($move, ['also']) as $each) {

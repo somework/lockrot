@@ -12592,6 +12592,7 @@
           "description": "The join of the counted flags' `flags[].summary` (a flag counts when a `score.terms[].flag` names it) as `<id>: <summary>` in flag order; kept for jq. Empty exactly on the score-0 shape (no flag counts). Prose, not contract; key on the fields it is rendered from.",
           "type": "string",
           "x-rendered-from": [
+            "flags[].id",
             "flags[].summary",
             "score.terms[].flag"
           ]

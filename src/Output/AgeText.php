@@ -99,11 +99,12 @@ final class AgeText
             }
             $lines[] = rtrim($head.$reading->measuredAt()->format('Y-m-d').'   '.str_pad(self::ago((float) $reading->years()), 30).implode('; ', $words));
         }
-        $libyears = $finding->libyears();
+        // The published two-decimal value, rounded half up: a reader of the JSON renders the same line.
+        $libyears = $finding->libyearsRounded();
         $unmeasured = $finding->libyearsUnmeasured();
         $lines[] = $libyears === null
             ? 'libyears not measured: '.CauseWords::of((string) $unmeasured)
-            : \sprintf('libyears %s%.1F behind the newest stable release', $finding->isLibyearsAtLeast() ? 'at least ' : '', $libyears);
+            : 'libyears '.($finding->isLibyearsAtLeast() ? 'at least ' : '').number_format($libyears, 1, '.', '').' behind the newest stable release';
 
         return $lines;
     }

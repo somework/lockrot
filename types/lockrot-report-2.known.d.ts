@@ -92,7 +92,7 @@ export type ReplacementNamedBy = "repository" | "lock" | (string & {});
 /** open set at #/definitions/throughEntry/properties/newest_requires_unmeasured/oneOf/0 */
 export type ThroughEntryNewestRequiresUnmeasured = "not_from_composer_repository" | "releases_unknown" | "installed_unlisted" | "through_other_package" | "no_stable_release" | (string & {});
 /** open set at #/definitions/move/properties/reason/oneOf/0 */
-export type MoveReason = "package_quiet" | "no_higher_release" | "higher_undated" | "releases_unknown" | "metadata_not_read" | "local_package" | (string & {});
+export type MoveReason = "package_quiet" | "no_higher_release" | "higher_undated" | "releases_unknown" | "affected_range_unknown" | "metadata_not_read" | "local_package" | (string & {});
 /** closed set at #/definitions/move/properties/composer_moves_because/items */
 export type MoveComposerMovesBecauseItem = "holders" | "crosses_major" | "transitive" | "unreached";
 /** open set at #/definitions/ignoredAdvisory/properties/by */

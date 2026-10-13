@@ -668,6 +668,7 @@
    "no_higher_release",
    "higher_undated",
    "releases_unknown",
+   "affected_range_unknown",
    "metadata_not_read",
    "local_package"
   ],
