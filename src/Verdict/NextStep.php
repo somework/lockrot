@@ -163,7 +163,7 @@ final class NextStep
         $flags = array_map(static fn ($term): string => $term->flag(), $finding->score()->maintenanceTerms());
         [$clears, $unverified] = MoveBuilder::clearsFor($installed, $partial->release(), $flags, [], $context);
         $settled = array_map(static fn (MoveFact $fact): string => $fact->id(), $clears);
-        foreach ($partial->clears() as $id) {
+        foreach (array_intersect($context->advisoryIds(), $partial->clears()) as $id) {
             $clears[] = MoveFact::on(MoveFact::ADVISORY, $id, MoveFact::OUTSIDE_RANGE);
         }
         $score = $finding->score();

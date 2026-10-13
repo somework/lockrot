@@ -328,6 +328,26 @@ final class MoveTest extends TestCase
         self::assertSame('no move: no advisory names the versions it affects, so lockrot names no fix', $move['text']);
     }
 
+    /** The feed gives the high advisory first. S9 puts the critical one first, and so does every fact list. */
+    public function testAnUpdateAndItsGetsListTheAdvisoriesInS9OrderWhateverTheFeedOrder(): void
+    {
+        $finding = self::analyse(['advisories' => [self::advisory('PKSA-a', 'high', '<1.9.0'), self::advisory('PKSA-b', 'critical', '<1.9.0')]]);
+
+        self::assertSame('update', JsonPath::stringAt($finding, ['next_step', 'kind']));
+        self::assertSame(['PKSA-b', 'PKSA-a'], array_column(JsonPath::arrayAt($finding, ['next_step', 'clears']), 'id'));
+        self::assertSame(['PKSA-b', 'PKSA-a'], array_column(JsonPath::arrayAt($finding, ['security', 'gets', 'clears']), 'id'));
+    }
+
+    /** S9 puts the unfixed critical advisory first, then the high one, then the medium one. */
+    public function testAPartialFixListsTheAdvisoriesItClearsInS9OrderWhateverTheFeedOrder(): void
+    {
+        $finding = self::analyse(['advisories' => [self::advisory('PKSA-a', 'medium', '<1.9.0'), self::advisory('PKSA-b', 'high', '<1.9.0'), self::advisory('PKSA-c', 'critical', '>=1.0.0')]]);
+        $cleared = [['kind' => 'advisory', 'id' => 'PKSA-b', 'basis' => 'outside_range'], ['kind' => 'advisory', 'id' => 'PKSA-a', 'basis' => 'outside_range']];
+
+        self::assertSame(['1.9.0', $cleared], [JsonPath::stringAt($finding, ['security', 'partial', 'version']), JsonPath::arrayAt($finding, ['security', 'partial', 'clears'])]);
+        self::assertSame($cleared, JsonPath::arrayAt($finding, ['security', 'gets', 'clears']));
+    }
+
     public function testAnAdvisoryOnAVcsPackageNamesNoMoveBecauseItsReleasesWereNotRead(): void
     {
         $move = JsonPath::arrayAt(self::analyse(['releases' => null, 'lock' => [['origin' => 'vcs']], 'advisories' => [self::ADVISORY]]), ['next_step']);
