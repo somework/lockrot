@@ -1,0 +1,4 @@
+::warning file=composer.lock,title=lockrot%3A stale (low)::league/config v1.2.0: last release 2022-12-11 (3.8 years ago) (via laravel/framework > league/commonmark, also via laravel/tinker)
+::warning title=lockrot::advisories not checked: the gate could not read the advisories of every package
+pulled in by: laravel/framework 1 · laravel/tinker 1
+76 packages checked · abandoned 0 · silent 0 · pinned 0 · left-behind 0 · old-promise 0 · stale 1 · unknown 0 · finished 19 · ok 56

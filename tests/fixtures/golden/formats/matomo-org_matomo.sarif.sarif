@@ -1,0 +1,403 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.13.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/abandoned",
+                            "name": "abandoned",
+                            "shortDescription": {
+                                "text": "abandoned: Package is marked abandoned by its repository, or its repository is archived"
+                            },
+                            "fullDescription": {
+                                "text": "The package's Composer repository marks it abandoned (Packagist by default), or its repository is archived on GitHub or GitLab."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/silent",
+                            "name": "silent",
+                            "shortDescription": {
+                                "text": "silent: No stable release and no repository push for a long time"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release for at least release-high-years (default 5 years) and no repository push for at least push-high-years (default 5 years); an archived repository is reported as abandoned instead."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/pinned",
+                            "name": "pinned",
+                            "shortDescription": {
+                                "text": "pinned: Installed version is a branch snapshot, or the package has no stable release"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "Old release or old push, but not old enough \u2014 or not on both fronts \u2014 for silent."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/advisories-not-checked",
+                            "name": "advisories-not-checked",
+                            "shortDescription": {
+                                "text": "advisories-not-checked: The advisories of some packages were not checked"
+                            },
+                            "fullDescription": {
+                                "text": "The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "lox/xhprof dev-master: marked abandoned by its repository; repository archived on GitHub; last push 2022-07-25 (4.1 years ago); released 2015-08-31 for PHP 5 (php \">=5.2.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; pinned to branch snapshot dev-master"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "lox/xhprof"
+                    },
+                    "properties": {
+                        "package": "lox/xhprof",
+                        "version": "dev-master",
+                        "verdict": "abandoned",
+                        "priority": "critical",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S1",
+                            "S3",
+                            "S4",
+                            "S5",
+                            "S6"
+                        ],
+                        "chain": [
+                            "lox/xhprof"
+                        ],
+                        "direct_dependents": [
+                            "lox/xhprof"
+                        ],
+                        "data_date": "2026-09-14T18:52:44+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "mustangostang/spyc 0.6.3: last release 2019-09-10 (7.0 years ago); last push 2020-03-16 (6.5 years ago); released 2019-09-10 for PHP 5 (php \">=5.3.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "mustangostang/spyc"
+                    },
+                    "properties": {
+                        "package": "mustangostang/spyc",
+                        "version": "0.6.3",
+                        "verdict": "silent",
+                        "priority": "critical",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4",
+                            "S5"
+                        ],
+                        "chain": [
+                            "mustangostang/spyc"
+                        ],
+                        "direct_dependents": [
+                            "matomo/device-detector",
+                            "mustangostang/spyc"
+                        ],
+                        "data_date": "2026-09-14T18:52:59+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/silent",
+                    "ruleIndex": 1,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "pear/console_getopt v1.4.3: last release 2019-11-20 (6.8 years ago); last push 2021-08-11 (5.1 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "pear/console_getopt"
+                    },
+                    "properties": {
+                        "package": "pear/console_getopt",
+                        "version": "v1.4.3",
+                        "verdict": "silent",
+                        "priority": "high",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "matomo/decompress",
+                            "pear/archive_tar",
+                            "pear/pear-core-minimal",
+                            "pear/console_getopt"
+                        ],
+                        "direct_dependents": [
+                            "matomo/decompress"
+                        ],
+                        "data_date": "2026-09-14T18:52:11+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 2,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "matomo/referrer-spam-list dev-master: pinned to branch snapshot dev-master"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "matomo/referrer-spam-list"
+                    },
+                    "properties": {
+                        "package": "matomo/referrer-spam-list",
+                        "version": "dev-master",
+                        "verdict": "pinned",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S6"
+                        ],
+                        "chain": [
+                            "matomo/referrer-spam-list"
+                        ],
+                        "direct_dependents": [
+                            "matomo/referrer-spam-list"
+                        ],
+                        "data_date": "2026-09-14T18:52:54+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 2,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "matomo/searchengine-and-social-list dev-master: pinned to branch snapshot dev-master; last release 2023-01-20 (3.6 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "matomo/searchengine-and-social-list"
+                    },
+                    "properties": {
+                        "package": "matomo/searchengine-and-social-list",
+                        "version": "dev-master",
+                        "verdict": "pinned",
+                        "priority": "high",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S6"
+                        ],
+                        "chain": [
+                            "matomo/searchengine-and-social-list"
+                        ],
+                        "direct_dependents": [
+                            "matomo/searchengine-and-social-list"
+                        ],
+                        "data_date": "2026-09-14T18:52:56+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 50.0,
+                    "message": {
+                        "text": "pear/pear_exception v1.0.2: last release 2021-03-21 (5.5 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "pear/pear_exception"
+                    },
+                    "properties": {
+                        "package": "pear/pear_exception",
+                        "version": "v1.0.2",
+                        "verdict": "stale",
+                        "priority": "medium",
+                        "direct": true,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "pear/pear_exception"
+                        ],
+                        "direct_dependents": [
+                            "matomo/decompress",
+                            "pear/pear_exception"
+                        ],
+                        "data_date": "2026-09-14T18:52:13+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "matomo/doctrine-cache-fork 1.10.4: last release 2021-09-13 (5.0 years ago); last push 2021-09-13 (5.0 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "matomo/doctrine-cache-fork"
+                    },
+                    "properties": {
+                        "package": "matomo/doctrine-cache-fork",
+                        "version": "1.10.4",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2",
+                            "S4"
+                        ],
+                        "chain": [
+                            "matomo/cache",
+                            "matomo/doctrine-cache-fork"
+                        ],
+                        "direct_dependents": [
+                            "matomo/cache"
+                        ],
+                        "data_date": "2026-09-14T18:52:49+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/advisories-not-checked",
+                    "ruleIndex": 4,
+                    "level": "warning",
+                    "message": {
+                        "text": "advisories not checked: the gate could not read the advisories of every package"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/run": "advisories-not-checked"
+                    }
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true
+                }
+            ]
+        }
+    ]
+}

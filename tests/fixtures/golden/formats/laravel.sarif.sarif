@@ -1,0 +1,115 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.13.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "Old release or old push, but not old enough \u2014 or not on both fronts \u2014 for silent."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        },
+                        {
+                            "id": "lockrot/advisories-not-checked",
+                            "name": "advisories-not-checked",
+                            "shortDescription": {
+                                "text": "advisories-not-checked: The advisories of some packages were not checked"
+                            },
+                            "fullDescription": {
+                                "text": "The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap."
+                            },
+                            "defaultConfiguration": {
+                                "level": "note"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/"
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "results": [
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 0,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "league/config v1.2.0: last release 2022-12-11 (3.8 years ago)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/package": "league/config"
+                    },
+                    "properties": {
+                        "package": "league/config",
+                        "version": "v1.2.0",
+                        "verdict": "stale",
+                        "priority": "low",
+                        "direct": false,
+                        "dev": false,
+                        "signals": [
+                            "S2"
+                        ],
+                        "chain": [
+                            "laravel/framework",
+                            "league/commonmark",
+                            "league/config"
+                        ],
+                        "direct_dependents": [
+                            "laravel/framework",
+                            "laravel/tinker"
+                        ],
+                        "data_date": "2026-09-14T18:53:21+00:00"
+                    }
+                },
+                {
+                    "ruleId": "lockrot/advisories-not-checked",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "message": {
+                        "text": "advisories not checked: the gate could not read the advisories of every package"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock"
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "lockrot/run": "advisories-not-checked"
+                    }
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true
+                }
+            ]
+        }
+    ]
+}
