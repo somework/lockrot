@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Verdict;
 
+use Lockrot\Analyzer\AdvisoryLookup;
 use Lockrot\Analyzer\Libyears;
 use Lockrot\Analyzer\RunNote;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Config\Gate;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Json\KnownValues;
@@ -105,7 +107,7 @@ final class ClosedSetsTest extends TestCase
     public function testTheFlaggedVerdictsAreTheFirstSix(): void
     {
         self::assertSame(self::FLAGGED, array_values(array_filter(Verdict::all(), [Verdict::class, 'flagged'])));
-        self::assertSame(['critical', 'high', 'medium', 'low'], (new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray()['graded_verdicts'], "report-2's run names the grades");
+        self::assertSame(['critical', 'high', 'medium', 'low'], (new RunSettings(null, null, null, RunSettings::SOURCE_RUNTIME, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray(null, null, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['graded_verdicts'], "report-2's run names the grades");
     }
 
     public function testThePrioritiesAreFrozenInTheirOrder(): void

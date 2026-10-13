@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Analyzer;
 
+use Lockrot\Analyzer\AdvisoryLookup;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Config\LockrotConfig;
+use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -69,7 +71,7 @@ final class RunSettingsTest extends TestCase
     {
         $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::fromString($failOn), RunSettings::SOURCE_OPTION, new Thresholds(), null, false, 'check');
 
-        self::assertSame($kinds, json_encode($run->toArray()['gates']));
+        self::assertSame($kinds, json_encode($run->toArray(null, null, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['gates']));
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -86,13 +88,13 @@ final class RunSettingsTest extends TestCase
         $run = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null, '^7.2 || ^8.0.0');
         $none = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null);
 
-        self::assertSame('7.2.0', $run->toArray()['project_php_lowest']);
-        self::assertNull($none->toArray()['project_php_lowest']);
+        self::assertSame('7.2.0', $run->toArray(null, null, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['project_php_lowest']);
+        self::assertNull($none->toArray(null, null, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['project_php_lowest']);
     }
 
     public function testTheRunKeysAreReport2sInOrder(): void
     {
-        $keys = array_keys((new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray(['counted' => 0]));
+        $keys = array_keys((new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray(['counted' => 0], null, AdvisoryLookup::of(AdvisoryCoverage::none(), [])));
 
         self::assertSame(['project', 'root_package', 'target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'lock_file', 'fail_on', 'fail_on_source', 'gates',
             'strict_network', 'mode', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts', 'signal_ids', 'fix_model', 'text_grammar', 'score_model', 'advisory_lookup', 'score_rules_used'], $keys);
@@ -116,8 +118,8 @@ final class RunSettingsTest extends TestCase
         $default = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null);
         $withDev = new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null, null, false, 'check', true);
 
-        self::assertFalse($default->toArray()['include_dev']);
-        self::assertTrue($withDev->toArray()['include_dev']);
-        self::assertFalse($withDev->toArray(null, false)['include_dev']);
+        self::assertFalse($default->toArray(null, null, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['include_dev']);
+        self::assertTrue($withDev->toArray(null, null, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['include_dev']);
+        self::assertFalse($withDev->toArray(null, false, AdvisoryLookup::of(AdvisoryCoverage::none(), []))['include_dev']);
     }
 }
