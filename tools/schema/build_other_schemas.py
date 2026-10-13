@@ -651,8 +651,8 @@ def explain_schema():
         'id': 'https://lockrot.dev/schema/explain-2.json',
         'title': 'lockrot explanation',
         'description': ('The document `composer lockrot --explain=vendor/package --format=json` prints (explain-2, lockrot 0.14): the finding exactly as '
-                        'report-2 carries it, everything it was read from, the run block every field of `run.score_model` refers to, and 0.13\'s '
-                        'reading of it (§7.7, §8.3). Every human string in it is a rendering of fields in the same object or in `run` (§7.11): '
+                        'report-2 carries it, everything it was read from, and the run block every field of `run.score_model` refers to '
+                        '(§7.7, §8.3). Every human string in it is a rendering of fields in the same object or in `run` (§7.11): '
                         'strings carry `x-rendered-from`, and no consumer parses them. Objects are open: a field added later validates against this '
                         'file unchanged; the number in the id changes only when a field is removed or renamed. Open sets carry a `pattern` and '
                         '`x-known-values`; closed sets are enums.'),
