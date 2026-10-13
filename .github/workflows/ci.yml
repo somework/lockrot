@@ -5,7 +5,9 @@ name: CI
 # because the ruleset waits for the new head's checks. On main, every push keeps its own run.
 # A full check pushes a PR's head unchanged to release/full-check-<sha>, for the whole-tree mutation
 # gate. The PR's own run has run every other job on that commit, so a full check runs only
-# mutation-coverage and mutation.
+# mutation-coverage and mutation. GitHub counts a skipped job as a passed check of its name on the
+# commit, so a job that a full check skips takes another name there: a required check keeps the
+# result of the PR's own run.
 on:
   push:
     branches: [main, 'release/**']
@@ -58,6 +60,7 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
+    name: ${{ startsWith(github.ref, 'refs/heads/release/full-check-') && 'quality (not run on a full check)' || 'quality' }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -235,6 +238,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
+    name: ${{ startsWith(github.ref, 'refs/heads/release/full-check-') && 'docs (not run on a full check)' || 'docs' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -257,6 +261,7 @@ jobs:
   corpus-selftest:
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
+    name: ${{ startsWith(github.ref, 'refs/heads/release/full-check-') && 'corpus-selftest (not run on a full check)' || 'corpus-selftest' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -269,6 +274,7 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
+    name: ${{ startsWith(github.ref, 'refs/heads/release/full-check-') && 'e2e (not run on a full check)' || 'e2e' }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -286,6 +292,7 @@ jobs:
   phar:
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
+    name: ${{ startsWith(github.ref, 'refs/heads/release/full-check-') && 'phar (not run on a full check)' || 'phar' }}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -324,6 +331,7 @@ jobs:
   phar-reproducible:
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.ref, 'refs/heads/release/full-check-') }}
+    name: ${{ startsWith(github.ref, 'refs/heads/release/full-check-') && 'phar-reproducible (not run on a full check)' || 'phar-reproducible' }}
     needs: phar
     steps:
       # The commit the first job built, spelled out: on a pull request the merge ref can be
