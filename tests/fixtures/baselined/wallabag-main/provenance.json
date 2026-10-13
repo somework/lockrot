@@ -11,5 +11,5 @@
  "before/composer.lock": "c303b807a03f9c2f1c69e8760cb4863b43ab2f48ce51bbd5aa3c29b79432cbe8",
  "before/composer.json": "14968e44c61e6af570fff8b0774da5d83853409544b109e88588d39602ab55e4",
  "lockrot-baseline.json": "written by BaselinedProjectTest (LOCKROT_REWRITE_GOLDEN=1)",
- "http": "p2, GitHub and advisory answers recorded by bin/record-fixtures tests/fixtures/baselined/wallabag-main/before"
+ "http": "p2, GitHub and advisory answers that bin/record-fixtures recorded for before/, kept in http/ so they move no other fixture"
 }

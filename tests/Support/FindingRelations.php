@@ -172,15 +172,15 @@ final class FindingRelations
         foreach ($findings as $finding) {
             $at = self::stringOrNull($finding, ['activity', 'cached_at']);
             if ($at !== null) {
-                $cached[] = (int) strtotime($at);
+                $cached[] = self::timestamp($at);
             }
         }
         $oldest = self::stringOrNull($document, ['activity_cache_oldest_at']);
-        if ($cached === [] ? $oldest !== null : ($oldest === null || strtotime($oldest) !== min($cached))) {
+        if ($cached === [] ? $oldest !== null : ($oldest === null || self::timestamp($oldest) !== min($cached))) {
             $out[] = 'activity_cache_oldest_at is the oldest findings[].activity.cached_at (A9)';
         }
         $hours = self::number($document, ['activity_cache_age_hours']);
-        $age = $oldest === null ? null : ((int) strtotime(JsonPath::stringAt($document, ['generated_at'])) - (int) strtotime($oldest)) / 3600;
+        $age = $oldest === null ? null : (self::timestamp(JsonPath::stringAt($document, ['generated_at'])) - self::timestamp($oldest)) / 3600;
         if (($hours === null) !== ($age === null) || ($hours !== null && $age !== null && abs($hours - $age) >= 0.1)) {
             $out[] = 'activity_cache_age_hours is the hours from activity_cache_oldest_at to generated_at, to one decimal (A9)';
         }
@@ -189,6 +189,12 @@ final class FindingRelations
         }
 
         return $out;
+    }
+
+    /** The instant a document wrote: never the real clock. */
+    private static function timestamp(string $at): int
+    {
+        return (new \DateTimeImmutable($at))->getTimestamp();
     }
 
     /**

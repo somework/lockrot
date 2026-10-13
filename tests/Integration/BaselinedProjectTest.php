@@ -53,6 +53,7 @@ final class BaselinedProjectTest extends TestCase
     private const BASELINE_1 = self::FIXTURES.'baselined/wallabag-main/lockrot-baseline-1.json';
     /** The baseline-2 file that the earlier lock writes on its own day. */
     private const BASELINE_2 = self::FIXTURES.'baselined/wallabag-main/lockrot-baseline.json';
+    private const HTTP = self::FIXTURES.'baselined/wallabag-main/http/';
     private const T0 = '2024-05-17T00:00:00+00:00';
     private const NOW = '2026-09-14T00:00:00+00:00';
 
@@ -76,10 +77,12 @@ final class BaselinedProjectTest extends TestCase
     #[RunInSeparateProcess]
     public function testTheLaterLockAgainstTheBaselineOfTheEarlierOne(): void
     {
-        $server = FixtureRepositoryServer::fromLockFiles([self::BEFORE.'/composer.lock', self::AFTER.'/composer.lock']);
+        // The earlier lock keeps its own answers, so they move no other fixture's results.
+        $server = FixtureRepositoryServer::fromLockFiles([self::BEFORE.'/composer.lock', self::AFTER.'/composer.lock'], self::FIXTURES.'http/p2', [], [['https://repo.packagist.org/p2/', self::HTTP.'p2']]);
         $server->start();
+        $github = self::githubAnswers();
         try {
-            $baseline = Baseline::fromReport(self::analyse($server, self::BEFORE, self::T0)->withRun(self::settings('generate_baseline')));
+            $baseline = Baseline::fromReport(self::analyse($server, $github, self::BEFORE, self::T0)->withRun(self::settings('generate_baseline')));
             $written = (string) json_encode(['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + $baseline->toArray(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n";
             if (getenv('LOCKROT_REWRITE_GOLDEN') === '1') {
                 file_put_contents(self::BASELINE_2, $written);
@@ -91,11 +94,13 @@ final class BaselinedProjectTest extends TestCase
                 $firstSeen[] = $entry === null ? null : $entry->firstSeen();
             }
             self::assertSame(['2024-05-17'], array_values(array_unique($firstSeen)), 'the baseline the project wrote that day');
-            $after = self::analyse($server, self::AFTER, self::NOW);
+            $after = self::analyse($server, $github, self::AFTER, self::NOW);
             $checked = self::checked($after, $baseline);
             $regenerated = self::checked($after, Baseline::fromReport($after->withRun(self::settings('generate_baseline')), $baseline));
         } finally {
             $server->stop();
+            array_map('unlink', glob($github.'/*') ?: []);
+            rmdir($github);
         }
         $document = JsonPath::decoded($checked->toArray());
         $root = JsonPath::arrayAt($document, ['baseline']);
@@ -139,13 +144,27 @@ final class BaselinedProjectTest extends TestCase
         self::assertFalse($regenerated->gate()->fails(), 'exit 0 after --generate-baseline');
     }
 
-    private static function analyse(FixtureRepositoryServer $server, string $dir, string $now): Report
+    /** The shared GitHub answers and the earlier lock's own, in one new temporary directory. */
+    private static function githubAnswers(): string
+    {
+        $dir = sys_get_temp_dir().'/lockrot-baselined-github-'.bin2hex(random_bytes(8));
+        self::assertTrue(mkdir($dir));
+        foreach ([self::FIXTURES.'http/github', self::HTTP.'github'] as $source) {
+            foreach (glob($source.'/*.json') ?: [] as $file) {
+                copy($file, $dir.'/'.basename($file));
+            }
+        }
+
+        return $dir;
+    }
+
+    private static function analyse(FixtureRepositoryServer $server, string $github, string $dir, string $now): Report
     {
         $clock = Clock::fixed($now);
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
         $analyzer = new Analyzer(
             new RepositoryMetadataLoader($server->repositories(), $clock),
-            new ActivityClient(new RecordedHttpClient(self::FIXTURES.'http/github'), $auth),
+            new ActivityClient(new RecordedHttpClient($github), $auth),
             new ActivityFetchPlanner($auth),
             new RepoLocator(),
             BuiltinAllowlist::load(),

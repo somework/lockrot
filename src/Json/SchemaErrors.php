@@ -85,7 +85,7 @@ final class SchemaErrors
         $id = spl_object_id($schema);
         if (!isset(self::$marked[$id])) {
             $descriptions = [];
-            $marked = self::mark(json_decode((string) json_encode($schema)), $descriptions);
+            $marked = self::mark($schema, $descriptions);
             self::$marked[$id] = [\is_object($marked) ? $marked : new \stdClass(), $descriptions];
         }
 
@@ -109,9 +109,12 @@ final class SchemaErrors
         if (!$node instanceof \stdClass) {
             return $node;
         }
+        // A copy: the schema object stays as the validator of the first pass reads it.
+        $copy = new \stdClass();
         foreach (get_object_vars($node) as $key => $child) {
-            $node->{$key} = self::mark($child, $descriptions);
+            $copy->{$key} = self::mark($child, $descriptions);
         }
+        $node = $copy;
         if (!\is_string($node->description ?? null) || (!isset($node->oneOf) && !isset($node->anyOf) && !isset($node->not))) {
             return $node;
         }
