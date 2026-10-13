@@ -1,0 +1,602 @@
+{
+    "$schema": "https://lockrot.dev/schema/baseline-2.json",
+    "lockrot": {
+        "version": "0.13.0",
+        "schema": 2
+    },
+    "generated_at": "2024-05-17T00:00:00+00:00",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "score_model_id": 1,
+    "fix_model": 1,
+    "findings": {
+        "behat/transliterator": {
+            "version": "v1.5.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "doctrine/annotations": {
+            "version": "2.0.1",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "doctrine/cache": {
+            "version": "2.2.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "endroid/qr-code": {
+            "version": "3.9.7",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "friendsofsymfony/oauth-server-bundle": {
+            "version": "dev-master",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "pinned": {
+                    "known_since": "2024-05-17"
+                },
+                "stale": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "friendsofsymfony/oauth2-php": {
+            "version": "1.3.1",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "stale": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "grandt/binstring": {
+            "version": "1.0.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "silent": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "grandt/phpresizegif": {
+            "version": "1.0.3",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "silent": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "grandt/phpzipmerge": {
+            "version": "1.0.4",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "silent": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "grandt/relativepath": {
+            "version": "1.0.2",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                },
+                "stale": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "guzzlehttp/guzzle": {
+            "version": "5.3.4",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "guzzlehttp/ringphp": {
+            "version": "1.1.1",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "guzzlehttp/streams": {
+            "version": "3.0.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/compiler": {
+            "version": "3.17.08.08",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/consistency": {
+            "version": "1.17.05.02",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/event": {
+            "version": "1.17.01.13",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/exception": {
+            "version": "1.17.01.16",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/file": {
+            "version": "1.17.07.11",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/iterator": {
+            "version": "2.17.01.10",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/math": {
+            "version": "1.17.05.16",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/protocol": {
+            "version": "1.17.01.14",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/regex": {
+            "version": "1.17.01.13",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/ruler": {
+            "version": "2.17.05.16",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/stream": {
+            "version": "1.17.02.21",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/ustring": {
+            "version": "4.17.01.16",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/visitor": {
+            "version": "2.17.01.16",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "hoa/zformat": {
+            "version": "1.17.01.10",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "j0k3r/httplug-ssrf-plugin": {
+            "version": "v2.0.2",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "javibravo/simpleue": {
+            "version": "2.1.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "silent": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "mgargano/simplehtmldom": {
+            "version": "1.5",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                },
+                "stale": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "mnapoli/piwik-twig-extension": {
+            "version": "3.0.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                },
+                "stale": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "php-http/guzzle5-adapter": {
+            "version": "2.0.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "php-http/message-factory": {
+            "version": "1.1.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "phpdocumentor/reflection-common": {
+            "version": "2.2.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "stale": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "phpunit/php-invoker": {
+            "version": "3.1.1",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "phpunit/php-text-template": {
+            "version": "2.0.4",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "phpunit/php-timer": {
+            "version": "5.0.3",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "phpzip/phpzip": {
+            "version": "2.0.8",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "silent": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "pragmarx/random": {
+            "version": "v0.2.2",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "silent": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "rulerz-php/doctrine-orm": {
+            "version": "dev-master",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "pinned": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                },
+                "stale": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "scheb/2fa-qr-code": {
+            "version": "v5.13.2",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "sebastian/code-unit": {
+            "version": "1.0.8",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "sebastian/code-unit-reverse-lookup": {
+            "version": "2.0.3",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "sebastian/object-enumerator": {
+            "version": "4.0.4",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "sebastian/object-reflector": {
+            "version": "2.0.4",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "sebastian/resource-operations": {
+            "version": "3.0.4",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "sebastian/version": {
+            "version": "3.0.2",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "sensio/framework-extra-bundle": {
+            "version": "v6.2.10",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "symfony/security-guard": {
+            "version": "v5.4.35",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "symfony/web-server-bundle": {
+            "version": "v4.4.44",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "thecodingmachine/safe": {
+            "version": "v1.3.3",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "true/punycode": {
+            "version": "v2.1.1",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "abandoned": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "wallabag/rulerz": {
+            "version": "dev-master",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "pinned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "wallabag/rulerz-bridge": {
+            "version": "dev-master",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "pinned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "wallabag/rulerz-bundle": {
+            "version": "dev-master",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "pinned": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        },
+        "willdurand/jsonp-callback-validator": {
+            "version": "v1.1.0",
+            "first_seen": "2024-05-17",
+            "flags": {
+                "left-behind": {
+                    "known_since": "2024-05-17"
+                },
+                "old-promise": {
+                    "known_since": "2024-05-17"
+                }
+            }
+        }
+    }
+}

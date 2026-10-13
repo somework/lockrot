@@ -155,14 +155,17 @@ final class GateAgreementTest extends TestCase
     {
         foreach ([false, true] as $networkFailures) {
             $report = self::withNetworkFailures($analysed, $networkFailures);
-            foreach ([null, self::changedBaseline($report)] as $baseline) {
+            foreach ([null, self::changedBaseline($report), self::realBaseline($dir)] as $i => $baseline) {
+                if ($i > 0 && $baseline === null) {
+                    continue;
+                }
                 $compared = $baseline === null ? $report : $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', []));
                 foreach (FailOn::allowed() as $value) {
                     $failOn = FailOn::parse($value);
                     $levels = FormatContext::create(null, $value);
                     foreach ([false, true] as $strict) {
                         foreach (Gate::MODES as $mode) {
-                            $what = \sprintf('%s fail-on=%s strict=%d network_failures=%d baseline=%d %s', $dir, $value, $strict, $networkFailures, $baseline !== null, $mode);
+                            $what = \sprintf('%s fail-on=%s strict=%d network_failures=%d baseline=%d %s', $dir, $value, $strict, $networkFailures, $i, $mode);
                             $withRun = $compared->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, $failOn, RunSettings::SOURCE_OPTION, new Thresholds(), null, $strict, $mode));
                             $this->holds($withRun->toArray(), $compared, $levels, $failOn, $strict, $mode, $what);
                             if (!$strict && $mode === Gate::MODE_CHECK) {
@@ -353,6 +356,21 @@ final class GateAgreementTest extends TestCase
         }
 
         return $report->flagged() === [] ? null : BaselineEntries::baseline($entries, self::NOW);
+    }
+
+    /**
+     * The baseline-2 file that wallabag's lock of 2024-05-17 writes on its own day
+     * (BaselinedProjectTest pins it), read against the fixture's later lock. Null for another lock.
+     */
+    private static function realBaseline(string $dir): ?Baseline
+    {
+        if ($dir !== 'apps/wallabag_wallabag') {
+            return null;
+        }
+        /** @var array<string, mixed> $data */
+        $data = JsonPath::decodeFile(self::FIXTURES.'baselined/wallabag-main/lockrot-baseline.json');
+
+        return Baseline::fromArray($data);
     }
 
     /** The report with a failed lookup among its notes, or with none: the notes are what the flag is computed from. */
