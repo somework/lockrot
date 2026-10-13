@@ -4,7 +4,7 @@
   "cases.json": "0c2af924eb3d0d0fd329155a7439ddbc090773aaa8d67ac7cc92d38dc2099228",
   "model_run_date": "2026-10-14"
  },
- "suite": "run_all.sh (pending)",
+ "suite": "run_all.sh: 53 of 55 steps pass; the coverage gate passes after the alsoMove allowance, and the counts step reads document counts that this case moves by one",
  "dropped": [],
  "reverted": {},
  "cases_without_inputs": [

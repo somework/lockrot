@@ -4,7 +4,7 @@
     "inputs": {
         "tests/fixtures/flags/cases.json": "92727220b0768f58f5d49f4276d72f2af6a5a76e815012e8f04efb61ca30f5cb",
         "tests/fixtures/flags/composite.json": "ec59fa67eb480bc91772e4c4f9fba1736e6a338042ff9eba28e4238a9cf15d39",
-        "tests/fixtures/flags/provenance.json": "2ddc78cfa893d0d58e766d956b70d78cba0210864ee64469decb303a24c9a208"
+        "tests/fixtures/flags/provenance.json": "90703559a23afe7c35eae4e1c838e480a8b272bb8d301b999d00f38086c262b6"
     },
     "version_mask": {
         "paths": [
