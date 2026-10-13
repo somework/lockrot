@@ -106,9 +106,15 @@ jobs:
         with: {subject-path: build/lockrot.phar}
       - uses: actions/upload-artifact@v7
         with: {name: lockrot.phar, path: 'build/lockrot.phar*'}
+      # The TypeScript contract of report-2 ships as release assets only: types/ is export-ignored, so
+      # the PHAR and the Composer dist do not carry it.
       - if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v3
-        with: {files: 'build/lockrot.phar*'}
+        with:
+          files: |
+            build/lockrot.phar*
+            types/lockrot-report-2.d.ts
+            types/lockrot-report-2.known.d.ts
       # lockrot.dev renders docs/ from the newest tag, and this step tells it that a new tag exists.
       # The release is published at this point, so a missing SITE_DISPATCH_TOKEN (a fine-grained token
       # with Contents: write on somework/lockrot.dev only) must not turn it red. The site also

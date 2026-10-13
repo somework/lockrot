@@ -38,3 +38,10 @@
 /tests/fixtures/schema/negative/** linguist-generated
 # tools/score/sweep.py --axis gate --sample writes it.
 /tests/fixtures/score/gate-rows.sample.txt linguist-generated
+# The TypeScript contract of report-2 ships as GitHub release assets only (.github/workflows/phar.yml).
+/types export-ignore
+# tools/schema/ts/emit_dts.py and tools/schema/node/emit_bundle.js write these. CI rebuilds them and fails on a diff.
+/types/lockrot-report-2.known.d.ts linguist-generated
+/tools/schema/ts/known-map.json linguist-generated
+/tools/schema/ts/probes.generated.ts linguist-generated
+/tests/fixtures/bundle.generated.ts linguist-generated

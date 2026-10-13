@@ -1,27 +1,29 @@
-"""The TypeScript contract of report-2, prototyped from resources/lockrot-report-2.schema.json.
+"""The generated half of the TypeScript contract of report-2, from resources/lockrot-report-2.schema.json.
 
-A hand-written d.ts drifts from the schema where a compiler cannot see it (a property typed `string` where the schema has
+A hand-kept d.ts drifts from the schema where a compiler cannot see it (a property typed `string` where the schema has
 a closed set, a known value the union lacks), so the contract is split in two:
 
-  lockrot-report-2.known.d.ts   generated: one literal union per `enum` and `x-known-values` node of report-2 (closed: the
-                                literals; open: `Known | (string & {})`, or `(number & {})` for the integer sets), named
-                                by the node; `known-map.json` records pointer -> name -> values
-  lockrot-report-2.d.ts         the object shapes, which import every union from the file above and never spell a literal
-                                set: every report-2 definition an interface or a union of interfaces, every required
-                                key required, `oneOf`/`anyOf` a union, relation `allOf` groups ignored
-  probes.generated.ts           one type-level equality per union pointer the shapes can reach by indexed access
-                                (`Equal<NonNullable<Finding['reach']>, FindingReach>`), so `tsc --strict` fails when a
-                                hand edit types a closed or open set as `string`, or the union and the schema disagree
+  types/lockrot-report-2.known.d.ts   generated: one literal union per `enum` and `x-known-values` node of report-2
+                                      (closed: the literals; open: `Known | (string & {})`, or `(number & {})` for the
+                                      integer sets), named by the node; `known-map.json` records pointer -> name -> values
+  types/lockrot-report-2.d.ts         hand-kept: the object shapes, which import every union from the file above and
+                                      never spell a literal set
+  ts/probes.generated.ts              one type-level equality per union pointer the shapes can reach by indexed access
+                                      (`Equal<NonNullable<Finding['reach']>, FindingReach>`), so `tsc --strict` fails when a
+                                      hand edit types a closed or open set as `string`, or the union and the schema disagree
 
-  python3 tools/schema/ts/emit_dts.py      writes the three files and known-map.json to types/
+  python3 tools/schema/ts/emit_dts.py      writes the unions, known-map.json and the probes
+  python3 tools/schema/ts/emit_dts.py --prototype <file>   also writes the shapes as the schema gives them, to compare
+                                                           with the hand-kept file after a schema change
 """
 import json
 import os
 import re
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, '..', '..', '..'))
-OUT = os.path.join(REPO, 'types')
+TYPES = os.path.join(REPO, 'types')
 S = json.load(open(os.path.join(REPO, 'resources', 'lockrot-report-2.schema.json')))
 D = S['definitions']
 BASE = '\0base'  # on a branch joined with its node: (the node's pointer, the keys the branch restates)
@@ -184,8 +186,8 @@ def obj(node, ptr, expr):
 
 
 out = ['// The TypeScript contract of lockrot report-2 (https://lockrot.dev/schema/report-2.json): the object shapes.',
-       '// Prototype emitted by tools/schema/ts/emit_dts.py; every literal set is imported from lockrot-report-2.known.d.ts,',
-       '// which is generated from the schema at build time. Relation rules (the schema\'s allOf groups) are not types.',
+       '// Kept by hand, from the prototype of tools/schema/ts/emit_dts.py. Every literal set is imported from',
+       '// lockrot-report-2.known.d.ts, which is generated from the schema. Relation rules (the allOf groups) are not types.',
        "import type * as K from './lockrot-report-2.known';", '']
 body = []
 for name, node in D.items():
@@ -194,8 +196,8 @@ for name, node in D.items():
     body.append('export type %s = %s;' % (tn, ty))
 root = T({k: v for k, v in S.items() if k not in ('definitions', 'allOf')}, '#', 'R.Report2')
 body.append('export type Report2 = %s;' % root)
-os.makedirs(OUT, exist_ok=True)
-open(os.path.join(OUT, 'lockrot-report-2.d.ts'), 'w').write('\n'.join(out + body) + '\n')
+if '--prototype' in sys.argv:
+    open(sys.argv[sys.argv.index('--prototype') + 1], 'w').write('\n'.join(out + body) + '\n')
 
 known = ['// GENERATED from lockrot-report-2.schema.json by tools/schema/ts/emit_dts.py: do not edit.',
          '// One literal union per enum (closed) and x-known-values (open: a later release may add a value) node.', '']
@@ -203,15 +205,15 @@ for k in KNOWN:
     lits = ' | '.join(lit(v) for v in k['values'])
     tail = (' | (number & {})' if k['integer'] else ' | (string & {})') if k['open'] else ''
     known.append('/** %s %s */\nexport type %s = %s%s;' % ('open set at' if k['open'] else 'closed set at', k['pointer'], k['name'], lits, tail))
-open(os.path.join(OUT, 'lockrot-report-2.known.d.ts'), 'w').write('\n'.join(known) + '\n')
-json.dump(KNOWN, open(os.path.join(OUT, 'known-map.json'), 'w'), indent=1)
+open(os.path.join(TYPES, 'lockrot-report-2.known.d.ts'), 'w').write('\n'.join(known) + '\n')
+json.dump(KNOWN, open(os.path.join(HERE, 'known-map.json'), 'w'), indent=1)
 
-probes = ["import type * as K from './lockrot-report-2.known';", "import type * as R from './lockrot-report-2';",
+probes = ["import type * as K from '../../../types/lockrot-report-2.known';", "import type * as R from '../../../types/lockrot-report-2';",
           '// GENERATED: each union pointer the shapes reach by indexed access must be exactly its generated union.',
           'type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;', '']
 for i, (e, name) in enumerate(PROBES):
     probes.append('export const p%d: Equal<Exclude<%s, null>, K.%s> = true;' % (i, e, name))
-open(os.path.join(OUT, 'probes.generated.ts'), 'w').write('\n'.join(probes) + '\n')
+open(os.path.join(HERE, 'probes.generated.ts'), 'w').write('\n'.join(probes) + '\n')
 probed_names = {n for _, n in PROBES}
 print(json.dumps(dict(definitions=len(D), schema_nodes=len(NAMES), unions=len(KNOWN), closed=sum(not k['open'] for k in KNOWN), open=sum(k['open'] for k in KNOWN),
                       probes=len(PROBES), unions_probed=len(probed_names), unions_reached_only_inside_a_branch=len(KNOWN) - len(probed_names))))
