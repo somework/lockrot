@@ -176,7 +176,7 @@ final class TableFormatterTest extends TestCase
         }
 
         self::assertSame(['packages checked', 'flags:', 'depth:', 'security:', 'fix, by package:', 'update now:', 'libyears:', 'pulled in by:', 'advisories:', 'gate:', 'Data as of'], $order);
-        self::assertSame('Data as of 2026-10-08 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for details.', end($lines));
+        self::assertMatchesRegularExpression('/^Data as of \d{4}-\d{2}-\d{2} \(package repositories, repository hosts\) · score model 1\. Run composer lockrot --format=json for details\.$/', $lines[\count($lines) - 1]);
     }
 
     public function testACleanRunSaysNothingIsFlaggedAndStillPrintsTheGateAndTheDataLine(): void

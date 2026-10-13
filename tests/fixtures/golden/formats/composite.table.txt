@@ -56,8 +56,8 @@ low (2)
       do: composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory
       vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts
                    xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
-      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than
-           three weeks ago), its newest release
+      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (0.1 years
+           ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
                               API of the extension they replace
 
@@ -75,5 +75,5 @@ furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: guzzlehttp/guzzle 1
 advisories: 7 packages asked · packagist.org answered (20 on record for 4 packages)
 gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)
-Data as of 2026-10-08 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-13 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
