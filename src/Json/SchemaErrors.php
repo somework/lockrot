@@ -19,19 +19,17 @@ final class SchemaErrors
 {
     private const MARKER = 'lockrot-rule-group-';
 
-    /** @var array<int, array{0: object, 1: list<string>}> by the schema's object id: the marked schema and each marker's description */
-    private static array $marked = [];
-
     /** @param mixed $payload the document as the validator reads it */
     public static function exception(string $title, object $schema, $payload, Validator $validator): ConfigException
     {
-        [$marked, $descriptions] = self::marked($schema);
+        $descriptions = [];
+        $marked = self::mark($schema, $descriptions);
         $groups = [];
         $again = new Validator();
-        $again->validate($payload, $marked);
+        $again->validate($payload, \is_object($marked) ? $marked : new \stdClass());
         foreach (self::errors($again) as [$property, $message]) {
-            if (preg_match('{'.self::MARKER.'(\d+)}', $message, $match) === 1) {
-                $groups[$property] = \sprintf('  - %s: %s', $property, $descriptions[(int) $match[1]]);
+            if (preg_match('{'.self::MARKER.'\d+}', $message, $match) === 1) {
+                $groups[$property] = \sprintf('  - %s: %s', $property, $descriptions[$match[0]]);
             }
         }
         $lines = [];
@@ -45,7 +43,7 @@ final class SchemaErrors
             }
         }
 
-        return ConfigException::withDetails(implode("\n", array_merge([$title], array_values($groups), $lines)), $details);
+        return ConfigException::withDetails(implode("\n", array_merge([$title], $groups, $lines)), $details);
     }
 
     /** @return list<array{0: string, 1: string}> each error's property path and message */
@@ -53,14 +51,23 @@ final class SchemaErrors
     {
         $out = [];
         foreach ($validator->getErrors() as $error) {
-            // The validator documents every error as {property, message, ...}, so this narrows the
-            // type for PHPStan. Skipping a malformed entry hides nothing: the caller still throws.
-            if (\is_array($error) && \is_string($error['property'] ?? null) && \is_string($error['message'] ?? null)) {
-                $out[] = [$error['property'], $error['message']];
-            }
+            $out[] = [self::text($error, 'property'), self::text($error, 'message')];
         }
 
         return $out;
+    }
+
+    /**
+     * The validator documents every error as {property, message, ...}: this narrows the type for
+     * PHPStan.
+     *
+     * @param mixed $error
+     */
+    private static function text($error, string $key): string
+    {
+        $value = \is_array($error) ? ($error[$key] ?? null) : null;
+
+        return \is_string($value) ? $value : '';
     }
 
     /**
@@ -79,32 +86,25 @@ final class SchemaErrors
         return false;
     }
 
-    /** @return array{0: object, 1: list<string>} */
-    private static function marked(object $schema): array
-    {
-        $id = spl_object_id($schema);
-        if (!isset(self::$marked[$id])) {
-            $descriptions = [];
-            $marked = self::mark($schema, $descriptions);
-            self::$marked[$id] = [\is_object($marked) ? $marked : new \stdClass(), $descriptions];
-        }
-
-        return self::$marked[$id];
-    }
-
     /**
      * The node with each described rule group beside a marker that the validator reports exactly
      * when the group fails.
      *
-     * @param mixed        $node
-     * @param list<string> $descriptions
+     * @param mixed                 $node
+     * @param array<string, string> $descriptions by marker
      *
      * @return mixed
      */
     private static function mark($node, array &$descriptions)
     {
         if (\is_array($node)) {
-            return array_map(static fn ($child) => self::mark($child, $descriptions), $node);
+            // A loop, not array_map(): an arrow function would add to a copy of $descriptions.
+            $out = [];
+            foreach ($node as $key => $child) {
+                $out[$key] = self::mark($child, $descriptions);
+            }
+
+            return $out;
         }
         if (!$node instanceof \stdClass) {
             return $node;
@@ -126,8 +126,9 @@ final class SchemaErrors
                 unset($node->{$keyword});
             }
         }
-        $descriptions[] = $node->description;
-        $node->allOf = array_merge(\is_array($node->allOf ?? null) ? $node->allOf : [], [(object) ['anyOf' => [$group, (object) ['enum' => [self::MARKER.(\count($descriptions) - 1)]]]]]);
+        $marker = self::MARKER.\count($descriptions);
+        $descriptions[$marker] = $node->description;
+        $node->allOf = array_merge(\is_array($node->allOf ?? null) ? $node->allOf : [], [(object) ['anyOf' => [$group, (object) ['enum' => [$marker]]]]]);
 
         return $node;
     }

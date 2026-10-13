@@ -74,6 +74,52 @@ final class SchemaErrorsTest extends TestCase
         self::assertSame($before, json_encode($schema));
     }
 
+    public function testAGroupInsideAListOfSchemasIsNamed(): void
+    {
+        $schema = self::schema('{"properties": {"a": {"allOf": [{"description": "A is a string or a number.", "oneOf": [{"type": "string"}, {"type": "integer"}]}]}}}');
+
+        self::assertSame("doc is invalid:\n  - a: A is a string or a number.", self::exception('{"a": true}', $schema)->getMessage());
+    }
+
+    public function testAGroupWithoutADescriptionGivesTheValidatorErrors(): void
+    {
+        $error = self::exception('{"a": true}', self::schema('{"properties": {"a": {"oneOf": [{"type": "string"}, {"type": "integer"}]}}}'));
+
+        self::assertStringNotContainsString('lockrot-rule-group', $error->getMessage());
+        self::assertSame([], $error->details());
+        self::assertStringContainsString("\n  - a: Boolean value found, but a string is required", $error->getMessage());
+    }
+
+    public function testAGroupOfEveryKeywordIsNamed(): void
+    {
+        $schema = self::schema('{"properties": {"a": {"description": "A is a short string, not x.", "oneOf": [{"type": "string"}], "anyOf": [{"maxLength": 3}], "not": {"enum": ["x"]}}}}');
+
+        self::assertSame("doc is invalid:\n  - a: A is a short string, not x.", self::exception('{"a": "x"}', $schema)->getMessage());
+    }
+
+    /** A property whose name starts with the group's name is beside the group, not below it. */
+    public function testOnlyAPathBelowTheGroupIsADetail(): void
+    {
+        $schema = self::schema('{"properties": {
+            "a": {"description": "A holds strings or nothing.", "anyOf": [{"maxItems": 0}, {"items": {"type": "string"}}]},
+            "ab": {"type": "string"},
+            "o": {"description": "O is empty or has x.", "anyOf": [{"maxProperties": 0}, {"required": ["x"]}], "properties": {"y": {"type": "string"}}}
+        }}');
+        $error = self::exception('{"a": [1], "ab": 1, "o": {"y": 1}}', $schema);
+
+        self::assertSame("doc is invalid:\n  - a: A holds strings or nothing.\n  - o: O is empty or has x.\n  - ab: Integer value found, but a string is required", $error->getMessage());
+        self::assertContains('  - a[0]: Integer value found, but a string is required', $error->details());
+        self::assertContains('  - o.y: Integer value found, but a string is required', $error->details());
+    }
+
+    private static function schema(string $json): \stdClass
+    {
+        $schema = json_decode($json);
+        self::assertInstanceOf(\stdClass::class, $schema);
+
+        return $schema;
+    }
+
     private static function exception(string $json, ?\stdClass $schema = null): ConfigException
     {
         $schema ??= json_decode(self::SCHEMA);
