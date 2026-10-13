@@ -525,6 +525,7 @@ final class Analyzer
             $signals = NotCheckedRule::withoutMaintenanceGaps($signals);
         }
         [$signals, $accepted] = $this->acceptUnchecked($signals, $facts);
+        $flags = FlagSet::fromSignals($signals, $entry, $counted);
 
         $note = null;
         if (!$package->isFromComposerRepository()) {

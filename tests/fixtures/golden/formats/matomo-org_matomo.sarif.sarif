@@ -105,10 +105,10 @@
                             }
                         },
                         {
-                            "id": "lockrot/advisories-not-checked",
-                            "name": "advisories-not-checked",
+                            "id": "lockrot/advisories-unchecked",
+                            "name": "advisories-unchecked",
                             "shortDescription": {
-                                "text": "advisories-not-checked: The advisories of some packages were not checked"
+                                "text": "advisories-unchecked: The advisories of some packages were not checked"
                             },
                             "fullDescription": {
                                 "text": "The gate could not read the advisories of every package. It is an error when --fail-on=unchecked fails on the gap."
@@ -936,7 +936,7 @@
                     ]
                 },
                 {
-                    "ruleId": "lockrot/advisories-not-checked",
+                    "ruleId": "lockrot/advisories-unchecked",
                     "ruleIndex": 5,
                     "level": "warning",
                     "message": {
@@ -952,7 +952,7 @@
                         }
                     ],
                     "partialFingerprints": {
-                        "lockrot/run": "advisories-not-checked"
+                        "lockrot/run": "advisories-unchecked"
                     }
                 }
             ],

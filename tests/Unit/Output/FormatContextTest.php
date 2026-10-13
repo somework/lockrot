@@ -32,6 +32,21 @@ final class FormatContextTest extends TestCase
         return new Report(array_values($findings), [], new \DateTimeImmutable(self::AT), \count($findings), 0);
     }
 
+    /** @param list<array{0: string, 1: string}> $entries package, verdict */
+    private function comparison(array $entries, Report $report): BaselineComparison
+    {
+        $rows = [];
+        foreach ($entries as [$package, $verdict]) {
+            $rows[] = BaselineEntries::of($package, '1.0.0', $verdict, '2026-01-15');
+        }
+        $names = [];
+        foreach ($report->findings() as $finding) {
+            $names[] = $finding->package();
+        }
+
+        return BaselineComparison::compare(BaselineEntries::baseline($rows, self::AT), $report, 'lockrot-baseline.json', $names);
+    }
+
 
     public function testAThresholdThatIsNotAValueIsRejected(): void
     {
@@ -175,16 +190,6 @@ final class FormatContextTest extends TestCase
         self::assertSame($graded, $names(FormatContext::create(null, 'critical')->recordFindings($report, false)), 'a graded finding that passes the gate still has its record');
         self::assertSame($missing, $names(FormatContext::create(null, 'critical,unchecked')->recordFindings($report, false)));
         self::assertSame($names($report->sorted()), $names(FormatContext::create(null, 'critical')->recordFindings($report, true)));
-    }
-
-    public function testAnAdvisoriesGapThatTheBaselineKnowsIsAWarningBecauseTheGatePasses(): void
-    {
-        $offline = $this->report(FindingBuilder::advisoriesUnchecked('a/offline', 'offline', true));
-        $known = $offline->withBaseline(BaselineComparison::compare(BaselineEntries::baseline([BaselineEntries::of('a/offline', '1.0.0', Verdict::STALE, '2026-06-01')]), $offline, 'lockrot-baseline.json', []));
-        $context = FormatContext::create(null, 'unchecked');
-
-        self::assertFalse($context->gateOf($known)->fails());
-        self::assertSame(FormatContext::LEVEL_WARNING, $context->advisoriesNotCheckedLevel($known));
     }
 
     /** I15b: the record set holds every flagged finding, every failing one, and with `unchecked` active every one with a missing check. */

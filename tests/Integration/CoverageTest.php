@@ -39,7 +39,6 @@ final class CoverageTest extends TestCase
     ];
     private const D = '#/definitions/';
     private const NOT_REACHED = 'not reached: no corpus finding and no case has the input that writes it';
-    private const VRC = self::D.'noteVerdictRulesChanged/properties/findings/items/properties/legacy/properties/';
 
     /** @var array<string, array<string, array<int|string, true>>> by schema, the values seen at each `pointer keyword` */
     private array $seen = [];
@@ -81,7 +80,7 @@ final class CoverageTest extends TestCase
                     $got += $this->seen[Schemas::REPORT][$key] ?? [];
                 }
                 foreach ($values as $value) {
-                    if (!isset($got[$value]) && !isset($allowed[$name.' '.$pointer.' '.$value]) && !self::allowedByPrefix($name, $pointer)) {
+                    if (!isset($got[$value]) && !isset($allowed[$name.' '.$pointer.' '.$value])) {
                         $missing[] = $name.' '.$key.' '.json_encode($value);
                     }
                 }
@@ -284,11 +283,6 @@ final class CoverageTest extends TestCase
         return $out;
     }
 
-    private static function allowedByPrefix(string $name, string $pointer): bool
-    {
-        return \in_array($name, [Schemas::REPORT, Schemas::EXPLAIN], true) && strpos($pointer, self::VRC.'basis/properties/steps/items') === 0;
-    }
-
     /**
      * The reviewed values that no generated document carries, each with why: a value the model
      * cannot produce from the corpus or a variant without an input lockrot never sees, or one a
@@ -335,9 +329,6 @@ final class CoverageTest extends TestCase
                 'security-exempt-from-reach', 'sum', 'divide-dev', 'floor-once', 'band-floors', 'zero-verdicts', 'sort', 'gate-bounded-new', 'baseline-cover'],
                 "score model 1's own parameters: model 1 names divide-reach only"],
             [self::D.'throughEntry/properties/newest_requires_unmeasured/oneOf/0', ['releases_unknown', 'no_stable_release'], self::NOT_REACHED.' (a direct dependent without metadata or a stable release)'],
-            [self::VRC.'priority', ['none', 'medium', 'low'], 'the note lists findings whose 0.13 priority reached a high or critical gate'],
-            [self::VRC.'verdict', ['unknown', 'finished', 'ok', 'abandoned', 'silent', 'pinned', 'old-promise', 'stale'], "the listed findings' 0.13 verdicts are all left-behind. finding.legacy carries every word"],
-            [self::VRC.'basis/properties/base', ['none', 'critical', 'medium', 'low'], 'as priority: finding.legacy.basis carries every value'],
         ];
         $out = [];
         foreach ($shared as [$pointer, $values, $why]) {
