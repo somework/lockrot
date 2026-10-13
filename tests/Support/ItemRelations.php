@@ -8,6 +8,8 @@ namespace Lockrot\Tests\Support;
  * The engine-only relations of the 0.14 items that draft-04 cannot say: C73 A1 to A10 (A9 in
  * {@see FindingRelations}), C75 R1 to R8, C77 pairing and status, W12 reach, I25 S7 coverage and I28
  * (SPEC-0.14.md §3). The predicates follow the model's `check_014` and `validate_root`.
+ * I28 includes C72's headline and quiet_years relations. C69 (I30) is held by the report-2
+ * schema relation and its negatives.
  */
 final class ItemRelations
 {
