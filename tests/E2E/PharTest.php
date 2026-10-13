@@ -262,7 +262,7 @@ final class PharTest extends TestCase
             $stderr
         );
 
-        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-key', 'extra' => ['lockrot' => ['<<fg=red>>' => 1, 'fail-on' => 'dead']]]));
+        file_put_contents($dir.'/composer.json', (string) json_encode(['name' => 'acme/markup-key', 'extra' => ['lockrot' => ['<<fg=red>>' => 1, 'include-dev' => 'yes']]]));
 
         $failed = $this->runPhar(['--offline'], $dir);
 
