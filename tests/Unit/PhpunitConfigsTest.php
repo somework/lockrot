@@ -8,7 +8,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Each PHPUnit configuration in CONFIGS excludes the same groups. The default suite, the PHPUnit 9
- * legs and the core coverage gate then skip the same slow tests.
+ * legs and the core coverage gate then skip the same slow tests. The core coverage gate also skips
+ * the covers-nothing group, whose tests collect no coverage.
  */
 final class PhpunitConfigsTest extends TestCase
 {
@@ -28,6 +29,6 @@ final class PhpunitConfigsTest extends TestCase
 
         self::assertContains('sweep', $excluded['phpunit.xml.dist']);
         self::assertSame($excluded['phpunit.xml.dist'], $excluded['phpunit9.xml.dist']);
-        self::assertSame($excluded['phpunit.xml.dist'], $excluded['phpunit.core-coverage.xml.dist']);
+        self::assertSame(array_merge($excluded['phpunit.xml.dist'], ['covers-nothing']), $excluded['phpunit.core-coverage.xml.dist']);
     }
 }
