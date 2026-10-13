@@ -4,19 +4,29 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Config;
 
+use Composer\Semver\VersionParser;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Config\Gate;
+use Lockrot\Data\Advisory\Advisory;
+use Lockrot\Score\CountedAdvisory;
+use Lockrot\Signal\Data\AdvisoryData;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
+use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\Notes;
+use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -101,10 +111,22 @@ final class GateTest extends TestCase
         self::assertSame([['value' => 'unchecked', 'kind' => 'unchecked', 'facts' => [['kind' => 'signal', 'id' => 'S3'], ['kind' => 'signal', 'id' => 'S4']]]], $standing['by']);
     }
 
+    /**
+     * TYPES-2: the raw signals hold no S10, and the details add the `releases` check that a counted
+     * advisory needed from metadata that was not read. `--fail-on=unchecked` reads the written S10.
+     */
     public function testTheReleasesCheckThatAWrittenFindingAddsFailsUnchecked(): void
     {
-        $finding = (new FindingBuilder())->withPackage('a/fixless')->withSignals([self::s10('releases', 'releases_unknown', ['S9'])])->withChain(['a/fixless'])->build();
+        $package = F::package(['name' => 'a/fixless']);
+        $advisory = new Advisory('PKSA-1', null, 'Title', null, 'high', null, (new VersionParser())->parseConstraints('<2.0.0'));
+        $facts = F::looked(new PackageFacts($package, null, null, [$advisory], null, null, null, true));
+        $signals = [new Signal(Signal::LEVEL_HIGH, 'advisory', new AdvisoryData([SignalDataStub::row(['id' => 'PKSA-1', 'severity' => 'high'])], false, true))];
+        $built = (new FindingBuilder())->withPackage('a/fixless')->withSignals($signals)->withChain(['a/fixless'])
+            ->withFlags(FlagSet::fromSignals($signals, null, [new CountedAdvisory('PKSA-1', 'high', 'unknown')]), false)->build();
+        $finding = $built->withDetails(FindingDetails::of($facts, null, new PhpFloor('8.4', null), [], $signals, null, FindingBuilder::unmeasuredAge()));
 
+        self::assertNotContains(Signal::S10, array_map(static fn (Signal $signal): string => $signal->id(), $finding->signals()), 'no S10 in the raw signals');
+        self::assertSame(['releases'], array_map(static fn (Check $check): string => $check->check(), $finding->checksMissing()));
         self::assertTrue(self::gate(self::report($finding), 'unchecked')->fails());
     }
 

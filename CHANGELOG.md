@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Verdict changes
 
-- **Breaking:** **Baseline:** a baseline knows facts: the counted flags and advisories, each with
-  the date it became known. Only what the facts the baseline does not know add sets the level of a
-  grade gate, `min(score, 2 × new)`. Action: regenerate the baseline after the upgrade.
+- **Breaking:** **Baseline:** a finding is worsened by a flag above the recorded one, a new
+  advisory, or a known one re-rated or no longer fixable. The gate reads `min(score, 2 × what the
+  new facts add)`. Action: run once, review, then `--generate-baseline`.
   ([Baseline](docs/baseline.md))
 - **Breaking:** **All formats:** a finding lists every flag that fired (`abandoned`, `silent`,
   `pinned`, `left-behind`, `old-promise`, `stale`, and the new `vulnerable`). Accepted flags stay
@@ -124,6 +124,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   only. Action: assert `."$schema" == "https://lockrot.dev/schema/report-2.json"` first, then read
   `.findings[] | [.flags[].summary]`.
   ([Schema](docs/schema.md#migrating-from-report-1))
+- **Breaking:** **Config:** an `ignore[]` entry whose `flags` key has another shape (`"stale"`,
+  `["vulnerable"]`) now exits 2. Action: list maintenance flag ids, or drop the key.
+  ([The allowlist](docs/configuration.md#the-allowlist))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is

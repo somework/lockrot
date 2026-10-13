@@ -44,9 +44,6 @@ final class Gate
     /** What can keep a finding that reaches fail-on from failing the run, as a finding's `gate.exempt_by` writes it. */
     public const EXEMPTIONS = [self::EXEMPT_BASELINE];
 
-    /** The advisory reasons that are a skip, never S10: with `unchecked` active they still fail open. */
-    private const SKIP_REASONS = ['not_from_composer_repository', 'unparseable_version'];
-
     /** @var list<string> */
     private array $trippedBy;
     private bool $failOnApplied;
@@ -193,7 +190,7 @@ final class Gate
     private static function advisoriesInS10(Finding $finding): bool
     {
         foreach ($finding->checksMissing() as $check) {
-            if ($check->check() === 'advisories' && !\in_array($check->reason(), self::SKIP_REASONS, true)) {
+            if ($check->check() === 'advisories') {
                 return true;
             }
         }

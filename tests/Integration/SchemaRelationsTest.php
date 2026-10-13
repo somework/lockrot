@@ -43,9 +43,12 @@ final class SchemaRelationsTest extends TestCase
      * Each relation of `alsoMove` reads an entry of `next_step.also[]`, and no document has one.
      */
     private const WAITING = [
-        '#/definitions/finding/allOf/22' => 'reads next_step.also[]',
-        '#/definitions/finding/allOf/35' => 'reads next_step.also[]',
+        'Under score model 1 each `next_step.also[].if_applied.verdict` is the band of its total, a score-0 word at 0.' => 'reads next_step.also[]',
+        "Each `also[]` move of a transitive or unreached package's `require` or `tag` kind writes no command." => 'reads next_step.also[]',
     ];
+
+    /** @var list<string> the pointers of the WAITING relations, found by their description */
+    private static array $waiting = [];
 
     /** @var array<string, object> by mode */
     private static array $schemas = [];
@@ -59,6 +62,12 @@ final class SchemaRelationsTest extends TestCase
         $published = json_decode((string) json_encode($schema));
         self::assertIsObject($published);
         self::$schemas['published'] = $published;
+        self::$waiting = [];
+        foreach (array_keys(self::WAITING) as $description) {
+            $pointers = self::pointersOf($schema, '#', $description);
+            self::assertCount(1, $pointers, 'one relation has the description: '.$description);
+            self::$waiting[] = $pointers[0];
+        }
         foreach (['none', 'break', 'reach'] as $mode) {
             $relations = [];
             $instrumented = json_decode((string) json_encode(self::instrument($schema, '#', $mode, $relations)));
@@ -137,7 +146,7 @@ final class SchemaRelationsTest extends TestCase
     /** @return list<string> */
     private static function waiting(): array
     {
-        $waiting = array_keys(self::WAITING);
+        $waiting = self::$waiting;
         foreach (self::$relations as $relation) {
             if (strpos($relation, '#/definitions/alsoMove/') === 0) {
                 $waiting[] = $relation;
@@ -145,6 +154,25 @@ final class SchemaRelationsTest extends TestCase
         }
 
         return $waiting;
+    }
+
+    /**
+     * The pointers of the schema nodes whose `description` is $description.
+     *
+     * @param array<mixed, mixed> $node
+     *
+     * @return list<string>
+     */
+    private static function pointersOf(array $node, string $pointer, string $description): array
+    {
+        $found = ($node['description'] ?? null) === $description ? [$pointer] : [];
+        foreach ($node as $key => $child) {
+            if (\is_array($child)) {
+                $found = array_merge($found, self::pointersOf($child, $pointer.'/'.$key, $description));
+            }
+        }
+
+        return $found;
     }
 
     /** @return list<string> the messages of the errors */
