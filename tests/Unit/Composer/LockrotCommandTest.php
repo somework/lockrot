@@ -2478,6 +2478,9 @@ final class LockrotCommandTest extends TestCase
         $levels = [];
         foreach (JsonPath::arrayAt($this->readJsonFile($dir.'/r.sarif'), ['runs', 0, 'results']) as $result) {
             self::assertIsArray($result);
+            if ($result['ruleId'] === 'lockrot/advisories-not-checked') {
+                continue;
+            }
             $levels[JsonPath::stringAt($result, ['partialFingerprints', 'lockrot/package'])] = JsonPath::stringAt($result, ['level']);
         }
         $failing = $unjudged = 0;
