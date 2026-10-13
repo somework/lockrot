@@ -178,8 +178,7 @@ final class TableFormatter implements FormatterInterface
     /**
      * A word longer than $wrap stays whole, so a reader can copy a path or a command. The text is
      * wrapped before it is escaped: the added backslashes do not print. `wordwrap()` counts bytes,
-     * which can only wrap early: lockrot does not require ext-mbstring. Each line is right-trimmed,
-     * so spaces do not pad its end.
+     * which can only wrap early: lockrot does not require ext-mbstring.
      *
      * @return list<string>
      */
