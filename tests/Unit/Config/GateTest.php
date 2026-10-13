@@ -151,7 +151,12 @@ final class GateTest extends TestCase
         Gate::decide(self::report(), FailOn::none(), false, 'pull_request');
     }
 
-    /** A finding whose flags are its maintenance flags and whose counted advisories have these severities. */
+    /**
+     * A finding whose flags are its maintenance flags and whose counted advisories have these severities.
+     *
+     * @param list<string> $flags
+     * @param list<string> $severities
+     */
     private static function vulnerable(string $package, array $flags, array $severities): Finding
     {
         $signals = [];
