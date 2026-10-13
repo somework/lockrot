@@ -77,8 +77,11 @@ jobs:
         run: |
           composer global require --no-interaction "maglnet/composer-require-checker:^4.24"
           $(composer global config bin-dir --absolute)/composer-require-checker check --config-file=composer-require-checker.json composer.json
+      # A test in the covers-nothing group collects no coverage, so both reports are the same without
+      # it, and the tests matrix runs it. An --exclude-group option replaces the <exclude> list of the
+      # configuration, so the option names all four groups.
       - name: Tests with coverage (whole src, informational)
-        run: vendor/bin/phpunit --coverage-text --only-summary-for-coverage-text
+        run: vendor/bin/phpunit --exclude-group=e2e --exclude-group=network --exclude-group=sweep --exclude-group=covers-nothing --coverage-text --only-summary-for-coverage-text
       # coverage-check reads the clover "elements" metric (methods, statements and conditionals),
       # not PHPUnit's line percentage. Keep the gate about three points below the measured value, so
       # that a new file does not fail it.
