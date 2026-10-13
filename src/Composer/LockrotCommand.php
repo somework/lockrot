@@ -105,7 +105,7 @@ final class LockrotCommand extends BaseCommand
             ->addOption('offline', null, InputOption::VALUE_NONE, 'Use cached data only, never go to the network')
             ->addOption('strict-network', null, InputOption::VALUE_NONE, 'Exit 1 when a repository or a repository host (GitHub, GitLab, Bitbucket) could not be reached')
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Baseline file to read or write (default: lockrot-baseline.json next to composer.json)')
-            ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file and exit 0')
+            ->addOption('generate-baseline', null, InputOption::VALUE_NONE, 'Write the current findings to the baseline file. It exits 1 only when --strict-network trips the gate')
             ->addOption('explain', null, InputOption::VALUE_REQUIRED, 'Explain one package: its verdict, every signal with its raw data, and the repository facts they were read from (text, or JSON with --format=json); exit 0')
             ->addOption('output', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Also write the report to a file, as <format>:<path> (e.g. sarif:lockrot.sarif), in any format --format takes; repeatable. A relative path is relative to the project directory lockrot runs in; the directory must exist. --format still decides stdout')
             ->addOption('markdown-max-bytes', null, InputOption::VALUE_REQUIRED, 'Keep each markdown report written through --output within this many bytes: rows are left out from the end, and a last row counts them. The heading, the table head, that row and the footer always print');
