@@ -471,6 +471,14 @@ final class ExplainFormatterTest extends TestCase
      * sentence is about a tag, and claiming it of `dev-main` states a fact the data does not
      * carry.
      */
+    public function testALowerBoundOfLibyearsSaysAtLeast(): void
+    {
+        $finding = (new FindingBuilder())->withVersion('1.2.0')->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::atLeast(2.0))->build();
+        $explanation = new Explanation($finding, F::facts(F::package(['version' => '1.2.0', 'time' => '2024-01-01T00:00:00+00:00'])), new Thresholds(), '8.4', $this->report());
+
+        self::assertStringContainsString('  libyears at least 2.0 behind the newest stable release', $this->plain($explanation));
+    }
+
     public function testABranchSnapshotIsNotToldItsTagsShareACommit(): void
     {
         $finding = (new FindingBuilder())->withVersion('dev-main')->withVerdict(Verdict::PINNED)->withDataDate(new \DateTimeImmutable(F::NOW))->withLibyears(LibyearsMeasurement::unmeasured(Libyears::BRANCH_SNAPSHOT))->build();

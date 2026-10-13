@@ -446,12 +446,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
     public function testAFeedCountsEachAdvisoryOfANameOnce(): void
     {
         $server = $this->api(['doctrine/cache' => [self::record('PKSA-cache-1', '<2.0', []), self::record('PKSA-cache-1', '<2.0', [])]]);
-        $server->start();
-        try {
-            $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['doctrine/cache' => '2.2.0']);
-        } finally {
-            $server->stop();
-        }
+        $batch = (new RepositoryAdvisoryLoader($server->repositories()))->load(['doctrine/cache' => '2.2.0']);
 
         self::assertSame(1, self::feed($batch, 'doctrine/cache', 0)['records']);
     }

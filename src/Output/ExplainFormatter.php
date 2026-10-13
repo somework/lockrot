@@ -89,7 +89,7 @@ final class ExplainFormatter
         $libyears = $finding->libyears();
         $lines[] = self::INDENT.self::escape($libyears === null
             ? 'libyears not measured: '.CauseWords::of((string) $finding->libyearsUnmeasured())
-            : \sprintf('libyears %.1F behind the newest stable release', $libyears));
+            : \sprintf($finding->isLibyearsAtLeast() ? 'libyears at least %.1F behind the newest stable release' : 'libyears %.1F behind the newest stable release', $libyears));
 
         return $lines;
     }
