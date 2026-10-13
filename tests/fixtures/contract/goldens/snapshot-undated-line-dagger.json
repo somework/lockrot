@@ -3,12 +3,12 @@
     "next_step_text": "move it to a tag — the newest on its own line is v4.4.44, through mautic/core-lib; 4.x needs php >=7.1.3; not checked: left-behind, old-promise; what requires it must allow it",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: newest release v8.1.5 2026-08-21 (0.1 years ago); last push 2026-09-25 (0.1 years ago)",
+    "age_line": "age: newest release v8.1.5 2026-08-21 (0.1 years ago); last push 2026-09-25 (less than three weeks ago)",
     "explain_age": [
         "installed  4.4.x-dev not read (a branch snapshot has no release branch)",
         "4.x                  not read (undated releases)",
         "newest     v8.1.5    2026-08-21   0.1 years ago                 below release-warn-years 3",
-        "last push            2026-09-25   0.1 years ago                 below push-warn-years 3",
+        "last push            2026-09-25   less than three weeks ago     below push-warn-years 3",
         "libyears not measured: a branch snapshot has no release branch"
     ],
     "baseline_suffix": null,

@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "run": {
         "project": "matomo/matomo",
         "root_package": "matomo/matomo",
@@ -1017,7 +1017,7 @@
         ],
         "fix_unknown": 0
     },
-    "data_date": "2026-10-14T00:00:00+00:00",
+    "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
         "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/monolog-bridge: 1 counted advisory; accept them in Composer's audit policy if that is the decision"
     ],
@@ -1425,7 +1425,7 @@
             ],
             "evidence": "vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
+            "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
             "age": {
                 "installed": {
@@ -1452,7 +1452,7 @@
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2026-09-23T14:28:05+00:00",
-                    "years": 0.1,
+                    "years": 0,
                     "level": null
                 },
                 "push_unmeasured": null

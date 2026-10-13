@@ -9,4 +9,4 @@
 libyears: 0.8 behind across the one package · 0.8 from direct requirements · furthest behind doctrine/cache 2.1.1 at 0.8
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 
-<sub>5 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>5 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

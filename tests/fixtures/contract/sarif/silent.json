@@ -51,6 +51,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/silent",
@@ -58,7 +63,7 @@
                     "level": "error",
                     "rank": 100.0,
                     "message": {
-                        "text": "yosymfony/toml v1.0.4 \u2014 finding critical, 36 = silent 32 + old-promise 4 [\u00bc of 16] \u2014 silent: last release 2018-08-08 (8.2 years ago); last push 2020-08-08 (6.2 years ago). Do: find a maintained alternative: nothing released for 8.2 years."
+                        "text": "yosymfony/toml v1.0.4 \u2014 finding critical, 36 = silent 32 + old-promise 4 [\u00bc of 16] \u2014 silent: last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago). Do: find a maintained alternative: nothing released for 8.1 years."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "yosymfony/toml"
@@ -78,7 +83,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -98,14 +103,14 @@
                         "age": {
                             "installed": {
                                 "at": "2018-08-08T15:08:14+00:00",
-                                "years": 8.2,
+                                "years": 8.1,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "v1.0.4",
                                 "at": "2018-08-08T15:08:14+00:00",
-                                "years": 8.2,
+                                "years": 8.1,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -113,14 +118,14 @@
                             "branch_release": {
                                 "version": "v1.0.4",
                                 "at": "2018-08-08T15:08:14+00:00",
-                                "years": 8.2,
+                                "years": 8.1,
                                 "level": "high",
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2020-08-08T20:48:54+00:00",
-                                "years": 6.2,
+                                "years": 6.1,
                                 "level": "high"
                             },
                             "push_unmeasured": null
@@ -139,7 +144,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }
@@ -151,7 +160,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "yosymfony/toml v1.0.4 \u2014 finding critical, 36 = silent 32 + old-promise 4 [\u00bc of 16] \u2014 old-promise: released 2018-08-08 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 8.2 years."
+                        "text": "yosymfony/toml v1.0.4 \u2014 finding critical, 36 = silent 32 + old-promise 4 [\u00bc of 16] \u2014 old-promise: released 2018-08-08 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 8.1 years."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "yosymfony/toml"
@@ -171,7 +180,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "term": {
@@ -188,7 +197,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

@@ -32,6 +32,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/stale",
@@ -39,7 +44,7 @@
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
-                        "text": "akaunting/laravel-debugbar-collector 2.1.1 \u2014 finding medium, 8 = stale 8 \u2014 stale: last release 2023-06-02 (3.4 years ago); last push 2023-06-02 (3.4 years ago). Do: \u2014."
+                        "text": "akaunting/laravel-debugbar-collector 2.1.1 \u2014 finding medium, 8 = stale 8 \u2014 stale: last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago). Do: \u2014."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "akaunting/laravel-debugbar-collector"
@@ -58,7 +63,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "chain": [
@@ -75,14 +80,14 @@
                         "age": {
                             "installed": {
                                 "at": "2023-06-02T07:22:01+00:00",
-                                "years": 3.4,
+                                "years": 3.3,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "2.1.1",
                                 "at": "2023-06-02T07:22:01+00:00",
-                                "years": 3.4,
+                                "years": 3.3,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -90,14 +95,14 @@
                             "branch_release": {
                                 "version": "2.1.1",
                                 "at": "2023-06-02T07:22:01+00:00",
-                                "years": 3.4,
+                                "years": 3.3,
                                 "level": "warn",
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2023-06-02T07:23:06+00:00",
-                                "years": 3.4,
+                                "years": 3.3,
                                 "level": "warn"
                             },
                             "push_unmeasured": null
@@ -116,7 +121,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

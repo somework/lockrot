@@ -76,6 +76,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/advisory/PKSA-m4t9-vsgq-8khn",
@@ -103,7 +108,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -124,14 +129,14 @@
                         "age": {
                             "installed": {
                                 "at": "2026-08-09T14:10:38+00:00",
-                                "years": 0.2,
+                                "years": 0.1,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "2.10.3",
                                 "at": "2026-09-21T13:07:34+00:00",
-                                "years": 0.1,
+                                "years": 0,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -139,7 +144,7 @@
                             "branch_release": {
                                 "version": "2.10.3",
                                 "at": "2026-09-21T13:07:34+00:00",
-                                "years": 0.1,
+                                "years": 0,
                                 "level": null,
                                 "dated_by": null
                             },
@@ -183,7 +188,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }
@@ -215,7 +224,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "advisory": "PKSA-zyf5-hrxv-hrd7",
@@ -238,7 +247,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }
@@ -270,7 +283,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "advisory": "PKSA-m2dq-1fhr-29b1",
@@ -293,7 +306,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

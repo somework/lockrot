@@ -51,6 +51,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/old-promise",
@@ -78,7 +83,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -97,14 +102,14 @@
                         "age": {
                             "installed": {
                                 "at": "2018-08-10T14:18:38+00:00",
-                                "years": 8.2,
+                                "years": 8.1,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "1.0.0",
                                 "at": "2018-08-10T14:18:38+00:00",
-                                "years": 8.2,
+                                "years": 8.1,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -112,7 +117,7 @@
                             "branch_release": {
                                 "version": "1.0.0",
                                 "at": "2018-08-10T14:18:38+00:00",
-                                "years": 8.2,
+                                "years": 8.1,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -138,7 +143,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }
@@ -150,7 +159,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "roots/wp-config 1.0.0 \u2014 finding high, 18 = old-promise 16 + stale 2 [\u00bc of 8] \u2014 stale: last release 2018-08-10 (8.2 years ago). Do: test it on PHP 8.4 \u2014 1.0.0 is its newest release."
+                        "text": "roots/wp-config 1.0.0 \u2014 finding high, 18 = old-promise 16 + stale 2 [\u00bc of 8] \u2014 stale: last release 2018-08-10 (8.1 years ago). Do: test it on PHP 8.4 \u2014 1.0.0 is its newest release."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "roots/wp-config"
@@ -170,7 +179,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "term": {
@@ -187,7 +196,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

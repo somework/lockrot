@@ -3,11 +3,11 @@
     "next_step_text": "raise require.php to >=8.1, then move league/uri to ^7.8 — clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed 6.4.0 released 2020-11-22 (5.9 years ago); 6.x last released 6.8.0 2022-09-13 (4.1 years ago); newest release 7.8.1 2026-03-15 (0.6 years ago); last push 2026-09-30 (less than three weeks ago)",
+    "age_line": "age: installed 6.4.0 released 2020-11-22 (5.9 years ago); 6.x last released 6.8.0 2022-09-13 (4.0 years ago); newest release 7.8.1 2026-03-15 (0.5 years ago); last push 2026-09-30 (less than three weeks ago)",
     "explain_age": [
         "installed  6.4.0     2020-11-22   5.9 years ago",
-        "6.x        6.8.0     2022-09-13   4.1 years ago                 past release-warn-years 3",
-        "newest     7.8.1     2026-03-15   0.6 years ago                 below release-warn-years 3",
+        "6.x        6.8.0     2022-09-13   4.0 years ago                 past release-warn-years 3",
+        "newest     7.8.1     2026-03-15   0.5 years ago                 below release-warn-years 3",
         "last push            2026-09-30   less than three weeks ago     below push-warn-years 3",
         "libyears 5.3 behind the newest stable release"
     ],

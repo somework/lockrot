@@ -17,7 +17,7 @@ libyears: 0.0 behind across the one package
 pulled in by: akaunting/laravel-apexcharts 1
 advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
-Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
 note: GitLab unreachable for 1 repositories: not stubbed:
 https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true&per_page=1

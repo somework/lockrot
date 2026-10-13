@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| low | `jfcherng/php-color-output` | 2.0.2 | old-promise · stale | `4 = ((old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)`<br>**Do:** move jfcherng/php-color-output to ^3.0.0 through jfcherng/php-diff — clears old-promise; 3.x needs php \>=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of jfcherng/php-diff (7.0.1) still requires it<br>*old-promise:* released 2020-05-27 for PHP 7 (php "\>=7.1.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2021-05-27 (5.4 years ago) | jfcherng/php-diff |
+| low | `jfcherng/php-color-output` | 2.0.2 | old-promise · stale | `4 = ((old-promise 16 + stale 2 [¼ of 8]) ÷ 2 transitive) ÷ 2 dev (4.5, rounded down)`<br>**Do:** move jfcherng/php-color-output to ^3.0.0 through jfcherng/php-diff — clears old-promise; 3.x needs php \>=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of jfcherng/php-diff (7.0.1) still requires it<br>*old-promise:* released 2020-05-27 for PHP 7 (php "\>=7.1.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2021-05-27 (5.3 years ago) | jfcherng/php-diff |
 
 flags: old-promise 1 · stale 1 · 1 package carries more than one
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · 1 in packages-dev · deepest: `jfcherng/php-color-output`, 1 hop (`jfcherng/php-diff` › `jfcherng/php-color-output`)
@@ -12,4 +12,4 @@ libyears: 1.0 behind across the one package · 0.0 from direct requirements · f
 pulled in by: `jfcherng/php-diff` 1
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 
-<sub>2 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

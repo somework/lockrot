@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "tobscure/json-api dev-joomla-backports \u2014 finding high (16 = pinned 16) \u2014 pinned: pinned to branch snapshot dev-joomla-backports. Do: no move: lockrot did not read its releases, so it names none; review the snapshot.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "5509bda20c5e71185c431e200fa90f90ee339e23e514d19f7d7fb15dbe8c806a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

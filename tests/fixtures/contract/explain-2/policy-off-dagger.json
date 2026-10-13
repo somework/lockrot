@@ -291,7 +291,7 @@
         ],
         "evidence": "vulnerable: 1 advisory: 1 medium \u2014 all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter",
         "allowlist_reason": null,
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "libyears": 2.11,
         "age": {
             "installed": {
@@ -353,7 +353,7 @@
         "installed_release_dated_by": null,
         "repository": null,
         "type": "library",
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "branches": [
             {
                 "branch": "4.x",
@@ -1238,7 +1238,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],
     "note_details": []
 }

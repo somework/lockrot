@@ -12,4 +12,4 @@ security: no vulnerable package · advisories not checked
 libyears: 10.6 behind across the one package · 10.6 from direct requirements · furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 advisories: 0 packages asked, 1 not asked (offline) · packagist.org not asked (offline)
 
-<sub>1 package checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

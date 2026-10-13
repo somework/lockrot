@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/abandoned",
-        "description": "guzzlehttp/cache-subscriber 0.2.0 \u2014 finding critical (36 = abandoned 32 + old-promise 4 [\u00bc of 16]) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.1 years ago); last push 2019-09-16 (7.1 years ago). Do: find a replacement (none named).",
+        "description": "guzzlehttp/cache-subscriber 0.2.0 \u2014 finding critical (36 = abandoned 32 + old-promise 4 [\u00bc of 16]) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.0 years ago); last push 2019-09-16 (7.0 years ago). Do: find a replacement (none named).",
         "categories": [
             "Bug Risk"
         ],
@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 1
+                "begin": 4
             }
         }
     },
@@ -27,7 +27,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 1
+                "begin": 4
             }
         }
     }

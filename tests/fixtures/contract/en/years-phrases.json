@@ -57,8 +57,8 @@
             "phrase": "2.2 years ago"
         },
         {
-            "value": 2.3,
-            "phrase": "2.3 years ago"
+            "value": 2.6,
+            "phrase": "2.6 years ago"
         },
         {
             "value": 2.7,
@@ -71,6 +71,10 @@
         {
             "value": 3.0,
             "phrase": "3.0 years ago"
+        },
+        {
+            "value": 3.3,
+            "phrase": "3.3 years ago"
         },
         {
             "value": 3.4,
@@ -87,10 +91,6 @@
         {
             "value": 3.8,
             "phrase": "3.8 years ago"
-        },
-        {
-            "value": 3.9,
-            "phrase": "3.9 years ago"
         },
         {
             "value": 4.0,
@@ -125,12 +125,12 @@
             "phrase": "5.2 years ago"
         },
         {
-            "value": 5.4,
-            "phrase": "5.4 years ago"
+            "value": 5.3,
+            "phrase": "5.3 years ago"
         },
         {
-            "value": 5.5,
-            "phrase": "5.5 years ago"
+            "value": 5.4,
+            "phrase": "5.4 years ago"
         },
         {
             "value": 5.6,
@@ -153,8 +153,8 @@
             "phrase": "6.2 years ago"
         },
         {
-            "value": 6.4,
-            "phrase": "6.4 years ago"
+            "value": 6.3,
+            "phrase": "6.3 years ago"
         },
         {
             "value": 6.9,
@@ -173,8 +173,8 @@
             "phrase": "7.7 years ago"
         },
         {
-            "value": 8.2,
-            "phrase": "8.2 years ago"
+            "value": 8.1,
+            "phrase": "8.1 years ago"
         },
         {
             "value": 8.7,

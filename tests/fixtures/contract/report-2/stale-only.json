@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "run": {
         "project": "akaunting/akaunting",
         "root_package": "akaunting/akaunting",
@@ -1004,7 +1004,7 @@
         "update_now_command": null,
         "fix_unknown": 0
     },
-    "data_date": "2026-10-14T00:00:00+00:00",
+    "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1035,10 +1035,10 @@
                     },
                     "headline": {
                         "unit": "years",
-                        "value": 3.4,
+                        "value": 3.3,
                         "source": "release"
                     },
-                    "summary": "last release 2023-06-02 (3.4 years ago); last push 2023-06-02 (3.4 years ago)"
+                    "summary": "last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago)"
                 }
             ],
             "score": {
@@ -1191,43 +1191,43 @@
                 {
                     "id": "S2",
                     "level": "warn",
-                    "summary": "last release 2023-06-02 (3.4 years ago)",
+                    "summary": "last release 2023-06-02 (3.3 years ago)",
                     "data": {
                         "last_release": "2023-06-02T07:22:01+00:00",
                         "last_version": "2.1.1",
-                        "years": 3.4,
+                        "years": 3.3,
                         "dated_by": null
                     }
                 },
                 {
                     "id": "S4",
                     "level": "warn",
-                    "summary": "last push 2023-06-02 (3.4 years ago)",
+                    "summary": "last push 2023-06-02 (3.3 years ago)",
                     "data": {
                         "last_push": "2023-06-02T07:23:06+00:00",
                         "repo": "akaunting/laravel-debugbar-collector",
                         "host": "github.com",
-                        "years": 3.4,
+                        "years": 3.3,
                         "forge": "github",
                         "event": "push"
                     }
                 }
             ],
-            "evidence": "stale: last release 2023-06-02 (3.4 years ago); last push 2023-06-02 (3.4 years ago)",
+            "evidence": "stale: last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
+            "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 0,
             "age": {
                 "installed": {
                     "at": "2023-06-02T07:22:01+00:00",
-                    "years": 3.4,
+                    "years": 3.3,
                     "dated_by": null
                 },
                 "installed_unmeasured": null,
                 "release": {
                     "version": "2.1.1",
                     "at": "2023-06-02T07:22:01+00:00",
-                    "years": 3.4,
+                    "years": 3.3,
                     "level": "warn",
                     "dated_by": null
                 },
@@ -1235,14 +1235,14 @@
                 "branch_release": {
                     "version": "2.1.1",
                     "at": "2023-06-02T07:22:01+00:00",
-                    "years": 3.4,
+                    "years": 3.3,
                     "level": "warn",
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2023-06-02T07:23:06+00:00",
-                    "years": 3.4,
+                    "years": 3.3,
                     "level": "warn"
                 },
                 "push_unmeasured": null

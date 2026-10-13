@@ -3,10 +3,10 @@
     "next_step_text": "replace with symfony/error-handler (named by its registry)",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v3.4.47 released 2020-10-24 (6.0 years ago), the newest on 3.x; newest release v4.4.44 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)",
+    "age_line": "age: installed v3.4.47 released 2020-10-24 (5.9 years ago), the newest on 3.x; newest release v4.4.44 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)",
     "explain_age": [
-        "installed  v3.4.47   2020-10-24   6.0 years ago",
-        "3.x        v3.4.47   2020-10-24   6.0 years ago                 past release-high-years 5",
+        "installed  v3.4.47   2020-10-24   5.9 years ago",
+        "3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5",
         "newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3",
         "last push            2022-07-29   4.2 years ago                 past push-warn-years 3",
         "libyears 1.8 behind the newest stable release"

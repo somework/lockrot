@@ -51,6 +51,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/abandoned",
@@ -58,7 +63,7 @@
                     "level": "error",
                     "rank": 100.0,
                     "message": {
-                        "text": "guzzlehttp/cache-subscriber 0.2.0 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.1 years ago); last push 2019-09-16 (7.1 years ago). Do: find a replacement (none named)."
+                        "text": "guzzlehttp/cache-subscriber 0.2.0 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.0 years ago); last push 2019-09-16 (7.0 years ago). Do: find a replacement (none named)."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/cache-subscriber"
@@ -78,7 +83,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -100,14 +105,14 @@
                         "age": {
                             "installed": {
                                 "at": "2019-09-16T13:44:55+00:00",
-                                "years": 7.1,
+                                "years": 7,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "0.2.0",
                                 "at": "2019-09-16T13:44:55+00:00",
-                                "years": 7.1,
+                                "years": 7,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -115,14 +120,14 @@
                             "branch_release": {
                                 "version": "0.2.0",
                                 "at": "2019-09-16T13:44:55+00:00",
-                                "years": 7.1,
+                                "years": 7,
                                 "level": "high",
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2019-09-16T13:45:37+00:00",
-                                "years": 7.1,
+                                "years": 7,
                                 "level": "high"
                             },
                             "push_unmeasured": null
@@ -141,7 +146,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }
@@ -173,7 +182,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "term": {
@@ -190,7 +199,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

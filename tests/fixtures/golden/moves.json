@@ -4546,6 +4546,65 @@
         "move_in": "next_step",
         "partial": null
     },
+    "local-path-advisory": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "unknown",
+            "reason": "local_package",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "pinned"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-j4xy-fb9q-x9h7"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-81ww-1p5d-6c6k"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-bxhd-1cmh-djg9"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-krjy-6tb4-skgg"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-ydwx-2n98-5dyf"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move: it is installed from a local path (your own package)"
+        },
+        "fix_kind": "unknown",
+        "installed_branch_fixes": null,
+        "move_in": "next_step",
+        "partial": null
+    },
     "lock-only\u2021": {
         "next_step": {
             "kind": "replace",
@@ -5514,6 +5573,41 @@
             "text": "move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching \u2014 clears left-behind; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it"
         }
     },
+    "pinned-unread": {
+        "next_step": {
+            "kind": "no-move",
+            "source": "pinned",
+            "merged": [],
+            "fix_kind": null,
+            "reason": "metadata_not_read",
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": null,
+            "version": null,
+            "newest": null,
+            "constraint": null,
+            "latest": null,
+            "php_check": null,
+            "crosses_major": null,
+            "held_by": [],
+            "clears": [],
+            "unverified": [],
+            "adds": [],
+            "leaves": [
+                {
+                    "kind": "flag",
+                    "id": "pinned"
+                }
+            ],
+            "clears_all": false,
+            "if_applied": null,
+            "composer_moves_because": [],
+            "commands": [],
+            "through": [],
+            "also": [],
+            "text": "no move: lockrot did not read its releases, so it names none; review the snapshot"
+        }
+    },
     "policy-off\u2021": {
         "next_step": {
             "kind": "raise-php",
@@ -6396,7 +6490,7 @@
             "fix_kind": null,
             "reason": null,
             "replacement": null,
-            "quiet_years": 8.2,
+            "quiet_years": 8.1,
             "to_branch": null,
             "version": null,
             "newest": null,
@@ -6424,7 +6518,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "find a maintained alternative: nothing released for 8.2 years"
+            "text": "find a maintained alternative: nothing released for 8.1 years"
         }
     },
     "snapshot-alias": {
@@ -7127,6 +7221,12 @@
         },
         "move_in": "next_step",
         "partial": null
+    },
+    "unknown": {
+        "next_step": null
+    },
+    "unknown-origin": {
+        "next_step": null
     },
     "unrated\u2021": {
         "next_step": {

@@ -21,6 +21,6 @@ furthest behind symfony/routing v4.4.41 at 4.5
 pulled in by: mautic/core-lib 1
 advisories: 1 package asked · packagist.org answered (2 on record for 1 package)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
-Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read

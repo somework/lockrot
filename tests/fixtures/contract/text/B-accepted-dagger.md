@@ -16,4 +16,4 @@ advisories: 1 package asked · packagist.org answered (1 on record for 1 package
 
 - note: extra.lockrot.ignore\[\] accepts maintenance flags only, not advisories: symfony/monolog-bridge: 1 counted advisory; accept them in Composer's audit policy if that is the decision
 
-<sub>1 package checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

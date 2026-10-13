@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -1031,7 +1031,7 @@
         "update_now_command": null,
         "fix_unknown": 0
     },
-    "data_date": "2026-10-14T00:00:00+00:00",
+    "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1721,14 +1721,14 @@
                             "project": true,
                             "target": true
                         },
-                        "newest_years": 0.4,
+                        "newest_years": 0.3,
                         "reachable_years": 2
                     }
                 }
             ],
             "evidence": "left-behind: branch 1.x last released 2022-07-20 (4.2 years ago); 3.x released v3.7.1 (2026-06-05), needs php >=8.1 above the project's php >=7.4; 2.x released v2.5.4 (2024-09-25)",
             "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
+            "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 3.88,
             "age": {
                 "installed": {
@@ -1740,7 +1740,7 @@
                 "release": {
                     "version": "v3.7.1",
                     "at": "2026-06-05T06:23:12+00:00",
-                    "years": 0.4,
+                    "years": 0.3,
                     "level": null,
                     "dated_by": null
                 },
@@ -1755,7 +1755,7 @@
                 "branch_release_unmeasured": null,
                 "push": {
                     "at": "2026-09-16T14:21:11+00:00",
-                    "years": 0.1,
+                    "years": 0,
                     "level": null
                 },
                 "push_unmeasured": null

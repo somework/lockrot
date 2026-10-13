@@ -3,12 +3,12 @@
     "next_step_text": "raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 — clears left-behind; 3.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed 2.0.8 released 2022-12-07 (3.9 years ago), the newest on 2.x; newest release v3.1.1 2026-04-05 (0.5 years ago); last push 2026-09-16 (0.1 years ago)",
+    "age_line": "age: installed 2.0.8 released 2022-12-07 (3.8 years ago), the newest on 2.x; newest release v3.1.1 2026-04-05 (0.5 years ago); last push 2026-09-16 (less than three weeks ago)",
     "explain_age": [
-        "installed  2.0.8     2022-12-07   3.9 years ago",
-        "2.x        2.0.8     2022-12-07   3.9 years ago                 past release-warn-years 3",
+        "installed  2.0.8     2022-12-07   3.8 years ago",
+        "2.x        2.0.8     2022-12-07   3.8 years ago                 past release-warn-years 3",
         "newest     v3.1.1    2026-04-05   0.5 years ago                 below release-warn-years 3",
-        "last push            2026-09-16   0.1 years ago                 below push-warn-years 3",
+        "last push            2026-09-16   less than three weeks ago     below push-warn-years 3",
         "libyears 3.3 behind the newest stable release"
     ],
     "baseline_suffix": null,

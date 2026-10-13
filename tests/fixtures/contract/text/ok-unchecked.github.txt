@@ -1,2 +1,2 @@
-::error file=composer.lock,title=lockrot%3A ok — unchecked::scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it. checks missing: S2, S8 (undated releases).
+::error file=composer.lock,line=4,title=lockrot%3A ok — unchecked::scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it. checks missing: S2, S8 (undated releases).
 gate: fails · --fail-on=high,unchecked · 1 finding fails it (unchecked 1) · target php 8.4 (--target-php)

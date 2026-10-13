@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "run": {
         "project": "mautic/mautic",
         "root_package": "mautic/mautic",
@@ -1021,7 +1021,7 @@
         "update_now_command": null,
         "fix_unknown": 0
     },
-    "data_date": "2026-10-14T00:00:00+00:00",
+    "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
         "1 package is not from a Composer repository: its release metadata and repository activity were not read"
     ],
@@ -1293,7 +1293,7 @@
             ],
             "evidence": "pinned: pinned to branch snapshot 4.4.x-dev",
             "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
+            "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": null,
             "age": {
                 "installed": null,
@@ -1310,7 +1310,7 @@
                 "branch_release_unmeasured": "undated_releases",
                 "push": {
                     "at": "2026-09-25T06:27:20+00:00",
-                    "years": 0.1,
+                    "years": 0,
                     "level": null
                 },
                 "push_unmeasured": null

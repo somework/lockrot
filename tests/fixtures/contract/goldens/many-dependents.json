@@ -3,12 +3,12 @@
     "next_step_text": "move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more — clears left-behind; 2.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of friendsofsymfony/user-bundle (v4.1.0), symfony/event-dispatcher (v8.1.5) and symfony/security-core (v8.1.8) still require it",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v1.10.0 released 2022-07-20 (4.2 years ago), the newest on 1.x; newest release v3.7.1 2026-06-05 (0.4 years ago); last push 2026-09-16 (0.1 years ago)",
+    "age_line": "age: installed v1.10.0 released 2022-07-20 (4.2 years ago), the newest on 1.x; newest release v3.7.1 2026-06-05 (0.3 years ago); last push 2026-09-16 (less than three weeks ago)",
     "explain_age": [
         "installed  v1.10.0   2022-07-20   4.2 years ago",
         "1.x        v1.10.0   2022-07-20   4.2 years ago                 past release-warn-years 3",
-        "newest     v3.7.1    2026-06-05   0.4 years ago                 below release-warn-years 3",
-        "last push            2026-09-16   0.1 years ago                 below push-warn-years 3",
+        "newest     v3.7.1    2026-06-05   0.3 years ago                 below release-warn-years 3",
+        "last push            2026-09-16   less than three weeks ago     below push-warn-years 3",
         "libyears 3.9 behind the newest stable release"
     ],
     "baseline_suffix": null,

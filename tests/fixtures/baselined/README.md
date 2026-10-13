@@ -20,6 +20,9 @@ recorded file. Re-record them when lockrot's output changes, and review the diff
    `--explain` for one package per standing shape and with `--fail-on=left-behind,vulnerable-high`.
 4. `regenerate`: the file is written again on the later lock, and the later lock is checked again.
 
+Each step also runs `LockrotCommand` with the options of the step, in a copy of the project.
+`provenance.json` `runs[]` records those options and the exit code of that run.
+
 The recorder runs every scenario twice and writes only when both runs agree byte for byte. It
 refuses a scenario that misses a coverage floor (`BaselinedFloors`). Every recorded file carries the
 tool version that `VersionMask` names, and the address of the fixture server loses its port.

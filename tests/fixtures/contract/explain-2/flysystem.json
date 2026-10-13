@@ -380,7 +380,7 @@
         ],
         "evidence": "left-behind: branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02); vulnerable: 1 advisory: 1 low \u2014 none fixed on 1.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter",
         "allowlist_reason": null,
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "libyears": 4.73,
         "age": {
             "installed": {
@@ -442,7 +442,7 @@
         "installed_release_dated_by": null,
         "repository": null,
         "type": "library",
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "branches": [
             {
                 "branch": "3.x",
@@ -494,7 +494,7 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
-                "released_years": 4.1,
+                "released_years": 4,
                 "fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -656,7 +656,7 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
-                "released_years": 12.8,
+                "released_years": 12.7,
                 "fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -1422,7 +1422,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [
         "1 package is not from a Composer repository: its release metadata and repository activity were not read"
     ],

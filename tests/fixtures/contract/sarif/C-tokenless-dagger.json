@@ -51,6 +51,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/abandoned",
@@ -78,7 +83,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -100,7 +105,7 @@
                         "age": {
                             "installed": {
                                 "at": "2020-10-24T10:57:07+00:00",
-                                "years": 6,
+                                "years": 5.9,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -115,7 +120,7 @@
                             "branch_release": {
                                 "version": "v3.4.47",
                                 "at": "2020-10-24T10:57:07+00:00",
-                                "years": 6,
+                                "years": 5.9,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -137,7 +142,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }
@@ -169,7 +178,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "term": {
@@ -186,7 +195,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

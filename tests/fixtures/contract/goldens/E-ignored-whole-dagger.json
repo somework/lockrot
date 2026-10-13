@@ -3,9 +3,9 @@
     "next_step_text": "composer update symfony/yaml (gets v5.4.53) — clears 3 advisories",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v5.4.23 released 2023-04-23 (3.5 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years ago); newest release v8.1.8 2026-09-26 (less than three weeks ago)",
+    "age_line": "age: installed v5.4.23 released 2023-04-23 (3.4 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years ago); newest release v8.1.8 2026-09-26 (less than three weeks ago)",
     "explain_age": [
-        "installed  v5.4.23   2023-04-23   3.5 years ago",
+        "installed  v5.4.23   2023-04-23   3.4 years ago",
         "5.x        v5.4.53   2026-05-20   0.4 years ago                 below release-warn-years 3",
         "newest     v8.1.8    2026-09-26   less than three weeks ago     below release-warn-years 3",
         "last push            not read (allowlisted)",

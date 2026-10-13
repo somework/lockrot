@@ -32,6 +32,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/abandoned",
@@ -39,7 +44,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "fgrosse/phpasn1 v2.5.0 \u2014 finding high, 16 = abandoned 32 \u00f7 2 unreached \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8 years ago); last push 2023-04-23 (3.5 years ago). Do: find a replacement (none named); lockrot found no path from your requirements to it: `composer why` names what requires it."
+                        "text": "fgrosse/phpasn1 v2.5.0 \u2014 finding high, 16 = abandoned 32 \u00f7 2 unreached \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8 years ago); last push 2023-04-23 (3.4 years ago). Do: find a replacement (none named); lockrot found no path from your requirements to it: `composer why` names what requires it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "fgrosse/phpasn1"
@@ -58,7 +63,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -97,7 +102,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2023-04-23T13:19:44+00:00",
-                                "years": 3.5,
+                                "years": 3.4,
                                 "level": "warn"
                             },
                             "push_unmeasured": null
@@ -116,7 +121,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

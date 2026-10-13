@@ -15,4 +15,4 @@ advisories: 1 package asked · packagist.org answered (1 on record for 1 package
 
 - note: GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true\&per\_page=1
 
-<sub>2 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

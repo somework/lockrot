@@ -3,12 +3,12 @@
     "next_step_text": "—",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed 0.0.3 released 2023-04-11 (3.5 years ago), its newest release; last push 2024-02-13 (2.7 years ago)",
+    "age_line": "age: installed 0.0.3 released 2023-04-11 (3.5 years ago), its newest release; last push 2024-02-13 (2.6 years ago)",
     "explain_age": [
         "installed  0.0.3     2023-04-11   3.5 years ago",
         "0.0.3      0.0.3     2023-04-11   3.5 years ago                 past release-warn-years 3",
         "newest     0.0.3     2023-04-11   3.5 years ago                 past release-warn-years 3",
-        "last push            2024-02-13   2.7 years ago                 below push-warn-years 3",
+        "last push            2024-02-13   2.6 years ago                 below push-warn-years 3",
         "libyears 0.0 behind the newest stable release"
     ],
     "baseline_suffix": null,

@@ -59,6 +59,7 @@
    }
   },
   "runs": {
+   "description": "One entry per step: the options of the step and the exit code of LockrotCommand, run with them in a copy of the side's project.",
    "type": "array",
    "minItems": 4,
    "items": {

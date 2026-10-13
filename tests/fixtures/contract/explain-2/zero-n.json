@@ -199,7 +199,7 @@
         ],
         "evidence": "stale: last release 2023-04-11 (3.5 years ago)",
         "allowlist_reason": null,
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "libyears": 0,
         "age": {
             "installed": {
@@ -226,7 +226,7 @@
             "branch_release_unmeasured": null,
             "push": {
                 "at": "2024-02-13T16:47:03+00:00",
-                "years": 2.7,
+                "years": 2.6,
                 "level": null
             },
             "push_unmeasured": null
@@ -261,7 +261,7 @@
         "installed_release_dated_by": null,
         "repository": null,
         "type": "library",
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "branches": [
             {
                 "branch": "0.0.3",
@@ -1071,7 +1071,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],
     "note_details": []
 }

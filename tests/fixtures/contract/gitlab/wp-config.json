@@ -11,14 +11,14 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 1
+                "begin": 4
             }
         }
     },
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "roots/wp-config 1.0.0 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2018-08-10 (8.2 years ago). Do: test it on PHP 8.4 \u2014 1.0.0 is its newest release.",
+        "description": "roots/wp-config 1.0.0 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2018-08-10 (8.1 years ago). Do: test it on PHP 8.4 \u2014 1.0.0 is its newest release.",
         "categories": [
             "Bug Risk"
         ],
@@ -27,7 +27,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 1
+                "begin": 4
             }
         }
     }

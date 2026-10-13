@@ -32,6 +32,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/left-behind",
@@ -39,7 +44,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "joomla/string 2.0.1 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 2.x last released 2022-08-15 (4.2 years ago); 4.x released 4.0.0 (2025-07-23), needs php ^8.3.0 above the project's php ^7.2.5; no releasing branch within reach. Do: raise require.php to >=8.1, then require joomla/string ^3.0 \u2014 clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "joomla/string 2.0.1 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 2.x last released 2022-08-15 (4.1 years ago); 4.x released 4.0.0 (2025-07-23), needs php ^8.3.0 above the project's php ^7.2.5; no releasing branch within reach. Do: raise require.php to >=8.1, then require joomla/string ^3.0 \u2014 clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "joomla/string"
@@ -58,7 +63,7 @@
                         ],
                         "direct": true,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -85,7 +90,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-08-15T12:47:17+00:00",
-                                "years": 4.2,
+                                "years": 4.1,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -100,7 +105,7 @@
                             "branch_release": {
                                 "version": "2.0.1",
                                 "at": "2022-08-15T12:47:17+00:00",
-                                "years": 4.2,
+                                "years": 4.1,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -126,7 +131,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

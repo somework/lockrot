@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/left-behind",
-        "description": "genealabs/laravel-pivot-events 10.0.1 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 10.x last released 2023-03-22 (3.6 years ago); 13.x released 13.1.0 (2026-02-28), needs php ^8.2 above the project's php ^8.1; 12.x released 12.0.0 (2025-02-26). Do: move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching \u2014 clears left-behind; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it. (via genealabs/laravel-model-caching)",
+        "description": "genealabs/laravel-pivot-events 10.0.1 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 10.x last released 2023-03-22 (3.5 years ago); 13.x released 13.1.0 (2026-02-28), needs php ^8.2 above the project's php ^8.1; 12.x released 12.0.0 (2025-02-26). Do: move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching \u2014 clears left-behind; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it. (via genealabs/laravel-model-caching)",
         "categories": [
             "Bug Risk"
         ],
@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 1
+                "begin": 4
             }
         }
     }

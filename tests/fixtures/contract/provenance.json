@@ -1,10 +1,10 @@
 {
     "recorded_by": "tools/report/record",
-    "clock": "2026-10-14T00:00:00+00:00",
+    "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "92727220b0768f58f5d49f4276d72f2af6a5a76e815012e8f04efb61ca30f5cb",
+        "tests/fixtures/flags/cases.json": "8757d6362e8ea8ee2b98238625dca1565d6b69e8db9009244de4182e023047fc",
         "tests/fixtures/flags/composite.json": "ec59fa67eb480bc91772e4c4f9fba1736e6a338042ff9eba28e4238a9cf15d39",
-        "tests/fixtures/flags/provenance.json": "90703559a23afe7c35eae4e1c838e480a8b272bb8d301b999d00f38086c262b6"
+        "tests/fixtures/flags/provenance.json": "710b09f714a843f97a1791554bf806916f65e72c7153ece12d24a5609dcb1aa7"
     },
     "version_mask": {
         "paths": [
@@ -29,8 +29,6 @@
     ],
     "cases_without_inputs": [
         "psr-log",
-        "pinned-unread",
-        "unknown",
         "ok-ignored‡",
         "unknown-vuln‡",
         "ok-offline‡",
@@ -41,33 +39,34 @@
         "scope-registries‡",
         "no-feed‡",
         "unparseable-version‡",
-        "local-path-advisory",
-        "unknown-origin",
         "host-accepted‡",
         "host-accept-expired‡",
         "no-feed-accepted‡",
         "vcs-accepted‡"
     ],
+    "model_only": "model-only/ holds the model documents of cases_without_inputs: the hydrator cannot rebuild those cases, so lockrot did not write them",
+    "baseline_2": "the gate-row baselines of tests/fixtures/schema/documents/baseline/gate-rows/, read by Baseline::fromArray() and written by BaselineFile::write()",
+    "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 18,
-            "baseline_suffix": 14,
-            "commands_cmd": 87,
-            "commands_posix": 87,
-            "gate_line": 84,
-            "next_step_text": 50,
-            "run_gate_line": 86,
-            "score_text": 73
+            "age_line": 65,
+            "baseline_suffix": 70,
+            "commands_cmd": 91,
+            "commands_posix": 91,
+            "gate_line": 88,
+            "next_step_text": 55,
+            "run_gate_line": 90,
+            "score_text": 78
         },
         "inputs_differ": {
-            "age_line": 70,
-            "baseline_suffix": 74,
+            "age_line": 27,
+            "baseline_suffix": 22,
             "commands_cmd": 1,
             "commands_posix": 1,
             "gate_line": 4,
-            "next_step_text": 38,
+            "next_step_text": 37,
             "run_gate_line": 2,
-            "score_text": 15
+            "score_text": 14
         }
     },
     "bundle_sha256": "sha256 of the lines \"<sha256>  <path>\", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json"

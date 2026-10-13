@@ -3,11 +3,11 @@
     "next_step_text": "composer update league/commonmark (gets 2.10.3) — clears 3 advisories",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed 2.9.1 released 2026-08-09 (0.2 years ago); 2.x last released 2.10.3 2026-09-21 (0.1 years ago), its newest release; last push 2026-10-01 (less than three weeks ago)",
+    "age_line": "age: installed 2.9.1 released 2026-08-09 (0.1 years ago); 2.x last released 2.10.3 2026-09-21 (less than three weeks ago), its newest release; last push 2026-10-01 (less than three weeks ago)",
     "explain_age": [
-        "installed  2.9.1     2026-08-09   0.2 years ago",
-        "2.x        2.10.3    2026-09-21   0.1 years ago                 below release-warn-years 3",
-        "newest     2.10.3    2026-09-21   0.1 years ago                 below release-warn-years 3",
+        "installed  2.9.1     2026-08-09   0.1 years ago",
+        "2.x        2.10.3    2026-09-21   less than three weeks ago     below release-warn-years 3",
+        "newest     2.10.3    2026-09-21   less than three weeks ago     below release-warn-years 3",
         "last push            2026-10-01   less than three weeks ago     below push-warn-years 3",
         "libyears 0.1 behind the newest stable release"
     ],

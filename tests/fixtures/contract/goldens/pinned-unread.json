@@ -1,0 +1,17 @@
+{
+    "score_text": "16 = pinned 16",
+    "next_step_text": "no move: lockrot did not read its releases, so it names none; review the snapshot",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": null,
+    "explain_age": [
+        "installed  dev-joomla-backportsnot read (a branch snapshot has no release branch)",
+        "its branch           not read (not from a Composer repository)",
+        "newest               not read (not from a Composer repository)",
+        "last push            not read (not from a Composer repository)",
+        "libyears not measured: not from a Composer repository"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

@@ -31472,7 +31472,47 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": null
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "joomla/joomla-cms",
+     "require": {
+      "php": "^7.2.5",
+      "tobscure/json-api": "*"
+     },
+     "repositories": [
+      {
+       "type": "vcs",
+       "url": "https://github.com/joomla-backports/json-api-php.git"
+      }
+     ]
+    },
+    "lock": [
+     {
+      "name": "tobscure/json-api",
+      "version": "dev-joomla-backports",
+      "time": "2022-12-30T19:09:00+00:00",
+      "php": "^7.0 || ^8.0",
+      "dev": false,
+      "origin": "vcs"
+     }
+    ],
+    "advisories": [],
+    "abandoned": null,
+    "dependents": {},
+    "activity": {
+     "host": "github.com",
+     "repo": "joomla-backports/json-api-php",
+     "pushed_at": null,
+     "archived": null
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^7.2.5",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "unreached-move",
@@ -47623,7 +47663,40 @@
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 10.6.18 released 2026-09-26 (less than three weeks ago)"
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "drupal/drupal",
+     "require": {
+      "drupal/core": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "drupal/core",
+      "version": "10.6.18",
+      "time": "2026-09-26T20:37:56+00:00",
+      "php": null,
+      "dev": false,
+      "origin": "path"
+     }
+    ],
+    "advisories": [],
+    "abandoned": null,
+    "dependents": {},
+    "activity": {
+     "host": "github.com",
+     "repo": "drupal/core",
+     "pushed_at": null,
+     "archived": null
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": null,
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "php-null",
@@ -131458,7 +131531,81 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": null
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "mautic/mautic",
+     "require": {
+      "mautic/core-lib": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "mautic/core-lib",
+      "version": "4.3.x-dev",
+      "time": null,
+      "php": ">=7.4.0 <8.1",
+      "dev": false,
+      "origin": "path"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-j4xy-fb9q-x9h7",
+      "cve": "CVE-2022-25768",
+      "title": "Mautic vulnerable to Improper Access Control in UI upgrade process",
+      "link": "https://github.com/advisories/GHSA-x3jx-5w6m-q2fc",
+      "reported_at": "2024-09-18T17:43:36+00:00",
+      "severity": "high",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.1.3,<4.4.13"
+     },
+     {
+      "id": "PKSA-81ww-1p5d-6c6k",
+      "cve": "CVE-2024-47058",
+      "title": "Mautic vulnerable to Cross-site Scripting (XSS) - stored (edit form HTML field)",
+      "link": "https://github.com/advisories/GHSA-xv68-rrmw-9xwf",
+      "reported_at": "2024-09-18T22:05:00+00:00",
+      "severity": "medium",
+      "affected_versions": ">=1.0.0-beta,<4.4.13|>=5.0.0-alpha,<5.1.1"
+     },
+     {
+      "id": "PKSA-bxhd-1cmh-djg9",
+      "cve": "CVE-2024-47050",
+      "title": "Mautic vulnerable to XSS in contact/company tracking (no authentication)",
+      "link": "https://github.com/advisories/GHSA-73gr-32wg-qhh7",
+      "reported_at": "2024-09-18T22:05:30+00:00",
+      "severity": "medium",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=2.6.0,<4.4.13"
+     },
+     {
+      "id": "PKSA-krjy-6tb4-skgg",
+      "cve": "CVE-2021-27917",
+      "title": "Mautic has an XSS in contact tracking and page hits report",
+      "link": "https://github.com/advisories/GHSA-xpc5-rr39-v8v2",
+      "reported_at": "2024-09-18T22:05:59+00:00",
+      "severity": "medium",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta4,<4.4.13"
+     },
+     {
+      "id": "PKSA-ydwx-2n98-5dyf",
+      "cve": "CVE-2022-25770",
+      "title": "Mautic has insufficient authentication in upgrade flow",
+      "link": "https://github.com/advisories/GHSA-qf6m-6m4g-rmrc",
+      "reported_at": "2024-09-18T22:06:13+00:00",
+      "severity": "medium",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta3,<4.4.13"
+     }
+    ],
+    "abandoned": null,
+    "dependents": {},
+    "activity": null,
+    "run": {
+     "target_php": "8.4",
+     "project_php": null,
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "unknown-origin",
@@ -132449,7 +132596,70 @@
     "run_gate_line": "gate: fails · --fail-on=high,unchecked · 1 finding fails it (unchecked 1) · target php 8.4 (--target-php)",
     "age_line": "age: installed 3.7.1, release date not known (no date)"
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "yiisoft/yii2-app-basic",
+     "require": {
+      "php": ">=8.2",
+      "yiisoft/yii2": "*",
+      "yiisoft/yii2-bootstrap5": "*",
+      "yiisoft/yii2-symfonymailer": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "bower-asset/jquery",
+      "version": "3.7.1",
+      "time": null,
+      "php": null,
+      "dev": false,
+      "origin": "unknown"
+     },
+     {
+      "name": "yiisoft/yii2",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "bower-asset/jquery": "*"
+      }
+     },
+     {
+      "name": "yiisoft/yii2-bootstrap5",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "bower-asset/jquery": "*"
+      }
+     },
+     {
+      "name": "yiisoft/yii2-symfonymailer",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "bower-asset/jquery": "*"
+      }
+     }
+    ],
+    "advisories": [],
+    "abandoned": null,
+    "dependents": {},
+    "activity": {
+     "host": "github.com",
+     "repo": "jquery/jquery-dist",
+     "pushed_at": null,
+     "archived": null
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": ">=8.2",
+     "fail_on": "high,unchecked",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "host-accepted‡",

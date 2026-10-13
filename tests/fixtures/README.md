@@ -36,6 +36,10 @@ these fixtures are re-recorded when lockrot's output changes: run `tools/report/
 `tools/report/record --all-baselined`, and review the diff in the pull request like a snapshot. A new
 recording changes `contract/bundle_sha256`, which a lockrot-report release pins.
 
+Every document of `contract/report-2/` is lockrot's output. `contract/model-only/` holds the model's
+documents of the cases that the hydrator cannot rebuild (`contract/provenance.json`
+`cases_without_inputs`). They pass the schema checks, but lockrot did not write them.
+
 ## Other fixtures
 
 - `mini/` — a hand-written lock and its composer.json, shared by `LockFileTest`,

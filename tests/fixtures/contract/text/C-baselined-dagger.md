@@ -12,4 +12,4 @@ libyears: 1.8 behind across the one package · 1.8 from direct requirements · f
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 baseline: 1 known · 0 new · 0 worsened · 0 stale (lockrot-baseline.json)
 
-<sub>3 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

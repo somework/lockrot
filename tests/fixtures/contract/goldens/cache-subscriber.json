@@ -3,12 +3,12 @@
     "next_step_text": "find a replacement (none named)",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed 0.2.0 released 2019-09-16 (7.1 years ago), its newest release; last push 2019-09-16 (7.1 years ago)",
+    "age_line": "age: installed 0.2.0 released 2019-09-16 (7.0 years ago), its newest release; last push 2019-09-16 (7.0 years ago)",
     "explain_age": [
-        "installed  0.2.0     2019-09-16   7.1 years ago",
-        "0.2.x      0.2.0     2019-09-16   7.1 years ago                 past release-high-years 5",
-        "newest     0.2.0     2019-09-16   7.1 years ago                 past release-high-years 5",
-        "last push            2019-09-16   7.1 years ago                 past push-high-years 5",
+        "installed  0.2.0     2019-09-16   7.0 years ago",
+        "0.2.x      0.2.0     2019-09-16   7.0 years ago                 past release-high-years 5",
+        "newest     0.2.0     2019-09-16   7.0 years ago                 past release-high-years 5",
+        "last push            2019-09-16   7.0 years ago                 past push-high-years 5",
         "libyears 0.0 behind the newest stable release"
     ],
     "baseline_suffix": null,

@@ -9,8 +9,6 @@
  "reverted": {},
  "cases_without_inputs": [
   "psr-log",
-  "pinned-unread",
-  "unknown",
   "ok-ignored‡",
   "unknown-vuln‡",
   "ok-offline‡",
@@ -21,8 +19,6 @@
   "scope-registries‡",
   "no-feed‡",
   "unparseable-version‡",
-  "local-path-advisory",
-  "unknown-origin",
   "host-accepted‡",
   "host-accept-expired‡",
   "no-feed-accepted‡",

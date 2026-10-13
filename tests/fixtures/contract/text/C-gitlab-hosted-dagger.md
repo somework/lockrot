@@ -13,4 +13,4 @@ advisories: 1 package asked · packagist.org answered (0 on record for 0 package
 
 - note: Repository activity not checked for 1 package on hosts lockrot cannot ask: gitlab.example.com (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.
 
-<sub>3 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

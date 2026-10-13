@@ -33,10 +33,10 @@
                 },
                 "headline": {
                     "unit": "years",
-                    "value": 8.2,
+                    "value": 8.1,
                     "source": "release"
                 },
-                "summary": "last release 2018-08-08 (8.2 years ago); last push 2020-08-08 (6.2 years ago)"
+                "summary": "last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago)"
             },
             {
                 "id": "old-promise",
@@ -142,7 +142,7 @@
             "fix_kind": null,
             "reason": null,
             "replacement": null,
-            "quiet_years": 8.2,
+            "quiet_years": 8.1,
             "to_branch": null,
             "version": null,
             "newest": null,
@@ -170,7 +170,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "find a maintained alternative: nothing released for 8.2 years"
+            "text": "find a maintained alternative: nothing released for 8.1 years"
         },
         "security": {
             "status": "clear",
@@ -242,23 +242,23 @@
             {
                 "id": "S2",
                 "level": "high",
-                "summary": "last release 2018-08-08 (8.2 years ago)",
+                "summary": "last release 2018-08-08 (8.1 years ago)",
                 "data": {
                     "last_release": "2018-08-08T15:08:14+00:00",
                     "last_version": "v1.0.4",
-                    "years": 8.2,
+                    "years": 8.1,
                     "dated_by": null
                 }
             },
             {
                 "id": "S4",
                 "level": "high",
-                "summary": "last push 2020-08-08 (6.2 years ago)",
+                "summary": "last push 2020-08-08 (6.1 years ago)",
                 "data": {
                     "last_push": "2020-08-08T20:48:54+00:00",
                     "repo": "yosymfony/toml",
                     "host": "github.com",
-                    "years": 6.2,
+                    "years": 6.1,
                     "forge": "github",
                     "event": "push"
                 }
@@ -277,21 +277,21 @@
                 }
             }
         ],
-        "evidence": "silent: last release 2018-08-08 (8.2 years ago); last push 2020-08-08 (6.2 years ago); old-promise: released 2018-08-08 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+        "evidence": "silent: last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago); old-promise: released 2018-08-08 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
         "allowlist_reason": null,
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "libyears": 0,
         "age": {
             "installed": {
                 "at": "2018-08-08T15:08:14+00:00",
-                "years": 8.2,
+                "years": 8.1,
                 "dated_by": null
             },
             "installed_unmeasured": null,
             "release": {
                 "version": "v1.0.4",
                 "at": "2018-08-08T15:08:14+00:00",
-                "years": 8.2,
+                "years": 8.1,
                 "level": "high",
                 "dated_by": null
             },
@@ -299,14 +299,14 @@
             "branch_release": {
                 "version": "v1.0.4",
                 "at": "2018-08-08T15:08:14+00:00",
-                "years": 8.2,
+                "years": 8.1,
                 "level": "high",
                 "dated_by": null
             },
             "branch_release_unmeasured": null,
             "push": {
                 "at": "2020-08-08T20:48:54+00:00",
-                "years": 6.2,
+                "years": 6.1,
                 "level": "high"
             },
             "push_unmeasured": null
@@ -352,7 +352,7 @@
         "installed_release_dated_by": null,
         "repository": null,
         "type": "library",
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "branches": [
             {
                 "branch": "1.x",
@@ -369,7 +369,7 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
-                "released_years": 8.2,
+                "released_years": 8.1,
                 "fixes": null
             },
             {
@@ -1180,7 +1180,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],
     "note_details": []
 }

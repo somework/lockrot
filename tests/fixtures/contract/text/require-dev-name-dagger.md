@@ -11,4 +11,4 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
 libyears: 3.9 behind across the one package · 0.0 from direct requirements · furthest behind symfony/var-dumper v4.4.47 at 3.9
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 
-<sub>35 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>35 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

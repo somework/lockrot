@@ -301,7 +301,7 @@
         ],
         "evidence": "vulnerable: 1 advisory: 1 low \u2014 fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
         "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "libyears": null,
         "age": {
             "installed": null,
@@ -309,7 +309,7 @@
             "release": {
                 "version": "v1.43.0",
                 "at": "2026-09-23T14:40:04+00:00",
-                "years": 0.1,
+                "years": 0,
                 "level": null,
                 "dated_by": null
             },
@@ -317,7 +317,7 @@
             "branch_release": {
                 "version": "v1.43.0",
                 "at": "2026-09-23T14:40:04+00:00",
-                "years": 0.1,
+                "years": 0,
                 "level": null,
                 "dated_by": null
             },
@@ -355,7 +355,7 @@
         "installed_release_dated_by": null,
         "repository": null,
         "type": "library",
-        "data_date": "2026-10-14T00:00:00+00:00",
+        "data_date": "2026-10-01T17:41:20+00:00",
         "branches": [
             {
                 "branch": "1.x",
@@ -372,7 +372,7 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
-                "released_years": 0.1,
+                "released_years": 0,
                 "fixes": {
                     "fixed": 0,
                     "unknown": 1,
@@ -1138,7 +1138,7 @@
             ]
         }
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],
     "note_details": []
 }

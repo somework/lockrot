@@ -1,4 +1,4 @@
-::error file=composer.lock,title=lockrot%3A critical — vulnerable (critical advisory)::twig/twig v2.16.1: 64 = vulnerable 64 [critical advisory 32 × 2: no reachable fix]. Do: no move runs on the target: 3.x needs php >=8.1.0 and the target php 8.0 does not run it. vulnerable: 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{%25 use %25}` template name.
+::error file=composer.lock,line=4,title=lockrot%3A critical — vulnerable (critical advisory)::twig/twig v2.16.1: 64 = vulnerable 64 [critical advisory 32 × 2: no reachable fix]. Do: no move runs on the target: 3.x needs php >=8.1.0 and the target php 8.0 does not run it. vulnerable: 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{%25 use %25}` template name.
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low

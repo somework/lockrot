@@ -4,7 +4,7 @@
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-14T00:00:00+00:00",
+    "generated_at": "2026-10-01T17:41:20+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -1006,7 +1006,7 @@
         "update_now_command": null,
         "fix_unknown": 0
     },
-    "data_date": "2026-10-14T00:00:00+00:00",
+    "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1249,7 +1249,7 @@
             ],
             "evidence": "abandoned: marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago)",
             "allowlist_reason": null,
-            "data_date": "2026-10-14T00:00:00+00:00",
+            "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 0,
             "age": {
                 "installed": {

@@ -4,11 +4,11 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `roots/wp-config` | 1.0.0 | old-promise · stale | `18 = old-promise 16 + stale 2 [¼ of 8]`<br>**Do:** test it on PHP 8.4 — 1.0.0 is its newest release<br>*old-promise:* released 2018-08-10 for PHP 5 (php "\>=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2018-08-10 (8.2 years ago) | direct |
+| **high** | `roots/wp-config` | 1.0.0 | old-promise · stale | `18 = old-promise 16 + stale 2 [¼ of 8]`<br>**Do:** test it on PHP 8.4 — 1.0.0 is its newest release<br>*old-promise:* released 2018-08-10 for PHP 5 (php "\>=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested<br>*stale:* last release 2018-08-10 (8.1 years ago) | direct |
 
 flags: old-promise 1 · stale 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 libyears: 0.0 behind across the one package
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 
-<sub>1 package checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

@@ -17,4 +17,4 @@ advisories: 1 package asked · packagist.org answered (2 on record for 1 package
 
 - note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
-<sub>2 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

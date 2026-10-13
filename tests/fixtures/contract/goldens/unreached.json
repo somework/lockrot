@@ -3,12 +3,12 @@
     "next_step_text": "find a replacement (none named); lockrot found no path from your requirements to it: `composer why` names what requires it",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v2.5.0 released 2022-12-19 (3.8 years ago), its newest release; last push 2023-04-23 (3.5 years ago)",
+    "age_line": "age: installed v2.5.0 released 2022-12-19 (3.8 years ago), its newest release; last push 2023-04-23 (3.4 years ago)",
     "explain_age": [
         "installed  v2.5.0    2022-12-19   3.8 years ago",
         "2.x        v2.5.0    2022-12-19   3.8 years ago                 past release-warn-years 3",
         "newest     v2.5.0    2022-12-19   3.8 years ago                 past release-warn-years 3",
-        "last push            2023-04-23   3.5 years ago                 past push-warn-years 3",
+        "last push            2023-04-23   3.4 years ago                 past push-warn-years 3",
         "libyears 0.0 behind the newest stable release"
     ],
     "baseline_suffix": null,

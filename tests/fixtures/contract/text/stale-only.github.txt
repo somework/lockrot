@@ -1,4 +1,4 @@
-::warning file=composer.lock,title=lockrot%3A medium — stale::akaunting/laravel-debugbar-collector 2.1.1: 8 = stale 8. Do: —. stale: last release 2023-06-02 (3.4 years ago); last push 2023-06-02 (3.4 years ago).
+::warning file=composer.lock,line=4,title=lockrot%3A medium — stale::akaunting/laravel-debugbar-collector 2.1.1: 8 = stale 8. Do: —. stale: last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago).
 flags: stale 1
 depth: every flagged package is named in composer.json · direct 1
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

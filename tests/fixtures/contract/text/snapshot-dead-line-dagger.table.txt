@@ -6,7 +6,7 @@
           higher line does, so left-behind would count; what requires it must allow it
       pinned       pinned to branch snapshot 4.4.x-dev
       age: 4.x last released v4.4.44 2022-07-20 (4.2 years ago); newest release v8.1.5 2026-08-21 (0.1 years ago);
-           last push 2026-09-25 (0.1 years ago)
+           last push 2026-09-25 (less than three weeks ago)
 
 2 packages checked · 1 flagged: medium 1
 flags: pinned 1
@@ -16,6 +16,6 @@ libyears: the one package could not be measured
 pulled in by: mautic/core-lib 1
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
-Data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read

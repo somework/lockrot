@@ -13,4 +13,4 @@ advisories: 1 package asked · packagist.org answered (0 on record for 0 package
 
 - note: Bitbucket credentials not set: repository activity checked for 0 candidate packages, 1 packages skipped (add bitbucket.org credentials to auth.json to check all)
 
-<sub>3 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

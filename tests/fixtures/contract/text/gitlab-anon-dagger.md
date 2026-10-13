@@ -14,4 +14,4 @@ advisories: 1 package asked · packagist.org answered (0 on record for 0 package
 
 - note: GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true\&per\_page=1
 
-<sub>3 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>3 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

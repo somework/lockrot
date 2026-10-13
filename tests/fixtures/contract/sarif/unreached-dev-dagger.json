@@ -32,6 +32,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/left-behind",
@@ -39,7 +44,7 @@
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
-                        "text": "bacon/bacon-qr-code 2.0.8 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 unreached \u2014 left-behind: branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach. Do: raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it."
+                        "text": "bacon/bacon-qr-code 2.0.8 \u2014 finding medium, 8 = left-behind 16 \u00f7 2 unreached \u2014 left-behind: branch 2.x last released 2022-12-07 (3.8 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach. Do: raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "bacon/bacon-qr-code"
@@ -58,7 +63,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "chain": [],
@@ -70,7 +75,7 @@
                         "age": {
                             "installed": {
                                 "at": "2022-12-07T17:46:57+00:00",
-                                "years": 3.9,
+                                "years": 3.8,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
@@ -85,14 +90,14 @@
                             "branch_release": {
                                 "version": "2.0.8",
                                 "at": "2022-12-07T17:46:57+00:00",
-                                "years": 3.9,
+                                "years": 3.8,
                                 "level": "warn",
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2026-09-16T01:33:33+00:00",
-                                "years": 0.1,
+                                "years": 0,
                                 "level": null
                             },
                             "push_unmeasured": null
@@ -111,7 +116,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

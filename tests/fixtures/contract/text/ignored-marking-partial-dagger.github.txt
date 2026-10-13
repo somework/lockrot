@@ -1,2 +1,2 @@
-::notice file=composer.lock,title=lockrot%3A finished::doctrine/cache 2.1.1: 0 (stale accepted).
+::notice file=composer.lock,line=4,title=lockrot%3A finished::doctrine/cache 2.1.1: 0 (stale accepted).
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

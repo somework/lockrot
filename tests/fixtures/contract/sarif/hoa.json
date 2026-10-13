@@ -51,6 +51,11 @@
                 }
             },
             "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
             "results": [
                 {
                     "ruleId": "lockrot/abandoned",
@@ -58,7 +63,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.5 years ago). Do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package."
+                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.4 years ago). Do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/consistency"
@@ -78,7 +83,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [
                             "high"
@@ -124,7 +129,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2021-04-28T21:38:16+00:00",
-                                "years": 5.5,
+                                "years": 5.4,
                                 "level": "high"
                             },
                             "push_unmeasured": null
@@ -143,7 +148,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }
@@ -175,7 +184,7 @@
                         ],
                         "direct": false,
                         "dev": false,
-                        "data_date": "2026-10-14T00:00:00+00:00",
+                        "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
                         "error_by": [],
                         "term": {
@@ -192,7 +201,11 @@
                         {
                             "physicalLocation": {
                                 "artifactLocation": {
-                                    "uri": "composer.lock"
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
                                 }
                             }
                         }

@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **high** | `laravel/framework` | v9.52.16 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** raise require.php to \>=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve<br>*vulnerable:* 6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule<br>*age:* installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.2 years ago); newest release v11.57.0 2026-09-29 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago) | direct |
+| **high** | `laravel/framework` | v9.52.16 | vulnerable | `16 = vulnerable 16 [high advisory]`<br>**Do:** raise require.php to \>=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve<br>*vulnerable:* 6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule<br>*age:* installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.1 years ago); newest release v11.57.0 2026-09-29 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago) | direct |
 
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
@@ -12,4 +12,4 @@ security: 1 vulnerable package · 6 advisories: 2 high, 2 medium, 1 unrated, 1 l
 libyears: 3.0 behind across the one package · 3.0 from direct requirements · furthest behind laravel/framework v9.52.16 at 3.0
 advisories: 1 package asked · packagist.org answered (6 on record for 1 package)
 
-<sub>2 packages checked — data as of 2026-10-14 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>2 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
