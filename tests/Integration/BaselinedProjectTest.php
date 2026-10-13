@@ -4,39 +4,22 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
-use Lockrot\Allowlist\BuiltinAllowlist;
-use Lockrot\Analyzer\Analyzer;
-use Lockrot\Analyzer\Report;
-use Lockrot\Analyzer\RunSettings;
-use Lockrot\Baseline\Baseline;
-use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Baseline\BaselineFile;
-use Lockrot\Clock;
-use Lockrot\Data\Forge\ActivityClient;
-use Lockrot\Data\Forge\ActivityFetchPlanner;
-use Lockrot\Data\Forge\ForgeAuth;
-use Lockrot\Data\Forge\RepoLocator;
-use Lockrot\Data\Forge\Tokens;
-use Lockrot\Data\Http\RecordedHttpClient;
-use Lockrot\Data\Php\PhpReleaseDates;
-use Lockrot\Data\Repository\RepositoryMetadataLoader;
 use Lockrot\Exception\ConfigException;
-use Lockrot\Lock\LockFile;
-use Lockrot\Lock\ProjectConfig;
-use Lockrot\Signal\SignalSet;
-use Lockrot\Signal\Thresholds;
-use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\Contract\BaselinedFloors;
+use Lockrot\Tests\Support\Contract\BaselinedScenario;
 use Lockrot\Tests\Support\JsonPath;
-use Lockrot\Verdict\FailOn;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 /**
- * A real project under a baseline: wallabag's lock of 2024-05-17 writes the baseline that day, and
- * the fixture's later lock is checked against it (`items/C78.md` R7). The advisory lookup is off,
- * so the floors are maintenance ones. The real 0.13 file of that day is the refusal input of Q2.
+ * Real projects under a committed baseline-2 (items C78): the earlier lock writes the baseline on
+ * its own day, and the later lock is checked against it, then regenerated and checked again. The
+ * four steps run in-process on the fixture server and the recorded answers, and their files equal
+ * the committed ones. Re-record them with tools/report/record --all-baselined.
  *
  * @coversNothing
  *
@@ -46,15 +29,7 @@ use PHPUnit\Framework\TestCase;
 #[Group('covers-nothing')]
 final class BaselinedProjectTest extends TestCase
 {
-    private const FIXTURES = __DIR__.'/../fixtures/';
-    private const BEFORE = self::FIXTURES.'baselined/wallabag-main/before';
-    private const AFTER = self::FIXTURES.'apps/wallabag_wallabag';
-    private const BASELINE_1 = self::FIXTURES.'baselined/wallabag-main/lockrot-baseline-1.json';
-    /** The baseline-2 file that the earlier lock writes on its own day. */
-    private const BASELINE_2 = self::FIXTURES.'baselined/wallabag-main/lockrot-baseline.json';
-    private const HTTP = self::FIXTURES.'baselined/wallabag-main/http/';
-    private const T0 = '2024-05-17T00:00:00+00:00';
-    private const NOW = '2026-09-14T00:00:00+00:00';
+    private const BASELINE_1 = BaselinedScenario::FIXTURES.'baselined/wallabag-main/lockrot-baseline-1.json';
 
     /** SPEC-0.14.md §6.4 (Q2): the 0.13 file that wallabag would have committed is refused before schema validation. */
     public function testTheReal013BaselineIsRefused(): void
@@ -65,148 +40,96 @@ final class BaselinedProjectTest extends TestCase
         BaselineFile::resolve(\dirname(self::BASELINE_1), basename(self::BASELINE_1), '0.14.0')->read();
     }
 
+    /** @return iterable<string, array{string}> */
+    public static function scenarios(): iterable
+    {
+        foreach (array_keys(BaselinedScenario::SCENARIOS) as $scenario) {
+            yield $scenario => [$scenario];
+        }
+    }
+
     /**
-     * The later lock against the baseline that the earlier one wrote: every standing, a worsened
-     * flag, a covered one, stale entries, both limits of the gate score, a failing and an exempt
-     * finding at --fail-on=high, and a dev finding the baseline knows. It fails, then a
-     * regenerated baseline passes.
+     * @dataProvider scenarios
      *
      * @runInSeparateProcess
      */
+    #[DataProvider('scenarios')]
     #[RunInSeparateProcess]
-    public function testTheLaterLockAgainstTheBaselineOfTheEarlierOne(): void
+    public function testTheFourStepsWriteTheCommittedFilesAndMeetTheFloors(string $scenario): void
     {
-        // The earlier lock keeps its own answers, so they move no other fixture's results.
-        $server = FixtureRepositoryServer::fromLockFiles([self::BEFORE.'/composer.lock', self::AFTER.'/composer.lock'], self::FIXTURES.'http/p2', [], [['https://repo.packagist.org/p2/', self::HTTP.'p2']]);
-        $server->start();
-        $github = self::githubAnswers();
-        try {
-            $baseline = Baseline::fromReport(self::analyse($server, $github, self::BEFORE, self::T0)->withRun(self::settings('generate_baseline')));
-            $written = (string) json_encode(['$schema' => 'https://lockrot.dev/schema/baseline-2.json'] + $baseline->toArray(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n";
-            if (getenv('LOCKROT_REWRITE_GOLDEN') === '1') {
-                file_put_contents(self::BASELINE_2, $written);
-            }
-            self::assertSame((string) @file_get_contents(self::BASELINE_2), $written, 'GateAgreementTest reads this file: rewrite it with LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit --filter BaselinedProjectTest');
-            $firstSeen = [];
-            foreach ($baseline->packages() as $package) {
-                $entry = $baseline->entryFor($package);
-                $firstSeen[] = $entry === null ? null : $entry->firstSeen();
-            }
-            self::assertSame(['2024-05-17'], array_values(array_unique($firstSeen)), 'the baseline the project wrote that day');
-            $after = self::analyse($server, $github, self::AFTER, self::NOW);
-            $checked = self::checked($after, $baseline);
-            $regenerated = self::checked($after, Baseline::fromReport($after->withRun(self::settings('generate_baseline')), $baseline));
-        } finally {
-            $server->stop();
-            array_map('unlink', glob($github.'/*') ?: []);
-            rmdir($github);
-        }
-        $document = JsonPath::decoded($checked->toArray());
-        $root = JsonPath::arrayAt($document, ['baseline']);
-        $statuses = [];
-        $flagStates = [];
-        $why = [];
-        $limitedBy = [];
-        $gates = [];
-        $devKnown = false;
-        foreach (JsonPath::arrayAt($document, ['findings']) as $finding) {
-            self::assertIsArray($finding);
-            $status = self::text($finding, ['baseline', 'status']);
-            $statuses[$status] = true;
-            foreach (JsonPath::arrayAt($finding, ['flags']) as $flag) {
-                $flagStates[\is_array($flag) ? self::text($flag, ['baseline', 'state']) : ''] = true;
-            }
-            foreach (JsonPath::has($finding, ['baseline', 'worsened_by']) ? JsonPath::column($finding, ['baseline', 'worsened_by'], 'why') : [] as $reason) {
-                $why[\is_string($reason) ? $reason : ''] = true;
-            }
-            if (JsonPath::has($finding, ['gate', 'basis', 'limited_by'])) {
-                $limitedBy[self::text($finding, ['gate', 'basis', 'limited_by'])] = true;
-            }
-            $gate = JsonPath::arrayAt($finding, ['gate']);
-            $gates[(string) json_encode([$gate['reaches_fail_on'] ?? null, $gate['fails'] ?? null, $gate['exempt_by'] ?? null])] = true;
-            $devKnown = $devKnown || (JsonPath::boolAt($finding, ['dev']) && $status === 'known');
-        }
+        $dir = BaselinedScenario::FIXTURES.'baselined/'.$scenario.'/';
+        $t1 = JsonPath::stringAt(JsonPath::decodeFile($dir.'provenance.json'), ['clocks', 't1']);
+        $files = BaselinedScenario::record($scenario, $t1);
 
-        self::assertGreaterThan(0, $root['known']);
-        self::assertGreaterThan(0, $root['new']);
-        self::assertGreaterThan(0, $root['worsened']);
-        self::assertNotSame([], $root['stale'], 'packages the later lock dropped');
-        self::assertArrayHasKey('covered', $flagStates);
-        self::assertArrayHasKey('new', $why, 'a flag worsened by a new fact');
-        self::assertSame(['cap', 'score'], self::sortedKeys($limitedBy), 'gate.basis.limited_by takes both values');
-        self::assertArrayHasKey('[true,true,null]', $gates, 'a finding reaches high and fails');
-        self::assertArrayHasKey('[true,false,"baseline"]', $gates, 'a known finding reaches high and is exempt');
-        self::assertTrue($devKnown, 'a dev finding the baseline knows');
-        self::assertNotNull($checked->gate());
-        self::assertTrue($checked->gate()->fails(), 'exit 1');
-        self::assertNotNull($regenerated->gate());
-        self::assertFalse($regenerated->gate()->fails(), 'exit 0 after --generate-baseline');
+        foreach ($files as $path => $contents) {
+            self::assertSame((string) @file_get_contents($dir.$path), $contents, $scenario.'/'.$path.': re-record with tools/report/record --baselined '.$scenario);
+        }
+        self::assertSame([], BaselinedFloors::missed($scenario, $files));
+        $check = JsonPath::decoded(json_decode($files['check/report.json'], true));
+        self::assertRootCountsAreTheFindingsCounts($check);
+        self::assertRecordedValuesAreSet($check);
+        self::assertTheRegeneratedFileKeepsItsHistory(json_decode($files['lockrot-baseline.json'], true), json_decode($files['regenerate/lockrot-baseline.json'], true), $check, substr($t1, 0, 10));
     }
 
-    /** The shared GitHub answers and the earlier lock's own, in one new temporary directory. */
-    private static function githubAnswers(): string
+    /** @param array<mixed, mixed> $report */
+    private static function assertRootCountsAreTheFindingsCounts(array $report): void
     {
-        $dir = sys_get_temp_dir().'/lockrot-baselined-github-'.bin2hex(random_bytes(8));
-        self::assertTrue(mkdir($dir));
-        foreach ([self::FIXTURES.'http/github', self::HTTP.'github'] as $source) {
-            foreach (glob($source.'/*.json') ?: [] as $file) {
-                copy($file, $dir.'/'.basename($file));
+        $counts = ['known' => 0, 'new' => 0, 'worsened' => 0];
+        foreach (JsonPath::arrayAt($report, ['findings']) as $finding) {
+            $status = \is_array($finding) && \is_array($finding['baseline'] ?? null) ? $finding['baseline']['status'] : null;
+            if (\is_string($status) && isset($counts[$status])) {
+                ++$counts[$status];
             }
         }
 
-        return $dir;
+        self::assertSame($counts, array_intersect_key(JsonPath::arrayAt($report, ['baseline']), $counts));
     }
 
-    private static function analyse(FixtureRepositoryServer $server, string $github, string $dir, string $now): Report
+    /** Q2: every entry comes from a baseline-2 file, so its fix model, target PHP and dates are set. */
+    private static function assertRecordedValuesAreSet(array $report): void
     {
-        $clock = Clock::fixed($now);
-        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
-        $analyzer = new Analyzer(
-            new RepositoryMetadataLoader($server->repositories(), $clock),
-            new ActivityClient(new RecordedHttpClient($github), $auth),
-            new ActivityFetchPlanner($auth),
-            new RepoLocator(),
-            BuiltinAllowlist::load(),
-            SignalSet::default($clock, new Thresholds(), '8.4', PhpReleaseDates::load()),
-            $clock,
-            false
-        );
-
-        return $analyzer->analyze(LockFile::fromFile($dir.'/composer.lock'), ProjectConfig::fromFile($dir.'/composer.json'), true);
-    }
-
-    private static function checked(Report $report, Baseline $baseline): Report
-    {
-        $names = array_map(static fn ($finding): string => $finding->package(), $report->findings());
-        $compared = $report->withBaseline(BaselineComparison::compare($baseline, $report, 'lockrot-baseline.json', $names));
-
-        return $compared->withRun(self::settings('check'));
-    }
-
-    private static function settings(string $mode): RunSettings
-    {
-        return new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, new Thresholds(), null, false, $mode, true);
+        foreach (JsonPath::arrayAt($report, ['findings']) as $finding) {
+            $recorded = \is_array($finding) && \is_array($finding['baseline']['recorded'] ?? null) ? $finding['baseline']['recorded'] : null;
+            if ($recorded === null) {
+                continue;
+            }
+            self::assertNotNull($recorded['fix_model'] ?? null);
+            self::assertNotNull($recorded['target_php'] ?? null);
+            foreach (\is_array($recorded['flags'] ?? null) ? $recorded['flags'] : [] as $flag) {
+                self::assertNotNull(\is_array($flag) ? ($flag['known_since'] ?? null) : null);
+            }
+        }
     }
 
     /**
-     * @param array<mixed, mixed> $data
-     * @param list<string>        $path
-     */
-    private static function text(array $data, array $path): string
-    {
-        return JsonPath::has($data, $path) ? JsonPath::stringAt($data, $path) : '';
-    }
-
-    /**
-     * @param array<string, true> $set
+     * The regenerated file keeps `first_seen` and each `known_since` of a fact still counted, dates a
+     * new fact on the check's day and drops the entries of packages the later lock no longer holds.
      *
-     * @return list<string>
+     * @param mixed               $before
+     * @param mixed               $after
+     * @param array<mixed, mixed> $report
      */
-    private static function sortedKeys(array $set): array
+    private static function assertTheRegeneratedFileKeepsItsHistory($before, $after, array $report, string $today): void
     {
-        $keys = array_map('strval', array_keys($set));
-        sort($keys);
-
-        return $keys;
+        self::assertIsArray($before);
+        self::assertIsArray($after);
+        $old = JsonPath::arrayAt($before, ['findings']);
+        $new = JsonPath::arrayAt($after, ['findings']);
+        foreach (JsonPath::arrayAt($report, ['baseline', 'stale']) as $stale) {
+            $package = \is_array($stale) ? ($stale['package'] ?? null) : $stale;
+            self::assertArrayNotHasKey((string) $package, $new, 'a stale entry is dropped');
+        }
+        $kept = 0;
+        foreach ($new as $package => $entry) {
+            self::assertIsArray($entry);
+            $was = \is_array($old[$package] ?? null) ? $old[$package] : null;
+            self::assertSame($was === null ? $today : $was['first_seen'], $entry['first_seen'], (string) $package);
+            foreach (\is_array($entry['flags'] ?? null) ? $entry['flags'] : [] as $flag => $state) {
+                $since = $was['flags'][$flag]['known_since'] ?? null;
+                self::assertSame($since ?? $today, \is_array($state) ? $state['known_since'] : null, $package.' '.$flag);
+                $kept += $since === null ? 0 : 1;
+            }
+        }
+        self::assertGreaterThan(0, $kept, 'a flag the earlier file knew keeps its date');
     }
 }

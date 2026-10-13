@@ -1,0 +1,2218 @@
+{
+    "scenario": "wallabag-2.6",
+    "project": "wallabag/wallabag",
+    "recorded_by": "tools/report/record --baselined wallabag-2.6",
+    "before": {
+        "ref": "2.6.10",
+        "ref_kind": "tag",
+        "lock_sha256": "51f8325a712d75efa481200840a674460144ee8dade53037d10e36838828bb42",
+        "manifest_sha256": "9c529c6f3dddda850df64f5def5c4f7fd4ea21bd3449fd4ab492fb6af799ca4c"
+    },
+    "after": {
+        "ref": "2.6.14",
+        "ref_kind": "tag",
+        "lock_sha256": "2e18ef62bab2f8577eeeecdbef786a24c331de85ac0778d6d3b5c3b0efce2a56",
+        "manifest_sha256": "ff3a979d1fa6d1873289b4a4d34b86a80690cc8e954528981d165f4911002aa3"
+    },
+    "clocks": {
+        "t0": "2024-11-03T15:02:01+00:00",
+        "t1": "2026-10-13T00:00:00+00:00"
+    },
+    "options": [
+        "--target-php=8.4"
+    ],
+    "runs": [
+        {
+            "step": "generate",
+            "argv": [
+                "--generate-baseline",
+                "--output=json:t0/report.json",
+                "--target-php=8.4"
+            ],
+            "exit": 0
+        },
+        {
+            "step": "check",
+            "argv": [
+                "--fail-on=high",
+                "--format=json",
+                "--target-php=8.4"
+            ],
+            "exit": 1
+        },
+        {
+            "step": "check",
+            "argv": [
+                "--fail-on=left-behind,vulnerable-high",
+                "--format=json",
+                "--target-php=8.4"
+            ],
+            "exit": 1
+        },
+        {
+            "step": "check",
+            "argv": [
+                "--fail-on=high",
+                "--format=json",
+                "--target-php=8.3"
+            ],
+            "exit": 1
+        },
+        {
+            "step": "regenerate",
+            "argv": [
+                "--generate-baseline",
+                "--target-php=8.4"
+            ],
+            "exit": 0
+        },
+        {
+            "step": "recheck",
+            "argv": [
+                "--fail-on=high",
+                "--format=json",
+                "--target-php=8.4"
+            ],
+            "exit": 0
+        }
+    ],
+    "as_of": {
+        "removed": [
+            {
+                "package": "enshrined/svg-sanitize",
+                "id": "PKSA-4g5g-4rkv-myqs",
+                "reported_at": "2025-08-12T20:20:58+00:00"
+            },
+            {
+                "package": "enshrined/svg-sanitize",
+                "id": "PKSA-6j95-1jtb-x6wc",
+                "reported_at": "2026-10-08T19:41:10+00:00"
+            },
+            {
+                "package": "enshrined/svg-sanitize",
+                "id": "PKSA-8j6w-3kr7-s9xk",
+                "reported_at": "2026-10-08T19:41:15+00:00"
+            },
+            {
+                "package": "enshrined/svg-sanitize",
+                "id": "PKSA-cbx2-m9db-bmzd",
+                "reported_at": "2026-10-08T19:41:05+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-gcrk-3vtt-1r14",
+                "reported_at": "2026-08-03T21:07:26+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-93qv-9n9h-6k6p",
+                "reported_at": "2026-06-18T14:12:49+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-bbs6-q5q9-f3t4",
+                "reported_at": "2026-07-20T23:27:02+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-bcdd-5xc7-gwfb",
+                "reported_at": "2026-07-20T22:00:09+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-cnw1-2ytm-cgr8",
+                "reported_at": "2026-08-03T21:05:26+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-fy2t-3c5f-827y",
+                "reported_at": "2026-07-20T23:28:36+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-k22t-f949-t9g6",
+                "reported_at": "2026-06-18T14:12:49+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-pwsk-hy21-4gby",
+                "reported_at": "2026-07-20T21:46:02+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "id": "PKSA-qxvb-2bpp-dnk6",
+                "reported_at": "2026-07-20T23:27:49+00:00"
+            },
+            {
+                "package": "guzzlehttp/psr7",
+                "id": "PKSA-7qs6-zvnz-h66r",
+                "reported_at": "2026-06-18T09:49:37+00:00"
+            },
+            {
+                "package": "guzzlehttp/psr7",
+                "id": "PKSA-gm5x-j3mz-71n9",
+                "reported_at": "2026-05-25T22:58:15+00:00"
+            },
+            {
+                "package": "guzzlehttp/psr7",
+                "id": "PKSA-jj5t-2zs1-dcfm",
+                "reported_at": "2026-05-25T22:58:15+00:00"
+            },
+            {
+                "package": "guzzlehttp/psr7",
+                "id": "PKSA-vznr-tgp9-fd7d",
+                "reported_at": "2026-07-21T18:35:25+00:00"
+            },
+            {
+                "package": "j0k3r/graby",
+                "id": "PKSA-j5hk-b83d-1p4h",
+                "reported_at": "2026-03-31T23:12:36+00:00"
+            },
+            {
+                "package": "j0k3r/httplug-ssrf-plugin",
+                "id": "PKSA-px1b-j2dd-31r6",
+                "reported_at": "2024-11-04T00:00:00+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "id": "PKSA-km2b-zc3b-mjm3",
+                "reported_at": "2026-03-19T16:42:18+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "id": "PKSA-smrh-yx37-92ws",
+                "reported_at": "2026-05-05T21:17:57+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "id": "PKSA-12sz-bcny-pk4m",
+                "reported_at": "2026-09-08T21:24:29+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "id": "PKSA-432p-hv1d-chf7",
+                "reported_at": "2026-06-16T15:03:58+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "id": "PKSA-zh4j-by9m-7mz8",
+                "reported_at": "2026-04-10T20:58:10+00:00"
+            },
+            {
+                "package": "spomky-labs/otphp",
+                "id": "PKSA-kbc7-dq62-pt7d",
+                "reported_at": "2026-05-31T09:06:37+00:00"
+            },
+            {
+                "package": "spomky-labs/otphp",
+                "id": "PKSA-qv5y-crcz-9nxw",
+                "reported_at": "2026-05-31T09:08:33+00:00"
+            },
+            {
+                "package": "symfony/cache",
+                "id": "PKSA-z7t6-zt6p-wtng",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/dom-crawler",
+                "id": "PKSA-5r1g-c7b7-y1zg",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/http-client",
+                "id": "PKSA-35by-yxtt-jc85",
+                "reported_at": "2026-05-26T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/http-client",
+                "id": "PKSA-4k7v-pfvw-nqvp",
+                "reported_at": "2024-11-13T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/http-foundation",
+                "id": "PKSA-365x-2zjk-pt47",
+                "reported_at": "2025-11-12T11:09:14+00:00"
+            },
+            {
+                "package": "symfony/http-foundation",
+                "id": "PKSA-b35n-565h-rs4q",
+                "reported_at": "2024-11-05T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/mailer",
+                "id": "PKSA-28rh-rzzn-djk4",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/mime",
+                "id": "PKSA-2n2k-66v2-bwg3",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/mime",
+                "id": "PKSA-wtxr-p26d-nn42",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/monolog-bridge",
+                "id": "PKSA-4wjj-gy1p-ft3r",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/polyfill-intl-idn",
+                "id": "PKSA-dwsq-ppd2-mb1x",
+                "reported_at": "2026-05-26T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/routing",
+                "id": "PKSA-bf7t-jnpz-492k",
+                "reported_at": "2026-05-26T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/routing",
+                "id": "PKSA-yc7t-91v9-99xs",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/security-http",
+                "id": "PKSA-c28x-6bj5-8spx",
+                "reported_at": "2026-05-26T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/security-http",
+                "id": "PKSA-tbsf-h7vc-j7hn",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/yaml",
+                "id": "PKSA-b14r-zh1d-vdrc",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/yaml",
+                "id": "PKSA-ft77-7h5f-p3r6",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "symfony/yaml",
+                "id": "PKSA-v5yj-8nmz-sk2q",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "id": "PKSA-98jj-zbnk-dgwp",
+                "reported_at": "2024-12-27T06:30:47+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "id": "PKSA-wb9y-hg45-chz4",
+                "reported_at": "2024-12-27T06:30:48+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "id": "PKSA-62dz-rc7r-pb8r",
+                "reported_at": "2024-11-26T18:38:52+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "id": "PKSA-tdkc-7xrw-d14c",
+                "reported_at": "2024-12-27T06:30:47+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "id": "PKSA-ys59-hzk7-wxt5",
+                "reported_at": "2024-12-27T06:30:48+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-h8hf-ytnd-5t9q",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-8zx5-v2nz-58pb",
+                "reported_at": "2026-07-01T18:55:49+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-dpx1-78wg-1kqs",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-1tmc-rt7x-12w6",
+                "reported_at": "2026-05-27T15:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-3mcc-k66d-pydb",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-fbvq-z33h-r2np",
+                "reported_at": "2026-05-27T15:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-xx6c-6d96-db2w",
+                "reported_at": "2026-05-27T15:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-kvv6-36cr-fkzb",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-yd6k-t2gh-1m43",
+                "reported_at": "2026-05-27T15:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-2wrf-1xmk-1pky",
+                "reported_at": "2024-11-06T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-g9zw-qxh8-pq8w",
+                "reported_at": "2026-05-27T15:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-n14z-jjjg-g8vd",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-sjvz-tbbr-vwth",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-wwb1-81rc-pd65",
+                "reported_at": "2026-05-20T08:00:00+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "id": "PKSA-yhcn-xrg3-68b1",
+                "reported_at": "2024-11-06T08:00:00+00:00"
+            }
+        ],
+        "entries_removed": [
+            "enshrined/svg-sanitize",
+            "guzzlehttp/psr7",
+            "j0k3r/graby",
+            "phpseclib/phpseclib",
+            "spomky-labs/otphp",
+            "symfony/cache",
+            "symfony/dom-crawler",
+            "symfony/http-client",
+            "symfony/http-foundation",
+            "symfony/mailer",
+            "symfony/mime",
+            "symfony/monolog-bridge",
+            "symfony/polyfill-intl-idn",
+            "symfony/routing",
+            "symfony/security-http",
+            "symfony/yaml"
+        ],
+        "later_than_t0": [
+            {
+                "package": "twig/twig",
+                "reading": "age.release",
+                "at": "2026-07-03T20:44:34+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "reading": "age.branch_release",
+                "at": "2026-07-03T20:44:34+00:00"
+            },
+            {
+                "package": "twig/twig",
+                "reading": "age.push",
+                "at": "2026-09-14T12:14:56+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "reading": "age.release",
+                "at": "2026-09-06T13:55:09+00:00"
+            },
+            {
+                "package": "guzzlehttp/guzzle",
+                "reading": "age.push",
+                "at": "2026-09-06T13:55:34+00:00"
+            },
+            {
+                "package": "j0k3r/httplug-ssrf-plugin",
+                "reading": "age.release",
+                "at": "2025-01-06T09:13:08+00:00"
+            },
+            {
+                "package": "j0k3r/httplug-ssrf-plugin",
+                "reading": "age.push",
+                "at": "2026-09-14T07:00:15+00:00"
+            },
+            {
+                "package": "symfony/http-foundation",
+                "reading": "age.release",
+                "at": "2026-08-30T20:10:55+00:00"
+            },
+            {
+                "package": "symfony/http-foundation",
+                "reading": "age.push",
+                "at": "2026-09-14T18:02:32+00:00"
+            },
+            {
+                "package": "symfony/mime",
+                "reading": "age.release",
+                "at": "2026-08-22T09:06:25+00:00"
+            },
+            {
+                "package": "symfony/mime",
+                "reading": "age.push",
+                "at": "2026-09-09T12:43:50+00:00"
+            },
+            {
+                "package": "symfony/security-http",
+                "reading": "age.release",
+                "at": "2026-08-30T17:31:45+00:00"
+            },
+            {
+                "package": "symfony/security-http",
+                "reading": "age.push",
+                "at": "2026-09-14T14:54:17+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "reading": "age.release",
+                "at": "2026-09-14T14:38:11+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "reading": "age.branch_release",
+                "at": "2026-08-28T11:28:19+00:00"
+            },
+            {
+                "package": "tecnickcom/tcpdf",
+                "reading": "age.push",
+                "at": "2026-09-14T14:39:53+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "reading": "age.release",
+                "at": "2026-08-26T12:15:13+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "reading": "age.branch_release",
+                "at": "2026-08-26T12:13:21+00:00"
+            },
+            {
+                "package": "phpseclib/phpseclib",
+                "reading": "age.push",
+                "at": "2026-09-13T18:43:50+00:00"
+            },
+            {
+                "package": "spomky-labs/otphp",
+                "reading": "age.release",
+                "at": "2026-06-06T23:41:24+00:00"
+            },
+            {
+                "package": "spomky-labs/otphp",
+                "reading": "age.push",
+                "at": "2026-09-01T09:05:18+00:00"
+            },
+            {
+                "package": "symfony/monolog-bridge",
+                "reading": "age.release",
+                "at": "2026-08-30T01:18:12+00:00"
+            },
+            {
+                "package": "symfony/monolog-bridge",
+                "reading": "age.branch_release",
+                "at": "2026-05-07T16:46:23+00:00"
+            },
+            {
+                "package": "symfony/monolog-bridge",
+                "reading": "age.push",
+                "at": "2026-08-30T21:43:38+00:00"
+            },
+            {
+                "package": "behat/transliterator",
+                "reading": "age.push",
+                "at": "2025-05-07T16:20:04+00:00"
+            },
+            {
+                "package": "doctrine/annotations",
+                "reading": "age.push",
+                "at": "2025-12-11T07:45:03+00:00"
+            },
+            {
+                "package": "doctrine/cache",
+                "reading": "age.push",
+                "at": "2025-10-08T08:10:50+00:00"
+            },
+            {
+                "package": "symfony/inflector",
+                "reading": "age.release",
+                "at": "2024-11-10T20:33:58+00:00"
+            },
+            {
+                "package": "symfony/inflector",
+                "reading": "age.branch_release",
+                "at": "2024-11-10T20:33:58+00:00"
+            },
+            {
+                "package": "symfony/inflector",
+                "reading": "age.push",
+                "at": "2024-11-13T13:51:12+00:00"
+            },
+            {
+                "package": "enshrined/svg-sanitize",
+                "reading": "age.release",
+                "at": "2026-09-01T09:35:47+00:00"
+            },
+            {
+                "package": "enshrined/svg-sanitize",
+                "reading": "age.push",
+                "at": "2026-09-01T11:02:18+00:00"
+            },
+            {
+                "package": "guzzlehttp/psr7",
+                "reading": "age.release",
+                "at": "2026-08-24T11:02:13+00:00"
+            },
+            {
+                "package": "guzzlehttp/psr7",
+                "reading": "age.branch_release",
+                "at": "2026-08-24T09:13:11+00:00"
+            },
+            {
+                "package": "guzzlehttp/psr7",
+                "reading": "age.push",
+                "at": "2026-08-24T11:03:20+00:00"
+            },
+            {
+                "package": "symfony/mailer",
+                "reading": "age.release",
+                "at": "2026-08-21T17:47:34+00:00"
+            },
+            {
+                "package": "symfony/mailer",
+                "reading": "age.push",
+                "at": "2026-09-10T15:29:47+00:00"
+            },
+            {
+                "package": "symfony/routing",
+                "reading": "age.release",
+                "at": "2026-08-17T13:18:34+00:00"
+            },
+            {
+                "package": "symfony/routing",
+                "reading": "age.push",
+                "at": "2026-09-13T19:21:03+00:00"
+            },
+            {
+                "package": "symfony/cache",
+                "reading": "age.release",
+                "at": "2026-08-30T20:10:55+00:00"
+            },
+            {
+                "package": "symfony/cache",
+                "reading": "age.branch_release",
+                "at": "2026-05-24T08:41:21+00:00"
+            },
+            {
+                "package": "symfony/cache",
+                "reading": "age.push",
+                "at": "2026-09-10T11:35:15+00:00"
+            },
+            {
+                "package": "symfony/http-client",
+                "reading": "age.release",
+                "at": "2026-08-30T14:03:40+00:00"
+            },
+            {
+                "package": "symfony/http-client",
+                "reading": "age.branch_release",
+                "at": "2026-05-22T10:25:12+00:00"
+            },
+            {
+                "package": "symfony/http-client",
+                "reading": "age.push",
+                "at": "2026-09-10T15:29:44+00:00"
+            },
+            {
+                "package": "thecodingmachine/safe",
+                "reading": "age.release",
+                "at": "2026-02-04T18:08:13+00:00"
+            },
+            {
+                "package": "thecodingmachine/safe",
+                "reading": "age.push",
+                "at": "2026-08-17T23:43:41+00:00"
+            },
+            {
+                "package": "endroid/qr-code",
+                "reading": "age.release",
+                "at": "2026-02-05T07:01:58+00:00"
+            },
+            {
+                "package": "endroid/qr-code",
+                "reading": "age.push",
+                "at": "2026-02-05T07:02:55+00:00"
+            },
+            {
+                "package": "smalot/pdfparser",
+                "reading": "age.release",
+                "at": "2026-04-17T11:37:58+00:00"
+            },
+            {
+                "package": "smalot/pdfparser",
+                "reading": "age.push",
+                "at": "2026-05-26T06:55:52+00:00"
+            },
+            {
+                "package": "symfony/http-client-contracts",
+                "reading": "age.release",
+                "at": "2026-08-04T08:41:16+00:00"
+            },
+            {
+                "package": "symfony/http-client-contracts",
+                "reading": "age.branch_release",
+                "at": "2024-11-28T08:37:04+00:00"
+            },
+            {
+                "package": "symfony/http-client-contracts",
+                "reading": "age.push",
+                "at": "2026-08-31T09:10:41+00:00"
+            },
+            {
+                "package": "j0k3r/graby",
+                "reading": "age.release",
+                "at": "2026-09-14T14:05:34+00:00"
+            },
+            {
+                "package": "j0k3r/graby",
+                "reading": "age.branch_release",
+                "at": "2026-09-14T14:05:34+00:00"
+            },
+            {
+                "package": "j0k3r/graby",
+                "reading": "age.push",
+                "at": "2026-09-14T14:20:20+00:00"
+            },
+            {
+                "package": "symfony/dom-crawler",
+                "reading": "age.release",
+                "at": "2026-08-21T17:47:34+00:00"
+            },
+            {
+                "package": "symfony/dom-crawler",
+                "reading": "age.push",
+                "at": "2026-08-22T13:46:35+00:00"
+            },
+            {
+                "package": "symfony/validator",
+                "reading": "age.release",
+                "at": "2026-08-30T01:03:44+00:00"
+            },
+            {
+                "package": "symfony/validator",
+                "reading": "age.push",
+                "at": "2026-09-11T15:31:13+00:00"
+            },
+            {
+                "package": "symfony/polyfill-intl-idn",
+                "reading": "age.release",
+                "at": "2026-08-24T10:51:20+00:00"
+            },
+            {
+                "package": "symfony/polyfill-intl-idn",
+                "reading": "age.branch_release",
+                "at": "2026-08-24T10:51:20+00:00"
+            },
+            {
+                "package": "symfony/yaml",
+                "reading": "age.release",
+                "at": "2026-08-30T01:03:44+00:00"
+            },
+            {
+                "package": "symfony/yaml",
+                "reading": "age.branch_release",
+                "at": "2026-05-20T17:13:41+00:00"
+            },
+            {
+                "package": "symfony/yaml",
+                "reading": "age.push",
+                "at": "2026-09-02T11:47:06+00:00"
+            },
+            {
+                "package": "phpdocumentor/reflection-common",
+                "reading": "age.push",
+                "at": "2025-11-10T21:22:02+00:00"
+            },
+            {
+                "package": "babdev/pagerfanta-bundle",
+                "reading": "age.release",
+                "at": "2025-11-29T13:01:51+00:00"
+            },
+            {
+                "package": "babdev/pagerfanta-bundle",
+                "reading": "age.push",
+                "at": "2026-01-05T13:13:27+00:00"
+            },
+            {
+                "package": "craue/config-bundle",
+                "reading": "age.push",
+                "at": "2026-09-03T09:20:31+00:00"
+            },
+            {
+                "package": "doctrine/collections",
+                "reading": "age.release",
+                "at": "2026-04-29T20:41:02+00:00"
+            },
+            {
+                "package": "doctrine/collections",
+                "reading": "age.push",
+                "at": "2026-07-17T06:39:49+00:00"
+            },
+            {
+                "package": "doctrine/common",
+                "reading": "age.release",
+                "at": "2025-01-01T22:12:03+00:00"
+            },
+            {
+                "package": "doctrine/common",
+                "reading": "age.branch_release",
+                "at": "2025-01-01T22:12:03+00:00"
+            },
+            {
+                "package": "doctrine/common",
+                "reading": "age.push",
+                "at": "2026-06-14T06:58:09+00:00"
+            },
+            {
+                "package": "doctrine/dbal",
+                "reading": "age.release",
+                "at": "2026-07-21T14:34:40+00:00"
+            },
+            {
+                "package": "doctrine/dbal",
+                "reading": "age.branch_release",
+                "at": "2026-07-21T12:57:49+00:00"
+            },
+            {
+                "package": "doctrine/dbal",
+                "reading": "age.push",
+                "at": "2026-09-12T11:40:50+00:00"
+            },
+            {
+                "package": "doctrine/doctrine-bundle",
+                "reading": "age.release",
+                "at": "2026-09-09T11:58:04+00:00"
+            },
+            {
+                "package": "doctrine/doctrine-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-09-08T11:48:41+00:00"
+            },
+            {
+                "package": "doctrine/doctrine-bundle",
+                "reading": "age.push",
+                "at": "2026-09-09T14:00:43+00:00"
+            },
+            {
+                "package": "doctrine/doctrine-migrations-bundle",
+                "reading": "age.release",
+                "at": "2026-08-26T05:54:54+00:00"
+            },
+            {
+                "package": "doctrine/doctrine-migrations-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-08-26T05:40:19+00:00"
+            },
+            {
+                "package": "doctrine/doctrine-migrations-bundle",
+                "reading": "age.push",
+                "at": "2026-08-31T21:29:21+00:00"
+            },
+            {
+                "package": "doctrine/event-manager",
+                "reading": "age.release",
+                "at": "2026-01-29T07:11:08+00:00"
+            },
+            {
+                "package": "doctrine/event-manager",
+                "reading": "age.push",
+                "at": "2026-06-12T03:54:14+00:00"
+            },
+            {
+                "package": "doctrine/migrations",
+                "reading": "age.release",
+                "at": "2026-04-23T19:33:20+00:00"
+            },
+            {
+                "package": "doctrine/migrations",
+                "reading": "age.branch_release",
+                "at": "2026-04-23T19:33:20+00:00"
+            },
+            {
+                "package": "doctrine/migrations",
+                "reading": "age.push",
+                "at": "2026-06-19T05:26:15+00:00"
+            },
+            {
+                "package": "doctrine/orm",
+                "reading": "age.release",
+                "at": "2026-09-14T05:45:59+00:00"
+            },
+            {
+                "package": "doctrine/orm",
+                "reading": "age.branch_release",
+                "at": "2026-05-25T05:46:05+00:00"
+            },
+            {
+                "package": "doctrine/orm",
+                "reading": "age.push",
+                "at": "2026-09-14T06:18:04+00:00"
+            },
+            {
+                "package": "doctrine/persistence",
+                "reading": "age.release",
+                "at": "2026-06-13T19:29:35+00:00"
+            },
+            {
+                "package": "doctrine/persistence",
+                "reading": "age.branch_release",
+                "at": "2026-06-13T19:29:35+00:00"
+            },
+            {
+                "package": "doctrine/persistence",
+                "reading": "age.push",
+                "at": "2026-09-11T15:18:15+00:00"
+            },
+            {
+                "package": "egulias/email-validator",
+                "reading": "age.release",
+                "at": "2025-03-06T22:45:56+00:00"
+            },
+            {
+                "package": "egulias/email-validator",
+                "reading": "age.push",
+                "at": "2025-03-20T21:39:01+00:00"
+            },
+            {
+                "package": "friendsofphp/proxy-manager-lts",
+                "reading": "age.release",
+                "at": "2025-10-28T10:28:17+00:00"
+            },
+            {
+                "package": "friendsofphp/proxy-manager-lts",
+                "reading": "age.branch_release",
+                "at": "2025-10-28T10:28:17+00:00"
+            },
+            {
+                "package": "friendsofphp/proxy-manager-lts",
+                "reading": "age.push",
+                "at": "2025-10-28T10:29:59+00:00"
+            },
+            {
+                "package": "friendsofsymfony/jsrouting-bundle",
+                "reading": "age.release",
+                "at": "2025-11-04T21:03:25+00:00"
+            },
+            {
+                "package": "friendsofsymfony/jsrouting-bundle",
+                "reading": "age.push",
+                "at": "2025-11-04T21:03:54+00:00"
+            },
+            {
+                "package": "friendsofsymfony/rest-bundle",
+                "reading": "age.release",
+                "at": "2026-02-10T02:36:12+00:00"
+            },
+            {
+                "package": "friendsofsymfony/rest-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-02-10T02:36:12+00:00"
+            },
+            {
+                "package": "friendsofsymfony/rest-bundle",
+                "reading": "age.push",
+                "at": "2026-02-10T02:37:33+00:00"
+            },
+            {
+                "package": "friendsofsymfony/user-bundle",
+                "reading": "age.release",
+                "at": "2026-02-13T21:22:55+00:00"
+            },
+            {
+                "package": "friendsofsymfony/user-bundle",
+                "reading": "age.push",
+                "at": "2026-02-13T21:23:35+00:00"
+            },
+            {
+                "package": "incenteev/composer-parameter-handler",
+                "reading": "age.release",
+                "at": "2025-11-26T14:10:46+00:00"
+            },
+            {
+                "package": "incenteev/composer-parameter-handler",
+                "reading": "age.branch_release",
+                "at": "2025-11-26T14:10:46+00:00"
+            },
+            {
+                "package": "incenteev/composer-parameter-handler",
+                "reading": "age.push",
+                "at": "2025-11-26T14:11:27+00:00"
+            },
+            {
+                "package": "jms/serializer",
+                "reading": "age.release",
+                "at": "2026-09-04T14:41:03+00:00"
+            },
+            {
+                "package": "jms/serializer",
+                "reading": "age.branch_release",
+                "at": "2026-09-04T14:41:03+00:00"
+            },
+            {
+                "package": "jms/serializer",
+                "reading": "age.push",
+                "at": "2026-09-04T14:42:02+00:00"
+            },
+            {
+                "package": "jms/serializer-bundle",
+                "reading": "age.release",
+                "at": "2025-11-25T21:41:31+00:00"
+            },
+            {
+                "package": "jms/serializer-bundle",
+                "reading": "age.branch_release",
+                "at": "2025-11-25T21:41:31+00:00"
+            },
+            {
+                "package": "jms/serializer-bundle",
+                "reading": "age.push",
+                "at": "2026-03-26T22:03:55+00:00"
+            },
+            {
+                "package": "laminas/laminas-code",
+                "reading": "age.release",
+                "at": "2025-11-01T09:38:14+00:00"
+            },
+            {
+                "package": "laminas/laminas-code",
+                "reading": "age.branch_release",
+                "at": "2025-11-01T09:38:14+00:00"
+            },
+            {
+                "package": "laminas/laminas-code",
+                "reading": "age.push",
+                "at": "2026-09-08T13:11:10+00:00"
+            },
+            {
+                "package": "lcobucci/jwt",
+                "reading": "age.release",
+                "at": "2025-10-17T11:30:53+00:00"
+            },
+            {
+                "package": "lcobucci/jwt",
+                "reading": "age.push",
+                "at": "2026-09-13T01:49:25+00:00"
+            },
+            {
+                "package": "nelmio/api-doc-bundle",
+                "reading": "age.release",
+                "at": "2026-09-14T11:12:11+00:00"
+            },
+            {
+                "package": "nelmio/api-doc-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-01-08T08:45:13+00:00"
+            },
+            {
+                "package": "nelmio/api-doc-bundle",
+                "reading": "age.push",
+                "at": "2026-09-14T11:12:42+00:00"
+            },
+            {
+                "package": "nelmio/cors-bundle",
+                "reading": "age.release",
+                "at": "2026-01-12T15:59:08+00:00"
+            },
+            {
+                "package": "nelmio/cors-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-01-12T15:59:08+00:00"
+            },
+            {
+                "package": "nelmio/cors-bundle",
+                "reading": "age.push",
+                "at": "2026-01-14T20:01:33+00:00"
+            },
+            {
+                "package": "pagerfanta/doctrine-orm-adapter",
+                "reading": "age.release",
+                "at": "2026-09-08T18:05:46+00:00"
+            },
+            {
+                "package": "pagerfanta/doctrine-orm-adapter",
+                "reading": "age.push",
+                "at": "2026-09-08T18:12:45+00:00"
+            },
+            {
+                "package": "pagerfanta/twig",
+                "reading": "age.push",
+                "at": "2026-09-08T18:12:53+00:00"
+            },
+            {
+                "package": "php-amqplib/php-amqplib",
+                "reading": "age.release",
+                "at": "2025-11-23T17:00:56+00:00"
+            },
+            {
+                "package": "php-amqplib/php-amqplib",
+                "reading": "age.branch_release",
+                "at": "2025-11-23T17:00:56+00:00"
+            },
+            {
+                "package": "php-amqplib/php-amqplib",
+                "reading": "age.push",
+                "at": "2026-01-06T07:52:20+00:00"
+            },
+            {
+                "package": "php-amqplib/rabbitmq-bundle",
+                "reading": "age.release",
+                "at": "2026-01-16T12:34:27+00:00"
+            },
+            {
+                "package": "php-amqplib/rabbitmq-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-01-16T12:34:27+00:00"
+            },
+            {
+                "package": "php-amqplib/rabbitmq-bundle",
+                "reading": "age.push",
+                "at": "2026-03-06T09:25:23+00:00"
+            },
+            {
+                "package": "php-http/client-common",
+                "reading": "age.release",
+                "at": "2025-11-29T19:12:34+00:00"
+            },
+            {
+                "package": "php-http/client-common",
+                "reading": "age.branch_release",
+                "at": "2025-11-29T19:12:34+00:00"
+            },
+            {
+                "package": "php-http/client-common",
+                "reading": "age.push",
+                "at": "2026-09-11T13:51:52+00:00"
+            },
+            {
+                "package": "php-http/discovery",
+                "reading": "age.push",
+                "at": "2025-12-10T16:44:50+00:00"
+            },
+            {
+                "package": "php-http/httplug",
+                "reading": "age.push",
+                "at": "2025-12-10T17:09:30+00:00"
+            },
+            {
+                "package": "php-http/httplug-bundle",
+                "reading": "age.release",
+                "at": "2026-04-25T08:45:32+00:00"
+            },
+            {
+                "package": "php-http/httplug-bundle",
+                "reading": "age.push",
+                "at": "2026-04-25T08:46:27+00:00"
+            },
+            {
+                "package": "php-http/message",
+                "reading": "age.push",
+                "at": "2025-12-10T17:07:47+00:00"
+            },
+            {
+                "package": "predis/predis",
+                "reading": "age.release",
+                "at": "2026-08-14T23:07:56+00:00"
+            },
+            {
+                "package": "predis/predis",
+                "reading": "age.branch_release",
+                "at": "2025-11-12T18:00:11+00:00"
+            },
+            {
+                "package": "predis/predis",
+                "reading": "age.push",
+                "at": "2026-09-14T18:33:02+00:00"
+            },
+            {
+                "package": "scheb/2fa-backup-code",
+                "reading": "age.push",
+                "at": "2026-07-10T18:36:01+00:00"
+            },
+            {
+                "package": "scheb/2fa-bundle",
+                "reading": "age.release",
+                "at": "2026-07-10T18:29:30+00:00"
+            },
+            {
+                "package": "scheb/2fa-bundle",
+                "reading": "age.push",
+                "at": "2026-07-10T18:36:01+00:00"
+            },
+            {
+                "package": "scheb/2fa-email",
+                "reading": "age.release",
+                "at": "2026-06-08T19:34:00+00:00"
+            },
+            {
+                "package": "scheb/2fa-email",
+                "reading": "age.push",
+                "at": "2026-07-10T18:36:01+00:00"
+            },
+            {
+                "package": "scheb/2fa-google-authenticator",
+                "reading": "age.push",
+                "at": "2026-07-10T18:36:02+00:00"
+            },
+            {
+                "package": "scheb/2fa-trusted-device",
+                "reading": "age.push",
+                "at": "2026-07-10T18:36:01+00:00"
+            },
+            {
+                "package": "sentry/sentry-symfony",
+                "reading": "age.release",
+                "at": "2026-08-28T10:41:44+00:00"
+            },
+            {
+                "package": "sentry/sentry-symfony",
+                "reading": "age.push",
+                "at": "2026-09-14T14:00:09+00:00"
+            },
+            {
+                "package": "stof/doctrine-extensions-bundle",
+                "reading": "age.release",
+                "at": "2026-01-23T08:45:07+00:00"
+            },
+            {
+                "package": "stof/doctrine-extensions-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-01-23T08:45:07+00:00"
+            },
+            {
+                "package": "stof/doctrine-extensions-bundle",
+                "reading": "age.push",
+                "at": "2026-01-23T08:46:28+00:00"
+            },
+            {
+                "package": "symfony/asset",
+                "reading": "age.release",
+                "at": "2026-05-29T05:06:50+00:00"
+            },
+            {
+                "package": "symfony/asset",
+                "reading": "age.push",
+                "at": "2026-09-13T11:06:41+00:00"
+            },
+            {
+                "package": "symfony/config",
+                "reading": "age.release",
+                "at": "2026-08-20T09:59:12+00:00"
+            },
+            {
+                "package": "symfony/config",
+                "reading": "age.push",
+                "at": "2026-09-09T09:26:16+00:00"
+            },
+            {
+                "package": "symfony/console",
+                "reading": "age.release",
+                "at": "2026-08-25T14:18:42+00:00"
+            },
+            {
+                "package": "symfony/console",
+                "reading": "age.push",
+                "at": "2026-09-13T11:07:07+00:00"
+            },
+            {
+                "package": "symfony/dependency-injection",
+                "reading": "age.release",
+                "at": "2026-08-21T17:47:34+00:00"
+            },
+            {
+                "package": "symfony/dependency-injection",
+                "reading": "age.push",
+                "at": "2026-09-11T15:25:39+00:00"
+            },
+            {
+                "package": "symfony/doctrine-bridge",
+                "reading": "age.release",
+                "at": "2026-08-30T18:34:12+00:00"
+            },
+            {
+                "package": "symfony/doctrine-bridge",
+                "reading": "age.push",
+                "at": "2026-09-11T14:56:40+00:00"
+            },
+            {
+                "package": "symfony/error-handler",
+                "reading": "age.release",
+                "at": "2026-08-21T17:47:34+00:00"
+            },
+            {
+                "package": "symfony/error-handler",
+                "reading": "age.push",
+                "at": "2026-08-25T12:15:53+00:00"
+            },
+            {
+                "package": "symfony/event-dispatcher",
+                "reading": "age.release",
+                "at": "2026-08-21T17:47:34+00:00"
+            },
+            {
+                "package": "symfony/event-dispatcher",
+                "reading": "age.push",
+                "at": "2026-09-11T15:16:56+00:00"
+            },
+            {
+                "package": "symfony/finder",
+                "reading": "age.release",
+                "at": "2026-08-21T12:16:08+00:00"
+            },
+            {
+                "package": "symfony/finder",
+                "reading": "age.push",
+                "at": "2026-09-10T19:16:58+00:00"
+            },
+            {
+                "package": "symfony/form",
+                "reading": "age.release",
+                "at": "2026-08-30T01:03:44+00:00"
+            },
+            {
+                "package": "symfony/form",
+                "reading": "age.push",
+                "at": "2026-09-14T13:41:06+00:00"
+            },
+            {
+                "package": "symfony/framework-bundle",
+                "reading": "age.release",
+                "at": "2026-08-30T20:10:55+00:00"
+            },
+            {
+                "package": "symfony/framework-bundle",
+                "reading": "age.push",
+                "at": "2026-09-14T12:53:04+00:00"
+            },
+            {
+                "package": "symfony/google-mailer",
+                "reading": "age.release",
+                "at": "2026-05-29T05:06:50+00:00"
+            },
+            {
+                "package": "symfony/google-mailer",
+                "reading": "age.push",
+                "at": "2026-08-02T09:30:53+00:00"
+            },
+            {
+                "package": "symfony/http-kernel",
+                "reading": "age.release",
+                "at": "2026-08-30T21:40:49+00:00"
+            },
+            {
+                "package": "symfony/http-kernel",
+                "reading": "age.push",
+                "at": "2026-09-11T18:03:35+00:00"
+            },
+            {
+                "package": "symfony/monolog-bundle",
+                "reading": "age.release",
+                "at": "2026-09-10T19:32:07+00:00"
+            },
+            {
+                "package": "symfony/monolog-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-04-02T18:23:01+00:00"
+            },
+            {
+                "package": "symfony/monolog-bundle",
+                "reading": "age.push",
+                "at": "2026-09-12T21:35:24+00:00"
+            },
+            {
+                "package": "symfony/options-resolver",
+                "reading": "age.release",
+                "at": "2026-05-29T05:06:50+00:00"
+            },
+            {
+                "package": "symfony/options-resolver",
+                "reading": "age.push",
+                "at": "2026-08-14T13:23:19+00:00"
+            },
+            {
+                "package": "symfony/proxy-manager-bridge",
+                "reading": "age.release",
+                "at": "2025-11-02T18:11:54+00:00"
+            },
+            {
+                "package": "symfony/proxy-manager-bridge",
+                "reading": "age.push",
+                "at": "2026-06-05T06:26:20+00:00"
+            },
+            {
+                "package": "symfony/security-bundle",
+                "reading": "age.release",
+                "at": "2026-08-30T17:31:45+00:00"
+            },
+            {
+                "package": "symfony/security-bundle",
+                "reading": "age.push",
+                "at": "2026-09-14T14:13:13+00:00"
+            },
+            {
+                "package": "symfony/security-core",
+                "reading": "age.release",
+                "at": "2026-08-30T01:03:44+00:00"
+            },
+            {
+                "package": "symfony/security-core",
+                "reading": "age.push",
+                "at": "2026-09-14T13:55:47+00:00"
+            },
+            {
+                "package": "symfony/templating",
+                "reading": "age.release",
+                "at": "2025-07-10T08:14:14+00:00"
+            },
+            {
+                "package": "symfony/templating",
+                "reading": "age.push",
+                "at": "2026-06-05T06:25:52+00:00"
+            },
+            {
+                "package": "symfony/twig-bundle",
+                "reading": "age.release",
+                "at": "2026-07-21T15:13:06+00:00"
+            },
+            {
+                "package": "symfony/twig-bundle",
+                "reading": "age.push",
+                "at": "2026-09-11T14:56:43+00:00"
+            },
+            {
+                "package": "twig/extra-bundle",
+                "reading": "age.release",
+                "at": "2026-02-07T08:07:38+00:00"
+            },
+            {
+                "package": "twig/extra-bundle",
+                "reading": "age.branch_release",
+                "at": "2026-02-07T08:07:38+00:00"
+            },
+            {
+                "package": "twig/extra-bundle",
+                "reading": "age.push",
+                "at": "2026-09-12T10:01:27+00:00"
+            },
+            {
+                "package": "twig/string-extra",
+                "reading": "age.release",
+                "at": "2026-01-07T15:24:12+00:00"
+            },
+            {
+                "package": "twig/string-extra",
+                "reading": "age.branch_release",
+                "at": "2025-12-02T14:45:16+00:00"
+            },
+            {
+                "package": "twig/string-extra",
+                "reading": "age.push",
+                "at": "2026-09-06T20:35:46+00:00"
+            },
+            {
+                "package": "wallabag/phpepub",
+                "reading": "age.push",
+                "at": "2025-12-21T17:47:38+00:00"
+            },
+            {
+                "package": "willdurand/hateoas",
+                "reading": "age.release",
+                "at": "2026-01-10T10:10:03+00:00"
+            },
+            {
+                "package": "willdurand/hateoas",
+                "reading": "age.branch_release",
+                "at": "2026-01-10T10:10:03+00:00"
+            },
+            {
+                "package": "willdurand/hateoas",
+                "reading": "age.push",
+                "at": "2026-01-10T10:11:02+00:00"
+            },
+            {
+                "package": "willdurand/hateoas-bundle",
+                "reading": "age.release",
+                "at": "2026-07-17T20:45:53+00:00"
+            },
+            {
+                "package": "willdurand/hateoas-bundle",
+                "reading": "age.branch_release",
+                "at": "2024-11-07T21:08:08+00:00"
+            },
+            {
+                "package": "willdurand/hateoas-bundle",
+                "reading": "age.push",
+                "at": "2026-07-17T20:46:36+00:00"
+            },
+            {
+                "package": "bacon/bacon-qr-code",
+                "reading": "age.release",
+                "at": "2026-04-05T21:06:35+00:00"
+            },
+            {
+                "package": "bacon/bacon-qr-code",
+                "reading": "age.push",
+                "at": "2026-04-05T21:07:25+00:00"
+            },
+            {
+                "package": "beberlei/assert",
+                "reading": "age.release",
+                "at": "2026-06-10T19:47:05+00:00"
+            },
+            {
+                "package": "beberlei/assert",
+                "reading": "age.branch_release",
+                "at": "2026-06-10T19:47:05+00:00"
+            },
+            {
+                "package": "beberlei/assert",
+                "reading": "age.push",
+                "at": "2026-06-10T19:57:39+00:00"
+            },
+            {
+                "package": "clue/stream-filter",
+                "reading": "age.push",
+                "at": "2026-07-03T22:45:34+00:00"
+            },
+            {
+                "package": "dasprid/enum",
+                "reading": "age.release",
+                "at": "2025-09-16T12:23:56+00:00"
+            },
+            {
+                "package": "dasprid/enum",
+                "reading": "age.branch_release",
+                "at": "2025-09-16T12:23:56+00:00"
+            },
+            {
+                "package": "dasprid/enum",
+                "reading": "age.push",
+                "at": "2025-09-16T12:25:01+00:00"
+            },
+            {
+                "package": "doctrine/deprecations",
+                "reading": "age.release",
+                "at": "2026-02-07T07:09:04+00:00"
+            },
+            {
+                "package": "doctrine/deprecations",
+                "reading": "age.branch_release",
+                "at": "2026-02-07T07:09:04+00:00"
+            },
+            {
+                "package": "doctrine/deprecations",
+                "reading": "age.push",
+                "at": "2026-06-14T17:53:36+00:00"
+            },
+            {
+                "package": "doctrine/inflector",
+                "reading": "age.release",
+                "at": "2025-08-10T19:31:58+00:00"
+            },
+            {
+                "package": "doctrine/inflector",
+                "reading": "age.branch_release",
+                "at": "2025-08-10T19:31:58+00:00"
+            },
+            {
+                "package": "doctrine/inflector",
+                "reading": "age.push",
+                "at": "2026-06-21T04:01:42+00:00"
+            },
+            {
+                "package": "doctrine/instantiator",
+                "reading": "age.release",
+                "at": "2026-01-05T06:47:08+00:00"
+            },
+            {
+                "package": "doctrine/instantiator",
+                "reading": "age.push",
+                "at": "2026-06-19T19:00:41+00:00"
+            },
+            {
+                "package": "doctrine/lexer",
+                "reading": "age.push",
+                "at": "2026-06-14T20:44:09+00:00"
+            },
+            {
+                "package": "doctrine/sql-formatter",
+                "reading": "age.release",
+                "at": "2026-02-08T16:21:46+00:00"
+            },
+            {
+                "package": "doctrine/sql-formatter",
+                "reading": "age.branch_release",
+                "at": "2026-02-08T16:21:46+00:00"
+            },
+            {
+                "package": "doctrine/sql-formatter",
+                "reading": "age.push",
+                "at": "2026-06-11T14:32:46+00:00"
+            },
+            {
+                "package": "fossar/htmlawed",
+                "reading": "age.release",
+                "at": "2026-07-09T07:57:28+00:00"
+            },
+            {
+                "package": "fossar/htmlawed",
+                "reading": "age.branch_release",
+                "at": "2026-07-09T07:57:28+00:00"
+            },
+            {
+                "package": "fossar/htmlawed",
+                "reading": "age.push",
+                "at": "2026-07-09T07:58:36+00:00"
+            },
+            {
+                "package": "gedmo/doctrine-extensions",
+                "reading": "age.release",
+                "at": "2026-08-01T13:57:40+00:00"
+            },
+            {
+                "package": "gedmo/doctrine-extensions",
+                "reading": "age.branch_release",
+                "at": "2026-08-01T13:57:40+00:00"
+            },
+            {
+                "package": "gedmo/doctrine-extensions",
+                "reading": "age.push",
+                "at": "2026-08-31T13:16:51+00:00"
+            },
+            {
+                "package": "guzzlehttp/promises",
+                "reading": "age.release",
+                "at": "2026-08-24T10:00:26+00:00"
+            },
+            {
+                "package": "guzzlehttp/promises",
+                "reading": "age.branch_release",
+                "at": "2026-08-24T09:11:28+00:00"
+            },
+            {
+                "package": "guzzlehttp/promises",
+                "reading": "age.push",
+                "at": "2026-08-24T10:00:45+00:00"
+            },
+            {
+                "package": "http-interop/http-factory-guzzle",
+                "reading": "age.release",
+                "at": "2025-12-15T11:28:16+00:00"
+            },
+            {
+                "package": "http-interop/http-factory-guzzle",
+                "reading": "age.branch_release",
+                "at": "2025-12-15T11:28:16+00:00"
+            },
+            {
+                "package": "http-interop/http-factory-guzzle",
+                "reading": "age.push",
+                "at": "2025-12-15T11:29:37+00:00"
+            },
+            {
+                "package": "j0k3r/graby-site-config",
+                "reading": "age.release",
+                "at": "2026-09-01T06:56:12+00:00"
+            },
+            {
+                "package": "j0k3r/graby-site-config",
+                "reading": "age.branch_release",
+                "at": "2026-09-01T06:56:12+00:00"
+            },
+            {
+                "package": "j0k3r/graby-site-config",
+                "reading": "age.push",
+                "at": "2026-09-01T06:56:14+00:00"
+            },
+            {
+                "package": "j0k3r/php-readability",
+                "reading": "age.release",
+                "at": "2026-07-11T19:40:14+00:00"
+            },
+            {
+                "package": "j0k3r/php-readability",
+                "reading": "age.branch_release",
+                "at": "2026-03-27T19:36:19+00:00"
+            },
+            {
+                "package": "j0k3r/php-readability",
+                "reading": "age.push",
+                "at": "2026-09-11T07:47:12+00:00"
+            },
+            {
+                "package": "jean85/pretty-package-versions",
+                "reading": "age.release",
+                "at": "2025-03-19T14:43:43+00:00"
+            },
+            {
+                "package": "jean85/pretty-package-versions",
+                "reading": "age.branch_release",
+                "at": "2025-03-19T14:43:43+00:00"
+            },
+            {
+                "package": "jean85/pretty-package-versions",
+                "reading": "age.push",
+                "at": "2026-06-22T07:11:21+00:00"
+            },
+            {
+                "package": "jms/metadata",
+                "reading": "age.release",
+                "at": "2025-11-30T20:12:26+00:00"
+            },
+            {
+                "package": "jms/metadata",
+                "reading": "age.branch_release",
+                "at": "2025-11-30T20:12:26+00:00"
+            },
+            {
+                "package": "jms/metadata",
+                "reading": "age.push",
+                "at": "2025-11-30T20:13:25+00:00"
+            },
+            {
+                "package": "khanamiryan/qrcode-detector-decoder",
+                "reading": "age.release",
+                "at": "2025-06-10T08:44:02+00:00"
+            },
+            {
+                "package": "khanamiryan/qrcode-detector-decoder",
+                "reading": "age.push",
+                "at": "2025-07-10T12:54:21+00:00"
+            },
+            {
+                "package": "lcobucci/clock",
+                "reading": "age.release",
+                "at": "2026-04-13T21:30:16+00:00"
+            },
+            {
+                "package": "lcobucci/clock",
+                "reading": "age.push",
+                "at": "2026-09-13T02:11:22+00:00"
+            },
+            {
+                "package": "masterminds/html5",
+                "reading": "age.release",
+                "at": "2026-08-18T06:18:41+00:00"
+            },
+            {
+                "package": "masterminds/html5",
+                "reading": "age.branch_release",
+                "at": "2026-08-18T06:18:41+00:00"
+            },
+            {
+                "package": "masterminds/html5",
+                "reading": "age.push",
+                "at": "2026-08-18T06:20:28+00:00"
+            },
+            {
+                "package": "monolog/monolog",
+                "reading": "age.release",
+                "at": "2026-09-09T08:34:20+00:00"
+            },
+            {
+                "package": "monolog/monolog",
+                "reading": "age.branch_release",
+                "at": "2026-09-02T07:57:24+00:00"
+            },
+            {
+                "package": "monolog/monolog",
+                "reading": "age.push",
+                "at": "2026-09-09T15:14:11+00:00"
+            },
+            {
+                "package": "myclabs/php-enum",
+                "reading": "age.release",
+                "at": "2025-01-14T11:49:03+00:00"
+            },
+            {
+                "package": "myclabs/php-enum",
+                "reading": "age.branch_release",
+                "at": "2025-01-14T11:49:03+00:00"
+            },
+            {
+                "package": "myclabs/php-enum",
+                "reading": "age.push",
+                "at": "2025-02-21T08:40:22+00:00"
+            },
+            {
+                "package": "pagerfanta/core",
+                "reading": "age.release",
+                "at": "2026-09-08T17:43:17+00:00"
+            },
+            {
+                "package": "pagerfanta/core",
+                "reading": "age.push",
+                "at": "2026-09-08T18:12:37+00:00"
+            },
+            {
+                "package": "paragonie/constant_time_encoding",
+                "reading": "age.release",
+                "at": "2025-09-24T15:12:37+00:00"
+            },
+            {
+                "package": "paragonie/constant_time_encoding",
+                "reading": "age.branch_release",
+                "at": "2025-09-24T15:12:37+00:00"
+            },
+            {
+                "package": "paragonie/constant_time_encoding",
+                "reading": "age.push",
+                "at": "2025-09-24T15:13:01+00:00"
+            },
+            {
+                "package": "php-http/logger-plugin",
+                "reading": "age.release",
+                "at": "2026-01-05T09:39:39+00:00"
+            },
+            {
+                "package": "php-http/logger-plugin",
+                "reading": "age.branch_release",
+                "at": "2026-01-05T09:39:39+00:00"
+            },
+            {
+                "package": "php-http/logger-plugin",
+                "reading": "age.push",
+                "at": "2026-01-05T09:40:03+00:00"
+            },
+            {
+                "package": "php-http/promise",
+                "reading": "age.release",
+                "at": "2025-11-08T15:23:07+00:00"
+            },
+            {
+                "package": "php-http/promise",
+                "reading": "age.branch_release",
+                "at": "2025-11-08T15:23:07+00:00"
+            },
+            {
+                "package": "php-http/promise",
+                "reading": "age.push",
+                "at": "2025-12-10T14:14:48+00:00"
+            },
+            {
+                "package": "php-http/stopwatch-plugin",
+                "reading": "age.release",
+                "at": "2025-12-09T12:30:02+00:00"
+            },
+            {
+                "package": "php-http/stopwatch-plugin",
+                "reading": "age.branch_release",
+                "at": "2025-12-09T12:30:02+00:00"
+            },
+            {
+                "package": "php-http/stopwatch-plugin",
+                "reading": "age.push",
+                "at": "2025-12-09T12:30:16+00:00"
+            },
+            {
+                "package": "phpdocumentor/reflection-docblock",
+                "reading": "age.release",
+                "at": "2026-03-18T20:49:53+00:00"
+            },
+            {
+                "package": "phpdocumentor/reflection-docblock",
+                "reading": "age.branch_release",
+                "at": "2026-03-18T20:47:46+00:00"
+            },
+            {
+                "package": "phpdocumentor/reflection-docblock",
+                "reading": "age.push",
+                "at": "2026-09-08T13:29:30+00:00"
+            },
+            {
+                "package": "phpdocumentor/type-resolver",
+                "reading": "age.release",
+                "at": "2026-01-06T21:53:42+00:00"
+            },
+            {
+                "package": "phpdocumentor/type-resolver",
+                "reading": "age.branch_release",
+                "at": "2025-11-21T15:09:14+00:00"
+            },
+            {
+                "package": "phpdocumentor/type-resolver",
+                "reading": "age.push",
+                "at": "2026-04-02T01:45:07+00:00"
+            },
+            {
+                "package": "phpstan/phpdoc-parser",
+                "reading": "age.release",
+                "at": "2026-08-31T16:05:28+00:00"
+            },
+            {
+                "package": "phpstan/phpdoc-parser",
+                "reading": "age.push",
+                "at": "2026-09-14T13:34:55+00:00"
+            },
+            {
+                "package": "react/promise",
+                "reading": "age.release",
+                "at": "2025-08-19T18:57:03+00:00"
+            },
+            {
+                "package": "react/promise",
+                "reading": "age.push",
+                "at": "2026-05-10T22:28:52+00:00"
+            },
+            {
+                "package": "sentry/sentry",
+                "reading": "age.release",
+                "at": "2026-08-27T12:59:01+00:00"
+            },
+            {
+                "package": "sentry/sentry",
+                "reading": "age.push",
+                "at": "2026-09-10T12:52:49+00:00"
+            },
+            {
+                "package": "simplepie/simplepie",
+                "reading": "age.release",
+                "at": "2025-09-12T06:34:27+00:00"
+            },
+            {
+                "package": "simplepie/simplepie",
+                "reading": "age.branch_release",
+                "at": "2025-09-12T06:34:27+00:00"
+            },
+            {
+                "package": "simplepie/simplepie",
+                "reading": "age.push",
+                "at": "2026-07-04T18:02:41+00:00"
+            },
+            {
+                "package": "symfony/cache-contracts",
+                "reading": "age.release",
+                "at": "2026-06-05T06:23:12+00:00"
+            },
+            {
+                "package": "symfony/cache-contracts",
+                "reading": "age.push",
+                "at": "2026-08-31T09:10:41+00:00"
+            },
+            {
+                "package": "symfony/deprecation-contracts",
+                "reading": "age.release",
+                "at": "2026-06-05T06:23:12+00:00"
+            },
+            {
+                "package": "symfony/deprecation-contracts",
+                "reading": "age.push",
+                "at": "2026-08-31T09:10:41+00:00"
+            },
+            {
+                "package": "symfony/event-dispatcher-contracts",
+                "reading": "age.release",
+                "at": "2026-06-05T06:23:12+00:00"
+            },
+            {
+                "package": "symfony/event-dispatcher-contracts",
+                "reading": "age.push",
+                "at": "2026-08-31T09:10:41+00:00"
+            },
+            {
+                "package": "symfony/expression-language",
+                "reading": "age.release",
+                "at": "2026-08-30T01:03:44+00:00"
+            },
+            {
+                "package": "symfony/expression-language",
+                "reading": "age.push",
+                "at": "2026-08-30T21:43:04+00:00"
+            },
+            {
+                "package": "symfony/filesystem",
+                "reading": "age.release",
+                "at": "2026-08-23T10:06:25+00:00"
+            },
+            {
+                "package": "symfony/filesystem",
+                "reading": "age.push",
+                "at": "2026-09-03T16:48:17+00:00"
+            },
+            {
+                "package": "symfony/intl",
+                "reading": "age.release",
+                "at": "2026-08-21T17:47:34+00:00"
+            },
+            {
+                "package": "symfony/intl",
+                "reading": "age.branch_release",
+                "at": "2024-11-08T08:12:23+00:00"
+            },
+            {
+                "package": "symfony/intl",
+                "reading": "age.push",
+                "at": "2026-08-22T13:46:50+00:00"
+            },
+            {
+                "package": "symfony/polyfill-intl-grapheme",
+                "reading": "age.release",
+                "at": "2026-07-28T08:25:59+00:00"
+            },
+            {
+                "package": "symfony/polyfill-intl-grapheme",
+                "reading": "age.branch_release",
+                "at": "2026-07-28T08:25:59+00:00"
+            },
+            {
+                "package": "symfony/polyfill-intl-normalizer",
+                "reading": "age.release",
+                "at": "2026-08-07T06:33:24+00:00"
+            },
+            {
+                "package": "symfony/polyfill-intl-normalizer",
+                "reading": "age.branch_release",
+                "at": "2026-08-07T06:33:24+00:00"
+            },
+            {
+                "package": "symfony/polyfill-mbstring",
+                "reading": "age.release",
+                "at": "2026-05-27T06:59:30+00:00"
+            },
+            {
+                "package": "symfony/polyfill-mbstring",
+                "reading": "age.branch_release",
+                "at": "2026-05-27T06:59:30+00:00"
+            },
+            {
+                "package": "symfony/polyfill-php81",
+                "reading": "age.release",
+                "at": "2026-05-26T12:45:58+00:00"
+            },
+            {
+                "package": "symfony/polyfill-php81",
+                "reading": "age.branch_release",
+                "at": "2026-05-26T12:45:58+00:00"
+            },
+            {
+                "package": "symfony/property-access",
+                "reading": "age.release",
+                "at": "2026-07-30T12:40:56+00:00"
+            },
+            {
+                "package": "symfony/property-access",
+                "reading": "age.push",
+                "at": "2026-09-14T10:21:45+00:00"
+            },
+            {
+                "package": "symfony/property-info",
+                "reading": "age.release",
+                "at": "2026-08-30T08:48:43+00:00"
+            },
+            {
+                "package": "symfony/property-info",
+                "reading": "age.branch_release",
+                "at": "2024-11-25T16:14:41+00:00"
+            },
+            {
+                "package": "symfony/property-info",
+                "reading": "age.push",
+                "at": "2026-09-14T10:21:45+00:00"
+            },
+            {
+                "package": "symfony/psr-http-message-bridge",
+                "reading": "age.release",
+                "at": "2026-05-29T05:06:50+00:00"
+            },
+            {
+                "package": "symfony/psr-http-message-bridge",
+                "reading": "age.push",
+                "at": "2026-08-10T19:31:55+00:00"
+            },
+            {
+                "package": "symfony/security-csrf",
+                "reading": "age.release",
+                "at": "2026-05-29T05:06:50+00:00"
+            },
+            {
+                "package": "symfony/security-csrf",
+                "reading": "age.push",
+                "at": "2026-08-03T16:43:39+00:00"
+            },
+            {
+                "package": "symfony/serializer",
+                "reading": "age.release",
+                "at": "2026-08-30T08:48:47+00:00"
+            },
+            {
+                "package": "symfony/serializer",
+                "reading": "age.push",
+                "at": "2026-09-11T15:31:13+00:00"
+            },
+            {
+                "package": "symfony/service-contracts",
+                "reading": "age.release",
+                "at": "2026-07-27T15:39:01+00:00"
+            },
+            {
+                "package": "symfony/service-contracts",
+                "reading": "age.push",
+                "at": "2026-08-31T09:10:42+00:00"
+            },
+            {
+                "package": "symfony/stopwatch",
+                "reading": "age.release",
+                "at": "2026-05-29T05:06:50+00:00"
+            },
+            {
+                "package": "symfony/stopwatch",
+                "reading": "age.push",
+                "at": "2026-08-14T13:38:00+00:00"
+            },
+            {
+                "package": "symfony/string",
+                "reading": "age.release",
+                "at": "2026-07-28T07:35:25+00:00"
+            },
+            {
+                "package": "symfony/string",
+                "reading": "age.branch_release",
+                "at": "2024-11-10T20:33:58+00:00"
+            },
+            {
+                "package": "symfony/string",
+                "reading": "age.push",
+                "at": "2026-09-11T14:56:40+00:00"
+            },
+            {
+                "package": "symfony/translation",
+                "reading": "age.release",
+                "at": "2026-08-21T17:47:34+00:00"
+            },
+            {
+                "package": "symfony/translation",
+                "reading": "age.push",
+                "at": "2026-09-14T13:43:50+00:00"
+            },
+            {
+                "package": "symfony/translation-contracts",
+                "reading": "age.release",
+                "at": "2026-06-05T06:23:12+00:00"
+            },
+            {
+                "package": "symfony/translation-contracts",
+                "reading": "age.push",
+                "at": "2026-08-31T09:10:43+00:00"
+            },
+            {
+                "package": "symfony/twig-bridge",
+                "reading": "age.release",
+                "at": "2026-08-22T09:06:25+00:00"
+            },
+            {
+                "package": "symfony/twig-bridge",
+                "reading": "age.push",
+                "at": "2026-09-14T12:21:37+00:00"
+            },
+            {
+                "package": "symfony/var-dumper",
+                "reading": "age.release",
+                "at": "2026-08-30T20:10:55+00:00"
+            },
+            {
+                "package": "symfony/var-dumper",
+                "reading": "age.push",
+                "at": "2026-09-04T10:37:07+00:00"
+            },
+            {
+                "package": "symfony/var-exporter",
+                "reading": "age.release",
+                "at": "2026-08-29T06:30:03+00:00"
+            },
+            {
+                "package": "symfony/var-exporter",
+                "reading": "age.push",
+                "at": "2026-08-30T21:43:45+00:00"
+            },
+            {
+                "package": "webmozart/assert",
+                "reading": "age.release",
+                "at": "2026-06-15T15:31:57+00:00"
+            },
+            {
+                "package": "webmozart/assert",
+                "reading": "age.branch_release",
+                "at": "2025-10-29T15:56:20+00:00"
+            },
+            {
+                "package": "webmozart/assert",
+                "reading": "age.push",
+                "at": "2026-06-15T15:32:30+00:00"
+            },
+            {
+                "package": "zircote/swagger-php",
+                "reading": "age.release",
+                "at": "2026-09-13T22:58:11+00:00"
+            },
+            {
+                "package": "zircote/swagger-php",
+                "reading": "age.push",
+                "at": "2026-09-13T23:10:52+00:00"
+            }
+        ]
+    },
+    "explain": [
+        "javibravo/simpleue",
+        "symfony/http-foundation",
+        "symfony/security-guard",
+        "twig/twig"
+    ],
+    "version_mask": {
+        "paths": [
+            "lockrot.version",
+            "report.lockrot.version",
+            "runs[].tool.driver.version"
+        ],
+        "value": "0.14.0"
+    },
+    "server_mask": "http://127.0.0.1:<port> reads http://127.0.0.1",
+    "files": {
+        "t0/report.json": "7793d3e586dd8509bdd8acfb0b0777f2b11cd5c4d1dc1df86078a2a0205143b6",
+        "lockrot-baseline.json": "54fcceafdea65b1da80b5c97a7e66021e77a34b0f9ee9301a58068ef50da8f64",
+        "check/report.json": "be158aea712c15aaa80e77dfd88937abea13a83a28620d2abe5eb80c9d63578b",
+        "check/report.table.txt": "291dd06abe4640970579618d831306b0ead1bfeddbde306c5796c77c92ecf124",
+        "check/report.md": "235e81e22d3931d42eb147163a76f2c5ceb87ff1d113aaecbedf6b2e57756235",
+        "check/report.github.txt": "d8e4ccf813d422d4952ccb72afd208e16ecbbc9ac368d16d9fdae1d691e3a212",
+        "check/report.gitlab.json": "3424f08a0d5a4ef21ee5875d7a82aeb0bea613f837bbb63032b6574f997a0d81",
+        "check/report.sarif.json": "2b7ee4cc6e4cfe3650d73629c85c4aedce629abc61021a27287fdd901adcacce",
+        "check/report.bundle.json": "774d9f610ec01a7f21b2f02418fa9a6cea7e727cf8307cc2685a04d79c8e4168",
+        "check/explain/javibravo--simpleue.json": "4e27a9b891aa335f602b9fd1f674564c19b191a5dda53b58f7c2c4d092d65bf6",
+        "check/explain/symfony--http-foundation.json": "60e2b4ab2b184e3d58f0d2a8b913b037405bb00b9108baddfa655e98f24aee7f",
+        "check/explain/symfony--security-guard.json": "815f66813a75e04c3b0675b3a574ee956f7a5664c57900a0631e8db49dc2eefd",
+        "check/explain/twig--twig.json": "ffbba3a0d01d1be47e10b32a8f8a4f319f7c437f09527cabfb9a8505114c7e1d",
+        "check/gates-left-behind-vulnerable-high.json": "da9e1b60d1a9da796feae6546890c94f08a30b7ef3069dd70ff0e2edaead38df",
+        "check/gates-left-behind-vulnerable-high.sarif.json": "72e4e9368d9cd195c1073f454001223ccacc7768406b0fc3cb2e58f318567300",
+        "check/target-8.3.json": "201c1956cfef898f711e13b7368b7887206f3ca3e46ab17f1890a26dd8fed450",
+        "regenerate/lockrot-baseline.json": "2469c2c1caaed260ddc7b31d63bb041eacadedc2863a70977bbc68874cffe4fb",
+        "regenerate/report.json": "d1e0a31e8445e59944751f04a5256d16bf5cb9a523536c7fcf144910657ab5e7"
+    }
+}

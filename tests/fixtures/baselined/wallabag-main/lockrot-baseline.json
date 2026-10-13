@@ -1,7 +1,7 @@
 {
     "$schema": "https://lockrot.dev/schema/baseline-2.json",
     "lockrot": {
-        "version": "0.13.0",
+        "version": "0.14.0",
         "schema": 2
     },
     "generated_at": "2024-05-17T00:00:00+00:00",
@@ -124,6 +124,33 @@
                 },
                 "old-promise": {
                     "known_since": "2024-05-17"
+                }
+            },
+            "advisories": {
+                "PKSA-2z36-j4q9-rsfy": {
+                    "known_since": "2024-05-17",
+                    "severity": "high",
+                    "fix_kind": "upgrade"
+                },
+                "PKSA-6d8m-6kgw-18zr": {
+                    "known_since": "2024-05-17",
+                    "severity": "high",
+                    "fix_kind": "upgrade"
+                },
+                "PKSA-fvw5-9t6n-nwvr": {
+                    "known_since": "2024-05-17",
+                    "severity": "high",
+                    "fix_kind": "upgrade"
+                },
+                "PKSA-k1b4-kshy-xgbh": {
+                    "known_since": "2024-05-17",
+                    "severity": "high",
+                    "fix_kind": "upgrade"
+                },
+                "PKSA-yfw5-9gnj-n2c7": {
+                    "known_since": "2024-05-17",
+                    "severity": "high",
+                    "fix_kind": "upgrade"
                 }
             }
         },
