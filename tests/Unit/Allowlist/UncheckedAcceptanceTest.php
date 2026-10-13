@@ -90,6 +90,7 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'a host with a scheme' => [['check' => 'repository_activity', 'host' => 'https://codeberg.org', 'reason' => 'x'], '%s "host" must be a lower-case host name with an optional port, without a scheme or a path'];
         yield 'an upper-case host' => [['check' => 'repository_activity', 'host' => 'Codeberg.org', 'reason' => 'x'], '%s "host" must be a lower-case host name'];
         yield 'a port of 0' => [['check' => 'repository_activity', 'host' => 'git.example.com:0', 'reason' => 'x'], '%s "host" has a port outside 1 to 65535'];
+        yield 'a port of zeros' => [['check' => 'repository_activity', 'host' => 'git.example.com:00', 'reason' => 'x'], '%s "host" has a port outside 1 to 65535'];
         yield 'a port of 65536' => [['check' => 'repository_activity', 'host' => 'git.example.com:65536', 'reason' => 'x'], '%s "host" has a port outside 1 to 65535'];
         yield 'a repository that is not a URL' => [['check' => 'release_metadata', 'repository' => 'github.com:acme/x', 'reason' => 'x'], '%s "repository" must be a URL with a scheme and no user name or password, or the scp form user@host:path'];
         yield 'a repository with userinfo' => [['check' => 'advisories', 'repository' => 'https://deploy:secret@mirror.example', 'reason' => 'x'], '%s "repository" must be a URL'];
@@ -119,6 +120,7 @@ final class UncheckedAcceptanceTest extends TestCase
         yield 'a host with port 1' => ['git.example.com:1'];
         yield 'a host with port 65535' => ['git.example.com:65535'];
         yield 'a host with port 8443' => ['git.example.com:8443'];
+        yield 'a host with a leading zero in its port' => ['git.example.com:080'];
     }
 
     /** @dataProvider edgeValues */

@@ -90,7 +90,8 @@ final class UncheckedAcceptanceEntry implements \JsonSerializable
                 throw new ConfigException($at.' "host" must be a lower-case host name with an optional port, without a scheme or a path');
             }
             $colon = strrchr($value, ':');
-            if ($colon !== false && filter_var(substr($colon, 1), \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]) === false) {
+            // FILTER_VALIDATE_INT refuses a leading zero, which the host pattern allows.
+            if ($colon !== false && filter_var(ltrim(substr($colon, 1), '0'), \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]) === false) {
                 throw new ConfigException($at.' "host" has a port outside 1 to 65535');
             }
         }
