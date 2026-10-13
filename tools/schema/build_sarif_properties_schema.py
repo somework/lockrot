@@ -189,7 +189,7 @@ defs['invocation'] = {'description': 'The invocation lockrot writes.', 'type': '
 
 schema = {
     '$schema': 'http://json-schema.org/draft-04/schema#',
-    'id': 'https://lockrot.dev/schema/sarif-properties-2.json',
+    'id': 'urn:lockrot:schema:sarif-properties-2',
     'title': 'lockrot SARIF property bags',
     'description': ("The property bags lockrot 0.14.0 writes into its SARIF 2.1.0 output (`--format=sarif`), for report schema 2: each result's "
                     "`properties` and the run's. A test fixture of lockrot's SarifFormatterTest, not a published schema: the instance is the "

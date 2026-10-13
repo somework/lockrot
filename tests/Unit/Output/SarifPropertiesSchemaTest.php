@@ -24,6 +24,9 @@ final class SarifPropertiesSchemaTest extends TestCase
     {
         $schema = json_decode((string) file_get_contents(self::SCHEMA));
         self::assertIsObject($schema);
+        self::assertSame('urn:lockrot:schema:sarif-properties-2', $schema->id ?? null);
+        // The validator reads a `urn:` id as a file path, and the `#/definitions` refs resolve without one.
+        unset($schema->id);
 
         return $schema;
     }
