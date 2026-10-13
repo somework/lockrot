@@ -437,9 +437,9 @@ def move_props(with_also):
         'fix_kind': nul(("The security fix kind beside the move kind when `source` or `merged` holds `vulnerable`, or the move clears every counted advisory (round 3); else null "
                          "(`upgrade` is the move `require`, §8.2)."), ref('fixKind')),
         'reason': nul(("Set exactly on `no-move` (I18): `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable, round 4), "
-                       "`metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a "
+                       "`affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a "
                        "local path, the project's own package) (attack round 1). An open set (§8.2)."),
-                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'metadata_not_read', 'local_package']}),
+                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package']}),
         'replacement': ref('replacement'),
         'quiet_years': nul('On a `silent` `find-alternative` move, the years nothing was released (a years field, §2.1); else null.', ref('years')),
         'to_branch': nul('The branch moved to; null when the move names none.', ref('branchLabel')),

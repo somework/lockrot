@@ -61,7 +61,7 @@ final class KnownValuesRegistryTest extends TestCase
         $misses = [PhpFloor::NEEDS_NEWER, PhpFloor::STOPS_BEFORE, PhpFloor::SKIPS, PhpFloor::UNSATISFIABLE];
         $floors = [PhpFloor::PROJECT, PhpFloor::TARGET];
         $moveKinds = ['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'];
-        $moveReasons = ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'metadata_not_read', 'local_package'];
+        $moveReasons = ['package_quiet', 'no_higher_release', 'higher_undated', 'releases_unknown', 'affected_range_unknown', 'metadata_not_read', 'local_package'];
         $assumes = ['clears_hold', 'composer_resolves', 'no_new_advisories'];
         $thresholds = ['release-warn-years', 'release-high-years', 'push-warn-years', 'push-high-years'];
 

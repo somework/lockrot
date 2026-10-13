@@ -77,8 +77,8 @@ final class NextStep
 
     /**
      * The security move: the release scan's pick, the easiest row candidate, then the lowest
-     * release. With none, why: no release outside the ranges, no single one, or no release
-     * data.
+     * release. With none, why: no release outside the ranges, no single one, no release data, or
+     * no affected range.
      */
     private static function securityDraft(MoveContext $context): MoveDraft
     {
@@ -90,12 +90,10 @@ final class NextStep
                 return self::toCandidate($row, $candidate);
             }
         }
-        $kinds = array_unique(array_map(static fn (Fix $fix): string => $fix->kind(), $fixes === null ? [] : array_values($fixes->fixes())));
-        $finding = $context->finding();
+        $all = $fixes === null ? [] : array_values($fixes->fixes());
+        $kinds = array_unique(array_map(static fn (Fix $fix): string => $fix->kind(), $all));
         if ($kinds === [Fix::UNKNOWN] || $kinds === []) {
-            $reason = $finding->origin()->isLocal() ? 'local_package' : ($finding->isFromComposerRepository() ? 'releases_unknown' : 'metadata_not_read');
-
-            return MoveDraft::of(Move::NO_MOVE, FlagSet::VULNERABLE)->withReason($reason)->withFixKind(Fix::UNKNOWN);
+            return MoveDraft::of(Move::NO_MOVE, FlagSet::VULNERABLE)->withReason(self::unknownReason($context->finding(), $all))->withFixKind(Fix::UNKNOWN);
         }
         $hardest = null;
         foreach (ScoreModel::FIX_KINDS as $kind) {
@@ -103,6 +101,20 @@ final class NextStep
         }
 
         return MoveDraft::of($kinds === [Fix::NONE] ? Move::NO_FIX : Move::NO_SINGLE_FIX, FlagSet::VULNERABLE)->withFixKind($hardest);
+    }
+
+    /** @param list<Fix> $fixes */
+    private static function unknownReason(Finding $finding, array $fixes): string
+    {
+        if ($finding->origin()->isLocal()) {
+            return 'local_package';
+        }
+        if (!$finding->isFromComposerRepository()) {
+            return 'metadata_not_read';
+        }
+        $reasons = array_unique(array_map(static fn (Fix $fix): ?string => $fix->reason(), $fixes));
+
+        return $reasons === [Fix::AFFECTED_RANGE_UNKNOWN] ? Fix::AFFECTED_RANGE_UNKNOWN : 'releases_unknown';
     }
 
     /** A move to a row's candidate: `composer update` on the installed row, `require ^{lowest}` above it. */

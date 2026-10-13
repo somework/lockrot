@@ -1456,7 +1456,7 @@
                     ]
                 },
                 "reason": {
-                    "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a local path, the project's own package). An open set.",
+                    "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a local path, the project's own package). An open set.",
                     "oneOf": [
                         {
                             "type": "string",
@@ -1466,6 +1466,7 @@
                                 "no_higher_release",
                                 "higher_undated",
                                 "releases_unknown",
+                                "affected_range_unknown",
                                 "metadata_not_read",
                                 "local_package"
                             ]
@@ -13314,7 +13315,7 @@
                     ]
                 },
                 "reason": {
-                    "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a local path, the project's own package). An open set.",
+                    "description": "Set exactly on `no-move`: `package_quiet` (stale), `no_higher_release` and `higher_undated` (left-behind), `releases_unknown` (vulnerable), `affected_range_unknown` (vulnerable: the releases were read, but no counted advisory names the versions it affects), `metadata_not_read` (pinned: its releases were never read, so lockrot cannot say whether a tag exists) and `local_package` (pinned: installed from a local path, the project's own package). An open set.",
                     "oneOf": [
                         {
                             "type": "string",
@@ -13324,6 +13325,7 @@
                                 "no_higher_release",
                                 "higher_undated",
                                 "releases_unknown",
+                                "affected_range_unknown",
                                 "metadata_not_read",
                                 "local_package"
                             ]

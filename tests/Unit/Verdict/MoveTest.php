@@ -318,6 +318,16 @@ final class MoveTest extends TestCase
         self::assertSame('no move: lockrot could not read its releases, so it names no fix', $move['text']);
     }
 
+    /** The releases were read, but no counted advisory names the versions it affects: no release data is missing. */
+    public function testAnAdvisoryWithoutAnAffectedRangeNamesNoMoveForThatCause(): void
+    {
+        $advisories = [['id' => 'PKSA-1', 'severity' => 'critical', 'affected_versions' => null], ['id' => 'PKSA-2', 'severity' => 'high', 'affected_versions' => null]];
+        $move = JsonPath::arrayAt(self::analyse(['advisories' => $advisories]), ['next_step']);
+
+        self::assertSame(['no-move', 'vulnerable', 'affected_range_unknown', 'unknown'], [$move['kind'], $move['source'], $move['reason'], $move['fix_kind']]);
+        self::assertSame('no move: no advisory names the versions it affects, so lockrot names no fix', $move['text']);
+    }
+
     public function testAnAdvisoryOnAVcsPackageNamesNoMoveBecauseItsReleasesWereNotRead(): void
     {
         $move = JsonPath::arrayAt(self::analyse(['releases' => null, 'lock' => [['origin' => 'vcs']], 'advisories' => [self::ADVISORY]]), ['next_step']);
