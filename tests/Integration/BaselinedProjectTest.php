@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Integration;
 
+use Composer\Composer;
 use JsonSchema\Validator;
 use Lockrot\Baseline\BaselineFile;
 use Lockrot\Exception\ConfigException;
@@ -62,8 +63,12 @@ final class BaselinedProjectTest extends TestCase
         $t1 = JsonPath::stringAt(JsonPath::decodeFile($dir.'provenance.json'), ['clocks', 't1']);
         $files = BaselinedScenario::record($scenario, $t1);
 
-        foreach ($files as $path => $contents) {
-            self::assertSame((string) @file_get_contents($dir.$path), $contents, $scenario.'/'.$path.': re-record with tools/report/record --baselined '.$scenario);
+        // The recording ran on a Composer of the latest line. Composer 2.2 reads some recorded answers otherwise, so on it
+        // the files differ and only the floors and the invariants below hold.
+        if (version_compare(Composer::VERSION, '2.3', '>=')) {
+            foreach ($files as $path => $contents) {
+                self::assertSame((string) @file_get_contents($dir.$path), $contents, $scenario.'/'.$path.': re-record with tools/report/record --baselined '.$scenario);
+            }
         }
         self::assertSame([], BaselinedFloors::missed($scenario, $files));
         $provenance = json_decode($files['provenance.json']);

@@ -290,6 +290,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4438
                                 }
                             }
                         }
@@ -347,6 +350,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4438
                                 }
                             }
                         }
@@ -441,6 +447,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 5401
                                 }
                             }
                         }
@@ -498,6 +507,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 5401
                                 }
                             }
                         }
@@ -598,6 +610,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 8010
                                 }
                             }
                         }
@@ -692,6 +707,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 8469
                                 }
                             }
                         }
@@ -826,6 +844,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 8469
                                 }
                             }
                         }
@@ -904,6 +925,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 8469
                                 }
                             }
                         }
@@ -993,6 +1017,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2160
                                 }
                             }
                         }
@@ -1050,6 +1077,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2160
                                 }
                             }
                         }
@@ -1149,6 +1179,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 5352
                                 }
                             }
                         }
@@ -1206,6 +1239,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 5352
                                 }
                             }
                         }
@@ -1307,6 +1343,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2637
                                 }
                             }
                         }
@@ -1364,6 +1403,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2637
                                 }
                             }
                         }
@@ -1464,6 +1506,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2684
                                 }
                             }
                         }
@@ -1521,6 +1566,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2684
                                 }
                             }
                         }
@@ -1622,6 +1670,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2737
                                 }
                             }
                         }
@@ -1679,6 +1730,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2737
                                 }
                             }
                         }
@@ -1774,6 +1828,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2797
                                 }
                             }
                         }
@@ -1831,6 +1888,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2797
                                 }
                             }
                         }
@@ -1934,6 +1994,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3176
                                 }
                             }
                         }
@@ -1991,6 +2054,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3176
                                 }
                             }
                         }
@@ -2091,6 +2157,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6848
                                 }
                             }
                         }
@@ -2148,6 +2217,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6848
                                 }
                             }
                         }
@@ -2248,6 +2320,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6913
                                 }
                             }
                         }
@@ -2305,6 +2380,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6913
                                 }
                             }
                         }
@@ -2411,6 +2489,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 1145
                                 }
                             }
                         }
@@ -2503,6 +2584,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4940
                                 }
                             }
                         }
@@ -2590,6 +2674,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 7611
                                 }
                             }
                         }
@@ -2686,6 +2773,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 7659
                                 }
                             }
                         }
@@ -2778,6 +2868,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 7727
                                 }
                             }
                         }
@@ -2865,6 +2958,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 7775
                                 }
                             }
                         }
@@ -2952,6 +3048,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 7825
                                 }
                             }
                         }
@@ -3051,6 +3150,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 19754
                                 }
                             }
                         }
@@ -3142,6 +3244,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 13758
                                 }
                             }
                         }
@@ -3224,6 +3329,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 14414
                                 }
                             }
                         }
@@ -3305,6 +3413,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 14555
                                 }
                             }
                         }
@@ -3405,6 +3516,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 163
                                 }
                             }
                         }
@@ -3502,6 +3616,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 431
                                 }
                             }
                         }
@@ -3607,6 +3724,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 507
                                 }
                             }
                         }
@@ -3709,6 +3829,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3085
                                 }
                             }
                         }
@@ -3812,6 +3935,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3248
                                 }
                             }
                         }
@@ -3914,6 +4040,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3313
                                 }
                             }
                         }
@@ -4016,6 +4145,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3376
                                 }
                             }
                         }
@@ -4119,6 +4251,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3447
                                 }
                             }
                         }
@@ -4222,6 +4357,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3510
                                 }
                             }
                         }
@@ -4324,6 +4462,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3584
                                 }
                             }
                         }
@@ -4427,6 +4568,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3653
                                 }
                             }
                         }
@@ -4528,6 +4672,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3718
                                 }
                             }
                         }
@@ -4631,6 +4778,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3785
                                 }
                             }
                         }
@@ -4735,6 +4885,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3858
                                 }
                             }
                         }
@@ -4837,6 +4990,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3927
                                 }
                             }
                         }
@@ -4941,6 +5097,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 3991
                                 }
                             }
                         }
@@ -5046,6 +5205,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 12524
                                 }
                             }
                         }
@@ -5156,6 +5318,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6691
                                 }
                             }
                         }
@@ -5246,6 +5411,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 278
                                 }
                             }
                         }
@@ -5335,6 +5503,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 364
                                 }
                             }
                         }
@@ -5425,6 +5596,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6980
                                 }
                             }
                         }
@@ -5515,6 +5689,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 14344
                                 }
                             }
                         }
@@ -5612,6 +5789,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 18984
                                 }
                             }
                         }
@@ -5702,6 +5882,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 8367
                                 }
                             }
                         }
@@ -5792,6 +5975,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 11992
                                 }
                             }
                         }
@@ -5890,6 +6076,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 13984
                                 }
                             }
                         }
@@ -5971,6 +6160,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 14492
                                 }
                             }
                         }
@@ -6072,7 +6264,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1573
+                                    "startLine": 17259
                                 }
                             }
                         }
@@ -6132,7 +6324,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1573
+                                    "startLine": 17259
                                 }
                             }
                         }
@@ -6234,7 +6426,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1637
+                                    "startLine": 17322
                                 }
                             }
                         }
@@ -6294,7 +6486,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1637
+                                    "startLine": 17322
                                 }
                             }
                         }
@@ -6396,7 +6588,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1697
+                                    "startLine": 17381
                                 }
                             }
                         }
@@ -6456,7 +6648,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1697
+                                    "startLine": 17381
                                 }
                             }
                         }
@@ -6558,7 +6750,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 2587
+                                    "startLine": 18192
                                 }
                             }
                         }
@@ -6618,7 +6810,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 2587
+                                    "startLine": 18192
                                 }
                             }
                         }
@@ -6721,7 +6913,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 2644
+                                    "startLine": 18248
                                 }
                             }
                         }
@@ -6781,7 +6973,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 2644
+                                    "startLine": 18248
                                 }
                             }
                         }
@@ -6883,7 +7075,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 3203
+                                    "startLine": 18797
                                 }
                             }
                         }
@@ -6943,7 +7135,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 3203
+                                    "startLine": 18797
                                 }
                             }
                         }
@@ -7046,7 +7238,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 3261
+                                    "startLine": 18854
                                 }
                             }
                         }
@@ -7106,7 +7298,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 3261
+                                    "startLine": 18854
                                 }
                             }
                         }
@@ -7208,7 +7400,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 3462
+                                    "startLine": 19094
                                 }
                             }
                         }
@@ -7268,7 +7460,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 3462
+                                    "startLine": 19094
                                 }
                             }
                         }
@@ -7359,6 +7551,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 16457
                                 }
                             }
                         }
@@ -7456,6 +7651,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 2249
                                 }
                             }
                         }
@@ -7554,6 +7752,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 6516
                                 }
                             }
                         }
@@ -7646,7 +7847,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1500
+                                    "startLine": 17199
                                 }
                             }
                         }
@@ -7739,7 +7940,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 2917
+                                    "startLine": 18512
                                 }
                             }
                         }
@@ -7832,7 +8033,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 3393
+                                    "startLine": 19038
                                 }
                             }
                         }
@@ -7932,6 +8133,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 14813
                                 }
                             }
                         }
@@ -8023,6 +8227,9 @@
                                 "artifactLocation": {
                                     "uri": "composer.lock",
                                     "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 14856
                                 }
                             }
                         }
@@ -8115,7 +8322,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 11
+                                    "startLine": 15000
                                 }
                             }
                         }
@@ -8209,7 +8416,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 760
+                                    "startLine": 16060
                                 }
                             }
                         }
@@ -8302,7 +8509,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 1295
+                                    "startLine": 16706
                                 }
                             }
                         }
@@ -8397,7 +8604,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 2004
+                                    "startLine": 17551
                                 }
                             }
                         }

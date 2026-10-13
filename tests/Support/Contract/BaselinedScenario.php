@@ -314,8 +314,16 @@ final class BaselinedScenario
         $suffix = ['json' => '.json', 'table' => '.table.txt', 'markdown' => '.md', 'github' => '.github.txt', 'gitlab' => '.gitlab.json', 'sarif' => '.sarif.json'];
         $run = $report->run();
         $context = FormatContext::forFailOn('composer.lock', $run === null || $run->failOn() === null ? FailOn::none() : $run->failOn());
-        foreach ($formats as $format) {
-            $this->put($stem.$suffix[$format], Formatters::for($format, $context)->format($report));
+        // The formats read `composer.lock` from the working directory, as lockrot run in the project does: SARIF takes its
+        // line numbers from it.
+        $cwd = (string) getcwd();
+        chdir(self::FIXTURES.$this->scenario['after']);
+        try {
+            foreach ($formats as $format) {
+                $this->put($stem.$suffix[$format], Formatters::for($format, $context)->format($report));
+            }
+        } finally {
+            chdir($cwd);
         }
     }
 

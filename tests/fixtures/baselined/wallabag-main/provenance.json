@@ -3409,9 +3409,9 @@
         "check/report.json": "5e29748d397111c754c6439584d761867684a31b7dfc8332f702c3c765461e53",
         "check/report.table.txt": "bde72a5efbf35b9fa9a743da76c5aeb16cd1772193127c3fac836fc8c4810ac3",
         "check/report.md": "15e92eb6cbacf614d5ffede48a094b22617de04c487dac11a182092fa027f982",
-        "check/report.github.txt": "25fde45017cfe9a7f9c3e35d9e8a116308609107700ab3c3ce12bb8130224306",
-        "check/report.gitlab.json": "cd157769dab09a0fade3559f6dd1f6242ef0502a1c73f7e829cffe6bbb782750",
-        "check/report.sarif.json": "dffa42bec4be78d3e36ba6fe9625612f3a7a94413ba787a062b3661324ed56fc",
+        "check/report.github.txt": "d69ca2513f3a6aa7515c0f1114a2c4078c609cb85c546b0cd350042a017204e4",
+        "check/report.gitlab.json": "91039274c83bf73571a7bdc8a5640d793f4ee72444faa1ea746d032341fa0f21",
+        "check/report.sarif.json": "30b61e330f7d28e00cddd8d641653061b86fec49ec8e48b46a8a94136241b56d",
         "check/report.bundle.json": "520a3781dadb4f1b2a160b2e8ad5991586d55a2b87ba278fa05d0698193badd3",
         "check/explain/javibravo--simpleue.json": "c131bb715dab514066b53878b1853fd2a93545a8ccec942413cf71ad76d9d947",
         "check/explain/mnapoli--piwik-twig-extension.json": "fec2c5fb05af8416f8d9329764199aa698e40db1cc27634c69a134ad3117b59a",
@@ -3419,7 +3419,7 @@
         "check/explain/symfony--web-server-bundle.json": "50b7b195fd2473adaddf5227771cbf795c3bc752f2fd2a856446099f3d1eb3f9",
         "check/explain/willdurand--jsonp-callback-validator.json": "57c4a7006bc6b981ab9f7c123d103b24a531146d5daa1dd019db7dfad127da14",
         "check/gates-left-behind-vulnerable-high.json": "2a3f967b0653ab87c6e5030a17837df26c28793897a50d003c1d980dcf95603c",
-        "check/gates-left-behind-vulnerable-high.sarif.json": "2d075ec6f276e5cff0a921aa381d66eb7fe08b2ece4d37efe63ac2811dee187d",
+        "check/gates-left-behind-vulnerable-high.sarif.json": "6b6628b77ade14ec020ec9a8ab1c4a9750c7c0d15cb10b3a73b688c94a0a2a4b",
         "regenerate/lockrot-baseline.json": "089841caa85602f5e033a50ded61a7369ec7de8a319bc1e864b0f389e7827c58",
         "regenerate/report.json": "edc23ae1a96cf7309104cdfb301c4e97cdf2ab9e1c1aff78d50f0c688af9343e"
     }
