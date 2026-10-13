@@ -7,8 +7,8 @@ namespace Lockrot\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The 0.13 vocabulary stays in src/Legacy (DECISIONS 2.31): live code reads the grade, the lead and
- * the flags, never 0.13's verdict predicate, its verdict counts or its order.
+ * Live code reads the grade, the lead and the flags, never 0.13's verdict predicate, its verdict
+ * counts or its order (DECISIONS 2.31).
  */
 final class LegacyVocabularyTest extends TestCase
 {
@@ -21,7 +21,7 @@ final class LegacyVocabularyTest extends TestCase
         foreach ($files as $file) {
             self::assertInstanceOf(\SplFileInfo::class, $file);
             $path = str_replace('\\', '/', $file->getPathname());
-            if (substr($path, -4) !== '.php' || strpos($path, '/src/Legacy/') !== false) {
+            if (substr($path, -4) !== '.php') {
                 continue;
             }
             $source = (string) file_get_contents($path);
