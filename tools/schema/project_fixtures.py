@@ -440,20 +440,39 @@ DOCUMENT_SETS += [('config-2', 'config', False)] + [(os.path.join('config-2', su
 NOT_DOCUMENTS = ('INDEX.json', 'EXPECT.json', 'corrections.json')
 
 
+def correct(doc):
+    """The model defects that a document carries, each corrected here and listed in provenance.json.
+
+    C75 R8: a repository that failed in transport is a network failure, so `network_failures` is true.
+    The model writes false and has no R8 check.
+    """
+    fixed = []
+    lookup = doc.get('run', {}).get('advisory_lookup') if isinstance(doc.get('run'), dict) else None
+    repositories = lookup.get('repositories', []) if isinstance(lookup, dict) else []
+    if doc.get('network_failures') is False and any(r.get('outcome') == 'failed' and r.get('reason') == 'transport' for r in repositories):
+        doc['network_failures'] = True
+        fixed.append('C75 R8: network_failures false beside a repository that failed in transport, written true')
+    return fixed
+
+
 def write_documents(source, run_date, suite):
     counts = {}
+    corrections = {}
     for model_dir, out_dir, zipped in DOCUMENT_SETS:
         paths = sorted(p for p in glob.glob(os.path.join(source, 'docs', model_dir, '*.json')) if not p.endswith(NOT_DOCUMENTS))
         for path in paths:
             with open(path) as fh:
                 doc = json.load(fh)
             stem = os.path.basename(path)
+            for fix in correct(doc):
+                corrections.setdefault(os.path.join(out_dir, stem), []).append(fix)
             if zipped:
                 dump_gz(os.path.join(DOCS_OUT, out_dir, stem + '.gz'), doc)
             else:
                 dump(os.path.join(DOCS_OUT, out_dir, stem), doc)
         counts[out_dir] = len(paths)
-    dump(os.path.join(DOCS_OUT, 'provenance.json'), {'source': 'security-axis/r3/docs', 'model_run_date': run_date, 'suite': suite, 'documents': counts})
+    dump(os.path.join(DOCS_OUT, 'provenance.json'), {'source': 'security-axis/r3/docs', 'model_run_date': run_date, 'suite': suite, 'documents': counts,
+                                                      'corrections': dict(sorted(corrections.items()))})
     return counts
 
 

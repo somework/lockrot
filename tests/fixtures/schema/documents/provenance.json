@@ -19,5 +19,13 @@
   "config": 33,
   "config/coverage": 40,
   "config/repo-docs": 4
+ },
+ "corrections": {
+  "coverage/variants/finished-lookup-failed.json": [
+   "C75 R8: network_failures false beside a repository that failed in transport, written true"
+  ],
+  "coverage/variants/lookup-not-run-lookup-failed.json": [
+   "C75 R8: network_failures false beside a repository that failed in transport, written true"
+  ]
  }
 }

@@ -78,7 +78,9 @@ The model writes every field of 0.14. The script drops each key that a later pul
 reverts each value that a later pull request changes. So the fixtures carry what the draft of that
 pull request holds. `tests/fixtures/flags/provenance.json` lists the source hash, the model run date,
 the suite result, every dropped key and every reverted value. The base documents of the negative
-fixtures come from the same projection. CI does not run this script: its input is not in the
+fixtures come from the same projection. At the last pull request of the train, the script writes
+every model document unprojected. It corrects a model defect that a relation refuses, and
+`tests/fixtures/schema/documents/provenance.json` lists each correction by document. CI does not run this script: its input is not in the
 repository.
 
 ## A second validator

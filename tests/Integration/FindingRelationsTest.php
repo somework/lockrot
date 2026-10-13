@@ -30,11 +30,6 @@ final class FindingRelationsTest extends TestCase
     private const WALLABAG = __DIR__.'/../fixtures/schema/documents/corpus/wallabag.json.gz';
     /** The sets that hold whole reports. A case or a coverage variant holds part of one, so I25 cannot read it. */
     private const WHOLE = ['corpus/', 'variants/', 'coverage/baselined/'];
-    /**
-     * The model writes these two with a repository that failed in transport and `network_failures`
-     * false. C75 R8 sets `network_failures`, and the model has no R8 check.
-     */
-    private const R8_MODEL_GAP = ['finished-lookup-failed.json.gz', 'lookup-not-run-lookup-failed.json.gz'];
 
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
@@ -46,9 +41,7 @@ final class FindingRelationsTest extends TestCase
             $set = substr($path, \strlen(self::DOCUMENTS));
             $whole = array_filter(self::WHOLE, static fn (string $prefix): bool => strpos($set, $prefix) === 0) !== [];
             foreach (array_merge(FindingRelations::violations($document), ItemRelations::violations($document, $whole)) as $violation) {
-                if (!\in_array(basename($path), self::R8_MODEL_GAP, true) || strpos($violation, 'C75 R8') !== 0) {
-                    $broken[] = basename($path).' '.$violation;
-                }
+                $broken[] = basename($path).' '.$violation;
             }
         }
 
