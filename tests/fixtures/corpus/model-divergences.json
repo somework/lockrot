@@ -17,7 +17,7 @@
       "path": "next_step.held_by",
       "model": [],
       "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder.",
-      "count": 40
+      "count": 41
     },
     {
       "path": "next_step.version",
@@ -561,66 +561,17 @@
       "app": "monicahq_monica",
       "package": "erusev/parsedown",
       "path": "next_step.kind",
-      "lockrot": "test",
+      "lockrot": "require",
       "model": "update",
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
+      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0. lockrot writes a require move to ^1.8.0 through the holder. The model reads no holder and writes update."
     },
     {
       "app": "monicahq_monica",
       "package": "erusev/parsedown",
-      "path": "next_step.version",
-      "lockrot": null,
-      "model": "1.8.0",
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
-    },
-    {
-      "app": "monicahq_monica",
-      "package": "erusev/parsedown",
-      "path": "next_step.to_branch",
-      "lockrot": null,
-      "model": "1.x",
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
-    },
-    {
-      "app": "monicahq_monica",
-      "package": "erusev/parsedown",
-      "path": "next_step.clears",
-      "lockrot": [],
-      "model": [
-        {
-          "basis": "released_after_ga",
-          "id": "old-promise",
-          "kind": "flag"
-        }
-      ],
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
-    },
-    {
-      "app": "monicahq_monica",
-      "package": "erusev/parsedown",
-      "path": "next_step.leaves",
-      "lockrot": [
-        {
-          "id": "old-promise",
-          "kind": "flag"
-        }
-      ],
-      "model": [],
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
-    },
-    {
-      "app": "monicahq_monica",
-      "package": "erusev/parsedown",
-      "path": "next_step.php_check",
-      "lockrot": null,
-      "model": {
-        "project_allows": true,
-        "raise_size": null,
-        "raise_to": null,
-        "requires": ">=7.1",
-        "target_runs": true
-      },
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
+      "path": "next_step.constraint",
+      "lockrot": "^1.8.0",
+      "model": null,
+      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0. lockrot writes a require move to ^1.8.0 through the holder. The model reads no holder and writes update."
     },
     {
       "app": "monicahq_monica",
@@ -647,31 +598,33 @@
           "5.11.0"
         ]
       ],
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
-    },
-    {
-      "app": "monicahq_monica",
-      "package": "erusev/parsedown",
-      "path": "next_step.crosses_major",
-      "lockrot": null,
-      "model": false,
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
+      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0. lockrot writes a require move to ^1.8.0 through the holder. The model reads no holder and writes update."
     },
     {
       "app": "monicahq_monica",
       "package": "erusev/parsedown",
       "path": "next_step.composer_moves_because",
       "lockrot": [
-        "transitive"
+        "holders"
       ],
       "model": [],
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
+      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0. lockrot writes a require move to ^1.8.0 through the holder. The model reads no holder and writes update."
     },
     {
       "app": "monicahq_monica",
       "package": "erusev/parsedown",
       "path": "next_step.if_applied",
-      "lockrot": null,
+      "lockrot": {
+        "assumes": [
+          "clears_hold",
+          "composer_resolves"
+        ],
+        "at_most": false,
+        "deciding_advisory": null,
+        "lead": null,
+        "total": 0,
+        "verdict": "ok"
+      },
       "model": {
         "assumes": [
           "clears_hold"
@@ -682,7 +635,7 @@
         "total": 0,
         "verdict": "ok"
       },
-      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
+      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0. lockrot writes a require move to ^1.8.0 through the holder. The model reads no holder and writes update."
     },
     {
       "app": "wallabag_wallabag",
