@@ -63,32 +63,42 @@ final class HtmlFormatter implements FormatterInterface
 
     private static function description(Report $report): string
     {
-        $flagged = \count($report->graded());
-        $checked = $report->packagesChecked();
-        if ($flagged === 0) {
-            return 'lockrot checked '.$checked.' packages in composer.lock and flagged none. Every verdict carries the release dates it was decided on.';
+        if ($report->packagesChecked() === 0) {
+            return 'lockrot found no package in composer.lock.';
         }
-
+        $flagged = \count($report->graded());
+        $checked = self::packages($report->packagesChecked());
+        if ($flagged === 0) {
+            return 'lockrot checked '.$checked.' in composer.lock and flagged none.';
+        }
+        $counts = $report->byGrade();
         $named = [];
-        foreach ($report->byGrade() as $grade => $count) {
-            if ($count > 0 && \in_array($grade, ScoreModel::GRADES, true)) {
-                $named[] = $count.' '.$grade;
+        foreach (ScoreModel::GRADES as $grade) {
+            if ($counts[$grade] > 0) {
+                $named[] = $counts[$grade].' '.$grade;
             }
         }
 
-        return 'lockrot flagged '.$flagged.' of '.$checked.' packages in composer.lock'
-            .($named === [] ? '' : ': '.implode(', ', $named))
-            .'. Each finding carries its evidence, the release branches behind it and any security advisory.';
+        return 'lockrot flagged '.$flagged.' of '.$checked.' in composer.lock: '.implode(', ', $named)
+            .'. Each finding lists every flag that fired, the sum behind its grade, and its next step.';
     }
 
     private static function title(Report $report): string
     {
+        if ($report->packagesChecked() === 0) {
+            return 'lockrot: composer.lock holds no package';
+        }
         $flagged = \count($report->graded());
         if ($flagged === 0) {
-            return 'lockrot: nothing flagged in '.$report->packagesChecked().' packages';
+            return 'lockrot: nothing flagged in '.self::packages($report->packagesChecked());
         }
 
-        return 'lockrot: '.$flagged.' of '.$report->packagesChecked().' packages flagged';
+        return 'lockrot: '.$flagged.' of '.self::packages($report->packagesChecked()).' flagged';
+    }
+
+    private static function packages(int $count): string
+    {
+        return $count.' '.($count === 1 ? 'package' : 'packages');
     }
 
     /**
