@@ -179,6 +179,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI:** `--explain` prints "archived flag not read" for a repository whose host did not send the
   flag, such as gitlab.com without a token. It printed "not archived".
   ([Explaining one package](docs/configuration.md#explaining-one-package))
+- **CLI:** the `--explain` branch table prints the php of each branch's highest tag. It printed
+  the php of the branch's newest dated release, such as an LTS backport, beside the highest tag.
+  ([Explaining one package](docs/configuration.md#explaining-one-package))
 
 ## [0.13.0] - 2026-10-01
 
