@@ -120,6 +120,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All formats:** a failing run that writes json, sarif, gitlab or html to stdout also prints
   `lockrot: gate: …` on stderr. Read stdout alone (do not merge `2>&1`).
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
+- **json:** each `--explain` branch row and each branch row of the html page's details block write
+  `highest_php`, the php of the branch's highest tag, beside `php`.
+  ([The PHP test](docs/verdicts.md#the-php-test-in-explain))
 
 ### Changed
 
@@ -158,6 +161,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Action: match the new ids in jq. ([Libyears](docs/verdicts.md#libyears))
 - **All formats:** the run note `not_from_composer_repository` says whether the run asked those
   packages' advisories (`data.advisories_asked`). ([Run notes](docs/notes.md#not_from_composer_repository))
+- **html:** the page title and description count with one singular rule ("1 package") and name an
+  empty lock. The description lists every grade in grade order.
 
 ### Removed
 

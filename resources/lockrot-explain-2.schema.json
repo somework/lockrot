@@ -15854,6 +15854,7 @@
                             "newest_dated_released",
                             "dated_by",
                             "php",
+                            "highest_php",
                             "admits_target_php",
                             "admits_project_php",
                             "php_blocked_by",
@@ -15925,6 +15926,17 @@
                             },
                             "php": {
                                 "description": "The requirement of the branch's newest dated release, as the repository lists it; null when it declares none (the Release branches line then leaves its php clause out).",
+                                "oneOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "highest_php": {
+                                "description": "The requirement of the branch's highest tag (`highest`), as the repository lists it; null when it declares none. It differs from `php` when the newest dated release is not the highest tag (composer/composer 2.x: 2.10.3 beside the backport 2.2.30). The Release branches line prints it beside `highest`; the floor answers read `php`.",
                                 "oneOf": [
                                     {
                                         "type": "string"
@@ -16023,7 +16035,7 @@
                                 ]
                             }
                         },
-                        "description": "One release branch, highest first (the details block). Every key but the last two is 0.13's; find the installed row by `installed: true`, never by name."
+                        "description": "One release branch, highest first (the details block). Every key but `highest_php`, `released_years` and `fixes` is 0.13's; find the installed row by `installed: true`, never by name."
                     }
                 },
                 "installed_branch": {

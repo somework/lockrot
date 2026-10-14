@@ -211,6 +211,7 @@ Each branch row in the JSON carries:
 | `php_blocked_by` | `project` when the branch misses the project's floor, whether or not it also misses the target. Else `target` when it misses the target. Else null: the branch is within reach. A null `admits_*` blocks nothing. An [open set](schema.md#open-sets) |
 | `misses_target_php`, `misses_project_php` | Which side of that floor the branch's php lies on. Null exactly where the matching `admits_*` is not false. An [open set](schema.md#open-sets) |
 | `highest_commit_date` | The highest tag's commit date when other tags share that commit, not a release date. Null when the tag has a release date or none |
+| `highest_php` | The requirement of the branch's highest tag, which the explain table and the page print beside that tag. It differs from `php` when the newest dated release is not the highest tag. Null when the tag declares no PHP. The floor fields test `php`, not this field |
 
 | `misses_*` | The branch's php admits | Example against the floor |
 |---|---|---|

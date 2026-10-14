@@ -1,0 +1,125 @@
+{
+  "note": "page-level goldens (attack round 4): every string is the model's rendering of the named document's root fields",
+  "goldens": {
+    "composite": {
+      "document": "cases/composite.json",
+      "title": "lockrot: 7 of 7 packages flagged",
+      "description": "lockrot flagged 7 of 7 packages in composer.lock: 3 critical, 2 high, 2 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for lockrot/composite · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4",
+        "7 of 7 packages flagged (100%): 3 graded critical, 2 high, 2 low. Flags: abandoned 1, pinned 1, left-behind 1, old-promise 3, stale 2, vulnerable 4.",
+        "All 7 in production · 6 required directly, 1 pulled in · 20 security advisories on 4 packages (severity: 1 critical, 4 high, 4 medium, 2 unrated, 9 low) · fix by package: 2 composer update, 1 upgrade, 1 php floor raise · 17.9 libyears behind."
+      ],
+      "libyears_panel": "17.85 libyears over 5 packages · furthest behind: symfony/monolog-bridge v2.6.13, 10.62",
+      "panel": [
+        "How the score works · score model 1",
+        "Bands: low 1 · medium 8 · high 16 · critical 32; from medium up, each band starts at 2 × the one below",
+        "score 0: finished (accepted by an allowlist) · unknown (no metadata) · ok",
+        "Weights: abandoned 32 (critical) · silent 32 (critical) · pinned 16 (high) · left-behind 16 (high) · old-promise 16 (high) · stale 8 (medium); after the lead, ¼: — · — · 4 · 4 · 4 · 2",
+        "the previous release's bands: critical · critical · high · high · high · medium; with corroboration at most 40 (abandoned + left-behind + old-promise) · 40 (silent + pinned + old-promise) · 22 (pinned + old-promise + stale) · 20 (left-behind + old-promise) · 18 (old-promise + stale) · 8 (stale)",
+        "Advisories: critical 32 · high 16 · medium 8 · unrated 8 (counts as medium) · low 2; × 2 when no reachable fix: 64 · 32 · 16 · 16 · 4",
+        " 1 counted: accepted facts are shown, never counted; an ignore[] entry's liveness word also accepts the words below it · used on 0 (muted)",
+        " 2 lead in full: the strongest maintenance fact counts in full · used on 4",
+        " 3 ¼ for the rest: correlated evidence: left-behind 16 + old-promise 4 · used on 4",
+        " 4 advisory points: critical, high, medium at their band floor; unrated counts as medium; low ¼ of medium · used on 4",
+        " 5 × 2: no reachable fix: high 16 → 32, high → critical · used on 0 (muted)",
+        " 6 highest-scoring advisory: one number per part: a second advisory adds nothing unless it scores more; ties by points, severity, id · used on 2",
+        " 7 ÷ 2 reach: maintenance of a transitive or unreached package: abandoned 32 → 16 · used on 0 (muted)",
+        " 8 not for security: reach never halves security: a transitive critical stays 32 · used on 1",
+        " 9 sum: parts add: 16 + 16 = 32, critical; 4 + 4 = 8, medium · used on 1",
+        "10 ÷ 2 dev: packages-dev halves the whole score: 32 → 16 · used on 0 (muted)",
+        "11 floor once: 4.5 → 4 · used on 0 (muted)",
+        "12 band floors: from medium up each floor is 2 × the one below: 8 · 16 · 32; low from 1 · used on 7",
+        "13 zero verdicts: score 0 says why: finished (accepted by an allowlist) · unknown (no metadata) · ok · used on 0 (muted)",
+        "14 sort: by grade, then findings with an advisory first, by what its advisories add to the score, then by the score, then direct requirements first, then by name (bytes) · —",
+        "15 gate: with a baseline: min(score, 2 × new): score 36, new 16 → 32 · used on 0 (muted)",
+        "16 cover: a recorded flag covers itself and every flag after it in the flag order · used on 0 (muted)",
+        "Fixes: composer update · upgrade · php floor raise · fix unknown · blocked × 2 · no fix × 2"
+      ]
+    },
+    "new-symfony": {
+      "document": "report-2/new-symfony.json",
+      "title": "lockrot: nothing flagged in 1 package",
+      "description": "lockrot checked 1 package in composer.lock and flagged none.",
+      "copy_summary": [
+        "lockrot report for symfony/skeleton · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4",
+        "Nothing flagged in 1 package.",
+        "No security advisory · 0.0 libyears behind."
+      ],
+      "libyears_panel": "0.00 libyears over 1 package",
+      "panel": [
+        "How the score works · score model 1",
+        "Bands: low 1 · medium 8 · high 16 · critical 32; from medium up, each band starts at 2 × the one below",
+        "score 0: finished (accepted by an allowlist) · unknown (no metadata) · ok",
+        "Weights: abandoned 32 (critical) · silent 32 (critical) · pinned 16 (high) · left-behind 16 (high) · old-promise 16 (high) · stale 8 (medium); after the lead, ¼: — · — · 4 · 4 · 4 · 2",
+        "the previous release's bands: critical · critical · high · high · high · medium; with corroboration at most 40 (abandoned + left-behind + old-promise) · 40 (silent + pinned + old-promise) · 22 (pinned + old-promise + stale) · 20 (left-behind + old-promise) · 18 (old-promise + stale) · 8 (stale)",
+        "Advisories: critical 32 · high 16 · medium 8 · unrated 8 (counts as medium) · low 2; × 2 when no reachable fix: 64 · 32 · 16 · 16 · 4",
+        " 1 counted: accepted facts are shown, never counted; an ignore[] entry's liveness word also accepts the words below it · used on 0 (muted)",
+        " 2 lead in full: the strongest maintenance fact counts in full · used on 0 (muted)",
+        " 3 ¼ for the rest: correlated evidence: left-behind 16 + old-promise 4 · used on 0 (muted)",
+        " 4 advisory points: critical, high, medium at their band floor; unrated counts as medium; low ¼ of medium · used on 0 (muted)",
+        " 5 × 2: no reachable fix: high 16 → 32, high → critical · used on 0 (muted)",
+        " 6 highest-scoring advisory: one number per part: a second advisory adds nothing unless it scores more; ties by points, severity, id · used on 0 (muted)",
+        " 7 ÷ 2 reach: maintenance of a transitive or unreached package: abandoned 32 → 16 · used on 0 (muted)",
+        " 8 not for security: reach never halves security: a transitive critical stays 32 · used on 0 (muted)",
+        " 9 sum: parts add: 16 + 16 = 32, critical; 4 + 4 = 8, medium · used on 0 (muted)",
+        "10 ÷ 2 dev: packages-dev halves the whole score: 32 → 16 · used on 0 (muted)",
+        "11 floor once: 4.5 → 4 · used on 0 (muted)",
+        "12 band floors: from medium up each floor is 2 × the one below: 8 · 16 · 32; low from 1 · used on 0 (muted)",
+        "13 zero verdicts: score 0 says why: finished (accepted by an allowlist) · unknown (no metadata) · ok · used on 1",
+        "14 sort: by grade, then findings with an advisory first, by what its advisories add to the score, then by the score, then direct requirements first, then by name (bytes) · —",
+        "15 gate: with a baseline: min(score, 2 × new): score 36, new 16 → 32 · used on 0 (muted)",
+        "16 cover: a recorded flag covers itself and every flag after it in the flag order · used on 0 (muted)",
+        "Fixes: composer update · upgrade · php floor raise · fix unknown · blocked × 2 · no fix × 2"
+      ]
+    },
+    "akaunting": {
+      "document": "report-2/akaunting.json",
+      "title": "lockrot: 37 of 183 packages flagged",
+      "description": "lockrot flagged 37 of 183 packages in composer.lock: 3 critical, 22 high, 7 medium, 5 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for akaunting/akaunting · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4",
+        "37 of 183 packages flagged (20%): 3 graded critical, 22 high, 7 medium, 5 low. Flags: abandoned 16, left-behind 7, old-promise 3, stale 10, vulnerable 4.",
+        "All 37 in production · 14 required directly, 23 pulled in · 12 security advisories on 4 packages (severity: 3 high, 6 medium, 3 low) · fix by package: 1 composer update, 1 upgrade, 2 php floor raise · 97.8 libyears behind."
+      ],
+      "libyears_panel": "97.81 libyears over 180 packages · furthest behind: mnsami/composer-custom-directory-installer 2.0.0, 5.75",
+      "panel": null
+    },
+    "ok-offline": {
+      "document": "cases/ok-offline-dagger.json",
+      "title": "lockrot: nothing flagged in 1 package",
+      "description": "lockrot checked 1 package in composer.lock and flagged none.",
+      "copy_summary": [
+        "lockrot report for joomla/joomla-cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4",
+        "Nothing flagged in 1 package.",
+        "No advisory found, but the advisory check was incomplete · 3.0 libyears behind."
+      ],
+      "libyears_panel": "2.98 libyears over 1 package · furthest behind: composer/ca-bundle 1.3.7, 2.98",
+      "panel": null
+    },
+    "policy-off": {
+      "document": "cases/policy-off-dagger.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 medium. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for joomla/joomla-cms · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4",
+        "1 of 1 package flagged (100%): 1 graded medium. Flags: vulnerable 1.",
+        "In production · required directly · 1 security advisory on 1 package (severity: 1 medium) · fix by package: 1 php floor raise · 2.1 libyears behind."
+      ],
+      "libyears_panel": "2.11 libyears over 1 package · furthest behind: joomla/filter 2.0.5, 2.11",
+      "panel": null
+    },
+    "empty-lock": {
+      "document": "report-2/moodle-v3.json",
+      "title": "lockrot: composer.lock holds no package",
+      "description": "lockrot found no package in composer.lock.",
+      "copy_summary": [
+        "lockrot report for moodle/moodle · lockrot 0.14.0 · score model 1 · target PHP 8.4",
+        "No packages in this lock.",
+        "No security advisory."
+      ],
+      "libyears_panel": null,
+      "panel": null
+    }
+  }
+}

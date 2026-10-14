@@ -40,6 +40,10 @@ Every document of `contract/report-2/` is lockrot's output. `contract/model-only
 documents of the cases that the hydrator cannot rebuild (`contract/provenance.json`
 `cases_without_inputs`). They pass the schema checks, but lockrot did not write them.
 
+`contract/page-goldens.json` is the model's page goldens of six documents, copied from the model and
+not recorded (`contract/provenance.json` `page_goldens`). `PageGoldensTest` holds the page title and
+description to it. The other keys are for lockrot-report.
+
 ## Other fixtures
 
 - `mini/` — a hand-written lock and its composer.json, shared by `LockFileTest`,

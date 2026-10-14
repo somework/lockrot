@@ -356,6 +356,7 @@
                 "newest_dated_released": "2018-08-10T14:18:38+00:00",
                 "dated_by": null,
                 "php": ">=5.6",
+                "highest_php": ">=5.6",
                 "admits_target_php": true,
                 "admits_project_php": true,
                 "php_blocked_by": null,

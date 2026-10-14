@@ -231,6 +231,7 @@ final class Explanation
                 'newest_dated_released' => self::date($row->newestDatedReleased()),
                 'dated_by' => $row->datedBy(),
                 'php' => $row->php(),
+                'highest_php' => $row->highestPhp(),
                 'admits_target_php' => $row->admitsTargetPhp(),
                 'admits_project_php' => $row->admitsProjectPhp(),
                 'php_blocked_by' => $row->phpBlockedBy(),

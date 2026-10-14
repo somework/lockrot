@@ -119,6 +119,12 @@ $provenance = [
     'baseline_2' => 'the gate-row baselines of tests/fixtures/schema/documents/baseline/gate-rows/, read by Baseline::fromArray() and written by BaselineFile::write()',
     'case_lock' => 'each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out',
     'model_goldens' => $meta['goldens'],
+    'page_goldens' => [
+        'file' => 'page-goldens.json',
+        'source' => 'the model\'s page goldens of six documents (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded',
+        'sha256' => hash_file('sha256', $contract.'page-goldens.json'),
+        'read_by' => 'tests/Integration/PageGoldensTest.php reads title and description; the other keys are the renderer\'s',
+    ],
     'bundle_sha256' => 'sha256 of the lines "<sha256>  <path>", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json',
 ];
 write($contract.'provenance.json', JsonWriter::encode($provenance, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n");

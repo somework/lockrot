@@ -105,9 +105,31 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
             array_diff_key(JsonPath::arrayAt($meta, ['branches', 0]), ['released_years' => true, 'fixes' => true])
         );
+    }
+
+    /**
+     * composer/composer 2.x: the highest tag 2.10.3 is older than the LTS backport 2.2.30. The
+     * Release branches line prints `highest_php` beside `highest`, and the floor answers read `php`.
+     */
+    public function testABranchRowCarriesThePhpOfItsHighestTagBesideTheNewestDatedOne(): void
+    {
+        $at = new \DateTimeImmutable('2026-01-01T00:00:00+00:00');
+        $branch = ['version' => '2.2.30', 'at' => new \DateTimeImmutable('2026-02-01T00:00:00+00:00'), 'highest' => ['normalized' => '2.10.3.0', 'pretty' => '2.10.3', 'at' => $at, 'php' => '^7.2.5 || ^8.0'], 'php' => '^5.3.2 || ^7.0 || ^8.0'];
+        $metadata = new PackageMetadata('composer/composer', false, null, true, $at, '2.10.3', 2, null, 'library', new \DateTimeImmutable(F::NOW), ['2' => $branch]);
+        $explanation = new Explanation($this->finding('2.2.1', Verdict::OK), F::facts(F::package(['version' => '2.2.1']), $metadata), new Thresholds(), '8.4', $this->report());
+
+        $explained = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
+        $details = $explanation->toDetailsArray()['metadata'];
+        self::assertNotNull($details);
+        $detailed = JsonPath::arrayAt($details, ['branches', 0]);
+
+        foreach ([$explained, $detailed] as $row) {
+            self::assertSame(['2.10.3', '^7.2.5 || ^8.0'], [$row['highest'], $row['highest_php']]);
+            self::assertSame(['2.2.30', '^5.3.2 || ^7.0 || ^8.0'], [$row['newest_dated'], $row['php']]);
+        }
     }
 
     public function testABranchSnapshotBelongsToNoBranch(): void
@@ -173,8 +195,8 @@ final class ExplanationTest extends TestCase
             'type' => 'library',
             'data_date' => F::NOW,
             'branches' => [
-                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 0.7, 'fixes' => null],
-                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 5.3, 'fixes' => null],
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 0.7, 'fixes' => null],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 5.3, 'fixes' => null],
             ],
             'installed_branch' => '1.x',
         ], $array['metadata']);
@@ -256,7 +278,7 @@ final class ExplanationTest extends TestCase
         self::assertSame('laravel/framework', $meta['installed_release_dated_by']);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
             array_diff_key(JsonPath::arrayAt($meta, ['branches', 0]), ['released_years' => true, 'fixes' => true])
         );
     }

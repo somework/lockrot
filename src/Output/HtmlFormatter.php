@@ -7,10 +7,10 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Html\PageData;
+use Lockrot\Html\PageHeading;
 use Lockrot\Html\ReportDocument;
 use Lockrot\Json\JsonReader;
 use Lockrot\Json\JsonWriter;
-use Lockrot\Verdict\ScoreModel;
 
 /**
  * The report as one self-contained page: docs/ci.md#-formathtml.
@@ -53,52 +53,13 @@ final class HtmlFormatter implements FormatterInterface
             throw new ConfigException(\sprintf('html needs a lockrot-report release that reads report-%d (this build vendors one that reads [%s]); use --format=json meanwhile', JsonFormatter::SCHEMA, implode(', ', $this->reads)));
         }
         $document = new ReportDocument($report, $this->page);
+        $heading = PageHeading::of($report);
 
         return strtr(self::template(), [
-            '{{TITLE}}' => self::text(self::title($report)),
-            '{{DESCRIPTION}}' => self::text(self::description($report)),
+            '{{TITLE}}' => self::text($heading->title()),
+            '{{DESCRIPTION}}' => self::text($heading->description()),
             '{{DATA}}' => self::payload($document->toArray($showAll)),
         ]);
-    }
-
-    private static function description(Report $report): string
-    {
-        if ($report->packagesChecked() === 0) {
-            return 'lockrot found no package in composer.lock.';
-        }
-        $flagged = \count($report->graded());
-        $checked = self::packages($report->packagesChecked());
-        if ($flagged === 0) {
-            return 'lockrot checked '.$checked.' in composer.lock and flagged none.';
-        }
-        $counts = $report->byGrade();
-        $named = [];
-        foreach (ScoreModel::GRADES as $grade) {
-            if ($counts[$grade] > 0) {
-                $named[] = $counts[$grade].' '.$grade;
-            }
-        }
-
-        return 'lockrot flagged '.$flagged.' of '.$checked.' in composer.lock: '.implode(', ', $named)
-            .'. Each finding lists every flag that fired, the sum behind its grade, and its next step.';
-    }
-
-    private static function title(Report $report): string
-    {
-        if ($report->packagesChecked() === 0) {
-            return 'lockrot: composer.lock holds no package';
-        }
-        $flagged = \count($report->graded());
-        if ($flagged === 0) {
-            return 'lockrot: nothing flagged in '.self::packages($report->packagesChecked());
-        }
-
-        return 'lockrot: '.$flagged.' of '.self::packages($report->packagesChecked()).' flagged';
-    }
-
-    private static function packages(int $count): string
-    {
-        return $count.' '.($count === 1 ? 'package' : 'packages');
     }
 
     /**

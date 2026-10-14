@@ -239,11 +239,17 @@ def shared_definitions():
 def explain_metadata():
     rows = strip_optional(copy.deepcopy(E1['definitions']['metadata']))
     row = rows['properties']['branches']['items']
-    row['description'] = ('One release branch, highest first (the details block, §7.6). Every key but the last two is 0.13\'s; find the installed row by '
-                          '`installed: true`, never by name.')
+    row['description'] = ('One release branch, highest first (the details block, §7.6). Every key but `highest_php`, `released_years` and `fixes` is '
+                          '0.13\'s; find the installed row by `installed: true`, never by name.')
     row['properties']['branch']['description'] = 'The branch label as `ReleaseBranch::label()` writes it (`2.x`, `0.15.x`, `0.0.3`), the same label as `finding.branch`.'
     row['properties']['php'] = nullable({'type': 'string'}, 'The requirement of the branch\'s newest dated release, as the repository lists it; null when it '
                                                            'declares none (the Release branches line then leaves its php clause out).')
+    props = row['properties']
+    at = list(props).index('php') + 1
+    row['properties'] = dict(list(props.items())[:at] + [('highest_php', nullable({'type': 'string'}, (
+        'The requirement of the branch\'s highest tag (`highest`), as the repository lists it; null when it declares none. It differs from `php` '
+        'when the newest dated release is not the highest tag (composer/composer 2.x: 2.10.3 beside the backport 2.2.30). The Release branches line '
+        'prints it beside `highest`; the floor answers read `php`.')))] + list(props.items())[at:])
     row['properties']['released_years'] = nullable(ref('years'), 'The age of the branch\'s newest release on the run clock: `highest_released`, or, when '
                                                                  'that is null, S8\'s `newest_release` for the same branch; null when neither dates it.')
     row['properties']['fixes'] = nullable(ref('branchFixes'), 'What the branch fixes of the counted advisories; null when the package has no counted advisory.')
