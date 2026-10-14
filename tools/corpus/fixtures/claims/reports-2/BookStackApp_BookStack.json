@@ -152,8 +152,8 @@
         "repo": "SocialiteProviders/Discord",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:03+00:00",
-        "cached_at": "2026-10-14T01:03:03+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -198,7 +198,7 @@
       ],
       "evidence": "stale: last release 2023-07-24 (3.2 years ago)",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:03+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -386,8 +386,8 @@
         "repo": "SocialiteProviders/GitLab",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:04+00:00",
-        "cached_at": "2026-10-14T01:03:04+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -432,7 +432,7 @@
       ],
       "evidence": "stale: last release 2020-12-01 (5.9 years ago)",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:04+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -530,8 +530,8 @@
         "repo": "guzzle/guzzle",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:04+00:00",
-        "cached_at": "2026-10-14T01:02:04+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -574,7 +574,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:04+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.04,
       "age": {
         "installed": {
