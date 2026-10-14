@@ -105,7 +105,7 @@ final class ExplanationTest extends TestCase
         self::assertIsArray($meta);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => '10.49.0', 'highest_released' => null, 'highest_commit_date' => '2023-06-05T12:46:42+00:00', 'newest_dated' => '10.49.0', 'newest_dated_released' => '2023-06-05T12:46:42+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'highest_admits_target_php' => null, 'highest_admits_project_php' => null, 'highest_misses_project_php' => null],
             array_diff_key(JsonPath::arrayAt($meta, ['branches', 0]), ['released_years' => true, 'fixes' => true])
         );
     }
@@ -130,6 +130,23 @@ final class ExplanationTest extends TestCase
             self::assertSame(['2.10.3', '^7.2.5 || ^8.0'], [$row['highest'], $row['highest_php']]);
             self::assertSame(['2.2.30', '^5.3.2 || ^7.0 || ^8.0'], [$row['newest_dated'], $row['php']]);
         }
+    }
+
+    /**
+     * sensio/framework-extra-bundle 5.x: the newest dated release v5.5.7 needs >=7.1.3, the highest tag
+     * v5.6.1 needs >=7.2.5. A project on require.php >=7.2.0 is admitted by the first and not by the
+     * second, so the line that prints v5.6.1's php reads the highest tag's floor answers.
+     */
+    public function testTheHighestTagHasItsOwnFloorAnswers(): void
+    {
+        $branch = ['version' => 'v5.5.7', 'at' => new \DateTimeImmutable('2020-09-05T14:06:05+00:00'), 'highest' => ['normalized' => '5.6.1.0', 'pretty' => 'v5.6.1', 'at' => new \DateTimeImmutable('2020-08-25T19:10:18+00:00'), 'php' => '>=7.2.5'], 'php' => '>=7.1.3'];
+        $metadata = new PackageMetadata('sensio/framework-extra-bundle', false, null, true, new \DateTimeImmutable('2020-09-05T14:06:05+00:00'), 'v5.5.7', 2, null, 'symfony-bundle', new \DateTimeImmutable(F::NOW), ['5' => $branch]);
+        $explanation = new Explanation($this->finding('v5.4.0', Verdict::OK), F::facts(F::package(['version' => 'v5.4.0']), $metadata), new Thresholds(), '7.2', $this->report(), '>=7.2.0');
+
+        $row = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
+
+        self::assertSame([true, true, null], [$row['admits_target_php'], $row['admits_project_php'], $row['misses_project_php']]);
+        self::assertSame([true, false, PhpFloor::NEEDS_NEWER], [$row['highest_admits_target_php'], $row['highest_admits_project_php'], $row['highest_misses_project_php']]);
     }
 
     public function testABranchSnapshotBelongsToNoBranch(): void
@@ -195,8 +212,8 @@ final class ExplanationTest extends TestCase
             'type' => 'library',
             'data_date' => F::NOW,
             'branches' => [
-                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 0.7, 'fixes' => null],
-                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'released_years' => 5.3, 'fixes' => null],
+                ['branch' => '2.x', 'installed' => false, 'highest' => '2.1.0', 'highest_released' => '2026-01-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '2.1.0', 'newest_dated_released' => '2026-01-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'highest_admits_target_php' => null, 'highest_admits_project_php' => null, 'highest_misses_project_php' => null, 'released_years' => 0.7, 'fixes' => null],
+                ['branch' => '1.x', 'installed' => true, 'highest' => '1.5.0', 'highest_released' => '2021-06-01T00:00:00+00:00', 'highest_commit_date' => null, 'newest_dated' => '1.5.0', 'newest_dated_released' => '2021-06-01T00:00:00+00:00', 'dated_by' => null, 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'highest_admits_target_php' => null, 'highest_admits_project_php' => null, 'highest_misses_project_php' => null, 'released_years' => 5.3, 'fixes' => null],
             ],
             'installed_branch' => '1.x',
         ], $array['metadata']);
@@ -278,7 +295,7 @@ final class ExplanationTest extends TestCase
         self::assertSame('laravel/framework', $meta['installed_release_dated_by']);
         self::assertIsArray($meta['branches']);
         self::assertSame(
-            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null],
+            ['branch' => '10.x', 'installed' => true, 'highest' => 'v10.50.3', 'highest_released' => '2026-08-12T03:46:26+00:00', 'highest_commit_date' => null, 'newest_dated' => 'v10.50.3', 'newest_dated_released' => '2026-08-12T03:46:26+00:00', 'dated_by' => 'laravel/framework', 'php' => null, 'highest_php' => null, 'admits_target_php' => null, 'admits_project_php' => null, 'php_blocked_by' => null, 'misses_target_php' => null, 'misses_project_php' => null, 'highest_admits_target_php' => null, 'highest_admits_project_php' => null, 'highest_misses_project_php' => null],
             array_diff_key(JsonPath::arrayAt($meta, ['branches', 0]), ['released_years' => true, 'fixes' => true])
         );
     }

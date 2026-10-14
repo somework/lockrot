@@ -121,7 +121,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lockrot: gate: …` on stderr. Read stdout alone (do not merge `2>&1`).
   ([Reading the gate line](docs/ci.md#reading-the-gate-line))
 - **json:** each `--explain` branch row and each branch row of the html page's details block write
-  `highest_php`, the php of the branch's highest tag, beside `php`.
+  `highest_php`, the php of the branch's highest tag, beside `php`, with its own floor answers
+  (`highest_admits_target_php`, `highest_admits_project_php`, `highest_misses_project_php`).
   ([The PHP test](docs/verdicts.md#the-php-test-in-explain))
 
 ### Changed

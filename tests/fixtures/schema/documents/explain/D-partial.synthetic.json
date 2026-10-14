@@ -348,6 +348,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 8.7,
     "fixes": null
    },
@@ -367,6 +370,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 9.4,
     "fixes": null
    },
@@ -386,6 +392,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 9.5,
     "fixes": null
    }

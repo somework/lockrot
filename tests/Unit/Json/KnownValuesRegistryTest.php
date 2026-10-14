@@ -168,6 +168,7 @@ final class KnownValuesRegistryTest extends TestCase
             '#/definitions/repositoryMetadata/properties/branches/items/properties/php_blocked_by/oneOf/0' => [$floors, 'PhpFloor'],
             '#/definitions/repositoryMetadata/properties/branches/items/properties/misses_target_php/oneOf/0' => [$misses, 'PhpFloor'],
             '#/definitions/repositoryMetadata/properties/branches/items/properties/misses_project_php/oneOf/0' => [$misses, 'PhpFloor'],
+            '#/definitions/repositoryMetadata/properties/branches/items/properties/highest_misses_project_php/oneOf/0' => [$misses, 'PhpFloor'],
             '#/definitions/clearedFact/properties/basis' => [['branch_releasing', 'released_after_ga', 'outside_range', 'tags_only'], self::LATER],
             '#/definitions/unverifiedFact/properties/reason' => [['undated', 'no_release_data'], self::LATER],
             '#/definitions/addedFact/properties/basis' => [['released_before_ga', 'branch_not_releasing'], self::LATER],

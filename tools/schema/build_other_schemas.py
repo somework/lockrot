@@ -239,8 +239,8 @@ def shared_definitions():
 def explain_metadata():
     rows = strip_optional(copy.deepcopy(E1['definitions']['metadata']))
     row = rows['properties']['branches']['items']
-    row['description'] = ('One release branch, highest first (the details block, §7.6). Every key but `highest_php`, `released_years` and `fixes` is '
-                          '0.13\'s; find the installed row by `installed: true`, never by name.')
+    row['description'] = ('One release branch, highest first (the details block, §7.6). Every key but `highest_php`, the three `highest_*` floor '
+                          'answers, `released_years` and `fixes` is 0.13\'s; find the installed row by `installed: true`, never by name.')
     row['properties']['branch']['description'] = 'The branch label as `ReleaseBranch::label()` writes it (`2.x`, `0.15.x`, `0.0.3`), the same label as `finding.branch`.'
     row['properties']['php'] = nullable({'type': 'string'}, 'The requirement of the branch\'s newest dated release, as the repository lists it, or of its '
                                                            'highest tag when no release on the branch has a date; null when it declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.')
@@ -250,6 +250,16 @@ def explain_metadata():
         'The requirement of the branch\'s highest tag (`highest`), as the repository lists it; null when it declares none. It differs from `php` '
         'when the newest dated release is not the highest tag (composer/composer 2.x: 2.10.3 beside the backport 2.2.30). The Release branches line '
         'prints it beside `highest`; the floor answers read `php`.')))] + list(props.items())[at:])
+    known = row['properties']['misses_project_php']['oneOf'][0]
+    row['properties']['highest_admits_target_php'] = nullable({'type': 'boolean'}, (
+        '`admits_target_php` asked of `highest_php`: whether the highest tag\'s php admits the target PHP. The Release branches line reads it beside '
+        '`highest_php`. Null is no answer, never admitted.'))
+    row['properties']['highest_admits_project_php'] = nullable({'type': 'boolean'}, (
+        '`admits_project_php` asked of `highest_php`: whether the highest tag\'s php admits the lowest PHP the project\'s `require.php` promises. '
+        'Null is no answer, never admitted.'))
+    row['properties']['highest_misses_project_php'] = nullable(copy.deepcopy(known), (
+        '`misses_project_php` asked of `highest_php`: which side of the project\'s floor the highest tag\'s php is on. Null exactly where '
+        '`highest_admits_project_php` is not false. Values grow in minor releases; treat one you do not know as other.'))
     row['properties']['released_years'] = nullable(ref('years'), 'The age of the branch\'s newest release on the run clock: `highest_released`, or, when '
                                                                  'that is null, S8\'s `newest_release` for the same branch; null when neither dates it.')
     row['properties']['fixes'] = nullable(ref('branchFixes'), 'What the branch fixes of the counted advisories; null when the package has no counted advisory.')

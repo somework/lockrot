@@ -750,6 +750,9 @@
     "php_blocked_by": "project",
     "misses_target_php": "needs_newer",
     "misses_project_php": "needs_newer",
+    "highest_admits_target_php": false,
+    "highest_admits_project_php": false,
+    "highest_misses_project_php": "needs_newer",
     "released_years": 0,
     "fixes": {
      "fixed": 15,
@@ -778,6 +781,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 2.1,
     "fixes": {
      "fixed": 0,
@@ -806,6 +812,9 @@
     "php_blocked_by": "project",
     "misses_target_php": null,
     "misses_project_php": "needs_newer",
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": false,
+    "highest_misses_project_php": "needs_newer",
     "released_years": 2.1,
     "fixes": {
      "fixed": 0,

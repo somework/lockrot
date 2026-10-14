@@ -15861,6 +15861,9 @@
                             "php_blocked_by",
                             "misses_target_php",
                             "misses_project_php",
+                            "highest_admits_target_php",
+                            "highest_admits_project_php",
+                            "highest_misses_project_php",
                             "released_years",
                             "fixes"
                         ],
@@ -16013,6 +16016,46 @@
                                     }
                                 ]
                             },
+                            "highest_admits_target_php": {
+                                "description": "`admits_target_php` asked of `highest_php`: whether the highest tag's php admits the target PHP. The Release branches line reads it beside `highest_php`. Null is no answer, never admitted.",
+                                "oneOf": [
+                                    {
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "highest_admits_project_php": {
+                                "description": "`admits_project_php` asked of `highest_php`: whether the highest tag's php admits the lowest PHP the project's `require.php` promises. Null is no answer, never admitted.",
+                                "oneOf": [
+                                    {
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "highest_misses_project_php": {
+                                "description": "`misses_project_php` asked of `highest_php`: which side of the project's floor the highest tag's php is on. Null exactly where `highest_admits_project_php` is not false. Values grow in minor releases; treat one you do not know as other.",
+                                "oneOf": [
+                                    {
+                                        "type": "string",
+                                        "pattern": "^[a-z][a-z0-9_]*$",
+                                        "x-known-values": [
+                                            "needs_newer",
+                                            "stops_before",
+                                            "skips",
+                                            "unsatisfiable"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
                             "released_years": {
                                 "description": "The age of the branch's newest release on the run clock: `highest_released`, or, when that is null, S8's `newest_release` for the same branch; null when neither dates it.",
                                 "oneOf": [
@@ -16036,7 +16079,7 @@
                                 ]
                             }
                         },
-                        "description": "One release branch, highest first (the details block). Every key but `highest_php`, `released_years` and `fixes` is 0.13's; find the installed row by `installed: true`, never by name."
+                        "description": "One release branch, highest first (the details block). Every key but `highest_php`, the three `highest_*` floor answers, `released_years` and `fixes` is 0.13's; find the installed row by `installed: true`, never by name."
                     }
                 },
                 "installed_branch": {

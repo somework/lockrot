@@ -237,6 +237,9 @@ final class Explanation
                 'php_blocked_by' => $row->phpBlockedBy(),
                 'misses_target_php' => $row->missesTargetPhp(),
                 'misses_project_php' => $row->missesProjectPhp(),
+                'highest_admits_target_php' => $row->highestAdmitsTargetPhp(),
+                'highest_admits_project_php' => $row->highestAdmitsProjectPhp(),
+                'highest_misses_project_php' => $row->highestMissesProjectPhp(),
             ] + $this->rowExtras($row);
         }
 

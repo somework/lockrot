@@ -503,6 +503,9 @@
     "php_blocked_by": "project",
     "misses_target_php": null,
     "misses_project_php": "needs_newer",
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": false,
+    "highest_misses_project_php": "needs_newer",
     "released_years": 0.1,
     "fixes": {
      "fixed": 1,
@@ -539,6 +542,9 @@
     "php_blocked_by": "project",
     "misses_target_php": null,
     "misses_project_php": "needs_newer",
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": false,
+    "highest_misses_project_php": "needs_newer",
     "released_years": 0.1,
     "fixes": {
      "fixed": 1,
@@ -575,6 +581,9 @@
     "php_blocked_by": "project",
     "misses_target_php": null,
     "misses_project_php": "needs_newer",
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": false,
+    "highest_misses_project_php": "needs_newer",
     "released_years": 0.1,
     "fixes": {
      "fixed": 1,
@@ -611,6 +620,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 0.4,
     "fixes": {
      "fixed": 1,
@@ -647,6 +659,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 4.3,
     "fixes": {
      "fixed": 0,
@@ -675,6 +690,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 5.9,
     "fixes": {
      "fixed": 0,
@@ -703,6 +721,9 @@
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
+    "highest_admits_target_php": true,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 6.9,
     "fixes": {
      "fixed": 0,

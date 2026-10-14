@@ -509,6 +509,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 0,
                 "fixes": {
                     "fixed": 3,
@@ -544,6 +547,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 4.7,
                 "fixes": {
                     "fixed": 0,
@@ -572,6 +578,9 @@
                 "php_blocked_by": "project",
                 "misses_target_php": "stops_before",
                 "misses_project_php": "stops_before",
+                "highest_admits_target_php": false,
+                "highest_admits_project_php": false,
+                "highest_misses_project_php": "stops_before",
                 "released_years": 7.3,
                 "fixes": {
                     "fixed": 0,
@@ -600,6 +609,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 7.5,
                 "fixes": {
                     "fixed": 0,
@@ -628,6 +640,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 8.5,
                 "fixes": {
                     "fixed": 0,
@@ -656,6 +671,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 8.9,
                 "fixes": {
                     "fixed": 0,
@@ -684,6 +702,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 8.9,
                 "fixes": {
                     "fixed": 0,
@@ -712,6 +733,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 10.2,
                 "fixes": {
                     "fixed": 0,
@@ -740,6 +764,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 10.3,
                 "fixes": {
                     "fixed": 0,
@@ -768,6 +795,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 10.9,
                 "fixes": {
                     "fixed": 0,
@@ -796,6 +826,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11,
                 "fixes": {
                     "fixed": 0,
@@ -824,6 +857,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.2,
                 "fixes": {
                     "fixed": 0,
@@ -852,6 +888,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.3,
                 "fixes": {
                     "fixed": 0,
@@ -880,6 +919,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.4,
                 "fixes": {
                     "fixed": 0,
@@ -908,6 +950,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.6,
                 "fixes": {
                     "fixed": 0,
@@ -936,6 +981,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.7,
                 "fixes": {
                     "fixed": 0,
@@ -964,6 +1012,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.8,
                 "fixes": {
                     "fixed": 0,
@@ -992,6 +1043,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.8,
                 "fixes": {
                     "fixed": 0,
@@ -1020,6 +1074,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.8,
                 "fixes": {
                     "fixed": 0,
@@ -1048,6 +1105,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 11.9,
                 "fixes": {
                     "fixed": 0,
@@ -1076,6 +1136,9 @@
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 12,
                 "fixes": {
                     "fixed": 0,

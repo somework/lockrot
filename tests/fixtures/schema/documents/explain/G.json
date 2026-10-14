@@ -391,6 +391,9 @@
     "php_blocked_by": "target",
     "misses_target_php": "stops_before",
     "misses_project_php": null,
+    "highest_admits_target_php": false,
+    "highest_admits_project_php": true,
+    "highest_misses_project_php": null,
     "released_years": 7.7,
     "fixes": null
    }
