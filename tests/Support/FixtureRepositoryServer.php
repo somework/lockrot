@@ -190,7 +190,10 @@ final class FixtureRepositoryServer
     public function withMirror(string $url, string $recordingDir): string
     {
         $prefix = '/mirror/'.\count(glob($this->docroot.'/mirror/*', \GLOB_ONLYDIR) ?: []);
-        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST);
+        $port = parse_url($url, \PHP_URL_PORT);
+        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST).($port === null || $port === false ? '' : ':'.$port);
+        $resolve = static fn (string $target): string => preg_match('{^https?://}', $target) === 1 ? $target : $base.$target;
+        $local = static fn (string $resolved): string => $prefix.(string) parse_url($resolved, \PHP_URL_PATH);
         $answer = static function (string $original) use ($recordingDir): ?string {
             $raw = @file_get_contents(RecordedHttpClient::pathFor($recordingDir, $original));
             $result = $raw === false ? null : HttpResult::fromEnvelopeJson($original, $raw);
@@ -201,26 +204,28 @@ final class FixtureRepositoryServer
         if (!\is_array($packages)) {
             throw new \RuntimeException('no recorded packages.json for '.$url.' in '.$recordingDir);
         }
+        $security = \is_array($packages['security-advisories'] ?? null) ? $packages['security-advisories'] : [];
+        if (($security['metadata'] ?? false) === true && !\is_string($security['api-url'] ?? null)) {
+            // bin/record-fixtures trims the advisories out of each p2 answer, so a mirror can serve only an advisory API.
+            throw new \RuntimeException($url.' publishes its advisories only in its p2 files, which the recordings do not keep');
+        }
         $patterns = array_values(array_filter(\is_array($packages['available-package-patterns'] ?? null) ? $packages['available-package-patterns'] : ['*'], 'is_string'));
         $served = ['available-package-patterns' => $patterns];
         if (\is_string($packages['metadata-url'] ?? null)) {
-            $served['metadata-url'] = $prefix.$packages['metadata-url'];
+            $template = $resolve($packages['metadata-url']);
+            $served['metadata-url'] = $local($template);
             foreach ($this->names as $name) {
-                if (!self::matchesAny($name, $patterns)) {
-                    continue;
-                }
-                $p2 = $answer($base.str_replace('%package%', $name, $packages['metadata-url']));
+                $p2 = self::matchesAny($name, $patterns) ? $answer(str_replace('%package%', $name, $template)) : null;
                 if ($p2 !== null) {
-                    self::writeFile($this->docroot.$prefix.str_replace('%package%', $name, $packages['metadata-url']), $p2);
+                    self::writeFile($this->docroot.str_replace('%package%', $name, $served['metadata-url']), $p2);
                 }
             }
         }
-        $security = \is_array($packages['security-advisories'] ?? null) ? $packages['security-advisories'] : [];
-        $api = $security['api-url'] ?? null;
-        $advisories = \is_string($api) ? $answer($api) : null;
-        if ($advisories !== null) {
-            $served['security-advisories'] = ['api-url' => $prefix.(string) parse_url((string) $api, \PHP_URL_PATH)];
-            self::writeFile($this->docroot.$served['security-advisories']['api-url'].'.post', $advisories);
+        $api = \is_string($security['api-url'] ?? null) ? $resolve($security['api-url']) : null;
+        $advisories = $api === null ? null : $answer($api);
+        if ($api !== null && $advisories !== null) {
+            $served['security-advisories'] = ['api-url' => $local($api)];
+            self::writeFile($this->docroot.$local($api).'.post', $advisories);
         }
         self::writeFile($this->docroot.$prefix.'/packages.json', (string) json_encode($served, \JSON_UNESCAPED_SLASHES));
 

@@ -201,9 +201,11 @@ $recordRepositories = static function (string $fixtureDir, LockFile $lock, strin
 
             return false;
         }));
-        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST);
+        $port = parse_url($url, \PHP_URL_PORT);
+        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST).($port === null || $port === false ? '' : ':'.$port);
+        $resolve = static fn (string $target): string => preg_match('{^https?://}', $target) === 1 ? $target : $base.$target;
         foreach (\is_string($packages['metadata-url'] ?? null) ? $names : [] as $name) {
-            $p2 = $base.str_replace('%package%', $name, $packages['metadata-url']);
+            $p2 = $resolve(str_replace('%package%', $name, $packages['metadata-url']));
             if (!$isRecorded(RecordedHttpClient::pathFor($dir, $p2))) {
                 $answer = $repositoryHttp->fetchAll([$p2])[$p2];
                 $record($dir, $answer, $answer->body() === null ? null : $trim($answer->body(), $name));
@@ -211,7 +213,8 @@ $recordRepositories = static function (string $fixtureDir, LockFile $lock, strin
             }
         }
         $api = $packages['security-advisories']['api-url'] ?? null;
-        if (\is_string($api) && $names !== [] && !$isRecorded(RecordedHttpClient::pathFor($dir, $api))) {
+        $api = \is_string($api) ? $resolve($api) : null;
+        if ($api !== null && $names !== [] && !$isRecorded(RecordedHttpClient::pathFor($dir, $api))) {
             $answer = $fetch($api, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
             $record($dir, $answer, $answer->body());
             fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $api, \count($names), $answer->status()));
