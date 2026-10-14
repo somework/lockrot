@@ -6,6 +6,9 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
+use Lockrot\Output\FormatContext;
+use Lockrot\Output\Formatters;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -13,6 +16,7 @@ use Lockrot\Tests\Support\CorpusFloor;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
@@ -258,6 +262,37 @@ final class SortTest extends TestCase
                 return strcmp($a, $b);
         }
         self::fail('a sort direction the published model does not define: '.var_export($key['dir'], true));
+    }
+
+    /**
+     * The order sorts every finding, and every format of a run reads it: a report sorts once, and so
+     * does its copy with the run settings. fragility-ok: compares two durations of one process, set
+     * apart by a factor of 10.
+     */
+    public function testEveryFormatOfOneReportReadsOneSort(): void
+    {
+        $findings = [];
+        $fired = [[Signal::S1], [Signal::S8], [Signal::S2], [Signal::S8, Signal::S5], []];
+        for ($i = 0; $i < 400; ++$i) {
+            $findings[] = self::graded(\sprintf('vendor/p%03d', $i * 7919 % 400), $fired[$i % 5]);
+        }
+        $fresh = new Report($findings, [], new \DateTimeImmutable(self::NOW), 400, 0);
+        $start = hrtime(true);
+        $order = $fresh->sorted();
+        $sort = hrtime(true) - $start;
+        $report = new Report($findings, [], new \DateTimeImmutable(self::NOW), 400, 0);
+        $context = FormatContext::create(null, 'none');
+        Formatters::for('json', $context)->format($report);
+        Formatters::for('table', $context)->format($report);
+
+        $start = hrtime(true);
+        $again = $report->sorted();
+        $copy = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null))->sorted();
+        $read = hrtime(true) - $start;
+
+        self::assertSame($order, $again);
+        self::assertSame($order, $copy);
+        self::assertLessThan($sort / 10, $read, 'a format or the copy with the run settings sorts the findings again');
     }
 
     /**
