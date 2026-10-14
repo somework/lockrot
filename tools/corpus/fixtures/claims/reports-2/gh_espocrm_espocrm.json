@@ -1,0 +1,135 @@
+{
+  "lockrot": {
+    "version": "0.14.0",
+    "schema": 2
+  },
+  "generated_at": "2026-10-14T00:00:00+00:00",
+  "findings": [
+    {
+      "package": "illuminate/collections",
+      "version": "v12.51.0",
+      "branch": "12.x",
+      "installed_php": {
+        "requires": "^8.2",
+        "target_runs": true,
+        "project_allows": null
+      },
+      "verdict": "ok",
+      "priority": "none",
+      "lead": null,
+      "rank": 1,
+      "flags": [],
+      "score": {
+        "model": 1,
+        "total": 0,
+        "exact": 0,
+        "accepted": [],
+        "text": "0"
+      },
+      "next_step": null,
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "illuminate/collections",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": null
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/illuminate/collections",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": false,
+      "dev": false,
+      "reach": "unreached",
+      "chain": [],
+      "depth": null,
+      "depth_unmeasured": "no_composer_json",
+      "named_in": [],
+      "direct_dependents": [],
+      "signals": [],
+      "evidence": "",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": 0.67,
+      "age": {
+        "installed": {
+          "at": "2026-02-10T18:20:19+00:00",
+          "years": 0.7,
+          "dated_by": "laravel/framework"
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "v13.36.0",
+          "at": "2026-10-11T20:46:11+00:00",
+          "years": 0,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "v12.70.0",
+          "at": "2026-10-13T13:24:10+00:00",
+          "years": 0,
+          "level": null,
+          "dated_by": "laravel/framework"
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-10-13T13:24:26+00:00",
+          "years": 0,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    }
+  ]
+}

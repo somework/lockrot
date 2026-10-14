@@ -73,26 +73,33 @@ time. Then run:
 It also refuses two runs that are further apart than lockrot keeps a repository answer, because they
 then read different upstream data.
 
-The exit codes are:
+`diff` reads `lockrot.schema` of each document. Two report-1 runs compare `verdict` and `priority`,
+and two report-2 runs compare `verdict` and `lead`. A report-2 verdict is a grade, so a report-1 run
+against a report-2 run prints `report-1 vs report-2: verdicts not compared`. It then compares only
+`lead` with report-1's `verdict`.
 
-| Code | Meaning |
-|---|---|
-| `0` | Every check ran and found nothing. |
-| `1` | A check found problems. |
-| `2` | The tool cannot tell you whether the output is clean: a check below its floor, a decline over its declared share, a corrupt cached document, an empty input tree, two runs that cannot be compared, an interrupted run or a bug in this tool. |
-| `3` | Usage error. |
+## The differential against the model
 
-`check` takes the list of targets from the run, not from the directory. It reads a report only when
-the run recorded that target as `ok` and the file still hashes to the recorded digest. It names and
-counts every other case:
+`php tools/corpus/differential.php` runs `bin/lockrot` on each app of `tests/fixtures/apps` and
+compares each finding of report-2 with the model's document for the same lock. drupal runs twice:
+once with its packages.drupal.org answers, and once with that advisory lookup failed. Both sides read
+only the answers in `tests/fixtures/corpus/cache/`, at one clock.
 
-- A project that lockrot died on leaves no file.
-- A project that the run never reached leaves no record.
-- `unreadable output` leaves its bytes on disk beside its stderr.
-- A file that something rewrote after the run is not evidence about that run.
+Each reviewed difference is an entry of `tests/fixtures/corpus/model-divergences.json`, with its
+reason. An entry names a path. An entry with `count` matches exactly that many cells. An entry
+without `count` names the app, the package and both values. The run fails on these cases:
 
-Each of these cases makes the exit code 2, because a partial audit is not a clean audit. `check`
-still audits and reports the other projects.
+- a difference that no entry allows, or an entry that matches the wrong number of cells
+- a cache or a model document that `tests/fixtures/corpus/model-report-2/provenance.json` does not
+  describe
+- a recording that neither lockrot nor the v0.13.0 PHAR reads.
+
+To renew the model side, record the answers once with `tools/report/record --corpus`. Then delete
+each recording that the differential names as unread. Write the model's input with
+`differential.php --model-input <v0.13.0 PHAR> <dir>`, and run the model's `reports` mode over it.
+`differential.php --adopt-model <reports dir> <input dir>` copies the model's documents and writes
+`provenance.json`: the PHAR, the sha256 of every input, what each run read, the cache digest and
+the clock.
 
 ## The corpus
 
@@ -134,7 +141,7 @@ inherit lockrot's PHP floor.** It has no `requirements.txt`, ruff or pytest and 
 | | |
 |---|---|
 | `corpus` | the entry point: `fetch`, `run`, `explain`, `check`, `diff`, `refresh`, `selftest` |
-| `record` | records the offline fixtures and the version oracle from a finished run |
+| `record` | records the offline fixtures and the version oracle from a finished run. `--report-2 <dir>` then records the report-2 twins of the claims reports |
 | `lockrot_corpus/checks.py` | the framework: selection, verdicts, declared declines, floors |
 | `lockrot_corpus/catalog.py` | every pattern read against rendered output, and the census |
 | `lockrot_corpus/claims.py` | A1–A5: findings against the repository data |
@@ -145,6 +152,7 @@ inherit lockrot's PHP floor.** It has no `requirements.txt`, ruff or pytest and 
 | `lockrot_corpus/runner.py` | running an archive over the corpus, resumably |
 | `lockrot_corpus/load.py` | turning a finished run into documents, and refusing what is not one |
 | `lockrot_corpus/diff.py` | comparing two runs, and refusing incomparable ones |
+| `differential.php` | lockrot's report-2 on the apps of `tests/fixtures/apps` against the model's documents |
 
 ## When to run it
 

@@ -51,6 +51,11 @@ final class FixtureRepositoryServer
             echo json_encode(['advisories' => $answer]);
             exit;
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $path !== null && is_file(__DIR__.$path.'.post')) {
+            header('Content-Type: application/json');
+            readfile(__DIR__.$path.'.post');
+            exit;
+        }
         $file = $path === null ? null : __DIR__.$path;
         if ($file === null || !is_file($file)) {
             http_response_code(404);
@@ -173,6 +178,79 @@ final class FixtureRepositoryServer
         /** @var array<string, list<array<string, mixed>>> $advisories */
         $advisories = $answer['advisories'];
         $this->withAdvisoryApi($advisories);
+    }
+
+    /**
+     * Serves the recorded answers of another `composer` repository below `/mirror/<n>` and returns
+     * the URL to use in its place: its packages.json, the p2 answer of each served name that its
+     * `available-packages` or `available-package-patterns` admit, and its advisory API, which gives
+     * the recorded answer to any POST. Each answer is the envelope that `bin/record-fixtures --into`
+     * wrote in $recordingDir for the original URL. Call before {@see start()}.
+     */
+    public function withMirror(string $url, string $recordingDir): string
+    {
+        $prefix = '/mirror/'.\count(glob($this->docroot.'/mirror/*', \GLOB_ONLYDIR) ?: []);
+        $port = parse_url($url, \PHP_URL_PORT);
+        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST).($port === null || $port === false ? '' : ':'.$port);
+        $resolve = static fn (string $target): string => preg_match('{^https?://}', $target) === 1 ? $target : $base.$target;
+        $local = static fn (string $resolved): string => $prefix.(string) parse_url($resolved, \PHP_URL_PATH);
+        $answer = static function (string $original) use ($recordingDir): ?string {
+            $raw = @file_get_contents(RecordedHttpClient::pathFor($recordingDir, $original));
+            $result = $raw === false ? null : HttpResult::fromEnvelopeJson($original, $raw);
+
+            return $result === null || $result->status() !== 200 ? null : $result->body();
+        };
+        $packages = json_decode((string) $answer(rtrim($url, '/').'/packages.json'), true);
+        if (!\is_array($packages)) {
+            throw new \RuntimeException('no recorded packages.json for '.$url.' in '.$recordingDir);
+        }
+        $security = \is_array($packages['security-advisories'] ?? null) ? $packages['security-advisories'] : [];
+        if (($security['metadata'] ?? false) === true && !\is_string($security['api-url'] ?? null)) {
+            // bin/record-fixtures trims the advisories out of each p2 answer, so a mirror can serve only an advisory API.
+            throw new \RuntimeException($url.' publishes its advisories only in its p2 files, which the recordings do not keep');
+        }
+        $listed = array_values(array_filter(\is_array($packages['available-packages'] ?? null) ? $packages['available-packages'] : [], 'is_string'));
+        $patterns = array_values(array_filter(\is_array($packages['available-package-patterns'] ?? null) ? $packages['available-package-patterns'] : ($listed === [] ? ['*'] : []), 'is_string'));
+        $served = ['available-packages' => $listed, 'available-package-patterns' => $patterns];
+        if (\is_string($packages['metadata-url'] ?? null)) {
+            $template = $resolve($packages['metadata-url']);
+            $served['metadata-url'] = $local($template);
+            foreach ($this->names as $name) {
+                $p2 = \in_array($name, $listed, true) || self::matchesAny($name, $patterns) ? $answer(str_replace('%package%', $name, $template)) : null;
+                if ($p2 !== null) {
+                    self::writeFile($this->docroot.str_replace('%package%', $name, $served['metadata-url']), $p2);
+                }
+            }
+        }
+        $api = \is_string($security['api-url'] ?? null) ? $resolve($security['api-url']) : null;
+        $advisories = $api === null ? null : $answer($api);
+        if ($api !== null && $advisories !== null) {
+            $served['security-advisories'] = ['api-url' => $local($api)];
+            self::writeFile($this->docroot.$local($api).'.post', $advisories);
+        }
+        self::writeFile($this->docroot.$prefix.'/packages.json', (string) json_encode($served, \JSON_UNESCAPED_SLASHES));
+
+        return $this->url().$prefix;
+    }
+
+    /** @param list<string> $patterns */
+    private static function matchesAny(string $name, array $patterns): bool
+    {
+        foreach ($patterns as $pattern) {
+            if (preg_match('{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}i', $name) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function writeFile(string $path, string $contents): void
+    {
+        if (!is_dir(\dirname($path)) && !mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            throw new \RuntimeException('cannot create docroot directory: '.\dirname($path));
+        }
+        file_put_contents($path, $contents);
     }
 
     /**

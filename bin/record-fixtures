@@ -4,7 +4,7 @@
 declare(strict_types=1);
 // Records Composer repository (p2), advisory, GitHub and GitLab responses for the acceptance
 // fixtures, so tests run offline.
-// Usage: GITHUB_TOKEN=... bin/record-fixtures [--gitlab-domain=<host> ...] [fixtureDir ...]
+// Usage: GITHUB_TOKEN=... bin/record-fixtures [--gitlab-domain=<host> ...] [--into=<dir>] [fixtureDir ...]
 //
 // It records packages and packages-dev: a `--dev` test replays them. The advisory answer is one
 // packagist.org POST with every locked name, whatever its origin, as lockrot's lookup sends it.
@@ -16,7 +16,11 @@ declare(strict_types=1);
 // answer, asked anonymously, in <fixtureDir>/http/gitlab. The script records its project document
 // only with a gitlab-token for that host from Composer's config (auth.json or COMPOSER_AUTH).
 // Anonymously, GitLab leaves `archived` out. The script never writes the token. It records no
-// Bitbucket answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
+// Bitbucket answer. With --into, every fixture keeps its answers in <dir> as if <dir> were its own `http`
+// directory, and the monorepo parents' p2 answers go to <dir>/p2 too. --into records no `~dev` answer and
+// no packages-dev name, because the corpus runs read neither. It also records, in <dir>/repos, each
+// further `composer` repository of a fixture's composer.json: its packages.json, the p2 answers of the
+// locked names that it lists and its advisory answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
 // 0 is a transport failure (a timeout or a DNS error), so the script fetches that answer again.
 // It records a GitLab answer only with the status 200 or 404, and it stops on a 429.
 require __DIR__.'/../vendor/autoload.php';
@@ -44,8 +48,11 @@ const GITLAB_PROJECT_KEYS = ['path_with_namespace', 'archived'];
 $root = \dirname(__DIR__);
 $fixtures = [];
 $gitlabDomains = ['gitlab.com'];
+$into = null;
 foreach (\array_slice($argv, 1) as $arg) {
-    if (strpos($arg, '--gitlab-domain=') === 0) {
+    if (strpos($arg, '--into=') === 0) {
+        $into = rtrim(substr($arg, \strlen('--into=')), '/');
+    } elseif (strpos($arg, '--gitlab-domain=') === 0) {
         $gitlabDomains[] = substr($arg, \strlen('--gitlab-domain='));
     } else {
         $fixtures[] = $arg;
@@ -57,9 +64,10 @@ if ($fixtures === []) {
         'tests/fixtures/skeletons/laravel', 'tests/fixtures/apps/BookStackApp_BookStack',
     ];
 }
-$p2Dir = $root.'/tests/fixtures/http/p2';
-$ghDir = $root.'/tests/fixtures/http/github';
-$advisoryDir = $root.'/tests/fixtures/http/advisories';
+$httpDir = $into ?? $root.'/tests/fixtures/http';
+$p2Dir = $httpDir.'/p2';
+$ghDir = $httpDir.'/github';
+$advisoryDir = $httpDir.'/advisories';
 foreach ([$p2Dir, $ghDir, $advisoryDir] as $dir) {
     if (!is_dir($dir)) {
         mkdir($dir, 0777, true);
@@ -126,8 +134,8 @@ $keep = static function (?string $body, array $keys, bool $list): ?string {
 
     return (string) json_encode($trimmed, \JSON_UNESCAPED_SLASHES);
 };
-$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
-    foreach ([false, true] as $dev) {
+$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded, $into): void {
+    foreach ($into === null ? [false, true] : [false] as $dev) {
         $url = REPOSITORY_BASE_URL.$name.($dev ? '~dev' : '').'.json';
         $path = RecordedHttpClient::pathFor($ownDir ?? $p2Dir, $url);
         if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($p2Dir, $url))) {
@@ -139,6 +147,80 @@ $recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, 
         fwrite(STDERR, \sprintf("p2 %s%s %d\n", $name, $dev ? '~dev' : '', $result->status()));
     }
 };
+/**
+ * @param list<array{string, string}> $answers [p2 URL, recording directory], the first recorded one wins
+ *
+ * @return list<string> every source URL that the recorded p2 answer of $name names
+ */
+$releaseSources = static function (string $name, array $answers): array {
+    $result = null;
+    foreach ($answers as [$url, $dir]) {
+        $raw = @file_get_contents(RecordedHttpClient::pathFor($dir, $url));
+        $result = $result ?? ($raw === false ? null : HttpResult::fromEnvelopeJson($url, $raw));
+    }
+    $json = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
+    $urls = [];
+    foreach (\is_array($json) ? $json['packages'][$name] ?? [] : [] as $version) {
+        if (\is_string($version['source']['url'] ?? null)) {
+            $urls[] = $version['source']['url'];
+        }
+    }
+
+    return $urls;
+};
+/**
+ * Each `composer` repository of the fixture's composer.json beside packagist.org: its packages.json,
+ * the p2 answer of each locked name that its `available-package-patterns` match, and the answer of
+ * its advisory API for those names.
+ */
+$recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim): void {
+    $manifest = json_decode((string) file_get_contents($fixtureDir.'/composer.json'), true);
+    foreach (\is_array($manifest['repositories'] ?? null) ? $manifest['repositories'] : [] as $repository) {
+        $url = \is_array($repository) && ($repository['type'] ?? null) === 'composer' && \is_string($repository['url'] ?? null) ? rtrim($repository['url'], '/') : null;
+        if ($url === null || strpos($url, 'https://') !== 0 || parse_url($url, \PHP_URL_HOST) === 'repo.packagist.org') {
+            continue;
+        }
+        $root = $url.'/packages.json';
+        if (!$isRecorded(RecordedHttpClient::pathFor($dir, $root))) {
+            $result = $fetch($root, []);
+            $record($dir, $result, $result->body());
+            fwrite(STDERR, \sprintf("repository %s %d\n", $root, $result->status()));
+        }
+        $result = HttpResult::fromEnvelopeJson($root, (string) file_get_contents(RecordedHttpClient::pathFor($dir, $root)));
+        $packages = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
+        if (!\is_array($packages)) {
+            continue;
+        }
+        $patterns = array_map(static fn (string $pattern): string => '{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}', $packages['available-package-patterns'] ?? []);
+        $names = array_values(array_filter(array_map(static fn ($package): string => $package->name(), $lock->packages(false)), static function (string $name) use ($patterns): bool {
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $name) === 1) {
+                    return true;
+                }
+            }
+
+            return false;
+        }));
+        $port = parse_url($url, \PHP_URL_PORT);
+        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST).($port === null || $port === false ? '' : ':'.$port);
+        $resolve = static fn (string $target): string => preg_match('{^https?://}', $target) === 1 ? $target : $base.$target;
+        foreach (\is_string($packages['metadata-url'] ?? null) ? $names : [] as $name) {
+            $p2 = $resolve(str_replace('%package%', $name, $packages['metadata-url']));
+            if (!$isRecorded(RecordedHttpClient::pathFor($dir, $p2))) {
+                $answer = $repositoryHttp->fetchAll([$p2])[$p2];
+                $record($dir, $answer, $answer->body() === null ? null : $trim($answer->body(), $name));
+                fwrite(STDERR, \sprintf("p2 %s %d\n", $p2, $answer->status()));
+            }
+        }
+        $api = $packages['security-advisories']['api-url'] ?? null;
+        $api = \is_string($api) ? $resolve($api) : null;
+        if ($api !== null && $names !== [] && !$isRecorded(RecordedHttpClient::pathFor($dir, $api))) {
+            $answer = $fetch($api, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
+            $record($dir, $answer, $answer->body());
+            fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $api, \count($names), $answer->status()));
+        }
+    }
+};
 // The monorepos that the analyzer can load to date the branches of a split package.
 foreach (MonorepoParents::load()->candidates() as $parent) {
     $recordP2($parent);
@@ -147,7 +229,7 @@ $repos = [];
 $gitlabRepos = [];
 foreach ($fixtures as $fixture) {
     $lock = LockFile::fromFile($root.'/'.$fixture.'/composer.lock');
-    $own = is_dir($root.'/'.$fixture.'/http') ? $root.'/'.$fixture.'/http' : null;
+    $own = $into ?? (is_dir($root.'/'.$fixture.'/http') ? $root.'/'.$fixture.'/http' : null);
     $notificationUrls = [];
     $rawLock = json_decode((string) file_get_contents($root.'/'.$fixture.'/composer.lock'), true);
     foreach (array_merge($rawLock['packages'] ?? [], $rawLock['packages-dev'] ?? []) as $entry) {
@@ -160,13 +242,18 @@ foreach ($fixtures as $fixture) {
         file_put_contents($advisoryPath, json_encode($result->toEnvelope(), \JSON_UNESCAPED_SLASHES));
         fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $fixture, \count($names), $result->status()));
     }
-    foreach ($lock->packages(true) as $package) {
+    if ($into !== null) {
+        $recordRepositories($root.'/'.$fixture, $lock, $into.'/repos');
+    }
+    foreach ($lock->packages($into === null) as $package) {
         if (!$package->isFromComposerRepository()) {
             continue;
         }
         $sourceUrl = $package->repositoryUrl();
+        $answers = [[REPOSITORY_BASE_URL.$package->name().'.json', $own !== null ? $own.'/p2' : $p2Dir], [REPOSITORY_BASE_URL.$package->name().'.json', $p2Dir]];
         if (preg_match(DRUPAL_NOTIFICATION, $notificationUrls[$package->name()] ?? '', $m) === 1) {
-            foreach (['', '~dev'] as $suffix) {
+            $answers = [['https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().'.json', $own !== null ? $own.'/p2' : $p2Dir]];
+            foreach ($into === null ? ['', '~dev'] : [''] as $suffix) {
                 $url = 'https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().$suffix.'.json';
                 $dir = $own !== null ? $own.'/p2' : $p2Dir;
                 if (!$isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
@@ -178,13 +265,16 @@ foreach ($fixtures as $fixture) {
         } else {
             $recordP2($package->name(), $own !== null ? $own.'/p2' : null);
         }
-        $repo = $locator->locate($sourceUrl);
-        if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
-            $githubDir = $own !== null ? $own.'/github' : $ghDir;
-            $repos[$githubDir.'|'.$repo->path()] = [$repo, $githubDir];
-        }
-        if ($own !== null && $repo !== null && $repo->forge() === RepoRef::GITLAB) {
-            $gitlabRepos[$own.'|'.$repo->key()] = [$repo, $own.'/gitlab'];
+        // lockrot asks the repository of the highest release, which a renamed or moved project changes.
+        foreach (array_unique(array_merge([$sourceUrl], $releaseSources($package->name(), $answers))) as $url) {
+            $repo = $locator->locate($url);
+            if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
+                $githubDir = $own !== null ? $own.'/github' : $ghDir;
+                $repos[$githubDir.'|'.$repo->path()] = [$repo, $githubDir];
+            }
+            if ($own !== null && $repo !== null && $repo->forge() === RepoRef::GITLAB) {
+                $gitlabRepos[$own.'|'.$repo->key()] = [$repo, $own.'/gitlab'];
+            }
         }
     }
 }
@@ -229,4 +319,4 @@ foreach ($repos as [$ref, $dir]) {
         exit(1);
     }
 }
-echo "recorded into tests/fixtures/http\n";
+echo "recorded into $httpDir\n";

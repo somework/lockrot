@@ -83,6 +83,10 @@ jobs:
         run: |
           composer global require --no-interaction "maglnet/composer-require-checker:^4.24"
           $(composer global config bin-dir --absolute)/composer-require-checker check --config-file=composer-require-checker.json composer.json
+      # lockrot's report-2 on tests/fixtures/apps against the model's documents, on the recorded answers only.
+      # tests/fixtures/corpus/model-divergences.json holds each reviewed difference.
+      - name: The corpus differential
+        run: php tools/corpus/differential.php
       # coverage-check reads the clover "elements" metric (methods, statements and conditionals),
       # not PHPUnit's line percentage. Keep the gate about three points below the measured value, so
       # that a new file does not fail it.
@@ -231,6 +235,16 @@ jobs:
         with: {python-version-file: .python-version}
       - run: python -m compileall -q tools/corpus
       - run: python -m unittest discover -s tools/corpus/tests -t tools/corpus/tests
+      # The lockrot.schema guard of the corpus diff, one row per pair of document numbers.
+      - name: 'corpus diff: report-1 vs report-1'
+        run: python -m unittest -v -k report_1_against_report_1 test_manifest_and_diff
+        working-directory: tools/corpus/tests
+      - name: 'corpus diff: report-1 vs report-2, both orders and a mixed run'
+        run: python -m unittest -v -k report_1_against_report_2 -k report_2_against_report_1 -k both_numbers test_manifest_and_diff
+        working-directory: tools/corpus/tests
+      - name: 'corpus diff: report-2 vs report-2'
+        run: python -m unittest -v -k report_2_against_report_2 test_manifest_and_diff
+        working-directory: tools/corpus/tests
       # The pull-request mutation gate and its shard configuration, also stdlib-only Python.
       - run: python -m compileall -q tools/mutation
       - run: python -m unittest discover -s tools/mutation/tests -t tools/mutation/tests

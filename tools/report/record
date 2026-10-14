@@ -8,6 +8,8 @@ declare(strict_types=1);
 //                                              writes it only when the two recordings are byte-identical
 //   tools/report/record --baselined <scenario>  records one real baselined scenario the same way
 //   tools/report/record --all-baselined         records every baselined scenario
+//   tools/report/record --corpus                records the answers of the apps of tests/fixtures/apps into
+//                                              tests/fixtures/corpus/cache/, once, from the network (GITHUB_TOKEN)
 //
 // The bundle is lockrot's own output for the cases of tests/fixtures/flags/cases.json, hydrated with
 // the clock of each case document (`generated_at`) and no network. Before it writes, it compares
@@ -77,8 +79,13 @@ if (\in_array($argv[1] ?? null, ['--baselined', '--all-baselined'], true)) {
     write(FIXTURES.'contract/bundle_sha256', ContractBundle::sha256(ContractBundle::bundleFiles())."\n");
     exit(0);
 }
+if (($argv[1] ?? null) === '--corpus') {
+    $apps = glob(FIXTURES.'apps/*', GLOB_ONLYDIR) ?: [];
+    passthru(implode(' ', array_map('escapeshellarg', array_merge([PHP_BINARY, __DIR__.'/../../bin/record-fixtures', '--into='.FIXTURES.'corpus/cache'], array_map(static fn (string $app): string => 'tests/fixtures/apps/'.basename($app), $apps)))), $exit);
+    exit($exit);
+}
 if (\count($argv) > 1) {
-    fwrite(STDERR, "usage: tools/report/record [--baselined <scenario> | --all-baselined]\n");
+    fwrite(STDERR, "usage: tools/report/record [--baselined <scenario> | --all-baselined | --corpus]\n");
     exit(2);
 }
 

@@ -83,6 +83,11 @@ documents of the cases that the hydrator cannot rebuild (`contract/provenance.js
   to each finding's signals and what report-1 recorded, for `CorpusFloorTest` and `SortTest`. `report-1-floor.provenance.json` beside it names the
   lockrot.dev commit, the counts and the sha256. Rebuild both with
   `python3 tools/corpus/floor.py <lockrot.dev checkout> <commit> <this path>`.
+- `corpus/cache/` — the p2, GitHub and advisory answers of the apps of `apps/`, recorded once by
+  `tools/report/record --corpus`. `repos/` holds the answers of the further `composer` repositories
+  of their composer.json files. `corpus/model-report-2/` holds the model's report-2 of the same
+  apps, with a `provenance.json`, and `corpus/model-divergences.json` the reviewed differences that
+  `tools/corpus/differential.php` allows (`tools/corpus/README.md`).
 - `big-summary.json`, `phar-summary.json`, `skeletons-summary.json`, `summary.json`,
   `top500.json`, `liveness.py`, `pre8.py` — research artefacts kept for provenance. No test reads
   them.
