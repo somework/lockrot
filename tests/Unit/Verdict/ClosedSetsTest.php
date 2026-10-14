@@ -147,7 +147,7 @@ final class ClosedSetsTest extends TestCase
     {
         $enums = [];
         if (isset($node['enum']) && \is_array($node['enum']) && \count($node['enum']) > 1) {
-            $enums[$pointer] = array_map('strval', array_values($node['enum']));
+            $enums[$pointer] = array_map(static fn ($value): string => \is_string($value) ? $value : (string) json_encode($value), array_values($node['enum']));
         }
         foreach ($node as $key => $child) {
             if (!\is_array($child) || \in_array($key, ['anyOf', 'allOf', 'not'], true)) {

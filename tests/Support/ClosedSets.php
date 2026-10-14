@@ -43,7 +43,7 @@ final class ClosedSets
      */
     public static function report2(): array
     {
-        $definition = static fn (string ...$path): array => array_merge(['definitions'], $path);
+        $definition = static fn (string ...$path): array => array_merge(['definitions'], array_values($path));
 
         return [
             'Verdicts, worst first' => [$definition('verdict')],
@@ -99,7 +99,7 @@ final class ClosedSets
             $values[$set] = [];
             foreach ($paths as $path) {
                 foreach (JsonPath::arrayAt($schema, array_merge($path, ['enum'])) as $value) {
-                    $values[$set][] = (string) $value;
+                    $values[$set][] = \is_string($value) ? $value : (string) json_encode($value);
                 }
             }
         }

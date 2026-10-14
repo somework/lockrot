@@ -46,7 +46,9 @@ final class CompatibilityPageTest extends TestCase
     {
         $listed = [];
         foreach (self::closedSetItems() as $item) {
-            self::assertSame(1, preg_match('/^(.+): ((?:`[^`]+`(?:, )?)+)\.$/', $item, $match), 'a closed-set line reads "<set>: `a`, `b`.": '.$item);
+            if (preg_match('/^(.+): ((?:`[^`]+`(?:, )?)+)\.$/', $item, $match) !== 1) {
+                self::fail('a closed-set line reads "<set>: `a`, `b`.": '.$item);
+            }
             preg_match_all('/`([^`]+)`/', $match[2], $values);
             $listed[$match[1]] = $values[1];
         }
@@ -172,7 +174,9 @@ final class CompatibilityPageTest extends TestCase
         $page = self::read('compatibility.md');
         $start = strpos($page, "\n### Closed sets and their order\n");
         self::assertNotFalse($start);
-        self::assertSame(1, preg_match('/\n((?:- .*\n(?: {4}.*\n)*)+)/', substr($page, $start), $list));
+        if (preg_match('/\n((?:- .*\n(?: {4}.*\n)*)+)/', substr($page, $start), $list) !== 1) {
+            self::fail('the closed sets section opens with a list');
+        }
 
         return array_map(
             static fn (string $item): string => trim((string) preg_replace('/\s+/', ' ', $item)),
