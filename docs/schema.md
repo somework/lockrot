@@ -82,8 +82,9 @@ Objects are open, and so are these sets of values, which grow in minor releases:
 - S10's `check` and `reason`
 - S6's `reason`, and S8's `floor_source`
 - a finding's `libyears_unmeasured`, and the keys of the report's `libyears.unmeasured`
-- a `priority_basis` step's `reason`, and a `no_fix_expected` item's `reason`
-- `run.mode`, `run.fail_on_kind` and `gate.tripped_by`, and a finding's `gate.exempt_by`
+- in report-1, a `priority_basis` step's `reason`, a `no_fix_expected` item's `reason`, and
+  `run.fail_on_kind`
+- `run.mode` and `gate.tripped_by`, and a finding's `gate.exempt_by`
 - a finding's `origin.kind` and `origin.registry`
 - a run note's `code`, and the `forge_id` and `reason` in its `data`
 - the explanation's `php_blocked_by`, `misses_target_php` and `misses_project_php`
