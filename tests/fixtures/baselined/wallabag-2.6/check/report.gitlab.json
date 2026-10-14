@@ -1,0 +1,2274 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "twig/twig v3.11.3 \u2014 finding critical (32 = vulnerable 32 [critical advisory]) \u2014 vulnerable: 15 advisories: 1 critical, 3 high, 5 medium, 2 unrated, 4 low \u2014 all fixed on 3.x (php floor raise); worst: CVE-2026-46633 PHP code injection via `{% use %}` template name. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "3b7ed306091a58f40e101ec0801a421597e4e8c516d89409ac81405a57a8970e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14752
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 left-behind: branch 5.x last released 2019-10-30 (7.0 years ago); 8.x released 8.2.0 (2026-09-06). Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "a67fb8ff9051acb6744cddbaabab369f62ec9cecc843d9fd683e14f398fe0164",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2991
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "f87055b8b87b1cc134262d5efc46b80eb98fedb20df7b42d1a6e53620f895ede",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2991
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 vulnerable: 14 advisories: 6 high, 8 medium \u2014 none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "fcd305e238194c96b8c24faf6bca1c516bf0637590e0a9e467b249ed1b5b4276",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2991
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/http-foundation v4.4.49 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 left-behind: branch 4.x last released 2022-11-04 (3.9 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.50 (2025-11-03). Do: require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "c7f67bfcebef4cdd153a8ea1a916457783f150f952d2a599ae390623f580c05d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11016
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/http-foundation v4.4.49 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 vulnerable: 2 advisories: 1 high, 1 low \u2014 none fixed on 4.x; worst: CVE-2025-64500 Incorrect parsing of PATH_INFO can lead to limited authorization bypass. Do: require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "dd452d7db3a52d800259204affae19ee14efa232125e6f70e2abe384d441cf96",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11016
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/mime v4.4.47 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.6 (2026-08-22), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.52 (2026-05-05). Do: require symfony/mime ^5.4.52 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "4901ebb9ee121f23cd714de967ed928afd357489cae3ce614bb8edfd8bcf3b0e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11432
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/mime v4.4.47 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 vulnerable: 2 advisories: 1 high, 1 medium \u2014 none fixed on 4.x; worst: CVE-2026-45067 Email Header / SMTP Command Injection via CRLF in Symfony\\Component\\Mime\\Address. Do: require symfony/mime ^5.4.52 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "733dd0a6527163b515b60a3d3e9b2789494e77e31ac75adced0f10a198a920c0",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11432
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/security-http v4.4.50 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 left-behind: branch 4.x last released 2023-01-24 (3.7 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.53 (2026-05-24). Do: require symfony/security-http ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50) and symfony/security-bundle v4.4.50 (requires ^4.4.50; itself left-behind) and symfony/security-guard v4.4.46 (requires ^4.4.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "6b7fe1981a1cde59b359f3106c6df1efc8b6a6f76a608c1003f3dc5996aba1df",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 13206
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/security-http v4.4.50 \u2014 finding critical (32 = left-behind 16 + vulnerable 16 [high advisory]) \u2014 vulnerable: 2 advisories: 2 high \u2014 none fixed on 4.x; worst: CVE-2026-48489 Security Firewall Bypass via failure_forward Subrequest: Unauthenticated Access to access_control-Protected GET Routes. Do: require symfony/security-http ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50) and symfony/security-bundle v4.4.50 (requires ^4.4.50; itself left-behind) and symfony/security-guard v4.4.46 (requires ^4.4.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "c02d64d86d0ff6b76db967fc773ce293373e0ebdf3d268e2b41f88dd0917313e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 13206
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "javibravo/simpleue 2.1.0 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 silent: last release 2017-11-15 (8.9 years ago); last push 2017-11-18 (8.9 years ago). Do: find a maintained alternative: nothing released for 8.9 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "f6b4d084cb35dc84fefb429a537a7e02eeba11be6574fa1abc36d1e52fd8ed64",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4766
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "javibravo/simpleue 2.1.0 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 old-promise: released 2017-11-15 for PHP 5 (php \">=5.5\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 8.9 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "665eb4c14a5e0baedc2c376148ed82c72c13bcaa6a5bf33e13f35da00619c1f9",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4766
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "kphoen/rulerz-bundle 0.15.0 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 silent: last release 2018-09-17 (8.1 years ago); last push 2018-10-01 (8.0 years ago). Do: find a maintained alternative: nothing released for 8.1 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "9115ad66429dc8ba15b5d8e264e413af0e6ab93c94a8c10389a1d47af2ca765a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5333
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "kphoen/rulerz-bundle 0.15.0 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 old-promise: released 2018-09-17 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 8.1 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "0a71a97efb9477164b7cbbc077112e058729f2dd3e09a02a245b098b37367941",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5333
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "mnapoli/piwik-twig-extension 3.0.0 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 silent: last release 2020-04-24 (6.5 years ago); last push 2020-04-28 (6.5 years ago). Do: find a maintained alternative: nothing released for 6.5 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "9447c9ef3f9009f2cd9d7ff2b7d76f854dc8b368826ff182f24894ef59075d44",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5775
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "mnapoli/piwik-twig-extension 3.0.0 \u2014 finding critical (36 = silent 32 + old-promise 4 [\u00bc of 16]) \u2014 old-promise: released 2020-04-24 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 6.5 years.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "7bcf9571f27f6b9878759d91b789f76fc8e1ebc0272f1fb4ea347badb0247576",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5775
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "lexik/form-filter-bundle v7.0.3 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: spiriitlabs/form-filter-bundle; its repository is archived on GitHub; last release 2023-05-19 (3.4 years ago). Do: replace with spiriitlabs/form-filter-bundle (named by its registry).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "00cda85812c63d666f27a5fe59fbc28e019de8814abe42e89c8867e0458167df",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5594
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "php-http/guzzle5-adapter 2.0.0 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived on GitHub; last release 2019-02-05 (7.7 years ago). Do: replace with php-http/guzzle7-adapter (named by its registry).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "aa60522952d8d7e9a0f873cb3c7a7d569040fd16ba31af8acc27b1ce68908efc",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 6719
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "php-http/message-factory 1.1.0 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: psr/http-factory; its repository is archived on GitHub; last release 2023-04-14 (3.5 years ago); last push 2023-04-14 (3.5 years ago). Do: replace with psr/http-factory (named by its registry).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "bffe808a8e3ea5173d609abd0aa143ca39764e347044a67c9327b7eeb744ede1",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7076
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "scheb/2fa-qr-code v5.13.2 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-01-03 (4.8 years ago). Do: find a replacement (none named).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "bf852f305e6000f789481860209cb15e42498be0e0e216e12da458dec2128c01",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 8571
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "sensio/framework-extra-bundle v6.2.10 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago). Do: replace it: its registry suggests \"Symfony\".",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "2f3583c83290825247879d0e9b20e5b4a030691ea67730c133416347aee97436",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 8670
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "symfony/debug v4.4.44 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry; itself high: left-behind).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "2df5056e8311a7fe7d3448073b04f2968ec46916d4935759352369de6d109157",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9712
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "wallabag/php-mobi 1.1.1 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-03-22 (4.6 years ago); last push 2022-03-22 (4.6 years ago). Do: find a replacement (none named).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "c9e93061cd2fba75f290c8bb004c092c192c30a750db756bccf99eb5feb9b30a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14832
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "spomky-labs/otphp v10.0.3 \u2014 finding high (24 = left-behind 16 \u00f7 2 transitive + vulnerable 16 [high advisory]) \u2014 left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06), needs php >=8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via scheb/2fa-google-authenticator)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "8cef2c97c3a0578848d26ea8a60d742bbe2efcf1556531d7df8caadcff24a3bb",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9150
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "spomky-labs/otphp v10.0.3 \u2014 finding high (24 = left-behind 16 \u00f7 2 transitive + vulnerable 16 [high advisory]) \u2014 vulnerable: 2 advisories: 1 high, 1 medium \u2014 none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation. Do: raise require.php to >=8.1, then move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via scheb/2fa-google-authenticator)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "5bca40a7e2d2453e942562f5924076568ad6e19fc3d558be23a510f5f2760692",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9150
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "j0k3r/httplug-ssrf-plugin v3.0.1 \u2014 finding high (16 = vulnerable 16 [unrated advisory 8 \u00d7 2: no reachable fix]) \u2014 vulnerable: 1 advisory: 1 unrated \u2014 none fixed on 3.x; advisory: PKSA-px1b-j2dd-31r6 Server-side Request Forgery (SSRF). Do: no release fixes it. (via j0k3r/graby)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "039fd64282772e09622ea7cbb8ffc775027f7c79fab5710458d39ed794f2f527",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4605
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "phpseclib/phpseclib 3.0.46 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 5 advisories: 2 high, 2 medium, 1 low \u2014 all fixed on 3.x; worst: CVE-2026-32935 phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack. Do: composer update phpseclib/phpseclib (gets 3.0.57) \u2014 clears 5 advisories. (via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "b018940da214ac4ec9cb47501310a1940cf936d807558cda7eb21755d1470eb2",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7416
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/monolog-bridge v5.2.12 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 1 advisory: 1 high \u2014 all fixed on 5.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener. Do: composer update symfony/monolog-bridge (gets v5.4.52) \u2014 clears the advisory. (via symfony/monolog-bundle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "3ac799385f5d6579c2a942cca35adac223d3fa5a8b9dd799caf4c4efafb1373f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11508
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "enshrined/svg-sanitize 0.15.4 \u2014 finding high (24 = left-behind 16 + vulnerable 8 [medium advisory]) \u2014 left-behind: branch 0.15.x last released 2022-02-21 (4.6 years ago); 1.x released 1.0.0 (2026-09-01). Do: require enshrined/svg-sanitize ^1.0 \u2014 clears left-behind and 4 advisories; 1.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.15.4); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "8a10765da7126e8ed80e590e6683f7b5b6ad5fc3116da39ccdfb9da266496c9e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2058
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "enshrined/svg-sanitize 0.15.4 \u2014 finding high (24 = left-behind 16 + vulnerable 8 [medium advisory]) \u2014 vulnerable: 4 advisories: 4 medium \u2014 none fixed on 0.15.x; worst: CVE-2025-55166 svg-sanitizer Bypasses Attribute Sanitization. Do: require enshrined/svg-sanitize ^1.0 \u2014 clears left-behind and 4 advisories; 1.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.15.4); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "9f0c1980326bf0997e72b1094f1d11656e919532c0fa71674effb61a3d36a048",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2058
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/mailer v4.4.49 \u2014 finding high (24 = left-behind 16 + vulnerable 8 [medium advisory]) \u2014 left-behind: branch 4.x last released 2022-11-04 (3.9 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.52 (2026-05-11). Do: require symfony/mailer ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "031e4b43fd8ca8cc9d1520a825cfe3c25d619b0718d765abec58023d0355702f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11351
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/mailer v4.4.49 \u2014 finding high (24 = left-behind 16 + vulnerable 8 [medium advisory]) \u2014 vulnerable: 1 advisory: 1 medium \u2014 none fixed on 4.x; advisory: CVE-2026-45068 Argument Injection in SendmailTransport via Dash-Prefixed Recipient Address. Do: require symfony/mailer ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "377f89feb800fcd04cbf79a6e9125ab79eb4fec5214222f918351574de3cc029",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11351
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/routing v4.4.44 \u2014 finding high (24 = left-behind 16 + vulnerable 8 [medium advisory]) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.6 (2026-08-17), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.53 (2026-05-22). Do: require symfony/routing ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "33887abc56e86645501c4cd452b12ae45ce007cebea18bf091cc553179961bc8",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12796
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/routing v4.4.44 \u2014 finding high (24 = left-behind 16 + vulnerable 8 [medium advisory]) \u2014 vulnerable: 2 advisories: 2 medium \u2014 none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: require symfony/routing ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "05a3d623ca7f4e66cfdaff6864d4119f0db78c9c1619f1dc190f77e75e6a3ff7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12796
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/dom-crawler v4.4.45 \u2014 finding high (18 = left-behind 16 + vulnerable 2 [low advisory]) \u2014 left-behind: branch 4.x last released 2022-08-03 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.52 (2026-04-17). Do: require symfony/dom-crawler ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.45); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "2afe8faf1aa9f0f5da97cab46f4cda4b093d431c27e76eada7e2f1030a49474b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10044
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/dom-crawler v4.4.45 \u2014 finding high (18 = left-behind 16 + vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 none fixed on 4.x; advisory: CVE-2026-45071 XXE (Local File Disclosure) in DomCrawler::addXmlContent() via validateOnParse = true. Do: require symfony/dom-crawler ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.45); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "30220d4fc4846375039bb02440cee56054b69e7a61ff846621373febbcc8dce2",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10044
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/validator v4.4.48 \u2014 finding high (18 = left-behind 16 + vulnerable 2 [low advisory]) \u2014 left-behind: branch 4.x last released 2022-10-25 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-27). Do: require symfony/validator ^5.4.43 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and kphoen/rulerz-bridge 1.1.1 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "d20711264e54e15e610ccc917de9cc85cf0b0e1761cda8e704a3a8c5bf7483b3",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14058
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/validator v4.4.48 \u2014 finding high (18 = left-behind 16 + vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 none fixed on 4.x; advisory: CVE-2024-50343 Incorrect response from Validator when input ends with ` `. Do: require symfony/validator ^5.4.43 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and kphoen/rulerz-bridge 1.1.1 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "info",
+        "fingerprint": "e14dae5ed49774a86fc506deb5b1b0e68c875ab77c1488beadb38365a5d09982",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14058
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high (18 = pinned 16 + stale 2 [\u00bc of 8]) \u2014 pinned: pinned to branch snapshot dev-master. Do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "5c76bac52e93c068b6abb03ecd5e1dca10eb7582ab62abea9af66e6c2e944c3c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2308
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high (18 = pinned 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2019-01-23 (7.7 years ago). Do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "d6a99a491c8912a16186959d72b7872e8647564c9ccd2868a54a297da3160912",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2308
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "kphoen/rulerz 0.21.1 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 old-promise: released 2018-09-18 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 0.21.1 is its newest release.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "104a2ee4dcc5da80fdd67f246bc8f305cfef689e053836c6fa7dff291cedf92a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5197
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "kphoen/rulerz 0.21.1 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2018-09-18 (8.1 years ago); last push 2022-09-02 (4.1 years ago). Do: test it on PHP 8.4 \u2014 0.21.1 is its newest release.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "cb0720261e0c2b4324fe8ee29b953bdfff0942452c1a12e7735a0688ce0b8609",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5197
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "mgargano/simplehtmldom 1.5 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 old-promise: released 2014-01-05 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 1.5 is its newest release.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "ce4948b6f9a63b2b0a795110b2bb827c89f7cbd5b3d417328275ae616d942a6a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5726
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "mgargano/simplehtmldom 1.5 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2014-01-05 (12.8 years ago); last push 2022-08-04 (4.2 years ago). Do: test it on PHP 8.4 \u2014 1.5 is its newest release.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "a9ad0fb43cad090e8d640f880de963f72b93f6f9c546d9f9a07c5388d726a6d8",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5726
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "grandt/binstring 1.0.0 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 silent: last release 2015-08-13 (11.2 years ago); last push 2015-08-13 (11.2 years ago). Do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "c2d252e2e8393ee96d686f65de92d6a9a89182ddc8416a7eebdc4f4f51bf1459",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2786
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "grandt/binstring 1.0.0 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2015-08-13 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "670ccee33398918b0457681d0263fe48d7e65a9aaa773c137d4d03f1a293c7ef",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2786
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "grandt/phpresizegif 1.0.3 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 silent: last release 2015-05-10 (11.4 years ago); last push 2015-08-13 (11.2 years ago). Do: find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "7d395ae479aea19a5c0f6cd27427f93791ede4cbf6e41d67a2c902183be06d87",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2833
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "grandt/phpresizegif 1.0.3 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2015-05-10 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "348a45426720408b7099069cae22edabab196211cddd3898f5e903baf303c913",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2833
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "grandt/phpzipmerge 1.0.4 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 silent: last release 2015-08-18 (11.2 years ago); last push 2015-08-18 (11.2 years ago). Do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "cfa4fc5d8b4bff1d8394b7d4a49d00222166fc26a3a3db429ee2bc16a5b01d8e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2886
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "grandt/phpzipmerge 1.0.4 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2015-08-18 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 11.2 years; it comes in through wallabag/phpepub: replace or update that package. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "d64879f2b8587ddabbeef838674ff05f6f27a28610ba8b56f6423a99e3e2a6fb",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2886
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "grandt/relativepath 1.0.2 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 silent: last release 2015-05-14 (11.4 years ago); last push 2020-04-01 (6.5 years ago). Do: find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "324f24a7636a8028b96afa91a8a61f06538ae0f2264cf93d3a8fcb85a588edae",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2946
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "grandt/relativepath 1.0.2 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2015-05-14 for PHP 5 (php \">=5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 11.4 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "ab2a485142e91675a4688243e306c89f6888254a955665f9106c8154116a15ba",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2946
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "guzzlehttp/ringphp 1.1.1 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2018-07-31 (8.2 years ago); last push 2019-07-31 (7.2 years ago). Do: find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more: replace or update them; the newest release of guzzlehttp/guzzle (8.2.0) no longer requires it. (via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "bb0dfe14641cd41f97c1be7a768b2367daed4a091c9839b8e4c08e6d4e4b4f0b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3247
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "guzzlehttp/ringphp 1.1.1 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2018-07-31 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more: replace or update them; the newest release of guzzlehttp/guzzle (8.2.0) no longer requires it. (via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "8a7182bbadba7559deee7fd94c35d0bac003b951674f50d1be78950babe1b9fc",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3247
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "guzzlehttp/streams 3.0.0 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2014-10-12 (12.0 years ago); last push 2019-11-11 (6.9 years ago). Do: find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more: replace or update them. (via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "b806e4bcc08c45d42586c0b41d71eed6447f0dce210797fdf12c820f036917cf",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3303
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "guzzlehttp/streams 3.0.0 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2014-10-12 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more: replace or update them. (via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "3248fd28df04dc734603bd95236a38d1918503b1d595ea91e16a1c14e843fadf",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3303
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/consistency 1.17.05.02 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1 years ago); last push 2021-04-28 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "060658393a252819e6a1a9d3abb809940dc4c0b127f71619483ce0c5f2a2661c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3449
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "hoa/consistency 1.17.05.02 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "bb8fd5572aee5d3c4129e0c92a0daf528ccd3e3fa96b21522d99c37bab0537ed",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3449
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "kphoen/rulerz-bridge 1.1.1 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 silent: last release 2018-10-01 (8.0 years ago); last push 2018-10-01 (8.0 years ago). Do: find a maintained alternative: nothing released for 8.0 years; it comes in through kphoen/rulerz-bundle: replace or update that package; the newest release of kphoen/rulerz-bundle (0.15.0) still requires it. (via kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "17612d010e36e0cf06b04cf046cbec0762b45816a19b7d75ecc52a9da3f18546",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5273
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "kphoen/rulerz-bridge 1.1.1 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2018-10-01 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 8.0 years; it comes in through kphoen/rulerz-bundle: replace or update that package; the newest release of kphoen/rulerz-bundle (0.15.0) still requires it. (via kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "d0cf1e9c4f2f06fb7d625c47a637c00eb4f1827528f3fdf6ef86dd127987aff9",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5273
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "phpzip/phpzip 2.0.8 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 silent: last release 2015-11-16 (10.9 years ago); last push 2015-11-16 (10.9 years ago). Do: find a maintained alternative: nothing released for 10.9 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "1372061240fde22464c48d18fd44a063cb113729e6a1690b12180fc166388015",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7573
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "phpzip/phpzip 2.0.8 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2015-11-16 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 10.9 years; it comes in through wallabag/phpepub: replace or update that package; the newest release of wallabag/phpepub (4.0.10) still requires it. (via wallabag/phpepub)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "417b30bc9e8ba9bfe1001ea2c1b80fdaaea2c02ba7d7c463b5ebc6fbc90e797f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7573
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/silent",
+        "description": "pragmarx/random v0.2.2 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 silent: last release 2017-11-21 (8.9 years ago); last push 2017-12-18 (8.8 years ago). Do: find a maintained alternative: nothing released for 8.9 years; it comes in through pragmarx/recovery: replace or update that package; the newest release of pragmarx/recovery (v0.2.1) still requires it. (via pragmarx/recovery)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "5b1123eba7cb1e063aa1d3588fd8b9c30c58950de9c2775055710645f1e75a56",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7638
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "pragmarx/random v0.2.2 \u2014 finding high (18 = (silent 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2017-11-21 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: find a maintained alternative: nothing released for 8.9 years; it comes in through pragmarx/recovery: replace or update that package; the newest release of pragmarx/recovery (v0.2.1) still requires it. (via pragmarx/recovery)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "75d73053f43ada901b1344e4de67f49245fe4a8930834d28887fa85ff85f0447",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7638
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "symfony/security-guard v4.4.46 \u2014 finding high (18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub. Do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it. (via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, symfony/security-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "d2f27df7ed5d7df4ce4f5d732f90935f046b24f371441530bde2f33a29b923aa",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 13140
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/security-guard v4.4.46 \u2014 finding high (18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 left-behind: branch 4.x last released 2022-09-23 (4.1 years ago); 5.x released v5.4.45 (2024-09-25). Do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it. (via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, symfony/security-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "54bf4e12ce186fd4b47a2668b57fe4de8572d36a12bdeb03bb49f759c94d6bf7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 13140
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "babdev/pagerfanta-bundle v3.8.0 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 3.x last released 2023-06-01 (3.4 years ago); 4.x released v4.6.0 (2025-11-29), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require babdev/pagerfanta-bundle ^4.6 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "b529fbf6559681937ba7b8631b4167201c8df92dd3ab5875c50c065d917c5870",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "doctrine/collections 1.8.0 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 1.x last released 2022-09-01 (4.1 years ago); 3.x released 3.1.0 (2026-04-29), needs php ^8.4 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require doctrine/collections ^2.6 \u2014 clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.8); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "63f98dd7ec477347e214b31931837381c17c908df19609e1e70eac8e103c76ff",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 709
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "doctrine/event-manager 1.2.0 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 1.x last released 2022-10-12 (4.0 years ago); 2.x released 2.1.1 (2026-01-29), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v4.4.48 (requires ~1.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "a1bf77eac900aaaf67c07365e94027315c04b57fdf337876093ce5f6552af4dc",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1231
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "egulias/email-validator 3.2.6 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 3.x last released 2023-06-01 (3.4 years ago); 4.x released 4.0.4 (2025-03-06), needs php >=8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require egulias/email-validator ^4.0 \u2014 clears left-behind; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.2.6) and symfony/mailer v4.4.49 (requires ^2.1.10|^3; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "680e35ca8bf9c893ab876aa5bc5467f8ce48356fbcd0b98510816c86ad787455",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1916
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "friendsofsymfony/jsrouting-bundle 2.8.0 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 2.x last released 2021-12-15 (4.8 years ago); 3.x released 3.6.1 (2025-11-04), needs php ^8.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.0, then require friendsofsymfony/jsrouting-bundle ^3.6 \u2014 clears left-behind; 3.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.8); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "1beaca5eb2fb70937e01c3cf955fcff6085cd3894423a836d5645e970a54c812",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2242
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "lcobucci/jwt 4.1.5 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2023-01-02 (3.8 years ago); 5.x released 5.6.0 (2025-10-17), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires 4.1.5) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "817ebf4d4f6b9cb989b42a17567241047b1e2fc9495c4741bd1d98bd92328806",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5520
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "pagerfanta/doctrine-orm-adapter v3.8.0 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2026-09-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require pagerfanta/doctrine-orm-adapter ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "8593afd1a8883044522509b1f914ec6b74b91fa0389a03a5a4825274636ac754",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 6199
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "pagerfanta/twig v3.8.0 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "cdf74e481588370240b11612c0c13e0ca7882b214ae0d53993856231aeb14106",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 6249
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "scheb/2fa-backup-code v5.13.2 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-backup-code ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "3c63c79f0bd631aaa60ead85ca21d24719db9fa6fb8e820a61e821b6f7047422",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 8357
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "scheb/2fa-bundle v5.13.2 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 5.x last released 2022-04-16 (4.5 years ago); 8.x released v8.6.1 (2026-07-10), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "973cabbee1ddf065f4b966c480cd322018c714e8d6bbb25b9c9c4f14d17d552e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 8405
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "scheb/2fa-email v5.13.2 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-06-08), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-email ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "30485725938a4b0bc7b022558c2883f59e5580e4994f228524cc465052e62289",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 8473
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "scheb/2fa-google-authenticator v5.13.2 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-google-authenticator ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "b68de862ac7ecb1413e86870c11792da60d52b40b9128c894f0d73dbd6451d39",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 8521
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "scheb/2fa-trusted-device v5.13.2 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.2, then require scheb/2fa-trusted-device ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "25b082745ea229cb4b90a1b2ba26b556b157add69726debb2f8da161ce9d5695",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 8621
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/asset v4.4.46 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-08-30 (4.1 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-22). Do: require symfony/asset ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.46); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "b2aa378d3207482b10a6e84bad4d28228e24680e080e3bc393c5a2da6f696360",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9299
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/config v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-20), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.46 (2024-10-30). Do: require symfony/config ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/dependency-injection v4.4.49 (requires <4.3|>=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "aea7a05e01e0d1cf5636c966bd2dcbeaa91b54aaca716e02e3700e94cb884603",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9544
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/console v4.4.49 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-11-05 (3.9 years ago); 8.x released v8.1.6 (2026-08-25), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.47 (2024-11-06). Do: require symfony/console ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49) and symfony/http-kernel v4.4.51 (requires >=5); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "3bc74c85ec3f3c1611dec02cd05e746445a943bf244871ff105bbb1fc0962e15",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9622
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/dependency-injection v4.4.49 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-11-16 (3.9 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-20). Do: require symfony/dependency-injection ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "89dda4c6b97a87c377808d583bdd7d9aec5ca40713ab82998e3acbaed8def20b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9781
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/doctrine-bridge v4.4.48 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-10-14 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-20). Do: require symfony/doctrine-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "de226302ceb6365c06f2cdfd040c2ced0ac2e2e5c44ed6ba9476c0b9f7d41ddc",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9934
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/error-handler v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-28 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.46 (2024-11-05). Do: require symfony/error-handler ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/http-kernel v4.4.51 (requires ^4.4); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "bf2898a351abb91eaf9c90cff4d64dcadc1835d80818a3b446746b87c99b5f58",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10118
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/event-dispatcher v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/event-dispatcher ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/console v4.4.49 (requires <4.3|>=5; itself left-behind) and symfony/form v4.4.48 (requires ^4.3; itself left-behind) and symfony/http-kernel v4.4.51 (requires ^4.4) and symfony/mailer v4.4.49 (requires ^4.3; itself left-behind) and symfony/security-core v4.4.48 (requires <4.3|>=5; itself left-behind) and symfony/security-http v4.4.50 (requires >=5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "935aaeb67c7ef7b36b44b7744bda020c50f039768957231aaf0e06ce34da29cb",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10186
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/finder v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-29 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-28). Do: require symfony/finder ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "e3b317ce3e8966b96c4452e3072cbbcc8d14365e13f5659208e1986ca5f8cf03",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10479
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/form v4.4.48 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-10-22 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-08). Do: require symfony/form ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and kphoen/rulerz-bridge 1.1.1 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "a07c27238424532c487fbf4f541785d6d6b515ed0e61c763b7831a6c8b228686",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10541
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/framework-bundle v4.4.51 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-11-05 (3.9 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-22). Do: require symfony/framework-bundle ^5.4.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.51) and kphoen/rulerz-bundle 0.15.0 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "a82e061798ba49e5823ae3f4f2588438a0c935424f0eae96597951a555c71a99",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10639
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/google-mailer v4.4.41 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/google-mailer ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.41); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "77244121cfcd7be166b735f685bf30d2c2eb17b80eeb7c60fbb9bb2bb11e0f27",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10785
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/options-resolver v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/options-resolver ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "64ba0e7c2c564022937dea6b5adf71f8706a9def1449cdc3630145b63a34b029",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11672
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/proxy-manager-bridge v4.4.39 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-02-25 (4.6 years ago); 6.x released v6.4.28 (2025-11-02), needs php >=8.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/proxy-manager-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.39); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "9fd1a08f3c1a0a3afeb7dd5e488a6e89a8bdbcb57d243f3bc202be2b8e005ed1",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12641
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/security-bundle v4.4.50 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2023-01-24 (3.7 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/security-bundle ^5.4.20 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "483b95ab3e45ff1619697269c4f8945270c12e665e0a9efe767a41b43dfac265",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12885
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/security-core v4.4.48 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-10-22 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-27). Do: require symfony/security-core ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and symfony/security-bundle v4.4.50 (requires ^4.4; itself left-behind) and symfony/security-http v4.4.50 (requires ^4.4.8; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "96e734d9b8fb781b1b2f9f8fd8805241fe31711a5ac6882cba2f466b98018794",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12981
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/templating v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-06-27 (4.3 years ago); 6.x released v6.4.24 (2025-07-10), needs php >=8.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-10-22). Do: require symfony/templating ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "edc75e54f25c6bd0c7dc36f00dc67e8cbb48d5caa0c012e727fbc82ab2c53419",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 13618
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/twig-bundle v4.4.41 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-04-12 (4.5 years ago); 7.x released v7.4.15 (2026-07-21), needs php >=8.2 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/twig-bundle ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.41); a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "fd13e078d36b4bc1fb4567473c4c5f16833d591f8aa7911e2ef1e18a2489282c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 13970
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "doctrine/annotations 1.14.4 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry. Do: find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 4 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2), nelmio/api-doc-bundle (v5.12.2) and willdurand/hateoas (3.14.0) no longer require it. (via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, nelmio/api-doc-bundle, sensio/framework-extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "87dbb0cf760b68d8125a7ec8943a08759dbed15b47a509d72405349e98c50671",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 540
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "doctrine/cache 2.2.0 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; last release 2022-05-20 (4.4 years ago). Do: find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.1) no longer require it. (via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, doctrine/orm, lexik/form-filter-bundle, pagerfanta/doctrine-orm-adapter)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "ccffcc8cbc81e508f9d3260e30300539667881f12469015e4255fa8ca76585b9",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 616
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/compiler 3.17.08.08 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-08 (9.2 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "cd536237ff85ae1053d8fc762696e9135e7485817178bf8e7c0a2c2fd2aa4b96",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3358
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/event 1.17.01.13 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "39d1cebd74c3488959846550902e67a54d0b71d16d58ce164c0d815fbb4e0a3d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3521
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/exception 1.17.01.16 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-30 (9.1 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "896d43b91e4f6507b3078a1de25982ed30689bcd5ce273570572050e11c2b17e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3586
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/file 1.17.07.11 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-07-11 (9.3 years ago); last push 2018-01-23 (8.7 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "9ddb17701124bf25510abf8595566dd56477cddeb91e5cfcdcc3602bc7561847",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3649
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/iterator 2.17.01.10 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "d235717806be81a0072b181d1bc96279f757f652cd3ac6049cd084d995501be0",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3720
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/math 1.17.05.16 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "6e689ccff9afe6a99922a90c72f8b8f11f20a011ec0ec094a16e1b241bc93ca7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3783
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/protocol 1.17.01.14 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-14 (9.7 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "2d76ceebbcab02119ee8995850fde601c8e0cbc1c58f701a2c9f300528426f22",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3857
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/regex 1.17.01.13 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-13 (9.7 years ago); last push 2018-07-20 (8.2 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "1346c703924ac74f02fdc7dde4f9284be8b52b9e0656f61d94cd2aedf5a8a4b5",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3926
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/ruler 2.17.05.16 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-05-16 (9.4 years ago); last push 2021-07-10 (5.3 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them; the newest release of kphoen/rulerz (0.21.1) still requires it. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "063ec2c3ce049fab31df20feafb781a5f80a9b43d4596941aee9d9ab5131564f",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3991
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/stream 1.17.02.21 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-02-21 (9.6 years ago); last push 2021-08-09 (5.2 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "56d5f89ba3204a7b8ba045d0b85013fd57ea6412a3fc1c17234d4d53d76265f2",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4058
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/ustring 4.17.01.16 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-29 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "8eeddba5ba453cce4437a6b1cb6965111496cfd4fbef6de9406cc794c582a2cb",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4131
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/visitor 2.17.01.16 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-16 (9.7 years ago); last push 2021-04-28 (5.5 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "c0080209ff9b20e701d8f2a86dfe0921bafbc2556d281ac31169ef07426636e5",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4200
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "hoa/zformat 1.17.01.10 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8 years ago); last push 2018-02-12 (8.7 years ago). Do: find a replacement (none named); it comes in through kphoen/rulerz, kphoen/rulerz-bundle: replace or update them. (via kphoen/rulerz, kphoen/rulerz-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "9ab59a575c9e1b9cb3c86f10efa7341fd32dd1b82060c8eb37b1faa0bbe9e262",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4264
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "symfony/inflector v5.4.47 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry, replacement: EnglishInflector from the String component; its repository is archived on GitHub. Do: replace it: its registry suggests \"EnglishInflector from the String component\"; it comes in through babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more: replace or update them. (via babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, kphoen/rulerz, kphoen/rulerz-bundle, lexik/form-filter-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sentry/sentry-symfony, symfony/form, symfony/security-bundle, symfony/security-http)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "ee2ed96d8c58b322f5d1c910a041ca41a4cf48fe963fcf67da58da592672779e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11188
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "guzzlehttp/psr7 2.8.0 \u2014 finding medium (8 = vulnerable 8 [medium advisory]) \u2014 vulnerable: 4 advisories: 4 medium \u2014 all fixed on 2.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization. Do: composer update guzzlehttp/psr7 (gets 2.13.1) \u2014 clears 4 advisories.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "c10171721b9318fe4bf2adeb64890d34271083da529a899dcb6d15131dae0ea1",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 3131
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/cache v5.4.46 \u2014 finding medium (8 = vulnerable 8 [medium advisory]) \u2014 vulnerable: 1 advisory: 1 medium \u2014 all fixed on 5.x; advisory: CVE-2026-45073 SQL Injection in PdoAdapter::doClear() via Unsanitized $prefix. Do: composer update symfony/cache (gets v5.4.53) \u2014 clears the advisory. (via bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, stof/doctrine-extensions-bundle, symfony/framework-bundle, twig/extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "c66dab4d9376dfbef1b522a872311d3e48aa17f7a50b2695fd9ceae52e59eaf8",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9368
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/http-client v5.4.49 \u2014 finding medium (8 = vulnerable 8 [medium advisory]) \u2014 vulnerable: 1 advisory: 1 medium \u2014 all fixed on 5.x; advisory: CVE-2026-48736 IpUtils::PRIVATE_SUBNETS Omits IPv6 Transition Forms (6to4, NAT64, Teredo, IPv4-compatible): SSRF Bypass in NoPrivateNetworkHttpClient. Do: composer update symfony/http-client (gets v5.4.53) \u2014 clears the advisory. (via php-http/httplug-bundle, sentry/sentry-symfony)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "663d44fe3617a1b4e6f81faa767acc8dfc228dd4fcf5bdce681b41042c26754e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10847
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "thecodingmachine/safe v1.3.3 \u2014 finding medium (10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 left-behind: branch 1.x last released 2020-10-28 (6.0 years ago); 3.x released v3.4.0 (2026-02-04), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via scheb/2fa-google-authenticator)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "c2a84633033ef51051057416aa6ddcfe10bbfafaca652f8ca64d98c1d8721cf2",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14472
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "thecodingmachine/safe v1.3.3 \u2014 finding medium (10 = (left-behind 16 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 old-promise: released 2020-10-28 for PHP 7 (php \">=7.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=8.1, then move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via scheb/2fa-google-authenticator)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "aab303fa8877e519c1f3da4876dfcf31cb0b7afada25a2bbb46b7b0356d3cab6",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14472
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "willdurand/jsonp-callback-validator v1.1.0 \u2014 finding medium (9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 old-promise: released 2014-01-20 for PHP 5 (php \">=5.3.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: move willdurand/jsonp-callback-validator to ^2.0.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; stale stays; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "805e91b5a5e0cf05c1d927547bfcd7e604dc5fbc7e78f93e452069072d64b24c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 15146
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "willdurand/jsonp-callback-validator v1.1.0 \u2014 finding medium (9 = (old-promise 16 + stale 2 [\u00bc of 8]) \u00f7 2 transitive) \u2014 stale: last release 2022-01-30 (4.7 years ago); last push 2023-07-29 (3.2 years ago). Do: move willdurand/jsonp-callback-validator to ^2.0.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; stale stays; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "cb68ed2d01e0b8bd6dbf3758d9ef273bf3f4e0091e829c6e71e0b2ec85563ffe",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 15146
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "bdunogier/guzzle-site-authenticator 1.1.0 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2023-08-21 (3.1 years ago); last push 2023-08-21 (3.1 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "628c618ccdc76ad1d97e5c25abe1b461ac1eb008120f8eda0072e3d9db6600b3",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 147
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "craue/config-bundle 2.7.0 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2023-08-06 (3.2 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "d545dffe79490d2190d2f18681dbfe8257eb0168c792b49e1a040d3b40f680bf",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 337
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "defuse/php-encryption v2.4.0 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2023-06-19 (3.3 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "6aca47a73337320de93c777734e3692beeb22a165acb7a1f39ac86a4ebb6c69e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 473
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "pragmarx/recovery v0.2.1 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2021-08-15 (5.2 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "aab7ff0d782c71d884aa9ba66f06d7547c3a92d3f3e92f469c94cd97553d72b3",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7705
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "wallabag/phpepub 4.0.10 \u2014 finding medium (8 = stale 8) \u2014 stale: last release 2022-03-21 (4.6 years ago). Do: \u2014.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "d5b241e663e353453fb771bd3f083899119085868a4d463721110f981969f5c1",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14881
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "bacon/bacon-qr-code 2.0.8 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via scheb/2fa-qr-code)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "5b0e680527cab1739b268a83ebb225339c3d1f31e9ad2e347af460bc203a1e9c",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 93
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "doctrine/instantiator 1.5.0 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 1.x last released 2022-12-30 (3.8 years ago); 2.x released 2.1.0 (2026-01-05), needs php ^8.4 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.4, then move doctrine/instantiator to ^2.1 through doctrine/orm, jms/serializer, jms/serializer-bundle and 4 more \u2014 clears left-behind; 2.x needs php ^8.4, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of doctrine/orm (3.7.1) and jms/serializer (3.32.9) still require it. (via doctrine/orm, jms/serializer, jms/serializer-bundle, lexik/form-filter-bundle, pagerfanta/doctrine-orm-adapter, willdurand/hateoas, willdurand/hateoas-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "99b734f3e4a19dd2d4c2393ba887aaf3bed54453d60c7ca796d2a4fa9ccd78e7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1413
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "endroid/qr-code 3.9.7 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 3.x last released 2021-04-20 (5.5 years ago); 6.x released 6.1.3 (2026-02-05), needs php ^8.4 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move endroid/qr-code to ^5.1 through scheb/2fa-qr-code \u2014 clears left-behind; 5.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-qr-code v5.13.2 (requires ^3.0; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via scheb/2fa-qr-code)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "7b398554941f1dd9bd639cc02a29589587c10e84829e55c73127725385bb4ec7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 1983
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "khanamiryan/qrcode-detector-decoder 1.0.6 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 1.x last released 2022-06-29 (4.3 years ago); 2.x released 2.0.3 (2025-06-10), needs php >=8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move khanamiryan/qrcode-detector-decoder to ^2.0 through scheb/2fa-qr-code \u2014 clears left-behind; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^1.0.5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via scheb/2fa-qr-code)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "6b583b3349b28e9a93d66a1d44019db59f663e19451f41fb79c0b6f408541647",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5140
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "lcobucci/clock 2.0.0 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 2.x last released 2022-12-19 (3.8 years ago); 3.x released 3.6.0 (2026-04-13), needs php ~8.4.0 || ~8.5.0 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.4, then move lcobucci/clock to ^3.6 through lcobucci/jwt, scheb/2fa-trusted-device \u2014 clears left-behind; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by lcobucci/jwt 4.1.5 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via lcobucci/jwt, scheb/2fa-trusted-device)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "122a8033783a20a905ff862317c877f63fc3f97e36c95ff65cba4381ac1b7aad",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 5459
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "pagerfanta/core v3.8.0 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2026-09-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move pagerfanta/core to ^4.9 through babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter, pagerfanta/twig \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by babdev/pagerfanta-bundle v3.8.0 (requires ^3.1; itself left-behind) and pagerfanta/doctrine-orm-adapter v3.8.0 (requires ^3.0; itself left-behind) and pagerfanta/twig v3.8.0 (requires ^3.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter, pagerfanta/twig)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "748b201970f198c01726be3b44dfe7435cfb6eea8d7c039c670dea086ed96765",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 6154
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "smalot/pdfparser v1.1.0 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 1.x last released 2021-08-03 (5.2 years ago); 2.x released v2.12.5 (2026-04-17). Do: move smalot/pdfparser to ^2.12 through j0k3r/graby \u2014 clears left-behind; 2.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby v2.5.0 (requires ^1.1; itself low: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via j0k3r/graby)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "6c922568c2fc951dbe6eccd462cb61776bbe330e66576c6d233f37e3e03a0dbd",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 9100
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/event-dispatcher-contracts v1.10.0 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 1.x last released 2022-07-20 (4.2 years ago); 3.x released v3.7.1 (2026-06-05), needs php >=8.1 above the project's php >=7.4; 2.x released v2.5.4 (2024-09-25). Do: move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more \u2014 clears left-behind; 2.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/event-dispatcher v4.4.44 (requires ^1.1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/event-dispatcher, symfony/form, symfony/framework-bundle, symfony/google-mailer, symfony/http-kernel, symfony/mailer, symfony/monolog-bundle, symfony/security-bundle, symfony/security-core, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "ae9da5b67047ea8049d4e7d79892aa8610d999a691311bc7fc79789269af9997",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 10270
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/property-access v4.4.44 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 4.x last released 2022-06-27 (4.3 years ago); 8.x released v8.1.4 (2026-07-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: move symfony/property-access to ^5.4 through babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by kphoen/rulerz 0.21.1 (requires ~3.0|~4.0; itself old-promise); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, kphoen/rulerz, kphoen/rulerz-bundle, lexik/form-filter-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sentry/sentry-symfony, symfony/form, symfony/security-bundle, symfony/security-http)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "77de6491d77ce94562c143e1fede546e86f6fd73cafa569343a854730e7db838",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12470
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/psr-http-message-bridge v2.1.4 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 2.x last released 2023-07-26 (3.2 years ago); 8.x released v8.1.0 (2026-05-29), needs php >=8.4.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then move symfony/psr-http-message-bridge to ^6.4 through sentry/sentry-symfony \u2014 clears left-behind; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of sentry/sentry-symfony (5.13.0) still requires it. (via sentry/sentry-symfony)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "77ff42ac487476c8ad530f116f67ebd0c41a022ea604ebadf9b8c0981577592b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12708
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/translation v4.4.47 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (requires >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via friendsofsymfony/user-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "a925a7d1b2671547c2072fee8faaa33ccdc10dbb4a1413ec7001a8f3e1cc71e5",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 13686
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/var-dumper v4.4.47 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.6 (2026-08-30), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.48 (2024-11-08). Do: move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47); a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.5) still requires it. (via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/error-handler, symfony/framework-bundle, symfony/http-kernel, symfony/monolog-bundle, symfony/security-bundle, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "e8874338edec2afaec87dd7cba0d9cfde9a2436c9930c56cfd7c1fcbe5278701",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14164
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "j0k3r/graby v2.5.0 \u2014 finding low (2 = vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 all fixed on 2.x; advisory: PKSA-j5hk-b83d-1p4h Graby has stored XSS via iframe srcdoc Attribute in htmLawed Sanitization Config. Do: composer update j0k3r/graby (gets 2.5.3) \u2014 clears the advisory.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "68981f265af38c6b3a208fbf8d5dfea3f3d09eff952593ee773c737b85f90ef7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4476
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/polyfill-intl-idn v1.33.0 \u2014 finding low (2 = vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence. Do: composer update symfony/polyfill-intl-idn (gets v1.42.0) \u2014 clears the advisory. (via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, egulias/email-validator, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, j0k3r/graby, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/framework-bundle, symfony/google-mailer, symfony/http-foundation, symfony/http-kernel, symfony/mailer, symfony/mime, symfony/monolog-bundle, symfony/security-bundle, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "19de73f53788f29eb50856bb90ffd1e800d1d3126a36bfa5a23a8b7490f0b588",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 11904
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/yaml v5.3.14 \u2014 finding low (2 = vulnerable 2 [low advisory]) \u2014 vulnerable: 3 advisories: 3 low \u2014 all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings. Do: composer update symfony/yaml (gets v5.4.53) \u2014 clears 3 advisories. (via incenteev/composer-parameter-handler, nelmio/api-doc-bundle, php-amqplib/rabbitmq-bundle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "24be27cc46819fdc46571f6f45cb5585819e240c6b816ba647d2156c6faeae6b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 14326
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "friendsofsymfony/oauth2-php 1.3.1 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2021-04-06 (5.5 years ago). Do: \u2014. (via friendsofsymfony/oauth-server-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "51c274f585e9a7334332ae89e0f46a67f0e6ba4db11402a5a0c03578c39c694e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 2397
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "phpdocumentor/reflection-common 2.2.0 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2020-06-27 (6.3 years ago). Do: \u2014. (via nelmio/api-doc-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "55011706e67f2cba1e2038f74a08c1d3b3ca67d0c75302c121241c514457ed9e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 7241
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/stale",
+        "description": "willdurand/negotiation 3.1.0 \u2014 finding low (4 = stale 8 \u00f7 2 transitive) \u2014 stale: last release 2022-01-30 (4.7 years ago); last push 2023-08-03 (3.2 years ago). Do: \u2014. (via friendsofsymfony/rest-bundle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "e3c16c5af22d6291809a9512e85c7b73f9a0e8ebf6aea9fa437a0b6e4a072e0a",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 15190
+            }
+        }
+    }
+]

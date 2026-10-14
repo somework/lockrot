@@ -1,0 +1,12 @@
+{
+    "reading": {
+        "installed": "installed",
+        "branch_release": "{branch}",
+        "release": "newest",
+        "push": "last {event}"
+    },
+    "not_read": "{reading} not read ({reason words})",
+    "below": "below {kind}-warn-years {warn}",
+    "past": "past {kind}-{level}-years {years}",
+    "dated_by": "dated by {package}"
+}

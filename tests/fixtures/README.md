@@ -28,6 +28,18 @@ Packagist/GitHub data moves over time. The per-package results over these fixtur
 `golden/`. After a re-recording, rewrite them with `LOCKROT_REWRITE_GOLDEN=1 vendor/bin/phpunit
 --testsuite integration`, review the diff package by package, and give the reason for each change in the commit message.
 
+## Contract fixtures (`contract/`, `baselined/`)
+
+`contract/` is the rendering contract bundle that lockrot-report tests against, and `baselined/` holds
+two real projects under a committed baseline (`baselined/README.md`). Unlike `schema-evolution/`,
+these fixtures are re-recorded when lockrot's output changes: run `tools/report/record` and
+`tools/report/record --all-baselined`, and review the diff in the pull request like a snapshot. A new
+recording changes `contract/bundle_sha256`, which a lockrot-report release pins.
+
+Every document of `contract/report-2/` is lockrot's output. `contract/model-only/` holds the model's
+documents of the cases that the hydrator cannot rebuild (`contract/provenance.json`
+`cases_without_inputs`). They pass the schema checks, but lockrot did not write them.
+
 ## Other fixtures
 
 - `mini/` — a hand-written lock and its composer.json, shared by `LockFileTest`,

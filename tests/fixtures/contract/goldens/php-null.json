@@ -1,0 +1,21 @@
+{
+    "score_text": "8 = left-behind 16 ÷ 2 transitive",
+    "next_step_text": "move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching — clears left-behind; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 10.0.1 released 2023-03-22 (3.5 years ago), the newest on 10.x; newest release 13.1.0 2026-02-28 (0.6 years ago); last push 2026-02-28 (0.6 years ago)",
+    "explain_age": [
+        "installed  10.0.1    2023-03-22   3.5 years ago",
+        "10.x       10.0.1    2023-03-22   3.5 years ago                 past release-warn-years 3",
+        "newest     13.1.0    2026-02-28   0.6 years ago                 below release-warn-years 3",
+        "last push            2026-02-28   0.6 years ago                 below push-warn-years 3",
+        "libyears 2.9 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer why-not genealabs/laravel-model-caching 13.1.11"
+    ],
+    "commands_cmd": [
+        "composer why-not genealabs/laravel-model-caching 13.1.11"
+    ]
+}

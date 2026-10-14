@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "symfony/routing v4.4.41 \u2014 finding high (16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28). Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it. (via mautic/core-lib)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "33887abc56e86645501c4cd452b12ae45ce007cebea18bf091cc553179961bc8",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/routing v4.4.41 \u2014 finding high (16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]) \u2014 vulnerable: 2 advisories: 2 medium \u2014 none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it. (via mautic/core-lib)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "05a3d623ca7f4e66cfdaff6864d4119f0db78c9c1619f1dc190f77e75e6a3ff7",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

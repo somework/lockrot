@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "twig/twig v2.16.1 \u2014 finding critical (32 = vulnerable 32 [critical advisory]) \u2014 vulnerable: 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low \u2014 none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "3b7ed306091a58f40e101ec0801a421597e4e8c516d89409ac81405a57a8970e",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

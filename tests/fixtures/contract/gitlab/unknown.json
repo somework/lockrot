@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/unknown",
+        "description": "drupal/core 10.6.18 \u2014 finding unknown (0).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "40e9de81e618bd062546ac84b8a72339ed44f9d93a860df06a589d6b9880312d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

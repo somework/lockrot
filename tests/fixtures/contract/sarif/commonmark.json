@@ -1,0 +1,387 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/advisory/PKSA-m4t9-vsgq-8khn",
+                            "name": "advisory/PKSA-m4t9-vsgq-8khn",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-m4t9-vsgq-8khn affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-zyf5-hrxv-hrd7",
+                            "name": "advisory/PKSA-zyf5-hrxv-hrd7",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-zyf5-hrxv-hrd7 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-m2dq-1fhr-29b1",
+                            "name": "advisory/PKSA-m2dq-1fhr-29b1",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-m2dq-1fhr-29b1 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "lockrot/advisory/PKSA-m4t9-vsgq-8khn",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "league/commonmark 2.9.1 is affected by PKSA-m4t9-vsgq-8khn (high advisory): league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan. Do: composer update league/commonmark (gets 2.10.3) \u2014 clears 3 advisories."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "league/commonmark",
+                        "lockrot/advisory": "PKSA-m4t9-vsgq-8khn"
+                    },
+                    "properties": {
+                        "package": "league/commonmark",
+                        "version": "2.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "laravel/framework",
+                            "league/commonmark"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "laravel/framework",
+                            "laravel/nightwatch",
+                            "spatie/laravel-markdown"
+                        ],
+                        "signal_ids": [
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2026-08-09T14:10:38+00:00",
+                                "years": 0.1,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "2.10.3",
+                                "at": "2026-09-21T13:07:34+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "2.10.3",
+                                "at": "2026-09-21T13:07:34+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-10-01T00:09:44+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-m4t9-vsgq-8khn",
+                        "cve": null,
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "2.x",
+                            "version": "2.10.3",
+                            "newest": "2.10.3",
+                            "on_installed_branch": true,
+                            "php": "^7.4 || ^8.0",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-m4t9-vsgq-8khn",
+                            "severity": "high",
+                            "fix_kind": "update",
+                            "weight": 16,
+                            "multiplier": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-zyf5-hrxv-hrd7",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "league/commonmark 2.9.1 is affected by PKSA-zyf5-hrxv-hrd7 (high advisory): league/commonmark: Denial of service via distinctly-named attributes in the Attributes extension. Do: composer update league/commonmark (gets 2.10.3) \u2014 clears 3 advisories."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "league/commonmark",
+                        "lockrot/advisory": "PKSA-zyf5-hrxv-hrd7"
+                    },
+                    "properties": {
+                        "package": "league/commonmark",
+                        "version": "2.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-zyf5-hrxv-hrd7",
+                        "cve": null,
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "2.x",
+                            "version": "2.10.0",
+                            "newest": "2.10.3",
+                            "on_installed_branch": true,
+                            "php": "^7.4 || ^8.0",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-m2dq-1fhr-29b1",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "league/commonmark 2.9.1 is affected by PKSA-m2dq-1fhr-29b1 (medium advisory): league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal. Do: composer update league/commonmark (gets 2.10.3) \u2014 clears 3 advisories."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "league/commonmark",
+                        "lockrot/advisory": "PKSA-m2dq-1fhr-29b1"
+                    },
+                    "properties": {
+                        "package": "league/commonmark",
+                        "version": "2.9.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-m2dq-1fhr-29b1",
+                        "cve": null,
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "2.x",
+                            "version": "2.10.3",
+                            "newest": "2.10.3",
+                            "on_installed_branch": true,
+                            "php": "^7.4 || ^8.0",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 1,
+                            "failing": 1,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 1
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 1,
+                            "records": 3
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

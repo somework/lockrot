@@ -20,3 +20,4 @@
 /build/*.txt
 /build/corpus/
 __pycache__/
+/tools/schema/node/node_modules/

@@ -213,11 +213,6 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-vznr-tgp9-fd7d",
-     "basis": "outside_range"
-    },
-    {
-     "kind": "advisory",
      "id": "PKSA-7qs6-zvnz-h66r",
      "basis": "outside_range"
     },
@@ -229,6 +224,11 @@
     {
      "kind": "advisory",
      "id": "PKSA-jj5t-2zs1-dcfm",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-vznr-tgp9-fd7d",
      "basis": "outside_range"
     }
    ],
@@ -1558,6 +1558,25 @@
      "message": null,
      "packages_with_records": 1,
      "records": 6
+    }
+   ]
+  }
+ },
+ "legacy": {
+  "verdict": "left-behind",
+  "priority": "high",
+  "basis": {
+   "base": "high",
+   "steps": [
+    {
+     "reason": "transitive",
+     "from": "high",
+     "to": "medium"
+    },
+    {
+     "reason": "no_fix_expected",
+     "from": "medium",
+     "to": "high"
     }
    ]
   }

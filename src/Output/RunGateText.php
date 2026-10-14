@@ -16,16 +16,16 @@ use Lockrot\Config\Gate;
  */
 final class RunGateText
 {
-    /** An unknown source or reason prints its id. */
-    private const FAIL_ON_SOURCE = [RunSettings::SOURCE_ENV => 'LOCKROT_FAIL_ON', RunSettings::SOURCE_CONFIG => 'extra.lockrot.fail-on', RunSettings::SOURCE_DEFAULT => 'default'];
-    private const TARGET_SOURCE = [
+    /** An unknown source or reason prints its id. tools/report/record records these tables as the gate words. */
+    public const FAIL_ON_SOURCE = [RunSettings::SOURCE_ENV => 'LOCKROT_FAIL_ON', RunSettings::SOURCE_CONFIG => 'extra.lockrot.fail-on', RunSettings::SOURCE_DEFAULT => 'default'];
+    public const TARGET_SOURCE = [
         RunSettings::SOURCE_OPTION => '--target-php',
         RunSettings::SOURCE_ENV => 'LOCKROT_TARGET_PHP',
         RunSettings::SOURCE_CONFIG => 'extra.lockrot.target-php',
         RunSettings::SOURCE_PLATFORM => 'config.platform.php',
         RunSettings::SOURCE_RUNTIME => 'the running PHP',
     ];
-    private const NOT_APPLIED = [
+    public const NOT_APPLIED = [
         'offline' => 'not checked (offline)',
         'composer_too_old' => 'not checked (Composer below 2.4)',
         'install_time_budget' => 'not checked (install-time budget spent)',

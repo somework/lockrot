@@ -1,4 +1,4 @@
-critical (9)
+critical (10)
   twig/twig v2.16.1  direct  ·  vulnerable
       32 = vulnerable 32 [critical advisory]
       do: raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0,
@@ -40,11 +40,17 @@ critical (9)
                    || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach
       vulnerable   9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host
                    can bypass host-based checks
+  mautic/core-lib 4.3.x-dev  direct  ·  pinned · vulnerable
+      32 = pinned 16 + vulnerable 16 [high advisory]
+      do: no move: it is installed from a local path (your own package)
+      pinned       pinned to branch snapshot 4.3.x-dev
+      vulnerable   5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in
+                   UI upgrade process
   guzzlehttp/cache-subscriber 0.2.0  direct  ·  abandoned · old-promise
       36 = abandoned 32 + old-promise 4 [¼ of 16]
       do: find a replacement (none named)
-      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.1
-                   years ago); last push 2019-09-16 (7.1 years ago)
+      abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.0
+                   years ago); last push 2019-09-16 (7.0 years ago)
       old-promise  released 2019-09-16 for PHP 5 (php ">=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   symfony/debug v3.4.47  direct  ·  abandoned · old-promise
@@ -56,8 +62,8 @@ critical (9)
                    admits 8.4 untested
   yosymfony/toml v1.0.4  direct  ·  silent · old-promise
       36 = silent 32 + old-promise 4 [¼ of 16]
-      do: find a maintained alternative: nothing released for 8.2 years
-      silent       last release 2018-08-08 (8.2 years ago); last push 2020-08-08 (6.2 years ago)
+      do: find a maintained alternative: nothing released for 8.1 years
+      silent       last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago)
       old-promise  released 2018-08-08 for PHP 7 (php ">=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   sensio/framework-extra-bundle v6.2.10  direct  ·  abandoned
@@ -71,7 +77,7 @@ critical (9)
       abandoned    marked abandoned by its registry, replacement: web-token/jwt-library
       age: installed 3.4.3, release date not known (no date); last push 2025-05-07 (1.4 years ago)
 
-high (13)
+high (14)
   robrichards/xmlseclibs 3.1.1  via mautic/core-lib  ·  old-promise · vulnerable
       24 = old-promise 16 ÷ 2 transitive + vulnerable 16 [high advisory]
       do: composer update robrichards/xmlseclibs (gets 3.1.5) — clears old-promise and 2 advisories
@@ -88,7 +94,7 @@ high (13)
           requirements, which lockrot does not solve
       vulnerable   6 advisories: 2 high, 2 medium, 1 unrated, 1 low — 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9
                    Laravel Framework: CRLF injection in default email rule
-      age: installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.2 years
+      age: installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.1 years
            ago); newest release v11.57.0 2026-09-29 (less than three weeks ago); last push 2026-09-30 (less than three
            weeks ago)
   league/commonmark 2.9.1  via laravel/framework, laravel/nightwatch, spatie/laravel-markdown  ·  vulnerable
@@ -96,8 +102,8 @@ high (13)
       do: composer update league/commonmark (gets 2.10.3) — clears 3 advisories
       vulnerable   3 advisories: 2 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark:
                    Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan
-      age: installed 2.9.1 released 2026-08-09 (0.2 years ago); 2.x last released 2.10.3 2026-09-21 (0.1 years
-           ago), its newest release; last push 2026-10-01 (less than three weeks ago)
+      age: installed 2.9.1 released 2026-08-09 (0.1 years ago); 2.x last released 2.10.3 2026-09-21 (less than
+           three weeks ago), its newest release; last push 2026-10-01 (less than three weeks ago)
   guzzlehttp/psr7 1.9.1  via guzzlehttp/guzzle  ·  left-behind · vulnerable
       16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory]
       do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle — clears
@@ -128,7 +134,7 @@ high (13)
       do: test it on PHP 8.4 — 1.0.0 is its newest release
       old-promise  released 2018-08-10 for PHP 5 (php ">=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-      stale        last release 2018-08-10 (8.2 years ago)
+      stale        last release 2018-08-10 (8.1 years ago)
   tubalmartin/cssmin v4.1.1  direct  ·  old-promise · stale
       18 = old-promise 16 + stale 2 [¼ of 8]
       do: test it on PHP 8.4 — v4.1.1 is its newest release
@@ -140,7 +146,7 @@ high (13)
       do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that
           package
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-08-29 (9.1
-                   years ago); last push 2021-04-28 (5.5 years ago)
+                   years ago); last push 2021-04-28 (5.4 years ago)
       old-promise  released 2017-05-02 for PHP 5 (php ">=5.5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   web-auth/metadata-service v2.1.7  via web-auth/webauthn-lib  ·  abandoned · left-behind
@@ -155,7 +161,7 @@ high (13)
           require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires
           ^2.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot
           does not solve
-      left-behind  branch 2.x last released 2022-08-15 (4.2 years ago); 4.x released 4.0.0 (2025-07-23), needs php
+      left-behind  branch 2.x last released 2022-08-15 (4.1 years ago); 4.x released 4.0.0 (2025-07-23), needs php
                    ^8.3.0 above the project's php ^7.2.5; no releasing branch within reach
   matomo/network 2.0.1  direct  ·  old-promise
       16 = old-promise 16
@@ -164,12 +170,17 @@ high (13)
                    untested
       age: installed 2.0.1 released 2020-10-05 (6.0 years ago); 2.x last released 2.0.3 2026-04-17 (0.5 years ago),
            its newest release; last push 2026-04-17 (0.5 years ago)
+  tobscure/json-api dev-joomla-backports  direct  ·  pinned
+      16 = pinned 16
+      do: no move: lockrot did not read its releases, so it names none; review the snapshot
+      pinned       pinned to branch snapshot dev-joomla-backports
+      checks missing: S2, S3, S4, S8 (not from a Composer repository)
   fgrosse/phpasn1 v2.5.0  unreached  ·  abandoned
       16 = abandoned 32 ÷ 2 unreached
       do: find a replacement (none named); lockrot found no path from your requirements to it: `composer why` names what
           requires it
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8
-                   years ago); last push 2023-04-23 (3.5 years ago)
+                   years ago); last push 2023-04-23 (3.4 years ago)
 
 medium (11)
   joomla/filter 2.0.5  direct  ·  vulnerable
@@ -196,14 +207,14 @@ medium (11)
           ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own
           requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what
           requires it must allow it
-      left-behind  branch 6.x last released 2022-09-13 (4.1 years ago); 7.x released 7.8.1 (2026-03-15), needs php ^8.1
+      left-behind  branch 6.x last released 2022-09-13 (4.0 years ago); 7.x released 7.8.1 (2026-03-15), needs php ^8.1
                    above the project's php ^7.2.5 || ^8.0; no releasing branch within reach
       old-promise  released 2020-11-22 for PHP 7 (php ">=7.2"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
   akaunting/laravel-debugbar-collector 2.1.1  direct  ·  stale
       8 = stale 8
       do: —
-      stale        last release 2023-06-02 (3.4 years ago); last push 2023-06-02 (3.4 years ago)
+      stale        last release 2023-06-02 (3.3 years ago); last push 2023-06-02 (3.3 years ago)
   doctrine/cache 2.1.1  direct  ·  stale
       8 = stale 8
       do: —
@@ -225,7 +236,7 @@ medium (11)
       do: move genealabs/laravel-pivot-events to ^12.0 through genealabs/laravel-model-caching — clears left-behind; a
           new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the
           newest release of genealabs/laravel-model-caching (13.1.11) no longer requires it
-      left-behind  branch 10.x last released 2023-03-22 (3.6 years ago); 13.x released 13.1.0 (2026-02-28), needs php
+      left-behind  branch 10.x last released 2023-03-22 (3.5 years ago); 13.x released 13.1.0 (2026-02-28), needs php
                    ^8.2 above the project's php ^8.1; 12.x released 12.0.0 (2025-02-26)
   symfony/event-dispatcher 5.4.x-dev  via mautic/core-lib  ·  pinned
       8 = pinned 16 ÷ 2 transitive
@@ -265,7 +276,7 @@ low (4)
       do: composer update symfony/yaml (gets v5.4.53) — clears 3 advisories
       vulnerable   3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via
                    Unbounded Recursion in Nested Blocks, Sequences, and Mappings
-      age: installed v5.4.23 released 2023-04-23 (3.5 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years
+      age: installed v5.4.23 released 2023-04-23 (3.4 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years
            ago); newest release v8.1.8 2026-09-26 (less than three weeks ago); last push 2026-10-01 (less than three
            weeks ago)
   symfony/polyfill-intl-idn v1.37.0  via guzzlehttp/guzzle  ·  vulnerable
@@ -273,8 +284,8 @@ low (4)
       do: composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory
       vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts
                    xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
-      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (0.1 years
-           ago), its newest release
+      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than
+           three weeks ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
                               API of the extension they replace
   jfcherng/php-color-output 2.0.2  via jfcherng/php-diff  ·  old-promise · stale
@@ -285,9 +296,14 @@ low (4)
           jfcherng/php-diff (7.0.1) still requires it
       old-promise  released 2020-05-27 for PHP 7 (php ">=7.1.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-      stale        last release 2021-05-27 (5.4 years ago)
+      stale        last release 2021-05-27 (5.3 years ago)
 
-not flagged (4)
+not flagged (6)
+  drupal/core 10.6.18  direct  ·  unknown
+      0
+  bower-asset/jquery 3.7.1  via yiisoft/yii2, yiisoft/yii2-bootstrap5, yiisoft/yii2-symfonymailer  ·  unknown
+      0
+      checks missing: S2, S3, S4, S8 (origin unknown)
   akaunting/laravel-version 1.0.4  direct  ·  finished · stale (accepted)
       0 (stale accepted)
   pagerfanta/twig v3.8.0  direct  ·  ok
@@ -299,21 +315,21 @@ not flagged (4)
       0
       checks missing: S2, S8 (undated releases)
 
-41 packages checked · 37 flagged: critical 9 · high 13 · medium 11 · low 4
-flags: abandoned 7 · silent 1 · pinned 2 · left-behind 13 · old-promise 12 · stale 8 · vulnerable 14 ·
-18 packages carry more than one
-depth: 17 of 37 flagged packages are named by no line of composer.json · direct 20 · 1 hop 11 · 2 hops 2 ·
+45 packages checked · 39 flagged: critical 10 · high 14 · medium 11 · low 4
+flags: abandoned 7 · silent 1 · pinned 4 · left-behind 13 · old-promise 12 · stale 8 · vulnerable 15 ·
+19 packages carry more than one
+depth: 17 of 39 flagged packages are named by no line of composer.json · direct 22 · 1 hop 11 · 2 hops 2 ·
 4 hops 1 · unreached 3 ·
 deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs)
-security: 14 vulnerable packages · 51 advisories: 1 critical, 11 high, 24 medium, 3 unrated, 12 low ·
+security: 15 vulnerable packages · 56 advisories: 1 critical, 12 high, 28 medium, 3 unrated, 12 low ·
 packages-dev not checked (pass --dev)
-fix, by package: composer update 6 · upgrade 1 · php floor raise 6 · no fix 1
+fix, by package: composer update 6 · upgrade 1 · php floor raise 6 · fix unknown 1 · no fix 1
 update now: composer update robrichards/xmlseclibs league/commonmark symfony/routing league/flysystem symfony/yaml symfony/polyfill-intl-idn
-libyears: 90.1 behind across 35 of 41 packages · 45.9 from direct requirements ·
+libyears: 90.1 behind across 35 of 45 packages · 45.9 from direct requirements ·
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: mautic/core-lib 4 · guzzlehttp/guzzle 2 · akaunting/laravel-apexcharts 1 ·
 genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 · … and 5 more
-advisories: 41 packages asked · packagist.org answered (51 on record for 14 packages)
-gate: fails · --fail-on=high,unchecked · 25 findings fail it (high 22, unchecked 3) · target php 8.4 (--target-php)
-Data as of 2026-10-13 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+advisories: 45 packages asked · packagist.org answered (56 on record for 15 packages)
+gate: fails · --fail-on=high,unchecked · 28 findings fail it (high 24, unchecked 5) · target php 8.4 (--target-php)
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

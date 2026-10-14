@@ -184,17 +184,7 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-cnw1-2ytm-cgr8",
-     "basis": "outside_range"
-    },
-    {
-     "kind": "advisory",
-     "id": "PKSA-fy2t-3c5f-827y",
-     "basis": "outside_range"
-    },
-    {
-     "kind": "advisory",
-     "id": "PKSA-qxvb-2bpp-dnk6",
+     "id": "PKSA-93qv-9n9h-6k6p",
      "basis": "outside_range"
     },
     {
@@ -209,17 +199,27 @@
     },
     {
      "kind": "advisory",
-     "id": "PKSA-pwsk-hy21-4gby",
+     "id": "PKSA-cnw1-2ytm-cgr8",
      "basis": "outside_range"
     },
     {
      "kind": "advisory",
-     "id": "PKSA-93qv-9n9h-6k6p",
+     "id": "PKSA-fy2t-3c5f-827y",
      "basis": "outside_range"
     },
     {
      "kind": "advisory",
      "id": "PKSA-k22t-f949-t9g6",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-pwsk-hy21-4gby",
+     "basis": "outside_range"
+    },
+    {
+     "kind": "advisory",
+     "id": "PKSA-qxvb-2bpp-dnk6",
      "basis": "outside_range"
     }
    ],
@@ -1712,6 +1712,20 @@
      "message": null,
      "packages_with_records": 1,
      "records": 15
+    }
+   ]
+  }
+ },
+ "legacy": {
+  "verdict": "left-behind",
+  "priority": "critical",
+  "basis": {
+   "base": "high",
+   "steps": [
+    {
+     "reason": "no_fix_expected",
+     "from": "high",
+     "to": "critical"
     }
    ]
   }

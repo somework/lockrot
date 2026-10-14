@@ -1,0 +1,17 @@
+{
+    "score_text": "64 = vulnerable 64 [critical advisory 32 × 2: no reachable fix]",
+    "next_step_text": "no move runs on the target: 3.x needs php >=8.1.0 and the target php 8.0 does not run it",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.0 (--target-php)",
+    "age_line": "age: installed v2.16.1 released 2024-09-09 (2.1 years ago), the newest on 2.x; newest release v3.30.0 2026-09-25 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v2.16.1   2024-09-09   2.1 years ago",
+        "2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3",
+        "newest     v3.30.0   2026-09-25   less than three weeks ago     below release-warn-years 3",
+        "last push            2026-09-30   less than three weeks ago     below push-warn-years 3",
+        "libyears 2.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

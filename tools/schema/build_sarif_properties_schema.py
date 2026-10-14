@@ -123,7 +123,7 @@ defs['resultAdvisory'] = bag("The bag of an advisory result, one per (package, c
      'anyOf': [{'properties': {'deciding': {'enum': [True]}}, 'required': ['term']},
                {'properties': {'deciding': {'enum': [False]}}, 'not': {'required': ['term']}}]}])
 defs['resultUnchecked'] = bag("The bag of a `lockrot/unchecked` result: a finding with S10 and no counted fact, when `unchecked` is active.", {},
-                              list(FIRST))
+                              [])
 defs['resultOther'] = bag("The bag of another lockrot result (`--all`'s `lockrot/ok`, `lockrot/finished`, `lockrot/unknown`).", {}, [])
 
 ESC = lambda s: s.replace('/', '\\/')
@@ -139,7 +139,7 @@ defs['suppression'] = {'description': 'The one suppression lockrot writes: a fac
 defs['result'] = {
     'description': "A SARIF result lockrot writes; SARIF 2.1.0's schema checks the rest of it.",
     # the SARIF envelope says `additionalProperties: true` so the tests' strict twin closes only lockrot's bags, never SARIF's own keys
-    'type': 'object', 'required': ['ruleId', 'level', 'properties'], 'additionalProperties': True,
+    'type': 'object', 'required': ['ruleId', 'level'], 'additionalProperties': True,
     'properties': {
         'ruleId': d('`lockrot/<flag>`, `lockrot/advisory/<id>`, `lockrot/unchecked`, or a score-0 word under `--all`.', {'type': 'string', 'pattern': ESC('^lockrot/')}),
         'level': d("`error` (a fact `gate.by[].facts` names), `note` (a fact the baseline knows or covers, or a score-0 result), else `warning`. Closed.",
@@ -158,6 +158,7 @@ defs['result'] = {
         {'description': '`level` is `error` exactly when `error_by` is not empty.', 'anyOf': [
             P(level={'enum': ['error']}, properties=P(error_by={'minItems': 1})),
             P(level={'not': {'enum': ['error']}}, properties=P(error_by={'maxItems': 0}))]},
+        {'description': 'A bag on every result but the run-level `lockrot/advisories-unchecked` one.', 'anyOf': [{'required': ['properties']}, P(ruleId={'enum': ['lockrot/advisories-unchecked']})]},
         {'description': '`suppressions` only on a `note`.', 'anyOf': [{'not': {'required': ['suppressions']}}, P(level={'enum': ['note']})]},
     ],
 }

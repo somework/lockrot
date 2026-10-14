@@ -1,0 +1,5 @@
+::error file=composer.lock,line=4,title=lockrot%3A critical — abandoned · old-promise::symfony/debug v3.4.47: 36 = abandoned 32 + old-promise 4 [¼ of 16]. Do: replace with symfony/error-handler (named by its registry). abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago). old-promise: released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested.
+::notice title=lockrot::Repository activity not checked for 1 package on hosts lockrot cannot ask: gitlab.example.com (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.
+flags: abandoned 1 · old-promise 1 · 1 package carries more than one
+depth: every flagged package is named in composer.json · direct 1
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

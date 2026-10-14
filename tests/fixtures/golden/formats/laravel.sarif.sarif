@@ -118,7 +118,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2026-09-14T03:05:36+00:00",
-                                "years": 0.0,
+                                "years": 0,
                                 "level": null
                             },
                             "push_unmeasured": null

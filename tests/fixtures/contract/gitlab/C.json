@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "symfony/debug v3.4.47 \u2014 finding critical (36 = abandoned 32 + old-promise 4 [\u00bc of 16]) \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "2df5056e8311a7fe7d3448073b04f2968ec46916d4935759352369de6d109157",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/old-promise",
+        "description": "symfony/debug v3.4.47 \u2014 finding critical (36 = abandoned 32 + old-promise 4 [\u00bc of 16]) \u2014 old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: replace with symfony/error-handler (named by its registry).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "39f5f359c95cadb7c1ce76bab37abd5acb36e377864f6d12bac909f8977118af",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

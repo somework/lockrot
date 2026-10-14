@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/yaml v5.4.23 \u2014 finding high (16 = vulnerable 16 [unrated advisory 8 \u00d7 2: no reachable fix]) \u2014 vulnerable: 3 advisories: 1 medium, 1 unrated, 1 low \u2014 2 of 3 fixed on 5.x; weighs most: CVE-2026-45305 YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex. Do: no single release fixes every advisory; see each advisory.",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "24be27cc46819fdc46571f6f45cb5585819e240c6b816ba647d2156c6faeae6b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

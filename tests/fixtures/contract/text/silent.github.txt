@@ -1,0 +1,4 @@
+::error file=composer.lock,line=4,title=lockrot%3A critical — silent · old-promise::yosymfony/toml v1.0.4: 36 = silent 32 + old-promise 4 [¼ of 16]. Do: find a maintained alternative: nothing released for 8.1 years. silent: last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago). old-promise: released 2018-08-08 for PHP 7 (php ">=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested.
+flags: silent 1 · old-promise 1 · 1 package carries more than one
+depth: every flagged package is named in composer.json · direct 1
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

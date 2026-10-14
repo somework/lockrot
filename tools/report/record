@@ -1,0 +1,174 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+// Records the rendering contract bundle of lockrot (SPEC-0.14.md §7.11) into tests/fixtures/contract/.
+//
+//   tools/report/record                        records the bundle twice, each time in a new process, and
+//                                              writes it only when the two recordings are byte-identical
+//   tools/report/record --baselined <scenario>  records one real baselined scenario the same way
+//   tools/report/record --all-baselined         records every baselined scenario
+//
+// The bundle is lockrot's own output for the cases of tests/fixtures/flags/cases.json, hydrated with
+// the clock of each case document (`generated_at`) and no network. Before it writes, it compares
+// the strings that the PHP grammars own with the model's goldens and stops on a difference. Every
+// file carries the release that Lockrot\Tests\Support\VersionMask names as the tool version.
+require __DIR__.'/../../vendor/autoload.php';
+
+use Lockrot\Analyzer\RunSettings;
+use Lockrot\Json\JsonWriter;
+use Lockrot\Tests\Support\Contract\BaselinedFloors;
+use Lockrot\Tests\Support\Contract\BaselinedScenario;
+use Lockrot\Tests\Support\Contract\ContractBundle;
+use Lockrot\Tests\Support\Contract\GoldenMismatch;
+use Lockrot\Tests\Support\VersionMask;
+use Lockrot\Verdict\ScoreModel;
+
+const FIXTURES = __DIR__.'/../../tests/fixtures/';
+/** The directories and files of tests/fixtures/contract/ that a recording replaces whole. */
+const RECORDED = ['report-2', 'model-only', 'explain-2', 'baseline-2', 'sarif', 'gitlab', 'text', 'goldens', 'score-lines.json', 'en/years-phrases.json', 'en/commands.json', 'en/reason-words.json', 'en/gate-words.json', 'en/sort-words.json', 'en/halving-words.json', 'en/activity-words.json', 'en/age-words.json'];
+const INPUTS = ['flags/cases.json', 'flags/composite.json', 'flags/provenance.json'];
+
+ini_set('memory_limit', '2G');
+
+$argv = $_SERVER['argv'];
+if (($argv[1] ?? null) === '--emit') {
+    $dir = $argv[2] ?? '';
+    try {
+        $recorded = ContractBundle::record();
+    } catch (GoldenMismatch $mismatch) {
+        fwrite(STDERR, JsonWriter::encode($mismatch->mismatches(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n".$mismatch->getMessage()."\n");
+        exit(1);
+    } catch (UnexpectedValueException $floor) {
+        fwrite(STDERR, $floor->getMessage()."\n");
+        exit(1);
+    }
+    foreach ($recorded['files'] as $path => $contents) {
+        write($dir.'/'.$path, $contents);
+    }
+    write($dir.'/.meta.json', (string) json_encode(['without_inputs' => $recorded['without_inputs'], 'goldens' => $recorded['goldens']]));
+    exit(0);
+}
+if (($argv[1] ?? null) === '--emit-baselined') {
+    foreach (BaselinedScenario::record($argv[2] ?? '', true) as $path => $contents) {
+        write(($argv[3] ?? '').'/'.$path, $contents);
+    }
+    exit(0);
+}
+if (\in_array($argv[1] ?? null, ['--baselined', '--all-baselined'], true)) {
+    $scenarios = $argv[1] === '--all-baselined' ? array_keys(BaselinedScenario::SCENARIOS) : [$argv[2] ?? ''];
+    foreach ($scenarios as $scenario) {
+        $files = twice(static fn (string $dir): string => '--emit-baselined '.escapeshellarg($scenario).' '.escapeshellarg($dir));
+        $missed = BaselinedFloors::missed($scenario, $files);
+        if ($missed !== []) {
+            fwrite(STDERR, "record: $scenario misses the floors: ".implode(', ', $missed)."\n");
+            exit(1);
+        }
+        $root = FIXTURES.'baselined/'.$scenario.'/';
+        foreach (['t0', 'check', 'regenerate', 'lockrot-baseline.json', 'provenance.json'] as $path) {
+            removeTree($root.$path);
+        }
+        foreach ($files as $path => $contents) {
+            write($root.$path, $contents);
+        }
+        fwrite(STDOUT, \sprintf("record: %s, %d files\n", $scenario, \count($files)));
+    }
+    // bundle_sha256 covers each scenario's check/report.bundle.json.
+    write(FIXTURES.'contract/bundle_sha256', ContractBundle::sha256(ContractBundle::bundleFiles())."\n");
+    exit(0);
+}
+if (\count($argv) > 1) {
+    fwrite(STDERR, "usage: tools/report/record [--baselined <scenario> | --all-baselined]\n");
+    exit(2);
+}
+
+$first = twice(static fn (string $dir): string => '--emit '.escapeshellarg($dir));
+$meta = json_decode($first['.meta.json'], true);
+unset($first['.meta.json']);
+
+$contract = FIXTURES.'contract/';
+foreach (RECORDED as $path) {
+    removeTree($contract.$path);
+}
+foreach ($first as $path => $contents) {
+    write($contract.$path, $contents);
+}
+
+$inputs = [];
+foreach (INPUTS as $input) {
+    $inputs['tests/fixtures/'.$input] = hash_file('sha256', FIXTURES.$input);
+}
+$provenance = [
+    'recorded_by' => 'tools/report/record',
+    'clock' => 'the generated_at of each case document in tests/fixtures/schema/documents/cases/',
+    'inputs' => $inputs,
+    'version_mask' => ['paths' => VersionMask::PATHS, 'value' => VersionMask::VALUE],
+    'text_grammar' => RunSettings::TEXT_GRAMMAR,
+    'score_text_grammar' => ScoreModel::SCORE_TEXT_GRAMMAR,
+    'formats' => ['json', 'table', 'markdown', 'github', 'gitlab', 'sarif'],
+    'format_options' => ['--all'],
+    'cases_without_inputs' => $meta['without_inputs'],
+    'model_only' => 'model-only/ holds the model documents of cases_without_inputs: the hydrator cannot rebuild those cases, so lockrot did not write them',
+    'baseline_2' => 'the gate-row baselines of tests/fixtures/schema/documents/baseline/gate-rows/, read by Baseline::fromArray() and written by BaselineFile::write()',
+    'case_lock' => 'each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out',
+    'model_goldens' => $meta['goldens'],
+    'bundle_sha256' => 'sha256 of the lines "<sha256>  <path>", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json',
+];
+write($contract.'provenance.json', JsonWriter::encode($provenance, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n");
+write($contract.'bundle_sha256', ContractBundle::sha256(ContractBundle::bundleFiles())."\n");
+fwrite(STDOUT, \sprintf("record: %d files, bundle_sha256 %s", \count($first), trim((string) file_get_contents($contract.'bundle_sha256')))."\n");
+
+/**
+ * Records twice, each time in a new process, and stops unless the two recordings are byte-identical.
+ *
+ * @param callable(string): string $arguments the arguments of one recording into a directory
+ *
+ * @return array<string, string> the recorded files by their relative path
+ */
+function twice(callable $arguments): array
+{
+    $trees = [];
+    foreach ([1, 2] as $run) {
+        $dir = sys_get_temp_dir().'/lockrot-record-'.bin2hex(random_bytes(8));
+        passthru(escapeshellarg(PHP_BINARY).' -d memory_limit=2G '.escapeshellarg(__FILE__).' '.$arguments($dir), $exit);
+        if ($exit !== 0) {
+            fwrite(STDERR, "record: recording $run failed\n");
+            exit(1);
+        }
+        $trees[] = ContractBundle::tree($dir);
+        removeTree($dir);
+    }
+    if ($trees[0] !== $trees[1]) {
+        $differ = array_keys(array_diff_assoc($trees[0], $trees[1]) + array_diff_assoc($trees[1], $trees[0]));
+        fwrite(STDERR, 'record: two recordings differ: '.implode(', ', \array_slice($differ, 0, 20))."\n");
+        exit(1);
+    }
+
+    return $trees[0];
+}
+
+function write(string $path, string $contents): void
+{
+    if (!is_dir(\dirname($path)) && !mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+        throw new RuntimeException('cannot create '.\dirname($path));
+    }
+    if (file_put_contents($path, $contents) === false) {
+        throw new RuntimeException('cannot write '.$path);
+    }
+}
+
+function removeTree(string $path): void
+{
+    if (is_file($path)) {
+        unlink($path);
+
+        return;
+    }
+    if (!is_dir($path)) {
+        return;
+    }
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+        $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+    }
+    rmdir($path);
+}

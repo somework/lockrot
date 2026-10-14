@@ -1128,7 +1128,7 @@ FINDING = {
     'direct_dependents': arr('The direct requirements that reach it (report-1); a transitive move names them (§5.6).', ref('packageName')),
     'signals': arr('S1–S10 that fired, as report-1 orders them (§7.6).', ref('signal')),
     'evidence': rendered("The join of the counted flags' `flags[].summary` (a flag counts when a `score.terms[].flag` names it) as `<id>: <summary>` in flag order; kept for jq (§7.6). "
-                         "Empty exactly on the score-0 shape (no flag counts).", ['flags[].summary', 'score.terms[].flag']),
+                         "Empty exactly on the score-0 shape (no flag counts).", ['flags[].id', 'flags[].summary', 'score.terms[].flag']),
     'allowlist_reason': nul(("report-1's key, kept (§6.5): the reason of an entry that accepts the whole package; null for a partial entry (`allowlist.flag_ids` set) and "
                              "when no entry applies. Not an alias of `allowlist.reason` (attack round 1): read that for every entry."), {'type': 'string'}),
     'data_date': nul('The time of the newest repository data the finding read (report-1); null when lockrot read none.', ref('dateTime')),

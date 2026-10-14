@@ -1,0 +1,4 @@
+::error file=composer.lock,line=4,title=lockrot%3A critical — abandoned::web-token/jwt-key-mgmt 3.4.3: 32 = abandoned 32. Do: replace with web-token/jwt-library (named by its registry). abandoned: marked abandoned by its registry, replacement: web-token/jwt-library.
+flags: abandoned 1
+depth: every flagged package is named in composer.json · direct 1
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

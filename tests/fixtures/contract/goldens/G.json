@@ -1,0 +1,17 @@
+{
+    "score_text": "18 = pinned 16 + stale 2 [¼ of 8]",
+    "next_step_text": "no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: newest release 1.6.2 2019-01-23 (7.7 years ago); last push 2024-01-12 (2.7 years ago)",
+    "explain_age": [
+        "installed  dev-masternot read (a branch snapshot has no release branch)",
+        "its branch           not read (a branch snapshot has no release branch)",
+        "newest     1.6.2     2019-01-23   7.7 years ago                 past release-high-years 5",
+        "last push            2024-01-12   2.7 years ago                 below push-warn-years 3",
+        "libyears not measured: a branch snapshot has no release branch"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

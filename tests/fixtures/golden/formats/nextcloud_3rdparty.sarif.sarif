@@ -134,14 +134,14 @@
                         "age": {
                             "installed": {
                                 "at": "2014-09-15T13:12:35+00:00",
-                                "years": 12.0,
+                                "years": 12,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "v1.0.1",
                                 "at": "2014-09-15T13:12:35+00:00",
-                                "years": 12.0,
+                                "years": 12,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -149,7 +149,7 @@
                             "branch_release": {
                                 "version": "v1.0.1",
                                 "at": "2014-09-15T13:12:35+00:00",
-                                "years": 12.0,
+                                "years": 12,
                                 "level": "high",
                                 "dated_by": null
                             },
@@ -228,14 +228,14 @@
                         "age": {
                             "installed": {
                                 "at": "2022-09-02T02:13:06+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "dated_by": null
                             },
                             "installed_unmeasured": null,
                             "release": {
                                 "version": "1.5.4",
                                 "at": "2022-09-02T02:13:06+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -243,7 +243,7 @@
                             "branch_release": {
                                 "version": "1.5.4",
                                 "at": "2022-09-02T02:13:06+00:00",
-                                "years": 4.0,
+                                "years": 4,
                                 "level": "warn",
                                 "dated_by": null
                             },
@@ -431,7 +431,7 @@
                             "branch_release_unmeasured": null,
                             "push": {
                                 "at": "2026-09-11T10:06:25+00:00",
-                                "years": 0.0,
+                                "years": 0,
                                 "level": null
                             },
                             "push_unmeasured": null

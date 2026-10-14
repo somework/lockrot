@@ -1,0 +1,14 @@
+<options=bold><fg=yellow>medium (1)</fg=yellow></options=bold>
+  hyvor/php-json-exporter 0.0.3  direct  ·  stale
+      8 = stale 8
+      do: —
+      stale        last release 2023-04-11 (3.5 years ago)
+
+1 package checked · 1 flagged: medium 1
+flags: stale 1
+depth: every flagged package is named in composer.json · direct 1
+libyears: 0.0 behind across the one package
+advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+details.

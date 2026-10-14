@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "guzzlehttp/psr7 1.9.1 \u2014 finding high (16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]) \u2014 left-behind: branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via guzzlehttp/guzzle)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "a621f2d4518b1d5acb71d16629c296279bc4e3b0b760fd6840d7ecb5bbb3d945",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "guzzlehttp/psr7 1.9.1 \u2014 finding high (16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory]) \u2014 vulnerable: 4 advisories: 4 medium \u2014 none fixed on 1.x; worst: CVE-2026-55766 CRLF injection in HTTP start-line serialization. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via guzzlehttp/guzzle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "c10171721b9318fe4bf2adeb64890d34271083da529a899dcb6d15131dae0ea1",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

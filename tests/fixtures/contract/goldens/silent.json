@@ -1,0 +1,17 @@
+{
+    "score_text": "36 = silent 32 + old-promise 4 [¼ of 16]",
+    "next_step_text": "find a maintained alternative: nothing released for 8.1 years",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v1.0.4 released 2018-08-08 (8.1 years ago), its newest release; last push 2020-08-08 (6.1 years ago)",
+    "explain_age": [
+        "installed  v1.0.4    2018-08-08   8.1 years ago",
+        "1.x        v1.0.4    2018-08-08   8.1 years ago                 past release-high-years 5",
+        "newest     v1.0.4    2018-08-08   8.1 years ago                 past release-high-years 5",
+        "last push            2020-08-08   6.1 years ago                 past push-high-years 5",
+        "libyears 0.0 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

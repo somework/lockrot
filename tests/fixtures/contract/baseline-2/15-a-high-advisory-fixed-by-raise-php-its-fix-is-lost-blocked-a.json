@@ -1,0 +1,25 @@
+{
+    "$schema": "https://lockrot.dev/schema/baseline-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-06-01T00:00:00+00:00",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "score_model_id": 1,
+    "fix_model": 1,
+    "findings": {
+        "lockrot/gate-row": {
+            "version": "1.0.0",
+            "first_seen": "2026-06-01",
+            "advisories": {
+                "A": {
+                    "known_since": "2026-06-01",
+                    "severity": "high",
+                    "fix_kind": "raise-php"
+                }
+            }
+        }
+    }
+}

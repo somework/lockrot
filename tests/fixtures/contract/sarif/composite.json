@@ -1,0 +1,2943 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/advisory/PKSA-h8hf-ytnd-5t9q",
+                            "name": "advisory/PKSA-h8hf-ytnd-5t9q",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-h8hf-ytnd-5t9q affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: critical severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "9.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-8zx5-v2nz-58pb",
+                            "name": "advisory/PKSA-8zx5-v2nz-58pb",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-8zx5-v2nz-58pb affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-dpx1-78wg-1kqs",
+                            "name": "advisory/PKSA-dpx1-78wg-1kqs",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-dpx1-78wg-1kqs affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-gw7n-z4yx-7xjt",
+                            "name": "advisory/PKSA-gw7n-z4yx-7xjt",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-gw7n-z4yx-7xjt affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-1tmc-rt7x-12w6",
+                            "name": "advisory/PKSA-1tmc-rt7x-12w6",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-1tmc-rt7x-12w6 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-3mcc-k66d-pydb",
+                            "name": "advisory/PKSA-3mcc-k66d-pydb",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-3mcc-k66d-pydb affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-fbvq-z33h-r2np",
+                            "name": "advisory/PKSA-fbvq-z33h-r2np",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-fbvq-z33h-r2np affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-xx6c-6d96-db2w",
+                            "name": "advisory/PKSA-xx6c-6d96-db2w",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-xx6c-6d96-db2w affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-kvv6-36cr-fkzb",
+                            "name": "advisory/PKSA-kvv6-36cr-fkzb",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-kvv6-36cr-fkzb affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: unrated severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": null
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-yd6k-t2gh-1m43",
+                            "name": "advisory/PKSA-yd6k-t2gh-1m43",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-yd6k-t2gh-1m43 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: unrated severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": null
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-2wrf-1xmk-1pky",
+                            "name": "advisory/PKSA-2wrf-1xmk-1pky",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-2wrf-1xmk-1pky affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-g9zw-qxh8-pq8w",
+                            "name": "advisory/PKSA-g9zw-qxh8-pq8w",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-g9zw-qxh8-pq8w affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-n14z-jjjg-g8vd",
+                            "name": "advisory/PKSA-n14z-jjjg-g8vd",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-n14z-jjjg-g8vd affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-sjvz-tbbr-vwth",
+                            "name": "advisory/PKSA-sjvz-tbbr-vwth",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-sjvz-tbbr-vwth affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-yhcn-xrg3-68b1",
+                            "name": "advisory/PKSA-yhcn-xrg3-68b1",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-yhcn-xrg3-68b1 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/left-behind",
+                            "name": "left-behind",
+                            "shortDescription": {
+                                "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release on the installed branch for release-warn-years, while a higher branch has released since."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/old-promise",
+                            "name": "old-promise",
+                            "shortDescription": {
+                                "text": "old-promise: Released before the target PHP's major with an open-ended php constraint"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version was released before the target PHP's GA date, and its php constraint admits that target untested."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-4wjj-gy1p-ft3r",
+                            "name": "advisory/PKSA-4wjj-gy1p-ft3r",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-4wjj-gy1p-ft3r affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/abandoned",
+                            "name": "abandoned",
+                            "shortDescription": {
+                                "text": "abandoned: Package is marked abandoned, or its repository is archived"
+                            },
+                            "fullDescription": {
+                                "text": "The package's registry or composer.lock marks it abandoned, or its repository is archived."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/pinned",
+                            "name": "pinned",
+                            "shortDescription": {
+                                "text": "pinned: Installed version is a branch snapshot, or the package has no stable release"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version is a branch snapshot (dev-* or #hash), or the package has no stable release at all."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/stale",
+                            "name": "stale",
+                            "shortDescription": {
+                                "text": "stale: Old release or old push, below the silent thresholds"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release or no repository push for release-warn-years or push-warn-years."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-b14r-zh1d-vdrc",
+                            "name": "advisory/PKSA-b14r-zh1d-vdrc",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-b14r-zh1d-vdrc affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-ft77-7h5f-p3r6",
+                            "name": "advisory/PKSA-ft77-7h5f-p3r6",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-ft77-7h5f-p3r6 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-v5yj-8nmz-sk2q",
+                            "name": "advisory/PKSA-v5yj-8nmz-sk2q",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-v5yj-8nmz-sk2q affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-dwsq-ppd2-mb1x",
+                            "name": "advisory/PKSA-dwsq-ppd2-mb1x",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-dwsq-ppd2-mb1x affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "lockrot/advisory/PKSA-h8hf-ytnd-5t9q",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 95.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{% use %}` template name. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-h8hf-ytnd-5t9q"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "twig/twig"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/twig-bridge",
+                            "twig/twig"
+                        ],
+                        "signal_ids": [
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2024-09-09T17:53:56+00:00",
+                                "years": 2.1,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v3.30.0",
+                                "at": "2026-09-25T13:20:01+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v2.16.1",
+                                "at": "2024-09-09T17:53:56+00:00",
+                                "years": 2.1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-30T20:43:40+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-h8hf-ytnd-5t9q",
+                        "cve": "CVE-2026-46633",
+                        "severity": "critical",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.26.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 32,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-h8hf-ytnd-5t9q",
+                            "severity": "critical",
+                            "fix_kind": "raise-php",
+                            "weight": 32,
+                            "multiplier": 1,
+                            "points": 32,
+                            "contribution": 32
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-8zx5-v2nz-58pb",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-49981 (high advisory): Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-8zx5-v2nz-58pb"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-8zx5-v2nz-58pb",
+                        "cve": "CVE-2026-49981",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.27.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-dpx1-78wg-1kqs",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-47732 (high advisory): Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-dpx1-78wg-1kqs"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-dpx1-78wg-1kqs",
+                        "cve": "CVE-2026-47732",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.26.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-gw7n-z4yx-7xjt",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-24425 (high advisory): Possible sandbox bypass when using a source policy. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-gw7n-z4yx-7xjt"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-gw7n-z4yx-7xjt",
+                        "cve": "CVE-2026-24425",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.26.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-1tmc-rt7x-12w6",
+                    "ruleIndex": 4,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48806 (medium advisory): Sandbox `__toString()` policy bypass via dynamic mapping keys. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-1tmc-rt7x-12w6"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-1tmc-rt7x-12w6",
+                        "cve": "CVE-2026-48806",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.27.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-3mcc-k66d-pydb",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46638 (medium advisory): `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-3mcc-k66d-pydb"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-3mcc-k66d-pydb",
+                        "cve": "CVE-2026-46638",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.26.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-fbvq-z33h-r2np",
+                    "ruleIndex": 6,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48808 (medium advisory): Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-fbvq-z33h-r2np"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-fbvq-z33h-r2np",
+                        "cve": "CVE-2026-48808",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.27.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-xx6c-6d96-db2w",
+                    "ruleIndex": 7,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48807 (medium advisory): Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-xx6c-6d96-db2w"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-xx6c-6d96-db2w",
+                        "cve": "CVE-2026-48807",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.27.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-kvv6-36cr-fkzb",
+                    "ruleIndex": 8,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46627 (unrated advisory): Sandbox does not protect against resource exhaustion. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-kvv6-36cr-fkzb"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-kvv6-36cr-fkzb",
+                        "cve": "CVE-2026-46627",
+                        "severity": "unrated",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.26.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-yd6k-t2gh-1m43",
+                    "ruleIndex": 9,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46636 (unrated advisory): Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-yd6k-t2gh-1m43"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-yd6k-t2gh-1m43",
+                        "cve": "CVE-2026-46636",
+                        "severity": "unrated",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.27.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-2wrf-1xmk-1pky",
+                    "ruleIndex": 10,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2024-51755 (low advisory): Unguarded calls to __isset() and to array-accesses when the sandbox is enabled. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-2wrf-1xmk-1pky"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-2wrf-1xmk-1pky",
+                        "cve": "CVE-2024-51755",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.14.1",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-g9zw-qxh8-pq8w",
+                    "ruleIndex": 11,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48805 (low advisory): Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-g9zw-qxh8-pq8w"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-g9zw-qxh8-pq8w",
+                        "cve": "CVE-2026-48805",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.27.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-n14z-jjjg-g8vd",
+                    "ruleIndex": 12,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46635 (low advisory): Sandbox property allowlist bypass via the `column` filter (array_column on objects). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-n14z-jjjg-g8vd"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-n14z-jjjg-g8vd",
+                        "cve": "CVE-2026-46635",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.26.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-sjvz-tbbr-vwth",
+                    "ruleIndex": 13,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46628 (low advisory): The `spaceless` filter implicitly marks its output as safe. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-sjvz-tbbr-vwth"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-sjvz-tbbr-vwth",
+                        "cve": "CVE-2026-46628",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.26.0",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-yhcn-xrg3-68b1",
+                    "ruleIndex": 14,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "twig/twig v2.16.1 is affected by CVE-2024-51754 (low advisory): Unguarded calls to __toString() when nesting an object into an array. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "twig/twig",
+                        "lockrot/advisory": "PKSA-yhcn-xrg3-68b1"
+                    },
+                    "properties": {
+                        "package": "twig/twig",
+                        "version": "v2.16.1",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": null,
+                        "score_total": 32,
+                        "score_text": "32 = vulnerable 32 [critical advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-yhcn-xrg3-68b1",
+                        "cve": "CVE-2024-51754",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "version": "v3.14.1",
+                            "newest": "v3.30.0",
+                            "on_installed_branch": false,
+                            "php": ">=8.1.0",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "symfony/twig-bridge",
+                                    "version": "v3.4.47",
+                                    "link": "require",
+                                    "constraint": "^1.41|^2.10",
+                                    "holder": {
+                                        "verdict": "unknown",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 15,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "symfony/monolog-bridge v2.6.13 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07). Do: require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/monolog-bridge"
+                    },
+                    "properties": {
+                        "package": "symfony/monolog-bridge",
+                        "version": "v2.6.13",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "left-behind",
+                        "score_total": 36,
+                        "score_text": "36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "symfony/monolog-bridge"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/monolog-bridge"
+                        ],
+                        "signal_ids": [
+                            "S5",
+                            "S8",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2016-01-14T10:11:35+00:00",
+                                "years": 10.7,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v6.4.45",
+                                "at": "2026-08-30T01:18:12+00:00",
+                                "years": 0.1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v2.8.52",
+                                "at": "2019-11-13T08:36:42+00:00",
+                                "years": 6.9,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-23T14:28:05+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "left-behind",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 26
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 16,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "symfony/monolog-bridge v2.6.13 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/monolog-bridge"
+                    },
+                    "properties": {
+                        "package": "symfony/monolog-bridge",
+                        "version": "v2.6.13",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "left-behind",
+                        "score_total": 36,
+                        "score_text": "36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "corroborating",
+                            "weight": 16,
+                            "divisor": 4,
+                            "points": 4,
+                            "contribution": 4
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 26
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-4wjj-gy1p-ft3r",
+                    "ruleIndex": 17,
+                    "level": "error",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "symfony/monolog-bridge v2.6.13 is affected by CVE-2026-45077 (high advisory): Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener. Do: require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/monolog-bridge",
+                        "lockrot/advisory": "PKSA-4wjj-gy1p-ft3r"
+                    },
+                    "properties": {
+                        "package": "symfony/monolog-bridge",
+                        "version": "v2.6.13",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "left-behind",
+                        "score_total": 36,
+                        "score_text": "36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "symfony/monolog-bridge"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/monolog-bridge"
+                        ],
+                        "signal_ids": [
+                            "S5",
+                            "S8",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2016-01-14T10:11:35+00:00",
+                                "years": 10.7,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v6.4.45",
+                                "at": "2026-08-30T01:18:12+00:00",
+                                "years": 0.1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v2.8.52",
+                                "at": "2019-11-13T08:36:42+00:00",
+                                "years": 6.9,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-23T14:28:05+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-4wjj-gy1p-ft3r",
+                        "cve": "CVE-2026-45077",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "upgrade",
+                            "to_branch": "5.x",
+                            "version": "v5.4.52",
+                            "newest": "v5.4.52",
+                            "on_installed_branch": false,
+                            "php": ">=7.2.5",
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.6",
+                                    "holder": null
+                                }
+                            ],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-4wjj-gy1p-ft3r",
+                            "severity": "high",
+                            "fix_kind": "upgrade",
+                            "weight": 16,
+                            "multiplier": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 26
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/abandoned",
+                    "ruleIndex": 18,
+                    "level": "error",
+                    "rank": 100.0,
+                    "message": {
+                        "text": "symfony/debug v3.4.47 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/debug"
+                    },
+                    "properties": {
+                        "package": "symfony/debug",
+                        "version": "v3.4.47",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "abandoned",
+                        "score_total": 36,
+                        "score_text": "36 = abandoned 32 + old-promise 4 [\u00bc of 16]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "abandoned",
+                            "old-promise"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "symfony/debug"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/console",
+                            "symfony/debug",
+                            "symfony/http-kernel"
+                        ],
+                        "signal_ids": [
+                            "S1",
+                            "S2",
+                            "S3",
+                            "S4",
+                            "S5"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 5.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v4.4.44",
+                                "at": "2022-07-28T16:29:46+00:00",
+                                "years": 4.2,
+                                "level": "warn",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v3.4.47",
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 5.9,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2022-07-29T12:25:06+00:00",
+                                "years": 4.2,
+                                "level": "warn"
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "abandoned",
+                            "role": "lead",
+                            "weight": 32,
+                            "divisor": 1,
+                            "points": 32,
+                            "contribution": 32
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 40
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 16,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "symfony/debug v3.4.47 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: replace with symfony/error-handler (named by its registry)."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/debug"
+                    },
+                    "properties": {
+                        "package": "symfony/debug",
+                        "version": "v3.4.47",
+                        "verdict": "critical",
+                        "priority": "critical",
+                        "lead": "abandoned",
+                        "score_total": 36,
+                        "score_text": "36 = abandoned 32 + old-promise 4 [\u00bc of 16]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "abandoned",
+                            "old-promise"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "corroborating",
+                            "weight": 16,
+                            "divisor": 4,
+                            "points": 4,
+                            "contribution": 4
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 40
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/pinned",
+                    "ruleIndex": 19,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high, 18 = pinned 16 + stale 2 [\u00bc of 8] \u2014 pinned: pinned to branch snapshot dev-master. Do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "friendsofsymfony/oauth-server-bundle"
+                    },
+                    "properties": {
+                        "package": "friendsofsymfony/oauth-server-bundle",
+                        "version": "dev-master",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "pinned",
+                        "score_total": 18,
+                        "score_text": "18 = pinned 16 + stale 2 [\u00bc of 8]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "stale"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "friendsofsymfony/oauth-server-bundle"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "friendsofsymfony/oauth-server-bundle"
+                        ],
+                        "signal_ids": [
+                            "S2",
+                            "S6"
+                        ],
+                        "age": {
+                            "installed": null,
+                            "installed_unmeasured": "branch_snapshot",
+                            "release": {
+                                "version": "1.6.2",
+                                "at": "2019-01-23T15:23:04+00:00",
+                                "years": 7.7,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": null,
+                            "branch_release_unmeasured": "branch_snapshot",
+                            "push": {
+                                "at": "2024-01-12T10:27:37+00:00",
+                                "years": 2.7,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "pinned",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 114
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 20,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "friendsofsymfony/oauth-server-bundle dev-master \u2014 finding high, 18 = pinned 16 + stale 2 [\u00bc of 8] \u2014 stale: last release 2019-01-23 (7.7 years ago). Do: no move runs on the target: the newest tag, 1.6.2, needs php ^5.5|^7.0 and the target php 8.4 does not run it; replace it."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "friendsofsymfony/oauth-server-bundle"
+                    },
+                    "properties": {
+                        "package": "friendsofsymfony/oauth-server-bundle",
+                        "version": "dev-master",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "pinned",
+                        "score_total": 18,
+                        "score_text": "18 = pinned 16 + stale 2 [\u00bc of 8]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "pinned",
+                            "stale"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "corroborating",
+                            "weight": 8,
+                            "divisor": 4,
+                            "points": 2,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 114
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 16,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "tubalmartin/cssmin v4.1.1 \u2014 finding high, 18 = old-promise 16 + stale 2 [\u00bc of 8] \u2014 old-promise: released 2018-01-15 for PHP 5 (php \">=5.3.2\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 v4.1.1 is its newest release."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "tubalmartin/cssmin"
+                    },
+                    "properties": {
+                        "package": "tubalmartin/cssmin",
+                        "version": "v4.1.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "old-promise",
+                        "score_total": 18,
+                        "score_text": "18 = old-promise 16 + stale 2 [\u00bc of 8]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "old-promise",
+                            "stale"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "tubalmartin/cssmin"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "tubalmartin/cssmin"
+                        ],
+                        "signal_ids": [
+                            "S2",
+                            "S5"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2018-01-15T15:26:51+00:00",
+                                "years": 8.7,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v4.1.1",
+                                "at": "2018-01-15T15:26:51+00:00",
+                                "years": 8.7,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v4.1.1",
+                                "at": "2018-01-15T15:26:51+00:00",
+                                "years": 8.7,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2023-12-22T23:56:28+00:00",
+                                "years": 2.8,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 70
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/stale",
+                    "ruleIndex": 20,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "tubalmartin/cssmin v4.1.1 \u2014 finding high, 18 = old-promise 16 + stale 2 [\u00bc of 8] \u2014 stale: last release 2018-01-15 (8.7 years ago). Do: test it on PHP 8.4 \u2014 v4.1.1 is its newest release."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "tubalmartin/cssmin"
+                    },
+                    "properties": {
+                        "package": "tubalmartin/cssmin",
+                        "version": "v4.1.1",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "old-promise",
+                        "score_total": 18,
+                        "score_text": "18 = old-promise 16 + stale 2 [\u00bc of 8]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "old-promise",
+                            "stale"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "stale",
+                            "role": "corroborating",
+                            "weight": 8,
+                            "divisor": 4,
+                            "points": 2,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 70
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-b14r-zh1d-vdrc",
+                    "ruleIndex": 21,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "symfony/yaml v5.4.23 is affected by CVE-2026-45133 (low advisory): YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings. Do: composer update symfony/yaml (gets v5.4.53) \u2014 clears 3 advisories."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml",
+                        "lockrot/advisory": "PKSA-b14r-zh1d-vdrc"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v5.4.23",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": null,
+                        "score_total": 2,
+                        "score_text": "2 = vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "symfony/yaml"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/yaml"
+                        ],
+                        "signal_ids": [
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-04-23T19:33:36+00:00",
+                                "years": 3.4,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v8.1.8",
+                                "at": "2026-09-26T06:33:49+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v5.4.53",
+                                "at": "2026-05-20T17:13:41+00:00",
+                                "years": 0.4,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-10-01T12:53:29+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-b14r-zh1d-vdrc",
+                        "cve": "CVE-2026-45133",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "5.x",
+                            "version": "v5.4.52",
+                            "newest": "v5.4.53",
+                            "on_installed_branch": true,
+                            "php": ">=7.2.5",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-b14r-zh1d-vdrc",
+                            "severity": "low",
+                            "fix_kind": "update",
+                            "weight": 2,
+                            "multiplier": 1,
+                            "points": 2,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 84
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-ft77-7h5f-p3r6",
+                    "ruleIndex": 22,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "symfony/yaml v5.4.23 is affected by CVE-2026-45305 (low advisory): YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex. Do: composer update symfony/yaml (gets v5.4.53) \u2014 clears 3 advisories."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml",
+                        "lockrot/advisory": "PKSA-ft77-7h5f-p3r6"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v5.4.23",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": null,
+                        "score_total": 2,
+                        "score_text": "2 = vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-ft77-7h5f-p3r6",
+                        "cve": "CVE-2026-45305",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "5.x",
+                            "version": "v5.4.52",
+                            "newest": "v5.4.53",
+                            "on_installed_branch": true,
+                            "php": ">=7.2.5",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 84
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-v5yj-8nmz-sk2q",
+                    "ruleIndex": 23,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "symfony/yaml v5.4.23 is affected by CVE-2026-45304 (low advisory): YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\"). Do: composer update symfony/yaml (gets v5.4.53) \u2014 clears 3 advisories."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml",
+                        "lockrot/advisory": "PKSA-v5yj-8nmz-sk2q"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v5.4.23",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": null,
+                        "score_total": 2,
+                        "score_text": "2 = vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-v5yj-8nmz-sk2q",
+                        "cve": "CVE-2026-45304",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "5.x",
+                            "version": "v5.4.52",
+                            "newest": "v5.4.53",
+                            "on_installed_branch": true,
+                            "php": ">=7.2.5",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 84
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-dwsq-ppd2-mb1x",
+                    "ruleIndex": 24,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "symfony/polyfill-intl-idn v1.37.0 is affected by CVE-2026-46644 (low advisory): symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence. Do: composer update symfony/polyfill-intl-idn (gets v1.43.0) \u2014 clears the advisory."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/polyfill-intl-idn",
+                        "lockrot/advisory": "PKSA-dwsq-ppd2-mb1x"
+                    },
+                    "properties": {
+                        "package": "symfony/polyfill-intl-idn",
+                        "version": "v1.37.0",
+                        "verdict": "low",
+                        "priority": "low",
+                        "lead": null,
+                        "score_total": 2,
+                        "score_text": "2 = vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": false,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "guzzlehttp/guzzle",
+                            "symfony/polyfill-intl-idn"
+                        ],
+                        "depth": 1,
+                        "direct_dependents": [
+                            "guzzlehttp/guzzle"
+                        ],
+                        "signal_ids": [
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": null,
+                            "installed_unmeasured": "undated",
+                            "release": {
+                                "version": "v1.43.0",
+                                "at": "2026-09-23T14:40:04+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v1.43.0",
+                                "at": "2026-09-23T14:40:04+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": null,
+                            "push_unmeasured": "allowlisted"
+                        },
+                        "advisory": "PKSA-dwsq-ppd2-mb1x",
+                        "cve": "CVE-2026-46644",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "1.x",
+                            "version": "v1.38.1",
+                            "newest": "v1.43.0",
+                            "on_installed_branch": true,
+                            "php": ">=7.2",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-dwsq-ppd2-mb1x",
+                            "severity": "low",
+                            "fix_kind": "update",
+                            "weight": 2,
+                            "multiplier": 1,
+                            "points": 2,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 98
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 5 findings fail it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 5,
+                            "failing": 5,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 5
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 5 findings fail it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 7,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 4,
+                            "records": 20
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

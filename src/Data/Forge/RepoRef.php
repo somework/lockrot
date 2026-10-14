@@ -19,7 +19,8 @@ final class RepoRef
     /** Every repository host, in the order that the report's notes name them. */
     public const FORGES = [self::GITHUB, self::GITLAB, self::BITBUCKET];
 
-    private const LABEL = [self::GITHUB => 'GitHub', self::GITLAB => 'GitLab', self::BITBUCKET => 'Bitbucket'];
+    /** tools/report/record records it as the forge words of the rendering bundle. */
+    public const LABEL = [self::GITHUB => 'GitHub', self::GITLAB => 'GitLab', self::BITBUCKET => 'Bitbucket'];
 
     /** GitLab and Bitbucket have no push date: the newest commit on any branch is the closest. */
     private const ACTIVITY = [self::GITHUB => 'last push', self::GITLAB => 'last commit', self::BITBUCKET => 'last commit'];

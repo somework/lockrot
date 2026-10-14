@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "fgrosse/phpasn1 v2.5.0 \u2014 finding high (16 = abandoned 32 \u00f7 2 unreached) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2022-12-19 (3.8 years ago); last push 2023-04-23 (3.4 years ago). Do: find a replacement (none named); lockrot found no path from your requirements to it: `composer why` names what requires it.",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "8800b8698ddc74eb9340520906dc1120a388972b726037b86513e856c4707f07",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

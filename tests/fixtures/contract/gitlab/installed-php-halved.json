@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "web-auth/metadata-service v2.1.7 \u2014 finding high (18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry, replacement: web-auth/webauthn-lib. Do: replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it. (via web-auth/webauthn-lib)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "be0884050ff494206cebcea74790c5ef740e50f479b6691900f08caf1e22235d",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "web-auth/metadata-service v2.1.7 \u2014 finding high (18 = (abandoned 32 + left-behind 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 left-behind: branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11). Do: replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it. (via web-auth/webauthn-lib)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "4a3d19b392682b897fb2ac24050baec2e818cbb1201fdc85f7f54895187cba4b",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

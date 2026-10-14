@@ -1,0 +1,34 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/left-behind",
+        "description": "league/flysystem 1.1.9 \u2014 finding medium (10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory]) \u2014 left-behind: branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02). Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it. (via mautic/core-lib)",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "minor",
+        "fingerprint": "7b034a78fcfc6bff32a628021b6e10e7e8d021d10bb308564c302aefe1751505",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "league/flysystem 1.1.9 \u2014 finding medium (10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 none fixed on 1.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter. Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it. (via mautic/core-lib)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "c8f735e3cddf9bc8bb5efa9ff25415642c08b69c6180f02176b9f7098d454539",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

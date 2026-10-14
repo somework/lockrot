@@ -1,0 +1,3211 @@
+[
+ {
+  "name": "EnvelopeSchema",
+  "pointer": "#/definitions/envelope/properties/schema",
+  "pointers": [
+   "#/definitions/envelope/properties/schema"
+  ],
+  "values": [
+   2
+  ],
+  "open": false,
+  "integer": true
+ },
+ {
+  "name": "Level",
+  "pointer": "#/definitions/level",
+  "pointers": [
+   "#/definitions/level"
+  ],
+  "values": [
+   "info",
+   "warn",
+   "high"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ForgeId",
+  "pointer": "#/definitions/forgeId",
+  "pointers": [
+   "#/definitions/forgeId"
+  ],
+  "values": [
+   "github",
+   "gitlab",
+   "bitbucket"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "MetadataFailureReason",
+  "pointer": "#/definitions/metadataFailureReason",
+  "pointers": [
+   "#/definitions/metadataFailureReason"
+  ],
+  "values": [
+   "offline",
+   "install_time_budget",
+   "no_versions",
+   "fetch_failed"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "RepositoryActivityNotCheckedReason",
+  "pointer": "#/definitions/repositoryActivityNotCheckedReason",
+  "pointers": [
+   "#/definitions/repositoryActivityNotCheckedReason"
+  ],
+  "values": [
+   "install_time_budget"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "OriginKind",
+  "pointer": "#/definitions/originKind",
+  "pointers": [
+   "#/definitions/originKind"
+  ],
+  "values": [
+   "packagist",
+   "composer",
+   "path",
+   "vcs",
+   "artifact",
+   "package",
+   "unknown"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "OriginRegistry",
+  "pointer": "#/definitions/originRegistry/oneOf/0",
+  "pointers": [
+   "#/definitions/originRegistry/oneOf/0",
+   "#/definitions/advisoryFeed/properties/registry/oneOf/0",
+   "#/definitions/advisoryRepository/properties/registry/oneOf/0"
+  ],
+  "values": [
+   "packagist.org",
+   "repo.packagist.com",
+   "wp-packages.org",
+   "packages.drupal.org"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "SignalId",
+  "pointer": "#/definitions/signalId",
+  "pointers": [
+   "#/definitions/signalId"
+  ],
+  "values": [
+   "S1",
+   "S2",
+   "S3",
+   "S4",
+   "S5",
+   "S6",
+   "S7",
+   "S8",
+   "S9",
+   "S10"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "AdvisoriesNotCheckedReason",
+  "pointer": "#/definitions/advisoriesNotCheckedReason",
+  "pointers": [
+   "#/definitions/advisoriesNotCheckedReason"
+  ],
+  "values": [
+   "offline",
+   "composer_too_old",
+   "install_time_budget",
+   "lookup_failed"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "Flag",
+  "pointer": "#/definitions/flag",
+  "pointers": [
+   "#/definitions/flag"
+  ],
+  "values": [
+   "abandoned",
+   "silent",
+   "pinned",
+   "left-behind",
+   "old-promise",
+   "stale",
+   "vulnerable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "MaintenanceFlag",
+  "pointer": "#/definitions/maintenanceFlag",
+  "pointers": [
+   "#/definitions/maintenanceFlag"
+  ],
+  "values": [
+   "abandoned",
+   "silent",
+   "pinned",
+   "left-behind",
+   "old-promise",
+   "stale"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "Verdict",
+  "pointer": "#/definitions/verdict",
+  "pointers": [
+   "#/definitions/verdict"
+  ],
+  "values": [
+   "critical",
+   "high",
+   "medium",
+   "low",
+   "unknown",
+   "finished",
+   "ok"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "Grade",
+  "pointer": "#/definitions/grade",
+  "pointers": [
+   "#/definitions/grade"
+  ],
+  "values": [
+   "critical",
+   "high",
+   "medium",
+   "low"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "Severity",
+  "pointer": "#/definitions/severity",
+  "pointers": [
+   "#/definitions/severity"
+  ],
+  "values": [
+   "critical",
+   "high",
+   "medium",
+   "unrated",
+   "low"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FixKind",
+  "pointer": "#/definitions/fixKind",
+  "pointers": [
+   "#/definitions/fixKind"
+  ],
+  "values": [
+   "update",
+   "upgrade",
+   "raise-php",
+   "unknown",
+   "blocked",
+   "none"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "FactKind",
+  "pointer": "#/definitions/factKind",
+  "pointers": [
+   "#/definitions/factKind"
+  ],
+  "values": [
+   "flag",
+   "advisory"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ClearedFactBasis",
+  "pointer": "#/definitions/clearedFact/properties/basis",
+  "pointers": [
+   "#/definitions/clearedFact/properties/basis"
+  ],
+  "values": [
+   "branch_releasing",
+   "released_after_ga",
+   "outside_range",
+   "tags_only"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "UnverifiedFactReason",
+  "pointer": "#/definitions/unverifiedFact/properties/reason",
+  "pointers": [
+   "#/definitions/unverifiedFact/properties/reason"
+  ],
+  "values": [
+   "undated",
+   "no_release_data"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "AddedFactBasis",
+  "pointer": "#/definitions/addedFact/properties/basis",
+  "pointers": [
+   "#/definitions/addedFact/properties/basis"
+  ],
+  "values": [
+   "released_before_ga",
+   "branch_not_releasing"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "FactBaselineState",
+  "pointer": "#/definitions/factBaseline/oneOf/0/properties/state",
+  "pointers": [
+   "#/definitions/factBaseline/oneOf/0/properties/state"
+  ],
+  "values": [
+   "known",
+   "covered",
+   "new",
+   "re_rated",
+   "fix_lost"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "HolderNextStepKind",
+  "pointer": "#/definitions/holder/oneOf/0/properties/next_step/oneOf/0/properties/kind",
+  "pointers": [
+   "#/definitions/holder/oneOf/0/properties/next_step/oneOf/0/properties/kind",
+   "#/definitions/move/properties/kind",
+   "#/definitions/alsoMove/properties/kind"
+  ],
+  "values": [
+   "replace",
+   "find-alternative",
+   "tag",
+   "require",
+   "update",
+   "raise-php",
+   "test",
+   "blocked",
+   "no-tag",
+   "no-move",
+   "no-fix",
+   "no-single-fix"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "HeldBySource",
+  "pointer": "#/definitions/heldBy/properties/source",
+  "pointers": [
+   "#/definitions/heldBy/properties/source"
+  ],
+  "values": [
+   "root",
+   "package"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "HeldByLink",
+  "pointer": "#/definitions/heldBy/properties/link",
+  "pointers": [
+   "#/definitions/heldBy/properties/link"
+  ],
+  "values": [
+   "require",
+   "require-dev",
+   "conflict"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "PhpCheckRaiseSize",
+  "pointer": "#/definitions/phpCheck/properties/raise_size/oneOf/0",
+  "pointers": [
+   "#/definitions/phpCheck/properties/raise_size/oneOf/0"
+  ],
+  "values": [
+   "major",
+   "minor",
+   "patch"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TermMaintenancePart",
+  "pointer": "#/definitions/termMaintenance/properties/part",
+  "pointers": [
+   "#/definitions/termMaintenance/properties/part"
+  ],
+  "values": [
+   "maintenance"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TermMaintenanceRole",
+  "pointer": "#/definitions/termMaintenance/properties/role",
+  "pointers": [
+   "#/definitions/termMaintenance/properties/role",
+   "#/definitions/ifCounted/properties/role"
+  ],
+  "values": [
+   "lead",
+   "corroborating"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "TermMaintenanceDivisor",
+  "pointer": "#/definitions/termMaintenance/properties/divisor",
+  "pointers": [
+   "#/definitions/termMaintenance/properties/divisor"
+  ],
+  "values": [
+   1,
+   4
+  ],
+  "open": true,
+  "integer": true
+ },
+ {
+  "name": "TermSecurityPart",
+  "pointer": "#/definitions/termSecurity/properties/part",
+  "pointers": [
+   "#/definitions/termSecurity/properties/part"
+  ],
+  "values": [
+   "security"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TermSecurityFlag",
+  "pointer": "#/definitions/termSecurity/properties/flag",
+  "pointers": [
+   "#/definitions/termSecurity/properties/flag"
+  ],
+  "values": [
+   "vulnerable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "TermSecurityRole",
+  "pointer": "#/definitions/termSecurity/properties/role",
+  "pointers": [
+   "#/definitions/termSecurity/properties/role"
+  ],
+  "values": [
+   "security"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "TermSecurityMultiplier",
+  "pointer": "#/definitions/termSecurity/properties/multiplier",
+  "pointers": [
+   "#/definitions/termSecurity/properties/multiplier"
+  ],
+  "values": [
+   1,
+   2
+  ],
+  "open": true,
+  "integer": true
+ },
+ {
+  "name": "ModifierReason",
+  "pointer": "#/definitions/modifier/properties/reason",
+  "pointers": [
+   "#/definitions/modifier/properties/reason"
+  ],
+  "values": [
+   "transitive",
+   "unreached",
+   "dev"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ModifierAppliesTo",
+  "pointer": "#/definitions/modifier/properties/applies_to",
+  "pointers": [
+   "#/definitions/modifier/properties/applies_to"
+  ],
+  "values": [
+   "maintenance",
+   "total"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ModifierDivideBy",
+  "pointer": "#/definitions/modifier/properties/divide_by",
+  "pointers": [
+   "#/definitions/modifier/properties/divide_by"
+  ],
+  "values": [
+   2
+  ],
+  "open": true,
+  "integer": true
+ },
+ {
+  "name": "PartMaintenanceStatus",
+  "pointer": "#/definitions/partMaintenance/properties/status",
+  "pointers": [
+   "#/definitions/partMaintenance/properties/status"
+  ],
+  "values": [
+   "counted",
+   "none",
+   "accepted",
+   "not_judged"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "PartSecurityStatus",
+  "pointer": "#/definitions/partSecurity/properties/status",
+  "pointers": [
+   "#/definitions/partSecurity/properties/status"
+  ],
+  "values": [
+   "counted",
+   "clear",
+   "unchecked"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "WithoutRowRemoveKind",
+  "pointer": "#/definitions/withoutRow/properties/remove/properties/kind",
+  "pointers": [
+   "#/definitions/withoutRow/properties/remove/properties/kind"
+  ],
+  "values": [
+   "flag",
+   "advisory"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "WithoutRowRevealedItemRole",
+  "pointer": "#/definitions/withoutRow/properties/revealed/items/properties/role",
+  "pointers": [
+   "#/definitions/withoutRow/properties/revealed/items/properties/role"
+  ],
+  "values": [
+   "lead",
+   "corroborating",
+   "accepted"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreGradedDecidedBy",
+  "pointer": "#/definitions/scoreGraded/properties/decided_by",
+  "pointers": [
+   "#/definitions/scoreGraded/properties/decided_by"
+  ],
+  "values": [
+   "maintenance",
+   "security",
+   "combination",
+   "either"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreZeroTotal",
+  "pointer": "#/definitions/scoreZero/properties/total",
+  "pointers": [
+   "#/definitions/scoreZero/properties/total"
+  ],
+  "values": [
+   0
+  ],
+  "open": false,
+  "integer": true
+ },
+ {
+  "name": "ScoreZeroExact",
+  "pointer": "#/definitions/scoreZero/properties/exact",
+  "pointers": [
+   "#/definitions/scoreZero/properties/exact"
+  ],
+  "values": [
+   0
+  ],
+  "open": false,
+  "integer": true
+ },
+ {
+  "name": "IfAppliedAssumesItem",
+  "pointer": "#/definitions/ifApplied/oneOf/0/properties/assumes/items",
+  "pointers": [
+   "#/definitions/ifApplied/oneOf/0/properties/assumes/items",
+   "#/definitions/branchFixes/properties/if_applied/oneOf/0/properties/assumes/items",
+   "#/definitions/securityVulnerable/properties/partial/oneOf/0/properties/if_applied/properties/assumes/items"
+  ],
+  "values": [
+   "clears_hold",
+   "composer_resolves",
+   "no_new_advisories"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "LatestRelation",
+  "pointer": "#/definitions/latest/oneOf/0/properties/relation/oneOf/0",
+  "pointers": [
+   "#/definitions/latest/oneOf/0/properties/relation/oneOf/0",
+   "#/definitions/s6/properties/tag_relation/oneOf/0"
+  ],
+  "values": [
+   "older",
+   "newer",
+   "same"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ReplacementNamedBy",
+  "pointer": "#/definitions/replacement/oneOf/0/properties/named_by",
+  "pointers": [
+   "#/definitions/replacement/oneOf/0/properties/named_by"
+  ],
+  "values": [
+   "repository",
+   "lock"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ThroughEntryNewestRequiresUnmeasured",
+  "pointer": "#/definitions/throughEntry/properties/newest_requires_unmeasured/oneOf/0",
+  "pointers": [
+   "#/definitions/throughEntry/properties/newest_requires_unmeasured/oneOf/0"
+  ],
+  "values": [
+   "not_from_composer_repository",
+   "releases_unknown",
+   "installed_unlisted",
+   "through_other_package",
+   "no_stable_release"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "MoveReason",
+  "pointer": "#/definitions/move/properties/reason/oneOf/0",
+  "pointers": [
+   "#/definitions/move/properties/reason/oneOf/0",
+   "#/definitions/alsoMove/properties/reason/oneOf/0"
+  ],
+  "values": [
+   "package_quiet",
+   "no_higher_release",
+   "higher_undated",
+   "releases_unknown",
+   "affected_range_unknown",
+   "metadata_not_read",
+   "local_package"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "MoveComposerMovesBecauseItem",
+  "pointer": "#/definitions/move/properties/composer_moves_because/items",
+  "pointers": [
+   "#/definitions/move/properties/composer_moves_because/items",
+   "#/definitions/alsoMove/properties/composer_moves_because/items"
+  ],
+  "values": [
+   "holders",
+   "crosses_major",
+   "transitive",
+   "unreached"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "IgnoredAdvisoryBy",
+  "pointer": "#/definitions/ignoredAdvisory/properties/by",
+  "pointers": [
+   "#/definitions/ignoredAdvisory/properties/by"
+  ],
+  "values": [
+   "policy.advisories",
+   "audit.ignore",
+   "audit.ignore-severity"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "IgnoredAdvisoryMatched",
+  "pointer": "#/definitions/ignoredAdvisory/properties/matched",
+  "pointers": [
+   "#/definitions/ignoredAdvisory/properties/matched"
+  ],
+  "values": [
+   "id",
+   "cve",
+   "remote_id",
+   "package",
+   "severity"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "SecurityVulnerableStatus",
+  "pointer": "#/definitions/securityVulnerable/properties/status",
+  "pointers": [
+   "#/definitions/securityVulnerable/properties/status"
+  ],
+  "values": [
+   "vulnerable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SecurityVulnerableCheck",
+  "pointer": "#/definitions/securityVulnerable/properties/check",
+  "pointers": [
+   "#/definitions/securityVulnerable/properties/check"
+  ],
+  "values": [
+   "complete",
+   "partial"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "SecurityVulnerableUncheckedReason",
+  "pointer": "#/definitions/securityVulnerable/properties/unchecked_reason/oneOf/0",
+  "pointers": [
+   "#/definitions/securityVulnerable/properties/unchecked_reason/oneOf/0"
+  ],
+  "values": [
+   "install_time_budget",
+   "lookup_failed"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "SecurityVulnerableMoveIn",
+  "pointer": "#/definitions/securityVulnerable/properties/move_in/oneOf/0",
+  "pointers": [
+   "#/definitions/securityVulnerable/properties/move_in/oneOf/0"
+  ],
+  "values": [
+   "next_step",
+   "also"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SecurityVulnerablePartialClearsAll",
+  "pointer": "#/definitions/securityVulnerable/properties/partial/oneOf/0/properties/clears_all",
+  "pointers": [
+   "#/definitions/securityVulnerable/properties/partial/oneOf/0/properties/clears_all"
+  ],
+  "values": [
+   false
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SecurityClearStatus",
+  "pointer": "#/definitions/securityClear/properties/status",
+  "pointers": [
+   "#/definitions/securityClear/properties/status"
+  ],
+  "values": [
+   "clear"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SecurityClearCheck",
+  "pointer": "#/definitions/securityClear/properties/check",
+  "pointers": [
+   "#/definitions/securityClear/properties/check"
+  ],
+  "values": [
+   "complete"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SecurityClearComplete",
+  "pointer": "#/definitions/securityClear/properties/complete",
+  "pointers": [
+   "#/definitions/securityClear/properties/complete"
+  ],
+  "values": [
+   true
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SecurityUncheckedStatus",
+  "pointer": "#/definitions/securityUnchecked/properties/status",
+  "pointers": [
+   "#/definitions/securityUnchecked/properties/status"
+  ],
+  "values": [
+   "unchecked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SecurityUncheckedCheck",
+  "pointer": "#/definitions/securityUnchecked/properties/check",
+  "pointers": [
+   "#/definitions/securityUnchecked/properties/check"
+  ],
+  "values": [
+   "partial",
+   "not_run"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "SecurityUncheckedUncheckedReason",
+  "pointer": "#/definitions/securityUnchecked/properties/unchecked_reason/oneOf/0",
+  "pointers": [
+   "#/definitions/securityUnchecked/properties/unchecked_reason/oneOf/0"
+  ],
+  "values": [
+   "offline",
+   "composer_too_old",
+   "install_time_budget",
+   "lookup_failed",
+   "not_from_composer_repository",
+   "unparseable_version",
+   "no_feed"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "HeadlineUnit",
+  "pointer": "#/definitions/headline/properties/unit",
+  "pointers": [
+   "#/definitions/headline/properties/unit"
+  ],
+  "values": [
+   "years",
+   "php",
+   "reason",
+   "advisories"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "HeadlineSource",
+  "pointer": "#/definitions/headline/properties/source/oneOf/0",
+  "pointers": [
+   "#/definitions/headline/properties/source/oneOf/0",
+   "#/definitions/headline/anyOf/0/properties/source/oneOf/0",
+   "#/definitions/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/headline/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/headline/anyOf/2/properties/source/oneOf/0",
+   "#/definitions/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/2/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/0/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/2/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/0/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/2/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/3/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/0/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/0/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/1/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/source/oneOf/0",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/3/properties/source/oneOf/0"
+  ],
+  "values": [
+   "release",
+   "push",
+   "branch"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "HeadlineUnit2",
+  "pointer": "#/definitions/headline/anyOf/0/properties/unit",
+  "pointers": [
+   "#/definitions/headline/anyOf/0/properties/unit",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/properties/unit",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/0/properties/unit",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/0/properties/unit",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/0/properties/unit",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/0/properties/unit",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/0/properties/unit"
+  ],
+  "values": [
+   "years"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "HeadlineUnit3",
+  "pointer": "#/definitions/headline/anyOf/1/properties/unit",
+  "pointers": [
+   "#/definitions/headline/anyOf/1/properties/unit",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/1/properties/unit",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/1/properties/unit",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/1/properties/unit",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/1/properties/unit",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/1/properties/unit",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/1/properties/unit"
+  ],
+  "values": [
+   "php"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "HeadlineUnit4",
+  "pointer": "#/definitions/headline/anyOf/2/properties/unit",
+  "pointers": [
+   "#/definitions/headline/anyOf/2/properties/unit",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/2/properties/unit",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/2/properties/unit",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/2/properties/unit",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/2/properties/unit",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/2/properties/unit",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/unit"
+  ],
+  "values": [
+   "reason"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "HeadlineValue",
+  "pointer": "#/definitions/headline/anyOf/2/properties/value",
+  "pointers": [
+   "#/definitions/headline/anyOf/2/properties/value",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/2/properties/value",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/2/properties/value",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/2/properties/value",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/2/properties/value",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/2/properties/value"
+  ],
+  "values": [
+   "archived",
+   "marked",
+   "branch_snapshot",
+   "no_stable_release"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "HeadlineUnit5",
+  "pointer": "#/definitions/headline/anyOf/3/properties/unit",
+  "pointers": [
+   "#/definitions/headline/anyOf/3/properties/unit",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/3/properties/unit",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/3/properties/unit",
+   "#/definitions/findingFlag/anyOf/2/properties/headline/anyOf/3/properties/unit",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/3/properties/unit",
+   "#/definitions/findingFlag/anyOf/4/properties/headline/anyOf/3/properties/unit",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/properties/unit",
+   "#/definitions/findingFlag/anyOf/5/properties/headline/anyOf/3/properties/unit"
+  ],
+  "values": [
+   "advisories"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "DegreeAbandonedReasonsItem",
+  "pointer": "#/definitions/degreeAbandoned/properties/reasons/items",
+  "pointers": [
+   "#/definitions/degreeAbandoned/properties/reasons/items"
+  ],
+  "values": [
+   "marked",
+   "archived"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagRole",
+  "pointer": "#/definitions/findingFlag/properties/role",
+  "pointers": [
+   "#/definitions/findingFlag/properties/role"
+  ],
+  "values": [
+   "lead",
+   "corroborating",
+   "security",
+   "accepted"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagId",
+  "pointer": "#/definitions/findingFlag/anyOf/0/properties/id",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/0/properties/id"
+  ],
+  "values": [
+   "abandoned"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagHeadlineValue",
+  "pointer": "#/definitions/findingFlag/anyOf/0/properties/headline/properties/value",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/0/properties/headline/properties/value",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/properties/value",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/0/anyOf/0/properties/value",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/1/properties/value",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/2/properties/value",
+   "#/definitions/findingFlag/anyOf/0/properties/headline/anyOf/3/properties/value"
+  ],
+  "values": [
+   "archived",
+   "marked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagId2",
+  "pointer": "#/definitions/findingFlag/anyOf/1/properties/id",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/1/properties/id"
+  ],
+  "values": [
+   "silent",
+   "stale"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagHeadlineSource",
+  "pointer": "#/definitions/findingFlag/anyOf/1/properties/headline/properties/source",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/1/properties/headline/properties/source",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/0/properties/source",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/0/anyOf/1/properties/source",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/1/properties/source",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/2/properties/source",
+   "#/definitions/findingFlag/anyOf/1/properties/headline/anyOf/3/properties/source"
+  ],
+  "values": [
+   "release",
+   "push",
+   null
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagId3",
+  "pointer": "#/definitions/findingFlag/anyOf/2/properties/id",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/2/properties/id"
+  ],
+  "values": [
+   "pinned"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagId4",
+  "pointer": "#/definitions/findingFlag/anyOf/3/properties/id",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/3/properties/id"
+  ],
+  "values": [
+   "left-behind"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagHeadlineSource2",
+  "pointer": "#/definitions/findingFlag/anyOf/3/properties/headline/properties/source",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/3/properties/headline/properties/source",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/0/properties/source",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/0/anyOf/1/properties/source",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/1/properties/source",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/2/properties/source",
+   "#/definitions/findingFlag/anyOf/3/properties/headline/anyOf/3/properties/source"
+  ],
+  "values": [
+   "branch"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagId5",
+  "pointer": "#/definitions/findingFlag/anyOf/4/properties/id",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/4/properties/id"
+  ],
+  "values": [
+   "old-promise"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingFlagId6",
+  "pointer": "#/definitions/findingFlag/anyOf/5/properties/id",
+  "pointers": [
+   "#/definitions/findingFlag/anyOf/5/properties/id"
+  ],
+  "values": [
+   "vulnerable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "CheckMissingCheck",
+  "pointer": "#/definitions/checkMissing/properties/check",
+  "pointers": [
+   "#/definitions/checkMissing/properties/check"
+  ],
+  "values": [
+   "repository_activity",
+   "release_dates",
+   "advisories",
+   "releases",
+   "release_metadata"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "CheckMissingReason",
+  "pointer": "#/definitions/checkMissing/properties/reason",
+  "pointers": [
+   "#/definitions/checkMissing/properties/reason"
+  ],
+  "values": [
+   "no_token",
+   "anonymous_budget",
+   "install_time_budget",
+   "rate_limit",
+   "fetch_failed",
+   "offline",
+   "undated_releases",
+   "releases_unknown",
+   "composer_too_old",
+   "lookup_failed",
+   "host_not_supported",
+   "no_feed",
+   "not_from_composer_repository"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "CheckSkippedCheck",
+  "pointer": "#/definitions/checkSkipped/properties/check",
+  "pointers": [
+   "#/definitions/checkSkipped/properties/check"
+  ],
+  "values": [
+   "repository_activity",
+   "release_metadata",
+   "advisories",
+   "release_branch",
+   "repository_archived"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "CheckSkippedReason",
+  "pointer": "#/definitions/checkSkipped/properties/reason",
+  "pointers": [
+   "#/definitions/checkSkipped/properties/reason"
+  ],
+  "values": [
+   "allowlisted",
+   "no_repository",
+   "not_from_composer_repository",
+   "offline",
+   "rate_limit",
+   "fetch_failed",
+   "anonymous_budget",
+   "install_time_budget",
+   "no_token",
+   "unavailable",
+   "not_found",
+   "branch_snapshot",
+   "host_not_supported",
+   "repository_not_found",
+   "unparseable_version",
+   "accepted_by_config"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "UncheckedAcceptedCheck",
+  "pointer": "#/definitions/uncheckedAccepted/properties/check",
+  "pointers": [
+   "#/definitions/uncheckedAccepted/properties/check"
+  ],
+  "values": [
+   "repository_activity",
+   "release_metadata",
+   "advisories"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "UncheckedAcceptedReason",
+  "pointer": "#/definitions/uncheckedAccepted/properties/reason",
+  "pointers": [
+   "#/definitions/uncheckedAccepted/properties/reason"
+  ],
+  "values": [
+   "host_not_supported",
+   "no_feed",
+   "not_from_composer_repository"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "UncheckedAcceptedAcceptedByScope",
+  "pointer": "#/definitions/uncheckedAccepted/properties/accepted_by/properties/scope",
+  "pointers": [
+   "#/definitions/uncheckedAccepted/properties/accepted_by/properties/scope"
+  ],
+  "values": [
+   "host",
+   "repository",
+   "package"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AllowlistBy",
+  "pointer": "#/definitions/allowlist/oneOf/0/properties/by",
+  "pointers": [
+   "#/definitions/allowlist/oneOf/0/properties/by"
+  ],
+  "values": [
+   "builtin",
+   "project",
+   "type"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AllowlistReasonId",
+  "pointer": "#/definitions/allowlist/oneOf/0/properties/reason_id/oneOf/0",
+  "pointers": [
+   "#/definitions/allowlist/oneOf/0/properties/reason_id/oneOf/0"
+  ],
+  "values": [
+   "php-fig-interfaces",
+   "php-fig-utilities",
+   "symfony-polyfills",
+   "symfony-extension-polyfills",
+   "symfony-packs",
+   "getallheaders-polyfill",
+   "random-compat-empty",
+   "type-metapackage",
+   "type-symfony-pack"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "AllowlistReasonBy",
+  "pointer": "#/definitions/allowlist/oneOf/0/properties/reason_by",
+  "pointers": [
+   "#/definitions/allowlist/oneOf/0/properties/reason_by"
+  ],
+  "values": [
+   "user",
+   "lockrot"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "MetadataStatus",
+  "pointer": "#/definitions/metadata/properties/status",
+  "pointers": [
+   "#/definitions/metadata/properties/status"
+  ],
+  "values": [
+   "read",
+   "not_from_composer_repository",
+   "unavailable",
+   "not_found"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingBaselineStatus",
+  "pointer": "#/definitions/findingBaseline/oneOf/0/properties/status",
+  "pointers": [
+   "#/definitions/findingBaseline/oneOf/0/properties/status"
+  ],
+  "values": [
+   "known",
+   "new",
+   "worsened"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingBaselineWorsenedByItemWhy",
+  "pointer": "#/definitions/findingBaseline/oneOf/0/properties/worsened_by/items/properties/why",
+  "pointers": [
+   "#/definitions/findingBaseline/oneOf/0/properties/worsened_by/items/properties/why"
+  ],
+  "values": [
+   "new",
+   "re_rated",
+   "fix_lost"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "GateFactKind",
+  "pointer": "#/definitions/gateFact/properties/kind",
+  "pointers": [
+   "#/definitions/gateFact/properties/kind"
+  ],
+  "values": [
+   "flag",
+   "advisory",
+   "signal"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "FindingGateExemptBy",
+  "pointer": "#/definitions/findingGate/properties/exempt_by/oneOf/0",
+  "pointers": [
+   "#/definitions/findingGate/properties/exempt_by/oneOf/0"
+  ],
+  "values": [
+   "baseline"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "FindingGateByItemKind",
+  "pointer": "#/definitions/findingGate/properties/by/items/properties/kind",
+  "pointers": [
+   "#/definitions/findingGate/properties/by/items/properties/kind",
+   "#/definitions/gateValue/properties/kind"
+  ],
+  "values": [
+   "grade",
+   "flag",
+   "vulnerable",
+   "unchecked"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "FindingGateBasisLimitedBy",
+  "pointer": "#/definitions/findingGate/properties/basis/oneOf/0/properties/limited_by",
+  "pointers": [
+   "#/definitions/findingGate/properties/basis/oneOf/0/properties/limited_by"
+  ],
+  "values": [
+   "score",
+   "cap",
+   "equal"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "S1MarkedBy",
+  "pointer": "#/definitions/s1/properties/marked_by",
+  "pointers": [
+   "#/definitions/s1/properties/marked_by"
+  ],
+  "values": [
+   "repository",
+   "lock"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "S3Forge",
+  "pointer": "#/definitions/s3/properties/forge",
+  "pointers": [
+   "#/definitions/s3/properties/forge",
+   "#/definitions/s4/properties/forge"
+  ],
+  "values": [
+   "github",
+   "gitlab",
+   "bitbucket"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "S6Reason",
+  "pointer": "#/definitions/s6/properties/reason",
+  "pointers": [
+   "#/definitions/s6/properties/reason"
+  ],
+  "values": [
+   "branch_snapshot",
+   "no_stable_release"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "S8FloorSource",
+  "pointer": "#/definitions/s8/properties/floor_source/oneOf/0",
+  "pointers": [
+   "#/definitions/s8/properties/floor_source/oneOf/0"
+  ],
+  "values": [
+   "project",
+   "target"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "S9fixReason",
+  "pointer": "#/definitions/s9fix/properties/reason/oneOf/0",
+  "pointers": [
+   "#/definitions/s9fix/properties/reason/oneOf/0"
+  ],
+  "values": [
+   "releases_unknown",
+   "affected_range_unknown",
+   "not_from_composer_repository",
+   "no_release_outside_range"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "S9rowCounted",
+  "pointer": "#/definitions/s9row/properties/counted",
+  "pointers": [
+   "#/definitions/s9row/properties/counted"
+  ],
+  "values": [
+   true
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId2",
+  "pointer": "#/definitions/signal/anyOf/0/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/0/properties/id"
+  ],
+  "values": [
+   "S1"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId3",
+  "pointer": "#/definitions/signal/anyOf/1/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/1/properties/id"
+  ],
+  "values": [
+   "S2"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId4",
+  "pointer": "#/definitions/signal/anyOf/2/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/2/properties/id"
+  ],
+  "values": [
+   "S3"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId5",
+  "pointer": "#/definitions/signal/anyOf/3/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/3/properties/id"
+  ],
+  "values": [
+   "S4"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId6",
+  "pointer": "#/definitions/signal/anyOf/4/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/4/properties/id"
+  ],
+  "values": [
+   "S5"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId7",
+  "pointer": "#/definitions/signal/anyOf/5/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/5/properties/id"
+  ],
+  "values": [
+   "S6"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId8",
+  "pointer": "#/definitions/signal/anyOf/6/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/6/properties/id"
+  ],
+  "values": [
+   "S7"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId9",
+  "pointer": "#/definitions/signal/anyOf/7/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/7/properties/id"
+  ],
+  "values": [
+   "S8"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId10",
+  "pointer": "#/definitions/signal/anyOf/8/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/8/properties/id"
+  ],
+  "values": [
+   "S9"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "SignalId11",
+  "pointer": "#/definitions/signal/anyOf/9/properties/id",
+  "pointers": [
+   "#/definitions/signal/anyOf/9/properties/id"
+  ],
+  "values": [
+   "S10"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ActivityEvent",
+  "pointer": "#/definitions/activityEvent",
+  "pointers": [
+   "#/definitions/activityEvent"
+  ],
+  "values": [
+   "push",
+   "commit"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ActivityReason",
+  "pointer": "#/definitions/activityReason",
+  "pointers": [
+   "#/definitions/activityReason"
+  ],
+  "values": [
+   "allowlisted",
+   "not_from_composer_repository",
+   "no_repository",
+   "host_not_supported",
+   "repository_not_found",
+   "offline",
+   "install_time_budget",
+   "no_token",
+   "anonymous_budget",
+   "rate_limit",
+   "fetch_failed"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ActivityStatus",
+  "pointer": "#/definitions/activity/properties/status",
+  "pointers": [
+   "#/definitions/activity/properties/status"
+  ],
+  "values": [
+   "read",
+   "not_found",
+   "not_read"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ActivityStatus2",
+  "pointer": "#/definitions/activity/anyOf/0/properties/status",
+  "pointers": [
+   "#/definitions/activity/anyOf/0/properties/status"
+  ],
+  "values": [
+   "read"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ActivityStatus3",
+  "pointer": "#/definitions/activity/anyOf/1/properties/status",
+  "pointers": [
+   "#/definitions/activity/anyOf/1/properties/status"
+  ],
+  "values": [
+   "not_found"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ActivityReason2",
+  "pointer": "#/definitions/activity/anyOf/1/properties/reason",
+  "pointers": [
+   "#/definitions/activity/anyOf/1/properties/reason"
+  ],
+  "values": [
+   "repository_not_found"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ActivityStatus4",
+  "pointer": "#/definitions/activity/anyOf/2/properties/status",
+  "pointers": [
+   "#/definitions/activity/anyOf/2/properties/status"
+  ],
+  "values": [
+   "not_read"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "InstalledUnmeasured",
+  "pointer": "#/definitions/installedUnmeasured",
+  "pointers": [
+   "#/definitions/installedUnmeasured"
+  ],
+  "values": [
+   "branch_snapshot",
+   "shared_commit",
+   "undated"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ReleaseUnmeasured",
+  "pointer": "#/definitions/releaseUnmeasured",
+  "pointers": [
+   "#/definitions/releaseUnmeasured"
+  ],
+  "values": [
+   "not_from_composer_repository",
+   "unavailable",
+   "not_found",
+   "no_stable_release",
+   "undated_releases"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "BranchReleaseUnmeasured",
+  "pointer": "#/definitions/branchReleaseUnmeasured",
+  "pointers": [
+   "#/definitions/branchReleaseUnmeasured"
+  ],
+  "values": [
+   "not_from_composer_repository",
+   "unavailable",
+   "not_found",
+   "branch_snapshot",
+   "no_branch_row",
+   "undated_releases",
+   "above_listed_releases"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "PushUnmeasured",
+  "pointer": "#/definitions/pushUnmeasured",
+  "pointers": [
+   "#/definitions/pushUnmeasured"
+  ],
+  "values": [
+   "allowlisted",
+   "not_from_composer_repository",
+   "no_repository",
+   "host_not_supported",
+   "repository_not_found",
+   "offline",
+   "install_time_budget",
+   "no_token",
+   "anonymous_budget",
+   "rate_limit",
+   "fetch_failed",
+   "undated"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "LibyearsUnmeasured",
+  "pointer": "#/definitions/libyearsUnmeasured",
+  "pointers": [
+   "#/definitions/libyearsUnmeasured"
+  ],
+  "values": [
+   "not_from_composer_repository",
+   "unavailable",
+   "not_found",
+   "branch_snapshot",
+   "shared_commit",
+   "undated",
+   "no_stable_release",
+   "undated_releases"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "DepthUnmeasured",
+  "pointer": "#/definitions/depthUnmeasured",
+  "pointers": [
+   "#/definitions/depthUnmeasured"
+  ],
+  "values": [
+   "unreached",
+   "no_composer_json"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "AgeLevel",
+  "pointer": "#/definitions/ageLevel/oneOf/0",
+  "pointers": [
+   "#/definitions/ageLevel/oneOf/0"
+  ],
+  "values": [
+   "warn",
+   "high"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AbandonedIgnoredBy",
+  "pointer": "#/definitions/abandonedIgnored/oneOf/0/properties/by",
+  "pointers": [
+   "#/definitions/abandonedIgnored/oneOf/0/properties/by",
+   "#/definitions/noteAbandonedMarkingsIgnored/properties/by"
+  ],
+  "values": [
+   "policy.abandoned",
+   "audit.ignore-abandoned"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ComposerJsonSection",
+  "pointer": "#/definitions/composerJsonSection",
+  "pointers": [
+   "#/definitions/composerJsonSection"
+  ],
+  "values": [
+   "require",
+   "require-dev"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryFeedAnswer",
+  "pointer": "#/definitions/advisoryFeed/properties/answer",
+  "pointers": [
+   "#/definitions/advisoryFeed/properties/answer"
+  ],
+  "values": [
+   "answered",
+   "failed",
+   "not_asked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryFeedReason",
+  "pointer": "#/definitions/advisoryFeed/properties/reason/oneOf/0",
+  "pointers": [
+   "#/definitions/advisoryFeed/properties/reason/oneOf/0",
+   "#/definitions/advisoryFeed/anyOf/0/properties/reason/oneOf/0",
+   "#/definitions/advisoryFeed/anyOf/1/properties/reason/oneOf/0"
+  ],
+  "values": [
+   "lookup_failed",
+   "not_from_composer_repository"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryFeedAnswer2",
+  "pointer": "#/definitions/advisoryFeed/anyOf/0/properties/answer",
+  "pointers": [
+   "#/definitions/advisoryFeed/anyOf/0/properties/answer"
+  ],
+  "values": [
+   "answered"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryFeedAnswer3",
+  "pointer": "#/definitions/advisoryFeed/anyOf/1/properties/answer",
+  "pointers": [
+   "#/definitions/advisoryFeed/anyOf/1/properties/answer"
+  ],
+  "values": [
+   "failed",
+   "not_asked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryRepositoryOutcome",
+  "pointer": "#/definitions/advisoryRepository/properties/outcome",
+  "pointers": [
+   "#/definitions/advisoryRepository/properties/outcome"
+  ],
+  "values": [
+   "answered",
+   "failed",
+   "not_asked",
+   "no_feed"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryRepositoryReason",
+  "pointer": "#/definitions/advisoryRepository/properties/reason/oneOf/0",
+  "pointers": [
+   "#/definitions/advisoryRepository/properties/reason/oneOf/0",
+   "#/definitions/advisoryRepository/anyOf/0/properties/reason/oneOf/0",
+   "#/definitions/advisoryRepository/anyOf/1/properties/reason/oneOf/0",
+   "#/definitions/advisoryRepository/anyOf/2/properties/reason/oneOf/0",
+   "#/definitions/advisoryRepository/anyOf/3/properties/reason/oneOf/0"
+  ],
+  "values": [
+   "offline",
+   "composer_too_old",
+   "install_time_budget",
+   "not_from_composer_repository",
+   "transport",
+   "invalid_response"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryRepositoryOutcome2",
+  "pointer": "#/definitions/advisoryRepository/anyOf/0/properties/outcome",
+  "pointers": [
+   "#/definitions/advisoryRepository/anyOf/0/properties/outcome"
+  ],
+  "values": [
+   "answered"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryRepositoryOutcome3",
+  "pointer": "#/definitions/advisoryRepository/anyOf/1/properties/outcome",
+  "pointers": [
+   "#/definitions/advisoryRepository/anyOf/1/properties/outcome"
+  ],
+  "values": [
+   "no_feed"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryRepositoryOutcome4",
+  "pointer": "#/definitions/advisoryRepository/anyOf/2/properties/outcome",
+  "pointers": [
+   "#/definitions/advisoryRepository/anyOf/2/properties/outcome"
+  ],
+  "values": [
+   "failed"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryRepositoryOutcome5",
+  "pointer": "#/definitions/advisoryRepository/anyOf/3/properties/outcome",
+  "pointers": [
+   "#/definitions/advisoryRepository/anyOf/3/properties/outcome"
+  ],
+  "values": [
+   "not_asked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryLookupScope",
+  "pointer": "#/definitions/advisoryLookup/properties/scope",
+  "pointers": [
+   "#/definitions/advisoryLookup/properties/scope"
+  ],
+  "values": [
+   "all",
+   "composer-repositories"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "AdvisoryLookupScopeSource",
+  "pointer": "#/definitions/advisoryLookup/properties/scope_source",
+  "pointers": [
+   "#/definitions/advisoryLookup/properties/scope_source"
+  ],
+  "values": [
+   "config",
+   "default"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingPriority",
+  "pointer": "#/definitions/finding/properties/priority",
+  "pointers": [
+   "#/definitions/finding/properties/priority"
+  ],
+  "values": [
+   "critical",
+   "high",
+   "medium",
+   "low",
+   "none"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "FindingReach",
+  "pointer": "#/definitions/finding/properties/reach",
+  "pointers": [
+   "#/definitions/finding/properties/reach"
+  ],
+  "values": [
+   "direct",
+   "transitive",
+   "unreached"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleId",
+  "pointer": "#/definitions/scoreRule/properties/id",
+  "pointers": [
+   "#/definitions/scoreRule/properties/id"
+  ],
+  "values": [
+   "counted",
+   "lead-first",
+   "corroborating-share",
+   "advisory-points",
+   "no-reachable-fix-multiplier",
+   "security-max",
+   "divide-reach",
+   "security-exempt-from-reach",
+   "sum",
+   "divide-dev",
+   "floor-once",
+   "band-floors",
+   "zero-verdicts",
+   "sort",
+   "gate-bounded-new",
+   "baseline-cover"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind",
+  "pointer": "#/definitions/scoreRule/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/properties/kind"
+  ],
+  "values": [
+   "select",
+   "share",
+   "lookup",
+   "multiply",
+   "max",
+   "divide",
+   "exempt",
+   "combine",
+   "floor",
+   "band",
+   "zero",
+   "order",
+   "gate",
+   "cover"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleAppliesTo",
+  "pointer": "#/definitions/scoreRule/properties/applies_to",
+  "pointers": [
+   "#/definitions/scoreRule/properties/applies_to"
+  ],
+  "values": [
+   "flags",
+   "maintenance",
+   "security",
+   "advisory",
+   "total",
+   "findings",
+   "gate"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleWhy",
+  "pointer": "#/definitions/scoreRule/properties/why",
+  "pointers": [
+   "#/definitions/scoreRule/properties/why"
+  ],
+  "values": [
+   "accepted-facts-shown-not-counted",
+   "strongest-fact-in-full",
+   "correlated-evidence",
+   "severity-points",
+   "one-band-up",
+   "one-number-per-part",
+   "reach-halves-maintenance",
+   "exploitability-independent-of-reach",
+   "parts-add",
+   "dev-halves-total",
+   "two-floor-parts-make-next",
+   "integer-band-edges",
+   "score-zero-says-why",
+   "advisory-findings-first",
+   "new-fact-sets-level",
+   "recorded-lead-covers-below"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleOrder",
+  "pointer": "#/definitions/scoreRule/properties/order",
+  "pointers": [
+   "#/definitions/scoreRule/properties/order"
+  ],
+  "values": [
+   "flag_order"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleTable",
+  "pointer": "#/definitions/scoreRule/properties/table",
+  "pointers": [
+   "#/definitions/scoreRule/properties/table"
+  ],
+  "values": [
+   "severities",
+   "zero_verdicts"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleOf",
+  "pointer": "#/definitions/scoreRule/properties/of",
+  "pointers": [
+   "#/definitions/scoreRule/properties/of"
+  ],
+  "values": [
+   "counted",
+   "lead-first",
+   "corroborating-share",
+   "advisory-points",
+   "no-reachable-fix-multiplier",
+   "security-max",
+   "divide-reach",
+   "security-exempt-from-reach",
+   "sum",
+   "divide-dev",
+   "floor-once",
+   "band-floors",
+   "zero-verdicts",
+   "sort",
+   "gate-bounded-new",
+   "baseline-cover"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleOp",
+  "pointer": "#/definitions/scoreRule/properties/op",
+  "pointers": [
+   "#/definitions/scoreRule/properties/op"
+  ],
+  "values": [
+   "sum"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleCovers",
+  "pointer": "#/definitions/scoreRule/properties/covers",
+  "pointers": [
+   "#/definitions/scoreRule/properties/covers"
+  ],
+  "values": [
+   "listed_and_below"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleAcceptGroup",
+  "pointer": "#/definitions/scoreRule/properties/accept_group",
+  "pointers": [
+   "#/definitions/scoreRule/properties/accept_group"
+  ],
+  "values": [
+   "liveness"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleAcceptCovers",
+  "pointer": "#/definitions/scoreRule/properties/accept_covers",
+  "pointers": [
+   "#/definitions/scoreRule/properties/accept_covers"
+  ],
+  "values": [
+   "listed_and_below"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind2",
+  "pointer": "#/definitions/scoreRule/anyOf/0/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/0/properties/kind"
+  ],
+  "values": [
+   "select"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleTieBreakItemKey",
+  "pointer": "#/definitions/scoreRule/properties/tie_break/items/properties/key",
+  "pointers": [
+   "#/definitions/scoreRule/properties/tie_break/items/properties/key"
+  ],
+  "values": [
+   "points",
+   "severity",
+   "id"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleTieBreakItemDir",
+  "pointer": "#/definitions/scoreRule/properties/tie_break/items/properties/dir",
+  "pointers": [
+   "#/definitions/scoreRule/properties/tie_break/items/properties/dir"
+  ],
+  "values": [
+   "desc",
+   "order",
+   "asc"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleTieBreakItemCollation",
+  "pointer": "#/definitions/scoreRule/properties/tie_break/items/properties/collation/oneOf/0",
+  "pointers": [
+   "#/definitions/scoreRule/properties/tie_break/items/properties/collation/oneOf/0",
+   "#/definitions/scoreModel/properties/sort/items/properties/collation/oneOf/0"
+  ],
+  "values": [
+   "bytes"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleWhenItem",
+  "pointer": "#/definitions/scoreRule/properties/when/items",
+  "pointers": [
+   "#/definitions/scoreRule/properties/when/items"
+  ],
+  "values": [
+   "transitive",
+   "unreached",
+   "dev"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind3",
+  "pointer": "#/definitions/scoreRule/anyOf/1/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/1/properties/kind"
+  ],
+  "values": [
+   "share"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind4",
+  "pointer": "#/definitions/scoreRule/anyOf/2/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/2/properties/kind"
+  ],
+  "values": [
+   "lookup"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind5",
+  "pointer": "#/definitions/scoreRule/anyOf/3/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/3/properties/kind"
+  ],
+  "values": [
+   "multiply"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind6",
+  "pointer": "#/definitions/scoreRule/anyOf/4/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/4/properties/kind"
+  ],
+  "values": [
+   "max"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind7",
+  "pointer": "#/definitions/scoreRule/anyOf/5/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/5/properties/kind"
+  ],
+  "values": [
+   "divide"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind8",
+  "pointer": "#/definitions/scoreRule/anyOf/6/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/6/properties/kind"
+  ],
+  "values": [
+   "exempt"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind9",
+  "pointer": "#/definitions/scoreRule/anyOf/7/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/7/properties/kind"
+  ],
+  "values": [
+   "combine"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind10",
+  "pointer": "#/definitions/scoreRule/anyOf/8/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/8/properties/kind"
+  ],
+  "values": [
+   "floor"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind11",
+  "pointer": "#/definitions/scoreRule/anyOf/9/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/9/properties/kind"
+  ],
+  "values": [
+   "band"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind12",
+  "pointer": "#/definitions/scoreRule/anyOf/10/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/10/properties/kind"
+  ],
+  "values": [
+   "zero"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind13",
+  "pointer": "#/definitions/scoreRule/anyOf/11/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/11/properties/kind"
+  ],
+  "values": [
+   "order"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind14",
+  "pointer": "#/definitions/scoreRule/anyOf/12/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/12/properties/kind"
+  ],
+  "values": [
+   "gate"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreRuleKind15",
+  "pointer": "#/definitions/scoreRule/anyOf/13/properties/kind",
+  "pointers": [
+   "#/definitions/scoreRule/anyOf/13/properties/kind"
+  ],
+  "values": [
+   "cover"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelPartsItemId",
+  "pointer": "#/definitions/scoreModel/properties/parts/items/properties/id",
+  "pointers": [
+   "#/definitions/scoreModel/properties/parts/items/properties/id"
+  ],
+  "values": [
+   "maintenance",
+   "security"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelPartsItemCombine",
+  "pointer": "#/definitions/scoreModel/properties/parts/items/properties/combine",
+  "pointers": [
+   "#/definitions/scoreModel/properties/parts/items/properties/combine"
+  ],
+  "values": [
+   "lead_plus_share",
+   "max"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelFlagsItemPart",
+  "pointer": "#/definitions/scoreModel/properties/flags/items/properties/part",
+  "pointers": [
+   "#/definitions/scoreModel/properties/flags/items/properties/part"
+  ],
+  "values": [
+   "maintenance",
+   "security"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelFlagsItemThresholdsItem",
+  "pointer": "#/definitions/scoreModel/properties/flags/items/properties/thresholds/items",
+  "pointers": [
+   "#/definitions/scoreModel/properties/flags/items/properties/thresholds/items"
+  ],
+  "values": [
+   "release-warn-years",
+   "release-high-years",
+   "push-warn-years",
+   "push-high-years"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelFlagsItemBasisPoints",
+  "pointer": "#/definitions/scoreModel/properties/flags/items/properties/basis/properties/points",
+  "pointers": [
+   "#/definitions/scoreModel/properties/flags/items/properties/basis/properties/points"
+  ],
+  "values": [
+   "band_floor",
+   "severities"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelFlagsItemPointsFrom",
+  "pointer": "#/definitions/scoreModel/properties/flags/items/properties/points_from/oneOf/0",
+  "pointers": [
+   "#/definitions/scoreModel/properties/flags/items/properties/points_from/oneOf/0"
+  ],
+  "values": [
+   "severities"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelSeveritiesItemBasisPoints",
+  "pointer": "#/definitions/scoreModel/properties/severities/items/properties/basis/properties/points",
+  "pointers": [
+   "#/definitions/scoreModel/properties/severities/items/properties/basis/properties/points"
+  ],
+  "values": [
+   "band_floor",
+   "counts_as",
+   "share"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelZeroVerdictsItemVerdict",
+  "pointer": "#/definitions/scoreModel/properties/zero_verdicts/items/properties/verdict",
+  "pointers": [
+   "#/definitions/scoreModel/properties/zero_verdicts/items/properties/verdict"
+  ],
+  "values": [
+   "finished",
+   "unknown",
+   "ok"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelZeroVerdictsItemWhen",
+  "pointer": "#/definitions/scoreModel/properties/zero_verdicts/items/properties/when",
+  "pointers": [
+   "#/definitions/scoreModel/properties/zero_verdicts/items/properties/when"
+  ],
+  "values": [
+   "allowlisted",
+   "no_metadata",
+   "otherwise"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelRounding",
+  "pointer": "#/definitions/scoreModel/properties/rounding",
+  "pointers": [
+   "#/definitions/scoreModel/properties/rounding"
+  ],
+  "values": [
+   "floor_once"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelBarOverflow",
+  "pointer": "#/definitions/scoreModel/properties/bar_overflow",
+  "pointers": [
+   "#/definitions/scoreModel/properties/bar_overflow"
+  ],
+  "values": [
+   "clip"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelExclusiveGroupsItemId",
+  "pointer": "#/definitions/scoreModel/properties/exclusive_groups/items/properties/id",
+  "pointers": [
+   "#/definitions/scoreModel/properties/exclusive_groups/items/properties/id"
+  ],
+  "values": [
+   "liveness",
+   "branch",
+   "release_age",
+   "release_push"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelExclusiveGroupsItemHoldsUnlessThreshold",
+  "pointer": "#/definitions/scoreModel/properties/exclusive_groups/items/properties/holds_unless/oneOf/0/properties/threshold",
+  "pointers": [
+   "#/definitions/scoreModel/properties/exclusive_groups/items/properties/holds_unless/oneOf/0/properties/threshold"
+  ],
+  "values": [
+   "push-warn-years",
+   "push-high-years",
+   "release-warn-years",
+   "release-high-years"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelExclusiveGroupsItemHoldsUnlessBelow",
+  "pointer": "#/definitions/scoreModel/properties/exclusive_groups/items/properties/holds_unless/oneOf/0/properties/below",
+  "pointers": [
+   "#/definitions/scoreModel/properties/exclusive_groups/items/properties/holds_unless/oneOf/0/properties/below"
+  ],
+  "values": [
+   "push-warn-years",
+   "push-high-years",
+   "release-warn-years",
+   "release-high-years"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelSortItemKey",
+  "pointer": "#/definitions/scoreModel/properties/sort/items/properties/key",
+  "pointers": [
+   "#/definitions/scoreModel/properties/sort/items/properties/key"
+  ],
+  "values": [
+   "verdict",
+   "security",
+   "score",
+   "direct",
+   "package"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "ScoreModelSortItemDir",
+  "pointer": "#/definitions/scoreModel/properties/sort/items/properties/dir",
+  "pointers": [
+   "#/definitions/scoreModel/properties/sort/items/properties/dir"
+  ],
+  "values": [
+   "order",
+   "desc",
+   "asc",
+   "true_first"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "GateValueKind",
+  "pointer": "#/definitions/gateValue/anyOf/0/properties/kind",
+  "pointers": [
+   "#/definitions/gateValue/anyOf/0/properties/kind"
+  ],
+  "values": [
+   "grade",
+   "flag",
+   "vulnerable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "GateValueKind2",
+  "pointer": "#/definitions/gateValue/anyOf/1/properties/kind",
+  "pointers": [
+   "#/definitions/gateValue/anyOf/1/properties/kind"
+  ],
+  "values": [
+   "unchecked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "RunTargetPhpSource",
+  "pointer": "#/definitions/run/properties/target_php_source",
+  "pointers": [
+   "#/definitions/run/properties/target_php_source"
+  ],
+  "values": [
+   "option",
+   "env",
+   "config",
+   "platform",
+   "runtime"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "RunFailOnSource",
+  "pointer": "#/definitions/run/properties/fail_on_source",
+  "pointers": [
+   "#/definitions/run/properties/fail_on_source"
+  ],
+  "values": [
+   "option",
+   "env",
+   "config",
+   "default"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "RunMode",
+  "pointer": "#/definitions/run/properties/mode",
+  "pointers": [
+   "#/definitions/run/properties/mode"
+  ],
+  "values": [
+   "check",
+   "generate_baseline"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "NoteAdvisoriesDisabledByPolicyPolicyKey",
+  "pointer": "#/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key",
+  "pointers": [
+   "#/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key"
+  ],
+  "values": [
+   "policy",
+   "policy.advisories",
+   "policy.advisories.audit",
+   "COMPOSER_POLICY"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "NoteAbandonedNotAuditedByComposerPolicyKey",
+  "pointer": "#/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key",
+  "pointers": [
+   "#/definitions/noteAbandonedNotAuditedByComposer/properties/policy_key"
+  ],
+  "values": [
+   "policy",
+   "policy.abandoned",
+   "policy.abandoned.audit",
+   "audit.abandoned",
+   "COMPOSER_AUDIT_ABANDONED",
+   "COMPOSER_POLICY"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "NoteRepositoryActivityHostNotSupportedHostsItemListedIn",
+  "pointer": "#/definitions/noteRepositoryActivityHostNotSupported/properties/hosts/items/properties/listed_in/oneOf/0",
+  "pointers": [
+   "#/definitions/noteRepositoryActivityHostNotSupported/properties/hosts/items/properties/listed_in/oneOf/0"
+  ],
+  "values": [
+   "github-domains",
+   "forgejo-domains"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "NoteBaselineTargetDiffersBaselineTargetPhpSource",
+  "pointer": "#/definitions/noteBaselineTargetDiffers/properties/baseline_target_php_source",
+  "pointers": [
+   "#/definitions/noteBaselineTargetDiffers/properties/baseline_target_php_source"
+  ],
+  "values": [
+   "option",
+   "env",
+   "config",
+   "platform",
+   "runtime"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteBaselineTargetDiffersRunTargetPhpSource",
+  "pointer": "#/definitions/noteBaselineTargetDiffers/properties/run_target_php_source",
+  "pointers": [
+   "#/definitions/noteBaselineTargetDiffers/properties/run_target_php_source"
+  ],
+  "values": [
+   "option",
+   "env",
+   "config",
+   "platform",
+   "runtime"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteCode",
+  "pointer": "#/definitions/noteCode",
+  "pointers": [
+   "#/definitions/noteCode"
+  ],
+  "values": [
+   "offline",
+   "metadata_unavailable",
+   "monorepo_parent_unavailable",
+   "advisory_ignore_unreadable",
+   "advisories_unavailable",
+   "advisories_not_checked",
+   "repository_activity_not_checked",
+   "repository_activity_anonymous_cap",
+   "repository_activity_rate_limited",
+   "repository_activity_unreachable",
+   "repository_activity_not_found",
+   "not_from_composer_repository",
+   "baseline_target_differs",
+   "baseline_fix_model_differs",
+   "ignore_does_not_cover_advisories",
+   "advisories_disabled_by_policy",
+   "abandoned_markings_ignored",
+   "abandoned_not_audited_by_composer",
+   "abandoned_ignore_unreadable",
+   "repository_activity_host_not_supported"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode",
+  "pointer": "#/definitions/noteDetail/anyOf/0/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/0/properties/code"
+  ],
+  "values": [
+   "offline"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode2",
+  "pointer": "#/definitions/noteDetail/anyOf/1/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/1/properties/code"
+  ],
+  "values": [
+   "metadata_unavailable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode3",
+  "pointer": "#/definitions/noteDetail/anyOf/2/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/2/properties/code"
+  ],
+  "values": [
+   "monorepo_parent_unavailable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode4",
+  "pointer": "#/definitions/noteDetail/anyOf/3/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/3/properties/code"
+  ],
+  "values": [
+   "advisory_ignore_unreadable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode5",
+  "pointer": "#/definitions/noteDetail/anyOf/4/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/4/properties/code"
+  ],
+  "values": [
+   "advisories_unavailable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode6",
+  "pointer": "#/definitions/noteDetail/anyOf/5/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/5/properties/code"
+  ],
+  "values": [
+   "advisories_not_checked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode7",
+  "pointer": "#/definitions/noteDetail/anyOf/6/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/6/properties/code"
+  ],
+  "values": [
+   "repository_activity_not_checked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode8",
+  "pointer": "#/definitions/noteDetail/anyOf/7/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/7/properties/code"
+  ],
+  "values": [
+   "repository_activity_anonymous_cap"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode9",
+  "pointer": "#/definitions/noteDetail/anyOf/8/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/8/properties/code"
+  ],
+  "values": [
+   "repository_activity_rate_limited"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode10",
+  "pointer": "#/definitions/noteDetail/anyOf/9/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/9/properties/code"
+  ],
+  "values": [
+   "repository_activity_unreachable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode11",
+  "pointer": "#/definitions/noteDetail/anyOf/10/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/10/properties/code"
+  ],
+  "values": [
+   "repository_activity_not_found"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode12",
+  "pointer": "#/definitions/noteDetail/anyOf/11/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/11/properties/code"
+  ],
+  "values": [
+   "not_from_composer_repository"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode13",
+  "pointer": "#/definitions/noteDetail/anyOf/12/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/12/properties/code"
+  ],
+  "values": [
+   "baseline_target_differs"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode14",
+  "pointer": "#/definitions/noteDetail/anyOf/13/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/13/properties/code"
+  ],
+  "values": [
+   "baseline_fix_model_differs"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode15",
+  "pointer": "#/definitions/noteDetail/anyOf/14/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/14/properties/code"
+  ],
+  "values": [
+   "ignore_does_not_cover_advisories"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode16",
+  "pointer": "#/definitions/noteDetail/anyOf/15/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/15/properties/code"
+  ],
+  "values": [
+   "advisories_disabled_by_policy"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode17",
+  "pointer": "#/definitions/noteDetail/anyOf/16/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/16/properties/code"
+  ],
+  "values": [
+   "abandoned_markings_ignored"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode18",
+  "pointer": "#/definitions/noteDetail/anyOf/17/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/17/properties/code"
+  ],
+  "values": [
+   "abandoned_not_audited_by_composer"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode19",
+  "pointer": "#/definitions/noteDetail/anyOf/18/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/18/properties/code"
+  ],
+  "values": [
+   "abandoned_ignore_unreadable"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode20",
+  "pointer": "#/definitions/noteDetail/anyOf/19/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/19/properties/code"
+  ],
+  "values": [
+   "repository_activity_host_not_supported"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "GateNotAppliedCheck",
+  "pointer": "#/definitions/gateNotApplied/properties/check",
+  "pointers": [
+   "#/definitions/gateNotApplied/properties/check"
+  ],
+  "values": [
+   "advisories"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "GateNotAppliedReason",
+  "pointer": "#/definitions/gateNotApplied/properties/reason",
+  "pointers": [
+   "#/definitions/gateNotApplied/properties/reason"
+  ],
+  "values": [
+   "offline",
+   "composer_too_old",
+   "install_time_budget",
+   "lookup_failed",
+   "no_feed",
+   "not_from_composer_repository",
+   "unparseable_version"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "RootGateTrippedByItem",
+  "pointer": "#/definitions/rootGate/properties/tripped_by/items",
+  "pointers": [
+   "#/definitions/rootGate/properties/tripped_by/items"
+  ],
+  "values": [
+   "strict_network",
+   "fail_on"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "RootSecurityCheck",
+  "pointer": "#/definitions/rootSecurity/properties/check",
+  "pointers": [
+   "#/definitions/rootSecurity/properties/check"
+  ],
+  "values": [
+   "complete",
+   "partial",
+   "not_run"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
+  "name": "Schema",
+  "pointer": "#/properties/$schema",
+  "pointers": [
+   "#/properties/$schema"
+  ],
+  "values": [
+   "https://lockrot.dev/schema/report-2.json"
+  ],
+  "open": false,
+  "integer": false
+ }
+]

@@ -1,0 +1,14 @@
+{
+  "name": "lockrot-schema-checks",
+  "private": true,
+  "description": "The TypeScript contract checks of report-2 and a second JSON Schema validator. Install with npm ci only.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-draft-04": "1.0.0",
+    "typescript": "5.9.3"
+  }
+}

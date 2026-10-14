@@ -1,0 +1,17 @@
+{
+    "score_text": "8 = pinned 16 ÷ 2 transitive",
+    "next_step_text": "move it to a tag — the newest on its own line is v5.4.45, through mautic/core-lib (2024-09-25); 5.x needs php >=7.2.5; what requires it must allow it",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: 5.x last released v5.4.45 2024-09-25 (2.0 years ago); newest release v8.1.5 2026-08-21 (0.1 years ago); last push 2026-09-25 (less than three weeks ago)",
+    "explain_age": [
+        "installed  5.4.x-dev not read (a branch snapshot has no release branch)",
+        "5.x        v5.4.45   2024-09-25   2.0 years ago                 below release-warn-years 3",
+        "newest     v8.1.5    2026-08-21   0.1 years ago                 below release-warn-years 3",
+        "last push            2026-09-25   less than three weeks ago     below push-warn-years 3",
+        "libyears not measured: a branch snapshot has no release branch"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

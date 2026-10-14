@@ -942,17 +942,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -962,37 +957,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -1002,7 +982,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],
@@ -7498,7 +7498,7 @@
      "clears": [
       {
        "kind": "advisory",
-       "id": "PKSA-v5yj-8nmz-sk2q",
+       "id": "PKSA-b14r-zh1d-vdrc",
        "basis": "outside_range"
       },
       {
@@ -7508,7 +7508,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-b14r-zh1d-vdrc",
+       "id": "PKSA-v5yj-8nmz-sk2q",
        "basis": "outside_range"
       }
      ],
@@ -7594,7 +7594,7 @@
       "clears": [
        {
         "kind": "advisory",
-        "id": "PKSA-v5yj-8nmz-sk2q",
+        "id": "PKSA-b14r-zh1d-vdrc",
         "basis": "outside_range"
        },
        {
@@ -7604,7 +7604,7 @@
        },
        {
         "kind": "advisory",
-        "id": "PKSA-b14r-zh1d-vdrc",
+        "id": "PKSA-v5yj-8nmz-sk2q",
         "basis": "outside_range"
        }
       ],
@@ -14093,17 +14093,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-cnw1-2ytm-cgr8",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-fy2t-3c5f-827y",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-qxvb-2bpp-dnk6",
+       "id": "PKSA-93qv-9n9h-6k6p",
        "basis": "outside_range"
       },
       {
@@ -14118,17 +14108,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-pwsk-hy21-4gby",
+       "id": "PKSA-cnw1-2ytm-cgr8",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-93qv-9n9h-6k6p",
+       "id": "PKSA-fy2t-3c5f-827y",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
        "id": "PKSA-k22t-f949-t9g6",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-pwsk-hy21-4gby",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-qxvb-2bpp-dnk6",
        "basis": "outside_range"
       }
      ],
@@ -16067,7 +16067,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-v5yj-8nmz-sk2q",
+       "id": "PKSA-b14r-zh1d-vdrc",
        "basis": "outside_range"
       },
       {
@@ -16077,7 +16077,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-b14r-zh1d-vdrc",
+       "id": "PKSA-v5yj-8nmz-sk2q",
        "basis": "outside_range"
       }
      ],
@@ -17757,11 +17757,6 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-vznr-tgp9-fd7d",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-7qs6-zvnz-h66r",
        "basis": "outside_range"
       },
@@ -17773,6 +17768,11 @@
       {
        "kind": "advisory",
        "id": "PKSA-jj5t-2zs1-dcfm",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-vznr-tgp9-fd7d",
        "basis": "outside_range"
       }
      ],
@@ -19461,17 +19461,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-1tmc-rt7x-12w6",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
@@ -19486,27 +19476,17 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -19516,7 +19496,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],
@@ -31472,7 +31472,47 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": null
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "joomla/joomla-cms",
+     "require": {
+      "php": "^7.2.5",
+      "tobscure/json-api": "*"
+     },
+     "repositories": [
+      {
+       "type": "vcs",
+       "url": "https://github.com/joomla-backports/json-api-php.git"
+      }
+     ]
+    },
+    "lock": [
+     {
+      "name": "tobscure/json-api",
+      "version": "dev-joomla-backports",
+      "time": "2022-12-30T19:09:00+00:00",
+      "php": "^7.0 || ^8.0",
+      "dev": false,
+      "origin": "vcs"
+     }
+    ],
+    "advisories": [],
+    "abandoned": null,
+    "dependents": {},
+    "activity": {
+     "host": "github.com",
+     "repo": "joomla-backports/json-api-php",
+     "pushed_at": null,
+     "archived": null
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^7.2.5",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "unreached-move",
@@ -41123,27 +41163,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gcrk-3vtt-1r14",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yfw5-9gnj-n2c7",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-k1b4-kshy-xgbh",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-2z36-j4q9-rsfy",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-fvw5-9t6n-nwvr",
        "basis": "outside_range"
       },
       {
@@ -41153,17 +41173,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-cnw1-2ytm-cgr8",
+       "id": "PKSA-fvw5-9t6n-nwvr",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fy2t-3c5f-827y",
+       "id": "PKSA-gcrk-3vtt-1r14",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-qxvb-2bpp-dnk6",
+       "id": "PKSA-k1b4-kshy-xgbh",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yfw5-9gnj-n2c7",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-93qv-9n9h-6k6p",
        "basis": "outside_range"
       },
       {
@@ -41178,17 +41208,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-pwsk-hy21-4gby",
+       "id": "PKSA-cnw1-2ytm-cgr8",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-93qv-9n9h-6k6p",
+       "id": "PKSA-fy2t-3c5f-827y",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
        "id": "PKSA-k22t-f949-t9g6",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-pwsk-hy21-4gby",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-qxvb-2bpp-dnk6",
        "basis": "outside_range"
       }
      ],
@@ -47623,7 +47663,40 @@
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 10.6.18 released 2026-09-26 (less than three weeks ago)"
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "drupal/drupal",
+     "require": {
+      "drupal/core": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "drupal/core",
+      "version": "10.6.18",
+      "time": "2026-09-26T20:37:56+00:00",
+      "php": null,
+      "dev": false,
+      "origin": "path"
+     }
+    ],
+    "advisories": [],
+    "abandoned": null,
+    "dependents": {},
+    "activity": {
+     "host": "github.com",
+     "repo": "drupal/core",
+     "pushed_at": null,
+     "archived": null
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": null,
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "php-null",
@@ -51149,27 +51222,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gcrk-3vtt-1r14",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yfw5-9gnj-n2c7",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-k1b4-kshy-xgbh",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-2z36-j4q9-rsfy",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-fvw5-9t6n-nwvr",
        "basis": "outside_range"
       },
       {
@@ -51179,17 +51232,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-cnw1-2ytm-cgr8",
+       "id": "PKSA-fvw5-9t6n-nwvr",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fy2t-3c5f-827y",
+       "id": "PKSA-gcrk-3vtt-1r14",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-qxvb-2bpp-dnk6",
+       "id": "PKSA-k1b4-kshy-xgbh",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yfw5-9gnj-n2c7",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-93qv-9n9h-6k6p",
        "basis": "outside_range"
       },
       {
@@ -51204,17 +51267,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-pwsk-hy21-4gby",
+       "id": "PKSA-cnw1-2ytm-cgr8",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-93qv-9n9h-6k6p",
+       "id": "PKSA-fy2t-3c5f-827y",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
        "id": "PKSA-k22t-f949-t9g6",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-pwsk-hy21-4gby",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-qxvb-2bpp-dnk6",
        "basis": "outside_range"
       }
      ],
@@ -55518,6 +55591,1251 @@
    }
   },
   {
+   "id": "affected-range-unknown‡",
+   "label": "polyfill-intl-idn (F) when its advisory names no affected range: releases read, fix unknown, no move (affected_range_unknown)",
+   "project": "phpbb",
+   "run": {
+    "project": "phpbb/phpbb",
+    "root_package": "phpbb/phpbb",
+    "target_php": "8.4",
+    "target_php_source": "option",
+    "project_php": "^7.2 || ^8.0.0",
+    "project_php_lowest": "7.2.0",
+    "lock_file": "composer.lock",
+    "fail_on": "high",
+    "fail_on_source": "option",
+    "gates": [
+     {
+      "value": "high",
+      "kind": "grade",
+      "threshold": "high"
+     }
+    ],
+    "strict_network": false,
+    "mode": "check",
+    "include_dev": false,
+    "thresholds": {
+     "release-warn-years": 3,
+     "release-high-years": 5,
+     "push-warn-years": 3,
+     "push-high-years": 5
+    },
+    "flag_ids": [
+     "abandoned",
+     "silent",
+     "pinned",
+     "left-behind",
+     "old-promise",
+     "stale",
+     "vulnerable"
+    ],
+    "verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     "unknown",
+     "finished",
+     "ok"
+    ],
+    "graded_verdicts": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "signal_ids": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7",
+     "S8",
+     "S9",
+     "S10"
+    ],
+    "fix_model": 1,
+    "text_grammar": 1,
+    "score_model": {
+     "id": 1,
+     "score_text_grammar": 1,
+     "flag_order": [
+      "abandoned",
+      "silent",
+      "pinned",
+      "left-behind",
+      "old-promise",
+      "stale",
+      "vulnerable"
+     ],
+     "parts": [
+      {
+       "id": "maintenance",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "pinned",
+        "left-behind",
+        "old-promise",
+        "stale"
+       ],
+       "combine": "lead_plus_share"
+      },
+      {
+       "id": "security",
+       "flag_ids": [
+        "vulnerable"
+       ],
+       "combine": "max"
+      }
+     ],
+     "flags": [
+      {
+       "id": "abandoned",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "abandoned",
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S1",
+        "S3"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "silent",
+       "part": "maintenance",
+       "points": 32,
+       "band": "critical",
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": 40,
+       "max_maintenance_flags": [
+        "silent",
+        "pinned",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-high-years",
+        "push-high-years"
+       ],
+       "basis": {
+        "v013_base": "critical",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "pinned",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 22,
+       "max_maintenance_flags": [
+        "pinned",
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S6"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "left-behind",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 20,
+       "max_maintenance_flags": [
+        "left-behind",
+        "old-promise"
+       ],
+       "raised_by": [
+        "S8"
+       ],
+       "thresholds": [
+        "release-warn-years"
+       ],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "old-promise",
+       "part": "maintenance",
+       "points": 16,
+       "band": "high",
+       "can_corroborate": true,
+       "corroborating_points": 4,
+       "max_maintenance": 18,
+       "max_maintenance_flags": [
+        "old-promise",
+        "stale"
+       ],
+       "raised_by": [
+        "S5"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": "high",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "stale",
+       "part": "maintenance",
+       "points": 8,
+       "band": "medium",
+       "can_corroborate": true,
+       "corroborating_points": 2,
+       "max_maintenance": 8,
+       "max_maintenance_flags": [
+        "stale"
+       ],
+       "raised_by": [
+        "S2",
+        "S4"
+       ],
+       "thresholds": [
+        "release-warn-years",
+        "push-warn-years"
+       ],
+       "basis": {
+        "v013_base": "medium",
+        "points": "band_floor"
+       },
+       "points_from": null
+      },
+      {
+       "id": "vulnerable",
+       "part": "security",
+       "points": null,
+       "band": null,
+       "can_corroborate": false,
+       "corroborating_points": null,
+       "max_maintenance": null,
+       "max_maintenance_flags": null,
+       "raised_by": [
+        "S9"
+       ],
+       "thresholds": [],
+       "basis": {
+        "v013_base": null,
+        "points": "severities"
+       },
+       "points_from": "severities"
+      }
+     ],
+     "severities": [
+      {
+       "id": "critical",
+       "points": 32,
+       "band": "critical",
+       "points_no_reachable_fix": 64,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 4,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "high",
+       "points": 16,
+       "band": "high",
+       "points_no_reachable_fix": 32,
+       "band_no_reachable_fix": "critical",
+       "gate_rank": 3,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "medium",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": null,
+       "basis": {
+        "points": "band_floor"
+       }
+      },
+      {
+       "id": "unrated",
+       "points": 8,
+       "band": "medium",
+       "points_no_reachable_fix": 16,
+       "band_no_reachable_fix": "high",
+       "gate_rank": 2,
+       "counts_as": "medium",
+       "basis": {
+        "points": "counts_as"
+       }
+      },
+      {
+       "id": "low",
+       "points": 2,
+       "band": "low",
+       "points_no_reachable_fix": 4,
+       "band_no_reachable_fix": "low",
+       "gate_rank": 1,
+       "counts_as": null,
+       "basis": {
+        "points": "share",
+        "of": "medium",
+        "share": {
+         "num": 1,
+         "den": 4
+        }
+       }
+      }
+     ],
+     "fix_kinds": [
+      {
+       "id": "update",
+       "ease": 1,
+       "doubles": false
+      },
+      {
+       "id": "upgrade",
+       "ease": 2,
+       "doubles": false
+      },
+      {
+       "id": "raise-php",
+       "ease": 3,
+       "doubles": false
+      },
+      {
+       "id": "unknown",
+       "ease": 4,
+       "doubles": false
+      },
+      {
+       "id": "blocked",
+       "ease": 5,
+       "doubles": true
+      },
+      {
+       "id": "none",
+       "ease": 6,
+       "doubles": true
+      }
+     ],
+     "bands": [
+      {
+       "verdict": "critical",
+       "floor": 32
+      },
+      {
+       "verdict": "high",
+       "floor": 16
+      },
+      {
+       "verdict": "medium",
+       "floor": 8
+      },
+      {
+       "verdict": "low",
+       "floor": 1
+      }
+     ],
+     "zero_verdicts": [
+      {
+       "verdict": "finished",
+       "when": "allowlisted"
+      },
+      {
+       "verdict": "unknown",
+       "when": "no_metadata"
+      },
+      {
+       "verdict": "ok",
+       "when": "otherwise"
+      }
+     ],
+     "exact_unit": 0.5,
+     "rounding": "floor_once",
+     "max_total": 104,
+     "bar_max": 64,
+     "bar_overflow": "clip",
+     "exclusive_groups": [
+      {
+       "id": "liveness",
+       "flag_ids": [
+        "abandoned",
+        "silent",
+        "stale"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "branch",
+       "flag_ids": [
+        "pinned",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_age",
+       "flag_ids": [
+        "silent",
+        "left-behind"
+       ],
+       "holds_unless": null
+      },
+      {
+       "id": "release_push",
+       "flag_ids": [
+        "left-behind",
+        "stale"
+       ],
+       "holds_unless": {
+        "threshold": "push-warn-years",
+        "below": "release-warn-years"
+       }
+      }
+     ],
+     "sort": [
+      {
+       "key": "verdict",
+       "path": "verdict",
+       "dir": "order",
+       "order": [
+        [
+         "critical"
+        ],
+        [
+         "high"
+        ],
+        [
+         "medium"
+        ],
+        [
+         "low"
+        ],
+        [
+         "unknown"
+        ],
+        [
+         "finished",
+         "ok"
+        ]
+       ],
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "security",
+       "path": "score.parts.security.contribution",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "score",
+       "path": "score.exact",
+       "dir": "desc",
+       "default": 0,
+       "collation": null
+      },
+      {
+       "key": "direct",
+       "path": "direct",
+       "dir": "true_first",
+       "default": null,
+       "collation": null
+      },
+      {
+       "key": "package",
+       "path": "package",
+       "dir": "asc",
+       "collation": "bytes",
+       "default": null
+      }
+     ],
+     "rules": [
+      {
+       "id": "counted",
+       "stage": 1,
+       "kind": "select",
+       "applies_to": "flags",
+       "accept_group": "liveness",
+       "accept_covers": "listed_and_below",
+       "why": "accepted-facts-shown-not-counted",
+       "doc": "score-counted",
+       "illustration": null
+      },
+      {
+       "id": "lead-first",
+       "stage": 2,
+       "kind": "select",
+       "applies_to": "maintenance",
+       "order": "flag_order",
+       "share": {
+        "num": 1,
+        "den": 1
+       },
+       "why": "strongest-fact-in-full",
+       "doc": "score-lead-first",
+       "illustration": null
+      },
+      {
+       "id": "corroborating-share",
+       "stage": 3,
+       "kind": "share",
+       "applies_to": "maintenance",
+       "share": {
+        "num": 1,
+        "den": 4
+       },
+       "why": "correlated-evidence",
+       "doc": "score-corroborating-share",
+       "illustration": {
+        "lead": "left-behind",
+        "flag": "old-promise",
+        "weight": 16,
+        "points": 4
+       }
+      },
+      {
+       "id": "advisory-points",
+       "stage": 4,
+       "kind": "lookup",
+       "applies_to": "security",
+       "table": "severities",
+       "why": "severity-points",
+       "doc": "score-advisory-points",
+       "illustration": null
+      },
+      {
+       "id": "no-reachable-fix-multiplier",
+       "stage": 5,
+       "kind": "multiply",
+       "applies_to": "advisory",
+       "factor": 2,
+       "when_fix": [
+        "none",
+        "blocked"
+       ],
+       "why": "one-band-up",
+       "doc": "score-no-reachable-fix-multiplier",
+       "illustration": {
+        "severity": "high",
+        "before": 16,
+        "after": 32,
+        "band_before": "high",
+        "band_after": "critical"
+       }
+      },
+      {
+       "id": "security-max",
+       "stage": 6,
+       "kind": "max",
+       "applies_to": "security",
+       "tie_break": [
+        {
+         "key": "points",
+         "dir": "desc",
+         "collation": null
+        },
+        {
+         "key": "severity",
+         "dir": "order",
+         "collation": null
+        },
+        {
+         "key": "id",
+         "dir": "asc",
+         "collation": "bytes"
+        }
+       ],
+       "why": "one-number-per-part",
+       "doc": "score-security-max",
+       "illustration": null
+      },
+      {
+       "id": "divide-reach",
+       "stage": 7,
+       "kind": "divide",
+       "applies_to": "maintenance",
+       "by": 2,
+       "when": [
+        "transitive",
+        "unreached"
+       ],
+       "why": "reach-halves-maintenance",
+       "doc": "score-divide-reach",
+       "illustration": {
+        "flag": "abandoned",
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "security-exempt-from-reach",
+       "stage": 8,
+       "kind": "exempt",
+       "applies_to": "security",
+       "of": "divide-reach",
+       "why": "exploitability-independent-of-reach",
+       "doc": "score-security-exempt-from-reach",
+       "illustration": {
+        "severity": "critical",
+        "reach": "transitive",
+        "total": 32
+       }
+      },
+      {
+       "id": "sum",
+       "stage": 9,
+       "kind": "combine",
+       "applies_to": "total",
+       "op": "sum",
+       "ratio_from": "medium",
+       "why": "parts-add",
+       "doc": "score-sum",
+       "illustration": {
+        "maintenance": 16,
+        "security": 16,
+        "total": 32,
+        "band": "critical",
+        "low_maintenance": 4,
+        "low_security": 4,
+        "low_total": 8,
+        "low_band": "medium"
+       }
+      },
+      {
+       "id": "divide-dev",
+       "stage": 10,
+       "kind": "divide",
+       "applies_to": "total",
+       "by": 2,
+       "when": [
+        "dev"
+       ],
+       "why": "dev-halves-total",
+       "doc": "score-divide-dev",
+       "illustration": {
+        "before": 32,
+        "after": 16,
+        "band_before": "critical",
+        "band_after": "high"
+       }
+      },
+      {
+       "id": "floor-once",
+       "stage": 11,
+       "kind": "floor",
+       "applies_to": "total",
+       "why": "integer-band-edges",
+       "doc": "score-floor-once",
+       "illustration": {
+        "exact": 4.5,
+        "total": 4
+       }
+      },
+      {
+       "id": "band-floors",
+       "stage": 12,
+       "kind": "band",
+       "applies_to": "total",
+       "ratio": 2,
+       "ratio_from": "medium",
+       "why": "two-floor-parts-make-next",
+       "doc": "score-band-floors",
+       "illustration": null
+      },
+      {
+       "id": "zero-verdicts",
+       "stage": 13,
+       "kind": "zero",
+       "applies_to": "total",
+       "table": "zero_verdicts",
+       "why": "score-zero-says-why",
+       "doc": "score-zero-verdicts",
+       "illustration": null
+      },
+      {
+       "id": "sort",
+       "stage": 14,
+       "kind": "order",
+       "applies_to": "findings",
+       "why": "advisory-findings-first",
+       "doc": "score-sort",
+       "illustration": null
+      },
+      {
+       "id": "gate-bounded-new",
+       "stage": 15,
+       "kind": "gate",
+       "applies_to": "gate",
+       "cap_multiplier": 2,
+       "why": "new-fact-sets-level",
+       "doc": "score-gate-bounded-new",
+       "illustration": {
+        "score": 36,
+        "new": 16,
+        "gate": 32
+       }
+      },
+      {
+       "id": "baseline-cover",
+       "stage": 16,
+       "kind": "cover",
+       "applies_to": "gate",
+       "order": "flag_order",
+       "covers": "listed_and_below",
+       "why": "recorded-lead-covers-below",
+       "doc": "score-baseline-cover",
+       "illustration": null
+      }
+     ],
+     "docs": "https://lockrot.dev/verdicts/model-1/"
+    },
+    "score_rules_used": {
+     "counted": 0,
+     "lead-first": 0,
+     "corroborating-share": 0,
+     "advisory-points": 1,
+     "no-reachable-fix-multiplier": 0,
+     "security-max": 0,
+     "divide-reach": 0,
+     "security-exempt-from-reach": 1,
+     "sum": 0,
+     "divide-dev": 0,
+     "floor-once": 0,
+     "band-floors": 1,
+     "zero-verdicts": 0,
+     "sort": null,
+     "gate-bounded-new": 0,
+     "baseline-cover": 0
+    },
+    "advisory_lookup": {
+     "scope": "all",
+     "scope_source": "default",
+     "packages_asked": 1,
+     "packages_not_asked": 0,
+     "other_repositories": 0,
+     "repositories": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "outcome": "answered",
+       "reason": null,
+       "message": null,
+       "packages_with_records": 1,
+       "records": 1
+      }
+     ]
+    }
+   },
+   "synthetic_inputs": [
+    "S9 affected_versions null (‡)"
+   ],
+   "finding": {
+    "package": "symfony/polyfill-intl-idn",
+    "version": "v1.37.0",
+    "branch": "1.x",
+    "installed_php": {
+     "requires": ">=7.2",
+     "target_runs": true,
+     "project_allows": true
+    },
+    "verdict": "low",
+    "priority": "low",
+    "lead": null,
+    "rank": 24,
+    "flags": [
+     {
+      "id": "vulnerable",
+      "role": "security",
+      "baseline": null,
+      "signal_ids": [
+       "S9"
+      ],
+      "degree": null,
+      "headline": {
+       "unit": "advisories",
+       "value": 1,
+       "source": null
+      },
+      "summary": "1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence"
+     }
+    ],
+    "score": {
+     "model": 1,
+     "total": 2,
+     "exact": 2,
+     "rounded_down": false,
+     "band": {
+      "floor": 1,
+      "next": "medium",
+      "to_next": 6
+     },
+     "decided_by": "security",
+     "parts": {
+      "maintenance": {
+       "status": "none",
+       "contribution": 0,
+       "alone": {
+        "total": 0,
+        "verdict": null
+       }
+      },
+      "security": {
+       "status": "counted",
+       "contribution": 2,
+       "alone": {
+        "total": 2,
+        "verdict": "low"
+       },
+       "of": 1,
+       "tied": []
+      }
+     },
+     "terms": [
+      {
+       "part": "security",
+       "flag": "vulnerable",
+       "role": "security",
+       "advisory": "PKSA-dwsq-ppd2-mb1x",
+       "severity": "low",
+       "fix_kind": "unknown",
+       "weight": 2,
+       "multiplier": 1,
+       "points": 2,
+       "contribution": 2
+      }
+     ],
+     "modifiers": [
+      {
+       "reason": "transitive",
+       "applies_to": "maintenance",
+       "divide_by": 2,
+       "before": 0,
+       "after": 0
+      }
+     ],
+     "accepted": [],
+     "without": [],
+     "text": "2 = vulnerable 2 [low advisory]"
+    },
+    "next_step": {
+     "kind": "no-move",
+     "source": "vulnerable",
+     "merged": [],
+     "fix_kind": "unknown",
+     "reason": "affected_range_unknown",
+     "replacement": null,
+     "quiet_years": null,
+     "to_branch": null,
+     "version": null,
+     "newest": null,
+     "constraint": null,
+     "latest": null,
+     "php_check": null,
+     "crosses_major": null,
+     "held_by": [],
+     "clears": [],
+     "unverified": [],
+     "adds": [],
+     "leaves": [
+      {
+       "kind": "advisory",
+       "id": "PKSA-dwsq-ppd2-mb1x"
+      }
+     ],
+     "clears_all": false,
+     "if_applied": null,
+     "composer_moves_because": [],
+     "commands": [
+      [
+       "composer",
+       "why-not",
+       "guzzlehttp/guzzle",
+       "8.2.0"
+      ]
+     ],
+     "through": [
+      {
+       "package": "guzzlehttp/guzzle",
+       "installed_version": "6.5.8",
+       "installed_requires": true,
+       "newest_stable": {
+        "version": "8.2.0",
+        "released": "2026-09-06T13:55:09+00:00"
+       },
+       "newest_requires": false,
+       "newest_requires_unmeasured": null
+      }
+     ],
+     "also": [],
+     "text": "no move: no advisory names the versions it affects, so lockrot names no fix"
+    },
+    "security": {
+     "status": "vulnerable",
+     "check": "complete",
+     "complete": true,
+     "unchecked_reason": null,
+     "records": 1,
+     "feeds": [
+      {
+       "composer_repository": "composer repo (https://repo.packagist.org)",
+       "registry": "packagist.org",
+       "answer": "answered",
+       "records": 1,
+       "reason": null
+      }
+     ],
+     "worst": "low",
+     "counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "unrated": 0,
+      "low": 1
+     },
+     "ignored": [],
+     "ignored_count": 0,
+     "fix_kind": "unknown",
+     "installed_branch_fixes": {
+      "fixed": 0,
+      "unknown": 1,
+      "of": 1,
+      "fix_kind": null,
+      "lowest": null,
+      "newest": "v1.43.0",
+      "held_by": [],
+      "if_applied": null
+     },
+     "move_in": "next_step",
+     "gets": {
+      "version": "v1.43.0",
+      "php_check": {
+       "requires": ">=7.2",
+       "project_allows": true,
+       "target_runs": true,
+       "raise_to": null,
+       "raise_size": null
+      },
+      "clears": [],
+      "clears_all": false
+     },
+     "partial": null
+    },
+    "checks_missing": [],
+    "checks_skipped": [
+     {
+      "check": "repository_activity",
+      "reason": "allowlisted",
+      "blocks": [
+       "S3",
+       "S4"
+      ]
+     }
+    ],
+    "unchecked_accepted": [],
+    "maintenance_judged": true,
+    "metadata": {
+     "status": "read",
+     "reason": null,
+     "message": null
+    },
+    "activity": {
+     "status": "not_read",
+     "reason": "allowlisted",
+     "forge": "github",
+     "host": "github.com",
+     "repo": "symfony/polyfill-intl-idn",
+     "event": null,
+     "archived": null,
+     "fetched_at": null,
+     "cached_at": null
+    },
+    "allowlist": {
+     "by": "builtin",
+     "pattern": "symfony/polyfill-*",
+     "version": null,
+     "reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
+     "reason_id": "symfony-extension-polyfills",
+     "reason_by": "lockrot",
+     "expires": null,
+     "flag_ids": null
+    },
+    "abandoned_ignored": null,
+    "from_composer_repository": true,
+    "origin": {
+     "kind": "packagist",
+     "registry": "packagist.org",
+     "package_url": "https://packagist.org/packages/symfony/polyfill-intl-idn",
+     "local": false
+    },
+    "replacement": null,
+    "replacement_url": null,
+    "note": null,
+    "libyears_unmeasured": "shared_commit",
+    "libyears_at_least": false,
+    "direct": false,
+    "dev": false,
+    "reach": "transitive",
+    "chain": [
+     "guzzlehttp/guzzle",
+     "symfony/polyfill-intl-idn"
+    ],
+    "depth": 1,
+    "depth_unmeasured": null,
+    "named_in": [],
+    "direct_dependents": [
+     "guzzlehttp/guzzle"
+    ],
+    "signals": [
+     {
+      "id": "S9",
+      "level": "warn",
+      "summary": "1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+      "data": {
+       "advisories": [
+        {
+         "id": "PKSA-dwsq-ppd2-mb1x",
+         "cve": "CVE-2026-46644",
+         "title": "symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+         "link": "https://symfony.com/cve-2026-46644",
+         "reported_at": "2026-05-26T08:00:00+00:00",
+         "severity": "low",
+         "severity_published": "low",
+         "affected_versions": null,
+         "counted": true,
+         "points": 2,
+         "deciding": true,
+         "fix": {
+          "kind": "unknown",
+          "to_branch": null,
+          "version": null,
+          "newest": null,
+          "on_installed_branch": null,
+          "php": null,
+          "held_by": [],
+          "reason": "affected_range_unknown"
+         },
+         "baseline": null
+        }
+       ],
+       "releases_read": true,
+       "complete": true
+      }
+     }
+    ],
+    "evidence": "vulnerable: 1 advisory: 1 low — fix not known on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+    "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "libyears": null,
+    "age": {
+     "installed": null,
+     "installed_unmeasured": "shared_commit",
+     "release": {
+      "version": "v1.43.0",
+      "at": "2026-09-23T14:40:04+00:00",
+      "years": 0,
+      "level": null,
+      "dated_by": null
+     },
+     "release_unmeasured": null,
+     "branch_release": {
+      "version": "v1.43.0",
+      "at": "2026-09-23T14:40:04+00:00",
+      "years": 0,
+      "level": null,
+      "dated_by": null
+     },
+     "branch_release_unmeasured": null,
+     "push": null,
+     "push_unmeasured": "allowlisted"
+    },
+    "baseline": null,
+    "gate": {
+     "reaches_fail_on": false,
+     "fails": false,
+     "exempt_by": null,
+     "by": [],
+     "basis": null
+    }
+   },
+   "details": {
+    "metadata": {
+     "installed_branch": "1.x",
+     "branches": [
+      {
+       "branch": "1.x",
+       "installed": true,
+       "highest": "v1.43.0",
+       "highest_released": "2026-09-23T14:40:04+00:00",
+       "highest_commit_date": null,
+       "newest_dated": "v1.43.0",
+       "newest_dated_released": "2026-09-23T14:40:04+00:00",
+       "dated_by": null,
+       "php": ">=7.2",
+       "admits_target_php": true,
+       "admits_project_php": true,
+       "php_blocked_by": null,
+       "misses_target_php": null,
+       "misses_project_php": null,
+       "released_years": 0,
+       "fixes": {
+        "fixed": 0,
+        "unknown": 1,
+        "of": 1,
+        "fix_kind": null,
+        "lowest": null,
+        "newest": "v1.43.0",
+        "held_by": [],
+        "if_applied": null
+       }
+      }
+     ]
+    }
+   },
+   "golden": {
+    "score_text": "2 = vulnerable 2 [low advisory]",
+    "next_step_text": "no move: no advisory names the versions it affects, so lockrot names no fix",
+    "answer": "Low: a low-severity advisory affects your version (CVE-2026-46644: symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence). It is not known whether it is fixed on 1.x. lockrot did not check its repository activity (allowlisted). No advisory names the versions it affects, so lockrot names no fix. Its maintenance is accepted by lockrot's built-in list: a Symfony polyfill for a PHP extension, released with Symfony.",
+    "why": [
+     "2 · low from 1 · 6 points short of medium",
+     "vulnerable 2: low advisory CVE-2026-46644; its fix is unknown: no × 2",
+     "transitive: no maintenance to halve; security is never halved for reach",
+     "the advisory alone makes it low",
+     "checks not run: its repository activity (allowlisted)"
+    ],
+    "gate_line": null,
+    "checks": "1 fired (S9) · 7 quiet · S3, S4 not run (allowlisted)",
+    "branches": "Your branch, 1.x, had its last release less than three weeks ago; no higher branch.",
+    "security_row": "1 low advisory · 1 on record for this name · fix: not known · lookup complete",
+    "baseline_suffix": null,
+    "commands_posix": [
+     "composer why-not guzzlehttp/guzzle 8.2.0"
+    ],
+    "commands_cmd": [
+     "composer why-not guzzlehttp/guzzle 8.2.0"
+    ],
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v1.37.0, release date not known (dated only by a commit its tags share); 1.x last released v1.43.0 2026-09-23 (less than three weeks ago), its newest release"
+   },
+   "inputs": {
+    "root": {
+     "name": "phpbb/phpbb",
+     "require": {
+      "php": "^7.2 || ^8.0.0",
+      "guzzlehttp/guzzle": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "symfony/polyfill-intl-idn",
+      "version": "v1.37.0",
+      "time": null,
+      "php": ">=7.2",
+      "dev": false,
+      "origin": "packagist"
+     },
+     {
+      "name": "guzzlehttp/guzzle",
+      "version": "6.5.8",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "symfony/polyfill-intl-idn": "*"
+      }
+     }
+    ],
+    "releases": [
+     {
+      "version": "v1.37.0",
+      "time": null,
+      "php": ">=7.2"
+     },
+     {
+      "version": "v1.43.0",
+      "time": "2026-09-23T14:40:04+00:00",
+      "php": ">=7.2"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-dwsq-ppd2-mb1x",
+      "cve": "CVE-2026-46644",
+      "title": "symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence",
+      "link": "https://symfony.com/cve-2026-46644",
+      "reported_at": "2026-05-26T08:00:00+00:00",
+      "severity": "low",
+      "affected_versions": null
+     }
+    ],
+    "abandoned": null,
+    "dependents": {
+     "guzzlehttp/guzzle": [
+      {
+       "version": "6.5.8",
+       "time": null,
+       "require": {
+        "symfony/polyfill-intl-idn": "*"
+       }
+      },
+      {
+       "version": "8.2.0",
+       "time": "2026-09-06T13:55:09+00:00",
+       "require": {}
+      }
+     ]
+    },
+    "activity": null,
+    "run": {
+     "target_php": "8.4",
+     "project_php": "^7.2 || ^8.0.0",
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
+  },
+  {
    "id": "A-blocked‡",
    "label": "twig v2.16.1 with target php 8.0: 3.x blocked, the advisory × 2",
    "project": "phpbb",
@@ -56427,15 +57745,11 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np"
+       "id": "PKSA-gw7n-z4yx-7xjt"
       },
       {
        "kind": "advisory",
@@ -56443,31 +57757,19 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w"
+       "id": "PKSA-fbvq-z33h-r2np"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth"
+       "id": "PKSA-xx6c-6d96-db2w"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky"
+       "id": "PKSA-kvv6-36cr-fkzb"
       },
       {
        "kind": "advisory",
@@ -56475,7 +57777,23 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb"
+       "id": "PKSA-2wrf-1xmk-1pky"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1"
       }
      ],
      "clears_all": false,
@@ -58233,17 +59551,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -58253,37 +59566,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -58293,7 +59591,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],
@@ -60086,17 +61404,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -60106,37 +61419,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -60146,7 +61444,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],
@@ -67900,7 +69218,7 @@
      "clears": [
       {
        "kind": "advisory",
-       "id": "PKSA-v5yj-8nmz-sk2q",
+       "id": "PKSA-b14r-zh1d-vdrc",
        "basis": "outside_range"
       },
       {
@@ -67910,7 +69228,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-b14r-zh1d-vdrc",
+       "id": "PKSA-v5yj-8nmz-sk2q",
        "basis": "outside_range"
       }
      ],
@@ -68006,7 +69324,7 @@
       "clears": [
        {
         "kind": "advisory",
-        "id": "PKSA-v5yj-8nmz-sk2q",
+        "id": "PKSA-b14r-zh1d-vdrc",
         "basis": "outside_range"
        },
        {
@@ -68016,7 +69334,7 @@
        },
        {
         "kind": "advisory",
-        "id": "PKSA-b14r-zh1d-vdrc",
+        "id": "PKSA-v5yj-8nmz-sk2q",
         "basis": "outside_range"
        }
       ],
@@ -70426,7 +71744,7 @@
      "clears": [
       {
        "kind": "advisory",
-       "id": "PKSA-v5yj-8nmz-sk2q",
+       "id": "PKSA-b14r-zh1d-vdrc",
        "basis": "outside_range"
       },
       {
@@ -70436,7 +71754,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-b14r-zh1d-vdrc",
+       "id": "PKSA-v5yj-8nmz-sk2q",
        "basis": "outside_range"
       }
      ],
@@ -70522,7 +71840,7 @@
       "clears": [
        {
         "kind": "advisory",
-        "id": "PKSA-v5yj-8nmz-sk2q",
+        "id": "PKSA-b14r-zh1d-vdrc",
         "basis": "outside_range"
        },
        {
@@ -70532,7 +71850,7 @@
        },
        {
         "kind": "advisory",
-        "id": "PKSA-b14r-zh1d-vdrc",
+        "id": "PKSA-v5yj-8nmz-sk2q",
         "basis": "outside_range"
        }
       ],
@@ -76256,17 +77574,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -76276,37 +77589,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -76316,7 +77614,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],
@@ -83838,11 +85156,11 @@
      "leaves": [
       {
        "kind": "advisory",
-       "id": "PKSA-v5yj-8nmz-sk2q"
+       "id": "PKSA-ft77-7h5f-p3r6"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-ft77-7h5f-p3r6"
+       "id": "PKSA-v5yj-8nmz-sk2q"
       },
       {
        "kind": "advisory",
@@ -92847,22 +94165,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-m5cs-t1y6-qpcs",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-8qx3-n5y5-vvnd",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-d5tc-s1qs-h781",
+       "id": "PKSA-m5cs-t1y6-qpcs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
        "id": "PKSA-mdq4-51ck-6kdq",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-d5tc-s1qs-h781",
        "basis": "outside_range"
       }
      ],
@@ -123543,17 +124861,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -123563,37 +124876,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -123603,7 +124901,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],
@@ -128353,15 +129671,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-ydwx-2n98-5dyf"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-krjy-6tb4-skgg"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-bxhd-1cmh-djg9"
+       "id": "PKSA-j4xy-fb9q-x9h7"
       },
       {
        "kind": "advisory",
@@ -128369,7 +129679,15 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-j4xy-fb9q-x9h7"
+       "id": "PKSA-bxhd-1cmh-djg9"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-krjy-6tb4-skgg"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-ydwx-2n98-5dyf"
       }
      ],
      "clears_all": false,
@@ -130213,7 +131531,81 @@
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": null
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "mautic/mautic",
+     "require": {
+      "mautic/core-lib": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "mautic/core-lib",
+      "version": "4.3.x-dev",
+      "time": null,
+      "php": ">=7.4.0 <8.1",
+      "dev": false,
+      "origin": "path"
+     }
+    ],
+    "advisories": [
+     {
+      "id": "PKSA-j4xy-fb9q-x9h7",
+      "cve": "CVE-2022-25768",
+      "title": "Mautic vulnerable to Improper Access Control in UI upgrade process",
+      "link": "https://github.com/advisories/GHSA-x3jx-5w6m-q2fc",
+      "reported_at": "2024-09-18T17:43:36+00:00",
+      "severity": "high",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.1.3,<4.4.13"
+     },
+     {
+      "id": "PKSA-81ww-1p5d-6c6k",
+      "cve": "CVE-2024-47058",
+      "title": "Mautic vulnerable to Cross-site Scripting (XSS) - stored (edit form HTML field)",
+      "link": "https://github.com/advisories/GHSA-xv68-rrmw-9xwf",
+      "reported_at": "2024-09-18T22:05:00+00:00",
+      "severity": "medium",
+      "affected_versions": ">=1.0.0-beta,<4.4.13|>=5.0.0-alpha,<5.1.1"
+     },
+     {
+      "id": "PKSA-bxhd-1cmh-djg9",
+      "cve": "CVE-2024-47050",
+      "title": "Mautic vulnerable to XSS in contact/company tracking (no authentication)",
+      "link": "https://github.com/advisories/GHSA-73gr-32wg-qhh7",
+      "reported_at": "2024-09-18T22:05:30+00:00",
+      "severity": "medium",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=2.6.0,<4.4.13"
+     },
+     {
+      "id": "PKSA-krjy-6tb4-skgg",
+      "cve": "CVE-2021-27917",
+      "title": "Mautic has an XSS in contact tracking and page hits report",
+      "link": "https://github.com/advisories/GHSA-xpc5-rr39-v8v2",
+      "reported_at": "2024-09-18T22:05:59+00:00",
+      "severity": "medium",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta4,<4.4.13"
+     },
+     {
+      "id": "PKSA-ydwx-2n98-5dyf",
+      "cve": "CVE-2022-25770",
+      "title": "Mautic has insufficient authentication in upgrade flow",
+      "link": "https://github.com/advisories/GHSA-qf6m-6m4g-rmrc",
+      "reported_at": "2024-09-18T22:06:13+00:00",
+      "severity": "medium",
+      "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta3,<4.4.13"
+     }
+    ],
+    "abandoned": null,
+    "dependents": {},
+    "activity": null,
+    "run": {
+     "target_php": "8.4",
+     "project_php": null,
+     "fail_on": "high",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "unknown-origin",
@@ -131204,7 +132596,70 @@
     "run_gate_line": "gate: fails · --fail-on=high,unchecked · 1 finding fails it (unchecked 1) · target php 8.4 (--target-php)",
     "age_line": "age: installed 3.7.1, release date not known (no date)"
    },
-   "inputs": null
+   "inputs": {
+    "root": {
+     "name": "yiisoft/yii2-app-basic",
+     "require": {
+      "php": ">=8.2",
+      "yiisoft/yii2": "*",
+      "yiisoft/yii2-bootstrap5": "*",
+      "yiisoft/yii2-symfonymailer": "*"
+     }
+    },
+    "lock": [
+     {
+      "name": "bower-asset/jquery",
+      "version": "3.7.1",
+      "time": null,
+      "php": null,
+      "dev": false,
+      "origin": "unknown"
+     },
+     {
+      "name": "yiisoft/yii2",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "bower-asset/jquery": "*"
+      }
+     },
+     {
+      "name": "yiisoft/yii2-bootstrap5",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "bower-asset/jquery": "*"
+      }
+     },
+     {
+      "name": "yiisoft/yii2-symfonymailer",
+      "version": "1.0.0",
+      "dev": false,
+      "origin": "packagist",
+      "require": {
+       "bower-asset/jquery": "*"
+      }
+     }
+    ],
+    "advisories": [],
+    "abandoned": null,
+    "dependents": {},
+    "activity": {
+     "host": "github.com",
+     "repo": "jquery/jquery-dist",
+     "pushed_at": null,
+     "archived": null
+    },
+    "run": {
+     "target_php": "8.4",
+     "project_php": ">=8.2",
+     "fail_on": "high,unchecked",
+     "include_dev": false,
+     "advisories_unchecked": null
+    }
+   }
   },
   {
    "id": "host-accepted‡",
@@ -146097,17 +147552,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -146117,37 +147567,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -146157,7 +147592,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],
@@ -151820,17 +153275,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -151840,37 +153290,22 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-3mcc-k66d-pydb",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-g9zw-qxh8-pq8w",
+       "id": "PKSA-fbvq-z33h-r2np",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-sjvz-tbbr-vwth",
+       "id": "PKSA-xx6c-6d96-db2w",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yhcn-xrg3-68b1",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-2wrf-1xmk-1pky",
+       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       },
       {
@@ -151880,7 +153315,27 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
+       "id": "PKSA-2wrf-1xmk-1pky",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-sjvz-tbbr-vwth",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yhcn-xrg3-68b1",
        "basis": "outside_range"
       }
      ],

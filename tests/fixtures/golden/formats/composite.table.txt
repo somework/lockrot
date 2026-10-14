@@ -48,7 +48,7 @@ low (2)
       do: composer update symfony/yaml (gets v5.4.53) — clears 3 advisories
       vulnerable   3 advisories: 3 low — all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via
                    Unbounded Recursion in Nested Blocks, Sequences, and Mappings
-      age: installed v5.4.23 released 2023-04-23 (3.5 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years
+      age: installed v5.4.23 released 2023-04-23 (3.4 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years
            ago); newest release v8.1.8 2026-09-26 (less than three weeks ago); last push 2026-10-01 (less than three
            weeks ago)
   symfony/polyfill-intl-idn v1.37.0  via guzzlehttp/guzzle  ·  vulnerable
@@ -56,8 +56,8 @@ low (2)
       do: composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory
       vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts
                    xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
-      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (0.1 years
-           ago), its newest release
+      age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than
+           three weeks ago), its newest release
       maintenance accepted (lockrot's list)  polyfills for PHP extensions; released with Symfony and complete for the
                               API of the extension they replace
 
@@ -75,5 +75,5 @@ furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: guzzlehttp/guzzle 1
 advisories: 7 packages asked · packagist.org answered (20 on record for 4 packages)
 gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)
-Data as of 2026-10-13 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

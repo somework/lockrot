@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/abandoned",
+        "description": "web-token/jwt-key-mgmt 3.4.3 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: web-token/jwt-library. Do: replace with web-token/jwt-library (named by its registry).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "a1c9360c46f817e8c31d67843afe952c53c283a4a25786bf0740fe3a871a37f5",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

@@ -1,0 +1,2 @@
+::notice file=composer.lock,line=4,title=lockrot%3A ok::pagerfanta/twig v3.8.0: 0. checks missing: S2, S8 (undated releases).
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

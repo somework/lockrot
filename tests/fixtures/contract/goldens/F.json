@@ -1,0 +1,23 @@
+{
+    "score_text": "2 = vulnerable 2 [low advisory]",
+    "next_step_text": "composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory",
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v1.37.0, release date not known (no date); 1.x last released v1.43.0 2026-09-23 (less than three weeks ago), its newest release",
+    "explain_age": [
+        "installed  v1.37.0   not read (no date)",
+        "1.x        v1.43.0   2026-09-23   less than three weeks ago     below release-warn-years 3",
+        "newest     v1.43.0   2026-09-23   less than three weeks ago     below release-warn-years 3",
+        "last push            not read (allowlisted)",
+        "libyears not measured: no date"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer update symfony/polyfill-intl-idn",
+        "composer why-not guzzlehttp/guzzle 8.2.0"
+    ],
+    "commands_cmd": [
+        "composer update symfony/polyfill-intl-idn",
+        "composer why-not guzzlehttp/guzzle 8.2.0"
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "score_text": "22 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 2 [low advisory]",
+    "next_step_text": "raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 — clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v3.4.47 released 2020-10-24 (5.9 years ago), the newest on 3.x; newest release v8.1.8 2026-09-26 (less than three weeks ago); last push 2026-10-01 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v3.4.47   2020-10-24   5.9 years ago",
+        "3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5",
+        "newest     v8.1.8    2026-09-26   less than three weeks ago     below release-warn-years 3",
+        "last push            2026-10-01   less than three weeks ago     below push-warn-years 3",
+        "libyears 5.9 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [
+        "composer require 'php:>=7.2.5' --no-update",
+        "composer require 'symfony/yaml:^5.4.52'"
+    ],
+    "commands_cmd": [
+        "composer require \"php:>=7.2.5\" --no-update",
+        "composer require \"symfony/yaml:^5.4.52\""
+    ]
+}

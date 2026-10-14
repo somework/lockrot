@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/finished",
+        "description": "doctrine/cache 2.1.1 \u2014 finding finished (0 (stale accepted)).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "info",
+        "fingerprint": "f5b1aa6208f43c9b2b92224ee4ed17cfdc4a4a89b6ccfab01c0380979776a622",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 4
+            }
+        }
+    }
+]

@@ -1,0 +1,625 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/advisory/PKSA-3r5d-mb8f-1qw9",
+                            "name": "advisory/PKSA-3r5d-mb8f-1qw9",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-3r5d-mb8f-1qw9 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-w7xr-vk7n-rstm",
+                            "name": "advisory/PKSA-w7xr-vk7n-rstm",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-w7xr-vk7n-rstm affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: high severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "8.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-8qx3-n5y5-vvnd",
+                            "name": "advisory/PKSA-8qx3-n5y5-vvnd",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-8qx3-n5y5-vvnd affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-m5cs-t1y6-qpcs",
+                            "name": "advisory/PKSA-m5cs-t1y6-qpcs",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-m5cs-t1y6-qpcs affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: medium severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "5.5"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-mdq4-51ck-6kdq",
+                            "name": "advisory/PKSA-mdq4-51ck-6kdq",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-mdq4-51ck-6kdq affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: unrated severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": null
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-d5tc-s1qs-h781",
+                            "name": "advisory/PKSA-d5tc-s1qs-h781",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-d5tc-s1qs-h781 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "lockrot/advisory/PKSA-3r5d-mb8f-1qw9",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "laravel/framework v9.52.16 is affected by PKSA-3r5d-mb8f-1qw9 (high advisory): Laravel Framework: CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laravel/framework",
+                        "lockrot/advisory": "PKSA-3r5d-mb8f-1qw9"
+                    },
+                    "properties": {
+                        "package": "laravel/framework",
+                        "version": "v9.52.16",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "laravel/framework"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "laravel/framework",
+                            "pragmarx/google2fa-laravel"
+                        ],
+                        "signal_ids": [
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2023-10-03T13:02:30+00:00",
+                                "years": 3,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v11.57.0",
+                                "at": "2026-09-29T15:33:27+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v9.52.22",
+                                "at": "2026-08-12T03:46:05+00:00",
+                                "years": 0.1,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-09-30T21:54:48+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-3r5d-mb8f-1qw9",
+                        "cve": null,
+                        "severity": "high",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "12.x",
+                            "version": "v12.60.0",
+                            "newest": "v12.69.3",
+                            "on_installed_branch": false,
+                            "php": "^8.2",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-3r5d-mb8f-1qw9",
+                            "severity": "high",
+                            "fix_kind": "raise-php",
+                            "weight": 16,
+                            "multiplier": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-w7xr-vk7n-rstm",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 80.0,
+                    "message": {
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2024-52301 (high advisory): Laravel environment manipulation via query string. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laravel/framework",
+                        "lockrot/advisory": "PKSA-w7xr-vk7n-rstm"
+                    },
+                    "properties": {
+                        "package": "laravel/framework",
+                        "version": "v9.52.16",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-w7xr-vk7n-rstm",
+                        "cve": "CVE-2024-52301",
+                        "severity": "high",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "9.x",
+                            "version": "v9.52.17",
+                            "newest": "v9.52.22",
+                            "on_installed_branch": true,
+                            "php": "^8.0.2",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 16,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-8qx3-n5y5-vvnd",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2025-27515 (medium advisory): Laravel has a File Validation Bypass. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laravel/framework",
+                        "lockrot/advisory": "PKSA-8qx3-n5y5-vvnd"
+                    },
+                    "properties": {
+                        "package": "laravel/framework",
+                        "version": "v9.52.16",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-8qx3-n5y5-vvnd",
+                        "cve": "CVE-2025-27515",
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "update",
+                            "to_branch": "10.x",
+                            "version": "v10.48.29",
+                            "newest": "v10.50.3",
+                            "on_installed_branch": false,
+                            "php": "^8.1",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-m5cs-t1y6-qpcs",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "laravel/framework v9.52.16 is affected by PKSA-m5cs-t1y6-qpcs (medium advisory): Laravel Framework: Temporary Signed URL Path Confusion. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laravel/framework",
+                        "lockrot/advisory": "PKSA-m5cs-t1y6-qpcs"
+                    },
+                    "properties": {
+                        "package": "laravel/framework",
+                        "version": "v9.52.16",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-m5cs-t1y6-qpcs",
+                        "cve": null,
+                        "severity": "medium",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "12.x",
+                            "version": "v12.61.1",
+                            "newest": "v12.69.3",
+                            "on_installed_branch": false,
+                            "php": "^8.2",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-mdq4-51ck-6kdq",
+                    "ruleIndex": 4,
+                    "level": "warning",
+                    "rank": 55.0,
+                    "message": {
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2026-48019 (unrated advisory): Laravel CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laravel/framework",
+                        "lockrot/advisory": "PKSA-mdq4-51ck-6kdq"
+                    },
+                    "properties": {
+                        "package": "laravel/framework",
+                        "version": "v9.52.16",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-mdq4-51ck-6kdq",
+                        "cve": "CVE-2026-48019",
+                        "severity": "unrated",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "12.x",
+                            "version": "v12.60.0",
+                            "newest": "v12.69.3",
+                            "on_installed_branch": false,
+                            "php": "^8.2",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 8,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-d5tc-s1qs-h781",
+                    "ruleIndex": 5,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2026-102279 (low advisory): Laravel: XSS in Debug Page Information. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "laravel/framework",
+                        "lockrot/advisory": "PKSA-d5tc-s1qs-h781"
+                    },
+                    "properties": {
+                        "package": "laravel/framework",
+                        "version": "v9.52.16",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": null,
+                        "score_total": 16,
+                        "score_text": "16 = vulnerable 16 [high advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-d5tc-s1qs-h781",
+                        "cve": "CVE-2026-102279",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "12.x",
+                            "version": "v12.69.0",
+                            "newest": "v12.69.3",
+                            "on_installed_branch": false,
+                            "php": "^8.2",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 1,
+                            "failing": 1,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 1
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 1,
+                            "records": 6
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

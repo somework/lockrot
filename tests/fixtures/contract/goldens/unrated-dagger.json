@@ -1,0 +1,17 @@
+{
+    "score_text": "16 = vulnerable 16 [unrated advisory 8 × 2: no reachable fix]",
+    "next_step_text": "no single release fixes every advisory; see each advisory",
+    "gate_line": null,
+    "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed v5.4.23 released 2023-04-23 (3.4 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years ago); newest release v8.1.8 2026-09-26 (less than three weeks ago); last push 2026-10-01 (less than three weeks ago)",
+    "explain_age": [
+        "installed  v5.4.23   2023-04-23   3.4 years ago",
+        "5.x        v5.4.53   2026-05-20   0.4 years ago                 below release-warn-years 3",
+        "newest     v8.1.8    2026-09-26   less than three weeks ago     below release-warn-years 3",
+        "last push            2026-10-01   less than three weeks ago     below push-warn-years 3",
+        "libyears 3.4 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}

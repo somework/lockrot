@@ -1275,8 +1275,127 @@
   "fix_unknown": 0
  },
  "data_date": "2026-10-01T17:39:46+00:00",
- "notes": [],
- "note_details": [],
+ "notes": [
+  "5 findings reached --fail-on=critical under 0.13's rules and no longer do: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/dom-crawler v4.4.45 (18 = left-behind 16 + vulnerable 2 [low advisory]), symfony/mailer v4.4.49 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/routing v4.4.44 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/validator v4.4.48 (18 = left-behind 16 + vulnerable 2 [low advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity."
+ ],
+ "note_details": [
+  {
+   "code": "verdict_rules_changed",
+   "text": "5 findings reached --fail-on=critical under 0.13's rules and no longer do: enshrined/svg-sanitize 0.15.4 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/dom-crawler v4.4.45 (18 = left-behind 16 + vulnerable 2 [low advisory]), symfony/mailer v4.4.49 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/routing v4.4.44 (24 = left-behind 16 + vulnerable 8 [medium advisory]), symfony/validator v4.4.48 (18 = left-behind 16 + vulnerable 2 [low advisory]). 0.13 raised each one for any advisory not fixed on its branch; an advisory now adds its own severity.",
+   "docs_url": "https://lockrot.dev/notes/#verdict_rules_changed",
+   "sets_network_failures": false,
+   "data": {
+    "fail_on": "critical",
+    "findings": [
+     {
+      "package": "enshrined/svg-sanitize",
+      "version": "0.15.4",
+      "legacy": {
+       "verdict": "left-behind",
+       "priority": "critical",
+       "basis": {
+        "base": "high",
+        "steps": [
+         {
+          "reason": "no_fix_expected",
+          "from": "high",
+          "to": "critical"
+         }
+        ]
+       }
+      },
+      "verdict": "high",
+      "score_total": 24,
+      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
+     },
+     {
+      "package": "symfony/dom-crawler",
+      "version": "v4.4.45",
+      "legacy": {
+       "verdict": "left-behind",
+       "priority": "critical",
+       "basis": {
+        "base": "high",
+        "steps": [
+         {
+          "reason": "no_fix_expected",
+          "from": "high",
+          "to": "critical"
+         }
+        ]
+       }
+      },
+      "verdict": "high",
+      "score_total": 18,
+      "score_text": "18 = left-behind 16 + vulnerable 2 [low advisory]"
+     },
+     {
+      "package": "symfony/mailer",
+      "version": "v4.4.49",
+      "legacy": {
+       "verdict": "left-behind",
+       "priority": "critical",
+       "basis": {
+        "base": "high",
+        "steps": [
+         {
+          "reason": "no_fix_expected",
+          "from": "high",
+          "to": "critical"
+         }
+        ]
+       }
+      },
+      "verdict": "high",
+      "score_total": 24,
+      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
+     },
+     {
+      "package": "symfony/routing",
+      "version": "v4.4.44",
+      "legacy": {
+       "verdict": "left-behind",
+       "priority": "critical",
+       "basis": {
+        "base": "high",
+        "steps": [
+         {
+          "reason": "no_fix_expected",
+          "from": "high",
+          "to": "critical"
+         }
+        ]
+       }
+      },
+      "verdict": "high",
+      "score_total": 24,
+      "score_text": "24 = left-behind 16 + vulnerable 8 [medium advisory]"
+     },
+     {
+      "package": "symfony/validator",
+      "version": "v4.4.48",
+      "legacy": {
+       "verdict": "left-behind",
+       "priority": "critical",
+       "basis": {
+        "base": "high",
+        "steps": [
+         {
+          "reason": "no_fix_expected",
+          "from": "high",
+          "to": "critical"
+         }
+        ]
+       }
+      },
+      "verdict": "high",
+      "score_total": 18,
+      "score_text": "18 = left-behind 16 + vulnerable 2 [low advisory]"
+     }
+    ]
+   }
+  }
+ ],
  "findings": [
   {
    "package": "twig/twig",
@@ -1406,17 +1525,12 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-gw7n-z4yx-7xjt",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
       "id": "PKSA-dpx1-78wg-1kqs",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
-      "id": "PKSA-fbvq-z33h-r2np",
+      "id": "PKSA-gw7n-z4yx-7xjt",
       "basis": "outside_range"
      },
      {
@@ -1426,7 +1540,7 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-xx6c-6d96-db2w",
+      "id": "PKSA-21g2-dzjv-sky5",
       "basis": "outside_range"
      },
      {
@@ -1436,12 +1550,32 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-21g2-dzjv-sky5",
+      "id": "PKSA-fbvq-z33h-r2np",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-xx6c-6d96-db2w",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-kvv6-36cr-fkzb",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-yd6k-t2gh-1m43",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
       "id": "PKSA-g9zw-qxh8-pq8w",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-n14z-jjjg-g8vd",
       "basis": "outside_range"
      },
      {
@@ -1452,21 +1586,6 @@
      {
       "kind": "advisory",
       "id": "PKSA-wwb1-81rc-pd65",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-n14z-jjjg-g8vd",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-yd6k-t2gh-1m43",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-kvv6-36cr-fkzb",
       "basis": "outside_range"
      }
     ],
@@ -1568,17 +1687,12 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-gw7n-z4yx-7xjt",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-dpx1-78wg-1kqs",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-fbvq-z33h-r2np",
+       "id": "PKSA-gw7n-z4yx-7xjt",
        "basis": "outside_range"
       },
       {
@@ -1588,7 +1702,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-xx6c-6d96-db2w",
+       "id": "PKSA-21g2-dzjv-sky5",
        "basis": "outside_range"
       },
       {
@@ -1598,12 +1712,32 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-21g2-dzjv-sky5",
+       "id": "PKSA-fbvq-z33h-r2np",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-xx6c-6d96-db2w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-kvv6-36cr-fkzb",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-yd6k-t2gh-1m43",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
        "id": "PKSA-g9zw-qxh8-pq8w",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-n14z-jjjg-g8vd",
        "basis": "outside_range"
       },
       {
@@ -1614,21 +1748,6 @@
       {
        "kind": "advisory",
        "id": "PKSA-wwb1-81rc-pd65",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-n14z-jjjg-g8vd",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-yd6k-t2gh-1m43",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
-       "id": "PKSA-kvv6-36cr-fkzb",
        "basis": "outside_range"
       }
      ],
@@ -2342,27 +2461,7 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-gcrk-3vtt-1r14",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-yfw5-9gnj-n2c7",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-k1b4-kshy-xgbh",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
       "id": "PKSA-2z36-j4q9-rsfy",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
-      "id": "PKSA-fvw5-9t6n-nwvr",
       "basis": "outside_range"
      },
      {
@@ -2372,17 +2471,27 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-cnw1-2ytm-cgr8",
+      "id": "PKSA-fvw5-9t6n-nwvr",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
-      "id": "PKSA-fy2t-3c5f-827y",
+      "id": "PKSA-gcrk-3vtt-1r14",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
-      "id": "PKSA-qxvb-2bpp-dnk6",
+      "id": "PKSA-k1b4-kshy-xgbh",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-yfw5-9gnj-n2c7",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-93qv-9n9h-6k6p",
       "basis": "outside_range"
      },
      {
@@ -2397,17 +2506,27 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-pwsk-hy21-4gby",
+      "id": "PKSA-cnw1-2ytm-cgr8",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
-      "id": "PKSA-93qv-9n9h-6k6p",
+      "id": "PKSA-fy2t-3c5f-827y",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
       "id": "PKSA-k22t-f949-t9g6",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-pwsk-hy21-4gby",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-qxvb-2bpp-dnk6",
       "basis": "outside_range"
      }
     ],
@@ -8394,12 +8513,12 @@
     "clears": [
      {
       "kind": "advisory",
-      "id": "PKSA-smrh-yx37-92ws",
+      "id": "PKSA-km2b-zc3b-mjm3",
       "basis": "outside_range"
      },
      {
       "kind": "advisory",
-      "id": "PKSA-km2b-zc3b-mjm3",
+      "id": "PKSA-smrh-yx37-92ws",
       "basis": "outside_range"
      },
      {
@@ -8523,12 +8642,12 @@
      "clears": [
       {
        "kind": "advisory",
-       "id": "PKSA-smrh-yx37-92ws",
+       "id": "PKSA-km2b-zc3b-mjm3",
        "basis": "outside_range"
       },
       {
        "kind": "advisory",
-       "id": "PKSA-km2b-zc3b-mjm3",
+       "id": "PKSA-smrh-yx37-92ws",
        "basis": "outside_range"
       },
       {
@@ -30772,11 +30891,6 @@
     "clears": [
      {
       "kind": "advisory",
-      "id": "PKSA-vznr-tgp9-fd7d",
-      "basis": "outside_range"
-     },
-     {
-      "kind": "advisory",
       "id": "PKSA-7qs6-zvnz-h66r",
       "basis": "outside_range"
      },
@@ -30788,6 +30902,11 @@
      {
       "kind": "advisory",
       "id": "PKSA-jj5t-2zs1-dcfm",
+      "basis": "outside_range"
+     },
+     {
+      "kind": "advisory",
+      "id": "PKSA-vznr-tgp9-fd7d",
       "basis": "outside_range"
      }
     ],
@@ -30873,11 +30992,6 @@
      "clears": [
       {
        "kind": "advisory",
-       "id": "PKSA-vznr-tgp9-fd7d",
-       "basis": "outside_range"
-      },
-      {
-       "kind": "advisory",
        "id": "PKSA-7qs6-zvnz-h66r",
        "basis": "outside_range"
       },
@@ -30889,6 +31003,11 @@
       {
        "kind": "advisory",
        "id": "PKSA-jj5t-2zs1-dcfm",
+       "basis": "outside_range"
+      },
+      {
+       "kind": "advisory",
+       "id": "PKSA-vznr-tgp9-fd7d",
        "basis": "outside_range"
       }
      ],
@@ -39854,7 +39973,7 @@
     "clears": [
      {
       "kind": "advisory",
-      "id": "PKSA-v5yj-8nmz-sk2q",
+      "id": "PKSA-b14r-zh1d-vdrc",
       "basis": "outside_range"
      },
      {
@@ -39864,7 +39983,7 @@
      },
      {
       "kind": "advisory",
-      "id": "PKSA-b14r-zh1d-vdrc",
+      "id": "PKSA-v5yj-8nmz-sk2q",
       "basis": "outside_range"
      }
     ],
@@ -39984,7 +40103,7 @@
      "clears": [
       {
        "kind": "advisory",
-       "id": "PKSA-v5yj-8nmz-sk2q",
+       "id": "PKSA-b14r-zh1d-vdrc",
        "basis": "outside_range"
       },
       {
@@ -39994,7 +40113,7 @@
       },
       {
        "kind": "advisory",
-       "id": "PKSA-b14r-zh1d-vdrc",
+       "id": "PKSA-v5yj-8nmz-sk2q",
        "basis": "outside_range"
       }
      ],

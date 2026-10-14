@@ -1,0 +1,5 @@
+::error file=composer.lock,line=4,title=lockrot%3A high — pinned::tobscure/json-api dev-joomla-backports: 16 = pinned 16. Do: no move: lockrot did not read its releases, so it names none; review the snapshot. pinned: pinned to branch snapshot dev-joomla-backports. checks missing: S2, S3, S4, S8 (not from a Composer repository).
+::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
+flags: pinned 1
+depth: every flagged package is named in composer.json · direct 1
+gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

@@ -1,0 +1,580 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "lockrot",
+                    "version": "0.14.0",
+                    "informationUri": "https://github.com/somework/lockrot",
+                    "rules": [
+                        {
+                            "id": "lockrot/left-behind",
+                            "name": "left-behind",
+                            "shortDescription": {
+                                "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
+                            },
+                            "fullDescription": {
+                                "text": "No stable release on the installed branch for release-warn-years, while a higher branch has released since."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/old-promise",
+                            "name": "old-promise",
+                            "shortDescription": {
+                                "text": "old-promise: Released before the target PHP's major with an open-ended php constraint"
+                            },
+                            "fullDescription": {
+                                "text": "The installed version was released before the target PHP's GA date, and its php constraint admits that target untested."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/",
+                            "properties": {
+                                "tags": [
+                                    "maintainability"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-b14r-zh1d-vdrc",
+                            "name": "advisory/PKSA-b14r-zh1d-vdrc",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-b14r-zh1d-vdrc affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-ft77-7h5f-p3r6",
+                            "name": "advisory/PKSA-ft77-7h5f-p3r6",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-ft77-7h5f-p3r6 affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        },
+                        {
+                            "id": "lockrot/advisory/PKSA-v5yj-8nmz-sk2q",
+                            "name": "advisory/PKSA-v5yj-8nmz-sk2q",
+                            "shortDescription": {
+                                "text": "Security advisory PKSA-v5yj-8nmz-sk2q affects the installed version"
+                            },
+                            "fullDescription": {
+                                "text": "A counted security advisory affects the installed version: low severity."
+                            },
+                            "defaultConfiguration": {
+                                "level": "warning"
+                            },
+                            "helpUri": "https://lockrot.dev/verdicts/#security-advisories",
+                            "properties": {
+                                "tags": [
+                                    "security",
+                                    "dependency"
+                                ],
+                                "security-severity": "2.0"
+                            }
+                        }
+                    ]
+                }
+            },
+            "columnKind": "utf16CodeUnits",
+            "originalUriBaseIds": {
+                "%SRCROOT%": {
+                    "uri": "file:///./"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "lockrot/left-behind",
+                    "ruleIndex": 0,
+                    "level": "error",
+                    "rank": 75.0,
+                    "message": {
+                        "text": "symfony/yaml v3.4.47 \u2014 finding high, 22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory] \u2014 left-behind: branch 3.x last released 2020-10-24 (5.9 years ago); 8.x released v8.1.8 (2026-09-26), needs php >=8.4.1 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach. Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v3.4.47",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 22,
+                        "score_text": "22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [
+                            "high"
+                        ],
+                        "chain": [
+                            "symfony/yaml"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/yaml"
+                        ],
+                        "signal_ids": [
+                            "S5",
+                            "S8",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 5.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v8.1.8",
+                                "at": "2026-09-26T06:33:49+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v3.4.47",
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 5.9,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-10-01T12:53:29+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "left-behind",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 16
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/old-promise",
+                    "ruleIndex": 1,
+                    "level": "warning",
+                    "rank": 25.0,
+                    "message": {
+                        "text": "symfony/yaml v3.4.47 \u2014 finding high, 22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory] \u2014 old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v3.4.47",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 22,
+                        "score_text": "22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "old-promise",
+                            "role": "corroborating",
+                            "weight": 16,
+                            "divisor": 4,
+                            "points": 4,
+                            "contribution": 4
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-b14r-zh1d-vdrc",
+                    "ruleIndex": 2,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "symfony/yaml v3.4.47 is affected by CVE-2026-45133 (low advisory): YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings. Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml",
+                        "lockrot/advisory": "PKSA-b14r-zh1d-vdrc"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v3.4.47",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 22,
+                        "score_text": "22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "chain": [
+                            "symfony/yaml"
+                        ],
+                        "depth": 0,
+                        "direct_dependents": [
+                            "symfony/yaml"
+                        ],
+                        "signal_ids": [
+                            "S5",
+                            "S8",
+                            "S9"
+                        ],
+                        "age": {
+                            "installed": {
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 5.9,
+                                "dated_by": null
+                            },
+                            "installed_unmeasured": null,
+                            "release": {
+                                "version": "v8.1.8",
+                                "at": "2026-09-26T06:33:49+00:00",
+                                "years": 0,
+                                "level": null,
+                                "dated_by": null
+                            },
+                            "release_unmeasured": null,
+                            "branch_release": {
+                                "version": "v3.4.47",
+                                "at": "2020-10-24T10:57:07+00:00",
+                                "years": 5.9,
+                                "level": "high",
+                                "dated_by": null
+                            },
+                            "branch_release_unmeasured": null,
+                            "push": {
+                                "at": "2026-10-01T12:53:29+00:00",
+                                "years": 0,
+                                "level": null
+                            },
+                            "push_unmeasured": null
+                        },
+                        "advisory": "PKSA-b14r-zh1d-vdrc",
+                        "cve": "CVE-2026-45133",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "5.x",
+                            "version": "v5.4.52",
+                            "newest": "v5.4.53",
+                            "on_installed_branch": false,
+                            "php": ">=7.2.5",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": true,
+                        "term": {
+                            "part": "security",
+                            "flag": "vulnerable",
+                            "role": "security",
+                            "advisory": "PKSA-b14r-zh1d-vdrc",
+                            "severity": "low",
+                            "fix_kind": "raise-php",
+                            "weight": 2,
+                            "multiplier": 1,
+                            "points": 2,
+                            "contribution": 2
+                        }
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-ft77-7h5f-p3r6",
+                    "ruleIndex": 3,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "symfony/yaml v3.4.47 is affected by CVE-2026-45305 (low advisory): YAML Parser ReDoS via Catastrophic Backtracking in Parser::cleanup() Regex. Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml",
+                        "lockrot/advisory": "PKSA-ft77-7h5f-p3r6"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v3.4.47",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 22,
+                        "score_text": "22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-ft77-7h5f-p3r6",
+                        "cve": "CVE-2026-45305",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "5.x",
+                            "version": "v5.4.52",
+                            "newest": "v5.4.53",
+                            "on_installed_branch": false,
+                            "php": ">=7.2.5",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "lockrot/advisory/PKSA-v5yj-8nmz-sk2q",
+                    "ruleIndex": 4,
+                    "level": "warning",
+                    "rank": 20.0,
+                    "message": {
+                        "text": "symfony/yaml v3.4.47 is affected by CVE-2026-45304 (low advisory): YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion (\"Billion Laughs\"). Do: raise require.php to >=7.2.5, then require symfony/yaml ^5.4.52 \u2014 clears left-behind and 3 advisories; 5.x needs php >=7.2.5, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                    },
+                    "partialFingerprints": {
+                        "lockrot/package": "symfony/yaml",
+                        "lockrot/advisory": "PKSA-v5yj-8nmz-sk2q"
+                    },
+                    "properties": {
+                        "package": "symfony/yaml",
+                        "version": "v3.4.47",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 22,
+                        "score_text": "22 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 2 [low advisory]",
+                        "score_model_id": 1,
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "direct": true,
+                        "dev": false,
+                        "data_date": "2026-10-01T17:41:20+00:00",
+                        "baseline_status": null,
+                        "error_by": [],
+                        "advisory": "PKSA-v5yj-8nmz-sk2q",
+                        "cve": "CVE-2026-45304",
+                        "severity": "low",
+                        "fix": {
+                            "kind": "raise-php",
+                            "to_branch": "5.x",
+                            "version": "v5.4.52",
+                            "newest": "v5.4.53",
+                            "on_installed_branch": false,
+                            "php": ">=7.2.5",
+                            "held_by": [],
+                            "reason": null
+                        },
+                        "points": 2,
+                        "deciding": false
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "composer.lock",
+                                    "uriBaseId": "%SRCROOT%"
+                                },
+                                "region": {
+                                    "startLine": 4
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "invocations": [
+                {
+                    "executionSuccessful": true,
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "properties": {
+                        "gate": {
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
+                            "fail_on_applied": true,
+                            "reaching": 1,
+                            "failing": 1,
+                            "exempt": {
+                                "baseline": 0
+                            },
+                            "failing_by": [
+                                {
+                                    "value": "high",
+                                    "failing": 1
+                                }
+                            ],
+                            "not_applied": [],
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+                        },
+                        "fail_on": "high",
+                        "fail_on_source": "option",
+                        "gates": [
+                            {
+                                "value": "high",
+                                "kind": "grade",
+                                "threshold": "high"
+                            }
+                        ],
+                        "mode": "check",
+                        "strict_network": false
+                    }
+                }
+            ],
+            "properties": {
+                "lockrot_schema": 2,
+                "text_grammar": 1,
+                "score_text_grammar": 1,
+                "score_model_id": 1,
+                "fix_model": 1,
+                "advisory_lookup": {
+                    "scope": "all",
+                    "scope_source": "default",
+                    "packages_asked": 1,
+                    "packages_not_asked": 0,
+                    "other_repositories": 0,
+                    "repositories": [
+                        {
+                            "composer_repository": "composer repo (https://repo.packagist.org)",
+                            "registry": "packagist.org",
+                            "outcome": "answered",
+                            "reason": null,
+                            "message": null,
+                            "packages_with_records": 1,
+                            "records": 3
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

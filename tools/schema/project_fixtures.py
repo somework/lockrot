@@ -314,14 +314,16 @@ def project_explain(doc, proj):
 
 
 def inputs_of(case):
-    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows.
+    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows and
+    lockrot reads its releases, or when it needs a run input that the hydrator does not take (see unhydrated()).
 
     The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix or
     a move names. `dependents` holds the `require` names of each direct dependent that C08 measured, and `abandoned` the
     marking that S1 reads. `accept`, when present, holds the flags of the case's project allowlist entry."""
     f, det, run = case['finding'], case.get('details') or {}, case['run']
     rows = ((det.get('metadata') or {}).get('branches')) or []
-    if not rows or f['metadata']['status'] != 'read':
+    unread = f['metadata']['status'] == 'not_from_composer_repository'
+    if (not rows and not unread) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
         return None
     s9 = next((s for s in f['signals'] if s['id'] == 'S9'), None)
     advisories = (s9 or {}).get('data', {}).get('advisories', [])
@@ -401,7 +403,9 @@ def inputs_of(case):
                         'severity': a['severity_published'], 'affected_versions': a['affected_versions']} for a in advisories],
         'abandoned': marking,
         'dependents': dependents,
-        'activity': None if act.get('status') != 'read' else {'host': act['host'], 'repo': act['repo'], 'pushed_at': push.get('at'), 'archived': act['archived']},
+        # A package that lockrot never asks still names its repository in the lock's `source`.
+        'activity': ({'host': act['host'], 'repo': act['repo'], 'pushed_at': None, 'archived': None} if unread and act.get('host') else None)
+        if act.get('status') != 'read' else {'host': act['host'], 'repo': act['repo'], 'pushed_at': push.get('at'), 'archived': act['archived']},
         'run': {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev'],
                 'advisories_unchecked': f['security']['unchecked_reason']},
     }
@@ -409,7 +413,26 @@ def inputs_of(case):
     allowlist = f.get('allowlist')
     if allowlist is not None and allowlist['by'] == 'project':
         inputs['accept'] = allowlist['flag_ids']
+    if unread:
+        # lockrot reads no release of a package that is not from a Composer repository.
+        del inputs['releases']
+    if f['origin']['kind'] == 'vcs' and act.get('host'):
+        # The project's vcs repository serves the package: lockrot names its origin from it.
+        inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
+
+
+def unhydrated(case):
+    """Why the hydrator cannot rebuild the case, or None: an advisory lookup scope other than `all`, an accept-unchecked
+    entry of the project, or registry dates on a package that no registry serves."""
+    if (case['run'].get('advisory_lookup') or {}).get('scope', 'all') != 'all':
+        return 'advisory-lookup'
+    if any(c['reason'] == 'accepted_by_config' for c in case['finding'].get('checks_skipped') or []):
+        return 'accept-unchecked'
+    if case['finding']['metadata']['status'] == 'not_from_composer_repository' and ((case['finding'].get('age') or {}).get('installed') or {}).get('dated_by'):
+        # A variant that keeps a registry's dates on a package that no registry serves: no lock gives both.
+        return 'registry-dates'
+    return None
 
 
 def dump(path, doc):

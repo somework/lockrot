@@ -8,6 +8,9 @@ on:
   push:
     branches: [main, 'release/**', '!release/full-check-**']
   pull_request:
+# No job of this workflow writes to the repository: the token reads only.
+permissions:
+  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -231,6 +234,27 @@ jobs:
       # The pull-request mutation gate and its shard configuration, also stdlib-only Python.
       - run: python -m compileall -q tools/mutation
       - run: python -m unittest discover -s tools/mutation/tests -t tools/mutation/tests
+  # The TypeScript contract of report-2 (types/, tools/schema/ts/emit_dts.py) and a second JSON
+  # Schema validator. npm ci installs only what tools/schema/node/package-lock.json pins.
+  typescript:
+    runs-on: ubuntu-latest
+    defaults:
+      run: {working-directory: tools/schema/node}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with: {python-version-file: .python-version}
+      - uses: actions/setup-node@v7
+        with: {node-version: '24', cache: npm, cache-dependency-path: tools/schema/node/package-lock.json}
+      - run: npm ci --ignore-scripts
+      - name: The generated unions, probes and bundle module match their sources
+        run: |
+          python3 ../ts/emit_dts.py
+          node emit_bundle.js
+          git diff --exit-code -- ../../../types/lockrot-report-2.known.d.ts ../ts/known-map.json ../ts/probes.generated.ts ../../../tests/fixtures/bundle.generated.ts
+      - run: node union_parity.js
+      - run: node dts_check.js
+      - run: node ajv_all.js
   e2e:
     runs-on: ubuntu-latest
     steps:

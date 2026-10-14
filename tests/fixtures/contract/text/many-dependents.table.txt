@@ -1,0 +1,21 @@
+<options=bold><fg=yellow>medium (1)</fg=yellow></options=bold>
+  symfony/event-dispatcher-contracts v1.10.0  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/event-dispatcher, symfony/form, symfony/framework-bundle, symfony/google-mailer, symfony/http-kernel, symfony/mailer, symfony/monolog-bundle, symfony/security-bundle, symfony/security-core, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle  ·  left-behind
+      8 = left-behind 16 ÷ 2 transitive
+      do: move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle,
+          bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more — clears left-behind; 2.x needs php
+          \>=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which
+          lockrot does not solve; what requires it must allow it; the newest releases of friendsofsymfony/user-bundle
+          (v4.1.0), symfony/event-dispatcher (v8.1.5) and symfony/security-core (v8.1.8) still require it
+      left-behind  branch 1.x last released 2022-07-20 (4.2 years ago); 3.x released v3.7.1 (2026-06-05), needs php
+                   \>=8.1 above the project's php \>=7.4; 2.x released v2.5.4 (2024-09-25)
+
+39 packages checked · 1 flagged: medium 1
+flags: left-behind 1
+depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
+deepest: symfony/event-dispatcher-contracts, 1 hop (friendsofsymfony/user-bundle › symfony/event-dispatcher-contracts)
+libyears: 3.9 behind across the one package · 0.0 from direct requirements ·
+furthest behind symfony/event-dispatcher-contracts v1.10.0 at 3.9
+advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
+Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
+details.

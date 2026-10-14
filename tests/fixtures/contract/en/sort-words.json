@@ -1,0 +1,15 @@
+{
+    "key": {
+        "verdict": "by grade",
+        "security": "findings with an advisory first, by what its advisories add to the score",
+        "score": "by the score",
+        "direct": "direct requirements first",
+        "package": "by name (bytes)"
+    },
+    "dir": {
+        "order": "in the grade order",
+        "desc": "highest first",
+        "true_first": "first",
+        "asc": "A to Z"
+    }
+}

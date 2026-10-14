@@ -1,0 +1,23 @@
+{
+    "fail_on_source": {
+        "env": "LOCKROT_FAIL_ON",
+        "config": "extra.lockrot.fail-on",
+        "default": "default"
+    },
+    "target_php_source": {
+        "option": "--target-php",
+        "env": "LOCKROT_TARGET_PHP",
+        "config": "extra.lockrot.target-php",
+        "platform": "config.platform.php",
+        "runtime": "the running PHP"
+    },
+    "not_applied": {
+        "offline": "not checked (offline)",
+        "composer_too_old": "not checked (Composer below 2.4)",
+        "install_time_budget": "not checked (install-time budget spent)",
+        "lookup_failed": "not checked (a repository failed)",
+        "no_feed": "not checked (no repository publishes advisories)",
+        "not_from_composer_repository": "not asked (advisory-lookup: composer-repositories)",
+        "unparseable_version": "version not readable"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "score_text": "0 (stale accepted)",
+    "next_step_text": null,
+    "gate_line": null,
+    "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
+    "age_line": "age: installed 2.1.1 released 2021-07-17 (5.2 years ago); 2.x last released 2.2.0 2022-05-20 (4.4 years ago), its newest release; last push 2025-10-08 (1.0 years ago)",
+    "explain_age": [
+        "installed  2.1.1     2021-07-17   5.2 years ago",
+        "2.x        2.2.0     2022-05-20   4.4 years ago                 past release-warn-years 3",
+        "newest     2.2.0     2022-05-20   4.4 years ago                 past release-warn-years 3",
+        "last push            2025-10-08   1.0 years ago                 below push-warn-years 3",
+        "libyears 0.8 behind the newest stable release"
+    ],
+    "baseline_suffix": null,
+    "commands_posix": [],
+    "commands_cmd": []
+}
