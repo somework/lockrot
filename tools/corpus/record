@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # Records the offline fixtures from a finished corpus run:
 #   tools/corpus/record --work <dir> --out <report run> --explain-out <explain run>
+# Records the report-2 twin of each claims report from a directory of report-2 documents, one per project:
+#   tools/corpus/record --report-2 <dir>
 # Run it when lockrot changes a sentence that a check reads, or when a new check needs a document.
 # Never edit a recorded fixture: one that does not match its source is worth less than none.
 # Keep the p2 documents minified, `__unset` sentinels included: the reader under test must get
@@ -27,6 +29,8 @@ PACKAGIST_HOST = 'https---repo.packagist.org'
 
 
 def main(argv: 'list[str]') -> int:
+    if argv[:1] == ['--report-2'] and len(argv) == 2:
+        return _write_report_2(argv[1])
     parser = argparse.ArgumentParser(prog='record')
     parser.add_argument('--work', required=True)
     parser.add_argument('--out', required=True)
@@ -125,7 +129,7 @@ def _clear() -> None:
     A stale report names packages that the lock does not carry, and every check then declines it for
     the wrong reason.
     """
-    for relative in ('claims/reports', 'claims/projects', 'claims/cache'):
+    for relative in ('claims/reports-1', 'claims/projects', 'claims/cache'):
         shutil.rmtree(os.path.join(FIXTURES, relative), ignore_errors=True)
     explain = os.path.join(FIXTURES, 'explain')
     for name in os.listdir(explain) if os.path.isdir(explain) else []:
@@ -220,9 +224,31 @@ def _write_claims(chosen: dict, cache: str) -> None:
     for case in cases:
         reports.setdefault(case['project'], []).append(case['finding'])
     for project, findings in reports.items():
-        write_json_atomic(os.path.join(FIXTURES, 'claims', 'reports', project + '.json'),
+        write_json_atomic(os.path.join(FIXTURES, 'claims', 'reports-1', project + '.json'),
                           {'findings': findings})
     print('%d claim case(s) recorded' % len(cases))
+
+
+def _write_report_2(documents: str) -> int:
+    """The findings of the same packages as each reports-1 file, from that project's report-2 document."""
+    target = os.path.join(FIXTURES, 'claims', 'reports-2')
+    shutil.rmtree(target, ignore_errors=True)
+    written = 0
+    for name in sorted(os.listdir(os.path.join(FIXTURES, 'claims', 'reports-1'))):
+        document = read_json(os.path.join(documents, name))
+        if document is None:
+            print('!! no report-2 document for %s' % name, file=sys.stderr)
+            continue
+        packages = [finding['package'] for finding in
+                    read_json(os.path.join(FIXTURES, 'claims', 'reports-1', name))['findings']]
+        findings = [finding for finding in document['findings'] if finding['package'] in packages]
+        write_json_atomic(os.path.join(target, name),
+                          {'lockrot': document['lockrot'], 'generated_at': document['generated_at'],
+                           'findings': findings})
+        written += 1
+    print('%d report-2 claims report(s) recorded' % written)
+
+    return 0
 
 
 def _copy_provider(package: str, cache: str) -> None:

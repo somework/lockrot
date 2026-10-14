@@ -231,6 +231,16 @@ jobs:
         with: {python-version-file: .python-version}
       - run: python -m compileall -q tools/corpus
       - run: python -m unittest discover -s tools/corpus/tests -t tools/corpus/tests
+      # The lockrot.schema guard of the corpus diff (SPEC-0.14.md §8.7.5), one row per pair of document numbers.
+      - name: 'corpus diff: report-1 vs report-1'
+        run: python -m unittest -v -k report_1_against_report_1 test_manifest_and_diff
+        working-directory: tools/corpus/tests
+      - name: 'corpus diff: report-1 vs report-2'
+        run: python -m unittest -v -k report_1_against_report_2 test_manifest_and_diff
+        working-directory: tools/corpus/tests
+      - name: 'corpus diff: report-2 vs report-2'
+        run: python -m unittest -v -k report_2_against_report_2 test_manifest_and_diff
+        working-directory: tools/corpus/tests
       # The pull-request mutation gate and its shard configuration, also stdlib-only Python.
       - run: python -m compileall -q tools/mutation
       - run: python -m unittest discover -s tools/mutation/tests -t tools/mutation/tests

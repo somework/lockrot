@@ -22,7 +22,7 @@ from lockrot_corpus.jsonio import read_json, read_text  # noqa: E402
 
 def fixture_claims() -> 'list':
     claims, empty = load.load_claims(
-        os.path.join(FIXTURES, 'claims', 'reports'),
+        os.path.join(FIXTURES, 'claims', 'reports-1'),
         os.path.join(FIXTURES, 'claims', 'projects'),
         os.path.join(FIXTURES, 'claims', 'cache'),
         REPO_ROOT)

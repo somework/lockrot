@@ -2,9 +2,14 @@
 
 A diff is evidence about the code only while everything else holds still. The runs must share the
 pinned day, the token mode and the Composer cache, and must lie inside one activity-cache lifetime.
-The comparison covers verdict, priority, signal ids, signal summaries and libyears. A libyears
+The comparison covers the verdict words, signal ids, signal summaries and libyears. A libyears
 change has one of three classes, because a measured value that becomes null differs from a number
 that moves.
+
+The verdict words depend on `lockrot.schema` (SPEC-0.14.md §8.7.5). Two report-1 runs compare
+`verdict` and `priority`. Two report-2 runs compare `verdict` and `lead`. A report-2 verdict is a
+grade, so a report-1 run against a report-2 run compares only report-2's `lead` with report-1's
+`verdict`, which held the same cause word.
 """
 
 import datetime
@@ -12,6 +17,11 @@ import os
 
 from .jsonio import read_json
 from .runner import load_manifest
+
+# A report without `lockrot.schema` predates report-2.
+REPORT_1 = 1
+# The report-1 verdicts that name no flag. report-2 writes `lead: null` for each of them.
+NO_LEAD = ('ok', 'finished', 'unknown')
 
 # The cache lifetime of `ActivityClient` (`CACHE_TTL`). Runs further apart than this can read
 # different upstream answers.
@@ -26,7 +36,7 @@ def compare(root_a: str, root_b: str, corpus_digest: 'str | None' = None) -> dic
     manifest_a, manifest_b = load_manifest(root_a), load_manifest(root_b)
     _assert_comparable(manifest_a, manifest_b, root_a, root_b, corpus_digest)
 
-    changes, rows, missing = {}, [], []
+    changes, rows, missing, schemas = {}, [], [], set()
     # The union of what both runs meant to cover. A listing of one side hides a project that is
     # missing from it.
     for project in _projects(root_a, root_b, manifest_a, manifest_b):
@@ -36,6 +46,8 @@ def compare(root_a: str, root_b: str, corpus_digest: 'str | None' = None) -> dic
             missing.append(project)
             continue
         old, new = read_json(path_a), read_json(path_b)
+        pair = (_schema(old), _schema(new))
+        schemas.add(pair)
         before = {item['package']: item for item in old.get('findings', [])}
         after = {item['package']: item for item in new.get('findings', [])}
         for package in sorted(set(before) | set(after)):
@@ -45,10 +57,35 @@ def compare(root_a: str, root_b: str, corpus_digest: 'str | None' = None) -> dic
                 _bump(changes, 'package only in ' + side)
                 rows.append('%s %s only in %s' % (project, package, side))
                 continue
-            _compare_finding(project, package, left, right, changes, rows)
+            _compare_finding(project, package, left, right, pair, changes, rows)
 
-    return {'changes': changes, 'rows': rows, 'missing': missing,
+    return {'changes': changes, 'rows': rows, 'missing': missing, 'schemas': sorted(schemas),
             'a': manifest_a, 'b': manifest_b}
+
+
+def _schema(document: dict) -> int:
+    lockrot = document.get('lockrot')
+
+    return lockrot.get('schema', REPORT_1) if isinstance(lockrot, dict) else REPORT_1
+
+
+def _words(finding: dict, schemas: 'tuple[int, int]', side: int) -> 'dict[str, object]':
+    """The verdict words that the two schemas share, by the name that each diff row prints."""
+    old, new = schemas
+    if old == new:
+        second = 'priority' if old == REPORT_1 else 'lead'
+
+        return {'verdict': finding.get('verdict'), second: finding.get(second)}
+    if schemas[side] == REPORT_1:
+        verdict = finding.get('verdict')
+
+        return {'lead': None if verdict in NO_LEAD else verdict}
+
+    return {'lead': finding.get('lead')}
+
+
+def schema_line(old: int, new: int) -> str:
+    return 'report-%d vs report-%d: verdicts not compared' % (old, new)
 
 
 def _projects(root_a: str, root_b: str, manifest_a: dict, manifest_b: dict) -> 'list[str]':
@@ -65,13 +102,13 @@ def _readable(path: str) -> bool:
 
 
 def _compare_finding(project: str, package: str, left: dict, right: dict,
-                     changes: 'dict[str, int]', rows: 'list[str]') -> None:
-    if left.get('verdict') != right.get('verdict'):
-        _bump(changes, 'verdict %s -> %s' % (left.get('verdict'), right.get('verdict')))
-        rows.append('%s %s verdict %s -> %s' % (project, package, left.get('verdict'), right.get('verdict')))
-    if left.get('priority') != right.get('priority'):
-        _bump(changes, 'priority %s -> %s' % (left.get('priority'), right.get('priority')))
-        rows.append('%s %s priority %s -> %s' % (project, package, left.get('priority'), right.get('priority')))
+                     schemas: 'tuple[int, int]', changes: 'dict[str, int]', rows: 'list[str]') -> None:
+    before_words, after_words = _words(left, schemas, 0), _words(right, schemas, 1)
+    for word, old in before_words.items():
+        new = after_words[word]
+        if old != new:
+            _bump(changes, '%s %s -> %s' % (word, old, new))
+            rows.append('%s %s %s %s -> %s' % (project, package, word, old, new))
 
     before = {signal['id']: signal for signal in left.get('signals', [])}
     after = {signal['id']: signal for signal in right.get('signals', [])}
@@ -174,12 +211,16 @@ def render(result: dict, root_a: str, root_b: str) -> str:
     lines.append('day %s, %s, cache %s'
                  % (result['a'].get('today'), result['a'].get('token_mode'), result['a'].get('cache_root')))
     lines.append('')
+    for old, new in result['schemas']:
+        if old != new:
+            lines.append(schema_line(old, new))
+            lines.append('')
     if result['missing']:
         lines.append('!! %d project(s) unreadable on one side and not compared: %s'
                      % (len(result['missing']), ', '.join(result['missing'])))
         lines.append('')
     if not result['changes']:
-        lines.append('no verdict, priority, signal or libyears change')
+        lines.append('no verdict word, signal or libyears change')
     else:
         for key in sorted(result['changes']):
             lines.append('%-40s %d' % (key, result['changes'][key]))

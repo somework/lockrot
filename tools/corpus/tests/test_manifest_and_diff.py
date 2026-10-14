@@ -9,7 +9,7 @@ import shutil
 import tempfile
 import unittest
 
-import support  # noqa: F401 - puts the package on the path
+import support
 
 from lockrot_corpus import diff, fetch, manifest
 from lockrot_corpus.jsonio import write_json_atomic
@@ -224,6 +224,84 @@ class DiffCounts(unittest.TestCase):
         self._write(self.a, [{'package': 'x/y', 'verdict': 'ok', 'signals': []}])
         result = diff.compare(self.a, self.b)
         self.assertEqual(['p'], result['missing'])
+
+
+
+class DiffSchemas(unittest.TestCase):
+    """The `lockrot.schema` guard: one row per pair of document numbers. Each row reads the claims
+    reports recorded under both numbers, so a guard that reads the wrong field fails on real output."""
+
+    PROJECT = 'BookStackApp_BookStack'
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp(prefix='corpus-diffschema-')
+        self.a = os.path.join(self.root, 'a')
+        self.b = os.path.join(self.root, 'b')
+        for directory, digest in ((self.a, 'a' * 8), (self.b, 'b' * 8)):
+            write_json_atomic(os.path.join(directory, 'run.json'),
+                              {'today': '2026-10-14', 'token_mode': 'token', 'cache_root': '/a/cache',
+                               'phar_sha256': digest, 'lockrot_version': '0.14.0',
+                               'started': '2026-10-14T08:00:00+00:00',
+                               'finished': '2026-10-14T09:00:00+00:00', 'targets': {}})
+
+    def tearDown(self):
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def _recorded(self, directory, schema_dir):
+        shutil.copy(os.path.join(support.FIXTURES, 'claims', schema_dir, self.PROJECT + '.json'),
+                    os.path.join(directory, self.PROJECT + '.json'))
+
+    def _write(self, directory, document):
+        write_json_atomic(os.path.join(directory, 'p.json'), document)
+
+    def test_report_1_against_report_1_compares_verdict_and_priority(self):
+        self._write(self.a, {'findings': [{'package': 'x/y', 'verdict': 'stale', 'priority': 'low', 'signals': []}]})
+        self._write(self.b, {'findings': [{'package': 'x/y', 'verdict': 'silent', 'priority': 'high', 'signals': []}]})
+        result = diff.compare(self.a, self.b)
+        self.assertEqual({'verdict stale -> silent': 1, 'priority low -> high': 1}, result['changes'])
+        self.assertNotIn('verdicts not compared', diff.render(result, self.a, self.b))
+
+    def test_report_1_against_report_1_on_the_recorded_reports_finds_no_change(self):
+        self._recorded(self.a, 'reports-1')
+        self._recorded(self.b, 'reports-1')
+        result = diff.compare(self.a, self.b)
+        self.assertEqual([(1, 1)], result['schemas'])
+        self.assertEqual({}, result['changes'])
+
+    def test_report_1_against_report_2_compares_lead_with_the_old_verdict_only(self):
+        self._write(self.a, {'findings': [
+            {'package': 'x/y', 'verdict': 'stale', 'priority': 'low', 'signals': []},
+            {'package': 'x/z', 'verdict': 'ok', 'priority': 'none', 'signals': []}]})
+        self._write(self.b, {'lockrot': {'schema': 2}, 'findings': [
+            {'package': 'x/y', 'verdict': 'medium', 'priority': 'medium', 'lead': 'silent', 'signals': []},
+            {'package': 'x/z', 'verdict': 'critical', 'priority': 'critical', 'lead': None, 'signals': []}]})
+        result = diff.compare(self.a, self.b)
+        self.assertEqual({'lead stale -> silent': 1}, result['changes'])
+        self.assertIn('report-1 vs report-2: verdicts not compared', diff.render(result, self.a, self.b))
+
+    def test_report_1_against_report_2_on_the_recorded_reports_keeps_every_lead(self):
+        self._recorded(self.a, 'reports-1')
+        self._recorded(self.b, 'reports-2')
+        result = diff.compare(self.a, self.b)
+        self.assertEqual([(1, 2)], result['schemas'])
+        self.assertEqual([], [key for key in result['changes'] if key.split(' ')[0] in ('verdict', 'priority', 'lead')])
+        self.assertIn('report-1 vs report-2: verdicts not compared', diff.render(result, self.a, self.b))
+
+    def test_report_2_against_report_2_compares_verdict_and_lead(self):
+        self._write(self.a, {'lockrot': {'schema': 2}, 'findings': [
+            {'package': 'x/y', 'verdict': 'high', 'priority': 'high', 'lead': 'stale', 'signals': []}]})
+        self._write(self.b, {'lockrot': {'schema': 2}, 'findings': [
+            {'package': 'x/y', 'verdict': 'critical', 'priority': 'critical', 'lead': 'abandoned', 'signals': []}]})
+        result = diff.compare(self.a, self.b)
+        self.assertEqual({'verdict high -> critical': 1, 'lead stale -> abandoned': 1}, result['changes'])
+        self.assertNotIn('verdicts not compared', diff.render(result, self.a, self.b))
+
+    def test_report_2_against_report_2_on_the_recorded_reports_finds_no_change(self):
+        self._recorded(self.a, 'reports-2')
+        self._recorded(self.b, 'reports-2')
+        result = diff.compare(self.a, self.b)
+        self.assertEqual([(2, 2)], result['schemas'])
+        self.assertEqual({}, result['changes'])
 
 
 if __name__ == '__main__':

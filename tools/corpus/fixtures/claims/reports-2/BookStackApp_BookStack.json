@@ -1,0 +1,757 @@
+{
+  "lockrot": {
+    "version": "0.14.0",
+    "schema": 2
+  },
+  "generated_at": "2026-10-14T00:00:00+00:00",
+  "findings": [
+    {
+      "package": "socialiteproviders/discord",
+      "version": "4.2.0",
+      "branch": "4.x",
+      "installed_php": {
+        "requires": "^7.4 || ^8.0",
+        "target_runs": true,
+        "project_allows": true
+      },
+      "verdict": "medium",
+      "priority": "medium",
+      "lead": "stale",
+      "rank": 3,
+      "flags": [
+        {
+          "id": "stale",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S2"
+          ],
+          "degree": {
+            "liveness_complete": true
+          },
+          "headline": {
+            "unit": "years",
+            "value": 3.2,
+            "source": "release"
+          },
+          "summary": "last release 2023-07-24 (3.2 years ago)"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 8,
+        "exact": 8,
+        "rounded_down": false,
+        "band": {
+          "floor": 8,
+          "next": "high",
+          "to_next": 8
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 8,
+            "alone": {
+              "total": 8,
+              "verdict": "medium"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "stale",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 8
+          }
+        ],
+        "modifiers": [],
+        "accepted": [],
+        "without": [],
+        "text": "8 = stale 8"
+      },
+      "next_step": {
+        "kind": "no-move",
+        "source": "stale",
+        "merged": [],
+        "fix_kind": null,
+        "reason": "package_quiet",
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": null,
+        "version": null,
+        "newest": null,
+        "constraint": null,
+        "latest": null,
+        "php_check": null,
+        "crosses_major": null,
+        "held_by": [],
+        "clears": [],
+        "unverified": [],
+        "adds": [],
+        "leaves": [
+          {
+            "kind": "flag",
+            "id": "stale"
+          }
+        ],
+        "clears_all": false,
+        "if_applied": null,
+        "composer_moves_because": [],
+        "commands": [],
+        "through": [],
+        "also": [],
+        "text": "—"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (http://127.0.0.1)",
+            "registry": null,
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "SocialiteProviders/Discord",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T01:03:03+00:00",
+        "cached_at": "2026-10-14T01:03:03+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/socialiteproviders/discord",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": true,
+      "dev": false,
+      "reach": "direct",
+      "chain": [
+        "socialiteproviders/discord"
+      ],
+      "depth": 0,
+      "depth_unmeasured": null,
+      "named_in": [
+        "require"
+      ],
+      "direct_dependents": [
+        "socialiteproviders/discord"
+      ],
+      "signals": [
+        {
+          "id": "S2",
+          "level": "warn",
+          "summary": "last release 2023-07-24 (3.2 years ago)",
+          "data": {
+            "last_release": "2023-07-24T23:28:47+00:00",
+            "last_version": "4.2.0",
+            "years": 3.2,
+            "dated_by": null
+          }
+        }
+      ],
+      "evidence": "stale: last release 2023-07-24 (3.2 years ago)",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T01:03:03+00:00",
+      "libyears": 0,
+      "age": {
+        "installed": {
+          "at": "2023-07-24T23:28:47+00:00",
+          "years": 3.2,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "4.2.0",
+          "at": "2023-07-24T23:28:47+00:00",
+          "years": 3.2,
+          "level": "warn",
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "4.2.0",
+          "at": "2023-07-24T23:28:47+00:00",
+          "years": 3.2,
+          "level": "warn",
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-02-21T12:48:34+00:00",
+          "years": 0.6,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
+      "package": "socialiteproviders/gitlab",
+      "version": "4.1.0",
+      "branch": "4.x",
+      "installed_php": {
+        "requires": "^7.2 || ^8.0",
+        "target_runs": true,
+        "project_allows": true
+      },
+      "verdict": "medium",
+      "priority": "medium",
+      "lead": "stale",
+      "rank": 4,
+      "flags": [
+        {
+          "id": "stale",
+          "role": "lead",
+          "baseline": null,
+          "signal_ids": [
+            "S2"
+          ],
+          "degree": {
+            "liveness_complete": true
+          },
+          "headline": {
+            "unit": "years",
+            "value": 5.9,
+            "source": "release"
+          },
+          "summary": "last release 2020-12-01 (5.9 years ago)"
+        }
+      ],
+      "score": {
+        "model": 1,
+        "total": 8,
+        "exact": 8,
+        "rounded_down": false,
+        "band": {
+          "floor": 8,
+          "next": "high",
+          "to_next": 8
+        },
+        "decided_by": "maintenance",
+        "parts": {
+          "maintenance": {
+            "status": "counted",
+            "contribution": 8,
+            "alone": {
+              "total": 8,
+              "verdict": "medium"
+            }
+          },
+          "security": {
+            "status": "clear",
+            "contribution": 0,
+            "alone": {
+              "total": 0,
+              "verdict": null
+            },
+            "of": 0,
+            "tied": []
+          }
+        },
+        "terms": [
+          {
+            "part": "maintenance",
+            "flag": "stale",
+            "role": "lead",
+            "weight": 8,
+            "divisor": 1,
+            "points": 8,
+            "contribution": 8
+          }
+        ],
+        "modifiers": [],
+        "accepted": [],
+        "without": [],
+        "text": "8 = stale 8"
+      },
+      "next_step": {
+        "kind": "no-move",
+        "source": "stale",
+        "merged": [],
+        "fix_kind": null,
+        "reason": "package_quiet",
+        "replacement": null,
+        "quiet_years": null,
+        "to_branch": null,
+        "version": null,
+        "newest": null,
+        "constraint": null,
+        "latest": null,
+        "php_check": null,
+        "crosses_major": null,
+        "held_by": [],
+        "clears": [],
+        "unverified": [],
+        "adds": [],
+        "leaves": [
+          {
+            "kind": "flag",
+            "id": "stale"
+          }
+        ],
+        "clears_all": false,
+        "if_applied": null,
+        "composer_moves_because": [],
+        "commands": [],
+        "through": [],
+        "also": [],
+        "text": "—"
+      },
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (http://127.0.0.1)",
+            "registry": null,
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "SocialiteProviders/GitLab",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T01:03:04+00:00",
+        "cached_at": "2026-10-14T01:03:04+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/socialiteproviders/gitlab",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": true,
+      "dev": false,
+      "reach": "direct",
+      "chain": [
+        "socialiteproviders/gitlab"
+      ],
+      "depth": 0,
+      "depth_unmeasured": null,
+      "named_in": [
+        "require"
+      ],
+      "direct_dependents": [
+        "socialiteproviders/gitlab"
+      ],
+      "signals": [
+        {
+          "id": "S2",
+          "level": "high",
+          "summary": "last release 2020-12-01 (5.9 years ago)",
+          "data": {
+            "last_release": "2020-12-01T23:10:59+00:00",
+            "last_version": "4.1.0",
+            "years": 5.9,
+            "dated_by": null
+          }
+        }
+      ],
+      "evidence": "stale: last release 2020-12-01 (5.9 years ago)",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T01:03:04+00:00",
+      "libyears": 0,
+      "age": {
+        "installed": {
+          "at": "2020-12-01T23:10:59+00:00",
+          "years": 5.9,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "4.1.0",
+          "at": "2020-12-01T23:10:59+00:00",
+          "years": 5.9,
+          "level": "high",
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "4.1.0",
+          "at": "2020-12-01T23:10:59+00:00",
+          "years": 5.9,
+          "level": "high",
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-02-21T12:50:05+00:00",
+          "years": 0.6,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
+      "package": "guzzlehttp/guzzle",
+      "version": "7.15.5",
+      "branch": "7.x",
+      "installed_php": {
+        "requires": "^7.2.5 || ^8.0",
+        "target_runs": true,
+        "project_allows": true
+      },
+      "verdict": "ok",
+      "priority": "none",
+      "lead": null,
+      "rank": 10,
+      "flags": [],
+      "score": {
+        "model": 1,
+        "total": 0,
+        "exact": 0,
+        "accepted": [],
+        "text": "0"
+      },
+      "next_step": null,
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 15,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (http://127.0.0.1)",
+            "registry": null,
+            "answer": "answered",
+            "records": 15,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "guzzle/guzzle",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T01:02:04+00:00",
+        "cached_at": "2026-10-14T01:02:04+00:00"
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/guzzlehttp/guzzle",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": null,
+      "libyears_at_least": false,
+      "direct": true,
+      "dev": false,
+      "reach": "direct",
+      "chain": [
+        "guzzlehttp/guzzle"
+      ],
+      "depth": 0,
+      "depth_unmeasured": null,
+      "named_in": [
+        "require"
+      ],
+      "direct_dependents": [
+        "guzzlehttp/guzzle",
+        "laravel/framework",
+        "laravel/socialite",
+        "laravel/tinker",
+        "league/flysystem-aws-s3-v3",
+        "league/oauth2-client",
+        "socialiteproviders/discord",
+        "socialiteproviders/gitlab",
+        "socialiteproviders/microsoft-azure",
+        "socialiteproviders/okta",
+        "socialiteproviders/twitch"
+      ],
+      "signals": [],
+      "evidence": "",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T01:02:04+00:00",
+      "libyears": 0.04,
+      "age": {
+        "installed": {
+          "at": "2026-08-24T09:21:06+00:00",
+          "years": 0.1,
+          "dated_by": null
+        },
+        "installed_unmeasured": null,
+        "release": {
+          "version": "8.2.0",
+          "at": "2026-09-06T13:55:09+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "release_unmeasured": null,
+        "branch_release": {
+          "version": "7.15.5",
+          "at": "2026-08-24T09:21:06+00:00",
+          "years": 0.1,
+          "level": null,
+          "dated_by": null
+        },
+        "branch_release_unmeasured": null,
+        "push": {
+          "at": "2026-09-06T13:55:34+00:00",
+          "years": 0.1,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    },
+    {
+      "package": "symfony/polyfill-ctype",
+      "version": "v1.37.0",
+      "branch": "1.x",
+      "installed_php": {
+        "requires": ">=7.2",
+        "target_runs": true,
+        "project_allows": true
+      },
+      "verdict": "finished",
+      "priority": "none",
+      "lead": null,
+      "rank": 92,
+      "flags": [],
+      "score": {
+        "model": 1,
+        "total": 0,
+        "exact": 0,
+        "accepted": [],
+        "text": "0"
+      },
+      "next_step": null,
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (http://127.0.0.1)",
+            "registry": null,
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [],
+      "checks_skipped": [
+        {
+          "check": "repository_activity",
+          "reason": "allowlisted",
+          "blocks": [
+            "S3",
+            "S4"
+          ]
+        }
+      ],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "not_read",
+        "reason": "allowlisted",
+        "forge": "github",
+        "host": "github.com",
+        "repo": "symfony/polyfill-ctype",
+        "event": null,
+        "archived": null,
+        "fetched_at": null,
+        "cached_at": null
+      },
+      "allowlist": {
+        "by": "builtin",
+        "pattern": "symfony/polyfill-*",
+        "version": null,
+        "reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
+        "reason_id": "symfony-extension-polyfills",
+        "reason_by": "lockrot",
+        "expires": null,
+        "flag_ids": null
+      },
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/symfony/polyfill-ctype",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": "shared_commit",
+      "libyears_at_least": false,
+      "direct": false,
+      "dev": false,
+      "reach": "transitive",
+      "chain": [
+        "laravel/framework",
+        "symfony/http-kernel",
+        "symfony/polyfill-ctype"
+      ],
+      "depth": 2,
+      "depth_unmeasured": null,
+      "named_in": [],
+      "direct_dependents": [
+        "laravel/framework",
+        "laravel/socialite",
+        "laravel/tinker",
+        "league/flysystem-aws-s3-v3",
+        "socialiteproviders/discord",
+        "socialiteproviders/gitlab",
+        "socialiteproviders/microsoft-azure",
+        "socialiteproviders/okta",
+        "socialiteproviders/twitch"
+      ],
+      "signals": [],
+      "evidence": "",
+      "allowlist_reason": "polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace",
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": null,
+      "age": {
+        "installed": null,
+        "installed_unmeasured": "shared_commit",
+        "release": null,
+        "release_unmeasured": "undated_releases",
+        "branch_release": null,
+        "branch_release_unmeasured": "undated_releases",
+        "push": null,
+        "push_unmeasured": "allowlisted"
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    }
+  ]
+}
