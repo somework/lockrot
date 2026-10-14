@@ -15925,7 +15925,7 @@
                                 ]
                             },
                             "php": {
-                                "description": "The requirement of the branch's newest dated release, as the repository lists it; null when it declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.",
+                                "description": "The requirement of the branch's newest dated release, as the repository lists it, or of its highest tag when no release on the branch has a date; null when it declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.",
                                 "oneOf": [
                                     {
                                         "type": "string"

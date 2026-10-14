@@ -242,8 +242,8 @@ def explain_metadata():
     row['description'] = ('One release branch, highest first (the details block, §7.6). Every key but `highest_php`, `released_years` and `fixes` is '
                           '0.13\'s; find the installed row by `installed: true`, never by name.')
     row['properties']['branch']['description'] = 'The branch label as `ReleaseBranch::label()` writes it (`2.x`, `0.15.x`, `0.0.3`), the same label as `finding.branch`.'
-    row['properties']['php'] = nullable({'type': 'string'}, 'The requirement of the branch\'s newest dated release, as the repository lists it; null when it '
-                                                           'declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.')
+    row['properties']['php'] = nullable({'type': 'string'}, 'The requirement of the branch\'s newest dated release, as the repository lists it, or of its '
+                                                           'highest tag when no release on the branch has a date; null when it declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.')
     props = row['properties']
     at = list(props).index('php') + 1
     row['properties'] = dict(list(props.items())[:at] + [('highest_php', nullable({'type': 'string'}, (
