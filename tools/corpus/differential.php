@@ -184,8 +184,10 @@ function run(string $entry, string $app, bool $mirrors, array $arguments): array
         fwrite(STDERR, "differential: $entry on $app exited ".$process->getExitCode()."\n".$process->getErrorOutput());
         exit(1);
     }
-    $outside = FixtureCliRun::outsideRequests($process);
-    if ($mirrors && $outside !== []) {
+    // Without mirrors, the run asks the app's own composer repositories, and the closed proxy fails each request.
+    $unmirrored = $mirrors ? [] : composerRepositories(APPS.'/'.$app);
+    $outside = array_filter(FixtureCliRun::outsideRequests($process), static fn (string $url): bool => [] === array_filter($unmirrored, static fn (string $repository): bool => strpos($url, $repository.'/') === 0));
+    if ($outside !== []) {
         fwrite(STDERR, "differential: $entry on $app asked outside the recordings: ".implode(', ', $outside)."\n");
         exit(1);
     }
@@ -315,6 +317,24 @@ function adoptModel(string $reports, string $inputs): void
 }
 
 /**
+ * The URL of each `composer` repository in the composer.json of $appDir, without a trailing slash.
+ *
+ * @return list<string>
+ */
+function composerRepositories(string $appDir): array
+{
+    $manifest = json_decode((string) file_get_contents($appDir.'/composer.json'), true);
+    $urls = [];
+    foreach (is_array($manifest['repositories'] ?? null) ? $manifest['repositories'] : [] as $repository) {
+        if (is_array($repository) && ($repository['type'] ?? null) === 'composer' && is_string($repository['url'] ?? null)) {
+            $urls[] = rtrim($repository['url'], '/');
+        }
+    }
+
+    return $urls;
+}
+
+/**
  * Why the model's documents in $reports were not written from the input in $inputs, by MODEL_PHAR at CLOCK.
  *
  * @param array<string, mixed> $model the reports mode's provenance.json
@@ -338,8 +358,14 @@ function adoptionProblems(array $model, array $input, string $reports, string $i
             }
         }
     }
-    if (($model['inputs'] ?? []) === [] || ($model['outputs'] ?? []) === []) {
-        $problems[] = 'the provenance of '.$reports.' names no input or no output';
+    $expected = array_map(static fn (string $id): string => $id.'.json', array_keys(runs()));
+    sort($expected);
+    foreach (['inputs', 'outputs'] as $key) {
+        $names = array_keys((array) ($model[$key] ?? []));
+        sort($names);
+        if ($names !== $expected) {
+            $problems[] = 'the '.$key.' in the provenance of '.$reports.' are not one document per run';
+        }
     }
 
     return $problems;
