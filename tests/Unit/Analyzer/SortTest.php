@@ -266,8 +266,8 @@ final class SortTest extends TestCase
 
     /**
      * The order sorts every finding, and every format of a run reads it: a report sorts once, and so
-     * does its copy with the run settings. fragility-ok: compares two durations of one process, set
-     * apart by a factor of 10.
+     * does its copy with the run settings. A sort writes a new list, and a kept order allocates
+     * nothing, so the memory the reads take tells the two apart.
      */
     public function testEveryFormatOfOneReportReadsOneSort(): void
     {
@@ -276,23 +276,20 @@ final class SortTest extends TestCase
         for ($i = 0; $i < 400; ++$i) {
             $findings[] = self::graded(\sprintf('vendor/p%03d', $i * 7919 % 400), $fired[$i % 5]);
         }
-        $fresh = new Report($findings, [], new \DateTimeImmutable(self::NOW), 400, 0);
-        $start = hrtime(true);
-        $order = $fresh->sorted();
-        $sort = hrtime(true) - $start;
         $report = new Report($findings, [], new \DateTimeImmutable(self::NOW), 400, 0);
         $context = FormatContext::create(null, 'none');
         Formatters::for('json', $context)->format($report);
         Formatters::for('table', $context)->format($report);
+        $copy = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
 
-        $start = hrtime(true);
-        $again = $report->sorted();
-        $copy = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null))->sorted();
-        $read = hrtime(true) - $start;
+        $before = memory_get_usage();
+        $order = $report->sorted();
+        $copied = $copy->sorted();
+        $taken = memory_get_usage() - $before;
 
-        self::assertSame($order, $again);
-        self::assertSame($order, $copy);
-        self::assertLessThan($sort / 10, $read, 'a format or the copy with the run settings sorts the findings again');
+        self::assertSame(array_map(static fn (Finding $f): string => $f->package(), (new Report($findings, [], new \DateTimeImmutable(self::NOW), 400, 0))->sorted()), array_map(static fn (Finding $f): string => $f->package(), $order));
+        self::assertSame($order, $copied);
+        self::assertSame(0, $taken, 'a format or the copy with the run settings sorts the findings again');
     }
 
     /**
