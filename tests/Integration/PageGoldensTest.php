@@ -69,8 +69,8 @@ final class PageGoldensTest extends TestCase
 
         self::assertSame(self::inputs($model), self::inputs($lockrot), $id.': lockrot and the model read different root fields');
         self::assertSame(self::GRADES, JsonPath::arrayAt($model, ['run', 'graded_verdicts']));
-        $counts = JsonPath::arrayAt($lockrot, ['counts']);
-        $heading = new PageHeading(JsonPath::intAt($lockrot, ['packages_checked']), (int) $counts['critical'], (int) $counts['high'], (int) $counts['medium'], (int) $counts['low']);
+        $count = static fn (string $grade): int => JsonPath::intAt($lockrot, ['counts', $grade]);
+        $heading = new PageHeading(JsonPath::intAt($lockrot, ['packages_checked']), $count('critical'), $count('high'), $count('medium'), $count('low'));
 
         self::assertSame(JsonPath::stringAt($golden, ['title']), $heading->title());
         self::assertSame(JsonPath::stringAt($golden, ['description']), $heading->description());
