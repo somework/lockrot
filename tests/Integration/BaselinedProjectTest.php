@@ -62,8 +62,8 @@ final class BaselinedProjectTest extends TestCase
         $dir = BaselinedScenario::FIXTURES.'baselined/'.$scenario.'/';
         $files = BaselinedScenario::record($scenario);
 
-        // Composer below 2.4 has no advisory API, so lockrot checks no advisory there. The recording ran with one, so on
-        // such a Composer the files differ, and only the floors that need no advisory and the invariants below hold.
+        // Composer below 2.4 has no advisory API, so lockrot checks no advisory there. The recording ran with one.
+        // On such a Composer, the files differ: only the floors that need no advisory and the invariants hold.
         $advisories = version_compare(Composer::VERSION, '2.4', '>=');
         if ($advisories) {
             self::assertSame(self::committed($dir), array_keys($files), $scenario.': the recorder writes every committed file and no other');

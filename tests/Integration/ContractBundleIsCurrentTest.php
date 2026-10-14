@@ -12,9 +12,8 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The committed contract bundle is what lockrot writes (SPEC-0.14.md §7.11 item 4): a fresh recording
- * equals tests/fixtures/contract/ file for file and byte for byte, and `bundle_sha256` is the hash of
- * the committed files. Re-record with tools/report/record.
+ * The committed contract bundle is what lockrot writes (SPEC-0.14.md §7.11 item 4). A fresh recording
+ * equals tests/fixtures/contract/ byte for byte. `bundle_sha256` hashes the committed files.
  *
  * @coversNothing
  *

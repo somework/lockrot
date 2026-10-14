@@ -53,7 +53,7 @@ final class ContractBundle
      * The fewest goldens per key that the recording compares with the model's. A hydrated input that
      * differs from the model's leaves its golden uncompared, so a lost input fails here.
      */
-    public const COMPARED_FLOOR = ['age_line' => 61, 'baseline_suffix' => 68, 'commands_cmd' => 87, 'commands_posix' => 87, 'gate_line' => 84, 'next_step_text' => 51, 'run_gate_line' => 86, 'score_text' => 74];
+    public const COMPARED_FLOOR = ['age_line' => 65, 'baseline_suffix' => 70, 'commands_cmd' => 91, 'commands_posix' => 91, 'gate_line' => 88, 'next_step_text' => 55, 'run_gate_line' => 90, 'score_text' => 78];
     /** The inputs of a command list: the move's argv. */
     private const COMMANDS = ['next_step.commands'];
     /** Up to this many score lines per grammar path of the sweep, as the model's score-lines.json keeps. */
@@ -82,9 +82,9 @@ final class ContractBundle
     private array $argvs = [];
 
     /**
-     * Every file of the bundle by its path below tests/fixtures/contract/, and the cases that no
-     * hydration rebuilds: their model documents go to `model-only/`, apart from lockrot's output. `provenance.json` and `bundle_sha256` are left out:
-     * tools/report/record writes them.
+     * Every file of the bundle by its path below tests/fixtures/contract/. The model documents of
+     * the cases that no hydration rebuilds go to `model-only/`. tools/report/record writes
+     * `provenance.json` and `bundle_sha256`.
      *
      * @return array{files: array<string, string>, without_inputs: list<string>, goldens: array{compared: array<string, int>, inputs_differ: array<string, int>}}
      */
