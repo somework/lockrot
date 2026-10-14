@@ -183,9 +183,9 @@ final class FixtureRepositoryServer
     /**
      * Serves the recorded answers of another `composer` repository below `/mirror/<n>` and returns
      * the URL to use in its place: its packages.json, the p2 answer of each served name that its
-     * `available-package-patterns` match, and its advisory API, which gives the recorded answer to
-     * any POST. Each answer is the envelope that `bin/record-fixtures --into` wrote in $recordingDir
-     * for the original URL. Call before {@see start()}.
+     * `available-packages` or `available-package-patterns` admit, and its advisory API, which gives
+     * the recorded answer to any POST. Each answer is the envelope that `bin/record-fixtures --into`
+     * wrote in $recordingDir for the original URL. Call before {@see start()}.
      */
     public function withMirror(string $url, string $recordingDir): string
     {
@@ -209,13 +209,14 @@ final class FixtureRepositoryServer
             // bin/record-fixtures trims the advisories out of each p2 answer, so a mirror can serve only an advisory API.
             throw new \RuntimeException($url.' publishes its advisories only in its p2 files, which the recordings do not keep');
         }
-        $patterns = array_values(array_filter(\is_array($packages['available-package-patterns'] ?? null) ? $packages['available-package-patterns'] : ['*'], 'is_string'));
-        $served = ['available-package-patterns' => $patterns];
+        $listed = array_values(array_filter(\is_array($packages['available-packages'] ?? null) ? $packages['available-packages'] : [], 'is_string'));
+        $patterns = array_values(array_filter(\is_array($packages['available-package-patterns'] ?? null) ? $packages['available-package-patterns'] : ($listed === [] ? ['*'] : []), 'is_string'));
+        $served = ['available-packages' => $listed, 'available-package-patterns' => $patterns];
         if (\is_string($packages['metadata-url'] ?? null)) {
             $template = $resolve($packages['metadata-url']);
             $served['metadata-url'] = $local($template);
             foreach ($this->names as $name) {
-                $p2 = self::matchesAny($name, $patterns) ? $answer(str_replace('%package%', $name, $template)) : null;
+                $p2 = \in_array($name, $listed, true) || self::matchesAny($name, $patterns) ? $answer(str_replace('%package%', $name, $template)) : null;
                 if ($p2 !== null) {
                     self::writeFile($this->docroot.str_replace('%package%', $name, $served['metadata-url']), $p2);
                 }
