@@ -83,7 +83,11 @@ if (($argv[1] ?? null) === '--adopt-model') {
     exit(0);
 }
 
-$provenance = json_decode((string) file_get_contents(MODEL.'/provenance.json'), true);
+$provenance = json_decode((string) @file_get_contents(MODEL.'/provenance.json'), true);
+if (!is_array($provenance)) {
+    fwrite(STDERR, "differential: tests/fixtures/corpus/model-report-2/provenance.json is missing or not JSON\n");
+    exit(2);
+}
 $problems = provenanceProblems($provenance);
 $write = ($argv[1] ?? null) === '--write' ? ($argv[2] ?? '') : null;
 $allowed = allowedEntries();
