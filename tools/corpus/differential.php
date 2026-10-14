@@ -77,10 +77,14 @@ foreach ($apps as $app) {
         file_put_contents($write.'/'.$app.'.json', preg_replace('{http://127\.0\.0\.1:\d+}', 'http://127.0.0.1', VersionMask::apply($json)));
     }
     $ours = findings(json_decode($json, true));
+    if (!is_file(MODEL.'/'.$app.'.json')) {
+        fwrite(STDERR, "differential: no model document tests/fixtures/corpus/model-report-2/$app.json\n");
+        exit(2);
+    }
     $theirs = findings(json_decode((string) file_get_contents(MODEL.'/'.$app.'.json'), true));
     foreach (['lockrot' => $ours, 'model' => $theirs] as $side => $findings) {
         foreach ($findings as $finding) {
-            $counts[$side]['vulnerable'] += in_array('vulnerable', array_column($finding['flags'], 'id'), true) ? 1 : 0;
+            $counts[$side]['vulnerable'] += in_array('vulnerable', array_column(listAt($finding, 'flags'), 'id'), true) ? 1 : 0;
             $counts[$side]['critical'] += $finding['verdict'] === 'critical' ? 1 : 0;
         }
     }
@@ -176,13 +180,13 @@ function values(array $finding): array
         }
         $values[$path] = canonical($value);
     }
-    foreach ($finding['flags'] as $flag) {
+    foreach (listAt($finding, 'flags') as $flag) {
         foreach (FLAG_FIELDS as $key) {
             $values['flags.'.$flag['id'].'.'.$key] = canonical($flag[$key] ?? null);
         }
     }
-    foreach ($finding['signals'] as $signal) {
-        foreach ($signal['id'] === 'S9' ? $signal['data']['advisories'] : [] as $row) {
+    foreach (listAt($finding, 'signals') as $signal) {
+        foreach (($signal['id'] ?? null) === 'S9' ? listAt($signal['data'] ?? [], 'advisories') : [] as $row) {
             foreach (is_array($row['fix'] ?? null) ? $row['fix'] : [] as $key => $fix) {
                 $values['S9.fix.'.$key.'['.$row['id'].']'] = canonical($fix);
             }
@@ -190,6 +194,18 @@ function values(array $finding): array
     }
 
     return $values;
+}
+
+/**
+ * A list under $key, or none: a document that lacks it then differs on each path it would give.
+ *
+ * @param mixed $object
+ *
+ * @return list<array<string, mixed>>
+ */
+function listAt($object, string $key): array
+{
+    return is_array($object) && is_array($object[$key] ?? null) ? $object[$key] : [];
 }
 
 /**
