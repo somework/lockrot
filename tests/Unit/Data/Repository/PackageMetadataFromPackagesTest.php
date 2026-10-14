@@ -144,6 +144,19 @@ final class PackageMetadataFromPackagesTest extends TestCase
         }
     }
 
+    /** composer/composer 2.x: an LTS backport is the newest dated release, and the highest tag keeps its own requirement. */
+    public function testTheBranchsHighestTagCarriesItsOwnPhp(): void
+    {
+        $higherButOlder = $this->load(['name' => 'a/b', 'version' => '2.10.3', 'time' => '2026-01-01T00:00:00+00:00', 'require' => ['php' => '^7.2.5 || ^8.0']]);
+        $lowerButNewer = $this->load(['name' => 'a/b', 'version' => '2.2.30', 'time' => '2026-02-01T00:00:00+00:00', 'require' => ['php' => '^5.3.2 || ^7.0 || ^8.0']]);
+
+        foreach ([[$lowerButNewer, $higherButOlder], [$higherButOlder, $lowerButNewer]] as $order) {
+            $branch = PackageMetadata::fromPackages('a/b', $order, new \DateTimeImmutable(self::FIXED))->latestStableByBranch()['2'];
+            self::assertSame(['2.10.3', '^7.2.5 || ^8.0'], [$branch['highest']['pretty'], $branch['highest']['php']]);
+            self::assertSame('^5.3.2 || ^7.0 || ^8.0', $branch['php']);
+        }
+    }
+
     /** php-http/promise: the highest 1.x tag is older than the branch's last release. */
     public function testTheNewestDatedReleaseOnABranchWinsOverAHigherOlderOne(): void
     {

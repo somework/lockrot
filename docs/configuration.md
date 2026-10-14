@@ -236,7 +236,9 @@ The document also carries `lockrot`, `package`, `version` and `generated_at`. Th
 
 In the release-branch table, S8 does not measure a branch whose highest tag is `undated` or dated
 only by a `commit <date>` that other tags share ([Left behind](verdicts.md#left-behind),
-[Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
+[Dates from the monorepo](verdicts.md#dates-from-the-monorepo)). The table's php column gives
+the requirement of each branch's highest tag. The JSON `php` field gives the requirement of the
+branch's newest dated release ([The PHP test](verdicts.md#the-php-test-in-explain)).
 
 ## Caching
 

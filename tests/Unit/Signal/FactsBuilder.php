@@ -75,7 +75,7 @@ final class FactsBuilder
             $branch = ReleaseBranch::of($version);
             if ($branch !== null && VersionParser::parseStability($version) === 'stable') {
                 $seen = $byBranch[$branch] ?? null;
-                $highest = $seen === null ? ['normalized' => (new VersionParser())->normalize($version), 'pretty' => $version, 'at' => $at] : $seen['highest'];
+                $highest = $seen === null ? ['normalized' => (new VersionParser())->normalize($version), 'pretty' => $version, 'at' => $at, 'php' => $php] : $seen['highest'];
                 if ($at !== null && ($seen === null || $seen['at'] === null || $at > $seen['at'])) {
                     $byBranch[$branch] = ['version' => $version, 'at' => $at, 'highest' => $highest, 'php' => $php];
                 } elseif ($seen === null) {

@@ -314,7 +314,7 @@ final class AgeMeasureTest extends TestCase
             'https://github.com/vendor/parent.git',
             'library',
             new \DateTimeImmutable(self::NOW),
-            [1 => ['version' => 'v1.1.0', 'at' => $year, 'highest' => ['normalized' => '1.1.0.0', 'pretty' => 'v1.1.0', 'at' => $year], 'php' => null]],
+            [1 => ['version' => 'v1.1.0', 'at' => $year, 'highest' => ['normalized' => '1.1.0.0', 'pretty' => 'v1.1.0', 'at' => $year, 'php' => null], 'php' => null]],
             ['vendor/pkg'],
             null,
             ['1.1.0.0' => $year, '1.0.0.0' => new \DateTimeImmutable(self::ago(2 * Clock::SECONDS_PER_YEAR))]

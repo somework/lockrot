@@ -93,6 +93,7 @@ final class Explanation
     /**
      * Highest branch first. `highest_commit_date` is the commit date of a highest tag that shares its
      * commit with other tags, else null. It tells "no date" from "a date that is not the release's".
+     * `php` is the highest tag's requirement, which the table prints beside that tag.
      * See docs/configuration.md#explaining-one-package.
      *
      * @return list<array{branch: string, installed: bool, highest: string, highest_released: ?\DateTimeImmutable, highest_commit_date: ?\DateTimeImmutable, newest_dated: string, newest_dated_released: ?\DateTimeImmutable, dated_by: ?string, php: ?string}>
@@ -110,7 +111,7 @@ final class Explanation
                 'newest_dated' => $row->newestDated(),
                 'newest_dated_released' => $row->newestDatedReleased(),
                 'dated_by' => $row->datedBy(),
-                'php' => $row->php(),
+                'php' => $row->highestPhp(),
             ];
         }
 

@@ -295,10 +295,21 @@ final class ExplainFormatterTest extends TestCase
     public function testATagThatSharesItsCommitIsDatedByTheCommit(): void
     {
         $at = new \DateTimeImmutable('2024-03-01T00:00:00+00:00');
-        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, 'v1.4.0', 1, null, 'library', new \DateTimeImmutable(F::NOW), ['1' => ['version' => 'v1.4.0', 'at' => $at, 'highest' => ['normalized' => '1.4.0.0', 'pretty' => 'v1.4.0', 'at' => null], 'php' => null]]);
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, 'v1.4.0', 1, null, 'library', new \DateTimeImmutable(F::NOW), ['1' => ['version' => 'v1.4.0', 'at' => $at, 'highest' => ['normalized' => '1.4.0.0', 'pretty' => 'v1.4.0', 'at' => null, 'php' => null], 'php' => null]]);
         $finding = (new FindingBuilder())->withVersion('v1.4.0')->build();
 
         self::assertStringContainsString("\n   * 1.x      v1.4.0        commit 2024-03-01 —\n", self::plain(new Explanation($finding, F::facts(F::package(['version' => 'v1.4.0']), $metadata), new Thresholds(), '8.4', self::report())));
+    }
+
+    /** SPEC §7: a row reads branch, highest tag, released, php, so the php is the highest tag's, not the newest dated release's. */
+    public function testABranchRowPrintsThePhpOfItsHighestTag(): void
+    {
+        $at = new \DateTimeImmutable('2026-01-01T00:00:00+00:00');
+        $branch = ['version' => '2.2.30', 'at' => new \DateTimeImmutable('2026-02-01T00:00:00+00:00'), 'highest' => ['normalized' => '2.10.3.0', 'pretty' => '2.10.3', 'at' => $at, 'php' => '^7.2.5 || ^8.0'], 'php' => '^5.3.2 || ^7.0 || ^8.0'];
+        $metadata = new PackageMetadata('vendor/pkg', false, null, true, $at, '2.10.3', 2, null, 'library', new \DateTimeImmutable(F::NOW), ['2' => $branch]);
+        $finding = (new FindingBuilder())->withVersion('2.2.1')->build();
+
+        self::assertStringContainsString("\n   * 2.x      2.10.3        2026-01-01   ^7.2.5 || ^8.0\n", self::plain(new Explanation($finding, F::facts(F::package(['version' => '2.2.1']), $metadata), new Thresholds(), '8.4', self::report())));
     }
 
     /** Case B's monolog-bridge v2.6.13 holds one counted advisory. */
