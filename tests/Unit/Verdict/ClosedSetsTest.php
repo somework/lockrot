@@ -110,6 +110,55 @@ final class ClosedSetsTest extends TestCase
         self::assertArrayHasKey(KnownValues::KEYWORD, JsonPath::arrayAt($schema, ['definitions', 'activityEvent']));
     }
 
+    public function testEachClosedSetOfReport2IsAnEnumWithoutKnownValues(): void
+    {
+        $schema = self::schema(Schemas::REPORT, 2);
+        foreach (ClosedSets::report2() as $set => $paths) {
+            foreach ($paths as $path) {
+                $node = JsonPath::arrayAt($schema, $path);
+                self::assertArrayHasKey('enum', $node, $set.' at '.implode('/', $path));
+                self::assertArrayNotHasKey(KnownValues::KEYWORD, $node, $set.' at '.implode('/', $path));
+            }
+        }
+    }
+
+    /**
+     * Every enum of two or more values in report-2 spells a set that the registry names, so the
+     * compatibility page cannot omit one. An enum inside a relation's `anyOf`, `allOf` or `not`
+     * restricts a value under a condition and is not a set of its own.
+     */
+    public function testEveryEnumOfReport2IsAClosedSetTheRegistryNames(): void
+    {
+        $sets = array_values(ClosedSets::report2Values());
+        $enums = self::enumsOutsideRelations(self::schema(Schemas::REPORT, 2), '#');
+        self::assertNotSame([], $enums);
+
+        foreach ($enums as $pointer => $values) {
+            self::assertContains($values, $sets, $pointer.' spells '.json_encode($values).', a set ClosedSets::report2() does not name');
+        }
+    }
+
+    /**
+     * @param array<mixed, mixed> $node
+     *
+     * @return array<string, list<string>> JSON pointer => the enum's values, for every enum of two or more values
+     */
+    private static function enumsOutsideRelations(array $node, string $pointer): array
+    {
+        $enums = [];
+        if (isset($node['enum']) && \is_array($node['enum']) && \count($node['enum']) > 1) {
+            $enums[$pointer] = array_map(static fn ($value): string => \is_string($value) ? $value : (string) json_encode($value), array_values($node['enum']));
+        }
+        foreach ($node as $key => $child) {
+            if (!\is_array($child) || \in_array($key, ['anyOf', 'allOf', 'not'], true)) {
+                continue;
+            }
+            $enums += self::enumsOutsideRelations($child, $pointer.'/'.$key);
+        }
+
+        return $enums;
+    }
+
 
     public function testTheExplainSchemaSpellsTheSameVerdictsPrioritiesAndLevels(): void
     {

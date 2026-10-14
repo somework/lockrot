@@ -39,7 +39,7 @@ composer config allow-plugins.somework/lockrot true
 
 The `composer config` line grants the plugin the permission that Composer asks for.
 
-The plugin also prints a short summary of the flagged packages that a `composer require`, `update`
+The plugin also prints a short summary of the graded packages that a `composer require`, `update`
 or `install` changes. To silence it, set `extra.lockrot.install-time` to `off`
 ([Install-time summary](https://lockrot.dev/install-time/)).
 
@@ -71,20 +71,21 @@ installed and, for a complete run, a GitHub token in `GITHUB_TOKEN`
     lockrot checks against `config.platform.php`, else the PHP that runs Composer. If your project
     runs on another PHP in production, pass `--target-php=<version>`.
 
-    lockrot groups flagged findings by priority. Each row gives the verdict, the package, how the
-    project reaches it (`direct` or `via …`) and the evidence. The summary block under the list
-    counts every verdict, sums the [libyears](https://lockrot.dev/verdicts/#libyears), and names the
-    direct requirements that pull in the most flagged packages.
+    lockrot groups graded findings by grade. Each finding gives the package, how the project
+    reaches it (`direct` or `via …`), its flags, the score line, the move (`do:`) and the evidence.
+    The summary block under the list counts the findings per grade and per flag, sums the
+    [libyears](https://lockrot.dev/verdicts/#libyears), and names the direct requirements that pull
+    in the most graded packages.
 
     ![composer lockrot on a real project: the grouped list, the summary block and the footer](docs/assets/lockrot-demo.gif)
 
-2. Ask why one package is flagged, or why it is not:
+2. Ask why one package is graded, or why it is not:
 
     ```bash
     composer lockrot --explain=vendor/package
     ```
 
-    lockrot prints the package's verdict, priority and every signal with its dates
+    lockrot prints the package's flags, each term of its score and every signal with its dates
     ([Explaining one package](https://lockrot.dev/configuration/#explaining-one-package)).
 
 3. Accept the current findings with the options that your CI step uses:
@@ -102,43 +103,43 @@ installed and, for a complete run, a GitHub token in `GITHUB_TOKEN`
     composer lockrot --fail-on=high
     ```
 
-    lockrot exits `1` when a finding that is new or worse than the baseline has priority `high` or
-    `critical`. [Choosing a threshold](https://lockrot.dev/ci/) says when to pick another.
+    lockrot exits `1` when a finding grades `high` or `critical`. For a package that the baseline
+    records, only the facts that are new to the baseline count
+    ([Baseline](https://lockrot.dev/baseline/)). [In CI](https://lockrot.dev/ci/) says when to pick
+    another value.
 
-Next: [What it reports](https://lockrot.dev/verdicts/) for each verdict,
+Next: [What it reports](https://lockrot.dev/verdicts/) for each flag and the score,
 [every configuration key](https://lockrot.dev/configuration/), and [CI setup](https://lockrot.dev/ci/).
 
 ## What it reports
 
-Each package gets one verdict:
+Each package gets the flags that fired on it:
 
-| Verdict | Meaning |
+| Flag | Meaning |
 |---|---|
-| `abandoned` | Its Composer repository marks it abandoned, or its repository is archived on GitHub or GitLab |
+| `abandoned` | Its Composer repository marks it abandoned, or its repository is archived on its host |
 | `silent` | No release and no push to its repository in years |
 | `pinned` | Installed from a branch snapshot (`dev-main` or any other `dev-*` branch, `2.x-dev`), or the package has no tagged release |
 | `left-behind` | The installed release branch stopped releasing while a newer branch still releases |
 | `old-promise` | Released before the target PHP major existed, and admits it only because `require.php` has no upper bound |
 | `stale` | An old release or an old push, short of `silent` |
-| `unknown` | No repository metadata: not from a Composer repository, not listed, or the lookup failed |
-| `finished` | On the built-in allowlist or the project's `ignore` list |
-| `ok` | None of the above |
+| `vulnerable` | A security advisory affects the installed version |
 
-- **Priority** (`critical` to `low`) says how much a finding matters to this project: it starts
-  from the verdict and drops for a transitive or development-only package
-  ([Priority](https://lockrot.dev/verdicts/#priority)).
-- **Security advisories:** on a flagged finding, lockrot names the release that fixes each
-  advisory `composer audit` reports, when the repository lists one. On an `abandoned`, `silent` or
-  `left-behind` package with no fix it says `no fix expected` and raises the priority one step
+- **Score and verdict:** the flags add up to a score, and the score's band is the finding's grade,
+  `critical` to `low`. A transitive or development-only package scores lower. A finding with score
+  0 reads `unknown`, `finished` or `ok` ([The score](https://lockrot.dev/verdicts/#score)).
+- **Security advisories:** lockrot reads the advisories that `composer audit` reports, names the
+  release that fixes each one and what holds that release back. An advisory that no reachable
+  release fixes counts double
   ([Security advisories](https://lockrot.dev/verdicts/#security-advisories)).
 - **Transitive exposure:** a transitive finding names every direct requirement that reaches it, and
-  each direct requirement's evidence lists the flagged packages it pulls in
+  each direct requirement's evidence lists the graded packages it pulls in
   ([Transitive exposure](https://lockrot.dev/verdicts/#transitive-exposure)).
 - **Libyears:** the summary's `libyears:` line sums, over the lock, the years between each
   installed release and the package's newest release
   ([Libyears](https://lockrot.dev/verdicts/#libyears)).
 
-[What it reports: every verdict, signal and threshold →](https://lockrot.dev/verdicts/)
+[What it reports: every flag, signal and score rule →](https://lockrot.dev/verdicts/)
 
 ## In CI
 
@@ -151,8 +152,9 @@ Run the same command as a CI step, with `GITHUB_TOKEN` in the step's environment
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-- **`--fail-on`** takes a verdict (fail on what lockrot observed), a priority (fail on how much it
-  matters here) or `unchecked` (fail when a check could not run).
+- **`--fail-on`** takes a grade (how much a finding matters here), a flag (one fact that lockrot
+  observed), a `vulnerable` value (an advisory of that severity or worse) or `unchecked` (a check
+  could not run).
 - **Exit codes:** `0` passed, `1` a finding reached `--fail-on` (or, with `--strict-network`, a
   network lookup failed), `2` lockrot could not run or finish
   ([Exit codes](https://lockrot.dev/ci/#exit-codes)).
@@ -191,7 +193,7 @@ variable, which wins over `composer.json`. The keys that most projects set:
 
 | `extra.lockrot` key | CLI option | Default | Effect |
 |---|---|---|---|
-| `fail-on` | `--fail-on` | `none` | Exit `1` threshold: a verdict, a priority, `unchecked` or `none` |
+| `fail-on` | `--fail-on` | `none` | The values that exit `1`: a grade, a flag, a `vulnerable` value, `unchecked`, or `none` |
 | `target-php` | `--target-php` | `config.platform.php`, else the running PHP | The PHP version that the project runs on: decides `old-promise`, and the newer branch that a `left-behind` finding names |
 | `include-dev` | `--dev` | `false` | Also check `packages-dev` |
 | `format` | `--format` | `table` | Output format |
@@ -219,11 +221,11 @@ What changed in each release is in the [changelog](https://lockrot.dev/changelog
 - **Package metadata** comes from the Composer repositories that your project configures. A Satis
   build needs `notify-batch` set
   ([Which Composer repository answers](https://lockrot.dev/internals/#two-passes)).
-- **No inherited verdicts:** a package is never flagged for what it depends on. Its evidence and the
+- **No inherited flags:** a package never gets a flag for what it depends on. Its evidence and the
   `pulled in by:` line say what it pulls in
   ([Transitive exposure](https://lockrot.dev/verdicts/#transitive-exposure)).
 - **`composer require --dev … --dry-run`:** the install-time summary can read a new package's
-  priority one step high
+  grade one band high
   ([Under `--dry-run`](https://lockrot.dev/install-time/#a-note-on-the-dry-run-development-flag)).
 
 ## Roadmap

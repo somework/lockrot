@@ -78,6 +78,14 @@ of them.
 | `api.bitbucket.org` and `bitbucket.org` | A package's repository is on Bitbucket | Repository activity, and on `bitbucket.org` only the exchange of a Composer `bitbucket-oauth` consumer for a token |
 | `api.github.com`, `github.com` and the host that its release downloads redirect to | `self-update` only | The release list, the archive, its checksum, its signature and the release metadata `lockrot.phar.meta.json` (which `--check` reads too) |
 
+The advisory lookup sends each Composer repository that publishes advisories the names of every
+package that the run checks: vcs, path and archive packages too, and packages-dev with `--dev`.
+Like `composer audit`, it asks by name whatever the package's origin. A repository that publishes
+the list of its packages gets only the names on that list. lockrot sends no version. With
+`extra.lockrot.advisory-lookup: composer-repositories`, lockrot sends only the names of the
+packages from a Composer repository
+([Which advisories count](docs/verdicts.md#which-advisories-count)).
+
 Credentials:
 
 - lockrot reads `LOCKROT_GITHUB_TOKEN`, `GITHUB_TOKEN`, `LOCKROT_GITLAB_TOKEN` and `GITLAB_TOKEN`
@@ -98,9 +106,10 @@ What a report reveals about your repositories (their URLs, names and paths) is i
 
 ## Known vulnerabilities
 
-lockrot is not a vulnerability scanner: an advisory can raise a finding's priority but never
-flags a package ([Security advisories](docs/verdicts.md#security-advisories)). Gate on known
-vulnerabilities with `composer audit`.
+A counted advisory flags the package `vulnerable` and adds to its score
+([Security advisories](docs/verdicts.md#security-advisories)). `--fail-on=vulnerable` fails the run
+on it ([In CI](docs/ci.md)). lockrot reads the advisories that Composer's
+repositories publish, and finds no vulnerability of its own.
 
 ## How self-update trusts a release
 

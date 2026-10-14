@@ -47,6 +47,7 @@ use Lockrot\Signal\Signal;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\AssertsNoteDetails;
+use Lockrot\Tests\Support\DocsPages;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
@@ -1169,7 +1170,13 @@ final class JsonSchemaConformanceTest extends TestCase
     /** @return iterable<string, array{string, int, string}> every ```json block in docs/, with the schema and number it must match */
     public static function docSamples(): iterable
     {
-        foreach (glob(self::DOCS.'*.md') ?: [] as $path) {
+        return self::samplesIn(self::DOCS);
+    }
+
+    /** @return iterable<string, array{string, int, string}> keyed by the page's path below $docs and the block's number */
+    private static function samplesIn(string $docs): iterable
+    {
+        foreach (DocsPages::in($docs) as $page => $path) {
             $text = (string) file_get_contents($path);
             preg_match_all('/```json\n(.*?)\n```/s', $text, $matches);
             foreach ($matches[1] as $i => $block) {
@@ -1178,9 +1185,32 @@ final class JsonSchemaConformanceTest extends TestCase
                 if ($schema === null) {
                     continue;
                 }
-                yield basename($path).' #'.($i + 1) => [$schema[0], $schema[1], $block];
+                yield $page.' #'.($i + 1) => [$schema[0], $schema[1], $block];
             }
         }
+    }
+
+    /** A nested page is a page: its report-2 sample is held to report-2, and `overrides/` is skipped. */
+    public function testASampleOnANestedPageIsHeldToItsSchema(): void
+    {
+        $docs = sys_get_temp_dir().'/lockrot-docs-'.bin2hex(random_bytes(8));
+        $sample = "```json\n{\n    \"\$schema\": \"https://lockrot.dev/schema/report-2.json\",\n    \"lockrot\": {\"schema\": 2},\n    \"findings\": []\n}\n```\n";
+        mkdir($docs.'/changes', 0777, true);
+        mkdir($docs.'/overrides');
+        file_put_contents($docs.'/changes/0.14.md', $sample);
+        file_put_contents($docs.'/overrides/main.md', $sample);
+        try {
+            $samples = iterator_to_array(self::samplesIn($docs));
+        } finally {
+            unlink($docs.'/changes/0.14.md');
+            unlink($docs.'/overrides/main.md');
+            rmdir($docs.'/changes');
+            rmdir($docs.'/overrides');
+            rmdir($docs);
+        }
+
+        self::assertSame(['changes/0.14.md #1'], array_keys($samples));
+        self::assertSame([Schemas::REPORT, 2], [$samples['changes/0.14.md #1'][0], $samples['changes/0.14.md #1'][1]]);
     }
 
     /**
@@ -1335,18 +1365,18 @@ final class JsonSchemaConformanceTest extends TestCase
         self::assertSame($expected, self::schemaFor($document));
     }
 
-    public function testADocsSampleNamingReport1IsCheckedAgainstTheReport1File(): void
+    public function testADocsSampleNamingReport2IsCheckedAgainstTheReport2File(): void
     {
         $found = 0;
         foreach (self::docSamples() as $name => [$document, $number, $block]) {
-            if (strpos($block, '"$schema": "https://lockrot.dev/schema/report-1.json"') === false) {
+            if (strpos($block, '"$schema": "https://lockrot.dev/schema/report-2.json"') === false) {
                 continue;
             }
-            self::assertSame([Schemas::REPORT, 1], [$document, $number], $name);
-            self::assertSame('lockrot-report-1.schema.json', basename(self::schemaFileFor($document, (string) json_encode(self::documentOf($block)), $number)), $name);
+            self::assertSame([Schemas::REPORT, 2], [$document, $number], $name);
+            self::assertSame('lockrot-report-2.schema.json', basename(self::schemaFileFor($document, (string) json_encode(self::documentOf($block)), $number)), $name);
             ++$found;
         }
-        self::assertGreaterThan(0, $found, 'docs/ holds a report-1 sample');
+        self::assertGreaterThan(0, $found, 'docs/ holds a report-2 sample');
     }
 
     /**

@@ -30,8 +30,8 @@ session() {
 export -f session
 
 # The exported function only exists for bash, whatever the recorder's login shell is.
-# The window is tall enough for the whole report of koel, the prompt and the cursor row in the last
-# frame. The idle cap shortens the repository round-trips, which show nothing on screen.
+# The last frame holds the summary block, the footer and the cursor row below the last findings. The
+# idle cap shortens the repository round-trips, which show nothing on screen.
 SHELL=/bin/bash asciinema rec --overwrite --quiet --idle-time-limit 2 --window-size 110x37 --command 'session "php lockrot.phar --target-php=8.4"' "$cast"
 agg --font-size 18 --line-height 1.3 --theme monokai --speed 1 --last-frame-duration 5 --fps-cap 20 "$cast" "$gif"
 ls -la "$gif"

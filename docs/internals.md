@@ -46,16 +46,23 @@ lockrot reads the host from the first of these URLs that is set:
    suffix cut off.
 3. the lock entry's `source` URL, then its `support.source`.
 
-lockrot never uses an older release's URL. It asks no host about a package that:
+lockrot never uses an older release's URL. No host is built in beyond github.com, bitbucket.org
+and gitlab.com: a host becomes askable only through Composer's `gitlab-domains`. A URL with a port,
+such as `gitlab.com:443`, is another host to Composer and to lockrot, so it gets no
+`GITLAB_TOKEN`. lockrot asks no host about a package, and the finding's `activity` says why, when:
 
-- has no such URL, or one that names none of github.com, bitbucket.org or a host in
-  `gitlab-domains`, so lockrot does not query GitHub Enterprise (`github-domains`) or Bitbucket
-  Server. A URL with a port, such as `gitlab.com:443`, is another host to Composer and to lockrot,
-  so it gets no `GITLAB_TOKEN`.
-- is allowlisted
-- is not from a Composer repository
+| Case | `activity.reason` | S10 |
+|---|---|---|
+| An allowlist entry accepts the whole package | `allowlisted` | no |
+| The package has no URL, or a URL that names no repository on a known host | `no_repository` | no |
+| The URL is on a host that lockrot cannot ask: GitHub Enterprise (`github-domains`), Bitbucket Server, a Forgejo, Gitea or Subversion host, a GitLab host that `gitlab-domains` does not list | `host_not_supported` | yes, unless [`accept-unchecked`](configuration.md#accept-unchecked) accepts it |
+| The package is installed from vcs, or from an origin that lockrot cannot tell | `not_from_composer_repository` | yes, unless `accept-unchecked` accepts it |
+| The package is installed from a path, an artifact or an inline `package` entry | `not_from_composer_repository` | no |
 
-Such a package gets no S3 or S4, and no S10 for `repository_activity`.
+A host that answers 404 is an answer, not a gap: `activity.status` is `not_found`, and no S10
+follows, even when the same host also rate-limits the run. The note
+[`repository_activity_host_not_supported`](notes.md#repository_activity_host_not_supported) names
+each host that lockrot cannot ask.
 
 ### What is sent
 
@@ -88,6 +95,31 @@ carries `User-Agent: lockrot`.
 `self-update` sends the same GitHub token to GitHub's release API
 ([Keeping it updated](phar.md#keeping-it-updated)).
 
+## Self-hosted GitLab {#self-hosted-gitlab}
+
+lockrot asks a self-hosted GitLab, such as Drupal's git.drupalcode.org, once Composer lists it:
+
+```sh
+composer config gitlab-domains git.drupalcode.org
+# optional: the archived flag (S3), and a higher rate limit
+composer config --global gitlab-token.git.drupalcode.org <token>
+```
+
+- Composer merges `gitlab-domains` with its default `gitlab.com`, and lockrot reads the merged
+  list. A `gitlab-token` entry for a host also adds the host to that list, so a token alone makes
+  the host askable.
+- Without a token, lockrot asks the host for the newest commit only. The answer carries no archived
+  flag, so S3 cannot fire, and each such finding carries the skip
+  `{check: repository_archived, reason: no_token}`.
+- A Forgejo or Gitea host is not GitLab: `gitlab-domains` cannot make it askable, and Composer's
+  `forgejo-domains` does not either. Accept its gap with
+  [`accept-unchecked`](configuration.md#accept-unchecked).
+
+On a Drupal site, the recipe removes the `host_not_supported` gaps of git.drupalcode.org. It does
+not make the site pass `--fail-on=unchecked`: packages from packages.drupal.org keep S10
+`undated_releases`, a gap that `accept-unchecked` does not accept. A recorded run of the PHAR over
+public Drupal site locks showed both.
+
 ## Which Composer repository answers {#two-passes}
 
 - lockrot looks up only lock entries that carry a `notification-url`, which Composer records for a
@@ -107,10 +139,12 @@ carries `User-Agent: lockrot`.
   ([Dates from the monorepo](verdicts.md#dates-from-the-monorepo)).
 
 - Advisories come from every repository that publishes them, not only the first
-  ([Advisories not checked](notes.md#advisories_not_checked)). A repository with an advisory API,
-  such as Packagist, receives the names of the checked packages, not their versions.
-  [Security advisories](verdicts.md#security-advisories) says how lockrot matches and ignores
-  advisories.
+  ([Advisories not checked](notes.md#advisories_not_checked)). lockrot makes one lookup per run:
+  it sends each repository the names of every package that the run checks, whatever its origin,
+  and never a version. It asks for every advisory of each name, and matches the versions itself:
+  the installed version, and the versions that each move admits. `extra.lockrot.advisory-lookup:
+  composer-repositories` sends only the names of the packages from a Composer repository
+  ([Which advisories count](verdicts.md#which-advisories-count)).
 
 ## Caching
 

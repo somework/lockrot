@@ -2,6 +2,7 @@
 # Vendor a release of the report renderer into resources/report/.
 #
 #   tools/report/update-renderer v1.2.3           a release of somework/lockrot-report
+#   tools/report/update-renderer v1.2.3-rc.1      a pre-release of it, attested the same way
 #   tools/report/update-renderer --from-dir DIR   a local dist/, for development only. It is not attested.
 #
 # The page that `--format=html` writes comes from https://github.com/somework/lockrot-report. The
@@ -14,7 +15,7 @@ REPO=somework/lockrot-report
 DEST=resources/report
 FILES=(report.html manifest.json)
 
-usage() { sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+usage() { sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 [ $# -ge 1 ] || usage
 
 work=$(mktemp -d)
@@ -26,7 +27,7 @@ if [ "$1" = "--from-dir" ]; then
   echo "update-renderer: vendoring a LOCAL build from $2 — not attested; do not release with it" >&2
 else
   tag=$1
-  [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "update-renderer: expected a tag like v1.2.3, got $tag" >&2; exit 2; }
+  [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]] || { echo "update-renderer: expected a tag like v1.2.3 or v1.2.3-rc.1, got $tag" >&2; exit 2; }
   gh release download "$tag" --repo "$REPO" --dir "$work" "${FILES[@]/#/--pattern=}"
   for file in "${FILES[@]}"; do
     gh attestation verify "$work/$file" --repo "$REPO" >/dev/null

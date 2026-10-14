@@ -56,6 +56,7 @@ theme:
 nav:
   - Home: index.md
   - What it reports: verdicts.md
+  - Score model 1: verdicts/model-1.md
   - Configuration: configuration.md
   - In CI: ci.md
   - Baseline: baseline.md

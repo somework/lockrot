@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Tests\Support\ClosedSets;
+use Lockrot\Tests\Support\DocsPages;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +35,30 @@ final class CompatibilityPageTest extends TestCase
         self::assertStringContainsString('Grades, highest first: `'.implode('`, `', ScoreModel::GRADES).'`.', $page);
         self::assertStringContainsString('Signal levels, lowest first: `'.implode('`, `', ClosedSets::levels()).'`.', $page);
         self::assertStringContainsString("A finding's standing against the baseline: `".implode('`, `', ClosedSets::standings()).'`.', $page);
-        self::assertStringContainsString("A finding's `activity.status` in report-2: `".implode('`, `', ClosedSets::activityStatuses()).'`.', $page);
+        self::assertStringContainsString("A finding's `activity.status`: `".implode('`, `', ClosedSets::activityStatuses()).'`.', $page);
+    }
+
+    /**
+     * The page's list of closed sets is the registry, set for set and value for value, so the page
+     * cannot call an open set closed or leave a closed one out.
+     */
+    public function testThePageListsExactlyTheClosedSetsOfReport2(): void
+    {
+        $listed = [];
+        foreach (self::closedSetItems() as $item) {
+            if (preg_match('/^(.+): ((?:`[^`]+`(?:, )?)+)\.$/', $item, $match) !== 1) {
+                self::fail('a closed-set line reads "<set>: `a`, `b`.": '.$item);
+            }
+            preg_match_all('/`([^`]+)`/', $match[2], $values);
+            $listed[$match[1]] = $values[1];
+        }
+
+        self::assertSame(ClosedSets::report2Values(), $listed);
+    }
+
+    public function testThePagePromisesNoLockrotActionMajorLine(): void
+    {
+        self::assertStringNotContainsString('lockrot-action@v1', self::read('compatibility.md'));
     }
 
     /**
@@ -69,9 +93,17 @@ final class CompatibilityPageTest extends TestCase
      */
     public static function pages(): iterable
     {
-        foreach (glob(self::DOCS.'*.md') ?: [] as $path) {
-            yield basename($path) => [basename($path)];
+        foreach (array_keys(DocsPages::in(self::DOCS)) as $page) {
+            yield $page => [$page];
         }
+    }
+
+    public function testThePagesIncludeTheNestedOnes(): void
+    {
+        $pages = array_keys(iterator_to_array(self::pages()));
+
+        self::assertContains('verdicts/model-1.md', $pages);
+        self::assertContains('changes/0.14.md', $pages);
     }
 
     /** @dataProvider pages */
@@ -130,6 +162,26 @@ final class CompatibilityPageTest extends TestCase
         }
 
         return $problems;
+    }
+
+    /**
+     * The items of the first list in "Closed sets and their order", each read as one line.
+     *
+     * @return list<string>
+     */
+    private static function closedSetItems(): array
+    {
+        $page = self::read('compatibility.md');
+        $start = strpos($page, "\n### Closed sets and their order\n");
+        self::assertNotFalse($start);
+        if (preg_match('/\n((?:- .*\n(?: {4}.*\n)*)+)/', substr($page, $start), $list) !== 1) {
+            self::fail('the closed sets section opens with a list');
+        }
+
+        return array_map(
+            static fn (string $item): string => trim((string) preg_replace('/\s+/', ' ', $item)),
+            array_values(array_filter(preg_split('/^- /m', $list[1]) ?: [], static fn (string $item): bool => trim($item) !== ''))
+        );
     }
 
     /** The page with every run of whitespace, line breaks included, read as one space. */

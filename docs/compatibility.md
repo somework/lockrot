@@ -18,16 +18,16 @@ description: Draft of the lockrot 1.0 promise — which fields, sets, exit codes
       [floor-rise warning](#php-platform).
 
 Key your integration on the Contract column. The Not contract column can change in any release,
-patches included. Verdicts and priorities change only as [Verdict changes](#verdict-changes) allows.
+patches included. Flags and verdicts change only as [Verdict changes](#verdict-changes) allows.
 
 | Surface | Contract for all of 1.x | Not contract |
 |---|---|---|
 | [Command line](#command-line) | The commands, their options, the `--fail-on` values and the exit codes | The wording of its messages |
 | [Configuration](#configuration) | `extra.lockrot` keys and the environment variables | The [testing hooks](configuration.md#testing-hooks) |
 | [Machine output](#documents) | `json`, `sarif`, `gitlab` and `github`, the baseline file, and the `report` embedded in `html` | `table`, `markdown`, the look of `html`, the `--explain` text and the install-time summary |
-| [Inside documents](#documents) | Ids, codes, keys and data fields | Every human-readable sentence: summaries, notes, evidence, messages |
-| [Closed sets](#closed-sets-and-their-order) | The closed sets and their order | Which verdict and priority a package gets |
-| [Distribution](#distribution) | The PHAR asset names and verification path, `lockrot-action@v1` and its inputs, `self-update` staying within its major and on a PHP it runs on | The Docker tag scheme, until 1.0.0-RC1 chooses it |
+| [Inside documents](#documents) | Ids, codes, keys and data fields | Every human-readable sentence: summaries, the score line, the move, the gate line, notes, evidence, messages |
+| [Closed sets](#closed-sets-and-their-order) | The closed sets and their order | Which flags a package gets, and its score and verdict |
+| [Distribution](#distribution) | The PHAR asset names and verification path, lockrot-action's inputs (Semantic Versioning), and `self-update` staying within its major and on a PHP it runs on. The action line that follows 1.x is named at 1.0 | The Docker tag scheme, until 1.0.0-RC1 chooses it |
 | [PHP platform](#php-platform) | — | The PHP and Composer floor, until 1.0.0-RC1 chooses the one for 1.x |
 | [PHP code](#what-is-not-contract) | — | The classes under `src/` |
 
@@ -38,8 +38,8 @@ before you move the pin.
 
 ### Documents
 
-- The report, the explanation, the baseline file and the configuration (report-1, explain-1,
-  baseline-1 and config-1) only gain fields within 1.x, under the rule in
+- The report, the explanation, the baseline file and the configuration (report-2, explain-2,
+  baseline-2 and config-2) only gain fields within 1.x, under the rule in
   [schema.md](schema.md#the-number-and-what-may-change-under-it).
 
 - Their schemas stay published under `https://lockrot.dev/schema/` for all of 1.x. The schema
@@ -48,7 +48,7 @@ before you move the pin.
 - Within 1.x no field becomes required, narrower or removed: a document valid against an earlier
   1.x schema validates against every later one.
 
-- *Planned:* lockrot 2.x keeps writing report-1 behind `--schema=1`.
+- *Planned:* lockrot 2.x keeps writing report-2 behind `--schema=2`.
 
 - Key on ids and data fields: for a run's notes, on `note_details` ([Run notes](#run-notes)),
   never on `notes`.
@@ -57,26 +57,52 @@ before you move the pin.
 
 Nothing is added to these sets, removed from them or reordered within 1.x:
 
-- Verdicts, most severe first: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `unknown`, `finished`, `ok`.
-- Priorities, highest first: `critical`, `high`, `medium`, `low`, `none`.
+- Verdicts, worst first: `critical`, `high`, `medium`, `low`, `unknown`, `finished`, `ok`.
 - Grades, highest first: `critical`, `high`, `medium`, `low`.
+- Flags, in flag order: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`, `vulnerable`.
+- The maintenance flags, in flag order: `abandoned`, `silent`, `pinned`, `left-behind`, `old-promise`, `stale`.
+- The `priority` alias, highest first: `critical`, `high`, `medium`, `low`, `none`.
+- Score parts: `run.score_model.parts[].id` and a flag's `part`: `maintenance`, `security`.
+- A score term's `part`: `maintenance`, `security`.
+- The verdicts at score 0, in `run.score_model.zero_verdicts`: `finished`, `unknown`, `ok`.
+- Advisory severities, highest first: `critical`, `high`, `medium`, `unrated`, `low`.
 - Signal levels, lowest first: `info`, `warn`, `high`.
+- A finding's `reach`: `direct`, `transitive`, `unreached`.
+- `security.status`: `vulnerable`, `clear`, `unchecked`.
+- `security.move_in`: `next_step`, `also`.
 - A finding's standing against the baseline: `known`, `new`, `worsened`.
-- A `priority_basis` step's `from` and `to`: the priority order without `none`.
-- A finding's `activity.status` in report-2: `read`, `not_found`, `not_read`.
-- The `level` of an `age` reading in report-2: `warn`, `high`.
-- A finding's `named_in` in report-2: `require`, `require-dev`.
-- A feed's `answer` in report-2: `answered`, `failed`, `not_asked`.
-- An advisory repository's `outcome` in report-2: `answered`, `failed`, `not_asked`, `no_feed`.
-- `run.advisory_lookup.scope` in report-2: `all`, `composer-repositories`.
-- `run.advisory_lookup.scope_source` in report-2: `config`, `default`.
+- The `kind` of a move's fact and of a rerun's `remove`: `flag`, `advisory`.
+- A flag's `headline.unit`: `years`, `php`, `reason`, `advisories`.
+- A flag's `headline.source`: `release`, `push`, `branch`.
+- A holder's `source`, in `held_by[]`: `root`, `package`.
+- A holder's `link`, in `held_by[]`: `require`, `require-dev`, `conflict`.
+- A move's `composer_moves_because`: `holders`, `crosses_major`, `transitive`, `unreached`.
+- A PHP check's `raise_size`: `major`, `minor`, `patch`.
+- `allowlist.by`: `builtin`, `project`, `type`.
+- `allowlist.reason_by`: `user`, `lockrot`.
+- `metadata.status`: `read`, `not_from_composer_repository`, `unavailable`, `not_found`.
+- S1's `marked_by`: `repository`, `lock`.
+- The `reasons` of an `abandoned` flag's `degree`: `marked`, `archived`.
+- `run.fail_on_source`: `option`, `env`, `config`, `default`.
+- `run.target_php_source`: `option`, `env`, `config`, `platform`, `runtime`.
+- A finding's `gate.basis.limited_by`: `score`, `cap`, `equal`.
+- A finding's `activity.status`: `read`, `not_found`, `not_read`.
+- The `level` of an `age` reading: `warn`, `high`.
+- A finding's `named_in`: `require`, `require-dev`.
+- A feed's `answer`, in `security.feeds[]`: `answered`, `failed`, `not_asked`.
+- An advisory repository's `outcome`, in `run.advisory_lookup.repositories[]`: `answered`, `failed`, `not_asked`, `no_feed`.
+- `run.advisory_lookup.scope`: `all`, `composer-repositories`.
+- `run.advisory_lookup.scope_source`: `config`, `default`.
+- The `scope` of an `unchecked_accepted[]` entry's `accepted_by`: `host`, `repository`, `package`.
 
-The document number `lockrot.schema` is `1` for all of 1.x. A new verdict, priority, level or
-standing needs report-2 and lockrot 2.0. [verdicts.md](verdicts.md#the-nine-verdicts) says what each
-value means.
+The document number `lockrot.schema` is `2` for all of 1.x. A new value in a closed set needs
+report-3 and lockrot 2.0. [verdicts.md](verdicts.md#the-nine-verdicts) says what each value means.
 
-- The flagged verdicts are `abandoned` to `stale`: the ones a baseline entry holds and `--fail-on`
-  accepts. report-2 lists its grades in `run.graded_verdicts` and its flags in `run.flag_ids`.
+- Open, not closed: the fix kind, a score term's and a flag's `role`, the `status` of each score
+  part, a flag's baseline `state`, and every other set that [Open sets](schema.md#open-sets) lists.
+  A score model can add a value to one of them in a minor release.
+
+- report-2 lists its grades in `run.graded_verdicts` and its flags in `run.flag_ids`.
 
 - `finished` and `ok` share the lowest severity: no threshold and no comparison tells them apart.
   Where lockrot lists verdicts — `counts`, `run.verdicts`, the schema enums, this page —
@@ -85,21 +111,24 @@ value means.
 
 The order decides:
 
-- `--fail-on`: a finding fails the run at or above the threshold.
-- The baseline: a finding is `worsened` when its verdict is more severe than the one the baseline
-  accepted.
-- The report's order: priority, then verdict, then direct before transitive, then package name.
-- The SARIF `rank`, which follows the priority.
+- `--fail-on`: a finding fails the run at or above a grade, at or above a flag in flag order, or
+  with an advisory at or above a severity ([ci.md](ci.md)).
+- The baseline: a finding is `worsened` when a flag above the recorded ones fires, an advisory is
+  new, or a known one is rated higher or loses its fix ([baseline.md](baseline.md)).
+- The report's order: verdict, then the security part of the score, then the score, then direct
+  before transitive, then package name.
+- The SARIF `rank`: a flag result's by the band of its own fact, an advisory result's by its
+  severity.
 
 ### Open sets
 
 The sets that [Open sets](schema.md#open-sets) lists grow in minor releases. The [closed
 sets](#closed-sets-and-their-order) do not. Read a value that you do not know as [Open
-sets](schema.md#open-sets) says. A `priority_basis` step whose `reason` you do not know still shows
-its direction: compare `from` and `to`. In lockrot's own input an unknown format name is an error:
+sets](schema.md#open-sets) says. A score modifier or a move whose `reason` or `kind` you do not
+know still carries its numbers and its `text`. In lockrot's own input an unknown format name is an error:
 `--format`, `--output` and `extra.lockrot.format` accept only the names the release knows.
 
-A minor release can split a `libyears_unmeasured` reason, `no_stable_release_date` included, into
+A minor release can split a `libyears_unmeasured` reason into
 narrower ones, which moves findings out of the old `libyears.unmeasured` key.
 
 ### Run notes
@@ -134,7 +163,7 @@ Not frozen:
 - Which notes a run writes, and in what order.
 - A catch-all reason: a minor release can move cases out of it into reasons of their own.
 
-A new code or reason arrives only in a minor release, and changes no verdict or priority. Under
+A new code or reason arrives only in a minor release, and changes no verdict. Under
 `--strict-network`, a new code whose `sets_network_failures` is true can make a run exit `1`
 ([what trips it](ci.md#exit-codes)).
 
@@ -160,20 +189,27 @@ Not frozen:
 - Which registries lockrot writes a `replacement_url` for, and whether a registry still keeps the
   page that a URL points at.
 
-A new kind or registry arrives only in a minor release, and changes no verdict, priority or exit
+A new kind or registry arrives only in a minor release, and changes no verdict or exit
 code.
 
 ### Finding identity
 
 - lockrot reports one finding per package per lock.
 - The baseline key is the package name.
-- GitLab Code Quality: `check_name` is `lockrot/<verdict>`, and `fingerprint` is the sha256 of
-  `lockrot|<package>|<verdict>`. The verdict is part of the fingerprint and not of the baseline
-  key, so a finding whose verdict changes gets a new fingerprint.
-- SARIF: `ruleId` is `lockrot/<verdict>`, and `partialFingerprints` holds `lockrot/package` with the
-  package name.
-- GitHub annotations: the title is `lockrot: <verdict> (<priority>)`, on the package's line of the
-  analysed lock.
+- GitLab Code Quality: one issue per counted flag. `check_name` is `lockrot/<flag>`, and
+  `fingerprint` is the sha256 of `lockrot|<package>|<flag>`. A flag that starts to count opens its
+  own issue, and a flag that stops resolves its own.
+- SARIF: `ruleId` is `lockrot/<flag>` per counted maintenance flag and `lockrot/advisory/<id>` per
+  counted advisory. `partialFingerprints` holds `lockrot/package` with the package name, and an
+  advisory result adds `lockrot/advisory`.
+- Both: a finding with S10 and nothing counted is `lockrot/unchecked`, and under `--all` a score-0
+  finding is `lockrot/ok`, `lockrot/finished` or `lockrot/unknown`. The run-level record of
+  advisories that were not checked is `lockrot/advisories-unchecked`: in SARIF its
+  `partialFingerprints` is `{"lockrot/run": "advisories-unchecked"}`, and in GitLab its
+  `fingerprint` is the sha256 of `lockrot|advisories-unchecked`.
+- No identity holds the grade, the score or a severity, so a change of grade opens no record.
+- GitHub annotations: one per package, on the package's line of the analysed lock. The title,
+  `lockrot: <verdict> — <flags>`, is not identity: key a script on the file and line.
 
 ### Severity mapping
 
@@ -210,7 +246,8 @@ The `github`, `sarif` and `gitlab` columns of
   `extra.lockrot`, the defaults. The one exception: when Composer already holds a credential
   header for a host (`auth.json`, `COMPOSER_AUTH`), lockrot sends that header instead of its own
   token ([Which credentials](internals.md#which-credentials)).
-- A key lockrot does not know, at the top level or inside an `ignore` entry, prints one warning on
+- A key lockrot does not know, at the top level, inside an `ignore` entry or inside an
+  `accept-unchecked` entry, prints one warning on
   stderr and changes nothing else, as [Unknown keys](configuration.md#unknown-keys) describes. The
   [reserved names](#names-reserved-for-extensions) never warn.
 - 1.0.0-RC1 chooses the default thresholds, and a later change to one is a
@@ -233,11 +270,16 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
   ([`advisories_not_checked`](notes.md#advisories_not_checked),
   [which advisory settings it reads](verdicts.md#security-advisories)).
 - The PHAR's asset names and the [verification path](phar.md#verifying-the-download) are stable.
-- `lockrot-action@v1` follows lockrot 1.x, and its inputs follow Semantic Versioning. lockrot 2.0
-  means action v2.
+- lockrot-action's inputs follow Semantic Versioning. Before 1.0, lockrot promises nothing about
+  the action's major lines. From 1.0, this page names the action line that follows lockrot 1.x.
 - Unless you give `--allow-major`, `self-update` stays within the running major version. It skips a
   release that needs a newer PHP than the running one. It also skips a release signed with a key
   that the archive does not carry ([which release it installs](phar.md#which-release-it-installs)).
+- All of 0.x is one major line for `self-update`. So `self-update` from 0.13 installs 0.14 at once,
+  and every later 0.x minor too. There is no guard ([phar.md](phar.md#keeping-it-updated)).
+- Composer's abandoned ignore list exists on Composer 2.10 (`config.policy.abandoned.ignore`) and
+  2.9 (`config.audit.ignore-abandoned`). The plugin on an older Composer has none, as
+  `composer audit` there has none ([Abandoned](verdicts.md#abandoned)).
 
 ### PHP platform
 
@@ -249,13 +291,13 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
 ## What is not contract
 
 - **Human-readable output:** the formats in the [table](#compatibility)'s Not contract column.
-  The `html` page embeds the report-1 document under its `report` key, and that document is
+  The `html` page embeds the report-2 document under its `report` key, and that document is
   contract. The rest of the page's payload is internal to lockrot and its renderer.
-- **Which verdict and priority a package gets:** thresholds and their defaults, heuristics, the
-  [priority rules](verdicts.md#priority), the curated package data lockrot ships, the
+- **Which flags a package gets, and its score and verdict:** thresholds and their defaults,
+  heuristics, the [score model](verdicts.md#score), the curated package data lockrot ships, the
   repository-host clients, and S10's reasons. These change under
   [Verdict changes](#verdict-changes).
-- **The exposure cap:** the value of `exposure_rule.max_fan_in`, and with it which flagged
+- **The exposure cap:** the value of `exposure_rule.max_fan_in`, and with it which graded
   transitive packages count in `exposure` and S7 and which in `unattributed`
   ([verdicts.md](verdicts.md#transitive-exposure)). The fields' shape is contract. The number is
   not. The report states the value it used, and a change gets a changelog line and is not a
@@ -268,23 +310,28 @@ when a finding reaches `fail-on`, are frozen with the rest of the [configuration
 Semantic Versioning covers shapes and names, not which verdict a package gets. A release changes
 verdicts only under these rules:
 
-- A change that can alter the verdict or the priority a package gets, or what
+- A change that can alter the flags, the score or the verdict a package gets, or what
   `--fail-on=unchecked` matches (a new S10 reason, support for another host), ships in a minor
-  release, never in a patch. The changelog lists it under **Verdict changes**.
+  release, never in a patch. A weight, band, sort or score rule change is such a change, and gets a
+  new score model id. The changelog lists it under **Verdict changes**.
 - The one patch exception is a curated-data fix that moves a package to `finished` or `ok`.
 - A new signal that decides verdicts ships for one minor release as evidence only: it appears in
   the report and decides nothing until the next minor release.
+- One exception, once: in 0.14.0 the `vulnerable` flag decides verdicts at once, because 0.14
+  changes every verdict anyway ([0.14.0's Verdict changes](changelog.md)). The rule above holds for
+  every later signal.
 
-A committed baseline does not make an upgrade silent. A package that a release starts to flag is
-`new`, and a package whose verdict worsens is `worsened`. Either one fails the run when it reaches
-`--fail-on`. An unchanged lock can cross a threshold too, as its packages' releases age
-([baseline.md](baseline.md)).
+A committed baseline does not make an upgrade silent. A package that a release starts to grade is
+`new`. A package whose facts worsen (a higher flag, a new advisory, a higher rating or a lost fix)
+is `worsened`. A `new` finding fails the run when it reaches `--fail-on`. A `worsened` one fails
+when its [gate score](baseline.md#the-gate-score) reaches it. An unchanged lock can cross a
+threshold too, as its packages' releases age ([baseline.md](baseline.md)).
 
 ## Extending lockrot
 
 1.0 ships no plugin API. Use one of these routes instead:
 
-- **JSON out.** Every [distribution](#distribution) writes report-1 and explain-1 from the same
+- **JSON out.** Every [distribution](#distribution) writes report-2 and explain-2 from the same
   code. Dashboards, fleet summaries, other formats and organisation policy (a `jq -e` gate) are
   programs over those documents.
 - **Composer configuration in.** lockrot reads extra GitLab hosts from Composer's `gitlab-domains`
@@ -302,8 +349,8 @@ A committed baseline does not make an upgrade silent. A package that a release s
   contains a colon.
 - lockrot never gives a meaning of its own to:
     - `extensions` at the top level of `extra.lockrot`
-    - any key that starts with `x-`, at the top level of `extra.lockrot` or inside an `ignore`
-      entry
+    - any key that starts with `x-`, at the top level of `extra.lockrot`, inside an `ignore`
+      entry or inside an `accept-unchecked` entry
     - any environment variable that starts with `LOCKROT_X_`
 - The PHP namespace `Lockrot\Extension\` is reserved and declares nothing.
 
@@ -319,7 +366,7 @@ A committed baseline does not make an upgrade silent. A package that a release s
       deprecated
 - Exit codes and format names never get a new meaning.
 - A JSON field is never deprecated on its own. lockrot continues to write it, the schema marks it
-  `x-deprecated: true`, and it disappears only with report-2. A draft-04 validator ignores
+  `x-deprecated: true`, and it disappears only with report-3. A draft-04 validator ignores
   `x-deprecated`, as it ignores `x-known-values`.
 - A signal is retired, never removed.
 - A surface marked *Experimental* on its page can change in any minor release, with a line in the
@@ -329,7 +376,7 @@ The register lists every deprecated or *Experimental* surface:
 
 | Surface | Status | Since | Replacement | Removed no earlier than |
 |---|---|---|---|---|
-| none | — | — | — | — |
+| report-2's `priority` on a finding, and the root `priorities` | Deprecated | 0.14.0 | `verdict`, and the grades in `counts` | report-3 |
 
 ## What lockrot does not do
 
@@ -341,7 +388,7 @@ lists every file that lockrot writes, every host it contacts and where each cred
 ## Related
 
 - [schema.md](schema.md) — the schemas, their number, and how a validator reads the open sets
-- [verdicts.md](verdicts.md) — what each verdict, priority and signal means
+- [verdicts.md](verdicts.md) — what each flag, verdict and signal means
 - [ci.md](ci.md#exit-codes) — what each exit code means, and each output format
 - [configuration.md](configuration.md) — every key, variable and option this page freezes
 - [notes.md](notes.md) — every run note code and what to do about it

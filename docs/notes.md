@@ -17,7 +17,7 @@ do, what each gap does to findings, and what to do about it.
 | [`advisory_ignore_unreadable`](#advisory_ignore_unreadable) | Composer rejected the advisory ignore settings | no | Every advisory counts, ignored ones included | Fix `config.policy` or `config.audit`, as the note's `message` says |
 | [`advisories_disabled_by_policy`](#advisories_disabled_by_policy) | Composer's policy stops Composer from warning about advisories | no | None: lockrot still checks advisories | Nothing for lockrot. Composer itself will not warn about advisories in this project |
 | [`advisories_unavailable`](#advisories_unavailable) | A Composer repository's advisory request failed | yes when unreachable, no for any other error the repository raised, such as an answer lockrot could not read | That repository's advisories are missing | Rerun. For any other error, check the repository that `composer_repository` names |
-| [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | A priority that an advisory can raise stays one step lower | `offline`: run online. `composer_too_old`: use Composer 2.4 or newer. `install_time_budget`: raise the [budget](install-time.md#time-budget) |
+| [`advisories_not_checked`](#advisories_not_checked) | Advisories were not looked up, or only partly | no | The packages that the lookup missed carry S10 `advisories`, and their advisories add no points | `offline`: run online. `composer_too_old`: use Composer 2.4 or newer. `install_time_budget`: raise the [budget](install-time.md#time-budget) |
 | [`repository_activity_not_checked`](#repository_activity_not_checked) | No repository host was asked | no | S10 `install_time_budget` | Raise the [budget](install-time.md#time-budget), or run `composer lockrot` |
 | [`repository_activity_anonymous_cap`](#repository_activity_anonymous_cap) | Without credentials, only some packages were asked about | no | S10 `no_token`, `anonymous_budget` | Set a token ([credentials](internals.md#repository-hosts-and-credentials)) |
 | [`repository_activity_rate_limited`](#repository_activity_rate_limited) | A host answered "too many requests" | yes | S10 `rate_limit` | Rerun, or add credentials for the host ([credentials](internals.md#repository-hosts-and-credentials)) |
@@ -105,7 +105,8 @@ later, with `config.audit` as its fallback, or `config.audit` on 2.9), so lockro
 advisory.
 
 - `data`: `message`, the first line of what Composer said. It can be empty.
-- Findings: advisories that the policy would ignore also raise the priority.
+- Findings: advisories that the policy would ignore also count: they flag `vulnerable` and add to the
+  score.
 - `sets_network_failures`: no.
 
 ### Advisories disabled by policy {#advisories_disabled_by_policy}
@@ -142,8 +143,8 @@ The advisory lookup did not run, or stopped before it asked every repository.
 - `data`: `reason`, and `composer_repositories_checked`: how many advisory-capable repositories
   lockrot asked before the check stopped, whatever each returned. A repository that failed has its
   own [`advisories_unavailable`](#advisories_unavailable) note.
-- Findings: a priority that an advisory can raise ([no fix
-  expected](verdicts.md#security-advisories)) stays one step lower.
+- Findings: the packages that the lookup missed carry S10 `{check: advisories}`, and their
+  advisories add no points ([what was not checked](verdicts.md#what-was-not-checked)).
 - `sets_network_failures`: no.
 
 | `reason` | Cause | `composer_repositories_checked` |
