@@ -33,6 +33,8 @@ const MODEL = ROOT.'/tests/fixtures/corpus/model-report-2';
 const DIVERGENCES = ROOT.'/tests/fixtures/corpus/model-divergences.json';
 const OPTIONS = ['--target-php=8.4', '--all'];
 const CLOCK = '2026-10-14T00:00:00+00:00';
+/** The release that writes the model's input. Its sha256 is the one that `gh attestation verify --repo somework/lockrot` accepted. */
+const MODEL_PHAR = ['release' => 'v0.13.0', 'sha256' => '935883f2d2f52ce0f801f9ede846ee5eb42565aa5fd57b47137a82db8c611b1f'];
 /** The run of drupal in which the advisory lookup of packages.drupal.org fails: lockrot must not write `clear` after it. */
 const FEED_FAILED = 'drupal_drupal.feed-failed';
 /** The value of a path that one side does not write. */
@@ -270,11 +272,19 @@ function provenanceProblems(array $provenance): array
     return $problems;
 }
 
-/** Copies the reports mode's documents and writes provenance.json from its provenance, the model input's manifest and the cache. */
+/**
+ * Copies the reports mode's documents and writes provenance.json from its provenance, the model input's manifest and the cache.
+ * Exits 2 and changes nothing when the two directories do not belong together.
+ */
 function adoptModel(string $reports, string $inputs): void
 {
-    $model = json_decode((string) file_get_contents($reports.'/provenance.json'), true);
-    $input = json_decode((string) file_get_contents($inputs.'/manifest.json'), true);
+    $model = json_decode((string) @file_get_contents($reports.'/provenance.json'), true);
+    $input = json_decode((string) @file_get_contents($inputs.'/manifest.json'), true);
+    $problems = !is_array($model) || !is_array($input) ? ['no provenance.json in '.$reports.' or no manifest.json in '.$inputs] : adoptionProblems($model, $input, $reports, $inputs);
+    if ($problems !== []) {
+        fwrite(STDERR, 'differential: nothing adopted:'."\n".implode("\n", $problems)."\n");
+        exit(2);
+    }
     foreach (glob(MODEL.'/*.json') ?: [] as $old) {
         unlink($old);
     }
@@ -286,7 +296,7 @@ function adoptModel(string $reports, string $inputs): void
         'model' => $model['model'],
         'model_inputs' => [
             'written_by' => 'php tools/corpus/differential.php --model-input <phar> <dir>',
-            'phar' => ['release' => 'v0.13.0', 'sha256' => $input['phar']['sha256'], 'verified_by' => 'gh attestation verify --repo somework/lockrot'],
+            'phar' => MODEL_PHAR + ['verified_by' => 'gh attestation verify --repo somework/lockrot'],
             'options' => $input['options'],
             'sha256' => $model['inputs'],
             'reads' => $input['reads'],
@@ -298,6 +308,37 @@ function adoptModel(string $reports, string $inputs): void
         'outputs' => $model['outputs'],
     ];
     file_put_contents(MODEL.'/provenance.json', json_encode($provenance, JSON_FLAGS)."\n");
+}
+
+/**
+ * Why the model's documents in $reports were not written from the input in $inputs, by MODEL_PHAR at CLOCK.
+ *
+ * @param array<string, mixed> $model the reports mode's provenance.json
+ * @param array<string, mixed> $input the manifest.json of `--model-input`
+ *
+ * @return list<string>
+ */
+function adoptionProblems(array $model, array $input, string $reports, string $inputs): array
+{
+    $problems = [];
+    if (($input['phar']['sha256'] ?? null) !== MODEL_PHAR['sha256']) {
+        $problems[] = 'the model input was not written by the '.MODEL_PHAR['release'].' PHAR';
+    }
+    if (($input['clock'] ?? null) !== CLOCK || array_values(array_unique((array) ($model['clock'] ?? []))) !== [CLOCK]) {
+        $problems[] = 'the model input or its documents read another clock than '.CLOCK;
+    }
+    foreach (['inputs' => $inputs, 'outputs' => $reports] as $key => $dir) {
+        foreach ((array) ($model[$key] ?? []) as $name => $sha256) {
+            if (!is_file($dir.'/'.$name) || hash_file('sha256', $dir.'/'.$name) !== $sha256) {
+                $problems[] = $dir.'/'.$name.' differs from its sha256 in the provenance of '.$reports;
+            }
+        }
+    }
+    if (($model['inputs'] ?? []) === [] || ($model['outputs'] ?? []) === []) {
+        $problems[] = 'the provenance of '.$reports.' names no input or no output';
+    }
+
+    return $problems;
 }
 
 /**

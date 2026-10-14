@@ -141,7 +141,7 @@ inherit lockrot's PHP floor.** It has no `requirements.txt`, ruff or pytest and 
 | | |
 |---|---|
 | `corpus` | the entry point: `fetch`, `run`, `explain`, `check`, `diff`, `refresh`, `selftest` |
-| `record` | records the offline fixtures and the version oracle from a finished run |
+| `record` | records the offline fixtures and the version oracle from a finished run. `--report-2 <dir>` then records the report-2 twins of the claims reports |
 | `lockrot_corpus/checks.py` | the framework: selection, verdicts, declared declines, floors |
 | `lockrot_corpus/catalog.py` | every pattern read against rendered output, and the census |
 | `lockrot_corpus/claims.py` | A1–A5: findings against the repository data |

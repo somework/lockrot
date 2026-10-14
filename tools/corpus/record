@@ -3,6 +3,7 @@
 #   tools/corpus/record --work <dir> --out <report run> --explain-out <explain run>
 # Records the report-2 twin of each claims report from a directory of report-2 documents, one per project:
 #   tools/corpus/record --report-2 <dir>
+# The first form removes the report-2 twins, so run the second after it: the diff tests read both.
 # Run it when lockrot changes a sentence that a check reads, or when a new check needs a document.
 # Never edit a recorded fixture: one that does not match its source is worth less than none.
 # Keep the p2 documents minified, `__unset` sentinels included: the reader under test must get
@@ -56,6 +57,8 @@ def main(argv: 'list[str]') -> int:
 
     if options.semver_oracle:
         _write_semver_oracle(cache)
+    print('claims/reports-2 removed: record it with tools/corpus/record --report-2 <dir of report-2 documents>',
+          file=sys.stderr)
 
     return 0
 
