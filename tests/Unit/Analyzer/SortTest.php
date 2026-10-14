@@ -6,6 +6,9 @@ namespace Lockrot\Tests\Unit\Analyzer;
 
 use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\RunSettings;
+use Lockrot\Output\FormatContext;
+use Lockrot\Output\Formatters;
 use Lockrot\Score\CountedAdvisory;
 use Lockrot\Signal\Signal;
 use Lockrot\Tests\Support\CaseHydrator;
@@ -13,6 +16,7 @@ use Lockrot\Tests\Support\CorpusFloor;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
+use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
@@ -258,6 +262,34 @@ final class SortTest extends TestCase
                 return strcmp($a, $b);
         }
         self::fail('a sort direction the published model does not define: '.var_export($key['dir'], true));
+    }
+
+    /**
+     * The order sorts every finding, and every format of a run reads it: a report sorts once, and its
+     * copy with the run settings keeps that order without a sort. A sort writes a new list, and a kept
+     * order allocates nothing, so the memory the reads take tells the two apart.
+     */
+    public function testEveryFormatOfOneReportReadsOneSort(): void
+    {
+        $findings = [];
+        $fired = [[Signal::S1], [Signal::S8], [Signal::S2], [Signal::S8, Signal::S5], []];
+        for ($i = 0; $i < 400; ++$i) {
+            $findings[] = self::graded(\sprintf('vendor/p%03d', $i * 7919 % 400), $fired[$i % 5]);
+        }
+        $report = new Report($findings, [], new \DateTimeImmutable(self::NOW), 400, 0);
+        $context = FormatContext::create(null, 'none');
+        Formatters::for('json', $context)->format($report);
+        Formatters::for('table', $context)->format($report);
+        $copy = $report->withRun(new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, FailOn::parse('high'), RunSettings::SOURCE_OPTION, null));
+
+        $before = memory_get_usage();
+        $order = $report->sorted();
+        $copied = $copy->sorted();
+        $taken = memory_get_usage() - $before;
+
+        self::assertSame(array_map(static fn (Finding $f): string => $f->package(), (new Report($findings, [], new \DateTimeImmutable(self::NOW), 400, 0))->sorted()), array_map(static fn (Finding $f): string => $f->package(), $order));
+        self::assertSame($order, $copied);
+        self::assertSame(0, $taken, 'a format or the copy with the run settings sorts the findings again');
     }
 
     /**

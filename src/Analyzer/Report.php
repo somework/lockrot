@@ -38,6 +38,12 @@ final class Report
     private bool $includesDev;
 
     private AdvisoryCoverage $advisoryCoverage;
+    /**
+     * @var list<Finding>|null the findings in the order of {@see sorted()}, once it is read. Every format of
+     *                         a run reads the order, and each sort compares the scores of every finding.
+     *                         A copy keeps it: the order reads the findings alone.
+     */
+    private ?array $sorted = null;
 
     /**
      * @param list<Finding> $findings
@@ -96,6 +102,7 @@ final class Report
         );
         $copy->notes = array_merge($this->notes, $baseline->notes());
         $copy->run = $this->run;
+        $copy->sorted = $this->sorted;
 
         return $copy;
     }
@@ -120,6 +127,7 @@ final class Report
             $this->advisoryCoverage
         );
         $copy->run = $run;
+        $copy->sorted = $this->sorted;
 
         return $copy;
     }
@@ -133,10 +141,13 @@ final class Report
     /** @return list<Finding> every finding in the order of {@see compareGraded()} */
     public function sorted(): array
     {
-        $sorted = $this->findings;
-        usort($sorted, [self::class, 'compareGraded']);
+        if ($this->sorted === null) {
+            $sorted = $this->findings;
+            usort($sorted, [self::class, 'compareGraded']);
+            $this->sorted = $sorted;
+        }
 
-        return $sorted;
+        return $this->sorted;
     }
 
     /** @return list<Finding> the findings with a grade, in the order of {@see sorted()} */
