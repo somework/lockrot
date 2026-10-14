@@ -97,7 +97,7 @@
             "replacement": {
                 "package": "web-token/jwt-library",
                 "suggestion": "web-token/jwt-library",
-                "url": null,
+                "url": "https://packagist.org/packages/web-token/jwt-library",
                 "named_by": "repository",
                 "finding": null
             },
@@ -175,7 +175,7 @@
             "local": false
         },
         "replacement": "web-token/jwt-library",
-        "replacement_url": null,
+        "replacement_url": "https://packagist.org/packages/web-token/jwt-library",
         "note": null,
         "libyears_unmeasured": "undated",
         "libyears_at_least": false,
@@ -201,7 +201,7 @@
                 "data": {
                     "marked_by": "repository",
                     "replacement": "web-token/jwt-library",
-                    "replacement_url": null
+                    "replacement_url": "https://packagist.org/packages/web-token/jwt-library"
                 }
             }
         ],

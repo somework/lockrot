@@ -154,7 +154,7 @@
             "replacement": {
                 "package": "web-auth/webauthn-lib",
                 "suggestion": "web-auth/webauthn-lib",
-                "url": null,
+                "url": "https://packagist.org/packages/web-auth/webauthn-lib",
                 "named_by": "repository",
                 "finding": null
             },
@@ -257,7 +257,7 @@
             "local": false
         },
         "replacement": "web-auth/webauthn-lib",
-        "replacement_url": null,
+        "replacement_url": "https://packagist.org/packages/web-auth/webauthn-lib",
         "note": null,
         "libyears_unmeasured": null,
         "libyears_at_least": false,
@@ -282,7 +282,7 @@
                 "data": {
                     "marked_by": "repository",
                     "replacement": "web-auth/webauthn-lib",
-                    "replacement_url": null
+                    "replacement_url": "https://packagist.org/packages/web-auth/webauthn-lib"
                 }
             },
             {

@@ -788,7 +788,7 @@
             "replacement": {
                 "package": "acme/new-lib",
                 "suggestion": "acme/new-lib",
-                "url": null,
+                "url": "https://packagist.org/packages/acme/new-lib",
                 "named_by": "repository",
                 "finding": null
             },
@@ -3865,7 +3865,7 @@
             "replacement": {
                 "package": "h/old",
                 "suggestion": "h/old",
-                "url": null,
+                "url": "https://packagist.org/packages/h/old",
                 "named_by": "repository",
                 "finding": {
                     "verdict": "low",

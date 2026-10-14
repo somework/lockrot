@@ -155,7 +155,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -237,7 +237,7 @@
             "local": false
         },
         "replacement": "symfony/error-handler",
-        "replacement_url": null,
+        "replacement_url": "https://packagist.org/packages/symfony/error-handler",
         "note": null,
         "libyears_unmeasured": null,
         "libyears_at_least": false,
@@ -265,7 +265,7 @@
                 "data": {
                     "marked_by": "repository",
                     "replacement": "symfony/error-handler",
-                    "replacement_url": null
+                    "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                 }
             },
             {

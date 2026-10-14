@@ -392,6 +392,10 @@ def inputs_of(case):
         dependents[name] = own
     s1 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S1'), None)
     marking = None if s1 is None else {'by': s1['marked_by'], 'replacement': s1['replacement']}
+    if marking is None and f.get('abandoned_ignored'):
+        # S1 does not fire on a marking that Composer's ignore list covers: the marking is in abandoned_ignored.
+        held = f['abandoned_ignored']['marking']
+        marking = {'by': held['marked_by'], 'replacement': held['replacement']}
     act = f.get('activity') or {}
     push = age.get('push') or {}
     inputs = {
@@ -409,6 +413,10 @@ def inputs_of(case):
         'run': {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev'],
                 'advisories_unchecked': f['security']['unchecked_reason']},
     }
+    # Composer's abandoned ignore list of the project, as `policy.abandoned.ignore` or `audit.ignore-abandoned` holds it.
+    ignored = f.get('abandoned_ignored')
+    if ignored is not None:
+        inputs['abandoned_ignore'] = {'by': ignored['by'], 'rules': ignored['rules']}
     # A builtin entry comes from lockrot's own allowlist. A project entry is the case's config: null accepts every flag.
     allowlist = f.get('allowlist')
     if allowlist is not None and allowlist['by'] == 'project':

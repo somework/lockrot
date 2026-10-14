@@ -1843,7 +1843,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -1888,7 +1888,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -1933,7 +1933,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -1978,7 +1978,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -2023,7 +2023,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -2068,7 +2068,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -2680,7 +2680,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -2725,7 +2725,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -2997,7 +2997,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -4411,7 +4411,7 @@
             "replacement": {
                 "package": "web-auth/webauthn-lib",
                 "suggestion": "web-auth/webauthn-lib",
-                "url": null,
+                "url": "https://packagist.org/packages/web-auth/webauthn-lib",
                 "named_by": "repository",
                 "finding": null
             },
@@ -4615,7 +4615,7 @@
             "replacement": {
                 "package": "symfony/error-handler",
                 "suggestion": "symfony/error-handler",
-                "url": null,
+                "url": "https://packagist.org/packages/symfony/error-handler",
                 "named_by": "repository",
                 "finding": null
             },
@@ -5821,7 +5821,7 @@
             "replacement": {
                 "package": "web-token/jwt-library",
                 "suggestion": "web-token/jwt-library",
-                "url": null,
+                "url": "https://packagist.org/packages/web-token/jwt-library",
                 "named_by": "repository",
                 "finding": null
             },
