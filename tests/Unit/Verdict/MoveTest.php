@@ -385,7 +385,8 @@ final class MoveTest extends TestCase
         ]), ['next_step']);
 
         self::assertSame(['require', 'old-promise', '1.x', '^1.5.0', '1.5.0'], [$move['kind'], $move['source'], $move['to_branch'], $move['constraint'], $move['version']]);
-        self::assertSame([['package', 'h/hold', '1.0.0', 'require', '1.0.0']], array_map(static fn (array $holder): array => [$holder['source'], $holder['package'], $holder['version'], $holder['link'], $holder['constraint']], JsonPath::arrayAt($move, ['held_by'])));
+        self::assertCount(1, JsonPath::arrayAt($move, ['held_by']));
+        self::assertSame(['package', 'h/hold', '1.0.0', 'require', '1.0.0'], array_map(static fn (string $key): string => JsonPath::stringAt($move, ['held_by', 0, $key]), ['source', 'package', 'version', 'link', 'constraint']));
         self::assertSame([['kind' => 'flag', 'id' => 'old-promise', 'basis' => 'released_after_ga']], $move['clears']);
         self::assertSame([['composer', 'require', 'a/b:^1.5.0']], $move['commands']);
     }
