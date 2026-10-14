@@ -245,7 +245,7 @@ def _write_report_2(documents: str) -> int:
         return 2
     recordings = {}
     missing = []
-    for name in sorted(os.listdir(source)):
+    for name in sorted(entry for entry in os.listdir(source) if entry.endswith('.json')):
         document = read_json(os.path.join(documents, name))
         if document is None:
             missing.append('%s: no report-2 document' % name)

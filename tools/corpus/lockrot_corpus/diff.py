@@ -47,6 +47,9 @@ def compare(root_a: str, root_b: str, corpus_digest: 'str | None' = None) -> dic
             continue
         old, new = read_json(path_a), read_json(path_b)
         pair = (_schema(old), _schema(new))
+        if None in pair:
+            missing.append(project)
+            continue
         schemas.add(pair)
         before = {item['package']: item for item in old.get('findings', [])}
         after = {item['package']: item for item in new.get('findings', [])}
@@ -63,10 +66,12 @@ def compare(root_a: str, root_b: str, corpus_digest: 'str | None' = None) -> dic
             'a': manifest_a, 'b': manifest_b}
 
 
-def _schema(document: dict) -> int:
+def _schema(document: dict) -> 'int | None':
+    """The report number, or None when `lockrot.schema` is there but is no integer."""
     lockrot = document.get('lockrot')
+    schema = lockrot.get('schema', REPORT_1) if isinstance(lockrot, dict) else REPORT_1
 
-    return lockrot.get('schema', REPORT_1) if isinstance(lockrot, dict) else REPORT_1
+    return schema if isinstance(schema, int) and not isinstance(schema, bool) else None
 
 
 def _words(finding: dict, schemas: 'tuple[int, int]', side: int) -> 'dict[str, object]':

@@ -254,6 +254,13 @@ class DiffSchemas(unittest.TestCase):
     def _write(self, directory, document):
         write_json_atomic(os.path.join(directory, 'p.json'), document)
 
+    def test_a_schema_that_is_no_integer_names_the_project_as_unreadable(self):
+        self._write(self.a, {'lockrot': {'schema': '2'}, 'findings': [{'package': 'x/y', 'verdict': 'high', 'lead': 'stale', 'signals': []}]})
+        self._write(self.b, {'lockrot': {'schema': 2}, 'findings': [{'package': 'x/y', 'verdict': 'high', 'lead': 'stale', 'signals': []}]})
+        result = diff.compare(self.a, self.b)
+        self.assertEqual(['p'], result['missing'])
+        self.assertEqual([], result['schemas'])
+
     def test_report_1_against_report_1_compares_verdict_and_priority(self):
         self._write(self.a, {'findings': [{'package': 'x/y', 'verdict': 'stale', 'priority': 'low', 'signals': []}]})
         self._write(self.b, {'findings': [{'package': 'x/y', 'verdict': 'silent', 'priority': 'high', 'signals': []}]})
