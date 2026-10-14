@@ -27947,7 +27947,7 @@ export const d_C_baselined_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -28029,7 +28029,7 @@ export const d_C_baselined_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -28057,7 +28057,7 @@ export const d_C_baselined_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -29365,7 +29365,7 @@ export const d_C_bitbucket_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -29456,7 +29456,7 @@ export const d_C_bitbucket_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -29484,7 +29484,7 @@ export const d_C_bitbucket_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -30746,7 +30746,7 @@ export const d_C_gitlab_hosted_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -30837,7 +30837,7 @@ export const d_C_gitlab_hosted_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -30865,7 +30865,7 @@ export const d_C_gitlab_hosted_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -32118,7 +32118,7 @@ export const d_C_offline_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -32209,7 +32209,7 @@ export const d_C_offline_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -32237,7 +32237,7 @@ export const d_C_offline_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -33510,7 +33510,7 @@ export const d_C_tokenless_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -33601,7 +33601,7 @@ export const d_C_tokenless_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -33629,7 +33629,7 @@ export const d_C_tokenless_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -34876,7 +34876,7 @@ export const d_C = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -34958,7 +34958,7 @@ export const d_C = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -34986,7 +34986,7 @@ export const d_C = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -47347,7 +47347,7 @@ export const d_abandoned_audit_ignore_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -47429,7 +47429,7 @@ export const d_abandoned_audit_ignore_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -47457,7 +47457,7 @@ export const d_abandoned_audit_ignore_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -48731,7 +48731,7 @@ export const d_abandoned_ignore_unreadable_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -48813,7 +48813,7 @@ export const d_abandoned_ignore_unreadable_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -48841,7 +48841,7 @@ export const d_abandoned_ignore_unreadable_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -55986,7 +55986,7 @@ export const d_composite = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -56068,7 +56068,7 @@ export const d_composite = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -56096,7 +56096,7 @@ export const d_composite = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -58828,7 +58828,7 @@ export const d_either_critical_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -59004,7 +59004,7 @@ export const d_either_critical_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -59032,7 +59032,7 @@ export const d_either_critical_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -78857,8 +78857,29 @@ export const d_ignored_marking_archived_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "Composer's abandoned ignore list (config.audit.ignore-abandoned) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count."
+    ],
+    "note_details": [
+        {
+            "code": "abandoned_markings_ignored",
+            "text": "Composer's abandoned ignore list (config.audit.ignore-abandoned) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            "docs_url": "https://lockrot.dev/notes/#abandoned_markings_ignored",
+            "sets_network_failures": false,
+            "data": {
+                "by": "audit.ignore-abandoned",
+                "count": 1,
+                "packages": [
+                    {
+                        "package": "symfony/debug",
+                        "patterns": [
+                            "symfony/debug"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
     "findings": [
         {
             "package": "symfony/debug",
@@ -79074,7 +79095,23 @@ export const d_ignored_marking_archived_dagger = {
                 "cached_at": null
             },
             "allowlist": null,
-            "abandoned_ignored": null,
+            "abandoned_ignored": {
+                "by": "audit.ignore-abandoned",
+                "rules": [
+                    {
+                        "pattern": "symfony/debug",
+                        "reason": "removed in the 7.x upgrade",
+                        "constraints": [
+                            "^3.4"
+                        ]
+                    }
+                ],
+                "marking": {
+                    "marked_by": "repository",
+                    "replacement": "symfony/error-handler",
+                    "replacement_url": "https://packagist.org/packages/symfony/error-handler"
+                }
+            },
             "from_composer_repository": true,
             "origin": {
                 "kind": "packagist",
@@ -80211,8 +80248,29 @@ export const d_ignored_marking_only_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/annotations. lockrot does not count the marking; an archived repository and the release and push dates still count."
+    ],
+    "note_details": [
+        {
+            "code": "abandoned_markings_ignored",
+            "text": "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/annotations. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            "docs_url": "https://lockrot.dev/notes/#abandoned_markings_ignored",
+            "sets_network_failures": false,
+            "data": {
+                "by": "policy.abandoned",
+                "count": 1,
+                "packages": [
+                    {
+                        "package": "doctrine/annotations",
+                        "patterns": [
+                            "doctrine/*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
     "findings": [
         {
             "package": "doctrine/annotations",
@@ -80275,7 +80333,21 @@ export const d_ignored_marking_only_dagger = {
                 "cached_at": null
             },
             "allowlist": null,
-            "abandoned_ignored": null,
+            "abandoned_ignored": {
+                "by": "policy.abandoned",
+                "rules": [
+                    {
+                        "pattern": "doctrine/*",
+                        "reason": "the annotations reader goes with the ORM 3 upgrade",
+                        "constraints": []
+                    }
+                ],
+                "marking": {
+                    "marked_by": "repository",
+                    "replacement": null,
+                    "replacement_url": null
+                }
+            },
             "from_composer_repository": true,
             "origin": {
                 "kind": "packagist",
@@ -81355,8 +81427,29 @@ export const d_ignored_marking_partial_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count."
+    ],
+    "note_details": [
+        {
+            "code": "abandoned_markings_ignored",
+            "text": "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            "docs_url": "https://lockrot.dev/notes/#abandoned_markings_ignored",
+            "sets_network_failures": false,
+            "data": {
+                "by": "policy.abandoned",
+                "count": 1,
+                "packages": [
+                    {
+                        "package": "doctrine/cache",
+                        "patterns": [
+                            "doctrine/cache"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
     "findings": [
         {
             "package": "doctrine/cache",
@@ -81460,7 +81553,21 @@ export const d_ignored_marking_partial_dagger = {
                     "abandoned"
                 ]
             },
-            "abandoned_ignored": null,
+            "abandoned_ignored": {
+                "by": "policy.abandoned",
+                "rules": [
+                    {
+                        "pattern": "doctrine/cache",
+                        "reason": "PSR-6 migration is planned for 9.0",
+                        "constraints": []
+                    }
+                ],
+                "marking": {
+                    "marked_by": "repository",
+                    "replacement": null,
+                    "replacement_url": null
+                }
+            },
             "from_composer_repository": true,
             "origin": {
                 "kind": "packagist",
@@ -82562,8 +82669,29 @@ export const d_ignored_marking_stale_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count."
+    ],
+    "note_details": [
+        {
+            "code": "abandoned_markings_ignored",
+            "text": "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            "docs_url": "https://lockrot.dev/notes/#abandoned_markings_ignored",
+            "sets_network_failures": false,
+            "data": {
+                "by": "policy.abandoned",
+                "count": 1,
+                "packages": [
+                    {
+                        "package": "doctrine/cache",
+                        "patterns": [
+                            "doctrine/cache"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
     "findings": [
         {
             "package": "doctrine/cache",
@@ -82716,7 +82844,21 @@ export const d_ignored_marking_stale_dagger = {
                 "cached_at": null
             },
             "allowlist": null,
-            "abandoned_ignored": null,
+            "abandoned_ignored": {
+                "by": "policy.abandoned",
+                "rules": [
+                    {
+                        "pattern": "doctrine/cache",
+                        "reason": "PSR-6 migration is planned for 9.0",
+                        "constraints": []
+                    }
+                ],
+                "marking": {
+                    "marked_by": "repository",
+                    "replacement": null,
+                    "replacement_url": null
+                }
+            },
             "from_composer_repository": true,
             "origin": {
                 "kind": "packagist",
@@ -83829,8 +83971,29 @@ export const d_ignored_marking_unchecked_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count."
+    ],
+    "note_details": [
+        {
+            "code": "abandoned_markings_ignored",
+            "text": "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            "docs_url": "https://lockrot.dev/notes/#abandoned_markings_ignored",
+            "sets_network_failures": false,
+            "data": {
+                "by": "policy.abandoned",
+                "count": 1,
+                "packages": [
+                    {
+                        "package": "symfony/debug",
+                        "patterns": [
+                            "symfony/debug"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
     "findings": [
         {
             "package": "symfony/debug",
@@ -84071,7 +84234,21 @@ export const d_ignored_marking_unchecked_dagger = {
                 "cached_at": null
             },
             "allowlist": null,
-            "abandoned_ignored": null,
+            "abandoned_ignored": {
+                "by": "policy.abandoned",
+                "rules": [
+                    {
+                        "pattern": "symfony/debug",
+                        "reason": "removed in the 7.x upgrade",
+                        "constraints": []
+                    }
+                ],
+                "marking": {
+                    "marked_by": "repository",
+                    "replacement": "symfony/error-handler",
+                    "replacement_url": "https://packagist.org/packages/symfony/error-handler"
+                }
+            },
             "from_composer_repository": true,
             "origin": {
                 "kind": "packagist",
@@ -85361,7 +85538,7 @@ export const d_installed_php_halved = {
                 "replacement": {
                     "package": "web-auth/webauthn-lib",
                     "suggestion": "web-auth/webauthn-lib",
-                    "url": null,
+                    "url": "https://packagist.org/packages/web-auth/webauthn-lib",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -85464,7 +85641,7 @@ export const d_installed_php_halved = {
                 "local": false
             },
             "replacement": "web-auth/webauthn-lib",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/web-auth/webauthn-lib",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -85489,7 +85666,7 @@ export const d_installed_php_halved = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "web-auth/webauthn-lib",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/web-auth/webauthn-lib"
                     }
                 },
                 {
@@ -89597,7 +89774,7 @@ export const d_lock_only_dagger = {
                 "replacement": {
                     "package": "symfony/error-handler",
                     "suggestion": "symfony/error-handler",
-                    "url": null,
+                    "url": "https://packagist.org/packages/symfony/error-handler",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -89681,7 +89858,7 @@ export const d_lock_only_dagger = {
                 "local": false
             },
             "replacement": "symfony/error-handler",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/symfony/error-handler",
             "note": null,
             "libyears_unmeasured": null,
             "libyears_at_least": false,
@@ -89701,7 +89878,7 @@ export const d_lock_only_dagger = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "symfony/error-handler",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/symfony/error-handler"
                     }
                 },
                 {
@@ -106477,7 +106654,7 @@ export const d_replace_graded = {
                 "replacement": {
                     "package": "web-token/jwt-library",
                     "suggestion": "web-token/jwt-library",
-                    "url": null,
+                    "url": "https://packagist.org/packages/web-token/jwt-library",
                     "named_by": "repository",
                     "finding": null
                 },
@@ -106555,7 +106732,7 @@ export const d_replace_graded = {
                 "local": false
             },
             "replacement": "web-token/jwt-library",
-            "replacement_url": null,
+            "replacement_url": "https://packagist.org/packages/web-token/jwt-library",
             "note": null,
             "libyears_unmeasured": "undated",
             "libyears_at_least": false,
@@ -106581,7 +106758,7 @@ export const d_replace_graded = {
                     "data": {
                         "marked_by": "repository",
                         "replacement": "web-token/jwt-library",
-                        "replacement_url": null
+                        "replacement_url": "https://packagist.org/packages/web-token/jwt-library"
                     }
                 }
             ],
