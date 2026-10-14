@@ -113,8 +113,9 @@ final class PharTest extends TestCase
     }
 
     /**
-     * The archive reads the GitHub answers from its activity cache, which the in-process recording does
-     * not use, so the cache readings are masked with the tool version and the server port.
+     * The archive reads the GitHub answers from its activity cache, dated the day of the run, where the
+     * in-process recording reads them fresh. So the cache readings (`fetched_at`, `cached_at` and the
+     * root cache age) are masked with the tool version and the server port.
      */
     public function testTheArchiveChecksABaselinedProjectAsTheRecordingDid(): void
     {
@@ -135,12 +136,13 @@ final class PharTest extends TestCase
         }
 
         self::assertSame(1, $process->getExitCode(), $process->getErrorOutput());
-        $masked = (string) preg_replace(
-            ['{http://127\.0\.0\.1:\d+}', '{"(cached_at|activity_cache_oldest_at|activity_cache_age_hours)": [^,\n]+}'],
+        self::assertSame([], FixtureCliRun::outsideRequests($process));
+        $mask = static fn (string $json): string => (string) preg_replace(
+            ['{http://127\.0\.0\.1:\d+}', '{"(fetched_at|cached_at|activity_cache_oldest_at|activity_cache_age_hours)": [^,\n]+}'],
             ['http://127.0.0.1', '"$1": null'],
-            VersionMask::apply($process->getOutput())
+            VersionMask::apply($json)
         );
-        self::assertSame((string) file_get_contents($root.'check/report.json'), $masked);
+        self::assertSame($mask((string) file_get_contents($root.'check/report.json')), $mask($process->getOutput()));
     }
 
     public function testListShowsOnlyTheTwoLockrotCommands(): void

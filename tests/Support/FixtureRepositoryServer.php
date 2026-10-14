@@ -51,6 +51,11 @@ final class FixtureRepositoryServer
             echo json_encode(['advisories' => $answer]);
             exit;
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $path !== null && is_file(__DIR__.$path.'.post')) {
+            header('Content-Type: application/json');
+            readfile(__DIR__.$path.'.post');
+            exit;
+        }
         $file = $path === null ? null : __DIR__.$path;
         if ($file === null || !is_file($file)) {
             http_response_code(404);
@@ -173,6 +178,73 @@ final class FixtureRepositoryServer
         /** @var array<string, list<array<string, mixed>>> $advisories */
         $advisories = $answer['advisories'];
         $this->withAdvisoryApi($advisories);
+    }
+
+    /**
+     * Serves the recorded answers of another `composer` repository below `/mirror/<n>` and returns
+     * the URL to use in its place: its packages.json, the p2 answer of each served name that its
+     * `available-package-patterns` match, and its advisory API, which gives the recorded answer to
+     * any POST. Each answer is the envelope that `bin/record-fixtures --into` wrote in $recordingDir
+     * for the original URL. Call before {@see start()}.
+     */
+    public function withMirror(string $url, string $recordingDir): string
+    {
+        $prefix = '/mirror/'.\count(glob($this->docroot.'/mirror/*', \GLOB_ONLYDIR) ?: []);
+        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST);
+        $answer = static function (string $original) use ($recordingDir): ?string {
+            $raw = @file_get_contents(RecordedHttpClient::pathFor($recordingDir, $original));
+            $result = $raw === false ? null : HttpResult::fromEnvelopeJson($original, $raw);
+
+            return $result === null || $result->status() !== 200 ? null : $result->body();
+        };
+        $packages = json_decode((string) $answer(rtrim($url, '/').'/packages.json'), true);
+        if (!\is_array($packages)) {
+            throw new \RuntimeException('no recorded packages.json for '.$url.' in '.$recordingDir);
+        }
+        $patterns = array_values(array_filter(\is_array($packages['available-package-patterns'] ?? null) ? $packages['available-package-patterns'] : ['*'], 'is_string'));
+        $served = ['available-package-patterns' => $patterns];
+        if (\is_string($packages['metadata-url'] ?? null)) {
+            $served['metadata-url'] = $prefix.$packages['metadata-url'];
+            foreach ($this->names as $name) {
+                if (!self::matchesAny($name, $patterns)) {
+                    continue;
+                }
+                $p2 = $answer($base.str_replace('%package%', $name, $packages['metadata-url']));
+                if ($p2 !== null) {
+                    self::writeFile($this->docroot.$prefix.str_replace('%package%', $name, $packages['metadata-url']), $p2);
+                }
+            }
+        }
+        $security = \is_array($packages['security-advisories'] ?? null) ? $packages['security-advisories'] : [];
+        $api = $security['api-url'] ?? null;
+        $advisories = \is_string($api) ? $answer($api) : null;
+        if ($advisories !== null) {
+            $served['security-advisories'] = ['api-url' => $prefix.(string) parse_url((string) $api, \PHP_URL_PATH)];
+            self::writeFile($this->docroot.$served['security-advisories']['api-url'].'.post', $advisories);
+        }
+        self::writeFile($this->docroot.$prefix.'/packages.json', (string) json_encode($served, \JSON_UNESCAPED_SLASHES));
+
+        return $this->url().$prefix;
+    }
+
+    /** @param list<string> $patterns */
+    private static function matchesAny(string $name, array $patterns): bool
+    {
+        foreach ($patterns as $pattern) {
+            if (preg_match('{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}i', $name) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function writeFile(string $path, string $contents): void
+    {
+        if (!is_dir(\dirname($path)) && !mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            throw new \RuntimeException('cannot create docroot directory: '.\dirname($path));
+        }
+        file_put_contents($path, $contents);
     }
 
     /**
