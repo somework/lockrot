@@ -779,8 +779,8 @@
       ]
     }
   },
-  "activity_cache_oldest_at": "2026-10-14T01:01:36+00:00",
-  "activity_cache_age_hours": -1,
+  "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
+  "activity_cache_age_hours": 0,
   "packages_checked": 156,
   "packages_flagged": 12,
   "packages_multi_flag": 1,
@@ -1293,8 +1293,8 @@
         "repo": "DaveRandom/Resume",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:50+00:00",
-        "cached_at": "2026-10-14T01:09:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -1365,7 +1365,7 @@
       ],
       "evidence": "silent: last release 2018-01-28 (8.7 years ago); last push 2018-06-25 (8.3 years ago); old-promise: released 2018-01-28 for PHP 7 (php \">=7.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -1687,8 +1687,8 @@
         "repo": "thephpleague/commonmark",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:18+00:00",
-        "cached_at": "2026-10-14T01:02:18+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -1781,7 +1781,7 @@
       ],
       "evidence": "vulnerable: 2 advisories: 1 high, 1 medium — all fixed on 2.x; worst: PKSA-m4t9-vsgq-8khn league/commonmark: Quadratic-time denial of service in the GitHub Flavored Markdown Table extension block-start scan",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:18+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.11,
       "age": {
         "installed": {
@@ -2094,8 +2094,8 @@
         "repo": "zbateson/mail-mime-parser",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:54+00:00",
-        "cached_at": "2026-10-14T01:09:54+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -2187,7 +2187,7 @@
       ],
       "evidence": "vulnerable: 2 advisories: 2 high — all fixed on 4.x; worst: CVE-2026-61815 zbateson/mail-mime-parser has CRLF header injection via attachment filename",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:54+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.55,
       "age": {
         "installed": {
@@ -2409,8 +2409,8 @@
         "repo": "jwilsson/spotify-web-api-php",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -2474,7 +2474,7 @@
       ],
       "evidence": "left-behind: branch 5.x last released 2023-08-01 (3.2 years ago); 7.x released 7.2.0 (2026-07-25)",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 2.98,
       "age": {
         "installed": {
@@ -2696,8 +2696,8 @@
         "repo": "meilisearch/meilisearch-php",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -2761,7 +2761,7 @@
       ],
       "evidence": "left-behind: branch 0.24.x last released 2022-08-16 (4.2 years ago); 1.x released v1.17.0 (2026-08-04)",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 4.14,
       "age": {
         "installed": {
@@ -2983,8 +2983,8 @@
         "repo": "predis/predis",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:45+00:00",
-        "cached_at": "2026-10-14T01:02:45+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -3048,7 +3048,7 @@
       ],
       "evidence": "left-behind: branch 1.x last released 2022-01-05 (4.8 years ago); 3.x released v3.7.0 (2026-10-08)",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:45+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 4.76,
       "age": {
         "installed": {
@@ -3321,8 +3321,8 @@
         "repo": "darylldoyle/svg-sanitizer",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:44+00:00",
-        "cached_at": "2026-10-14T01:09:44+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -3439,7 +3439,7 @@
       ],
       "evidence": "vulnerable: 3 advisories: 3 medium — none fixed on 0.22.x; worst: CVE-2026-107381 svg-sanitizer: Mixed-case xlink:HrEf skips the `<use>` nesting-DoS check in Resolver::processReferences",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:44+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.05,
       "age": {
         "installed": {
@@ -3727,8 +3727,8 @@
         "repo": "phpseclib/phpseclib",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:43+00:00",
-        "cached_at": "2026-10-14T01:02:43+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -3797,7 +3797,7 @@
       ],
       "evidence": "vulnerable: 1 advisory: 1 medium — all fixed on 3.x; advisory: CVE-2026-84308 phpseclib — non-constant-time X25519 scalar multiplication permits full private-key recovery",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:43+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.31,
       "age": {
         "installed": {
@@ -3985,8 +3985,8 @@
         "repo": "TiBeN/CrontabManager",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:54+00:00",
-        "cached_at": "2026-10-14T01:09:54+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -4031,7 +4031,7 @@
       ],
       "evidence": "stale: last release 2023-05-02 (3.5 years ago)",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:54+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -4288,8 +4288,8 @@
         "repo": "laravel/framework",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:12+00:00",
-        "cached_at": "2026-10-14T01:02:12+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -4406,7 +4406,7 @@
       ],
       "evidence": "vulnerable: 1 advisory: 1 low — all fixed on 13.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:12+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.19,
       "age": {
         "installed": {
@@ -4738,8 +4738,8 @@
         "repo": "thephpleague/flysystem",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:20+00:00",
-        "cached_at": "2026-10-14T01:02:20+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -4812,7 +4812,7 @@
       ],
       "evidence": "vulnerable: 1 advisory: 1 low — all fixed on 3.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:20+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.16,
       "age": {
         "installed": {
@@ -5031,8 +5031,8 @@
         "repo": "thephpleague/config",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:19+00:00",
-        "cached_at": "2026-10-14T01:02:19+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -5078,7 +5078,7 @@
       ],
       "evidence": "stale: last release 2022-12-11 (3.8 years ago)",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:19+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -5341,8 +5341,8 @@
         "repo": "algolia/algoliasearch-client-php",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:50+00:00",
-        "cached_at": "2026-10-14T01:09:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -5375,7 +5375,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.72,
       "age": {
         "installed": {
@@ -5473,8 +5473,8 @@
         "repo": "ezyang/htmlpurifier",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:59+00:00",
-        "cached_at": "2026-10-14T01:01:59+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -5507,7 +5507,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:59+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.91,
       "age": {
         "installed": {
@@ -5605,8 +5605,8 @@
         "repo": "FakerPHP/Faker",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:57+00:00",
-        "cached_at": "2026-10-14T01:03:57+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -5639,7 +5639,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:57+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -5737,8 +5737,8 @@
         "repo": "FileEye/MimeMap",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:50+00:00",
-        "cached_at": "2026-10-14T01:09:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -5771,7 +5771,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.44,
       "age": {
         "installed": {
@@ -5869,8 +5869,8 @@
         "repo": "guzzle/guzzle",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:04+00:00",
-        "cached_at": "2026-10-14T01:02:04+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -5913,7 +5913,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:04+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.09,
       "age": {
         "installed": {
@@ -6011,8 +6011,8 @@
         "repo": "http-interop/http-factory-guzzle",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:50+00:00",
-        "cached_at": "2026-10-14T01:09:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -6045,7 +6045,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -6143,8 +6143,8 @@
         "repo": "Intervention/image",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:09+00:00",
-        "cached_at": "2026-10-14T01:02:09+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -6177,7 +6177,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:09+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.17,
       "age": {
         "installed": {
@@ -6275,8 +6275,8 @@
         "repo": "JamesHeinrich/getID3",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:50+00:00",
-        "cached_at": "2026-10-14T01:09:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -6309,7 +6309,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.54,
       "age": {
         "installed": {
@@ -6407,8 +6407,8 @@
         "repo": "JayBizzle/Crawler-Detect",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:50+00:00",
-        "cached_at": "2026-10-14T01:09:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -6441,7 +6441,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.17,
       "age": {
         "installed": {
@@ -6539,8 +6539,8 @@
         "repo": "laravel/ai",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -6573,7 +6573,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.4,
       "age": {
         "installed": {
@@ -6671,8 +6671,8 @@
         "repo": "laravel/helpers",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:44+00:00",
-        "cached_at": "2026-10-14T01:09:44+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -6705,7 +6705,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:44+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -6803,8 +6803,8 @@
         "repo": "laravel/nightwatch",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -6888,7 +6888,7 @@
       ],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.4,
       "age": {
         "installed": {
@@ -6986,8 +6986,8 @@
         "repo": "laravel/prompts",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:13+00:00",
-        "cached_at": "2026-10-14T01:02:13+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -7023,7 +7023,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:13+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.18,
       "age": {
         "installed": {
@@ -7121,8 +7121,8 @@
         "repo": "laravel/sanctum",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -7155,7 +7155,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.15,
       "age": {
         "installed": {
@@ -7253,8 +7253,8 @@
         "repo": "laravel/scout",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -7288,7 +7288,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.4,
       "age": {
         "installed": {
@@ -7386,8 +7386,8 @@
         "repo": "laravel/socialite",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:15+00:00",
-        "cached_at": "2026-10-14T01:02:15+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -7443,7 +7443,7 @@
       ],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:15+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.35,
       "age": {
         "installed": {
@@ -7541,8 +7541,8 @@
         "repo": "laravel/tinker",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:16+00:00",
-        "cached_at": "2026-10-14T01:02:16+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -7575,7 +7575,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:16+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -7673,8 +7673,8 @@
         "repo": "laravel/ui",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:40+00:00",
-        "cached_at": "2026-10-14T01:09:40+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -7707,7 +7707,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:40+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -7805,8 +7805,8 @@
         "repo": "thephpleague/flysystem-aws-s3-v3",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:21+00:00",
-        "cached_at": "2026-10-14T01:02:21+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -7862,7 +7862,7 @@
       ],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:21+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.26,
       "age": {
         "installed": {
@@ -7960,8 +7960,8 @@
         "repo": "thephpleague/flysystem-sftp-v3",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8029,7 +8029,7 @@
       ],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.45,
       "age": {
         "installed": {
@@ -8127,8 +8127,8 @@
         "repo": "thephpleague/flysystem-webdav",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8184,7 +8184,7 @@
       ],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -8282,8 +8282,8 @@
         "repo": "mlocati/ip-lib",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8316,7 +8316,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.92,
       "age": {
         "installed": {
@@ -8414,8 +8414,8 @@
         "repo": "nunomaduro/collision",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:04:07+00:00",
-        "cached_at": "2026-10-14T01:04:07+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8448,7 +8448,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:04:07+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.23,
       "age": {
         "installed": {
@@ -8546,8 +8546,8 @@
         "repo": "owen-it/laravel-auditing",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8580,7 +8580,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.23,
       "age": {
         "installed": {
@@ -8678,8 +8678,8 @@
         "repo": "phanan/poddle",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8712,7 +8712,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -8810,8 +8810,8 @@
         "repo": "pusher/pusher-http-php",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8844,7 +8844,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.22,
       "age": {
         "installed": {
@@ -8942,8 +8942,8 @@
         "repo": "RobThree/TwoFactorAuth",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -8976,7 +8976,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -9074,8 +9074,8 @@
         "repo": "saloonphp/laravel-plugin",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -9108,7 +9108,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.42,
       "age": {
         "installed": {
@@ -9206,8 +9206,8 @@
         "repo": "saloonphp/saloon",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -9241,7 +9241,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.55,
       "age": {
         "installed": {
@@ -9339,8 +9339,8 @@
         "repo": "spatie/flysystem-dropbox",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -9396,7 +9396,7 @@
       ],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -9494,8 +9494,8 @@
         "repo": "spatie/laravel-permission",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -9528,7 +9528,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.29,
       "age": {
         "installed": {
@@ -9626,8 +9626,8 @@
         "repo": "spatie/laravel-ray",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -9683,7 +9683,7 @@
       ],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -9781,8 +9781,8 @@
         "repo": "webmozarts/assert",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:34+00:00",
-        "cached_at": "2026-10-14T01:09:34+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -9816,7 +9816,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:34+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.93,
       "age": {
         "installed": {
@@ -9914,8 +9914,8 @@
         "repo": "awslabs/aws-crt-php",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:36+00:00",
-        "cached_at": "2026-10-14T01:01:36+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -9949,7 +9949,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:36+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -10047,8 +10047,8 @@
         "repo": "aws/aws-sdk-php",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:44+00:00",
-        "cached_at": "2026-10-14T01:01:44+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -10081,7 +10081,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:44+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.39,
       "age": {
         "installed": {
@@ -10179,8 +10179,8 @@
         "repo": "brick/math",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:47+00:00",
-        "cached_at": "2026-10-14T01:01:47+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -10214,7 +10214,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:47+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.25,
       "age": {
         "installed": {
@@ -10312,8 +10312,8 @@
         "repo": "CarbonPHP/carbon-doctrine-types",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:48+00:00",
-        "cached_at": "2026-10-14T01:01:48+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -10347,7 +10347,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:48+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 2.57,
       "age": {
         "installed": {
@@ -10445,8 +10445,8 @@
         "repo": "clue/stream-filter",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:39+00:00",
-        "cached_at": "2026-10-14T01:09:39+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -10480,7 +10480,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:39+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -10578,8 +10578,8 @@
         "repo": "dflydev/dflydev-dot-access-data",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:50+00:00",
-        "cached_at": "2026-10-14T01:01:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -10614,7 +10614,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -10712,8 +10712,8 @@
         "repo": "doctrine/inflector",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:52+00:00",
-        "cached_at": "2026-10-14T01:01:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -10746,7 +10746,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -10844,8 +10844,8 @@
         "repo": "doctrine/lexer",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:53+00:00",
-        "cached_at": "2026-10-14T01:01:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -10879,7 +10879,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 2.65,
       "age": {
         "installed": {
@@ -10977,8 +10977,8 @@
         "repo": "dragonmantank/cron-expression",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:57+00:00",
-        "cached_at": "2026-10-14T01:01:57+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11011,7 +11011,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:57+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -11109,8 +11109,8 @@
         "repo": "egulias/EmailValidator",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:01:58+00:00",
-        "cached_at": "2026-10-14T01:01:58+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11143,7 +11143,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:01:58+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -11241,8 +11241,8 @@
         "repo": "filp/whoops",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:59+00:00",
-        "cached_at": "2026-10-14T01:03:59+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11274,7 +11274,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:59+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.15,
       "age": {
         "installed": {
@@ -11372,8 +11372,8 @@
         "repo": "googleapis/php-jwt",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:01+00:00",
-        "cached_at": "2026-10-14T01:02:01+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11405,7 +11405,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:01+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.49,
       "age": {
         "installed": {
@@ -11503,8 +11503,8 @@
         "repo": "fruitcake/php-cors",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:02+00:00",
-        "cached_at": "2026-10-14T01:02:02+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11537,7 +11537,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:02+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -11635,8 +11635,8 @@
         "repo": "GrahamCampbell/Guzzle-Factory",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:50+00:00",
-        "cached_at": "2026-10-14T01:09:50+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11669,7 +11669,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:50+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.2,
       "age": {
         "installed": {
@@ -11767,8 +11767,8 @@
         "repo": "GrahamCampbell/Result-Type",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:03+00:00",
-        "cached_at": "2026-10-14T01:02:03+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11802,7 +11802,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:03+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.66,
       "age": {
         "installed": {
@@ -11900,8 +11900,8 @@
         "repo": "guzzle/promises",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:05+00:00",
-        "cached_at": "2026-10-14T01:02:05+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -11943,7 +11943,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:05+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.05,
       "age": {
         "installed": {
@@ -12041,8 +12041,8 @@
         "repo": "guzzle/psr7",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:06+00:00",
-        "cached_at": "2026-10-14T01:02:06+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -12086,7 +12086,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:06+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.11,
       "age": {
         "installed": {
@@ -12184,8 +12184,8 @@
         "repo": "guzzle/uri-template",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:07+00:00",
-        "cached_at": "2026-10-14T01:02:07+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -12218,7 +12218,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:07+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.1,
       "age": {
         "installed": {
@@ -12316,8 +12316,8 @@
         "repo": "Intervention/gif",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:08+00:00",
-        "cached_at": "2026-10-14T01:02:08+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -12349,7 +12349,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:08+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -12447,8 +12447,8 @@
         "repo": "laravel/serializable-closure",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:14+00:00",
-        "cached_at": "2026-10-14T01:02:14+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -12483,7 +12483,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:14+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.17,
       "age": {
         "installed": {
@@ -12581,8 +12581,8 @@
         "repo": "thephpleague/flysystem-local",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:22+00:00",
-        "cached_at": "2026-10-14T01:02:22+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -12619,7 +12619,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:22+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.55,
       "age": {
         "installed": {
@@ -12717,8 +12717,8 @@
         "repo": "thephpleague/mime-type-detection",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:24+00:00",
-        "cached_at": "2026-10-14T01:02:24+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -12755,7 +12755,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:24+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -12853,8 +12853,8 @@
         "repo": "thephpleague/oauth1-client",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:25+00:00",
-        "cached_at": "2026-10-14T01:02:25+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -12886,7 +12886,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:25+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.77,
       "age": {
         "installed": {
@@ -12984,8 +12984,8 @@
         "repo": "thephpleague/uri",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:28+00:00",
-        "cached_at": "2026-10-14T01:02:28+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13018,7 +13018,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:28+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -13116,8 +13116,8 @@
         "repo": "thephpleague/uri-interfaces",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:29+00:00",
-        "cached_at": "2026-10-14T01:02:29+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13151,7 +13151,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:29+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -13249,8 +13249,8 @@
         "repo": "Seldaek/monolog",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:31+00:00",
-        "cached_at": "2026-10-14T01:02:31+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13283,7 +13283,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:31+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.74,
       "age": {
         "installed": {
@@ -13381,8 +13381,8 @@
         "repo": "jmespath/jmespath.php",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:32+00:00",
-        "cached_at": "2026-10-14T01:02:32+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13416,7 +13416,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:32+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -13514,8 +13514,8 @@
         "repo": "CarbonPHP/carbon",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:33+00:00",
-        "cached_at": "2026-10-14T01:02:33+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13548,7 +13548,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:33+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.15,
       "age": {
         "installed": {
@@ -13646,8 +13646,8 @@
         "repo": "nette/schema",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:34+00:00",
-        "cached_at": "2026-10-14T01:02:34+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13682,7 +13682,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:34+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -13780,8 +13780,8 @@
         "repo": "nette/utils",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:35+00:00",
-        "cached_at": "2026-10-14T01:02:35+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13817,7 +13817,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:35+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -13915,8 +13915,8 @@
         "repo": "nikic/PHP-Parser",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:36+00:00",
-        "cached_at": "2026-10-14T01:02:36+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -13949,7 +13949,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:36+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.77,
       "age": {
         "installed": {
@@ -14047,8 +14047,8 @@
         "repo": "nunomaduro/termwind",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:37+00:00",
-        "cached_at": "2026-10-14T01:02:37+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -14082,7 +14082,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:37+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -14180,8 +14180,8 @@
         "repo": "paragonie/constant_time_encoding",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:40+00:00",
-        "cached_at": "2026-10-14T01:02:40+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -14215,7 +14215,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:40+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -14557,8 +14557,8 @@
         "repo": "PHP-DI/Invoker",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:51+00:00",
-        "cached_at": "2026-10-14T01:09:51+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -14592,7 +14592,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:51+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -14690,8 +14690,8 @@
         "repo": "PHP-DI/PHP-DI",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -14724,7 +14724,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -14822,8 +14822,8 @@
         "repo": "php-http/client-common",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:41+00:00",
-        "cached_at": "2026-10-14T01:09:41+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -14855,7 +14855,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:41+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -14953,8 +14953,8 @@
         "repo": "php-http/discovery",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:37+00:00",
-        "cached_at": "2026-10-14T01:09:37+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -14986,7 +14986,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:37+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -15084,8 +15084,8 @@
         "repo": "php-http/httplug",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:41+00:00",
-        "cached_at": "2026-10-14T01:09:41+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -15117,7 +15117,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:41+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -15215,8 +15215,8 @@
         "repo": "php-http/message",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:41+00:00",
-        "cached_at": "2026-10-14T01:09:41+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -15249,7 +15249,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:41+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -15347,8 +15347,8 @@
         "repo": "php-http/promise",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:41+00:00",
-        "cached_at": "2026-10-14T01:09:41+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -15381,7 +15381,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:41+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.65,
       "age": {
         "installed": {
@@ -15479,8 +15479,8 @@
         "repo": "php-standard-library/php-standard-library",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -15514,7 +15514,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.58,
       "age": {
         "installed": {
@@ -15612,8 +15612,8 @@
         "repo": "schmittjoh/php-option",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:42+00:00",
-        "cached_at": "2026-10-14T01:02:42+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -15647,7 +15647,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:42+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.65,
       "age": {
         "installed": {
@@ -17313,8 +17313,8 @@
         "repo": "bobthecow/psysh",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:57+00:00",
-        "cached_at": "2026-10-14T01:02:57+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -17346,7 +17346,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:57+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.1,
       "age": {
         "installed": {
@@ -17699,8 +17699,8 @@
         "repo": "ramsey/collection",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:02:59+00:00",
-        "cached_at": "2026-10-14T01:02:59+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -17735,7 +17735,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:02:59+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -17833,8 +17833,8 @@
         "repo": "ramsey/uuid",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:00+00:00",
-        "cached_at": "2026-10-14T01:03:00+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -17868,7 +17868,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:00+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.25,
       "age": {
         "installed": {
@@ -17966,8 +17966,8 @@
         "repo": "revoltphp/event-loop",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:35+00:00",
-        "cached_at": "2026-10-14T01:09:35+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18002,7 +18002,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:35+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -18100,8 +18100,8 @@
         "repo": "sabre-io/dav",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18133,7 +18133,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.69,
       "age": {
         "installed": {
@@ -18231,8 +18231,8 @@
         "repo": "sabre-io/event",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18265,7 +18265,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.19,
       "age": {
         "installed": {
@@ -18363,8 +18363,8 @@
         "repo": "sabre-io/http",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18397,7 +18397,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.72,
       "age": {
         "installed": {
@@ -18495,8 +18495,8 @@
         "repo": "sabre-io/uri",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18529,7 +18529,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.66,
       "age": {
         "installed": {
@@ -18627,8 +18627,8 @@
         "repo": "sabre-io/vobject",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18661,7 +18661,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.48,
       "age": {
         "installed": {
@@ -18759,8 +18759,8 @@
         "repo": "sabre-io/xml",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:52+00:00",
-        "cached_at": "2026-10-14T01:09:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18793,7 +18793,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 1.64,
       "age": {
         "installed": {
@@ -18891,8 +18891,8 @@
         "repo": "saloonphp/xml-wrangler",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -18924,7 +18924,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -19022,8 +19022,8 @@
         "repo": "spatie/array-to-xml",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19056,7 +19056,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -19154,8 +19154,8 @@
         "repo": "spatie/backtrace",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:42+00:00",
-        "cached_at": "2026-10-14T01:09:42+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19187,7 +19187,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:42+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -19285,8 +19285,8 @@
         "repo": "spatie/dropbox-api",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19318,7 +19318,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.42,
       "age": {
         "installed": {
@@ -19416,8 +19416,8 @@
         "repo": "spatie/macroable",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19450,7 +19450,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -19548,8 +19548,8 @@
         "repo": "spatie/ray",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:54+00:00",
-        "cached_at": "2026-10-14T01:09:54+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19581,7 +19581,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:54+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -19679,8 +19679,8 @@
         "repo": "symfony/clock",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:11+00:00",
-        "cached_at": "2026-10-14T01:03:11+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19714,7 +19714,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:11+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.18,
       "age": {
         "installed": {
@@ -19812,8 +19812,8 @@
         "repo": "symfony/console",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:12+00:00",
-        "cached_at": "2026-10-14T01:03:12+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19854,7 +19854,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:12+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.13,
       "age": {
         "installed": {
@@ -19952,8 +19952,8 @@
         "repo": "symfony/css-selector",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:13+00:00",
-        "cached_at": "2026-10-14T01:03:13+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -19987,7 +19987,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:13+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.35,
       "age": {
         "installed": {
@@ -20085,8 +20085,8 @@
         "repo": "symfony/deprecation-contracts",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:15+00:00",
-        "cached_at": "2026-10-14T01:03:15+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -20139,7 +20139,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:15+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -20237,8 +20237,8 @@
         "repo": "symfony/error-handler",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:16+00:00",
-        "cached_at": "2026-10-14T01:03:16+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -20271,7 +20271,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:16+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.17,
       "age": {
         "installed": {
@@ -20369,8 +20369,8 @@
         "repo": "symfony/event-dispatcher",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:18+00:00",
-        "cached_at": "2026-10-14T01:03:18+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -20404,7 +20404,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:18+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.09,
       "age": {
         "installed": {
@@ -20502,8 +20502,8 @@
         "repo": "symfony/event-dispatcher-contracts",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:19+00:00",
-        "cached_at": "2026-10-14T01:03:19+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -20538,7 +20538,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:19+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -20636,8 +20636,8 @@
         "repo": "symfony/filesystem",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:20+00:00",
-        "cached_at": "2026-10-14T01:03:20+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -20671,7 +20671,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:20+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.28,
       "age": {
         "installed": {
@@ -20769,8 +20769,8 @@
         "repo": "symfony/finder",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:22+00:00",
-        "cached_at": "2026-10-14T01:03:22+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -20804,7 +20804,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:22+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.25,
       "age": {
         "installed": {
@@ -20902,8 +20902,8 @@
         "repo": "symfony/http-foundation",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:23+00:00",
-        "cached_at": "2026-10-14T01:03:23+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -20936,7 +20936,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:23+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.13,
       "age": {
         "installed": {
@@ -21034,8 +21034,8 @@
         "repo": "symfony/http-kernel",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:24+00:00",
-        "cached_at": "2026-10-14T01:03:24+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -21068,7 +21068,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:24+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.14,
       "age": {
         "installed": {
@@ -21166,8 +21166,8 @@
         "repo": "symfony/mailer",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:25+00:00",
-        "cached_at": "2026-10-14T01:03:25+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -21200,7 +21200,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:25+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.13,
       "age": {
         "installed": {
@@ -21298,8 +21298,8 @@
         "repo": "symfony/mime",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:26+00:00",
-        "cached_at": "2026-10-14T01:03:26+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -21332,7 +21332,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:26+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.08,
       "age": {
         "installed": {
@@ -21430,8 +21430,8 @@
         "repo": "symfony/options-resolver",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:08:47+00:00",
-        "cached_at": "2026-10-14T01:08:47+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -21464,7 +21464,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:08:47+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.18,
       "age": {
         "installed": {
@@ -23344,8 +23344,8 @@
         "repo": "symfony/process",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:40+00:00",
-        "cached_at": "2026-10-14T01:03:40+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -23378,7 +23378,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:40+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.28,
       "age": {
         "installed": {
@@ -23476,8 +23476,8 @@
         "repo": "symfony/routing",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:41+00:00",
-        "cached_at": "2026-10-14T01:03:41+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -23510,7 +23510,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:41+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.19,
       "age": {
         "installed": {
@@ -23608,8 +23608,8 @@
         "repo": "symfony/service-contracts",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:42+00:00",
-        "cached_at": "2026-10-14T01:03:42+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -23652,7 +23652,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:42+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.11,
       "age": {
         "installed": {
@@ -23750,8 +23750,8 @@
         "repo": "symfony/stopwatch",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:34+00:00",
-        "cached_at": "2026-10-14T01:09:34+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -23783,7 +23783,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:34+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.18,
       "age": {
         "installed": {
@@ -23881,8 +23881,8 @@
         "repo": "symfony/string",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:43+00:00",
-        "cached_at": "2026-10-14T01:03:43+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -23924,7 +23924,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:43+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.12,
       "age": {
         "installed": {
@@ -24022,8 +24022,8 @@
         "repo": "symfony/translation",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:45+00:00",
-        "cached_at": "2026-10-14T01:03:45+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24057,7 +24057,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:45+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.06,
       "age": {
         "installed": {
@@ -24155,8 +24155,8 @@
         "repo": "symfony/translation-contracts",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:46+00:00",
-        "cached_at": "2026-10-14T01:03:46+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24191,7 +24191,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:46+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -24289,8 +24289,8 @@
         "repo": "symfony/uid",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:48+00:00",
-        "cached_at": "2026-10-14T01:03:48+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24323,7 +24323,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:48+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.4,
       "age": {
         "installed": {
@@ -24421,8 +24421,8 @@
         "repo": "symfony/var-dumper",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:49+00:00",
-        "cached_at": "2026-10-14T01:03:49+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24457,7 +24457,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:49+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.12,
       "age": {
         "installed": {
@@ -24555,8 +24555,8 @@
         "repo": "teamtnt/tntsearch",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:54+00:00",
-        "cached_at": "2026-10-14T01:09:54+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24588,7 +24588,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:54+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 3.07,
       "age": {
         "installed": {
@@ -24686,8 +24686,8 @@
         "repo": "tijsverkoyen/CssToInlineStyles",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:52+00:00",
-        "cached_at": "2026-10-14T01:03:52+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24720,7 +24720,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:52+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -24818,8 +24818,8 @@
         "repo": "veewee/xml",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:53+00:00",
-        "cached_at": "2026-10-14T01:09:53+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24852,7 +24852,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:53+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.25,
       "age": {
         "installed": {
@@ -24950,8 +24950,8 @@
         "repo": "phpdotenv/phpdotenv",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:14:57+00:00",
-        "cached_at": "2026-10-14T01:14:57+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -24984,7 +24984,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:14:57+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.13,
       "age": {
         "installed": {
@@ -25082,8 +25082,8 @@
         "repo": "voku/portable-ascii",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:03:55+00:00",
-        "cached_at": "2026-10-14T01:03:55+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -25116,7 +25116,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:03:55+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0,
       "age": {
         "installed": {
@@ -25214,8 +25214,8 @@
         "repo": "zbateson/mb-wrapper",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:54+00:00",
-        "cached_at": "2026-10-14T01:09:54+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -25248,7 +25248,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:54+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.36,
       "age": {
         "installed": {
@@ -25346,8 +25346,8 @@
         "repo": "zbateson/stream-decorators",
         "event": "push",
         "archived": false,
-        "fetched_at": "2026-10-14T01:09:54+00:00",
-        "cached_at": "2026-10-14T01:09:54+00:00"
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": "2026-10-14T00:00:00+00:00"
       },
       "allowlist": null,
       "abandoned_ignored": null,
@@ -25380,7 +25380,7 @@
       "signals": [],
       "evidence": "",
       "allowlist_reason": null,
-      "data_date": "2026-10-14T01:09:54+00:00",
+      "data_date": "2026-10-14T00:00:00+00:00",
       "libyears": 0.44,
       "age": {
         "installed": {

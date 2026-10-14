@@ -5,17 +5,22 @@ declare(strict_types=1);
 // The corpus differential: lockrot's report-2 on the apps of tests/fixtures/apps against the model's report-2 for the same
 // locks.
 //
-//   php tools/corpus/differential.php                         runs bin/lockrot on each app and diffs it against the model
+//   php tools/corpus/differential.php                         runs bin/lockrot on each run of runs() and diffs it against the
+//                                                            model
 //   php tools/corpus/differential.php --write <dir>           also writes lockrot's documents into <dir>, with the masks of
 //                                                            tools/report/record (the tool version, the server port)
 //   php tools/corpus/differential.php --model-input <phar> <dir>
-//                                                            runs a 0.13 PHAR the same way and writes each app's html data
-//                                                            block, the model's input, into <dir>
+//                                                            runs a 0.13 PHAR the same way and writes each run's html data
+//                                                            block, the model's input, into <dir>, and <dir>/manifest.json
+//   php tools/corpus/differential.php --adopt-model <reports dir> <input dir>
+//                                                            copies the model's documents into tests/fixtures/corpus/model-report-2/
+//                                                            and writes its provenance.json
 //
 // Every run reads only tests/fixtures/corpus/cache/ (tools/report/record --corpus) through Lockrot\Tests\Support\FixtureCliRun,
-// at CLOCK, the recording day of the cache. The model documents must carry the same clock. A difference that
-// tests/fixtures/corpus/model-divergences.json does not allow fails the run, and so does an allowed difference that no longer
-// occurs.
+// at CLOCK, the recording day of the cache. The differential fails on a difference that
+// tests/fixtures/corpus/model-divergences.json does not allow, on an allowed difference that no longer occurs or occurs a
+// different number of times, on a cache or a model document that provenance.json does not describe, and on a recording that
+// neither lockrot nor the 0.13 PHAR reads.
 require __DIR__.'/../../vendor/autoload.php';
 
 use Lockrot\Tests\Support\FixtureCliRun;
@@ -28,21 +33,25 @@ const MODEL = ROOT.'/tests/fixtures/corpus/model-report-2';
 const DIVERGENCES = ROOT.'/tests/fixtures/corpus/model-divergences.json';
 const OPTIONS = ['--target-php=8.4', '--all'];
 const CLOCK = '2026-10-14T00:00:00+00:00';
+/** The run of drupal in which the advisory lookup of packages.drupal.org fails: lockrot must not write `clear` after it. */
+const FEED_FAILED = 'drupal_drupal.feed-failed';
+/** The value of a path that one side does not write. */
+const ABSENT = ['$absent' => true];
 /** The fields of a finding that the differential compares. Beside them: each flag's FLAG_FIELDS as `flags.<id>.<key>`, and each key of each S9 row's `fix` as `S9.fix.<key>[<advisory id>]`. */
 const FIELDS = [
-    'verdict', 'lead', 'installed_php', 'checks_skipped', 'age', 'activity', 'gate.basis',
+    'verdict', 'lead', 'direct', 'reach', 'installed_php', 'checks_missing', 'checks_skipped', 'age', 'activity', 'gate.basis',
     'score.terms', 'score.modifiers', 'score.without', 'score.accepted',
     'next_step.kind', 'next_step.constraint', 'next_step.version', 'next_step.to_branch', 'next_step.clears', 'next_step.leaves',
     'next_step.adds', 'next_step.unverified', 'next_step.php_check', 'next_step.commands', 'next_step.crosses_major',
     'next_step.composer_moves_because', 'next_step.if_applied', 'next_step.held_by',
+    'security.status', 'security.check', 'security.complete', 'security.unchecked_reason',
     'security.fix_kind', 'security.gets', 'security.partial', 'security.move_in', 'security.installed_branch_fixes',
 ];
 /** The fields of each flag, by flag id. */
 const FLAG_FIELDS = ['role', 'headline', 'degree'];
+const JSON_FLAGS = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
 $argv = $_SERVER['argv'];
-$apps = array_map('basename', glob(APPS.'/*', GLOB_ONLYDIR) ?: []);
-$today = CLOCK;
 
 if (($argv[1] ?? null) === '--model-input') {
     [$phar, $out] = [$argv[2] ?? '', $argv[3] ?? ''];
@@ -51,39 +60,47 @@ if (($argv[1] ?? null) === '--model-input') {
         exit(2);
     }
     @mkdir($out, 0777, true);
-    foreach ($apps as $app) {
-        $html = run($phar, $app, $today, array_merge(OPTIONS, ['--format=html']));
+    $reads = [];
+    foreach (runs() as $id => [$app, $mirrors]) {
+        [$html, $read] = run($phar, $app, $mirrors, array_merge(OPTIONS, ['--format=html']));
+        $reads = array_merge($reads, $read);
         if (preg_match('{<script id="lockrot-data" type="application/json">(.*?)</script>}s', $html, $match) !== 1) {
-            fwrite(STDERR, "differential: no data block in the page of $app\n");
+            fwrite(STDERR, "differential: no data block in the page of $id\n");
             exit(1);
         }
-        file_put_contents($out.'/'.$app.'.json', json_encode(['data' => json_decode($match[1], true)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n");
-        fwrite(STDOUT, "differential: $app\n");
+        file_put_contents($out.'/'.$id.'.json', json_encode(['data' => json_decode($match[1], true)], JSON_FLAGS)."\n");
+        fwrite(STDOUT, "differential: $id\n");
     }
+    $manifest = ['phar' => ['sha256' => hash_file('sha256', $phar)], 'options' => array_merge(OPTIONS, ['--format=html']), 'clock' => CLOCK, 'reads' => recordingFiles($reads)];
+    file_put_contents($out.'/manifest.json', json_encode($manifest, JSON_FLAGS)."\n");
     exit(0);
 }
 
-assertModelClock();
+if (($argv[1] ?? null) === '--adopt-model') {
+    adoptModel($argv[2] ?? '', $argv[3] ?? '');
+    exit(0);
+}
+
+$provenance = json_decode((string) file_get_contents(MODEL.'/provenance.json'), true);
+$problems = provenanceProblems($provenance);
 $write = ($argv[1] ?? null) === '--write' ? ($argv[2] ?? '') : null;
-$allowed = json_decode((string) file_get_contents(DIVERGENCES), true)['allowed'];
+$allowed = allowedEntries();
 $used = array_fill(0, count($allowed), 0);
 $unreviewed = [];
 $byPath = [];
+$reads = [];
 $counts = ['lockrot' => ['vulnerable' => 0, 'critical' => 0], 'model' => ['vulnerable' => 0, 'critical' => 0]];
-foreach ($apps as $app) {
-    $json = run(ROOT.'/bin/lockrot', $app, $today, array_merge(OPTIONS, ['--format=json', '--fail-on=high']));
+foreach (runs() as $id => [$app, $mirrors]) {
+    [$json, $read] = run(ROOT.'/bin/lockrot', $app, $mirrors, array_merge(OPTIONS, ['--format=json', '--fail-on=high']));
+    $reads = array_merge($reads, $read);
     if ($write !== null) {
         @mkdir($write, 0777, true);
-        file_put_contents($write.'/'.$app.'.json', preg_replace('{http://127\.0\.0\.1:\d+}', 'http://127.0.0.1', VersionMask::apply($json)));
+        file_put_contents($write.'/'.$id.'.json', preg_replace('{http://127\.0\.0\.1:\d+}', 'http://127.0.0.1', VersionMask::apply($json)));
     }
     $ours = findings(json_decode($json, true));
-    if (!is_file(MODEL.'/'.$app.'.json')) {
-        fwrite(STDERR, "differential: no model document tests/fixtures/corpus/model-report-2/$app.json\n");
-        exit(2);
-    }
-    $theirs = findings(json_decode((string) file_get_contents(MODEL.'/'.$app.'.json'), true));
+    $theirs = findings(json_decode((string) file_get_contents(MODEL.'/'.$id.'.json'), true));
     foreach (['lockrot' => $ours, 'model' => $theirs] as $side => $findings) {
-        foreach ($findings as $finding) {
+        foreach ($id === FEED_FAILED ? [] : $findings as $finding) {
             $counts[$side]['vulnerable'] += in_array('vulnerable', array_column(listAt($finding, 'flags'), 'id'), true) ? 1 : 0;
             $counts[$side]['critical'] += $finding['verdict'] === 'critical' ? 1 : 0;
         }
@@ -95,9 +112,9 @@ foreach ($apps as $app) {
         foreach ($differences as $path => [$lockrot, $model]) {
             $field = (string) preg_replace('{\[.*\]$}', '', $path);
             $byPath[$field] = ($byPath[$field] ?? 0) + 1;
-            $index = allowedBy($allowed, $app, $package, $path, $lockrot, $model);
+            $index = allowedBy($allowed, $id, $package, $path, $lockrot, $model);
             if ($index === null) {
-                $unreviewed[] = compact('app', 'package', 'path', 'lockrot', 'model');
+                $unreviewed[] = ['app' => $id, 'package' => $package, 'path' => $path, 'lockrot' => $lockrot, 'model' => $model];
             } else {
                 ++$used[$index];
             }
@@ -111,31 +128,48 @@ foreach ($byPath as $path => $count) {
     fwrite(STDOUT, sprintf("  %-40s %d\n", $path, $count));
 }
 fwrite(STDOUT, sprintf("vulnerable: lockrot %d, model %d; critical: lockrot %d, model %d\n", $counts['lockrot']['vulnerable'], $counts['model']['vulnerable'], $counts['lockrot']['critical'], $counts['model']['critical']));
-$stale = array_keys(array_filter($used, static fn (int $count): bool => $count === 0));
-foreach ($stale as $index) {
-    fwrite(STDERR, 'differential: an allowed divergence no longer occurs: '.json_encode($allowed[$index], JSON_UNESCAPED_SLASHES)."\n");
-}
-foreach ($unreviewed as $row) {
-    fwrite(STDERR, 'differential: '.json_encode($row, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n");
-}
-fwrite(STDOUT, sprintf("differential: %d unreviewed, %d allowed divergences unused\n", count($unreviewed), count($stale)));
-exit($unreviewed === [] && $stale === [] ? 0 : 1);
-
-function assertModelClock(): void
-{
-    $clocks = array_unique(array_values(json_decode((string) file_get_contents(MODEL.'/provenance.json'), true)['clock']));
-    if ($clocks !== [CLOCK]) {
-        fwrite(STDERR, 'differential: the model documents read the clock '.implode(', ', $clocks).', not '.CLOCK."\n");
-        exit(2);
+foreach ($allowed as $index => $entry) {
+    $expected = $entry['count'] ?? null;
+    if ($expected === null ? $used[$index] === 0 : $used[$index] !== $expected) {
+        $problems[] = sprintf('an allowed divergence occurs %d times, not %s: %s', $used[$index], $expected ?? 'at least once', json_encode($entry, JSON_UNESCAPED_SLASHES));
     }
 }
+$unread = array_values(array_diff(cacheFiles(), recordingFiles($reads), $provenance['model_inputs']['reads']));
+if ($unread !== []) {
+    $problems[] = sprintf('%d recordings that no run reads, among them %s', count($unread), implode(', ', array_slice($unread, 0, 10)));
+}
+foreach (array_merge($problems, array_map(static fn (array $row): string => (string) json_encode($row, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $unreviewed)) as $line) {
+    fwrite(STDERR, 'differential: '.$line."\n");
+}
+fwrite(STDOUT, sprintf("differential: %d unreviewed, %d other problems\n", count($unreviewed), count($problems)));
+exit($unreviewed === [] && $problems === [] ? 0 : 1);
 
-/** @param list<string> $arguments */
-function run(string $entry, string $app, string $today, array $arguments): string
+/**
+ * Each run by its document name: the app and whether the further repositories of its composer.json answer.
+ *
+ * @return array<string, array{string, bool}>
+ */
+function runs(): array
 {
-    $run = FixtureCliRun::forRecording(APPS.'/'.$app, CACHE);
+    $runs = [];
+    foreach (glob(APPS.'/*', GLOB_ONLYDIR) ?: [] as $dir) {
+        $runs[basename($dir)] = [basename($dir), true];
+    }
+    $runs[FEED_FAILED] = ['drupal_drupal', false];
+
+    return $runs;
+}
+
+/**
+ * @param list<string> $arguments
+ *
+ * @return array{string, list<string>} the output and the recordings that the run read
+ */
+function run(string $entry, string $app, bool $mirrors, array $arguments): array
+{
+    $run = FixtureCliRun::forRecording(APPS.'/'.$app, CACHE, $mirrors);
     try {
-        $process = $run->run($entry, APPS.'/'.$app, $today, $arguments);
+        $process = $run->run($entry, APPS.'/'.$app, CLOCK, $arguments);
     } finally {
         $run->stop();
     }
@@ -144,8 +178,146 @@ function run(string $entry, string $app, string $today, array $arguments): strin
         fwrite(STDERR, "differential: $entry on $app exited ".$process->getExitCode()."\n".$process->getErrorOutput());
         exit(1);
     }
+    $outside = FixtureCliRun::outsideRequests($process);
+    if ($mirrors && $outside !== []) {
+        fwrite(STDERR, "differential: $entry on $app asked outside the recordings: ".implode(', ', $outside)."\n");
+        exit(1);
+    }
+    $read = $run->recordingsRead($process);
+    if (in_array('https://packagist.org/api/security-advisories/', $read, true)) {
+        $read[] = 'advisories/'.$app;
+    }
 
-    return $process->getOutput();
+    return [$process->getOutput(), $read];
+}
+
+/**
+ * The cache files that the reads name, as paths below the cache.
+ *
+ * @param list<string> $reads
+ *
+ * @return list<string>
+ */
+function recordingFiles(array $reads): array
+{
+    $files = [];
+    foreach (array_unique($reads) as $read) {
+        if (strpos($read, 'github/') === 0) {
+            $files[] = $read;
+        } elseif (strpos($read, 'advisories/') === 0) {
+            $files[] = $read.'.json';
+        } elseif (strpos($read, 'https://repo.packagist.org/p2/') === 0) {
+            $files[] = 'p2/'.sha1($read).'.json';
+        } elseif (strpos($read, 'https://packagist.org/') !== 0) {
+            $files[] = 'repos/'.sha1($read).'.json';
+        }
+    }
+    sort($files);
+
+    return array_values(array_unique($files));
+}
+
+/** @return list<string> every file of the cache, as a path below it, sorted */
+function cacheFiles(): array
+{
+    $files = [];
+    /** @var SplFileInfo $file */
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(CACHE, FilesystemIterator::SKIP_DOTS)) as $file) {
+        $files[] = substr($file->getPathname(), strlen(CACHE) + 1);
+    }
+    sort($files);
+
+    return $files;
+}
+
+/** The sha256 of the lines "<sha256>  <path>", one per cache file, sorted by path. */
+function cacheDigest(): string
+{
+    return hash('sha256', implode('', array_map(static fn (string $file): string => hash_file('sha256', CACHE.'/'.$file).'  '.$file."\n", cacheFiles())));
+}
+
+/**
+ * What provenance.json says that the files do not hold: the clock, the cache digest and each model document's sha256.
+ *
+ * @param array<string, mixed> $provenance
+ *
+ * @return list<string>
+ */
+function provenanceProblems(array $provenance): array
+{
+    $problems = [];
+    if (array_values(array_unique($provenance['clock'])) !== [CLOCK]) {
+        $problems[] = 'the model documents read another clock than '.CLOCK;
+    }
+    if ($provenance['cache']['sha256'] !== cacheDigest()) {
+        $problems[] = 'tests/fixtures/corpus/cache/ is not the cache that the model read: its digest differs from provenance.json';
+    }
+    $documents = array_values(array_diff(array_map('basename', glob(MODEL.'/*.json') ?: []), ['provenance.json']));
+    $outputs = array_keys($provenance['outputs']);
+    $expected = array_map(static fn (string $id): string => $id.'.json', array_keys(runs()));
+    sort($documents);
+    sort($outputs);
+    sort($expected);
+    if ($outputs !== $documents || $outputs !== $expected) {
+        $problems[] = 'the model documents are not the ones of provenance.json outputs, one per run';
+    }
+    foreach ($provenance['outputs'] as $name => $sha256) {
+        if (!is_file(MODEL.'/'.$name) || hash_file('sha256', MODEL.'/'.$name) !== $sha256) {
+            $problems[] = 'tests/fixtures/corpus/model-report-2/'.$name.' differs from its sha256 in provenance.json';
+        }
+    }
+
+    return $problems;
+}
+
+/** Copies the reports mode's documents and writes provenance.json from its provenance, the model input's manifest and the cache. */
+function adoptModel(string $reports, string $inputs): void
+{
+    $model = json_decode((string) file_get_contents($reports.'/provenance.json'), true);
+    $input = json_decode((string) file_get_contents($inputs.'/manifest.json'), true);
+    foreach (glob(MODEL.'/*.json') ?: [] as $old) {
+        unlink($old);
+    }
+    foreach (array_keys($model['outputs']) as $name) {
+        copy($reports.'/'.$name, MODEL.'/'.$name);
+    }
+    $provenance = [
+        'written_by' => 'security-axis/spec_flags_r3_docs.py reports <dir> <out> --cache tests/fixtures/corpus/cache --php-fit <file>, in the private model folder, then tools/corpus/differential.php --adopt-model',
+        'model' => $model['model'],
+        'model_inputs' => [
+            'written_by' => 'php tools/corpus/differential.php --model-input <phar> <dir>',
+            'phar' => ['release' => 'v0.13.0', 'sha256' => $input['phar']['sha256'], 'verified_by' => 'gh attestation verify --repo somework/lockrot'],
+            'options' => $input['options'],
+            'sha256' => $model['inputs'],
+            'reads' => $input['reads'],
+        ],
+        'php_fit_sha256' => $model['php_fit'],
+        'cache' => ['path' => 'tests/fixtures/corpus/cache', 'files' => count(cacheFiles()), 'sha256' => cacheDigest(), 'sha256_of' => 'the lines "<sha256>  <path below the cache>", one per file, sorted by path'],
+        'clock' => $model['clock'],
+        'fail_on' => $model['fail_on'],
+        'outputs' => $model['outputs'],
+    ];
+    file_put_contents(MODEL.'/provenance.json', json_encode($provenance, JSON_FLAGS)."\n");
+}
+
+/**
+ * The entries of model-divergences.json. Each names a `path`. An entry without `count` names `app`, `package`, `lockrot` and
+ * `model` too, and must match at least once. An entry with `count` must match exactly that many times.
+ *
+ * @return list<array<string, mixed>>
+ */
+function allowedEntries(): array
+{
+    $allowed = json_decode((string) file_get_contents(DIVERGENCES), true)['allowed'];
+    foreach ($allowed as $entry) {
+        $missing = array_diff(isset($entry['count']) ? ['path'] : ['app', 'package', 'path', 'lockrot', 'model'], array_keys($entry));
+        if ($missing !== [] || !is_string($entry['path'])) {
+            fwrite(STDERR, 'differential: an allowed divergence lacks '.implode(', ', $missing ?: ['a path']).': '.json_encode($entry, JSON_UNESCAPED_SLASHES)."\n");
+            exit(2);
+        }
+    }
+
+    return $allowed;
 }
 
 /**
@@ -176,13 +348,13 @@ function values(array $finding): array
     foreach (FIELDS as $path) {
         $value = $finding;
         foreach (explode('.', $path) as $key) {
-            $value = is_array($value) && array_key_exists($key, $value) ? $value[$key] : null;
+            $value = is_array($value) && array_key_exists($key, $value) ? $value[$key] : ABSENT;
         }
         $values[$path] = canonical($value);
     }
     foreach (listAt($finding, 'flags') as $flag) {
         foreach (FLAG_FIELDS as $key) {
-            $values['flags.'.$flag['id'].'.'.$key] = canonical($flag[$key] ?? null);
+            $values['flags.'.$flag['id'].'.'.$key] = canonical(array_key_exists($key, $flag) ? $flag[$key] : ABSENT);
         }
     }
     foreach (listAt($finding, 'signals') as $signal) {
@@ -212,15 +384,15 @@ function listAt($object, string $key): array
  * @param array<string, string> $ours
  * @param array<string, string> $theirs
  *
- * @return array<string, array{mixed, mixed}> lockrot's and the model's value of each path that differs, a path that one side
- *                                            lacks included
+ * @return array<string, array{mixed, mixed}> lockrot's and the model's value of each path that differs, ABSENT for a side
+ *                                            that lacks the path
  */
 function differences(array $ours, array $theirs): array
 {
     $differences = [];
     foreach (array_unique(array_merge(array_keys($ours), array_keys($theirs))) as $path) {
-        $left = $ours[$path] ?? 'absent';
-        $right = $theirs[$path] ?? 'absent';
+        $left = $ours[$path] ?? canonical(ABSENT);
+        $right = $theirs[$path] ?? canonical(ABSENT);
         if ($left !== $right) {
             $differences[$path] = [json_decode($left, true), json_decode($right, true)];
         }
@@ -260,7 +432,8 @@ function normalised($value)
 
 /**
  * The index of the first allowed divergence that matches. An entry matches on each key it has: `app`, `package`, `path` (a
- * path or a prefix that ends in `*`), `lockrot` and `model` (each side's value).
+ * path or a prefix that ends in `*`), `lockrot` and `model` (each side's value, `{"$absent": true}` for a side without the
+ * path).
  *
  * @param list<array<string, mixed>> $allowed
  * @param mixed                      $lockrot
@@ -269,7 +442,7 @@ function normalised($value)
 function allowedBy(array $allowed, string $app, string $package, string $path, $lockrot, $model): ?int
 {
     foreach ($allowed as $index => $entry) {
-        $pattern = (string) ($entry['path'] ?? '*');
+        $pattern = (string) $entry['path'];
         $pathMatches = substr($pattern, -1) === '*' ? strpos($path, substr($pattern, 0, -1)) === 0 : $pattern === $path;
         if ($pathMatches
             && ($entry['app'] ?? $app) === $app
