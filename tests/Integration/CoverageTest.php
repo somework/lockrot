@@ -338,7 +338,7 @@ final class CoverageTest extends TestCase
             }
         }
         foreach (['skips', 'unsatisfiable'] as $value) {
-            foreach (['misses_project_php', 'misses_target_php'] as $key) {
+            foreach (['misses_project_php', 'misses_target_php', 'highest_misses_project_php'] as $key) {
                 $out[Schemas::EXPLAIN.' '.self::D.'repositoryMetadata/properties/branches/items/properties/'.$key.'/oneOf/0 '.$value] = "0.13's branch-row values: the details blocks carry needs_newer and needs_older only";
             }
         }

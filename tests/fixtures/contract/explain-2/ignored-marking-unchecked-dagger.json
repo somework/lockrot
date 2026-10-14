@@ -245,7 +245,21 @@
             "cached_at": null
         },
         "allowlist": null,
-        "abandoned_ignored": null,
+        "abandoned_ignored": {
+            "by": "policy.abandoned",
+            "rules": [
+                {
+                    "pattern": "symfony/debug",
+                    "reason": "removed in the 7.x upgrade",
+                    "constraints": []
+                }
+            ],
+            "marking": {
+                "marked_by": "repository",
+                "replacement": "symfony/error-handler",
+                "replacement_url": "https://packagist.org/packages/symfony/error-handler"
+            }
+        },
         "from_composer_repository": true,
         "origin": {
             "kind": "packagist",
@@ -360,8 +374,8 @@
         "type": "library"
     },
     "metadata": {
-        "abandoned": false,
-        "replacement": null,
+        "abandoned": true,
+        "replacement": "symfony/error-handler",
         "releases_listed": 3,
         "has_stable_release": true,
         "last_stable_release": "2022-07-28T16:29:46+00:00",
@@ -383,11 +397,15 @@
                 "newest_dated_released": "2022-07-28T16:29:46+00:00",
                 "dated_by": null,
                 "php": ">=7.1.3",
+                "highest_php": ">=7.1.3",
                 "admits_target_php": true,
                 "admits_project_php": true,
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 4.2,
                 "fixes": null
             },
@@ -401,11 +419,15 @@
                 "newest_dated_released": "2020-10-24T10:57:07+00:00",
                 "dated_by": null,
                 "php": "^5.5.9|>=7.0.8",
+                "highest_php": "^5.5.9|>=7.0.8",
                 "admits_target_php": true,
                 "admits_project_php": true,
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": 5.9,
                 "fixes": null
             },
@@ -419,11 +441,15 @@
                 "newest_dated_released": null,
                 "dated_by": null,
                 "php": ">=5.3.9",
+                "highest_php": ">=5.3.9",
                 "admits_target_php": true,
                 "admits_project_php": true,
                 "php_blocked_by": null,
                 "misses_target_php": null,
                 "misses_project_php": null,
+                "highest_admits_target_php": true,
+                "highest_admits_project_php": true,
+                "highest_misses_project_php": null,
                 "released_years": null,
                 "fixes": null
             }
@@ -1187,6 +1213,27 @@
         }
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": []
+    "notes": [
+        "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count."
+    ],
+    "note_details": [
+        {
+            "code": "abandoned_markings_ignored",
+            "text": "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.",
+            "docs_url": "https://lockrot.dev/notes/#abandoned_markings_ignored",
+            "sets_network_failures": false,
+            "data": {
+                "by": "policy.abandoned",
+                "count": 1,
+                "packages": [
+                    {
+                        "package": "symfony/debug",
+                        "patterns": [
+                            "symfony/debug"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
 }

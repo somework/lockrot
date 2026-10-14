@@ -10,6 +10,7 @@ use Lockrot\Output\JsonFormatter;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +35,37 @@ final class CaseHydratorTest extends TestCase
         self::assertSame('32 = vulnerable 32 [critical advisory]', JsonPath::stringAt($recorded, ['score', 'text']), 'the case records its score text');
         self::assertSame(JsonPath::stringAt($recorded, ['score', 'text']), JsonPath::stringAt($finding, ['score', 'text']));
         self::assertSame(JsonPath::stringAt($recorded, ['verdict']), JsonPath::stringAt($finding, ['verdict']));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function provideIgnoredMarkingCases(): iterable
+    {
+        foreach (['ignored-marking-only‡', 'ignored-marking-stale‡', 'ignored-marking-archived‡', 'ignored-marking-unchecked‡', 'ignored-marking-partial‡'] as $id) {
+            yield $id => [$id];
+        }
+    }
+
+    /**
+     * A case whose project lists the package in Composer's abandoned ignore list hydrates with that
+     * list, so lockrot ignores the marking as the model does.
+     *
+     * @dataProvider provideIgnoredMarkingCases
+     */
+    #[DataProvider('provideIgnoredMarkingCases')]
+    public function testAnIgnoredMarkingCaseHydratesWithComposersIgnoreList(string $id): void
+    {
+        $case = CaseHydrator::case($id);
+        $recorded = JsonPath::arrayAt($case, ['finding', 'abandoned_ignored']);
+
+        $finding = null;
+        foreach (JsonPath::arrayAt(JsonPath::decoded(CaseHydrator::report($case)->toArray()), ['findings']) as $row) {
+            self::assertIsArray($row);
+            if (JsonPath::stringAt($row, ['package']) === JsonPath::stringAt($case, ['finding', 'package'])) {
+                $finding = $row;
+            }
+        }
+        self::assertNotNull($finding, 'the case package has a finding');
+        self::assertSame([JsonPath::stringAt($recorded, ['by']), JsonPath::arrayAt($recorded, ['rules'])], [JsonPath::stringAt($finding, ['abandoned_ignored', 'by']), JsonPath::arrayAt($finding, ['abandoned_ignored', 'rules'])]);
     }
 
     /** Case C has a release without a date: lockrot reads it as undated, and the case still hydrates. */

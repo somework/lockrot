@@ -152,7 +152,7 @@ final class GithubFormatter implements FormatterInterface
             $parts[] = $allowlist[0].': '.$allowlist[1].'.';
         }
         if (!$finding->isDirect() && $finding->directDependents() !== []) {
-            $parts[] = '(via '.implode(', ', $finding->directDependents()).')';
+            $parts[] = '(via '.FindingBlock::dependents($finding).')';
         }
 
         return $finding->package().' '.$finding->version().': '.implode(' ', $parts);

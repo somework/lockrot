@@ -204,7 +204,7 @@
       abandoned    marked abandoned by its registry
       age: installed 2.0.2 released 2024-09-05 (2.1 years ago), its newest release; last push 2025-12-11 (0.8 years
            ago)
-  doctrine/cache 2.2.0  via craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle, doctrine/doctrine-fixtures-bundle, doctrine/doctrine-migrations-bundle, doctrine/orm, pagerfanta/doctrine-orm-adapter, spiriitlabs/form-filter-bundle  ·  abandoned (baseline)
+  doctrine/cache 2.2.0  via craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle and 5 more  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 transitive (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0
       do: find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle,
@@ -302,7 +302,7 @@
           update them
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8
                    years ago); last push 2018-02-12 (8.7 years ago)
-  symfony/security-guard v5.4.45  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-trusted-device, symfony/security-bundle  ·  abandoned (baseline)
+  symfony/security-guard v5.4.45  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 transitive (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0
       do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle,

@@ -19,6 +19,7 @@ use Lockrot\Tests\Support\JsonPath as J;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\Verdict;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class HtmlFormatterTest extends TestCase
@@ -124,13 +125,32 @@ final class HtmlFormatterTest extends TestCase
         self::assertSame($nasty, J::stringAt($payload, ['report', 'findings', 0, 'package']), 'and it still reads back unchanged');
     }
 
-    public function testTheTitleSaysWhatTheRunFound(): void
+    /**
+     * @return iterable<string, array{list<array{string, string}>, int, string, string}>
+     */
+    public static function provideTheTitleAndTheDescriptionOfEachForm(): iterable
     {
-        $flagged = $this->page($this->report([$this->finding('vendor/pkg')], 12));
-        self::assertStringContainsString('<title>lockrot: 1 of 12 packages flagged</title>', $flagged);
+        $tail = ' Each finding lists every flag that fired, the sum behind its grade, and its next step.';
 
-        $clean = $this->page($this->report([$this->finding('vendor/pkg', Verdict::OK)], 12));
-        self::assertStringContainsString('<title>lockrot: nothing flagged in 12 packages</title>', $clean);
+        yield 'flagged' => [[['vendor/pkg', Verdict::STALE]], 12, 'lockrot: 1 of 12 packages flagged', 'lockrot flagged 1 of 12 packages in composer.lock: 1 low.'.$tail];
+        yield 'flagged, one package checked' => [[['vendor/pkg', Verdict::STALE]], 1, 'lockrot: 1 of 1 package flagged', 'lockrot flagged 1 of 1 package in composer.lock: 1 low.'.$tail];
+        yield 'nothing flagged' => [[['vendor/pkg', Verdict::OK]], 12, 'lockrot: nothing flagged in 12 packages', 'lockrot checked 12 packages in composer.lock and flagged none.'];
+        yield 'nothing flagged, one package checked' => [[['vendor/pkg', Verdict::OK]], 1, 'lockrot: nothing flagged in 1 package', 'lockrot checked 1 package in composer.lock and flagged none.'];
+        yield 'an empty lock' => [[], 0, 'lockrot: composer.lock holds no package', 'lockrot found no package in composer.lock.'];
+    }
+
+    /**
+     * @param list<array{string, string}> $findings
+     *
+     * @dataProvider provideTheTitleAndTheDescriptionOfEachForm
+     */
+    #[DataProvider('provideTheTitleAndTheDescriptionOfEachForm')]
+    public function testTheTitleAndTheDescriptionSayWhatTheRunFound(array $findings, int $checked, string $title, string $description): void
+    {
+        $page = $this->page($this->report(array_map(fn (array $f): Finding => $this->finding($f[0], $f[1]), $findings), $checked));
+
+        self::assertStringContainsString('<title>'.$title.'</title>', $page);
+        self::assertStringContainsString('<meta name="description" content="'.$description.'">', $page);
     }
 
     public function testThePayloadCarriesTheLibyearsBlock(): void
@@ -141,14 +161,6 @@ final class HtmlFormatterTest extends TestCase
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'libyears'])['total']);
         self::assertSame(4.71, J::arrayAt($payload, ['report', 'findings', 0])['libyears']);
         self::assertNull(J::arrayAt($payload, ['report', 'findings', 1])['libyears']);
-    }
-
-    public function testTheTitleIsEscapedLikeEverythingElse(): void
-    {
-        $page = (new HtmlFormatter(null, [JsonFormatter::SCHEMA]))->format($this->report([], 0));
-
-        self::assertStringNotContainsString('<title></title>', $page);
-        self::assertStringContainsString('lockrot: nothing flagged in 0 packages', $page);
     }
 
     public function testThePayloadCarriesTheReportAndNothingItCannotShow(): void
@@ -230,7 +242,7 @@ final class HtmlFormatterTest extends TestCase
         $page = $this->page($this->report($findings, 60));
 
         self::assertStringContainsString(
-            'lockrot flagged 14 of 60 packages in composer.lock: 2 high, 8 medium, 4 low.',
+            'lockrot flagged 14 of 60 packages in composer.lock: 2 high, 8 medium, 4 low. Each finding lists every flag that fired, the sum behind its grade, and its next step.',
             $page
         );
         self::assertStringNotContainsString('1 abandoned', $page, 'the description counts grades, not flags');
@@ -250,13 +262,6 @@ final class HtmlFormatterTest extends TestCase
         self::assertIsString($withoutPayload);
         self::assertStringNotContainsString('vendor/pkg', $withoutPayload, 'package names come from the payload');
         self::assertDoesNotMatchRegularExpression('{target PHP \d}', $withoutPayload);
-    }
-
-    public function testACleanRunSaysSoInItsDescription(): void
-    {
-        $page = $this->page($this->report([$this->finding('vendor/fine', Verdict::OK)], 40));
-
-        self::assertStringContainsString('lockrot checked 40 packages in composer.lock and flagged none.', $page);
     }
 
     public function testTheFormatIsReachableByName(): void

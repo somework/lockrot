@@ -1,6 +1,7 @@
 <options=bold>not flagged (1)</options=bold>
   doctrine/cache 2.1.1  direct  ·  finished · stale (accepted)
       0 (stale accepted)
+      abandoned marking ignored (policy.abandoned: doctrine/cache): PSR-6 migration is planned for 9.0
 
 5 packages checked · nothing flagged
 libyears: 0.8 behind across the one package · 0.8 from direct requirements ·
@@ -9,3 +10,5 @@ advisories: 1 package asked · packagist.org answered (0 on record for 0 package
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
+note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package:
+doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.

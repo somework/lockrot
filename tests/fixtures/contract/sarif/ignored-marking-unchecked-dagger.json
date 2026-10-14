@@ -251,7 +251,15 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    }
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count."
+                            }
+                        }
+                    ]
                 }
             ],
             "properties": {

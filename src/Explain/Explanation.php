@@ -231,11 +231,15 @@ final class Explanation
                 'newest_dated_released' => self::date($row->newestDatedReleased()),
                 'dated_by' => $row->datedBy(),
                 'php' => $row->php(),
+                'highest_php' => $row->highestPhp(),
                 'admits_target_php' => $row->admitsTargetPhp(),
                 'admits_project_php' => $row->admitsProjectPhp(),
                 'php_blocked_by' => $row->phpBlockedBy(),
                 'misses_target_php' => $row->missesTargetPhp(),
                 'misses_project_php' => $row->missesProjectPhp(),
+                'highest_admits_target_php' => $row->highestAdmitsTargetPhp(),
+                'highest_admits_project_php' => $row->highestAdmitsProjectPhp(),
+                'highest_misses_project_php' => $row->highestMissesProjectPhp(),
             ] + $this->rowExtras($row);
         }
 

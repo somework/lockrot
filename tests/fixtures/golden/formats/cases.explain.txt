@@ -2761,6 +2761,7 @@ do        nothing to do: nothing counts
 
 flags
   feeds        packagist.org: none on record
+  S1 ignored   marked abandoned by its registry: ignored, config.policy.abandoned.ignore lists doctrine/* ("the annotations reader goes with the ORM 3 upgrade"); not counted.
   accepted     none
   not checked  nothing
 
@@ -2768,6 +2769,7 @@ repository metadata
      branch   highest tag   released     php        fixes
    * 2.x      2.0.2         2024-09-05   ^7.2 || ^8.0
      1.x      1.14.4        2024-09-05   ^7.1 || ^8.0
+note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/annotations. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
 == case ignored-marking-stale‡
 doctrine/cache 2.1.1 — medium: stale
@@ -2790,6 +2792,7 @@ do        —
 flags
   stale        S2 · last release 2022-05-20 (4.4 years ago)
   feeds        packagist.org: none on record
+  S1 ignored   marked abandoned by its registry: ignored, config.policy.abandoned.ignore lists doctrine/cache ("PSR-6 migration is planned for 9.0"); not counted.
   accepted     none
   not checked  nothing
 
@@ -2797,6 +2800,7 @@ repository metadata
      branch   highest tag   released     php        fixes
    * 2.x      2.2.0         2022-05-20   ~7.1 || ^8.0
      1.x      1.13.0        2022-05-20   ~7.1 || ^8.0
+note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
 == case ignored-marking-archived‡
 symfony/debug v3.4.47 — critical: abandoned · old-promise
@@ -2820,6 +2824,7 @@ flags
   abandoned    S3 high · its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
+  S1 ignored   marked abandoned by its registry (replacement: symfony/error-handler): ignored, config.audit.ignore-abandoned lists symfony/debug ("removed in the 7.x upgrade"); not counted. The constraint ^3.4 on that entry is not applied, as composer audit does not apply it.
   accepted     none
   not checked  nothing
 
@@ -2828,6 +2833,7 @@ repository metadata
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
      2.x      v2.8.52       undated      >=5.3.9
+note: Composer's abandoned ignore list (config.audit.ignore-abandoned) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
 == case ignored-marking-unchecked‡
 symfony/debug v3.4.47 — high: old-promise · stale
@@ -2852,6 +2858,7 @@ flags
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   stale        S2 · last release 2022-07-28 (4.2 years ago)
   feeds        packagist.org: none on record
+  S1 ignored   marked abandoned by its registry (replacement: symfony/error-handler): ignored, config.policy.abandoned.ignore lists symfony/debug ("removed in the 7.x upgrade"); not counted.
   accepted     none
   not checked  S3, S4 (no repository found)
 
@@ -2860,6 +2867,7 @@ repository metadata
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
      2.x      v2.8.52       undated      >=5.3.9
+note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
 == case ignored-marking-partial‡
 doctrine/cache 2.1.1 — finished
@@ -2881,6 +2889,7 @@ do        nothing to do: nothing counts
 flags
   stale        S2 · last release 2022-05-20 (4.4 years ago)
   feeds        packagist.org: none on record
+  S1 ignored   marked abandoned by its registry: ignored, config.policy.abandoned.ignore lists doctrine/cache ("PSR-6 migration is planned for 9.0"); not counted.
   accepted     stale
   not checked  nothing
 
@@ -2888,6 +2897,7 @@ repository metadata
      branch   highest tag   released     php        fixes
    * 2.x      2.2.0         2022-05-20   ~7.1 || ^8.0
      1.x      1.13.0        2022-05-20   ~7.1 || ^8.0
+note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
 == case abandoned-audit-ignore‡
 symfony/debug v3.4.47 — critical: abandoned · old-promise

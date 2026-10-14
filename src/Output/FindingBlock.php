@@ -28,6 +28,9 @@ final class FindingBlock
     /** The signals whose own flag line already prints a reading: the age line then stays out. */
     private const AGE_SIGNALS = [Signal::S2, Signal::S4, Signal::S8];
 
+    /** A framework's core package has a direct dependent per bundle: the rest is counted, so the line stays one line. */
+    private const DEPENDENTS_NAMED = 3;
+
     /** `direct`, `via <direct dependents>` or `unreached`. */
     public static function reach(Finding $finding): string
     {
@@ -35,7 +38,17 @@ final class FindingBlock
             return 'direct';
         }
 
-        return $finding->reach() === 'unreached' ? 'unreached' : 'via '.implode(', ', $finding->directDependents());
+        return $finding->reach() === 'unreached' ? 'unreached' : 'via '.self::dependents($finding);
+    }
+
+    /** `a, b, c and 2 more`: the first direct dependents, then how many are left out. */
+    public static function dependents(Finding $finding): string
+    {
+        $dependents = $finding->directDependents();
+        $named = implode(', ', \array_slice($dependents, 0, self::DEPENDENTS_NAMED));
+        $more = \count($dependents) - self::DEPENDENTS_NAMED;
+
+        return $more > 0 ? $named.' and '.$more.' more' : $named;
     }
 
     /**

@@ -125,6 +125,14 @@ final class MarkdownFormatterTest extends TestCase
         self::assertMatchesRegularExpression('/\| `a\/deep` .* \| a\/root, a\/other \|$/m', self::formatter()->format(self::report()));
     }
 
+    public function testTheViaCellNamesAtMostThreeDirectDependents(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('a/leaf')->withVerdict(Verdict::STALE)->withChain(['a/r1', 'a/leaf'])->withDirectDependents(['a/r1', 'a/r2', 'a/r3', 'a/r4', 'a/r5'])->withDataDate($at)->build()], [], $at, 1, 0);
+
+        self::assertMatchesRegularExpression('/\| `a\/leaf` .* \| a\/r1, a\/r2, a\/r3 and 2 more \|$/m', self::formatter()->format($report));
+    }
+
     public function testShowAllAddsTheScoreZeroRows(): void
     {
         $at = new \DateTimeImmutable(self::AT);

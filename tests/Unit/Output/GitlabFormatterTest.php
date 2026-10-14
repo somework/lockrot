@@ -86,6 +86,16 @@ final class GitlabFormatterTest extends TestCase
         ], Notes::texts(['GitHub token not set: repository activity checked only for 2 candidate packages']), $at, 4, 0);
     }
 
+    public function testTheViaClauseNamesAtMostThreeDirectDependents(): void
+    {
+        $at = new \DateTimeImmutable(self::AT);
+        $report = new Report([(new FindingBuilder())->withPackage('a/leaf')->withVerdict(Verdict::STALE)->withChain(['a/r1', 'a/leaf'])->withDirectDependents(['a/r1', 'a/r2', 'a/r3', 'a/r4', 'a/r5'])->withDataDate($at)->build()], [], $at, 1, 0);
+
+        $out = $this->formatter('none', null)->format($report);
+        self::assertStringContainsString('(via a/r1, a/r2, a/r3 and 2 more)', $out);
+        self::assertStringNotContainsString('a/r4', $out);
+    }
+
     private function formatter(string $failOn, ?string $lockPath): GitlabFormatter
     {
         return new GitlabFormatter(FormatContext::create($lockPath, $failOn));

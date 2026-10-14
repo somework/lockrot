@@ -34,6 +34,9 @@ final class BranchRow
     private ?string $phpBlockedBy;
     private ?string $missesTargetPhp;
     private ?string $missesProjectPhp;
+    private ?bool $highestAdmitsTargetPhp;
+    private ?bool $highestAdmitsProjectPhp;
+    private ?string $highestMissesProjectPhp;
     private ?float $releasedYears;
     private ?BranchFixes $fixes;
 
@@ -85,6 +88,9 @@ final class BranchRow
             $row->phpBlockedBy = $floor->blocking($row->php);
             $row->missesTargetPhp = $floor->missesTarget($row->php);
             $row->missesProjectPhp = $floor->missesProject($row->php);
+            $row->highestAdmitsTargetPhp = $floor->admitsTarget($row->highestPhp);
+            $row->highestAdmitsProjectPhp = $floor->admitsProject($row->highestPhp);
+            $row->highestMissesProjectPhp = $floor->missesProject($row->highestPhp);
             $released = $row->highestReleased;
             if ($released === null && $s8Data instanceof LeftBehindData && $s8Data->newestBranch() === $row->branch) {
                 $released = new \DateTimeImmutable($s8Data->newestRelease());
@@ -174,6 +180,22 @@ final class BranchRow
     public function missesProjectPhp(): ?string
     {
         return $this->missesProjectPhp;
+    }
+
+    /** The floor answers on {@see self::highestPhp()}, which the Release branches line prints. */
+    public function highestAdmitsTargetPhp(): ?bool
+    {
+        return $this->highestAdmitsTargetPhp;
+    }
+
+    public function highestAdmitsProjectPhp(): ?bool
+    {
+        return $this->highestAdmitsProjectPhp;
+    }
+
+    public function highestMissesProjectPhp(): ?string
+    {
+        return $this->highestMissesProjectPhp;
     }
 
     /** The age of the branch's newest release on the run clock, to one decimal. Null with no date for the branch. */

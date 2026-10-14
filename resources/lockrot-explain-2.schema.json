@@ -3808,7 +3808,8 @@
                         "medium",
                         "low",
                         "none"
-                    ]
+                    ],
+                    "x-deprecated": true
                 },
                 "lead": {
                     "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",
@@ -15854,11 +15855,15 @@
                             "newest_dated_released",
                             "dated_by",
                             "php",
+                            "highest_php",
                             "admits_target_php",
                             "admits_project_php",
                             "php_blocked_by",
                             "misses_target_php",
                             "misses_project_php",
+                            "highest_admits_target_php",
+                            "highest_admits_project_php",
+                            "highest_misses_project_php",
                             "released_years",
                             "fixes"
                         ],
@@ -15924,7 +15929,18 @@
                                 ]
                             },
                             "php": {
-                                "description": "The requirement of the branch's newest dated release, as the repository lists it; null when it declares none (the Release branches line then leaves its php clause out).",
+                                "description": "The requirement of the branch's newest dated release, as the repository lists it, or of its highest tag when no release on the branch has a date; null when it declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.",
+                                "oneOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "highest_php": {
+                                "description": "The requirement of the branch's highest tag (`highest`), as the repository lists it; null when it declares none. It differs from `php` when the newest dated release is not the highest tag (composer/composer 2.x: 2.10.3 beside the backport 2.2.30). The Release branches line prints it beside `highest`; the floor answers read `php`.",
                                 "oneOf": [
                                     {
                                         "type": "string"
@@ -16000,6 +16016,46 @@
                                     }
                                 ]
                             },
+                            "highest_admits_target_php": {
+                                "description": "`admits_target_php` asked of `highest_php`: whether the highest tag's php admits the target PHP. The Release branches line reads it beside `highest_php`. Null is no answer, never admitted.",
+                                "oneOf": [
+                                    {
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "highest_admits_project_php": {
+                                "description": "`admits_project_php` asked of `highest_php`: whether the highest tag's php admits the lowest PHP the project's `require.php` promises. Null is no answer, never admitted.",
+                                "oneOf": [
+                                    {
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "highest_misses_project_php": {
+                                "description": "`misses_project_php` asked of `highest_php`: which side of the project's floor the highest tag's php is on. Null exactly where `highest_admits_project_php` is not false. Values grow in minor releases; treat one you do not know as other.",
+                                "oneOf": [
+                                    {
+                                        "type": "string",
+                                        "pattern": "^[a-z][a-z0-9_]*$",
+                                        "x-known-values": [
+                                            "needs_newer",
+                                            "stops_before",
+                                            "skips",
+                                            "unsatisfiable"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
                             "released_years": {
                                 "description": "The age of the branch's newest release on the run clock: `highest_released`, or, when that is null, S8's `newest_release` for the same branch; null when neither dates it.",
                                 "oneOf": [
@@ -16023,7 +16079,7 @@
                                 ]
                             }
                         },
-                        "description": "One release branch, highest first (the details block). Every key but the last two is 0.13's; find the installed row by `installed: true`, never by name."
+                        "description": "One release branch, highest first (the details block). Every key but `highest_php`, the three `highest_*` floor answers, `released_years` and `fixes` is 0.13's; find the installed row by `installed: true`, never by name."
                     }
                 },
                 "installed_branch": {

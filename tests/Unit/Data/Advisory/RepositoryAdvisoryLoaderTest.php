@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 final class RepositoryAdvisoryLoaderTest extends TestCase
 {
     private const WALLABAG_LOCK = __DIR__.'/../../../fixtures/apps/wallabag_wallabag/composer.lock';
-    private const BUDGET_NOTE = 'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower';
+    private const BUDGET_NOTE = 'security advisories not checked (install-time budget spent): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none';
 
     private static ?FixtureRepositoryServer $server = null;
 
@@ -325,7 +325,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
 
         $batch = $loader->load(['doctrine/cache' => '2.2.0']);
 
-        self::assertSame(['offline: security advisories not checked; a priority they would raise stays one step lower'], self::texts($batch));
+        self::assertSame(['security advisories not checked (offline): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none'], self::texts($batch));
         self::assertSame(['reason' => 'offline', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
         self::assertSame([false], self::networkFailures($batch));
         self::assertSame([], $batch->byName());
@@ -379,7 +379,7 @@ final class RepositoryAdvisoryLoaderTest extends TestCase
         if (interface_exists(AdvisoryProviderInterface::class)) {
             self::assertSame([], $batch->notes());
         } else {
-            self::assertSame(['security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower'], self::texts($batch));
+            self::assertSame(['security advisories not checked (needs Composer 2.4 or newer): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none'], self::texts($batch));
             self::assertSame(['reason' => 'composer_too_old', 'composer_repositories_checked' => 0], $batch->notes()[0]->data());
             self::assertSame([], $batch->byName());
             self::assertSame(AdvisoryCoverage::COMPOSER_TOO_OLD, self::nameCoverage($batch, 'doctrine/cache')->reason());

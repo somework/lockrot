@@ -7,10 +7,10 @@ namespace Lockrot\Output;
 use Lockrot\Analyzer\Report;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Html\PageData;
+use Lockrot\Html\PageHeading;
 use Lockrot\Html\ReportDocument;
 use Lockrot\Json\JsonReader;
 use Lockrot\Json\JsonWriter;
-use Lockrot\Verdict\ScoreModel;
 
 /**
  * The report as one self-contained page: docs/ci.md#-formathtml.
@@ -53,42 +53,13 @@ final class HtmlFormatter implements FormatterInterface
             throw new ConfigException(\sprintf('html needs a lockrot-report release that reads report-%d (this build vendors one that reads [%s]); use --format=json meanwhile', JsonFormatter::SCHEMA, implode(', ', $this->reads)));
         }
         $document = new ReportDocument($report, $this->page);
+        $heading = PageHeading::of($report);
 
         return strtr(self::template(), [
-            '{{TITLE}}' => self::text(self::title($report)),
-            '{{DESCRIPTION}}' => self::text(self::description($report)),
+            '{{TITLE}}' => self::text($heading->title()),
+            '{{DESCRIPTION}}' => self::text($heading->description()),
             '{{DATA}}' => self::payload($document->toArray($showAll)),
         ]);
-    }
-
-    private static function description(Report $report): string
-    {
-        $flagged = \count($report->graded());
-        $checked = $report->packagesChecked();
-        if ($flagged === 0) {
-            return 'lockrot checked '.$checked.' packages in composer.lock and flagged none. Every verdict carries the release dates it was decided on.';
-        }
-
-        $named = [];
-        foreach ($report->byGrade() as $grade => $count) {
-            if ($count > 0 && \in_array($grade, ScoreModel::GRADES, true)) {
-                $named[] = $count.' '.$grade;
-            }
-        }
-
-        return 'lockrot flagged '.$flagged.' of '.$checked.' packages in composer.lock'
-            .($named === [] ? '' : ': '.implode(', ', $named))
-            .'. Each finding carries its evidence, the release branches behind it and any security advisory.';
-    }
-
-    private static function title(Report $report): string
-    {
-        $flagged = \count($report->graded());
-        if ($flagged === 0) {
-            return 'lockrot: nothing flagged in '.$report->packagesChecked().' packages';
-        }
-
-        return 'lockrot: '.$flagged.' of '.$report->packagesChecked().' packages flagged';
     }
 
     /**

@@ -1,4 +1,5 @@
-::warning file=composer.lock,line=4,title=lockrot%3A medium — stale::doctrine/cache 2.1.1: 8 = stale 8. Do: —. stale: last release 2022-05-20 (4.4 years ago).
+::warning file=composer.lock,line=4,title=lockrot%3A medium — stale::doctrine/cache 2.1.1: 8 = stale 8. Do: —. stale: last release 2022-05-20 (4.4 years ago). abandoned marking ignored (policy.abandoned: doctrine/cache): PSR-6 migration is planned for 9.0.
+::notice title=lockrot::Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/cache. lockrot does not count the marking; an archived repository and the release and push dates still count.
 flags: stale 1
 depth: every flagged package is named in composer.json · direct 1
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

@@ -16,6 +16,8 @@ use Lockrot\Analyzer\Analyzer;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
 use Lockrot\Clock;
+use Lockrot\Data\Abandoned\AbandonedIgnore;
+use Lockrot\Data\Abandoned\AbandonedIgnoreRule;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
@@ -273,7 +275,10 @@ final class CaseHydrator
         if ($locked === null) {
             throw new \InvalidArgumentException('the lock has no '.$package);
         }
-        $byName = \is_array($inputs['releases'] ?? null) ? [$package => PackageMetadata::fromPackages($package, self::releases($package, $inputs['releases'], $marking), $clock->now(), $locked->normalizedVersion())] : [];
+        // The releases come from the registry the lock entry reports to, so a marking names it as lockrot's metadata would.
+        $origin = JsonPath::has($entries, [0, 'origin']) ? JsonPath::stringAt($entries, [0, 'origin']) : 'packagist';
+        $registry = \in_array($origin, ['packagist', 'composer'], true) ? self::PACKAGIST : null;
+        $byName = \is_array($inputs['releases'] ?? null) ? [$package => PackageMetadata::fromPackages($package, self::releases($package, $inputs['releases'], $marking, $registry), $clock->now(), $locked->normalizedVersion())] : [];
         foreach (\is_array($inputs['dependents'] ?? null) ? $inputs['dependents'] : [] as $name => $releases) {
             $dependent = $lock->find((string) $name);
             self::assertArray($releases);
@@ -293,7 +298,9 @@ final class CaseHydrator
             SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp),
             $clock,
             false,
-            self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []), self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null)
+            self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []), self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null),
+            null,
+            self::abandonedIgnore(\is_array($inputs['abandoned_ignore'] ?? null) ? $inputs['abandoned_ignore'] : null)
         );
 
         if (\array_key_exists('accept', $inputs)) {
@@ -304,6 +311,21 @@ final class CaseHydrator
         $includeDev = ($run['include_dev'] ?? false) === true;
 
         return $analyzer->analyzeWithFacts($lock->packages($includeDev), $lock, $project, $includeDev);
+    }
+
+    /** @param array<mixed, mixed>|null $ignore the case's `abandoned_ignore` input: Composer's list, `{by, rules[{pattern, reason, constraints}]}` */
+    private static function abandonedIgnore(?array $ignore): AbandonedIgnore
+    {
+        if ($ignore === null) {
+            return AbandonedIgnore::none();
+        }
+        $rules = [];
+        foreach (JsonPath::arrayAt($ignore, ['rules']) as $rule) {
+            self::assertArray($rule);
+            $rules[] = new AbandonedIgnoreRule(JsonPath::stringAt($rule, ['pattern']), \is_string($rule['reason'] ?? null) ? $rule['reason'] : null, array_values(array_filter(JsonPath::arrayAt($rule, ['constraints']), 'is_string')));
+        }
+
+        return AbandonedIgnore::of(JsonPath::stringAt($ignore, ['by']), $rules);
     }
 
     /**
@@ -381,7 +403,7 @@ final class CaseHydrator
      *
      * @return list<BasePackage>
      */
-    private static function releases(string $package, array $releases, ?array $marking): array
+    private static function releases(string $package, array $releases, ?array $marking, ?string $registry = null): array
     {
         $versions = [];
         foreach ($releases as $release) {
@@ -392,7 +414,8 @@ final class CaseHydrator
                 'version' => JsonPath::stringAt($release, ['version']),
                 'require' => (\is_string($release['php'] ?? null) ? ['php' => $release['php']] : []) + (\is_array($release['require'] ?? null) ? $release['require'] : []),
             ] + (\is_string($release['time'] ?? null) ? ['time' => $release['time']] : [])
-              + ($marking !== null && ($marking['by'] ?? null) === 'repository' ? ['abandoned' => $marking['replacement'] ?? true] : []));
+              + ($marking !== null && ($marking['by'] ?? null) === 'repository' ? ['abandoned' => $marking['replacement'] ?? true] : [])
+              + ($registry !== null ? ['notification-url' => $registry] : []));
         }
 
         return $versions;

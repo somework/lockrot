@@ -610,7 +610,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/abandoned",
-        "description": "doctrine/cache 2.2.0 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; last release 2022-05-20 (4.4 years ago). Do: find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle and 5 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.1) no longer require it. (via craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle, doctrine/doctrine-fixtures-bundle, doctrine/doctrine-migrations-bundle, doctrine/orm, pagerfanta/doctrine-orm-adapter, spiriitlabs/form-filter-bundle)",
+        "description": "doctrine/cache 2.2.0 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; last release 2022-05-20 (4.4 years ago). Do: find a replacement (none named); it comes in through craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle and 5 more: replace or update them; the newest releases of doctrine/doctrine-bundle (3.3.2) and doctrine/orm (3.7.1) no longer require it. (via craue/config-bundle, dama/doctrine-test-bundle, doctrine/doctrine-bundle and 5 more)",
         "categories": [
             "Bug Risk"
         ],
@@ -834,7 +834,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/abandoned",
-        "description": "symfony/security-guard v5.4.45 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub. Do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it. (via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-trusted-device, symfony/security-bundle)",
+        "description": "symfony/security-guard v5.4.45 \u2014 finding high (16 = abandoned 32 \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; its repository is archived on GitHub. Do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update them; the newest release of symfony/security-bundle (v8.1.6) no longer requires it. (via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more)",
         "categories": [
             "Bug Risk"
         ],

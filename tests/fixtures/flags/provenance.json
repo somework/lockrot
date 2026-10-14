@@ -1,10 +1,10 @@
 {
  "pr": "6b",
  "source": {
-  "cases.json": "0c2af924eb3d0d0fd329155a7439ddbc090773aaa8d67ac7cc92d38dc2099228",
+  "cases.json": "b0ed85dff80af5ed1c16346167793b005f04fa203f2aa6420705cfe47ca66ff9",
   "model_run_date": "2026-10-14"
  },
- "suite": "run_all.sh: 53 of 55 steps pass; the coverage gate passes after the alsoMove allowance, and the counts step reads document counts that this case moves by one",
+ "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "dropped": [],
  "reverted": {},
  "cases_without_inputs": [

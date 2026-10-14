@@ -57,6 +57,15 @@ final class FindingBlockTest extends TestCase
         return FindingBlock::baselineSuffix($finding, $comparison->standingOf('a/b'));
     }
 
+    public function testTheReachNamesAtMostThreeDirectDependentsAndCountsTheRest(): void
+    {
+        $five = (new FindingBuilder())->withPackage('a/leaf')->withChain(['a/r1', 'a/leaf'])->withDirectDependents(['a/r1', 'a/r2', 'a/r3', 'a/r4', 'a/r5'])->build();
+        $three = (new FindingBuilder())->withPackage('a/leaf')->withChain(['a/r1', 'a/leaf'])->withDirectDependents(['a/r1', 'a/r2', 'a/r3'])->build();
+
+        self::assertSame('via a/r1, a/r2, a/r3 and 2 more', FindingBlock::reach($five));
+        self::assertSame('via a/r1, a/r2, a/r3', FindingBlock::reach($three));
+    }
+
     public function testALostFixReadsTheRecordedAndTheCurrentFixKind(): void
     {
         self::assertSame('(baseline: PKSA-x fix lost: update → none)', self::suffixOf('medium', 'none', '8.4'));
