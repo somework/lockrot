@@ -239,8 +239,8 @@ jobs:
       - name: 'corpus diff: report-1 vs report-1'
         run: python -m unittest -v -k report_1_against_report_1 test_manifest_and_diff
         working-directory: tools/corpus/tests
-      - name: 'corpus diff: report-1 vs report-2'
-        run: python -m unittest -v -k report_1_against_report_2 test_manifest_and_diff
+      - name: 'corpus diff: report-1 vs report-2, both orders and a mixed run'
+        run: python -m unittest -v -k report_1_against_report_2 -k report_2_against_report_1 -k both_numbers test_manifest_and_diff
         working-directory: tools/corpus/tests
       - name: 'corpus diff: report-2 vs report-2'
         run: python -m unittest -v -k report_2_against_report_2 test_manifest_and_diff

@@ -287,6 +287,30 @@ class DiffSchemas(unittest.TestCase):
         self.assertEqual([], [key for key in result['changes'] if key.split(' ')[0] in ('verdict', 'priority', 'lead')])
         self.assertIn('report-1 vs report-2: verdicts not compared', diff.render(result, self.a, self.b))
 
+    def test_report_2_against_report_1_compares_lead_with_the_newer_verdict_only(self):
+        self._write(self.a, {'lockrot': {'schema': 2}, 'findings': [
+            {'package': 'x/y', 'verdict': 'medium', 'priority': 'medium', 'lead': 'silent', 'signals': []},
+            {'package': 'x/z', 'verdict': 'critical', 'priority': 'critical', 'lead': None, 'signals': []}]})
+        self._write(self.b, {'findings': [
+            {'package': 'x/y', 'verdict': 'stale', 'priority': 'low', 'signals': []},
+            {'package': 'x/z', 'verdict': 'finished', 'priority': 'none', 'signals': []}]})
+        result = diff.compare(self.a, self.b)
+        self.assertEqual({'lead silent -> stale': 1}, result['changes'])
+        self.assertIn('report-2 vs report-1: verdicts not compared', diff.render(result, self.a, self.b))
+
+    def test_report_1_against_a_run_of_both_numbers_guards_only_the_mixed_project(self):
+        self._write(self.a, {'findings': [{'package': 'x/y', 'verdict': 'stale', 'priority': 'low', 'signals': []}]})
+        self._write(self.b, {'lockrot': {'schema': 2}, 'findings': [
+            {'package': 'x/y', 'verdict': 'medium', 'priority': 'medium', 'lead': 'stale', 'signals': []}]})
+        write_json_atomic(os.path.join(self.a, 'q.json'), {'findings': [
+            {'package': 'q/r', 'verdict': 'stale', 'priority': 'low', 'signals': []}]})
+        write_json_atomic(os.path.join(self.b, 'q.json'), {'findings': [
+            {'package': 'q/r', 'verdict': 'silent', 'priority': 'low', 'signals': []}]})
+        result = diff.compare(self.a, self.b)
+        self.assertEqual([(1, 1), (1, 2)], result['schemas'])
+        self.assertEqual({'verdict stale -> silent': 1}, result['changes'])
+        self.assertEqual(1, diff.render(result, self.a, self.b).count('verdicts not compared'))
+
     def test_report_2_against_report_2_compares_verdict_and_lead(self):
         self._write(self.a, {'lockrot': {'schema': 2}, 'findings': [
             {'package': 'x/y', 'verdict': 'high', 'priority': 'high', 'lead': 'stale', 'signals': []}]})
