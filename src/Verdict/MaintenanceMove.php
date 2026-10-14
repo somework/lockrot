@@ -138,8 +138,10 @@ final class MaintenanceMove
         $installed = $context->installedRow();
         $newest = $installed === null ? null : $context->release($installed->highest());
         $lower = $newest === null ? null : $context->candidate($newest);
-        if ($installed !== null && $lower !== null && $lower->kind() === Fix::UPDATE && self::after($newest === null ? null : $newest->at(), $ga)) {
-            return MoveDraft::of(Move::UPDATE, FlagSet::OLD_PROMISE)->to($installed, $lower, null);
+        if ($installed !== null && $lower !== null && $lower->kind() !== Fix::BLOCKED && self::after($newest === null ? null : $newest->at(), $ga)) {
+            return $lower->kind() === Fix::UPDATE
+                ? MoveDraft::of(Move::UPDATE, FlagSet::OLD_PROMISE)->to($installed, $lower, null)
+                : self::require(FlagSet::OLD_PROMISE, $context, $installed, '^'.ltrim($installed->highest(), 'vV'));
         }
         foreach (array_reverse($context->rows()) as $row) {
             if (!$row->installed() && $context->isAbove($row) && $row->admitsTargetPhp() !== false && self::after($row->highestReleased(), $ga)) {

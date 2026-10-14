@@ -315,7 +315,7 @@ final class LeftBehindRuleTest extends TestCase
     {
         /** @return array{version: string, at: \DateTimeImmutable, highest: array{normalized: string, pretty: string, at: \DateTimeImmutable}, dated_by?: string, php: ?string} */
         $branch = static function (string $version, string $at, ?string $datedBy): array {
-            $row = ['version' => $version, 'at' => new \DateTimeImmutable($at), 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => new \DateTimeImmutable($at)], 'php' => null];
+            $row = ['version' => $version, 'at' => new \DateTimeImmutable($at), 'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => new \DateTimeImmutable($at), 'php' => null], 'php' => null];
 
             return $datedBy === null ? $row : $row + ['dated_by' => $datedBy];
         };

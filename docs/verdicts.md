@@ -201,8 +201,9 @@ the target PHP as `target_php`, and the project's `require.php` constraint as `p
 
 [`--explain`](configuration.md#explaining-one-package) applies this test to every branch, the
 installed one and those below it included. A row's php is the requirement of its branch's newest
-dated release. On the installed row, that release can be newer than the version you have, whose
-own requirement is `lock.php`. Each branch row in the JSON carries:
+dated release, or of its highest tag when no release on the branch has a date. On the installed
+row, that release can be newer than the version you have, whose own requirement is `lock.php`.
+Each branch row in the JSON carries:
 
 | Field | Value |
 |---|---|

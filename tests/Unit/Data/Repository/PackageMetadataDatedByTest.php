@@ -145,6 +145,7 @@ final class PackageMetadataDatedByTest extends TestCase
 
         self::assertSame('laravel/framework', $branch['dated_by'] ?? null);
         self::assertSame('^7.3|^8.0', $branch['php']);
+        self::assertSame('^7.3|^8.0', $branch['highest']['php'], 'the highest tag keeps the child\'s requirement too');
     }
 
     public function testThePackagesOwnLastReleaseFollowsWhenTheParentDatesItsHighestBranch(): void
@@ -364,7 +365,7 @@ final class PackageMetadataDatedByTest extends TestCase
      * Built by hand rather than from packages, so the branch order and each branch's dates are
      * exactly what the case under test needs.
      *
-     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, dated_by?: string, php: ?string}> $byBranch
+     * @param array<array-key, array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, dated_by?: string, php: ?string}> $byBranch
      * @param list<string>                                                                                                                                                      $replaces
      */
     private static function metadata(string $name, array $byBranch, array $replaces = [], ?string $lastStable = null): PackageMetadata
@@ -372,13 +373,13 @@ final class PackageMetadataDatedByTest extends TestCase
         return new PackageMetadata($name, false, null, true, $lastStable === null ? null : new \DateTimeImmutable($lastStable), $lastStable === null ? null : 'x', \count($byBranch), null, 'library', new \DateTimeImmutable(self::NOW), $byBranch, $replaces);
     }
 
-    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable}, php: ?string} */
+    /** @return array{version: string, at: ?\DateTimeImmutable, highest: array{normalized: string, pretty: string, at: ?\DateTimeImmutable, php: ?string}, php: ?string} */
     private static function branch(string $version, ?string $newestDated, ?string $highestAt): array
     {
         return [
             'version' => 'v'.$version,
             'at' => $newestDated === null ? null : new \DateTimeImmutable($newestDated),
-            'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => $highestAt === null ? null : new \DateTimeImmutable($highestAt)],
+            'highest' => ['normalized' => $version.'.0', 'pretty' => 'v'.$version, 'at' => $highestAt === null ? null : new \DateTimeImmutable($highestAt), 'php' => null],
             'php' => null,
         ];
     }

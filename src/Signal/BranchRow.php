@@ -28,6 +28,7 @@ final class BranchRow
     private ?\DateTimeImmutable $newestDatedReleased;
     private ?string $datedBy;
     private ?string $php;
+    private ?string $highestPhp;
     private ?bool $admitsTargetPhp;
     private ?bool $admitsProjectPhp;
     private ?string $phpBlockedBy;
@@ -78,6 +79,7 @@ final class BranchRow
             $row->newestDatedReleased = $release['at'];
             $row->datedBy = $release['dated_by'] ?? null;
             $row->php = $release['php'] ?? null;
+            $row->highestPhp = $release['highest']['php'];
             $row->admitsTargetPhp = $floor->admitsTarget($row->php);
             $row->admitsProjectPhp = $floor->admitsProject($row->php);
             $row->phpBlockedBy = $floor->blocking($row->php);
@@ -135,6 +137,12 @@ final class BranchRow
     public function datedBy(): ?string
     {
         return $this->datedBy;
+    }
+
+    /** The php of the branch's highest tag, null when it declares none. */
+    public function highestPhp(): ?string
+    {
+        return $this->highestPhp;
     }
 
     /** The php of the branch's newest dated release, null when it declares none. */
