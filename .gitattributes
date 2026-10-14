@@ -53,3 +53,6 @@
 /tests/fixtures/baselined/*/http/** linguist-generated
 /tests/fixtures/baselined/*/lockrot-baseline.json linguist-generated
 /tests/fixtures/baselined/*/provenance.json linguist-generated
+# tools/report/record --corpus writes the recorded answers, and the model writes its documents outside this repository.
+/tests/fixtures/corpus/cache/** linguist-generated
+/tests/fixtures/corpus/model-report-2/** linguist-generated

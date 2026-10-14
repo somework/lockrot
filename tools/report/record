@@ -81,7 +81,7 @@ if (\in_array($argv[1] ?? null, ['--baselined', '--all-baselined'], true)) {
 }
 if (($argv[1] ?? null) === '--corpus') {
     $apps = glob(FIXTURES.'apps/*', GLOB_ONLYDIR) ?: [];
-    passthru(implode(' ', array_map('escapeshellarg', array_merge([PHP_BINARY, __DIR__.'/../../bin/record-fixtures', '--into='.FIXTURES.'corpus/cache'], array_map(static fn (string $app): string => 'tests/fixtures/apps/'.basename($app), $apps)))), $exit);
+    passthru(implode(' ', array_map('escapeshellarg', array_merge([PHP_BINARY, __DIR__.'/../../bin/record-fixtures', '--into='.realpath(FIXTURES.'corpus').'/cache'], array_map(static fn (string $app): string => 'tests/fixtures/apps/'.basename($app), $apps)))), $exit);
     exit($exit);
 }
 if (\count($argv) > 1) {
