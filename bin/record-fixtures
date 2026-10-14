@@ -144,6 +144,20 @@ $recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, 
         fwrite(STDERR, \sprintf("p2 %s%s %d\n", $name, $dev ? '~dev' : '', $result->status()));
     }
 };
+/** @return list<string> every source URL that the recorded p2 answer of $name names */
+$releaseSources = static function (string $name, string $dir): array {
+    $raw = @file_get_contents(RecordedHttpClient::pathFor($dir, REPOSITORY_BASE_URL.$name.'.json'));
+    $result = $raw === false ? null : HttpResult::fromEnvelopeJson(REPOSITORY_BASE_URL.$name.'.json', $raw);
+    $json = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
+    $urls = [];
+    foreach (\is_array($json) ? $json['packages'][$name] ?? [] : [] as $version) {
+        if (\is_string($version['source']['url'] ?? null)) {
+            $urls[] = $version['source']['url'];
+        }
+    }
+
+    return $urls;
+};
 // The monorepos that the analyzer can load to date the branches of a split package.
 foreach (MonorepoParents::load()->candidates() as $parent) {
     $recordP2($parent);
@@ -183,13 +197,16 @@ foreach ($fixtures as $fixture) {
         } else {
             $recordP2($package->name(), $own !== null ? $own.'/p2' : null);
         }
-        $repo = $locator->locate($sourceUrl);
-        if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
-            $githubDir = $own !== null ? $own.'/github' : $ghDir;
-            $repos[$githubDir.'|'.$repo->path()] = [$repo, $githubDir];
-        }
-        if ($own !== null && $repo !== null && $repo->forge() === RepoRef::GITLAB) {
-            $gitlabRepos[$own.'|'.$repo->key()] = [$repo, $own.'/gitlab'];
+        // lockrot asks the repository of the highest release, which a renamed or moved project changes.
+        foreach (array_unique(array_merge([$sourceUrl], $releaseSources($package->name(), $own !== null ? $own.'/p2' : $p2Dir))) as $url) {
+            $repo = $locator->locate($url);
+            if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
+                $githubDir = $own !== null ? $own.'/github' : $ghDir;
+                $repos[$githubDir.'|'.$repo->path()] = [$repo, $githubDir];
+            }
+            if ($own !== null && $repo !== null && $repo->forge() === RepoRef::GITLAB) {
+                $gitlabRepos[$own.'|'.$repo->key()] = [$repo, $own.'/gitlab'];
+            }
         }
     }
 }
