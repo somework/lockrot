@@ -17,7 +17,10 @@ declare(strict_types=1);
 // only with a gitlab-token for that host from Composer's config (auth.json or COMPOSER_AUTH).
 // Anonymously, GitLab leaves `archived` out. The script never writes the token. It records no
 // Bitbucket answer. With --into, every fixture keeps its answers in <dir> as if <dir> were its own `http`
-// directory, and the monorepo parents' p2 answers go to <dir>/p2 too. It reuses an envelope on disk only when its recorded `status` is not 0: status
+// directory, and the monorepo parents' p2 answers go to <dir>/p2 too. --into records no `~dev` answer and
+// no packages-dev name, because the corpus runs read neither. It also records, in <dir>/repos, each
+// further `composer` repository of a fixture's composer.json: its packages.json, the p2 answers of the
+// locked names that it lists and its advisory answer. It reuses an envelope on disk only when its recorded `status` is not 0: status
 // 0 is a transport failure (a timeout or a DNS error), so the script fetches that answer again.
 // It records a GitLab answer only with the status 200 or 404, and it stops on a 429.
 require __DIR__.'/../vendor/autoload.php';
@@ -131,8 +134,8 @@ $keep = static function (?string $body, array $keys, bool $list): ?string {
 
     return (string) json_encode($trimmed, \JSON_UNESCAPED_SLASHES);
 };
-$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded): void {
-    foreach ([false, true] as $dev) {
+$recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, $repositoryHttp, $trim, $isRecorded, $into): void {
+    foreach ($into === null ? [false, true] : [false] as $dev) {
         $url = REPOSITORY_BASE_URL.$name.($dev ? '~dev' : '').'.json';
         $path = RecordedHttpClient::pathFor($ownDir ?? $p2Dir, $url);
         if ($isRecorded($path) || $isRecorded(RecordedHttpClient::pathFor($p2Dir, $url))) {
@@ -165,6 +168,56 @@ $releaseSources = static function (string $name, array $answers): array {
 
     return $urls;
 };
+/**
+ * Each `composer` repository of the fixture's composer.json beside packagist.org: its packages.json,
+ * the p2 answer of each locked name that its `available-package-patterns` match, and the answer of
+ * its advisory API for those names.
+ */
+$recordRepositories = static function (string $fixtureDir, LockFile $lock, string $dir) use ($fetch, $repositoryHttp, $record, $isRecorded, $trim): void {
+    $manifest = json_decode((string) file_get_contents($fixtureDir.'/composer.json'), true);
+    foreach (\is_array($manifest['repositories'] ?? null) ? $manifest['repositories'] : [] as $repository) {
+        $url = \is_array($repository) && ($repository['type'] ?? null) === 'composer' && \is_string($repository['url'] ?? null) ? rtrim($repository['url'], '/') : null;
+        if ($url === null || strpos($url, 'https://') !== 0 || parse_url($url, \PHP_URL_HOST) === 'repo.packagist.org') {
+            continue;
+        }
+        $root = $url.'/packages.json';
+        if (!$isRecorded(RecordedHttpClient::pathFor($dir, $root))) {
+            $result = $fetch($root, []);
+            $record($dir, $result, $result->body());
+            fwrite(STDERR, \sprintf("repository %s %d\n", $root, $result->status()));
+        }
+        $result = HttpResult::fromEnvelopeJson($root, (string) file_get_contents(RecordedHttpClient::pathFor($dir, $root)));
+        $packages = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
+        if (!\is_array($packages)) {
+            continue;
+        }
+        $patterns = array_map(static fn (string $pattern): string => '{^'.str_replace('\\*', '.*', preg_quote($pattern, '{')).'$}', $packages['available-package-patterns'] ?? []);
+        $names = array_values(array_filter(array_map(static fn ($package): string => $package->name(), $lock->packages(false)), static function (string $name) use ($patterns): bool {
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $name) === 1) {
+                    return true;
+                }
+            }
+
+            return false;
+        }));
+        $base = (string) parse_url($url, \PHP_URL_SCHEME).'://'.(string) parse_url($url, \PHP_URL_HOST);
+        foreach (\is_string($packages['metadata-url'] ?? null) ? $names : [] as $name) {
+            $p2 = $base.str_replace('%package%', $name, $packages['metadata-url']);
+            if (!$isRecorded(RecordedHttpClient::pathFor($dir, $p2))) {
+                $answer = $repositoryHttp->fetchAll([$p2])[$p2];
+                $record($dir, $answer, $answer->body() === null ? null : $trim($answer->body(), $name));
+                fwrite(STDERR, \sprintf("p2 %s %d\n", $p2, $answer->status()));
+            }
+        }
+        $api = $packages['security-advisories']['api-url'] ?? null;
+        if (\is_string($api) && $names !== [] && !$isRecorded(RecordedHttpClient::pathFor($dir, $api))) {
+            $answer = $fetch($api, ['Content-Type: application/x-www-form-urlencoded'], http_build_query(['packages' => $names]));
+            $record($dir, $answer, $answer->body());
+            fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $api, \count($names), $answer->status()));
+        }
+    }
+};
 // The monorepos that the analyzer can load to date the branches of a split package.
 foreach (MonorepoParents::load()->candidates() as $parent) {
     $recordP2($parent);
@@ -186,7 +239,10 @@ foreach ($fixtures as $fixture) {
         file_put_contents($advisoryPath, json_encode($result->toEnvelope(), \JSON_UNESCAPED_SLASHES));
         fwrite(STDERR, \sprintf("advisories %s (%d names) %d\n", $fixture, \count($names), $result->status()));
     }
-    foreach ($lock->packages(true) as $package) {
+    if ($into !== null) {
+        $recordRepositories($root.'/'.$fixture, $lock, $into.'/repos');
+    }
+    foreach ($lock->packages($into === null) as $package) {
         if (!$package->isFromComposerRepository()) {
             continue;
         }
