@@ -300,6 +300,8 @@ tools/report/update-renderer vX.Y.Z
   sha256 in its manifest, and that the manifest names the requested version.
   `tests/Unit/Output/RendererManifestTest.php` rechecks the page against the manifest on every run.
 - `--from-dir DIR` vendors a local build for development. It is not attested. Never release with it.
+- `vX.Y.Z-rc.N` vendors a pre-release. A lockrot release vendors a plain `vX.Y.Z`
+  ([tools/report/README.md](tools/report/README.md#which-renderer-a-lockrot-release-vendors)).
 - Do not edit the vendored page by hand: change the renderer, release it, update the pin.
 - A bump gets one `html` entry under `### Changed` (`.claude/rules/changelog.md`, "Entry
   shape").

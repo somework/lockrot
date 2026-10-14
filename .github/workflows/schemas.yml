@@ -1,0 +1,21 @@
+# lockrot.dev publishes the schema files from the commit that this workflow names. It runs when a
+# change to a schema file reaches main, so a new schema number is published before the tag that
+# writes it. The site publishes nothing until a person approves its `schemas` environment.
+# The commit is already on main, so a missing SITE_DISPATCH_TOKEN (a fine-grained token with
+# Contents: write on somework/lockrot.dev only) must not turn it red. If the dispatch fails, run
+# this workflow by hand.
+name: schemas
+on:
+  push:
+    branches: [main]
+    paths: ['resources/*.schema.json']
+  workflow_dispatch:
+permissions: {}
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask lockrot.dev to publish the schema files
+        continue-on-error: true
+        env: {GH_TOKEN: '${{ secrets.SITE_DISPATCH_TOKEN }}'}
+        run: gh api repos/somework/lockrot.dev/dispatches -f event_type=lockrot-schemas -f "client_payload[sha]=$GITHUB_SHA"
