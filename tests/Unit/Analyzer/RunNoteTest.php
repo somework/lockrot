@@ -127,21 +127,21 @@ final class RunNoteTest extends TestCase
         yield 'advisories offline' => [
             static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::ADVISORIES_OFFLINE, 0),
             'advisories_not_checked',
-            'offline: security advisories not checked; a priority they would raise stays one step lower',
+            'security advisories not checked (offline): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none',
             false,
             ['reason' => 'offline', 'composer_repositories_checked' => 0],
         ];
         yield 'advisories on an old Composer' => [
             static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::ADVISORIES_COMPOSER_TOO_OLD, 0),
             'advisories_not_checked',
-            'security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower',
+            'security advisories not checked (needs Composer 2.4 or newer): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none',
             false,
             ['reason' => 'composer_too_old', 'composer_repositories_checked' => 0],
         ];
         yield 'advisories past the budget' => [
             static fn (): RunNote => RunNote::advisoriesNotChecked(RunNote::INSTALL_TIME_BUDGET, 2),
             'advisories_not_checked',
-            'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower',
+            'security advisories not checked (install-time budget spent): no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none',
             false,
             ['reason' => 'install_time_budget', 'composer_repositories_checked' => 2],
         ];

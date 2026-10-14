@@ -259,7 +259,7 @@
       silent       last release 2015-05-14 (11.4 years ago); last push 2020-04-01 (6.5 years ago)
       old-promise  released 2015-05-14 for PHP 5 (php "\>=5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-  guzzlehttp/ringphp 1.1.1  via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle  ·  abandoned (baseline) · old-promise (baseline)
+  guzzlehttp/ringphp 1.1.1  via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more  ·  abandoned (baseline) · old-promise (baseline)
       18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive (baseline: known)
       gate 0 = min(18, 2 × 0) (the new facts bound it); new: 0
       do: find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle,
@@ -269,7 +269,7 @@
                    years ago); last push 2019-07-31 (7.2 years ago)
       old-promise  released 2018-07-31 for PHP 5 (php "\>=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-  guzzlehttp/streams 3.0.0  via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter, php-http/httplug-bundle  ·  abandoned (baseline) · old-promise (baseline)
+  guzzlehttp/streams 3.0.0  via bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle, php-http/guzzle5-adapter and 1 more  ·  abandoned (baseline) · old-promise (baseline)
       18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive (baseline: known)
       gate 0 = min(18, 2 × 0) (the new facts bound it); new: 0
       do: find a replacement (none named); it comes in through bdunogier/guzzle-site-authenticator, guzzlehttp/guzzle,
@@ -311,7 +311,7 @@
       silent       last release 2017-11-21 (8.9 years ago); last push 2017-12-18 (8.8 years ago)
       old-promise  released 2017-11-21 for PHP 7 (php "\>=7.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-  symfony/security-guard v4.4.46  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, symfony/security-bundle  ·  abandoned (baseline) · left-behind
+  symfony/security-guard v4.4.46  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 6 more  ·  abandoned (baseline) · left-behind
       18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive (baseline: left-behind covered by the recorded abandoned)
       gate 0 = min(18, 2 × 0) (the new facts bound it); new: 0
       do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle,
@@ -560,7 +560,7 @@
           which lockrot does not solve
       left-behind  branch 4.x last released 2022-04-12 (4.5 years ago); 7.x released v7.4.15 (2026-07-21), needs php
                    \>=8.2 above the project's php \>=7.4; 5.x released v5.4.45 (2024-09-25)
-  doctrine/annotations 1.14.4  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, nelmio/api-doc-bundle, sensio/framework-extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle  ·  abandoned (baseline)
+  doctrine/annotations 1.14.4  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 4 more  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 transitive (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0
       do: find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle,
@@ -570,7 +570,7 @@
       abandoned    marked abandoned by its registry
       age: installed 1.14.4 released 2024-09-05 (2.1 years ago), the newest on 1.x; newest release 2.0.2 2024-09-05
            (2.1 years ago); last push 2025-12-11 (0.8 years ago)
-  doctrine/cache 2.2.0  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, doctrine/orm, lexik/form-filter-bundle, pagerfanta/doctrine-orm-adapter  ·  abandoned (baseline)
+  doctrine/cache 2.2.0  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 transitive (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0
       do: find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle,
@@ -668,7 +668,7 @@
           them
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8
                    years ago); last push 2018-02-12 (8.7 years ago)
-  symfony/inflector v5.4.47  via babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, kphoen/rulerz, kphoen/rulerz-bundle, lexik/form-filter-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sentry/sentry-symfony, symfony/form, symfony/security-bundle, symfony/security-http  ·  abandoned (baseline)
+  symfony/inflector v5.4.47  via babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 transitive (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0
       do: replace it: its registry suggests "EnglishInflector from the String component"; it comes in through
@@ -687,7 +687,7 @@
                    serialization
       age: installed 2.8.0 released 2025-08-23 (1.1 years ago); 2.x last released 2.13.1 2026-08-24 (0.1 years
            ago); newest release 3.1.0 2026-08-24 (0.1 years ago); last push 2026-08-24 (0.1 years ago)
-  symfony/cache v5.4.46  via bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, stof/doctrine-extensions-bundle, symfony/framework-bundle, twig/extra-bundle, willdurand/hateoas, willdurand/hateoas-bundle  ·  vulnerable
+  symfony/cache v5.4.46  via bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle and 23 more  ·  vulnerable
       8 = vulnerable 8 [medium advisory] (baseline: new package)
       do: composer update symfony/cache (gets v5.4.53) — clears the advisory
       vulnerable   1 advisory: 1 medium — all fixed on 5.x; advisory: CVE-2026-45073 SQL Injection in
@@ -758,7 +758,7 @@
           new major brings its own requirements, which lockrot does not solve
       left-behind  branch 2.x last released 2022-12-07 (3.9 years ago); 3.x released v3.1.1 (2026-04-05), needs php ^8.1
                    above the project's php \>=7.4; no releasing branch within reach
-  doctrine/instantiator 1.5.0  via doctrine/orm, jms/serializer, jms/serializer-bundle, lexik/form-filter-bundle, pagerfanta/doctrine-orm-adapter, willdurand/hateoas, willdurand/hateoas-bundle  ·  left-behind
+  doctrine/instantiator 1.5.0  via doctrine/orm, jms/serializer, jms/serializer-bundle and 4 more  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
       do: raise require.php to \>=8.4, then move doctrine/instantiator to ^2.1 through doctrine/orm, jms/serializer,
           jms/serializer-bundle and 4 more — clears left-behind; 2.x needs php ^8.4, require.php allows 7.4 (a major
@@ -810,7 +810,7 @@
           vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which
           lockrot does not solve
       left-behind  branch 1.x last released 2021-08-03 (5.2 years ago); 2.x released v2.12.5 (2026-04-17)
-  symfony/event-dispatcher-contracts v1.10.0  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/event-dispatcher, symfony/form, symfony/framework-bundle, symfony/google-mailer, symfony/http-kernel, symfony/mailer, symfony/monolog-bundle, symfony/security-bundle, symfony/security-core, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle  ·  left-behind
+  symfony/event-dispatcher-contracts v1.10.0  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
       do: move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle,
           bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more — clears left-behind; 2.x needs php
@@ -819,7 +819,7 @@
           own requirements, which lockrot does not solve
       left-behind  branch 1.x last released 2022-07-20 (4.2 years ago); 3.x released v3.7.1 (2026-06-05), needs php
                    \>=8.1 above the project's php \>=7.4; 2.x released v2.5.4 (2024-09-25)
-  symfony/property-access v4.4.44  via babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, kphoen/rulerz, kphoen/rulerz-bundle, lexik/form-filter-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sentry/sentry-symfony, symfony/form, symfony/security-bundle, symfony/security-http  ·  left-behind
+  symfony/property-access v4.4.44  via babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
       do: move symfony/property-access to ^5.4 through babdev/pagerfanta-bundle, craue/config-bundle,
           friendsofsymfony/oauth-server-bundle and 14 more — clears left-behind; 5.x needs php \>=7.2.5, which
@@ -844,7 +844,7 @@
           requirements, which lockrot does not solve
       left-behind  branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php
                    \>=8.4.1 above the project's php \>=7.4; 5.x released v5.4.45 (2024-09-25)
-  symfony/var-dumper v4.4.47  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/error-handler, symfony/framework-bundle, symfony/http-kernel, symfony/monolog-bundle, symfony/security-bundle, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle  ·  left-behind
+  symfony/var-dumper v4.4.47  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
       do: move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator,
           craue/config-bundle and 31 more — clears left-behind; 5.x needs php \>=7.2.5, which require.php allows; the
@@ -863,7 +863,7 @@
       age: installed v2.5.0 released 2025-09-26 (1.0 years ago); 2.x last released 2.5.3 2026-09-14 (0.1 years
            ago), its newest release; last push 2026-09-14 (0.1 years ago)
       pulls in 2 flagged packages: j0k3r/httplug-ssrf-plugin (vulnerable), smalot/pdfparser (left-behind)
-  symfony/polyfill-intl-idn v1.33.0  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, egulias/email-validator, friendsofsymfony/jsrouting-bundle, friendsofsymfony/oauth-server-bundle, friendsofsymfony/rest-bundle, friendsofsymfony/user-bundle, j0k3r/graby, jms/serializer-bundle, kphoen/rulerz-bundle, lexik/form-filter-bundle, nelmio/api-doc-bundle, nelmio/cors-bundle, php-amqplib/rabbitmq-bundle, php-http/httplug-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-qr-code, scheb/2fa-trusted-device, sensio/framework-extra-bundle, sentry/sentry-symfony, stof/doctrine-extensions-bundle, symfony/framework-bundle, symfony/google-mailer, symfony/http-foundation, symfony/http-kernel, symfony/mailer, symfony/mime, symfony/monolog-bundle, symfony/security-bundle, symfony/security-http, symfony/twig-bundle, twig/extra-bundle, willdurand/hateoas-bundle  ·  vulnerable
+  symfony/polyfill-intl-idn v1.33.0  via babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 36 more  ·  vulnerable
       2 = vulnerable 2 [low advisory] (baseline: new package)
       do: composer update symfony/polyfill-intl-idn (gets v1.42.0) — clears the advisory
       vulnerable   1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts

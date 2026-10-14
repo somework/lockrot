@@ -217,7 +217,8 @@
           "type": "integer",
           "minimum": 0
         }
-      }
+      },
+      "x-deprecated": true
     },
     "flags": {
       "description": "Per flag, all seven: an object keyed by flag id at the root.",
@@ -12390,7 +12391,8 @@
             "medium",
             "low",
             "none"
-          ]
+          ],
+          "x-deprecated": true
         },
         "lead": {
           "description": "The first counted maintenance flag; null when none counts. Equal to 0.13's verdict word on every 0.13-flagged finding: jq reads `.lead` where it read `.verdict`.",

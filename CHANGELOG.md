@@ -163,6 +163,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   packages' advisories (`data.advisories_asked`). ([Run notes](docs/notes.md#not_from_composer_repository))
 - **html:** the page title and description count with one singular rule ("1 package") and name an
   empty lock. The description lists every grade in grade order.
+- **All formats:** the run note `advisories_not_checked` says that no finding is graded for an
+  advisory, and that each next step's score after the move assumes none on its versions.
+  ([Run notes](docs/notes.md#advisories_not_checked))
 
 ### Removed
 

@@ -77,7 +77,7 @@ final class GitlabFormatter implements FormatterInterface
     {
         $marks = new SarifRecords($finding, $gate->standingOf($finding->package()), $report->baseline());
         $location = ['path' => $this->context->lockName(), 'lines' => ['begin' => $line ?? self::FALLBACK_LINE]];
-        $via = $finding->isDirect() || $finding->directDependents() === [] ? '' : ' (via '.implode(', ', $finding->directDependents()).')';
+        $via = $finding->isDirect() || $finding->directDependents() === [] ? '' : ' (via '.FindingBlock::dependents($finding).')';
         if (!$finding->isGraded()) {
             $head = $finding->package().' '.$finding->version().' — finding '.$finding->verdict().' ('.FindingBlock::scoreLine($finding).')';
             $issues = [];

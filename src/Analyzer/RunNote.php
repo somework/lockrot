@@ -77,15 +77,14 @@ final class RunNote
     /** The same reason strings as S10 carries on the findings that the note concerns. */
     public const REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS = [NotCheckedRule::BUDGET];
 
-    /**
-     * Each text states the cost of the missing check: a priority that S9 raises stays one
-     * step lower, and `--fail-on` decides on it.
-     */
+    /** Each text states the cost of the missing check: no advisory adds points, and `if_applied` assumes none on the move's versions. */
     private const ADVISORIES_NOT_CHECKED_TEXT = [
-        self::ADVISORIES_OFFLINE => 'offline: security advisories not checked; a priority they would raise stays one step lower',
-        self::ADVISORIES_COMPOSER_TOO_OLD => 'security advisories not checked (needs Composer 2.4 or newer); a priority they would raise stays one step lower',
-        self::INSTALL_TIME_BUDGET => 'security advisories not checked: install-time budget exhausted; a priority they would raise stays one step lower',
+        self::ADVISORIES_OFFLINE => 'security advisories not checked (offline)'.self::ADVISORIES_NOT_CHECKED_COST,
+        self::ADVISORIES_COMPOSER_TOO_OLD => 'security advisories not checked (needs Composer 2.4 or newer)'.self::ADVISORIES_NOT_CHECKED_COST,
+        self::INSTALL_TIME_BUDGET => 'security advisories not checked (install-time budget spent)'.self::ADVISORIES_NOT_CHECKED_COST,
     ];
+
+    private const ADVISORIES_NOT_CHECKED_COST = ': no finding is graded for an advisory, and each next step\'s score after the move assumes its versions carry none';
 
     /** The words of each `target_php_source`, as the baseline notes print them. */
     private const TARGET_SOURCE_WORDS = [
