@@ -232,6 +232,10 @@ def _write_claims(chosen: dict, cache: str) -> None:
 def _write_report_2(documents: str) -> int:
     """The findings of the same packages as each reports-1 file, from that project's report-2 document."""
     target = os.path.join(FIXTURES, 'claims', 'reports-2')
+    if not os.path.isdir(os.path.join(FIXTURES, 'claims', 'reports-1')):
+        print('!! claims/reports-1 does not exist; record the report-1 claims first', file=sys.stderr)
+
+        return 2
     shutil.rmtree(target, ignore_errors=True)
     written = 0
     for name in sorted(os.listdir(os.path.join(FIXTURES, 'claims', 'reports-1'))):
