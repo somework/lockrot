@@ -265,9 +265,9 @@ final class SortTest extends TestCase
     }
 
     /**
-     * The order sorts every finding, and every format of a run reads it: a report sorts once, and so
-     * does its copy with the run settings. A sort writes a new list, and a kept order allocates
-     * nothing, so the memory the reads take tells the two apart.
+     * The order sorts every finding, and every format of a run reads it: a report sorts once, and its
+     * copy with the run settings keeps that order without a sort. A sort writes a new list, and a kept
+     * order allocates nothing, so the memory the reads take tells the two apart.
      */
     public function testEveryFormatOfOneReportReadsOneSort(): void
     {
