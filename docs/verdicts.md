@@ -628,8 +628,8 @@ in.
 The `via` column of the table and the markdown report names the first three direct requirements
 that reach the package, then counts the rest (`a, b, c and 2 more`). The github and gitlab messages
 end with the same list. `--format=json` carries the full list as `direct_dependents` on every
-finding, the package itself included when it is direct, and `chain` holds the shortest path from
-one of them. A direct requirement's own row reads `direct`, whoever else reaches it.
+finding, the package itself included when it is direct. `chain` holds the shortest path from one of
+them. A direct requirement's own row reads `direct`, whoever else reaches it.
 
 If you remove one requirement, every other one that reaches the package still installs it.
 
@@ -784,9 +784,9 @@ The skips of `checks_skipped[]`:
   `offline` and `install_time_budget` can still occur, and `release_dates` asks no host, so a fully
   credentialed run can still carry S10.
 
-- Three gaps stay on every run: `host_not_supported`, `no_feed` and `not_from_composer_repository`.
-  An [`accept-unchecked`](configuration.md#accept-unchecked) entry accepts each one by name, with a
-  reason. It hides no flag and changes no score. `undated_releases` can stay too, and no entry
+- Three gaps stay whatever the credentials: `host_not_supported`, `no_feed` and
+  `not_from_composer_repository`. An [`accept-unchecked`](configuration.md#accept-unchecked) entry
+  accepts each one by name, with a reason. It hides no flag and changes no score. `undated_releases` can stay too, and no entry
   accepts it.
 
 - A finding's `activity` says what the repository activity lookup did: `status` `read`,

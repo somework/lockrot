@@ -214,9 +214,9 @@ them, and `grep` on the raw file does not.
 
 `report-2.json` holds every nested key, with a description for each. Every report-2 document
 carries every field that this page names: a nullable field is written as null, never left out. Two
-shapes leave out the parts that do not apply: a score of 0 carries only `model`, `total`, `exact`,
-`accepted` and `text`, and a `security` block that is `clear` or `unchecked` has no `worst`,
-`counts`, `fix_kind`, `installed_branch_fixes`, `move_in`, `gets` or `partial`.
+shapes leave out the parts that do not apply. A score of 0 carries only `model`, `total`, `exact`,
+`accepted` and `text`. A `security` block that is `clear` or `unchecked` has no `worst`, `counts`,
+`fix_kind`, `installed_branch_fixes`, `move_in`, `gets` or `partial`.
 
 ### The document
 
