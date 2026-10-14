@@ -18,9 +18,9 @@ declare(strict_types=1);
 //
 // Every run reads only tests/fixtures/corpus/cache/ (tools/report/record --corpus) through Lockrot\Tests\Support\FixtureCliRun,
 // at CLOCK, the recording day of the cache. The differential fails on a difference that
-// tests/fixtures/corpus/model-divergences.json does not allow, on an allowed difference that no longer occurs or occurs a
-// different number of times, on a cache or a model document that provenance.json does not describe, and on a recording that
-// neither lockrot nor the 0.13 PHAR reads.
+// tests/fixtures/corpus/model-divergences.json does not allow, on an allowed difference that does not occur exactly once, on
+// a cache or a model document that provenance.json does not describe, and on a recording that neither lockrot nor the 0.13
+// PHAR reads.
 require __DIR__.'/../../vendor/autoload.php';
 
 use Lockrot\Tests\Support\FixtureCliRun;
@@ -39,12 +39,14 @@ const MODEL_PHAR = ['release' => 'v0.13.0', 'sha256' => '935883f2d2f52ce0f801f9e
 const FEED_FAILED = 'drupal_drupal.feed-failed';
 /** The value of a path that one side does not write. */
 const ABSENT = ['$absent' => true];
+/** The keys of each entry of DIVERGENCES, and its only keys. */
+const ENTRY_KEYS = ['app', 'package', 'path', 'lockrot', 'model', 'reason'];
 /** The fields of a finding that the differential compares. Beside them: each flag's FLAG_FIELDS as `flags.<id>.<key>`, and each key of each S9 row's `fix` as `S9.fix.<key>[<advisory id>]`. */
 const FIELDS = [
     'verdict', 'lead', 'direct', 'reach', 'installed_php', 'checks_missing', 'checks_skipped', 'age', 'activity', 'gate.basis',
     'score.total', 'score.exact', 'score.band', 'score.decided_by', 'score.rounded_down', 'score.parts', 'score.terms', 'score.modifiers', 'score.without', 'score.accepted',
     'next_step.kind', 'next_step.constraint', 'next_step.version', 'next_step.to_branch', 'next_step.clears', 'next_step.leaves',
-    'next_step.adds', 'next_step.unverified', 'next_step.php_check', 'next_step.commands', 'next_step.crosses_major',
+    'next_step.adds', 'next_step.clears_all', 'next_step.through', 'next_step.unverified', 'next_step.php_check', 'next_step.commands', 'next_step.crosses_major',
     'next_step.composer_moves_because', 'next_step.if_applied', 'next_step.held_by',
     'security.status', 'security.check', 'security.complete', 'security.unchecked_reason',
     'security.fix_kind', 'security.gets', 'security.partial', 'security.move_in', 'security.installed_branch_fixes',
@@ -139,9 +141,8 @@ foreach ($byPath as $path => $count) {
 }
 fwrite(STDOUT, sprintf("vulnerable: lockrot %d, model %d; critical: lockrot %d, model %d\n", $counts['lockrot']['vulnerable'], $counts['model']['vulnerable'], $counts['lockrot']['critical'], $counts['model']['critical']));
 foreach ($allowed as $index => $entry) {
-    $expected = $entry['count'] ?? null;
-    if ($expected === null ? $used[$index] === 0 : $used[$index] !== $expected) {
-        $problems[] = sprintf('an allowed divergence occurs %d times, not %s: %s', $used[$index], $expected ?? 'at least once', json_encode($entry, JSON_UNESCAPED_SLASHES));
+    if ($used[$index] !== 1) {
+        $problems[] = sprintf('an allowed divergence occurs %d times, not once: %s', $used[$index], json_encode($entry, JSON_UNESCAPED_SLASHES));
     }
 }
 $unread = array_values(array_diff(cacheFiles(), recordingFiles($reads), $provenance['model_inputs']['reads']));
@@ -386,20 +387,32 @@ function adoptionProblems(array $model, array $input, string $reports, string $i
 }
 
 /**
- * The entries of model-divergences.json. Each names a `path`. An entry without `count` names `app`, `package`, `lockrot` and
- * `model` too, and must match at least once. An entry with `count` must match exactly that many times.
+ * The entries of model-divergences.json. Each names one cell and its two values: `app` (the run), `package`, `path`, `lockrot`
+ * and `model`, with a `reason`. An entry that lacks one of these keys, holds another key (such as `count`) or repeats a cell
+ * exits 2: an entry that matches more than one cell, or any value, hides a regression in each cell that it covers.
  *
  * @return list<array<string, mixed>>
  */
 function allowedEntries(): array
 {
-    $allowed = json_decode((string) file_get_contents(DIVERGENCES), true)['allowed'];
+    $decoded = json_decode((string) @file_get_contents(DIVERGENCES), true);
+    $allowed = is_array($decoded) && is_array($decoded['allowed'] ?? null) ? $decoded['allowed'] : null;
+    if ($allowed === null) {
+        fwrite(STDERR, "differential: tests/fixtures/corpus/model-divergences.json is missing or has no allowed list\n");
+        exit(2);
+    }
+    $cells = [];
     foreach ($allowed as $entry) {
-        $missing = array_diff(isset($entry['count']) ? ['path'] : ['app', 'package', 'path', 'lockrot', 'model'], array_keys($entry));
-        if ($missing !== [] || !is_string($entry['path'])) {
-            fwrite(STDERR, 'differential: an allowed divergence lacks '.implode(', ', $missing ?: ['a path']).': '.json_encode($entry, JSON_UNESCAPED_SLASHES)."\n");
+        $keys = is_array($entry) ? array_keys($entry) : [];
+        $missing = array_diff(ENTRY_KEYS, $keys);
+        $extra = array_diff($keys, ENTRY_KEYS);
+        $cell = $missing === [] ? json_encode([$entry['app'], $entry['package'], $entry['path']]) : null;
+        if ($missing !== [] || $extra !== [] || isset($cells[$cell])) {
+            $why = $missing !== [] ? 'lacks '.implode(', ', $missing) : ($extra !== [] ? 'holds '.implode(', ', $extra) : 'repeats its cell');
+            fwrite(STDERR, 'differential: an allowed divergence '.$why.': '.json_encode($entry, JSON_UNESCAPED_SLASHES)."\n");
             exit(2);
         }
+        $cells[$cell] = true;
     }
 
     return $allowed;
@@ -516,9 +529,8 @@ function normalised($value)
 }
 
 /**
- * The index of the first allowed divergence that matches. An entry matches on each key it has: `app`, `package`, `path` (a
- * path or a prefix that ends in `*`), `lockrot` and `model` (each side's value, `{"$absent": true}` for a side without the
- * path).
+ * The index of the allowed divergence of the cell, when it names both values: `{"$absent": true}` for a side without the
+ * path.
  *
  * @param list<array<string, mixed>> $allowed
  * @param mixed                      $lockrot
@@ -527,13 +539,8 @@ function normalised($value)
 function allowedBy(array $allowed, string $app, string $package, string $path, $lockrot, $model): ?int
 {
     foreach ($allowed as $index => $entry) {
-        $pattern = (string) $entry['path'];
-        $pathMatches = substr($pattern, -1) === '*' ? strpos($path, substr($pattern, 0, -1)) === 0 : $pattern === $path;
-        if ($pathMatches
-            && ($entry['app'] ?? $app) === $app
-            && ($entry['package'] ?? $package) === $package
-            && (!array_key_exists('lockrot', $entry) || canonical($entry['lockrot']) === canonical($lockrot))
-            && (!array_key_exists('model', $entry) || canonical($entry['model']) === canonical($model))) {
+        if ($entry['path'] === $path && $entry['app'] === $app && $entry['package'] === $package
+            && canonical($entry['lockrot']) === canonical($lockrot) && canonical($entry['model']) === canonical($model)) {
             return $index;
         }
     }
