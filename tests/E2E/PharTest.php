@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Lockrot\Tests\E2E;
 
 use Lockrot\SelfUpdate\ReleaseKey;
+use Lockrot\Tests\Support\Contract\BaselinedScenario;
+use Lockrot\Tests\Support\FixtureCliRun;
 use Lockrot\Tests\Support\GitHubReleases;
 use Lockrot\Tests\Support\SigningKeys;
 use Lockrot\Tests\Support\StaticFileServer;
+use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -107,6 +110,37 @@ final class PharTest extends TestCase
         self::assertSame(['critical', 'high', 'medium', 'low', 'unknown', 'finished', 'ok'], array_keys($counts));
         self::assertIsArray($json['findings']);
         self::assertNotContains('abandoned', array_column($json['findings'], 'lead'));
+    }
+
+    /**
+     * The archive reads the GitHub answers from its activity cache, which the in-process recording does
+     * not use, so the cache readings are masked with the tool version and the server port.
+     */
+    public function testTheArchiveChecksABaselinedProjectAsTheRecordingDid(): void
+    {
+        $fixtures = \dirname(__DIR__).'/fixtures/';
+        $scenario = BaselinedScenario::SCENARIOS['wallabag-2.6'];
+        $root = $fixtures.'baselined/wallabag-2.6/';
+        $run = FixtureCliRun::start(
+            [$fixtures.$scenario['before'].'/composer.lock', $fixtures.$scenario['after'].'/composer.lock'],
+            [$fixtures.'http/p2', $root.'http/p2'],
+            [$fixtures.'http/github', $root.'http/github'],
+            $root.'http/advisories/after.json',
+            false
+        );
+        try {
+            $process = $run->run($this->phar(), $fixtures.$scenario['after'], $scenario['t1'], ['--fail-on=high', '--format=json', '--target-php='.BaselinedScenario::TARGET_PHP], ['lockrot-baseline.json' => $root.'lockrot-baseline.json']);
+        } finally {
+            $run->stop();
+        }
+
+        self::assertSame(1, $process->getExitCode(), $process->getErrorOutput());
+        $masked = (string) preg_replace(
+            ['{http://127\.0\.0\.1:\d+}', '{"(cached_at|activity_cache_oldest_at|activity_cache_age_hours)": [^,\n]+}'],
+            ['http://127.0.0.1', '"$1": null'],
+            VersionMask::apply($process->getOutput())
+        );
+        self::assertSame((string) file_get_contents($root.'check/report.json'), $masked);
     }
 
     public function testListShowsOnlyTheTwoLockrotCommands(): void
