@@ -1,6 +1,6 @@
 ---
 title: JSON schemas — lockrot report, explanation, baseline and configuration
-description: The published JSON Schema of every lockrot document. What a schema number allows, which value sets grow, CI validation and the report's fields.
+description: The published JSON Schema of every lockrot document. What a schema number allows, which value sets grow, moving from report-1, CI validation and the report's fields.
 ---
 
 # JSON schemas
@@ -11,10 +11,10 @@ only gain values and a field's type only widens.
 
 | Document | Schema | Written by / read from |
 |---|---|---|
-| The report | [`https://lockrot.dev/schema/report-1.json`](https://lockrot.dev/schema/report-1.json) | `composer lockrot --format=json` |
-| The explanation | [`https://lockrot.dev/schema/explain-1.json`](https://lockrot.dev/schema/explain-1.json) | `composer lockrot --explain=vendor/package --format=json` |
-| The baseline file | [`https://lockrot.dev/schema/baseline-1.json`](https://lockrot.dev/schema/baseline-1.json) | `--generate-baseline` writes `lockrot-baseline.json`. Every later run reads it |
-| The configuration | [`https://lockrot.dev/schema/config-1.json`](https://lockrot.dev/schema/config-1.json) | `extra.lockrot` in `composer.json` |
+| The report | [`https://lockrot.dev/schema/report-2.json`](https://lockrot.dev/schema/report-2.json) | `composer lockrot --format=json` |
+| The explanation | [`https://lockrot.dev/schema/explain-2.json`](https://lockrot.dev/schema/explain-2.json) | `composer lockrot --explain=vendor/package --format=json` |
+| The baseline file | [`https://lockrot.dev/schema/baseline-2.json`](https://lockrot.dev/schema/baseline-2.json) | `--generate-baseline` writes `lockrot-baseline.json`. Every later run reads it |
+| The configuration | [`https://lockrot.dev/schema/config-2.json`](https://lockrot.dev/schema/config-2.json) | `extra.lockrot` in `composer.json` |
 
 - **Dialect.** [JSON Schema draft-04](https://json-schema.org/specification-links#draft-4).
 
@@ -28,33 +28,39 @@ only gain values and a field's type only widens.
   release's tag, describes exactly that release. The URL describes the newest release under the
   same number.
 
+- **The `-1` files** (report-1, explain-1, baseline-1 and config-1) stay published at their URLs
+  and do not change. lockrot 0.13 and earlier wrote them.
+
 ## The documents say which schema they follow
 
 The report, the explanation and the baseline file open with a `$schema` key that names their URL:
 
 ```json
 {
-    "$schema": "https://lockrot.dev/schema/report-1.json",
+    "$schema": "https://lockrot.dev/schema/report-2.json",
     "lockrot": {
-        "version": "0.13.0",
-        "schema": 1
+        "version": "0.14.0",
+        "schema": 2
     },
     …
 }
 ```
 
-An editor that reads `$schema` completes and checks these documents as you edit them.
+An editor that reads `$schema` completes and checks these documents as you edit them. Check
+`$schema` before you read a field: `lockrot.schema` is `2` in a report, an explanation and a
+baseline file alike.
 
 `extra.lockrot` sits inside `composer.json`, which has a schema of its own, so it carries no
-`$schema`. Map `config-1.json` to the `extra.lockrot` path in the JSON schema settings of your
+`$schema`. Map `config-2.json` to the `extra.lockrot` path in the JSON schema settings of your
 editor.
 
 ## The number, and what can change under it {#the-number-and-what-may-change-under-it}
 
-The `1` in `report-1.json` is the `lockrot.schema` value the document carries.
+The `2` in `report-2.json` is the `lockrot.schema` value the document carries.
 
-- **Fields are only added.** No object sets `additionalProperties: false`, so a field your code
-  does not know is not an error.
+- **Fields are only added.** No object with named fields sets `additionalProperties: false`, so a
+  field your code does not know is not an error. A map keyed by a closed set (a baseline entry's
+  `flags`) or by a pattern (`run.score_rules_used`) rejects other keys.
 
 - **Types can widen.** A field can accept a further type (for example `null`) under the same
   number. A document that uses the wider type fails an older copy. When you upgrade, refresh a
@@ -139,126 +145,184 @@ closed set needs a new schema number.
 
 ## Migrating from report-1
 
-A report-2 document names `https://lockrot.dev/schema/report-2.json` in `$schema`. Check that URL
-before you read a field. This table names the field to read for each report-1 field that report-2
-removes or redefines.
+A report-2 document names `https://lockrot.dev/schema/report-2.json` in `$schema`. Assert that URL
+before you read a field: a report-1 filter run on report-2 matches nothing and exits `0`. This table
+names what to read for each report-1 field that report-2 removes or redefines.
 
 | report-1 | report-2 |
 |---|---|
-| a finding's `verdict` from `abandoned` to `stale` | [`lead`](verdicts.md#flags). `verdict` is the grade, and `unknown`, `finished` and `ok` stay in `verdict` |
-| `priority_basis` | `score`: its terms, its modifiers and its `text` |
-| `no_fix_expected` | `security` and the `fix` of each S9 row |
-| S9's `fixed_by` and `fixed_on_branch` | the `fix` of each S9 row |
-| `run.flagged_verdicts` | `run.graded_verdicts` for the grades, `run.flag_ids` for the flags |
-| `run.fail_on_kind` | `run.gates[].kind` |
-| the cause keys of `counts` | the root `flags.<flag>.leading`. `counts` holds the verdicts |
-| `baseline.previous_verdict` | `baseline.recorded.lead` |
-| explain-1's top-level `activity` | explain-2's `finding.activity` |
+| no guard | `."$schema" == "https://lockrot.dev/schema/report-2.json"` first. `.lockrot.schema == 2` also passes on a baseline-2 file, whose `findings` is an object |
+| `.verdict == "abandoned"` | `.lead == "abandoned"`: [`lead`](verdicts.md#flags) is report-1's word for the same findings |
+| `.verdict` at or above `left-behind` | `.lead as $l \| ["abandoned","silent","pinned","left-behind"] \| index($l) != null` |
+| a flag anywhere on the finding | `any(.score.terms[]?; .flag == "old-promise")`: a flag counts exactly when a score term names it |
+| `.priority == "critical"` | unchanged (an alias), or `.verdict == "critical"` |
+| `.verdict == "ok"` | `.verdict == "ok"`. A package that was `ok` with advisories is now graded, with `lead` null |
+| `.counts.abandoned`, `.counts["left-behind"]` | `.flags["left-behind"].leading`. `counts` holds the seven verdicts, so `.counts["left-behind"]` is null |
+| `.counts.ok`, `.counts.finished`, `.counts.unknown` | the same keys. A package with a counted advisory is graded, not `ok`, `finished` or `unknown` |
+| "has an advisory": `any(.signals[]; .id == "S9")` | unchanged, or `.security.status == "vulnerable"` |
+| `.run.fail_on_kind` | `(.run.gates // [])[].kind`: `flag` is report-1's `verdict`, and `grade` is report-1's `priority`. `.run.fail_on` stays a string |
+| `.run.flagged_verdicts` | `.run.graded_verdicts` for the grades, `.run.flag_ids` for the flags |
+| `.baseline.previous_verdict` | `.baseline.recorded.lead` (null for a package new to the baseline) |
+| S7's `.data.packages[].verdict`, `.unattributed[].verdict` | `.lead` on the same objects. `.verdict` there is the grade |
+| gating on `.priority` and `.baseline.status` | `.gate.fails`. Under a baseline, `.priority` is the full grade, while the gate reads `min(score, 2 × new)` |
+| `.evidence` (every fact) | `.evidence` holds the summaries of the counted flags only. Read `[.flags[].summary]` for every flag that fired, accepted ones included, and `[.signals[].summary]` for the rest |
+| `.priority_basis` | `.score`: its `terms`, its `modifiers` and its `text` |
+| `.no_fix_expected`, S9's `fixed_by` and `fixed_on_branch` | `.security` and the `fix` of each S9 row |
+| `.libyears.total` | the same key. It is the rounded sum of the findings' `libyears` |
+| `.libyears_unmeasured == "metadata_unavailable"` | `.libyears_unmeasured == "unavailable" or .libyears_unmeasured == "not_found"` |
+| `.libyears_unmeasured == "no_stable_release_date"` | `shared_commit`, `undated`, `no_stable_release` or `undated_releases`, the ids that `age` uses for the same cause |
+| S9's `.severity == null` | `.severity == "unrated"`. `moderate` reads `medium`, and `.severity_published` keeps Composer's word |
+| S4's `.data.activity` | S4's `.data.event`, or the finding's `.activity.event` |
+| explain-1's `.activity`, `.target_php`, `.project_php`, `.thresholds` | explain-2's `.finding.activity`, `.run.target_php`, `.run.project_php`, `.run.thresholds` |
 | the html page's `details.<package>.activity` | the finding's `activity`. `repository_link` stays in `details` |
+| a baseline entry's `.verdict` | the first key of the entry's `flags`, in flag order, or the report's `.baseline.recorded.lead` |
+| every flag id a finding mentions: `[.. \| .flag_ids? \| arrays]` | `[.score.terms[]?.flag]` for the counted flags, and `.allowlist.flag_ids` for the accepted ones (null: every maintenance flag) |
+
+Recipes for the new fields:
+
+```bash
+# why each graded finding scores what it does
+jq -r '.findings[] | select(.score.total > 0) | "\(.package) \(.score.total) " + ([.score.terms[] | "\(.flag) \(.contribution)"] | join(" + "))' report.json
+# what each move would leave, the also[] moves included
+jq -r '.findings[] | .package as $p | .score.total as $t | (.next_step | ., .also[]?) | select(.if_applied) | "\($p) \(.kind): \($t) -> \(if .if_applied.at_most then "at most " else "" end)\(.if_applied.total) \(.if_applied.verdict)"' report.json
+# which facts fail the gate
+jq -r '.findings[] | select(.gate.fails) | "\(.package): " + ([.gate.by[].facts[] | .id] | unique | join(", "))' report.json
+# the gate: line
+jq -r '.gate.text' report.json
+# what the repository activity lookup did for each package
+jq -r '.findings[] | "\(.package) \(.activity.status) \(.activity.reason // "")"' report.json
+# graded findings by depth below composer.json
+jq -c '.rot_depth.by_depth' report.json
+# what each advisory repository did in this run
+jq -r '.run.advisory_lookup.repositories[] | "\(.composer_repository) \(.outcome)"' report.json
+# libyears values that are lower bounds
+jq -r '.findings[] | select(.libyears_at_least) | .package' report.json
+```
+
+`score.text`, `next_step.text`, `gate.text` and every `summary` are prose. Key a script on the
+fields, never on the sentences. JSON writes `÷`, `¼` and `×` as `\u` escapes: `jq -r` decodes
+them, and `grep` on the raw file does not.
 
 ## What the report schema types
 
-**Since** is the release that added a field. The schema marks such a field optional so that
-earlier reports validate, and lockrot writes it in every report from that release on. A field
-without a **Since** is in every report that has its parent. `report-1.json` holds every nested key.
+`report-2.json` holds every nested key, with a description for each. Every report-2 document
+carries every field that this page names: a nullable field is written as null, never left out.
 
 ### The document
 
-| Field | Type | Since | Holds |
-|---|---|---|---|
-| `$schema` | string | | The URL of `report-1.json` |
-| `lockrot` | object | | `version`, the lockrot release that wrote the document, and `schema`, the schema number |
-| `generated_at` | date-time | | When lockrot wrote the report |
-| `run` | object or null | 0.10.0 | What the run was told to do: see [What the run was told](#what-the-run-was-told) |
-| `activity_cache_oldest_at` | date-time or null | | Fetch time of the oldest repository-activity answer served from lockrot's cache. Null when lockrot fetched every answer in this run |
-| `packages_checked` | integer | | Packages analysed |
-| `include_dev` | boolean | | Whether lockrot analysed `packages-dev` |
-| `not_from_composer_repository` | integer | | Findings whose `from_composer_repository` is false |
-| `network_failures` | boolean | | True exactly when a `note_details` entry has `sets_network_failures: true`. `--strict-network` fails on it ([ci.md](ci.md#exit-codes)) |
-| `counts` | object | | Findings per verdict. Every verdict is a key, zero included |
-| `abandoned` | object | 0.11.0 | `total`, equal to `counts.abandoned`, and `with_replacement`, the abandoned findings whose `replacement` names a package |
-| `priorities` | object | | Findings per priority. Every priority is a key, zero included |
-| `exposure` | array | | Direct requirements that pull in flagged packages: see [Transitive exposure](#transitive-exposure) |
-| `exposure_rule` | object | 0.13.0 | `max_fan_in`, the fan-in cap this run attributed `exposure` by: see [Transitive exposure](#transitive-exposure) |
-| `unattributed` | array | 0.13.0 | Flagged transitive packages above the cap |
-| `libyears` | object | 0.11.0 | Totals over the findings' `libyears`: see [Libyears](#libyears) |
-| `baseline` | object or null | | `path`, the counts `known`, `new` and `worsened`, and `stale`, the baselined names absent from the lock. Null when the run read no baseline |
-| `gate` | object or null | 0.13.0 | Why the run exits as it does: see [The gate](#the-gate) |
-| `notes` | array of strings | | What the run could not see, as sentences: text, not contract |
-| `note_details` | array | 0.13.0 | The same notes, typed: see [Run notes](#run-notes) |
-| `findings` | array | | One per analysed package, by priority, then severity order, direct before transitive, then name |
+| Field | Type | Holds |
+|---|---|---|
+| `$schema` | string | The URL of `report-2.json` |
+| `lockrot` | object | `version`, the lockrot release that wrote the document, and `schema`, the schema number |
+| `generated_at` | date-time | When the run ran: every years field is measured against it |
+| `run` | object | What the run was told to do: see [What the run was told](#what-the-run-was-told) |
+| `activity_cache_oldest_at`, `activity_cache_age_hours` | date-time, number, or null | Fetch time of the oldest repository-activity answer served from lockrot's cache, and its age in hours. Null when lockrot fetched every answer in this run |
+| `packages_checked` | integer | Findings in the document |
+| `packages_flagged` | integer | Graded findings |
+| `packages_multi_flag` | integer | Graded findings with two or more counted flags |
+| `include_dev` | boolean | Whether lockrot analysed `packages-dev` |
+| `not_from_composer_repository` | integer | Findings whose `from_composer_repository` is false |
+| `packages_unchecked_accepted` | integer | Findings with a check that `accept-unchecked` accepted |
+| `network_failures` | boolean | True exactly when a `note_details` entry has `sets_network_failures: true`. `--strict-network` fails on it ([ci.md](ci.md#exit-codes)) |
+| `counts` | object | Findings per verdict, the seven verdicts, zero included |
+| `priorities` | object | Findings per `priority`, the alias of the grade |
+| `abandoned` | object | `total`, the findings whose `abandoned` counts, `with_replacement`, those whose `replacement` names a package, and `with_suggestion`, those whose registry suggests something that names no package |
+| `flags` | object | Per flag: `carrying` (findings where it counts), `leading` (findings it leads, report-1's count of that verdict), `accepted` and `by_verdict`. `vulnerable` has null `leading` and `accepted` |
+| `exposure`, `exposure_rule`, `unattributed` | | See [Transitive exposure](#transitive-exposure) |
+| `rot_depth` | object | Graded findings by reach, by depth below `composer.json` and by section ([How deep the rot sits](verdicts.md#rot-depth)) |
+| `libyears` | object | Totals over the findings' `libyears`: see [Libyears](#libyears) |
+| `baseline` | object or null | `path`, the counts `known`, `new` and `worsened`, and `stale`, the baselined names absent from the lock. Null when the run read no baseline |
+| `gate` | object | Why the run exits as it does: see [The gate](#the-gate) |
+| `security` | object | The run's advisory totals: the lookup's `check`, packages and advisories by status and severity, vulnerable packages per fix kind, `update_now` and its command |
+| `data_date` | date-time or null | The oldest finding `data_date` |
+| `notes` | array of strings | What the run could not see, as sentences: text, not contract |
+| `note_details` | array | The same notes, typed: see [Run notes](#run-notes) |
+| `findings` | array | One per analysed package, in `rank` order ([sort](verdicts.md#score)) |
 
 ### Each finding
 
-| Field | Type | Since | Holds |
-|---|---|---|---|
-| `package` | string | | The package name, `vendor/name` |
-| `version` | string | | The installed version, as the lock records it |
-| `verdict` | enum | | A [verdict](verdicts.md#the-nine-verdicts) |
-| `priority` | enum | | A [priority](verdicts.md#priority) |
-| `priority_basis` | object | 0.13.0 | How `priority` was reached: see [How a priority was reached](#how-a-priority-was-reached) |
-| `direct` | boolean | | Whether the project requires the package directly |
-| `dev` | boolean | | Whether the lock lists it under `packages-dev` |
-| `signals` | array | | `{id, level, summary, data}` per [signal](verdicts.md#the-signals). `data` is typed per id, `summary` is text |
-| `chain` | array | | Package names from a direct requirement down to this one. One element when it is direct, empty when no direct requirement reaches it |
-| `direct_dependents` | array | | The run's direct requirements that reach the package, sorted by name. A direct package lists itself |
-| `evidence` | string | | The sentence behind the verdict: text, not contract |
-| `allowlist_reason` | string or null | | The reason the [allowlist](configuration.md#the-allowlist) gives. Null when the package is not allowlisted |
-| `note` | string or null | | Why lockrot has no repository metadata for the package, as a sentence. Null when it has |
-| `data_date` | date-time or null | | When lockrot read the repository data behind the verdict: the later of the metadata and the repository activity. Null when lockrot had neither |
-| `from_composer_repository` | boolean | 0.13.0 | Whether the lock entry carries a Composer `notification-url`: see [Where a package came from](#where-a-package-came-from) |
-| `origin` | object | 0.13.0 | Where the lock entry came from: see [Where a package came from](#where-a-package-came-from) |
-| `replacement` | string or null | 0.11.0 | On an abandoned finding, the package its repository names as the replacement, when that is a package name other than its own. Null otherwise ([Abandoned](verdicts.md#abandoned-and-where-to)) |
-| `replacement_url` | string or null | 0.13.0 | The replacement's page: see [Where a package came from](#where-a-package-came-from) |
-| `libyears` | number or null | 0.11.0 | Years behind the newest stable release, at least 0, two decimals. A lower bound when the newest tag is undated ([Libyears](verdicts.md#libyears)). Null when unmeasured |
-| `libyears_unmeasured` | string or null | 0.13.0 | Null when `libyears` is a number, 0 included. Otherwise the `libyears.unmeasured` key the finding counts under. An open set |
-| `no_fix_expected` | array or null | 0.13.0 | The advisories lockrot expects no fix for: see [Advisories with no fix expected](#advisories-with-no-fix-expected) |
-| `baseline` | object or null | 0.10.0 | `status` (`known`, `new` or `worsened`) and `previous_verdict`, the verdict the baseline accepted or null. Null when the run read no baseline or the finding is not flagged |
-| `gate` | object or null | 0.13.0 | Where the finding stands against `run.fail_on`: see [The gate](#the-gate). Null exactly when the root `gate` is |
-
-A finding without `libyears_unmeasured` comes from a report that predates the field. Its absence
-never means "measured".
+| Field | Type | Holds |
+|---|---|---|
+| `package`, `version` | string | The package name and the installed version, as the lock records it |
+| `branch` | string or null | The installed release branch (`2.x`, `0.15.x`). Null for a branch snapshot |
+| `installed_php` | object | The installed release's own `require.php`, and whether the target PHP and the project's `require.php` admit it |
+| `verdict` | enum | A [verdict](verdicts.md#the-nine-verdicts): a grade, or `unknown`, `finished` or `ok` |
+| `priority` | enum | The grade, else `none`. Deprecated: read `verdict` |
+| `lead` | string or null | The first counted maintenance flag ([Flags](verdicts.md#flags)) |
+| `rank` | integer | The finding's place in the report's order, 1 first |
+| `flags` | array | Every flag that fired, in flag order: `{id, role, baseline, signal_ids, degree, headline, summary}`. `role` is `accepted` on an accepted flag. A flag counts exactly when `score.terms[].flag` names it |
+| `score` | object | The sum: see [The score](#how-a-priority-was-reached) |
+| `next_step` | object or null | The move: see [The move](#the-move). Null at score 0 |
+| `security` | object | What the advisory lookup found: see [Security](#advisories-with-no-fix-expected) |
+| `checks_missing`, `checks_skipped`, `unchecked_accepted` | array | The checks that did not run, as S10 or as skips, and the ones that `accept-unchecked` accepted ([What was not checked](verdicts.md#what-was-not-checked)) |
+| `maintenance_judged` | boolean | True exactly when lockrot read the package's release metadata |
+| `metadata` | object | `status` (`read`, `not_from_composer_repository`, `unavailable`, `not_found`) and why it was not read |
+| `activity` | object | What the repository activity lookup did: `status`, `reason`, `forge`, `host`, `repo`, `event`, `archived`, `fetched_at` and `cached_at` |
+| `age` | object | Four readings on the run clock (`installed`, `release`, `branch_release`, `push`), each with `years`, and a `<reading>_unmeasured` reason beside each null one |
+| `allowlist` | object or null | Who accepted the package's flags (`by`: `builtin`, `project`, `type`), the `pattern`, `reason`, `reason_id`, `reason_by`, `expires` and `flag_ids` (null: every maintenance flag) |
+| `allowlist_reason` | string or null | The reason of an entry that accepts the whole package |
+| `abandoned_ignored` | object or null | The mark that [Composer's abandoned ignore list](verdicts.md#abandoned) removed: `by`, `rules` and `marking` |
+| `from_composer_repository`, `origin` | | Where the lock entry came from: see [Where a package came from](#where-a-package-came-from) |
+| `replacement`, `replacement_url` | string or null | On a finding whose `abandoned` counts, the package its registry names as the replacement, and its page ([Abandoned](verdicts.md#abandoned-and-where-to)) |
+| `note` | string or null | Why lockrot has no repository metadata for the package, as a sentence |
+| `libyears`, `libyears_unmeasured`, `libyears_at_least` | | Years behind the newest stable release, the reason when unmeasured, and whether the value is a lower bound ([Libyears](verdicts.md#libyears)) |
+| `direct`, `dev`, `reach` | | Whether the project requires it directly, whether the lock lists it under `packages-dev`, and `direct`, `transitive` or `unreached` |
+| `chain`, `direct_dependents` | array | The shortest path from a direct requirement, and every direct requirement that reaches it |
+| `depth`, `depth_unmeasured`, `named_in` | | Hops below `composer.json`, why there are none, and the `composer.json` sections that name it ([How deep the rot sits](verdicts.md#rot-depth)) |
+| `signals` | array | `{id, level, summary, data}` per [signal](verdicts.md#the-signals). `data` is typed per id, `summary` is text |
+| `evidence` | string | The summaries of the counted flags: text, not contract |
+| `data_date` | date-time or null | When lockrot read the repository data behind the finding |
+| `baseline` | object or null | `status` (`known`, `new` or `worsened`), `recorded`, `advisories_now` and `worsened_by`. Null when the run read no baseline, or the finding scores 0 and has no entry |
+| `gate` | object | Where the finding stands against `run.gates`: see [The gate](#the-gate) |
 
 ### What the run was told
 
-`run` holds what lockrot decided every verdict against. The command writes it on every run.
+`run` holds what lockrot decided every finding against. The command writes it on every run.
 
-| Key | Type | Since | Holds |
-|---|---|---|---|
-| `project` | string or null | | What the report calls the project: composer.json's `name`, or `extra.lockrot.project` instead. A display name, not an identifier. Null when the manifest has no `name` and `extra.lockrot.project` is unset |
-| `root_package` | string or null | 0.13.0 | The `name` of the manifest Composer reads, exactly as written, whatever `extra.lockrot.project` says: the key to match a report to its repository or to join several projects' reports on |
-| `target_php` | string or null | | The PHP version the verdicts target, as the run resolved it ([`target-php`](configuration.md#extralockrot-keys)) |
-| `project_php` | string or null | 0.13.0 | The manifest's `require.php` exactly as written (`>=8.2`): a constraint, not a version. The second floor that S8 holds a higher branch against ([Within reach](verdicts.md#within-reach)). `--explain` writes the same value |
-| `lock_file` | string or null | | The lock's file name, never its path |
-| `fail_on` | string or null | | The threshold the run used, from `--fail-on` or its [key](configuration.md#extralockrot-keys) ([choosing one](ci.md)) |
-| `fail_on_kind` | string or null | 0.13.0 | Which kind of threshold `fail_on` is: `none`, `verdict`, `priority` or `unchecked`. An open set. Null only where `fail_on` is |
-| `strict_network` | boolean | 0.13.0 | Whether `--strict-network` was on |
-| `mode` | string | 0.13.0 | `check`, or `generate_baseline` for `--generate-baseline`, which records the findings and judges none. An open set |
-| `thresholds` | object or null | | `release-warn-years`, `release-high-years`, `push-warn-years` and `push-high-years` ([keys](configuration.md#extralockrot-keys)) |
-| `flagged_verdicts` | array | | The verdicts this run counted as flagged, most severe first |
-
-`root_package` and `project_php` are null when the manifest has no such key, and in a run that read
-a lock without its composer.json.
+| Key | Type | Holds |
+|---|---|---|
+| `project` | string or null | What the report calls the project: composer.json's `name`, or `extra.lockrot.project` instead. A display name, not an identifier |
+| `root_package` | string or null | The `name` of the manifest Composer reads, exactly as written: the key to match a report to its repository |
+| `target_php`, `target_php_source` | string | The target PHP minor, and where it came from: `option`, `env`, `config`, `platform` or `runtime` ([`target-php`](configuration.md#extralockrot-keys)) |
+| `project_php` | string or null | The manifest's `require.php` exactly as written (`>=8.2`): a constraint, not a version |
+| `project_php_lowest` | string or null | The lowest PHP that `require.php` admits, as `MAJOR.MINOR.PATCH` (`>=8.2` is `8.2.0`, `>7.1` is `7.1.1`) |
+| `lock_file` | string or null | The lock's file name, never its path |
+| `fail_on`, `fail_on_source` | string | The `--fail-on` list in kind order (`"left-behind,vulnerable-high"`), and where it came from: `option`, `env`, `config` or `default` |
+| `gates` | array | `{value, kind, threshold}` per value of the list. `kind` is `grade`, `flag`, `vulnerable` or `unchecked`, an open set. `[]` for `none` |
+| `strict_network` | boolean | Whether `--strict-network` was on |
+| `include_dev` | boolean | Whether the run walked `require-dev` |
+| `mode` | string | `check`, or `generate_baseline` for `--generate-baseline`, which records the findings and judges none. An open set |
+| `thresholds` | object | `release-warn-years`, `release-high-years`, `push-warn-years` and `push-high-years` ([keys](configuration.md#extralockrot-keys)) |
+| `flag_ids`, `verdicts`, `graded_verdicts`, `signal_ids` | array | The flags in flag order, the seven verdicts, the four grades, and the signal ids |
+| `fix_model`, `text_grammar` | integer | The id of the fix classification, and the version of the sentence grammars |
+| `score_model` | object | The whole score model: weights, severities, fix kinds, bands, sort and rules ([Score model 1](verdicts/model-1.md)) |
+| `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
+| `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each repository that publishes advisories with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
 
 ### The gate
 
 The root `gate` is the decision behind the exit code. lockrot takes it over the document's own
-findings, by what `run` says. It is null only where `run` is null or has no `fail_on`. The command
-always writes both.
+findings, by what `run` says.
 
 | Key | Type | Holds |
 |---|---|---|
 | `fails` | boolean | True: the run exits `1`. False: it exits `0`. A later write error overrides both with `2` ([exit codes](ci.md#exit-codes)) |
-| `tripped_by` | array | Each cause once: `strict_network` (it was on and `network_failures` is true) and `fail_on` (some finding's `gate.fails` is true). Empty exactly when `fails` is false. An open set. The order is not contract |
+| `tripped_by` | array | Each cause once: `strict_network` (it was on and `network_failures` is true) and `fail_on` (some finding's `gate.fails` is true). Empty exactly when `fails` is false. An open set |
 | `fail_on_applied` | boolean | True in a `check` run. False in a `generate_baseline` run, which only `--strict-network` can fail |
+| `reaching`, `failing`, `exempt` | | How many findings reach a value, fail it, and are exempt by the baseline (`exempt.baseline`) |
+| `failing_by` | array | `{value, failing}` per value of `run.gates`, zero counts included |
+| `not_applied` | array | `{check, packages, reason}` per gap that a grade or `vulnerable` value could not read: advisories that lockrot did not check |
+| `text` | string | The [`gate:` line](ci.md#reading-the-gate-line): prose, not contract |
 
 Each finding's `gate`:
 
 | Key | Type | Holds |
 |---|---|---|
-| `reaches_fail_on` | boolean | Whether the finding is at or above `run.fail_on`. lockrot decides it in every mode. Always false under `none` |
-| `exempt_by` | string or null | `baseline` when the finding reaches `run.fail_on` and the baseline accepted it (`baseline.status` is `known`, so a `worsened` finding is not exempt). Otherwise null. Non-null only where `reaches_fail_on` is true. An open set |
+| `reaches_fail_on` | boolean | Whether the finding reaches some value of `run.gates`, read from the score and the flags before the baseline. Always false under `none` |
+| `exempt_by` | string or null | `baseline` when the finding reaches a value and the baseline is why it does not fail: a `known` finding, or a `worsened` one whose gate score stays below the value. Otherwise null. An open set |
 | `fails` | boolean | True exactly when `reaches_fail_on` is true, `exempt_by` is null and the root `fail_on_applied` is true |
+| `by` | array | `{value, kind, facts}` per value that the finding fails, naming the facts whose records are marked `error` |
+| `basis` | object or null | The baseline arithmetic: the score, what the new facts add, and the gate score `min(score, 2 × new)`. Null without a baseline entry |
 
 ### Run notes
 
@@ -278,50 +342,48 @@ For a code the schema does not list, show `text`, link `docs_url` when it is a s
 `data`, and still honour `sets_network_failures`. Key on `note_details`, never on the `notes`
 sentences.
 
-### How a priority was reached
+### The score {#how-a-priority-was-reached}
 
-`priority_basis` has `base`, the priority that the verdict starts at, and `steps`, each
-`{reason, from, to}` in the order that lockrot applies them:
+A graded finding's `score` holds every number of the sum, so a reader never repeats a rule:
 
-1. `transitive`, or `unreached` when `chain` is empty: exactly when `direct` is false.
-
-2. `dev`: the finding's `dev` is true.
-
-3. `no_fix_expected`: the finding's `no_fix_expected` names an advisory.
-
-How the steps chain:
-
-- lockrot records a step whenever its fact holds on a flagged finding, also when the step cannot
-  move the priority. `from` then equals `to`.
-
-- The first step starts at `base`, each later one where the last ended, and the last ends at
-  `priority`. With no steps, `priority` is `base`.
-
-- An unflagged verdict (`unknown`, `finished`, `ok`) gives `{"base": "none", "steps": []}`.
-
-- `from` and `to` take the priority order without `none`. A step whose `reason` you do not know
-  still reads as a move from one priority to another.
-
-[Priority](verdicts.md#priority) says what each step does to the priority.
-
-### Advisories with no fix expected
-
-| `no_fix_expected` | Meaning |
+| Key | Holds |
 |---|---|
-| absent | A report written before 0.13.0 |
-| `null` | The verdict makes no fix prediction: every verdict but `abandoned`, `silent` and `left-behind` |
-| `[]` | One of those three verdicts, and every advisory is fixed by a release it lets the project reach, or there is none |
-| non-empty | `{id, reason}` per advisory that lockrot expects no fix for, in S9's order. They raise the priority ([Priority](verdicts.md#priority)) |
+| `model` | The score model id. Scores compare only under one model |
+| `total`, `exact`, `rounded_down` | The score, the value before the one floor (in half points), and whether the floor changed it |
+| `band` | `floor`, the floor of the grade, `next`, the next grade up, and `to_next`, the points short of it |
+| `decided_by` | `maintenance`, `security`, `combination` (the sum decides the band) or `either`. An open set |
+| `parts` | Per part, `maintenance` and `security`: its `status`, its `contribution` and the grade it reaches alone. `security` adds `of`, the counted advisories, and `tied` |
+| `terms` | One per counted fact, the lead first and the security term last: `weight`, `divisor` or `multiplier`, `points` and `contribution`. The contributions add up to `exact` |
+| `modifiers` | Each halving in order: `reason` (`transitive`, `unreached`, `dev`), `applies_to`, `divide_by`, `before` and `after` |
+| `accepted` | Each accepted flag, with `if_counted`: the score if it counted |
+| `without` | The score without each counted flag, and without the deciding advisory: new runs of the rules |
+| `text` | The [score line](verdicts.md#score): prose |
 
-`id` is the `id` of one of the finding's S9 advisories. `reason` is the first that applies, from an
-open set:
+A score-0 finding has `{model, total: 0, exact: 0, accepted, text}`. `terms` is present exactly on
+the graded shape.
 
-| `reason` | When |
-|---|---|
-| `not_on_installed_branch` | The finding is left-behind and the fix is only on a higher branch |
-| `releases_unknown` | S9's `releases_read` is false, so lockrot looked for no fix |
-| `affected_range_unknown` | The advisory gives no affected range |
-| `no_release_fixes` | No listed release above the installed version fixes it |
+### The move
+
+`next_step` is the [move](verdicts.md#move) of a graded finding: its `kind`, the `constraint` or
+command, `clears`, `unverified` and `leaves` (the facts it settles, cannot check and does not
+touch), `held_by`, `php_check`, `if_applied` (the score after it), `through` for a package that
+comes in through others, `commands` (argv lists) and `text`. `also` holds the other part's move.
+`kind` is an open set: show `text` for a kind you do not know.
+
+### Security {#advisories-with-no-fix-expected}
+
+`security` is one of three shapes, told apart by `status`:
+
+| `status` | When | Holds |
+|---|---|---|
+| `vulnerable` | At least one advisory counts | `worst`, `counts` by severity, `fix_kind`, `installed_branch_fixes`, `gets` (what `composer update` installs), `partial`, `move_in` (where the move is) |
+| `clear` | The lookup was complete and found nothing that counts | |
+| `unchecked` | The lookup did not run, or ran in part, and found nothing that counts | `unchecked_reason` |
+
+Every shape carries `check` (`complete`, `partial` or `not_run`), `records`, `feeds[]` and
+`ignored[]`, the advisories that Composer's audit policy ignores. Each S9 row carries the
+advisory's `fix`: `{kind, to_branch, version, newest, on_installed_branch, php, held_by, reason}`
+([Fix](verdicts.md#fix)).
 
 ### Libyears
 
@@ -329,67 +391,61 @@ lockrot derives the root `libyears` block from the findings' `libyears`:
 
 | Key | Type | Holds |
 |---|---|---|
-| `total` | number or null | Sum over the measured findings, two decimals. Null when `measured` is 0. It sums the unrounded values, so it can differ from the sum of the findings' printed `libyears` by up to 0.005 per measured finding |
+| `total` | number or null | The findings' `libyears`, summed and rounded to two decimals. Null when `measured` is 0 |
 | `direct_requirements` | number or null | The same sum over `direct: true`. Null when `measured` is 0 |
 | `measured` | integer | Findings whose `libyears` is a number |
+| `at_least_count` | integer | Findings whose `libyears` is a lower bound. When it is above 0, `total` is a lower bound |
 | `unmeasured` | object | Findings whose `libyears` is null, counted per reason. Every key that this release writes is present |
-| `furthest_behind` | object or null | `{package, version, libyears}` of the finding furthest behind. Null when nothing measured is behind |
+| `furthest_behind` | object or null | `{package, version, libyears, at_least}` of the finding furthest behind. Null when nothing measured is behind |
+| `packages` | integer | Findings: `measured` plus every `unmeasured` count |
 
-`measured` plus every `unmeasured` value is the number of findings, and counting findings by
-`libyears_unmeasured` gives `unmeasured` key for key. [Libyears](verdicts.md#libyears) defines the
-number and says what it is not.
+Counting findings by `libyears_unmeasured` gives `unmeasured` key for key.
+[Libyears](verdicts.md#libyears) defines the number and says what it is not.
 
 ### Transitive exposure
 
 | Key | Type | Holds |
 |---|---|---|
-| `exposure` | array | `{package, flagged}` per direct requirement that pulls in attributed flagged packages, most first, then by name. `flagged` is the count S7 carries on that requirement's finding |
-| `exposure_rule.max_fan_in` | integer | The most direct requirements that can reach a flagged transitive package while it still counts under each. The value that this run used: read it, and do not hard-code it |
-| `unattributed` | array | `{package, verdict, fan_in}` per flagged transitive package above that cap, in report order. `fan_in` is how many of the run's direct requirements reach it. Such a package counts in no `exposure` entry and no S7 |
+| `exposure` | array | `{package, flagged}` per direct requirement that pulls in attributed graded packages, most first, then by name. `flagged` is the count S7 carries on that requirement's finding |
+| `exposure_rule.max_fan_in` | integer | The most direct requirements that can reach a graded transitive package while it still counts under each. The value that this run used: read it, and do not hard-code it |
+| `unattributed` | array | `{package, verdict, lead, flag_ids, fan_in}` per graded transitive package above that cap, in report order. `fan_in` is how many of the run's direct requirements reach it. Such a package counts in no `exposure` entry and no S7 |
 
 See [Transitive exposure](verdicts.md#transitive-exposure).
 
 ### Signal data
 
-`report-1.json` types every signal's `data` (`S9` in `definitions.s9`), and [The
-signals](verdicts.md#the-signals) says when each fires. This table lists only the fields that a
-release after 0.9.0, the first published schema, added or changed. A field that the table omits is
-still typed and still written.
+`report-2.json` types every signal's `data` (`S9` in `definitions.s9`), and [The
+signals](verdicts.md#the-signals) says when each fires. A signal whose id the schema does not list
+validates with any object as its `data`.
 
-| Signal | Field | Since | Holds |
-|---|---|---|---|
-| S5 | `target_major` | 0.11.0 | The first release of the target's major, `8.0` for a target of `8.4` |
-| S5 | `ga_date` | | The GA date of `target_major`. In a report written before 0.11.0, the GA of the target minor |
-| S5 | `written_for_php` | 0.11.0 | The PHP major of the constraint's lower bound. Null when it has none (`*`) |
-| S6 | `reason`, `has_stable_release`, `last_stable_release`, `last_stable_version`, `last_stable_dated_by`, `snapshot_time` | 0.13.0 | See [What S6 carries](verdicts.md#what-s6-carries) |
-| S8 | `newest_php` | 0.11.0 | The php requirement of the newest branch's release. Null when it requires no PHP |
-| S8 | `newest_within_reach` | 0.11.0 | Whether the newest branch's php requirement admits both the project's own `require.php` and the target PHP ([Within reach](verdicts.md#within-reach)) |
-| S8 | `floor_php`, `floor_source` | 0.11.0 | What holds the newest branch back, and which floor that is (`project` or `target`, an open set). Both null when it is within reach |
-| S8 | `reachable_branch`, `reachable_version`, `reachable_release` | 0.11.0 | The newest higher branch that releases and is within reach, the one that `suggested_constraint` follows. Null when none is |
-| S9 | `releases_read` | 0.13.0 | True when lockrot read the releases and compared them with the installed version, so a null `fixed_by` means none fixes it. False with no metadata or an incomparable version ([Security advisories](verdicts.md#security-advisories)) |
-| S10 | `unchecked`, `blocks` | 0.11.0 | See [What was not checked](verdicts.md#what-was-not-checked) |
+| Signal | Field | Holds |
+|---|---|---|
+| S4 | `event` | What the date is: `push` or `commit`. An open set |
+| S6 | `reason`, `has_stable_release`, `last_stable_release`, `last_stable_version`, `last_stable_dated_by`, `snapshot_time`, `tag_relation` | See [What S6 carries](verdicts.md#what-s6-carries) |
+| S8 | `suggested_constraint`, `reachable_branch`, `reachable_version`, `reachable_release` | The newest higher branch that releases and is within reach ([Within reach](verdicts.md#within-reach)) |
+| S9 | `advisories`, `releases_read`, `complete` | One row per counted advisory, the deciding one first: `id`, `cve`, `title`, `link`, `reported_at`, `severity`, `severity_published`, `affected_versions`, `counted`, `points`, `deciding`, `fix` and `baseline` |
+| S10 | `unchecked`, `blocks` | See [What was not checked](verdicts.md#what-was-not-checked) |
 
 ### Dates
 
 Dates are RFC 3339 strings (`format: date-time`). S5's `ga_date` and a baseline entry's
-`first_seen` are plain `YYYY-MM-DD`.
+`first_seen` and `known_since` are plain `YYYY-MM-DD`. Every years field holds one decimal at most.
 
 ### The explanation
 
-The explanation's `finding` has a report finding's fields without `baseline` and `gate`. Its
-`project_php` and `note_details` are the report's. `explain-1.json` types its `lock`, `metadata` and
-`activity`. [Explaining one package](configuration.md#explaining-one-package) says what each shows.
+The explanation's `finding` has a report finding's fields. `run` holds the report's `run` keys that
+the explanation reads, `target_php`, `project_php` and `thresholds` among them. `explain-2.json`
+types its `lock` and its `metadata`, whose `branches[]` carry the PHP test of each branch and its
+`fixes` ([The PHP test](verdicts.md#the-php-test-in-explain)).
+[Explaining one package](configuration.md#explaining-one-package) says what each shows.
 
-`explain-1.json` does not type a signal's `data`. Validate it against the matching
-`definitions.s<N>` of `report-1.json` (`S9` → `definitions.s9`), or read it as the report types
-it.
+### TypeScript
 
-| Field | Since |
-|---|---|
-| `metadata.installed_release`, `metadata.installed_release_dated_by` | 0.11.0 |
-| `metadata.branches[].php` | 0.11.0 |
-| `metadata.branches[].admits_target_php`, `admits_project_php`, `php_blocked_by`, `misses_target_php`, `misses_project_php` | 0.13.0 |
-| `project_php`, `note_details` | 0.13.0 |
+Each lockrot release attaches the TypeScript types of report-2 to its
+[GitHub release](https://github.com/somework/lockrot/releases) as two assets:
+`lockrot-report-2.d.ts` (the object shapes, with `Report2` at the root) and
+`lockrot-report-2.known.d.ts` (each set of values, generated from the schema). Download the pair
+of the release whose reports you read. lockrot.dev does not publish them.
 
 ## Where a package came from
 
@@ -524,19 +580,20 @@ Any draft-04 validator works. With [check-jsonschema](https://check-jsonschema.r
 
 ```bash
 composer lockrot --fail-on=high --target-php=8.4 --format=json > lockrot.json || test $? -eq 1
-check-jsonschema --schemafile https://lockrot.dev/schema/report-1.json lockrot.json
+check-jsonschema --schemafile "$(jq -r '."$schema"' lockrot.json)" lockrot.json
 jq -e '.gate.fails | not' lockrot.json
 ```
 
 `|| test $? -eq 1` lets validation run after exit `1`. Exit `2` still fails the step
-([exit codes](ci.md#exit-codes)). The `jq` line keeps the gate. It fails the step when `gate.fails`
-is true.
+([exit codes](ci.md#exit-codes)). The schema comes from the document's own `$schema`, so the step
+validates a report-1 and a report-2 document alike. The `jq` line keeps the gate. It fails the step
+when `gate.fails` is true.
 
 To keep the check independent of lockrot.dev, pin the schema next to the workflow. When you upgrade
 lockrot, refresh the copy, so that it lists new fields and types a new signal's `data`:
 
 ```bash
-curl -fsSL -o ci/lockrot-report.schema.json https://lockrot.dev/schema/report-1.json
+curl -fsSL -o ci/lockrot-report.schema.json https://lockrot.dev/schema/report-2.json
 check-jsonschema --schemafile ci/lockrot-report.schema.json lockrot.json
 ```
 
@@ -552,9 +609,9 @@ check-jsonschema --schemafile ci/lockrot-report.schema.json lockrot.json
 ## Related
 
 - [ci.md](ci.md) — every output format, and what each exit code means
-- [verdicts.md](verdicts.md) — what the verdicts, signals and priorities in a report mean
+- [verdicts.md](verdicts.md) — what the flags, the score, the verdicts and the signals in a report mean
 - [notes.md](notes.md) — each run note code, its `data` and what to do about it
-- [baseline.md](baseline.md) — writing and updating the file `baseline-1.json` describes
-- [configuration.md](configuration.md) — the `extra.lockrot` keys `config-1.json` types, and `--explain`
+- [baseline.md](baseline.md) — writing and updating the file `baseline-2.json` describes
+- [configuration.md](configuration.md) — the `extra.lockrot` keys `config-2.json` types, and `--explain`
 - [compatibility.md](compatibility.md) — what 1.0 freezes beyond the schemas
 - [changelog](changelog.md) — the release each schema change shipped in
