@@ -130,6 +130,10 @@ PHIVE shows the release key's fingerprint and asks before it trusts the key. Com
 SECURITY.md. To install without the prompt, pass the fingerprint, without spaces, as
 `--trust-gpg-keys <fingerprint>`.
 
+`.phive/phars.xml` records a caret constraint such as `^0.13.0`. On 0.x, PHIVE reads it as the one minor
+line, so `phive update` stays on 0.13.x. To move to another minor, install it by name:
+`phive install somework/lockrot@^0.14`.
+
 ### The Docker image
 
 [lockrot-action](https://github.com/somework/lockrot-action#docker-image) publishes and signs the
@@ -191,7 +195,8 @@ the running file exactly as it was.
   `<name>.<pid>-<id>.tmp.phar` file beside the PHAR. It is inert. The next `self-update` that
   downloads a release and verifies it deletes any such file older than an hour.
 
-- **No rollback.** Every earlier release stays downloadable from GitHub.
+- **No rollback.** `self-update` cannot pin a version or go back. Every earlier release stays
+  downloadable from GitHub: [go back by hand](#reinstalling-by-hand).
 
 - **Rate limit.** `LOCKROT_GITHUB_TOKEN`, `GITHUB_TOKEN` or Composer's `github-oauth` lifts GitHub's
   anonymous rate limit
@@ -215,6 +220,11 @@ release each rule held back:
 | Rule | A release that breaks it | What `self-update` does |
 |---|---|---|
 | **Same major version.** The major version is the first number: all of 0.x is one line, and 0.x to 1.0 is a major step | Is in a later major version | Prints it, does not install it |
+
+All of 0.x is one line, so `self-update` from 0.13 installs 0.14 at once, and every later 0.x minor
+too. There is no guard. A job that runs `self-update` unattended moves to each minor on the day it is
+published. To stay on a minor, stop calling `self-update` in that job and download a pinned release
+([In CI](#in-ci)).
 | **A PHP this machine has** | Needs a newer PHP than the running one, or gives a malformed PHP floor (not `major.minor.patch`) | Skips it |
 | **A key this archive carries** | Is signed with a self-update key the running archive does not carry | Skips it. After a planned key rotation, this rule makes the transition release the step in between ([SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#key-custody-and-rotation)) |
 
@@ -234,6 +244,19 @@ each release publishes beside the archive: `{"php": "7.4.0", "selfupdate-key": "
 The release metadata is not signed: it decides which release is tried, and the checksum and the
 signature decide whether one is installed. What doctored metadata can and cannot do is in
 [SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#how-self-update-trusts-a-release).
+
+What lockrot 0.13 does with the files that 0.14 writes, on a machine that has not updated:
+
+| 0.14 file or key | lockrot 0.13 |
+|---|---|
+| A baseline-2 file | Exits `2` |
+| A `fail-on` list, or a `vulnerable-*` value | Exits `2`: its configuration schema refuses them |
+| An `ignore` entry with `flags` | Warns about an unknown key, then accepts every flag of that package |
+| `accept-unchecked` | Warns about an unknown key and ignores it, so `--fail-on=unchecked` fails on 0.13 where 0.14 accepted the gap |
+| `advisory-lookup` | Warns about an unknown key and ignores it, keeping its own boundary: it asks only packages from a Composer repository |
+
+So upgrade every machine that shares the project before you commit a baseline-2 file or one of
+these keys. [Upgrading to 0.14](changes/0.14.md) has the steps.
 
 !!! note "Older releases"
     - Archives before 0.13.0 install whatever GitHub's latest release is. From them, a new major
@@ -294,6 +317,10 @@ unique prefix such as `self-up` runs `self-update`.
 - it predates the [release rules](#which-release-it-installs) and the release it takes was signed
   after a key rotation, or it is the 0.6.0 archive (Older releases under
   [Which release it installs](#which-release-it-installs))
+- you go back to a release: `self-update` never installs an older minor. Download that release's
+  files from its tag, such as
+  `https://github.com/somework/lockrot/releases/download/v0.13.0/lockrot.phar` and the
+  `lockrot.phar.sha256` beside it
 
 To reinstall:
 
@@ -302,7 +329,8 @@ To reinstall:
    not with a key the old archive carried.
 3. Put it in place of the old file.
 
-Every `self-update` after that verifies with the key the new download carries.
+Every `self-update` after that verifies with the key the new download carries. On a release that
+you went back to, do not call `self-update`: it moves to the newest release of the line again.
 
 ## In CI
 
@@ -321,7 +349,8 @@ gh attestation verify lockrot.phar --repo somework/lockrot   # drop this line wh
 php lockrot.phar --fail-on=high --target-php=8.4
 ```
 
-Pick the `--fail-on` value in [ci.md](ci.md).
+A pinned `LOCKROT_VERSION` never moves: the job runs that release until you change the line. Do not
+add `self-update` to such a job. Pick the `--fail-on` value in [ci.md](ci.md).
 
 ## The global-plugin alternative
 
