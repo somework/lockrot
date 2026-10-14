@@ -1,0 +1,150 @@
+{
+  "lockrot": {
+    "version": "0.14.0",
+    "schema": 2
+  },
+  "generated_at": "2026-10-14T00:00:00+00:00",
+  "findings": [
+    {
+      "package": "phootwork/collection",
+      "version": "v3.2.3",
+      "branch": "3.x",
+      "installed_php": {
+        "requires": ">=8.0",
+        "target_runs": true,
+        "project_allows": null
+      },
+      "verdict": "ok",
+      "priority": "none",
+      "lead": null,
+      "rank": 1,
+      "flags": [],
+      "score": {
+        "model": 1,
+        "total": 0,
+        "exact": 0,
+        "accepted": [],
+        "text": "0"
+      },
+      "next_step": null,
+      "security": {
+        "status": "clear",
+        "check": "complete",
+        "complete": true,
+        "unchecked_reason": null,
+        "records": 0,
+        "feeds": [
+          {
+            "composer_repository": "composer repo (https://repo.packagist.org)",
+            "registry": "packagist.org",
+            "answer": "answered",
+            "records": 0,
+            "reason": null
+          }
+        ],
+        "ignored": [],
+        "ignored_count": 0
+      },
+      "checks_missing": [
+        {
+          "check": "release_dates",
+          "reason": "undated_releases",
+          "blocks": [
+            "S2",
+            "S8"
+          ]
+        }
+      ],
+      "checks_skipped": [],
+      "unchecked_accepted": [],
+      "maintenance_judged": true,
+      "metadata": {
+        "status": "read",
+        "reason": null,
+        "message": null
+      },
+      "activity": {
+        "status": "read",
+        "reason": null,
+        "forge": "github",
+        "host": "github.com",
+        "repo": "phootwork/collection",
+        "event": "push",
+        "archived": false,
+        "fetched_at": "2026-10-14T00:00:00+00:00",
+        "cached_at": null
+      },
+      "allowlist": null,
+      "abandoned_ignored": null,
+      "from_composer_repository": true,
+      "origin": {
+        "kind": "packagist",
+        "registry": "packagist.org",
+        "package_url": "https://packagist.org/packages/phootwork/collection",
+        "local": false
+      },
+      "replacement": null,
+      "replacement_url": null,
+      "note": null,
+      "libyears_unmeasured": "shared_commit",
+      "libyears_at_least": false,
+      "direct": false,
+      "dev": false,
+      "reach": "unreached",
+      "chain": [],
+      "depth": null,
+      "depth_unmeasured": "no_composer_json",
+      "named_in": [],
+      "direct_dependents": [],
+      "signals": [
+        {
+          "id": "S10",
+          "level": "info",
+          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+          "data": {
+            "unchecked": [
+              {
+                "check": "release_dates",
+                "reason": "undated_releases",
+                "blocks": [
+                  "S2",
+                  "S8"
+                ]
+              }
+            ],
+            "blocks": [
+              "S2",
+              "S8"
+            ]
+          }
+        }
+      ],
+      "evidence": "",
+      "allowlist_reason": null,
+      "data_date": "2026-10-14T00:00:00+00:00",
+      "libyears": null,
+      "age": {
+        "installed": null,
+        "installed_unmeasured": "shared_commit",
+        "release": null,
+        "release_unmeasured": "undated_releases",
+        "branch_release": null,
+        "branch_release_unmeasured": "undated_releases",
+        "push": {
+          "at": "2024-10-03T15:44:53+00:00",
+          "years": 2,
+          "level": null
+        },
+        "push_unmeasured": null
+      },
+      "baseline": null,
+      "gate": {
+        "reaches_fail_on": false,
+        "fails": false,
+        "exempt_by": null,
+        "by": [],
+        "basis": null
+      }
+    }
+  ]
+}

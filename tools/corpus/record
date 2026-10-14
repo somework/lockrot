@@ -129,7 +129,7 @@ def _clear() -> None:
     A stale report names packages that the lock does not carry, and every check then declines it for
     the wrong reason.
     """
-    for relative in ('claims/reports-1', 'claims/projects', 'claims/cache'):
+    for relative in ('claims/reports-1', 'claims/reports-2', 'claims/projects', 'claims/cache'):
         shutil.rmtree(os.path.join(FIXTURES, relative), ignore_errors=True)
     explain = os.path.join(FIXTURES, 'explain')
     for name in os.listdir(explain) if os.path.isdir(explain) else []:
@@ -230,27 +230,38 @@ def _write_claims(chosen: dict, cache: str) -> None:
 
 
 def _write_report_2(documents: str) -> int:
-    """The findings of the same packages as each reports-1 file, from that project's report-2 document."""
-    target = os.path.join(FIXTURES, 'claims', 'reports-2')
-    if not os.path.isdir(os.path.join(FIXTURES, 'claims', 'reports-1')):
+    """The findings of the same packages as each reports-1 file, from that project's report-2 document.
+
+    Writes nothing when a project has no document or its document misses a package: a partial
+    recording would let a claims check pass on fewer findings than reports-1 holds.
+    """
+    source = os.path.join(FIXTURES, 'claims', 'reports-1')
+    if not os.path.isdir(source):
         print('!! claims/reports-1 does not exist; record the report-1 claims first', file=sys.stderr)
 
         return 2
-    shutil.rmtree(target, ignore_errors=True)
-    written = 0
-    for name in sorted(os.listdir(os.path.join(FIXTURES, 'claims', 'reports-1'))):
+    recordings = {}
+    missing = []
+    for name in sorted(os.listdir(source)):
         document = read_json(os.path.join(documents, name))
         if document is None:
-            print('!! no report-2 document for %s' % name, file=sys.stderr)
+            missing.append('%s: no report-2 document' % name)
             continue
-        packages = [finding['package'] for finding in
-                    read_json(os.path.join(FIXTURES, 'claims', 'reports-1', name))['findings']]
+        packages = [finding['package'] for finding in read_json(os.path.join(source, name))['findings']]
         findings = [finding for finding in document['findings'] if finding['package'] in packages]
-        write_json_atomic(os.path.join(target, name),
-                          {'lockrot': document['lockrot'], 'generated_at': document['generated_at'],
-                           'findings': findings})
-        written += 1
-    print('%d report-2 claims report(s) recorded' % written)
+        missing.extend('%s: no finding for %s' % (name, package)
+                       for package in sorted(set(packages) - {finding['package'] for finding in findings}))
+        recordings[name] = {'lockrot': document['lockrot'], 'generated_at': document['generated_at'],
+                            'findings': findings}
+    if missing:
+        print('!! nothing recorded:\n' + '\n'.join(missing), file=sys.stderr)
+
+        return 1
+    target = os.path.join(FIXTURES, 'claims', 'reports-2')
+    shutil.rmtree(target, ignore_errors=True)
+    for name, recording in recordings.items():
+        write_json_atomic(os.path.join(target, name), recording)
+    print('%d report-2 claims report(s) recorded' % len(recordings))
 
     return 0
 
