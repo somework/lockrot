@@ -144,10 +144,17 @@ $recordP2 = static function (string $name, ?string $ownDir = null) use ($p2Dir, 
         fwrite(STDERR, \sprintf("p2 %s%s %d\n", $name, $dev ? '~dev' : '', $result->status()));
     }
 };
-/** @return list<string> every source URL that the recorded p2 answer of $name names */
-$releaseSources = static function (string $name, string $dir): array {
-    $raw = @file_get_contents(RecordedHttpClient::pathFor($dir, REPOSITORY_BASE_URL.$name.'.json'));
-    $result = $raw === false ? null : HttpResult::fromEnvelopeJson(REPOSITORY_BASE_URL.$name.'.json', $raw);
+/**
+ * @param list<array{string, string}> $answers [p2 URL, recording directory], the first recorded one wins
+ *
+ * @return list<string> every source URL that the recorded p2 answer of $name names
+ */
+$releaseSources = static function (string $name, array $answers): array {
+    $result = null;
+    foreach ($answers as [$url, $dir]) {
+        $raw = @file_get_contents(RecordedHttpClient::pathFor($dir, $url));
+        $result = $result ?? ($raw === false ? null : HttpResult::fromEnvelopeJson($url, $raw));
+    }
     $json = $result === null || $result->body() === null ? null : json_decode($result->body(), true);
     $urls = [];
     foreach (\is_array($json) ? $json['packages'][$name] ?? [] : [] as $version) {
@@ -184,7 +191,9 @@ foreach ($fixtures as $fixture) {
             continue;
         }
         $sourceUrl = $package->repositoryUrl();
+        $answers = [[REPOSITORY_BASE_URL.$package->name().'.json', $own !== null ? $own.'/p2' : $p2Dir], [REPOSITORY_BASE_URL.$package->name().'.json', $p2Dir]];
         if (preg_match(DRUPAL_NOTIFICATION, $notificationUrls[$package->name()] ?? '', $m) === 1) {
+            $answers = [['https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().'.json', $own !== null ? $own.'/p2' : $p2Dir]];
             foreach (['', '~dev'] as $suffix) {
                 $url = 'https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().$suffix.'.json';
                 $dir = $own !== null ? $own.'/p2' : $p2Dir;
@@ -198,7 +207,7 @@ foreach ($fixtures as $fixture) {
             $recordP2($package->name(), $own !== null ? $own.'/p2' : null);
         }
         // lockrot asks the repository of the highest release, which a renamed or moved project changes.
-        foreach (array_unique(array_merge([$sourceUrl], $releaseSources($package->name(), $own !== null ? $own.'/p2' : $p2Dir))) as $url) {
+        foreach (array_unique(array_merge([$sourceUrl], $releaseSources($package->name(), $answers))) as $url) {
             $repo = $locator->locate($url);
             if ($repo !== null && $repo->forge() === RepoRef::GITHUB) {
                 $githubDir = $own !== null ? $own.'/github' : $ghDir;

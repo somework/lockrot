@@ -89,6 +89,9 @@ final class FixtureCliRun
             copy($projectDir.'/composer.json', $project.'/composer.json');
             copy($projectDir.'/composer.lock', $project.'/composer.lock');
             foreach ($files as $name => $source) {
+                if (!is_dir(\dirname($project.'/'.$name))) {
+                    mkdir(\dirname($project.'/'.$name), 0777, true);
+                }
                 copy($source, $project.'/'.$name);
             }
             $proxy = 'http://127.0.0.1:'.PhpBuiltinServer::closedPort();
