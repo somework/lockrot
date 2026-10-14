@@ -115,10 +115,10 @@ composer config --global gitlab-token.git.drupalcode.org <token>
   `forgejo-domains` does not either. Accept its gap with
   [`accept-unchecked`](configuration.md#accept-unchecked).
 
-On a Drupal site, the recipe removes every `host_not_supported` gap. It does not make the site pass
-`--fail-on=unchecked`: packages from packages.drupal.org keep S10 `undated_releases`, a gap that
-`accept-unchecked` does not accept. A recorded run of the PHAR over public Drupal site locks
-showed both.
+On a Drupal site, the recipe removes the `host_not_supported` gaps of git.drupalcode.org. It does
+not make the site pass `--fail-on=unchecked`: packages from packages.drupal.org keep S10
+`undated_releases`, a gap that `accept-unchecked` does not accept. A recorded run of the PHAR over
+public Drupal site locks showed both.
 
 ## Which Composer repository answers {#two-passes}
 

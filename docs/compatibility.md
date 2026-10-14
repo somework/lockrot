@@ -71,7 +71,7 @@ Nothing is added to these sets, removed from them or reordered within 1.x:
 - `security.status`: `vulnerable`, `clear`, `unchecked`.
 - `security.move_in`: `next_step`, `also`.
 - A finding's standing against the baseline: `known`, `new`, `worsened`.
-- The `kind` of a fact reference and of a rerun's `remove`: `flag`, `advisory`.
+- The `kind` of a move's fact and of a rerun's `remove`: `flag`, `advisory`.
 - A flag's `headline.unit`: `years`, `php`, `reason`, `advisories`.
 - A flag's `headline.source`: `release`, `push`, `branch`.
 - A holder's `source`, in `held_by[]`: `root`, `package`.
@@ -117,7 +117,8 @@ The order decides:
   new, or a known one is rated higher or loses its fix ([baseline.md](baseline.md)).
 - The report's order: verdict, then the security part of the score, then the score, then direct
   before transitive, then package name.
-- The SARIF `rank`, which follows the band of each result's own fact.
+- The SARIF `rank`: a flag result's by the band of its own fact, an advisory result's by its
+  severity.
 
 ### Open sets
 
@@ -322,7 +323,8 @@ verdicts only under these rules:
 
 A committed baseline does not make an upgrade silent. A package that a release starts to grade is
 `new`. A package whose facts worsen (a higher flag, a new advisory, a higher rating or a lost fix)
-is `worsened`. Either one fails the run when it reaches `--fail-on`. An unchanged lock can cross a
+is `worsened`. A `new` finding fails the run when it reaches `--fail-on`. A `worsened` one fails
+when its [gate score](baseline.md#the-gate-score) reaches it. An unchanged lock can cross a
 threshold too, as its packages' releases age ([baseline.md](baseline.md)).
 
 ## Extending lockrot
@@ -374,7 +376,7 @@ The register lists every deprecated or *Experimental* surface:
 
 | Surface | Status | Since | Replacement | Removed no earlier than |
 |---|---|---|---|---|
-| none | — | — | — | — |
+| report-2's `priority` on a finding, and the root `priorities` | Deprecated | 0.14.0 | `verdict`, and the grades in `counts` | report-3 |
 
 ## What lockrot does not do
 

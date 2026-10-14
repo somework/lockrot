@@ -76,7 +76,8 @@ The `2` in `report-2.json` is the `lockrot.schema` value the document carries.
 
 ## Open sets
 
-Objects are open, and so are these sets of values, which grow in minor releases:
+Objects are open. Every set of values that the schema marks with `x-known-values` is open too, and
+grows in minor releases. These are the ones that a reader meets most:
 
 - signal ids: a signal's `id` and S10's `blocks`
 - S10's `check` and `reason`
@@ -99,6 +100,11 @@ Objects are open, and so are these sets of values, which grow in minor releases:
   and the `listed_in` of a `repository_activity_host_not_supported` note's host
 - in report-2, each `*_unmeasured` key of a finding and of its `age`, and the keys of the report's
   `libyears.unmeasured`
+- in report-2, an S9 fix's `kind`, `next_step.kind` and `next_step.reason`, the `kind` of a
+  `gate.by[].facts[]` entry (`flag`, `advisory`, `signal`), and the `check` and `reason` of a
+  `gate.not_applied[]` entry
+- in report-2, `baseline.worsened_by[].why`, `if_applied.assumes[]`, `latest.relation`,
+  `replacement.named_by`, the `basis` of `clears[]` and `adds[]`, and `unverified[].reason`
 - in report-2, `abandoned_ignored.by`, and the `by` and `policy_key` of the abandoned ignore list's
   notes
 - in report-2, the `registry` and `reason` of `security.feeds[]` and of
@@ -157,7 +163,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | `.verdict` at or above `left-behind` | `.lead as $l \| ["abandoned","silent","pinned","left-behind"] \| index($l) != null` |
 | a flag anywhere on the finding | `any(.score.terms[]?; .flag == "old-promise")`: a flag counts exactly when a score term names it |
 | `.priority == "critical"` | unchanged (an alias), or `.verdict == "critical"` |
-| `.verdict == "ok"` | `.verdict == "ok"`. A package that was `ok` with advisories is now graded, with `lead` null |
+| `.verdict == "ok"` | `.verdict == "ok"`. A package with a counted advisory and no maintenance flag is graded, with `lead` null |
 | `.counts.abandoned`, `.counts["left-behind"]` | `.flags["left-behind"].leading`. `counts` holds the seven verdicts, so `.counts["left-behind"]` is null |
 | `.counts.ok`, `.counts.finished`, `.counts.unknown` | the same keys. A package with a counted advisory is graded, not `ok`, `finished` or `unknown` |
 | "has an advisory": `any(.signals[]; .id == "S9")` | unchanged, or `.security.status == "vulnerable"` |
@@ -207,7 +213,10 @@ them, and `grep` on the raw file does not.
 ## What the report schema types
 
 `report-2.json` holds every nested key, with a description for each. Every report-2 document
-carries every field that this page names: a nullable field is written as null, never left out.
+carries every field that this page names: a nullable field is written as null, never left out. Two
+shapes leave out the parts that do not apply: a score of 0 carries only `model`, `total`, `exact`,
+`accepted` and `text`, and a `security` block that is `clear` or `unchecked` has no `worst`,
+`counts`, `fix_kind`, `installed_branch_fixes`, `move_in`, `gets` or `partial`.
 
 ### The document
 
@@ -293,12 +302,12 @@ carries every field that this page names: a nullable field is written as null, n
 | `strict_network` | boolean | Whether `--strict-network` was on |
 | `include_dev` | boolean | Whether the run walked `require-dev` |
 | `mode` | string | `check`, or `generate_baseline` for `--generate-baseline`, which records the findings and judges none. An open set |
-| `thresholds` | object | `release-warn-years`, `release-high-years`, `push-warn-years` and `push-high-years` ([keys](configuration.md#extralockrot-keys)) |
+| `thresholds` | object or null | `release-warn-years`, `release-high-years`, `push-warn-years` and `push-high-years` ([keys](configuration.md#extralockrot-keys)) |
 | `flag_ids`, `verdicts`, `graded_verdicts`, `signal_ids` | array | The flags in flag order, the seven verdicts, the four grades, and the signal ids |
 | `fix_model`, `text_grammar` | integer | The id of the fix classification, and the version of the sentence grammars |
 | `score_model` | object | The whole score model: weights, severities, fix kinds, bands, sort and rules ([Score model 1](verdicts/model-1.md)) |
 | `score_rules_used` | object | Rule id → the number of findings on which the rule changed or decided a number. Null for `sort` |
-| `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each repository that publishes advisories with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
+| `advisory_lookup` | object | `scope` and `scope_source`, the packages asked and not asked, and each Composer repository that can publish advisories, with its `outcome` ([Which advisories count](verdicts.md#which-advisories-count)) |
 
 ### The gate
 

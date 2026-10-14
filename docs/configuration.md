@@ -364,11 +364,12 @@ names, for one of three reasons:
 |---|---|---|
 | `host_not_supported` | The repository is on a host that lockrot cannot ask, such as a Forgejo, Gitea or Subversion host | `host`, `repository` or `package` |
 | `no_feed` | No configured Composer repository publishes advisories, such as a mirror without a feed | `repository` (the Composer repository) or `package` |
-| `not_from_composer_repository` | The package is installed from vcs, or from an origin that lockrot cannot tell | `repository` (its vcs URL) or `package`. For an unknown origin, by `package` |
+| `not_from_composer_repository` | The package is installed from vcs, or from an origin that lockrot cannot tell | `host`, `repository` (its vcs URL) or `package`. For an unknown origin, by `package` |
 
 Every other reason stays S10, whatever the list says: `offline`, `rate_limit`, `lookup_failed`,
 `install_time_budget`, `composer_too_old`, `undated_releases`, `releases_unknown` and the rest. A
-rerun with a token, the network or a newer Composer closes those.
+rerun with a token, the network or a newer Composer closes most of them. `undated_releases` can stay
+on every run ([What `--fail-on=unchecked` fails on](ci.md#what-unchecked-fails-on)).
 
 - **A scope matches the package, never the cause of the gap.** So
   `{"check": "release_metadata", "host": "github.com"}` accepts every vcs package on github.com
@@ -398,7 +399,7 @@ line.
 
 **Gates.** `--fail-on=unchecked` does not fail on an accepted check. An accepted `no_feed` still
 leaves the advisories unchecked, so a grade or `vulnerable` value cannot read them, and the `gate:`
-line names the package. An accepted check writes no `lockrot/unchecked` record in SARIF or GitLab.
+line counts the package. An accepted check writes no `lockrot/unchecked` record in SARIF or GitLab.
 
 **Errors** (exit `2`): a `check` that is not one of the three, no scope or two scopes, a blank scope
 value or reason, a `host` that is not a lower-case host name with an optional port from 1 to 65535,

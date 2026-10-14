@@ -48,7 +48,8 @@ when it reaches any value of the list:
     | A grade, with `composer audit` parity for development packages | `high,vulnerable-high`, with `--dev` |
 
 - **`--dev` and a grade.** packages-dev halves a package's whole score, so with
-  `--dev --fail-on=high` a high advisory in a development package is `medium` and passes. A
+  `--dev --fail-on=high` a high advisory with a reachable fix in a development package is `medium`
+  and passes. A
   `vulnerable-*` value reads the advisory's own severity, so add one for parity with
   `composer audit`.
 
@@ -145,9 +146,8 @@ The JSON report writes the line as `gate.text` and the counts as fields: `gate.f
 script on the fields. The line is prose.
 
 A run that writes `json`, `sarif`, `gitlab` or `html` to stdout also writes `lockrot: ` and the
-`gate:` line to stderr when the gate fails, so the job log says why the job exits `1`. Every 0.14.x
-run that gates, or writes `json`, `sarif`, `gitlab` or a baseline, also prints one upgrade notice
-on stderr. Read stdout alone: do not merge stderr into a report with `2>&1`.
+`gate:` line to stderr when the gate fails, so the job log says why the job exits `1`. Read stdout
+alone: do not merge stderr into a report with `2>&1`.
 
 ## What `--fail-on=unchecked` fails on {#what-unchecked-fails-on}
 
@@ -162,9 +162,9 @@ that lockrot did not run on a package it judges. It catches a workflow that does
 - a package installed from vcs, or from an origin that lockrot cannot tell
   (`not_from_composer_repository`)
 
-A package installed from a path is the project's own code: its gaps are skips, and `unchecked`
-never fails on them. Under a baseline, a `known` finding is exempt, and a `worsened` one fails on
-whatever S10 it carries.
+A package installed from a path is the project's own code: its release and activity gaps are
+skips. An advisory lookup that did not complete is S10 for it too. Under a baseline, a `known`
+finding is exempt, and a `worsened` one fails on whatever S10 it carries.
 
 Most gaps close on a rerun. For a self-hosted GitLab, list the host in `gitlab-domains`
 ([Self-hosted GitLab](internals.md#self-hosted-gitlab)). Three gaps stay on every run. Accept each
@@ -196,7 +196,7 @@ one in [`extra.lockrot.accept-unchecked`](configuration.md#accept-unchecked), wi
   run wrote then shows as fixed in code scanning and in the merge-request widget, not as
   accepted. The json report holds what was accepted: `unchecked_accepted[]` on each finding and
   `packages_unchecked_accepted` at the root.
-- An accepted `no_feed` still leaves the advisories unchecked: the `gate:` line names the package
+- An accepted `no_feed` still leaves the advisories unchecked: the `gate:` line counts the package
   in its `advisories not applied` clause.
 - On Composer below 2.4 (the plugin on an LTS Composer, 2.2 or 2.3), advisories are never checked,
   and `accept-unchecked` cannot accept that gap. Upgrade Composer, or run the
@@ -246,6 +246,7 @@ record gets one mark, by the fact it stands for, so the marks agree with the exi
 |---|---|---|---|---|
 | Known | `notice` | `note`, with `suppressions` | `info` | The baseline covers the record's fact |
 | Fails | `error` | `error` | `major` | The finding fails, and the record's own fact reaches a failing value (below) |
+| Not graded | `notice` | `note` | `info` | A `lockrot/unchecked` record that fails no value, or a score-0 record under `--all` |
 | Other | `warning` | `warning` | `minor` | Anything else |
 
 A record's fact reaches a failing value when:
@@ -265,12 +266,12 @@ mark.
 - **SARIF `rank`** is the band of the record's own fact: `100.0` for critical, `75.0` high, `50.0`
   medium, `25.0` low. An advisory result ranks by its severity: `95.0`, `80.0`, `55.0` (medium and
   unrated) and `20.0`. An advisory rule carries the `security-severity` that code scanning reads:
-  `9.5`, `8.0`, `5.5` and `2.0`, none for an unrated advisory.
+  `9.5`, `8.0`, `5.5` and `2.0`, and `null` for an unrated advisory.
 - **The run-level record.** When advisories were not checked, `github`, `sarif` and `gitlab` add
   one record for the run: `lockrot/advisories-unchecked`. It is `error` (`major`) only when
   `unchecked` is a failing value and a finding fails it on an advisory gap. Otherwise it is
   `warning` (`minor`).
-- **A finding with S10 and nothing counted** (an `ok` or `unknown` finding) gets its own
+- **A finding with S10 and nothing counted** (score 0, whatever its verdict) gets its own
   `lockrot/unchecked` record when `unchecked` is active. `sarif` and `gitlab` also write it under
   `--all`.
 - **GitHub caps annotations per step** (10 errors and 10 warnings). The report's sort puts the

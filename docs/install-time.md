@@ -38,8 +38,10 @@ The block is at most ten lines, in this order:
 
 - The header, with the counts per grade.
 - One line per graded package, in the report's order: its grade, its score, its counted flags and
-  its move, cut at 160 characters. A `vulnerable` flag adds its advisories:
-  `vulnerable (critical advisory; 15 in all)`. `… and <n> more` replaces the lines that do not fit.
+  its move, cut at 160 characters. When `vulnerable` is the only counted flag, it adds its
+  advisories: the deciding severity and the count (`vulnerable (critical advisory; 15 in all)`), or
+  the count alone for one advisory or for low ones (`vulnerable (2 low advisories)`).
+  `… and <n> more` replaces the lines that do not fit.
 - `update now:` with every package that `composer update` fixes, shown or not.
 - The [`gate:` line](ci.md#reading-the-gate-line), when the gate fails.
 - Up to two notes, in the order the run wrote them ([run notes](notes.md)). A note that does not

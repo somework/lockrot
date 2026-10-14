@@ -26,8 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **All formats:** a counted security advisory flags the package `vulnerable` and adds
   its severity's points, doubled when no release fixes it or none runs on the target PHP.
   `ignore[]` entries no longer hide advisories. `vulnerable` decides at once, an exception to the
-  rule that a new signal ships as evidence for one minor release. Action: run once without a gate.
-  ([Verdict changes](docs/compatibility.md#verdict-changes))
+  evidence-first rule for a new signal, because 0.14 changes every verdict anyway. Action: run once
+  without a gate. ([Verdict changes](docs/compatibility.md#verdict-changes))
 - **Breaking:** **All formats:** the raise for advisories not fixed on the installed branch is gone,
   so a left-behind package with only medium or low advisories can drop a grade. Action: if you gate
   at `critical` or `high`, run once without the gate and compare each finding's verdict.
@@ -130,12 +130,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **github:** the title reads `lockrot: <verdict> — <flags>`, with `(<severity>
   advisory)` after `vulnerable`. Action: key on the annotation's file and line, not its title.
   ([Compatibility](docs/compatibility.md#finding-identity))
-- **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline, prints one
-  upgrade notice on stderr that links the upgrade page. Read stdout alone (do not merge `2>&1`).
-  `-q` also silences the report. ([Upgrading to 0.14](docs/changes/0.14.md))
-- **table, markdown, github, install-time, `--explain`:** each finding prints its flags, its score
-  line, its move and one evidence line per counted flag, under its grade. The footer adds the
-  `flags:`, `depth:`, `security:` and `advisories:` lines. ([In CI](docs/ci.md))
 - **Breaking:** **Self-update, Baseline, Config:** `self-update` from 0.13 lands on 0.14 at once.
   lockrot 0.13 cannot read baseline-2 or config-2. 0.13 reads an `ignore[]` entry with `flags` as an
   entry for the whole package, and warns. Action: upgrade every job, then regenerate the baseline.
@@ -153,6 +147,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** **Config:** an `ignore[]` entry whose `flags` key has another shape (`"stale"`,
   `["vulnerable"]`) now exits 2. Action: list maintenance flag ids, or drop the key.
   ([The allowlist](docs/configuration.md#the-allowlist))
+- **CLI:** every 0.14.x run that gates, or writes json, sarif, gitlab or a baseline, prints one
+  upgrade notice on stderr that links the upgrade page. Read stdout alone (do not merge `2>&1`).
+  `-q` also silences the report. ([Upgrading to 0.14](docs/changes/0.14.md))
+- **table, markdown, github, install-time, `--explain`:** each finding prints its flags, its score
+  line, its move and one evidence line per counted flag, under its grade. The footer adds the
+  `flags:`, `depth:`, `security:`, `fix, by package:`, `update now:` and `advisories:` lines.
+  ([In CI](docs/ci.md))
 - **All formats:** findings sort by verdict, then the points of the deciding advisory, then score.
 - **json:** `libyears_unmeasured` and the keys of `libyears.unmeasured` follow `metadata.status`
   and `age`. `metadata_unavailable` is `unavailable` or `not_found`. `no_stable_release_date` is
@@ -161,9 +162,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Action: match the new ids in jq. ([Libyears](docs/verdicts.md#libyears))
 - **All formats:** the run note `not_from_composer_repository` says whether the run asked those
   packages' advisories (`data.advisories_asked`). ([Run notes](docs/notes.md#not_from_composer_repository))
-- **html:** the page is lockrot-report 0.14.0, which reads report-2 only. A lockrot 0.14 run is not
-  affected, because it writes report-2. A page that 0.13 wrote keeps opening: it embeds its own
-  renderer. ([changelog](https://github.com/somework/lockrot-report/blob/v0.14.0/CHANGELOG.md))
+- **html:** the page is lockrot-report 0.14.0, which reads report-2 only.
+  ([changelog](https://github.com/somework/lockrot-report/blob/v0.14.0/CHANGELOG.md))
 - **html:** the page title and description count with one singular rule ("1 package") and name an
   empty lock. The description lists every grade in grade order.
 - **All formats:** the run note `advisories_not_checked` says that no finding is graded for an
@@ -180,8 +180,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cause keys of `counts` and the html details block's `activity`. Action: read `score`, `security`,
   `run.flag_ids`, `run.gates[].kind`, `baseline.recorded.lead`, the root `flags.<flag>.leading`
   and the finding's `activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
-- **Breaking:** **json (explain):** the explanation's top-level `activity` moves to `finding`.
-  Action: read `.finding.activity`. ([Migrating](docs/schema.md#migrating-from-report-1))
+- **Breaking:** **json (explain):** the explanation's top-level `target_php`, `project_php`,
+  `thresholds` and `activity` move to `run` and `finding`. Action: read `.run.target_php`,
+  `.run.project_php`, `.run.thresholds` and `.finding.activity`.
+  ([Migrating](docs/schema.md#migrating-from-report-1))
 
 ### Fixed
 

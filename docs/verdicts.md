@@ -572,7 +572,7 @@ The score line writes the sum, and it evaluates to the score:
 ```text
 24 = left-behind 16 ÷ 2 transitive + vulnerable 16 [high advisory]
 18 = (silent 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive
-16 = vulnerable 8 [unrated advisory 8 × 2: no reachable fix] ÷ 2 dev
+8 = vulnerable 16 [unrated advisory 8 × 2: no reachable fix] ÷ 2 dev
 ```
 
 - A corroborating flag prints its share: `old-promise 4 [¼ of 16]`.
@@ -726,8 +726,8 @@ the finding tell the cases apart:
   project's own code, or because the answer is not a gap (a 404). It raises no S10 and reaches no
   gate.
 
-A row with S10 adds `checks missing: S2, S8 (undated releases)`. A score-0 row reads
-`ok (not all checks ran: S3, S4)`.
+A row with S10 adds `checks missing: S2, S8 (undated releases)`. A score-0 row, which the text
+formats print only under `--all`, keeps its verdict and adds the same `checks missing:` line.
 
 | Check | S10 `reason` | Cause | Blocks |
 |---|---|---|---|

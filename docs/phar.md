@@ -220,13 +220,13 @@ release each rule held back:
 | Rule | A release that breaks it | What `self-update` does |
 |---|---|---|
 | **Same major version.** The major version is the first number: all of 0.x is one line, and 0.x to 1.0 is a major step | Is in a later major version | Prints it, does not install it |
+| **A PHP this machine has** | Needs a newer PHP than the running one, or gives a malformed PHP floor (not `major.minor.patch`) | Skips it |
+| **A key this archive carries** | Is signed with a self-update key the running archive does not carry | Skips it. After a planned key rotation, this rule makes the transition release the step in between ([SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#key-custody-and-rotation)) |
 
 All of 0.x is one line, so `self-update` from 0.13 installs 0.14 at once, and every later 0.x minor
 too. There is no guard. A job that runs `self-update` unattended moves to each minor on the day it is
 published. To stay on a minor, stop calling `self-update` in that job and download a pinned release
 ([In CI](#in-ci)).
-| **A PHP this machine has** | Needs a newer PHP than the running one, or gives a malformed PHP floor (not `major.minor.patch`) | Skips it |
-| **A key this archive carries** | Is signed with a self-update key the running archive does not carry | Skips it. After a planned key rotation, this rule makes the transition release the step in between ([SECURITY.md](https://github.com/somework/lockrot/blob/main/SECURITY.md#key-custody-and-rotation)) |
 
 `--allow-major` takes the newest release of the next major version that has a stable release, and
 no further: from 1.x it installs the newest 2.x even when 3.0 exists. `self-update` suggests
@@ -250,7 +250,7 @@ What lockrot 0.13 does with the files that 0.14 writes, on a machine that has no
 | 0.14 file or key | lockrot 0.13 |
 |---|---|
 | A baseline-2 file | Exits `2` |
-| A `fail-on` list, or a `vulnerable-*` value | Exits `2`: its configuration schema refuses them |
+| A `fail-on` list, or a `vulnerable` or `vulnerable-*` value | Exits `2`: its configuration schema refuses them |
 | An `ignore` entry with `flags` | Warns about an unknown key, then accepts every flag of that package |
 | `accept-unchecked` | Warns about an unknown key and ignores it, so `--fail-on=unchecked` fails on 0.13 where 0.14 accepted the gap |
 | `advisory-lookup` | Warns about an unknown key and ignores it, keeping its own boundary: it asks only packages from a Composer repository |

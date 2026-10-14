@@ -60,7 +60,7 @@ final class ClosedSets
             '`security.status`' => [$definition('securityVulnerable', 'properties', 'status'), $definition('securityClear', 'properties', 'status'), $definition('securityUnchecked', 'properties', 'status')],
             '`security.move_in`' => [$definition('securityVulnerable', 'properties', 'move_in', 'oneOf', '0')],
             'A finding\'s standing against the baseline' => [$definition('findingBaseline', 'oneOf', '0', 'properties', 'status')],
-            'The `kind` of a fact reference and of a rerun\'s `remove`' => [$definition('factKind')],
+            'The `kind` of a move\'s fact and of a rerun\'s `remove`' => [$definition('factKind')],
             'A flag\'s `headline.unit`' => [$definition('headline', 'properties', 'unit')],
             'A flag\'s `headline.source`' => [$definition('headline', 'properties', 'source', 'oneOf', '0')],
             'A holder\'s `source`, in `held_by[]`' => [$definition('heldBy', 'properties', 'source')],
