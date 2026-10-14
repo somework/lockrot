@@ -546,6 +546,9 @@ navigate it. The page carries the run as JSON in
 [contract](compatibility.md#what-is-not-contract). A script that extracts it guards on its
 `$schema` first.
 
+The page reads report-2 only. Each page embeds its own renderer, so a page that an older lockrot
+wrote keeps opening as it did.
+
 Without `--all` the page carries release detail for graded packages. `--all` adds that detail for
 every package, so the file grows with the lock.
 
