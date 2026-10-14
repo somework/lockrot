@@ -12,6 +12,9 @@ declare(strict_types=1);
 //   php tools/corpus/differential.php --model-input <phar> <dir>
 //                                                            runs a 0.13 PHAR the same way and writes each run's html data
 //                                                            block, the model's input, into <dir>, and <dir>/manifest.json
+//   php tools/corpus/differential.php --provenance [<model dir> <cache dir>]
+//                                                            checks only that the model documents and the cache are the ones
+//                                                            that provenance.json describes
 //   php tools/corpus/differential.php --adopt-model <reports dir> <input dir>
 //                                                            copies the model's documents into tests/fixtures/corpus/model-report-2/
 //                                                            and writes its provenance.json
@@ -89,12 +92,20 @@ if (($argv[1] ?? null) === '--adopt-model') {
     exit(0);
 }
 
-$provenance = json_decode((string) @file_get_contents(MODEL.'/provenance.json'), true);
+$provenanceOnly = ($argv[1] ?? null) === '--provenance';
+[$model, $cache] = $provenanceOnly && isset($argv[2], $argv[3]) ? [$argv[2], $argv[3]] : [MODEL, CACHE];
+$provenance = json_decode((string) @file_get_contents($model.'/provenance.json'), true);
 if (!is_array($provenance)) {
-    fwrite(STDERR, "differential: tests/fixtures/corpus/model-report-2/provenance.json is missing or not JSON\n");
+    fwrite(STDERR, "differential: $model/provenance.json is missing or not JSON\n");
     exit(2);
 }
-$problems = provenanceProblems($provenance);
+$problems = provenanceProblems($provenance, $model, $cache);
+if ($provenanceOnly) {
+    foreach ($problems as $line) {
+        fwrite(STDERR, 'differential: '.$line."\n");
+    }
+    exit($problems === [] ? 0 : 1);
+}
 $write = ($argv[1] ?? null) === '--write' ? ($argv[2] ?? '') : null;
 $allowed = allowedEntries();
 $used = array_fill(0, count($allowed), 0);
@@ -231,12 +242,12 @@ function recordingFiles(array $reads): array
 }
 
 /** @return list<string> every file of the cache, as a path below it, sorted */
-function cacheFiles(): array
+function cacheFiles(string $cache = CACHE): array
 {
     $files = [];
     /** @var SplFileInfo $file */
-    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(CACHE, FilesystemIterator::SKIP_DOTS)) as $file) {
-        $files[] = substr($file->getPathname(), strlen(CACHE) + 1);
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($cache, FilesystemIterator::SKIP_DOTS)) as $file) {
+        $files[] = substr($file->getPathname(), strlen($cache) + 1);
     }
     sort($files);
 
@@ -244,28 +255,29 @@ function cacheFiles(): array
 }
 
 /** The sha256 of the lines "<sha256>  <path>", one per cache file, sorted by path. */
-function cacheDigest(): string
+function cacheDigest(string $cache = CACHE): string
 {
-    return hash('sha256', implode('', array_map(static fn (string $file): string => hash_file('sha256', CACHE.'/'.$file).'  '.$file."\n", cacheFiles())));
+    return hash('sha256', implode('', array_map(static fn (string $file): string => hash_file('sha256', $cache.'/'.$file).'  '.$file."\n", cacheFiles($cache))));
 }
 
 /**
- * What provenance.json says that the files do not hold: the clock, the cache digest and each model document's sha256.
+ * What the provenance.json of $model says that the files do not hold: the clock, the digest of $cache and each model
+ * document's sha256.
  *
  * @param array<string, mixed> $provenance
  *
  * @return list<string>
  */
-function provenanceProblems(array $provenance): array
+function provenanceProblems(array $provenance, string $model = MODEL, string $cache = CACHE): array
 {
     $problems = [];
     if (array_values(array_unique($provenance['clock'])) !== [CLOCK]) {
         $problems[] = 'the model documents read another clock than '.CLOCK;
     }
-    if ($provenance['cache']['sha256'] !== cacheDigest()) {
-        $problems[] = 'tests/fixtures/corpus/cache/ is not the cache that the model read: its digest differs from provenance.json';
+    if ($provenance['cache']['sha256'] !== cacheDigest($cache)) {
+        $problems[] = 'the cache is not the one that the model read: its digest differs from provenance.json';
     }
-    $documents = array_values(array_diff(array_map('basename', glob(MODEL.'/*.json') ?: []), ['provenance.json']));
+    $documents = array_values(array_diff(array_map('basename', glob($model.'/*.json') ?: []), ['provenance.json']));
     $outputs = array_keys($provenance['outputs']);
     $expected = array_map(static fn (string $id): string => $id.'.json', array_keys(runs()));
     sort($documents);
@@ -275,8 +287,8 @@ function provenanceProblems(array $provenance): array
         $problems[] = 'the model documents are not the ones of provenance.json outputs, one per run';
     }
     foreach ($provenance['outputs'] as $name => $sha256) {
-        if (!is_file(MODEL.'/'.$name) || hash_file('sha256', MODEL.'/'.$name) !== $sha256) {
-            $problems[] = 'tests/fixtures/corpus/model-report-2/'.$name.' differs from its sha256 in provenance.json';
+        if (!is_file($model.'/'.$name) || hash_file('sha256', $model.'/'.$name) !== $sha256) {
+            $problems[] = 'the model document '.$name.' differs from its sha256 in provenance.json';
         }
     }
 

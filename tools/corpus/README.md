@@ -86,12 +86,13 @@ once with its packages.drupal.org answers, and once with that advisory lookup fa
 only the answers in `tests/fixtures/corpus/cache/`, at one clock.
 
 Each reviewed difference is an entry of `tests/fixtures/corpus/model-divergences.json`, with its
-reason. An entry names a path. An entry with `count` matches exactly that many cells. An entry
-without `count` names the app, the package and both values. The run fails on these cases:
+reason. An entry names one cell: the run, the package, the path and both values. An entry with
+another key, such as `count`, stops the run with exit 2. The run fails on these cases:
 
-- a difference that no entry allows, or an entry that matches the wrong number of cells
+- a difference that no entry allows, or an entry that does not occur exactly once
 - a cache or a model document that `tests/fixtures/corpus/model-report-2/provenance.json` does not
-  describe
+  describe. `differential.php --provenance` runs this check alone, and `CorpusProvenanceTest` plants
+  one changed byte in each.
 - a recording that neither lockrot nor the v0.13.0 PHAR reads.
 
 To renew the model side, record the answers once with `tools/report/record --corpus`. Then delete
