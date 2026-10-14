@@ -164,7 +164,7 @@
       abandoned    marked abandoned by its registry
       age: installed 2.0.2 released 2024-09-05 (2.0 years ago), its newest release; last push 2025-12-11 (0.8 years
            ago)
-  doctrine/cache 2.2.0  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, doctrine/orm, pagerfanta/doctrine-orm-adapter, spiriitlabs/form-filter-bundle  ·  abandoned
+  doctrine/cache 2.2.0  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle,
           doctrine/doctrine-migrations-bundle and 3 more: replace or update them; the newest releases of
@@ -248,7 +248,7 @@
           update them
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.7
                    years ago); last push 2018-02-12 (8.6 years ago)
-  symfony/security-guard v5.4.45  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-trusted-device, symfony/security-bundle  ·  abandoned
+  symfony/security-guard v5.4.45  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle,
           friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update them; the newest release of

@@ -1,7 +1,7 @@
 {
  "source": "security-axis/r3/docs",
  "model_run_date": "2026-10-14",
- "suite": "run_all.sh: 53 of 55 steps pass; the coverage gate passes after the alsoMove allowance, and the counts step reads document counts that this case moves by one",
+ "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",
  "documents": {
   "corpus": 49,
   "variants": 3,

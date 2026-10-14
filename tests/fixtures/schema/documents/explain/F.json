@@ -402,6 +402,7 @@
     "newest_dated_released": "2026-09-23T14:40:04+00:00",
     "dated_by": null,
     "php": ">=7.2",
+    "highest_php": ">=7.2",
     "admits_target_php": true,
     "admits_project_php": true,
     "php_blocked_by": null,
