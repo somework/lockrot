@@ -9,12 +9,12 @@
     {
       "path": "S9.fix.held_by*",
       "model": [],
-      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder (SPEC-0.14.md §5.6)."
+      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
     },
     {
       "path": "next_step.held_by",
       "model": [],
-      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder (SPEC-0.14.md §5.6)."
+      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
     },
     {
       "path": "next_step.version",
@@ -31,7 +31,7 @@
         "crosses_major",
         "transitive"
       ],
-      "reason": "lockrot names the holders of the move and says holders. The model reads no holder and says transitive for a transitive move (SPEC-0.14.md §5.6)."
+      "reason": "lockrot names the holders of the move and says holders. The model reads no holder and says transitive for a transitive move."
     },
     {
       "path": "next_step.composer_moves_because",
@@ -42,7 +42,7 @@
       "model": [
         "crosses_major"
       ],
-      "reason": "lockrot names the holders of the move and says holders. The model reads no holder and says transitive for a transitive move (SPEC-0.14.md §5.6)."
+      "reason": "lockrot names the holders of the move and says holders. The model reads no holder and says transitive for a transitive move."
     },
     {
       "package": "league/commonmark",

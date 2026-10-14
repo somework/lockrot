@@ -6,7 +6,7 @@ The comparison covers the verdict words, signal ids, signal summaries and libyea
 change has one of three classes, because a measured value that becomes null differs from a number
 that moves.
 
-The verdict words depend on `lockrot.schema` (SPEC-0.14.md §8.7.5). Two report-1 runs compare
+The verdict words depend on `lockrot.schema`. Two report-1 runs compare
 `verdict` and `priority`. Two report-2 runs compare `verdict` and `lead`. A report-2 verdict is a
 grade, so a report-1 run against a report-2 run compares only report-2's `lead` with report-1's
 `verdict`, which held the same cause word.

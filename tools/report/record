@@ -8,7 +8,7 @@ declare(strict_types=1);
 //                                              writes it only when the two recordings are byte-identical
 //   tools/report/record --baselined <scenario>  records one real baselined scenario the same way
 //   tools/report/record --all-baselined         records every baselined scenario
-//   tools/report/record --corpus                records the answers of the 12 apps of tests/fixtures/apps into
+//   tools/report/record --corpus                records the answers of the apps of tests/fixtures/apps into
 //                                              tests/fixtures/corpus/cache/, once, from the network (GITHUB_TOKEN)
 //
 // The bundle is lockrot's own output for the cases of tests/fixtures/flags/cases.json, hydrated with

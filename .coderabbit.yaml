@@ -83,9 +83,9 @@ reviews:
     - '!tests/fixtures/baselined/*/lockrot-baseline.json'
     - '!tests/fixtures/baselined/*/provenance.json'
     - '!tests/fixtures/baselined/*/http/**'
-    # Written only by tools/report/record --corpus: the recorded answers of the 12 apps.
+    # Written only by tools/report/record --corpus: the recorded answers of tests/fixtures/apps.
     - '!tests/fixtures/corpus/cache/**'
-    # The model's report-2 of the 12 apps, written outside this repository from the v0.13.0 PHAR's
+    # The model's report-2 of those apps, written outside this repository from the v0.13.0 PHAR's
     # reports (tools/corpus/differential.php --model-input). model-divergences.json stays reviewed.
     - '!tests/fixtures/corpus/model-report-2/**'
     # Written only by tools/schema/node/emit_bundle.js from the recorded bundle. CI rebuilds it and fails on a diff.

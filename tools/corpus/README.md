@@ -73,6 +73,23 @@ time. Then run:
 It also refuses two runs that are further apart than lockrot keeps a repository answer, because they
 then read different upstream data.
 
+`diff` reads `lockrot.schema` of each document. Two report-1 runs compare `verdict` and `priority`,
+and two report-2 runs compare `verdict` and `lead`. A report-2 verdict is a grade, so a report-1 run
+against a report-2 run prints `report-1 vs report-2: verdicts not compared`. It then compares only
+`lead` with report-1's `verdict`.
+
+## The differential against the model
+
+`php tools/corpus/differential.php` runs `bin/lockrot` on each app of `tests/fixtures/apps` and
+compares each finding of report-2 with the model's document for the same lock. Both sides read only
+the answers in `tests/fixtures/corpus/cache/`, at one clock. Each reviewed difference is an entry of
+`tests/fixtures/corpus/model-divergences.json`, with its reason. The run fails on any other
+difference, and on an entry that matches none.
+
+The model reads 0.13 reports, so `differential.php --model-input <v0.13.0 PHAR> <dir>` writes its
+input over the same answers. `tests/fixtures/corpus/model-report-2/provenance.json` names the PHAR,
+the sha256 of every input and the clock. Record the answers once with `tools/report/record --corpus`.
+
 The exit codes are:
 
 | Code | Meaning |
@@ -145,6 +162,7 @@ inherit lockrot's PHP floor.** It has no `requirements.txt`, ruff or pytest and 
 | `lockrot_corpus/runner.py` | running an archive over the corpus, resumably |
 | `lockrot_corpus/load.py` | turning a finished run into documents, and refusing what is not one |
 | `lockrot_corpus/diff.py` | comparing two runs, and refusing incomparable ones |
+| `differential.php` | lockrot's report-2 on the apps of `tests/fixtures/apps` against the model's documents |
 
 ## When to run it
 

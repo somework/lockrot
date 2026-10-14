@@ -2,8 +2,8 @@
 <?php
 
 declare(strict_types=1);
-// The corpus differential (SPEC-0.14.md §7.11, PLAN-0.14.md PR 7c): lockrot's report-2 on the 12 apps of tests/fixtures/apps
-// against the model's report-2 for the same locks.
+// The corpus differential: lockrot's report-2 on the apps of tests/fixtures/apps against the model's report-2 for the same
+// locks.
 //
 //   php tools/corpus/differential.php                         runs bin/lockrot on each app and diffs it against the model
 //   php tools/corpus/differential.php --write <dir>           also writes lockrot's documents into <dir>, with the masks of
