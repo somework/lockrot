@@ -1,0 +1,70 @@
+{
+  "cache": {
+    "files": 2631,
+    "path": "tests/fixtures/corpus/cache",
+    "sha256": "5509484daa936e91d93eb3667c2d03f46d128a5096dfc15d20ee5d1adb33c12b",
+    "sha256_of": "the lines \"<sha256>  <path below the cache>\", one per file, sorted by path"
+  },
+  "clock": {
+    "BookStackApp_BookStack": "2026-10-14T00:00:00+00:00",
+    "PrestaShop_PrestaShop": "2026-10-14T00:00:00+00:00",
+    "drupal_drupal": "2026-10-14T00:00:00+00:00",
+    "firefly-iii_firefly-iii": "2026-10-14T00:00:00+00:00",
+    "grokability_snipe-it": "2026-10-14T00:00:00+00:00",
+    "koel_koel": "2026-10-14T00:00:00+00:00",
+    "magento_magento2": "2026-10-14T00:00:00+00:00",
+    "matomo-org_matomo": "2026-10-14T00:00:00+00:00",
+    "mautic_mautic": "2026-10-14T00:00:00+00:00",
+    "monicahq_monica": "2026-10-14T00:00:00+00:00",
+    "nextcloud_3rdparty": "2026-10-14T00:00:00+00:00",
+    "wallabag_wallabag": "2026-10-14T00:00:00+00:00"
+  },
+  "fail_on": "high",
+  "model": {
+    "spec_flags_r3.py": "3065840edbade87609272111bf4c9e4a86bb70efd9cc1fc550ac189dab9b1015",
+    "spec_flags_r3_docs.py": "1c2af7517e1261ac96b1ba762e03b5655f1c01de8f79b60742cf6154456d25ab"
+  },
+  "model_inputs": {
+    "options": [
+      "--target-php=8.4",
+      "--all",
+      "--format=html"
+    ],
+    "phar": {
+      "release": "v0.13.0",
+      "sha256": "935883f2d2f52ce0f801f9ede846ee5eb42565aa5fd57b47137a82db8c611b1f",
+      "verified_by": "gh attestation verify --repo somework/lockrot"
+    },
+    "sha256": {
+      "BookStackApp_BookStack.json": "f565b2affdbee16ca9204ac184270434f3492d3bd1d37ebd00720c4a15355007",
+      "PrestaShop_PrestaShop.json": "c5d6d8761721ccef3ef3d87da0fd59329130947bcc8ce8cce754df58f89a45f2",
+      "drupal_drupal.json": "5dda320404f78b192b8792fef8b32765c97275798efab9a771c3e20d5d792b15",
+      "firefly-iii_firefly-iii.json": "ccc7e900b7c4994cad79979f170e23694ee4937538ebad1702cef85de0943a06",
+      "grokability_snipe-it.json": "dbe82458123b684372cc54c79a98d2e5e54a8e2fc3b3a45f43096846a27273fd",
+      "koel_koel.json": "92563c6824a1f5e841bc569d17dda569acc1a6d84f766657edb3d4d0915584f8",
+      "magento_magento2.json": "5f6ea73cfd3dd927e8fb3fae03fecf4f62b1a8bdd021c06a02659262a355c950",
+      "matomo-org_matomo.json": "6d1b9f40d3b8c2de5caa1ffda3595b10fdaf4cd0f39608c6a336200d0826e048",
+      "mautic_mautic.json": "bd122db1c3ee61aec889a5416c5456b143d1c73676c50a5bfd392b7255883078",
+      "monicahq_monica.json": "53fb8c54e49b7b03408d125c982ac1829f23d3c05828a930731d67264fa4c476",
+      "nextcloud_3rdparty.json": "144302a45a19ef827867139eec686e02cb5c82b9cfe917ff77efec7de79fd413",
+      "wallabag_wallabag.json": "1be1b7c20468755b2c0a63c66239dd7c2f9a2c224c2b46638d9ec2cccc0f0a5b"
+    },
+    "written_by": "php tools/corpus/differential.php --model-input <phar> <dir>"
+  },
+  "outputs": {
+    "BookStackApp_BookStack.json": "ad95575e4cc73c51878b80711757057959bcf9576c7a3e4f7e6e290a1ca9c34c",
+    "PrestaShop_PrestaShop.json": "72c793c98125d4b804023683e2d6f3a678b5fd0ecdd82a32f2e6563859181a00",
+    "drupal_drupal.json": "3dc0092bc96ce8ffc39307cd853c698d0defeb19f783a22040d706f7d1341daf",
+    "firefly-iii_firefly-iii.json": "f0913859ef5265b58e9c187c7eaa82c3b312779d93b9d0b895a2667fe6c5ae4c",
+    "grokability_snipe-it.json": "a5957fda436a8ce9f2c5ee4579e81de32c59285bda21a1c190d43e6ecc04bea0",
+    "koel_koel.json": "da8a1e7b0529df347472f5976fd4af1821bfcf5da15c4e46e66c5783367a27a3",
+    "magento_magento2.json": "a828cd1406cdf2a5fae3791a7d656140fb2f40d5748e17adba7f0852ed4a39f7",
+    "matomo-org_matomo.json": "941fb63f3539bca9e6ff01daac73f5b0bdc540e3787b1d56f2e0392ecdd3b0f4",
+    "mautic_mautic.json": "2bb1cd3a4dfc6874eba6b674b92795911f49df7e2de577281f5a86f690a1fdbf",
+    "monicahq_monica.json": "57c9d4dbcb64c91a98bc82dafe5f0150c9a35f13e1dd53361134aa3164979749",
+    "nextcloud_3rdparty.json": "9419bf94ef3525dbcaf3aad1a0486e4b8ca8fa619fadcb5f21a4738a5d81732b",
+    "wallabag_wallabag.json": "99d68d920b22caa4fba895ecf094611d9544d0d147f4582a9d1b628c263017f0"
+  },
+  "php_fit_sha256": "05f83b2b12c0c5a3e713f0d4370947dd3ec0d663475668063061847940898015",
+  "written_by": "security-axis/spec_flags_r3_docs.py reports <dir> <out> --cache tests/fixtures/corpus/cache --php-fit <file>, in the private model folder"
+}

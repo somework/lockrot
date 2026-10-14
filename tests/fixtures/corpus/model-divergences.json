@@ -1,0 +1,373 @@
+{
+  "note": "The reviewed differences between lockrot's report-2 and the model's documents of tests/fixtures/corpus/model-report-2/. tools/corpus/differential.php fails on any other difference, and on an entry here that matches none.",
+  "allowed": [
+    {
+      "path": "S9.fix.version*",
+      "model": null,
+      "reason": "A 0.13 report names no fix release, so the model does not know the lowest fixing release and writes null."
+    },
+    {
+      "path": "S9.fix.held_by*",
+      "model": [],
+      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder (SPEC-0.14.md §5.6)."
+    },
+    {
+      "path": "next_step.held_by",
+      "model": [],
+      "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder (SPEC-0.14.md §5.6)."
+    },
+    {
+      "path": "next_step.version",
+      "model": null,
+      "reason": "A 0.13 report lists only the highest release of each branch, so the model does not know the lowest release that the move's constraint admits and writes null."
+    },
+    {
+      "path": "next_step.composer_moves_because",
+      "lockrot": [
+        "holders",
+        "crosses_major"
+      ],
+      "model": [
+        "crosses_major",
+        "transitive"
+      ],
+      "reason": "lockrot names the holders of the move and says holders. The model reads no holder and says transitive for a transitive move (SPEC-0.14.md §5.6)."
+    },
+    {
+      "path": "next_step.composer_moves_because",
+      "lockrot": [
+        "holders",
+        "crosses_major"
+      ],
+      "model": [
+        "crosses_major"
+      ],
+      "reason": "lockrot names the holders of the move and says holders. The model reads no holder and says transitive for a transitive move (SPEC-0.14.md §5.6)."
+    },
+    {
+      "package": "league/commonmark",
+      "path": "next_step.version",
+      "lockrot": "2.10.2",
+      "model": "2.10.3",
+      "reason": "The model does not know the lowest fixing release, so its update move names the newest release of the installed branch. lockrot names the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "league/commonmark",
+      "path": "security.installed_branch_fixes",
+      "lockrot": {
+        "fix_kind": "update",
+        "fixed": 2,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "2.10.2",
+        "newest": "2.10.3",
+        "of": 2,
+        "unknown": 0
+      },
+      "model": {
+        "fix_kind": "update",
+        "fixed": 2,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "2.10.3",
+        "newest": "2.10.3",
+        "of": 2,
+        "unknown": 0
+      },
+      "reason": "The model does not know the lowest fixing release, so the installed row's lowest is its newest release. lockrot reads the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "league/flysystem",
+      "path": "next_step.version",
+      "lockrot": "3.35.3",
+      "model": "3.36.0",
+      "reason": "The model does not know the lowest fixing release, so its update move names the newest release of the installed branch. lockrot names the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "league/flysystem",
+      "path": "security.installed_branch_fixes",
+      "lockrot": {
+        "fix_kind": "update",
+        "fixed": 1,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "3.35.3",
+        "newest": "3.36.0",
+        "of": 1,
+        "unknown": 0
+      },
+      "model": {
+        "fix_kind": "update",
+        "fixed": 1,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "3.36.0",
+        "newest": "3.36.0",
+        "of": 1,
+        "unknown": 0
+      },
+      "reason": "The model does not know the lowest fixing release, so the installed row's lowest is its newest release. lockrot reads the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "livewire/livewire",
+      "path": "next_step.version",
+      "lockrot": "v4.3.4",
+      "model": "v4.4.7",
+      "reason": "The model does not know the lowest fixing release, so its update move names the newest release of the installed branch. lockrot names the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "livewire/livewire",
+      "path": "security.installed_branch_fixes",
+      "lockrot": {
+        "fix_kind": "update",
+        "fixed": 1,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "v4.3.4",
+        "newest": "v4.4.7",
+        "of": 1,
+        "unknown": 0
+      },
+      "model": {
+        "fix_kind": "update",
+        "fixed": 1,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "v4.4.7",
+        "newest": "v4.4.7",
+        "of": 1,
+        "unknown": 0
+      },
+      "reason": "The model does not know the lowest fixing release, so the installed row's lowest is its newest release. lockrot reads the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "webonyx/graphql-php",
+      "path": "next_step.version",
+      "lockrot": "v15.32.3",
+      "model": "v15.38.1",
+      "reason": "The model does not know the lowest fixing release, so its update move names the newest release of the installed branch. lockrot names the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "webonyx/graphql-php",
+      "path": "security.installed_branch_fixes",
+      "lockrot": {
+        "fix_kind": "update",
+        "fixed": 3,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "v15.32.3",
+        "newest": "v15.38.1",
+        "of": 3,
+        "unknown": 0
+      },
+      "model": {
+        "fix_kind": "update",
+        "fixed": 3,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "v15.38.1",
+        "newest": "v15.38.1",
+        "of": 3,
+        "unknown": 0
+      },
+      "reason": "The model does not know the lowest fixing release, so the installed row's lowest is its newest release. lockrot reads the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "league/commonmark",
+      "path": "security.installed_branch_fixes",
+      "lockrot": {
+        "fix_kind": "update",
+        "fixed": 14,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "2.10.2",
+        "newest": "2.10.3",
+        "of": 14,
+        "unknown": 0
+      },
+      "model": {
+        "fix_kind": "update",
+        "fixed": 14,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "2.10.3",
+        "newest": "2.10.3",
+        "of": 14,
+        "unknown": 0
+      },
+      "reason": "The model does not know the lowest fixing release, so the installed row's lowest is its newest release. lockrot reads the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "livewire/livewire",
+      "path": "next_step.version",
+      "lockrot": "v3.8.3",
+      "model": "v3.8.10",
+      "reason": "The model does not know the lowest fixing release, so its update move names the newest release of the installed branch. lockrot names the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "livewire/livewire",
+      "path": "security.installed_branch_fixes",
+      "lockrot": {
+        "fix_kind": "update",
+        "fixed": 1,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "v3.8.3",
+        "newest": "v3.8.10",
+        "of": 1,
+        "unknown": 0
+      },
+      "model": {
+        "fix_kind": "update",
+        "fixed": 1,
+        "held_by": [],
+        "if_applied": {
+          "assumes": [
+            "clears_hold"
+          ],
+          "at_most": false,
+          "total": 0,
+          "verdict": "ok"
+        },
+        "lowest": "v3.8.10",
+        "newest": "v3.8.10",
+        "of": 1,
+        "unknown": 0
+      },
+      "reason": "The model does not know the lowest fixing release, so the installed row's lowest is its newest release. lockrot reads the lowest release of the safe window (P2b)."
+    },
+    {
+      "package": "enshrined/svg-sanitize",
+      "path": "next_step.constraint",
+      "lockrot": "^1.0.0",
+      "model": "^1.0",
+      "reason": "The model does not know the lowest fixing release, so it writes the caret of the branch. lockrot writes the caret of the lowest fixing release, 1.0.0."
+    },
+    {
+      "package": "enshrined/svg-sanitize",
+      "path": "next_step.commands",
+      "reason": "The command carries the constraint of the move, which differs for the reason of the next_step.constraint entry."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "pragmarx/google2fa-laravel",
+      "path": "next_step.clears",
+      "reason": "The model does not know v2.3.0, the lowest release that ^2.3 admits, or its date, so old-promise stays unverified. lockrot dates v2.3.0 after the GA of PHP 8 and clears it."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "pragmarx/google2fa-laravel",
+      "path": "next_step.unverified",
+      "reason": "The other side of the next_step.clears entry of this package."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "pragmarx/google2fa-laravel",
+      "path": "next_step.if_applied",
+      "reason": "if_applied.at_most is set when unverified is not empty, so it follows the next_step.unverified entry of this package."
+    },
+    {
+      "app": "magento_magento2",
+      "package": "composer/composer",
+      "path": "S9.fix.php*",
+      "lockrot": "^7.2.5 || ^8.0",
+      "model": "^5.3.2 || ^7.0 || ^8.0",
+      "reason": "The model takes the php of the 2.x branch row, which 0.13 reads from 2.2.30, the newest dated release on 2.x. lockrot takes the php of each fix release."
+    },
+    {
+      "app": "magento_magento2",
+      "package": "composer/composer",
+      "path": "next_step.php_check",
+      "reason": "The php check reads the php of the fix release, which differs for the reason of the S9.fix.php entry of this package."
+    },
+    {
+      "app": "magento_magento2",
+      "package": "composer/composer",
+      "path": "security.gets",
+      "reason": "security.gets.php_check differs for the reason of the S9.fix.php entry of this package."
+    },
+    {
+      "app": "monicahq_monica",
+      "package": "erusev/parsedown",
+      "path": "next_step.*",
+      "reason": "knuckleswtf/scribe 5.3.0 requires erusev/parsedown 1.7.4, so it holds 1.8.0, and the old-promise move reads test. The model reads no holder and writes update: its own rule writes test for a held row."
+    }
+  ]
+}

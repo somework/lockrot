@@ -83,6 +83,10 @@ jobs:
         run: |
           composer global require --no-interaction "maglnet/composer-require-checker:^4.24"
           $(composer global config bin-dir --absolute)/composer-require-checker check --config-file=composer-require-checker.json composer.json
+      # lockrot's report-2 on the 12 apps against the model's documents, on the recorded answers only.
+      # tests/fixtures/corpus/model-divergences.json holds each reviewed difference.
+      - name: The corpus differential
+        run: php tools/corpus/differential.php
       # coverage-check reads the clover "elements" metric (methods, statements and conditionals),
       # not PHPUnit's line percentage. Keep the gate about three points below the measured value, so
       # that a new file does not fail it.
