@@ -235,7 +235,7 @@ shapes leave out the parts that do not apply: a score of 0 carries only `model`,
 | `packages_unchecked_accepted` | integer | Findings with a check that `accept-unchecked` accepted |
 | `network_failures` | boolean | True exactly when a `note_details` entry has `sets_network_failures: true`. `--strict-network` fails on it ([ci.md](ci.md#exit-codes)) |
 | `counts` | object | Findings per verdict, the seven verdicts, zero included |
-| `priorities` | object | Findings per `priority`, the alias of the grade |
+| `priorities` | object | Findings per `priority`, the alias of the grade. Deprecated: read the grades in `counts` |
 | `abandoned` | object | `total`, the findings whose `abandoned` counts, `with_replacement`, those whose `replacement` names a package, and `with_suggestion`, those whose registry suggests something that names no package |
 | `flags` | object | Per flag: `carrying` (findings where it counts), `leading` (findings it leads, report-1's count of that verdict), `accepted` and `by_verdict`. `vulnerable` has null `leading` and `accepted` |
 | `exposure`, `exposure_rule`, `unattributed` | | See [Transitive exposure](#transitive-exposure) |

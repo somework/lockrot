@@ -602,9 +602,11 @@ first.
 
 ### The `priority` alias {#priority}
 
-report-2 keeps `priority` beside `verdict`: the grade of a graded finding, else `none`. Without a
-baseline it predicts the gate. Under a baseline it is still the full grade, while the gate reads
-`min(score, 2 × new)`, so read `gate.fails` for what fails ([Baseline](baseline.md)).
+report-2 keeps `priority` beside `verdict`: the grade of a graded finding, else `none`. `priority`
+and the root `priorities` are [deprecated](compatibility.md#deprecation): read `verdict` and the
+grades in `counts`. Without a baseline, `priority` predicts the gate. Under a baseline it is still
+the full grade, while the gate reads `min(score, 2 × new)`, so read `gate.fails` for what fails
+([Baseline](baseline.md)).
 
 ### The grade in each format {#priority-in-each-format}
 
@@ -623,10 +625,11 @@ in.
 
 ### Every direct requirement that reaches a package
 
-The `via` column names the direct requirements that reach the package. `--format=json` carries the
-full list as `direct_dependents` on every finding, the package itself included when it is direct,
-and `chain` holds the shortest path from one of them. A direct requirement's own row reads
-`direct`, whoever else reaches it.
+The `via` column of the table and the markdown report names the first three direct requirements
+that reach the package, then counts the rest (`a, b, c and 2 more`). The github and gitlab messages
+end with the same list. `--format=json` carries the full list as `direct_dependents` on every
+finding, the package itself included when it is direct, and `chain` holds the shortest path from
+one of them. A direct requirement's own row reads `direct`, whoever else reaches it.
 
 If you remove one requirement, every other one that reaches the package still installs it.
 

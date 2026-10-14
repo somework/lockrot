@@ -186,7 +186,7 @@ high (39)
       do: require symfony/webpack-encore-bundle ^2.4 — clears left-behind; 2.x needs php >=8.1.0, which require.php
           allows; the target php 8.4 runs it; held by composer.json (requires ^1.17.2); a new major brings its own
           requirements, which lockrot does not solve
-      left-behind  branch 1.x last released 2023-09-26 (3.0 years ago); 2.x released 2.4.2 (2026-09-17)
+      left-behind  branch 1.x last released 2023-09-26 (3.1 years ago); 2.x released 2.4.2 (2026-09-17)
   wallabag/rulerz dev-master  direct  ·  pinned
       16 = pinned 16
       do: no tagged release to move to; review the snapshot, or replace it
@@ -214,7 +214,7 @@ high (39)
       abandoned    marked abandoned by its registry
       age: installed 2.0.2 released 2024-09-05 (2.1 years ago), its newest release; last push 2025-12-11 (0.8 years
            ago)
-  doctrine/cache 2.2.0  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle, doctrine/orm, pagerfanta/doctrine-orm-adapter, spiriitlabs/form-filter-bundle  ·  abandoned
+  doctrine/cache 2.2.0  via craue/config-bundle, doctrine/doctrine-bundle, doctrine/doctrine-migrations-bundle and 3 more  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through craue/config-bundle, doctrine/doctrine-bundle,
           doctrine/doctrine-migrations-bundle and 3 more: replace or update them; the newest releases of
@@ -298,7 +298,7 @@ high (39)
           update them
       abandoned    marked abandoned by its registry; its repository is archived on GitHub; last release 2017-01-10 (9.8
                    years ago); last push 2018-02-12 (8.7 years ago)
-  symfony/security-guard v5.4.45  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code, scheb/2fa-bundle, scheb/2fa-email, scheb/2fa-google-authenticator, scheb/2fa-trusted-device, symfony/security-bundle  ·  abandoned
+  symfony/security-guard v5.4.45  via friendsofsymfony/oauth-server-bundle, friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through friendsofsymfony/oauth-server-bundle,
           friendsofsymfony/user-bundle, scheb/2fa-backup-code and 5 more: replace or update them; the newest release of
@@ -460,7 +460,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "version": "0.14.0",
         "schema": 2
     },
-    "generated_at": "2026-10-14T11:06:40+00:00",
+    "generated_at": "2026-10-14T16:27:30+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -1075,7 +1075,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         ],
         "fix_unknown": 0
     },
-    "data_date": "2026-10-14T11:06:40+00:00",
+    "data_date": "2026-10-14T16:27:30+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1383,7 +1383,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 "repo": "Spomky-Labs/otphp",
                 "event": "push",
                 "archived": false,
-                "fetched_at": "2026-10-14T11:06:40+00:00",
+                "fetched_at": "2026-10-14T16:27:30+00:00",
                 "cached_at": null
             },
             "allowlist": null,
@@ -1548,7 +1548,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             ],
             "evidence": "left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06); vulnerable: 2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
             "allowlist_reason": null,
-            "data_date": "2026-10-14T11:06:40+00:00",
+            "data_date": "2026-10-14T16:27:30+00:00",
             "libyears": 4.22,
             "age": {
                 "installed": {
