@@ -253,7 +253,7 @@ foreach ($fixtures as $fixture) {
         $answers = [[REPOSITORY_BASE_URL.$package->name().'.json', $own !== null ? $own.'/p2' : $p2Dir], [REPOSITORY_BASE_URL.$package->name().'.json', $p2Dir]];
         if (preg_match(DRUPAL_NOTIFICATION, $notificationUrls[$package->name()] ?? '', $m) === 1) {
             $answers = [['https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().'.json', $own !== null ? $own.'/p2' : $p2Dir]];
-            foreach (['', '~dev'] as $suffix) {
+            foreach ($into === null ? ['', '~dev'] : [''] as $suffix) {
                 $url = 'https://packages.drupal.org/files/packages/'.$m[1].'/p2/'.$package->name().$suffix.'.json';
                 $dir = $own !== null ? $own.'/p2' : $p2Dir;
                 if (!$isRecorded(RecordedHttpClient::pathFor($dir, $url))) {
