@@ -164,7 +164,7 @@ names what to read for each report-1 field that report-2 removes or redefines.
 | a flag anywhere on the finding | `any(.score.terms[]?; .flag == "old-promise")`: a flag counts exactly when a score term names it |
 | `.priority == "critical"` | unchanged (an alias), or `.verdict == "critical"` |
 | `.verdict == "ok"` | `.verdict == "ok"`. A package with a counted advisory and no maintenance flag is graded, with `lead` null |
-| `.counts.abandoned`, `.counts["left-behind"]` | `.flags["left-behind"].leading`. `counts` holds the seven verdicts, so `.counts["left-behind"]` is null |
+| `.counts.abandoned`, `.counts["left-behind"]` | `.flags.abandoned.leading`, `.flags["left-behind"].leading`: the `leading` of the same flag. `counts` holds the seven verdicts, so `.counts["left-behind"]` is null |
 | `.counts.ok`, `.counts.finished`, `.counts.unknown` | the same keys. A package with a counted advisory is graded, not `ok`, `finished` or `unknown` |
 | "has an advisory": `any(.signals[]; .id == "S9")` | unchanged, or `.security.status == "vulnerable"` |
 | `.run.fail_on_kind` | `(.run.gates // [])[].kind`: `flag` is report-1's `verdict`, and `grade` is report-1's `priority`. `.run.fail_on` stays a string |
