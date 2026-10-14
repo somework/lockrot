@@ -7,8 +7,8 @@ namespace Lockrot\Html;
 use Lockrot\Analyzer\Report;
 
 /**
- * The page's title and description, from report-2's `packages_checked` and the non-zero grades of
- * `counts`. lockrot-report pins both against the page goldens of tests/fixtures/contract/page-goldens.json.
+ * The page's title and description, from report-2's `packages_checked` and `counts`.
+ * PageGoldensTest holds both to the model's page goldens.
  *
  * @internal
  */

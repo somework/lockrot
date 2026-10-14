@@ -243,7 +243,7 @@ def explain_metadata():
                           '0.13\'s; find the installed row by `installed: true`, never by name.')
     row['properties']['branch']['description'] = 'The branch label as `ReleaseBranch::label()` writes it (`2.x`, `0.15.x`, `0.0.3`), the same label as `finding.branch`.'
     row['properties']['php'] = nullable({'type': 'string'}, 'The requirement of the branch\'s newest dated release, as the repository lists it; null when it '
-                                                           'declares none (the Release branches line then leaves its php clause out).')
+                                                           'declares none. The floor answers (`admits_*`, `php_blocked_by`, `misses_*`) test it.')
     props = row['properties']
     at = list(props).index('php') + 1
     row['properties'] = dict(list(props.items())[:at] + [('highest_php', nullable({'type': 'string'}, (
