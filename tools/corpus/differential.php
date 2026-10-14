@@ -42,7 +42,7 @@ const ABSENT = ['$absent' => true];
 /** The fields of a finding that the differential compares. Beside them: each flag's FLAG_FIELDS as `flags.<id>.<key>`, and each key of each S9 row's `fix` as `S9.fix.<key>[<advisory id>]`. */
 const FIELDS = [
     'verdict', 'lead', 'direct', 'reach', 'installed_php', 'checks_missing', 'checks_skipped', 'age', 'activity', 'gate.basis',
-    'score.terms', 'score.modifiers', 'score.without', 'score.accepted',
+    'score.total', 'score.exact', 'score.band', 'score.decided_by', 'score.rounded_down', 'score.parts', 'score.terms', 'score.modifiers', 'score.without', 'score.accepted',
     'next_step.kind', 'next_step.constraint', 'next_step.version', 'next_step.to_branch', 'next_step.clears', 'next_step.leaves',
     'next_step.adds', 'next_step.unverified', 'next_step.php_check', 'next_step.commands', 'next_step.crosses_major',
     'next_step.composer_moves_because', 'next_step.if_applied', 'next_step.held_by',
@@ -73,7 +73,11 @@ if (($argv[1] ?? null) === '--model-input') {
         file_put_contents($out.'/'.$id.'.json', json_encode(['data' => json_decode($match[1], true)], JSON_FLAGS)."\n");
         fwrite(STDOUT, "differential: $id\n");
     }
-    $manifest = ['phar' => ['sha256' => hash_file('sha256', $phar)], 'options' => array_merge(OPTIONS, ['--format=html']), 'clock' => CLOCK, 'reads' => recordingFiles($reads)];
+    $outputs = [];
+    foreach (array_keys(runs()) as $id) {
+        $outputs[$id.'.json'] = hash_file('sha256', $out.'/'.$id.'.json');
+    }
+    $manifest = ['phar' => ['sha256' => hash_file('sha256', $phar)], 'options' => array_merge(OPTIONS, ['--format=html']), 'clock' => CLOCK, 'cache_sha256' => cacheDigest(), 'outputs' => $outputs, 'reads' => recordingFiles($reads)];
     file_put_contents($out.'/manifest.json', json_encode($manifest, JSON_FLAGS)."\n");
     exit(0);
 }
@@ -347,6 +351,16 @@ function adoptionProblems(array $model, array $input, string $reports, string $i
     $problems = [];
     if (($input['phar']['sha256'] ?? null) !== MODEL_PHAR['sha256']) {
         $problems[] = 'the model input was not written by the '.MODEL_PHAR['release'].' PHAR';
+    }
+    if (($input['cache_sha256'] ?? null) !== cacheDigest()) {
+        $problems[] = 'the model input was written from another cache than tests/fixtures/corpus/cache/';
+    }
+    $read = (array) ($model['inputs'] ?? []);
+    $written = (array) ($input['outputs'] ?? []);
+    ksort($read);
+    ksort($written);
+    if ($written !== $read) {
+        $problems[] = 'the model read other documents than the ones that the manifest of '.$inputs.' names';
     }
     if (($input['clock'] ?? null) !== CLOCK || array_values(array_unique((array) ($model['clock'] ?? []))) !== [CLOCK]) {
         $problems[] = 'the model input or its documents read another clock than '.CLOCK;
