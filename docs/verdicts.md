@@ -17,7 +17,7 @@ each flag's rule, its signals, and what you and the package's maintainer can do 
 | `high` | The score is 16 to 31 | |
 | `medium` | The score is 8 to 15 | |
 | `low` | The score is 1 to 7 | |
-| `unknown` | The score is 0, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
+| `unknown` | The score is 0, no allowlist entry applies, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
 | `finished` | The score is 0, and an allowlist entry applies to the package | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why |
 | `ok` | The score is 0 | No flag counts |
 
