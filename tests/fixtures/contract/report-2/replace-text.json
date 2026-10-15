@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -781,7 +781,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 3,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -1244,6 +1244,28 @@
                         "years": 3.6,
                         "forge": "github",
                         "event": "push"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: doctrine/annotations (abandoned)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "doctrine/annotations",
+                                "chain": [
+                                    "sensio/framework-extra-bundle",
+                                    "doctrine/annotations"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],

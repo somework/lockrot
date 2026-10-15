@@ -756,7 +756,7 @@
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 14
+                    "records": 15
                 }
             ]
         },
@@ -781,11 +781,11 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 4,
+    "packages_checked": 7,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
-    "not_from_composer_repository": 0,
+    "not_from_composer_repository": 1,
     "packages_unchecked_accepted": 0,
     "network_failures": false,
     "counts": {
@@ -1012,8 +1012,21 @@
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 1,
+                "advisories_asked": true
+            }
+        }
+    ],
     "findings": [
         {
             "package": "guzzlehttp/guzzle",
@@ -1137,7 +1150,7 @@
                         "role": "security",
                         "advisory": "PKSA-2z36-j4q9-rsfy",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -1221,7 +1234,99 @@
                     "raise_size": "minor"
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "~5.0",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "csa/guzzle-bundle",
+                        "version": "dev-compat-php",
+                        "link": "require",
+                        "constraint": "^5.3",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "pinned",
+                            "flag_ids": [
+                                "pinned"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "guzzlehttp/cache-subscriber",
+                        "version": "0.2.0",
+                        "link": "require",
+                        "constraint": "~5.0",
+                        "holder": {
+                            "verdict": "critical",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "find-alternative",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "guzzlehttp/log-subscriber",
+                        "version": "1.0.1",
+                        "link": "require",
+                        "constraint": "~4.0 | ~5.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "find-alternative",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "prestashop/circuit-breaker",
+                        "version": "v3.0.0",
+                        "link": "require",
+                        "constraint": "^5",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "raise-php",
+                                "to_branch": "4.x",
+                                "constraint": "^4.0"
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -1321,6 +1426,7 @@
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -1338,20 +1444,20 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 14,
+                "records": 15,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 14,
+                        "records": 15,
                         "reason": null
                     }
                 ],
@@ -1446,6 +1552,43 @@
                     }
                 },
                 {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                    "data": {
+                        "flagged": 2,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/ringphp",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/streams",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp",
+                                    "guzzlehttp/streams"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "S8",
                     "level": "high",
                     "summary": "branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.1.3; no releasing branch within reach",
@@ -1491,13 +1634,105 @@
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1515,13 +1750,105 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.6",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1539,13 +1866,105 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1569,7 +1988,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1587,13 +2098,105 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1611,13 +2214,105 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1641,7 +2336,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1665,7 +2452,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1689,7 +2568,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1713,7 +2684,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1737,7 +2800,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1761,7 +2916,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1785,7 +3032,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1809,7 +3148,99 @@
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null

@@ -85,6 +85,16 @@
             "argv": [
                 "composer",
                 "require",
+                "pagerfanta/twig:^4.9"
+            ],
+            "posix": "composer require 'pagerfanta/twig:^4.9'",
+            "cmd": "composer require \"pagerfanta/twig:^4.9\"",
+            "powershell": "composer require 'pagerfanta/twig:^4.9'"
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "php:>=7.2.5",
                 "--no-update"
             ],

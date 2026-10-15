@@ -151,7 +151,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "laravel/framework v9.52.16 is affected by PKSA-3r5d-mb8f-1qw9 (high advisory): Laravel Framework: CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "laravel/framework v9.52.16 is affected by PKSA-3r5d-mb8f-1qw9 (high advisory): Laravel Framework: CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "laravel/framework",
@@ -185,6 +185,7 @@
                             "pragmarx/google2fa-laravel"
                         ],
                         "signal_ids": [
+                            "S7",
                             "S9"
                         ],
                         "age": {
@@ -227,7 +228,30 @@
                             "newest": "v12.69.3",
                             "on_installed_branch": false,
                             "php": "^8.2",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^9.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "pragmarx/google2fa-laravel",
+                                    "version": "v2.2.0",
+                                    "link": "require",
+                                    "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -253,7 +277,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -265,7 +289,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "laravel/framework v9.52.16 is affected by CVE-2024-52301 (high advisory): Laravel environment manipulation via query string. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2024-52301 (high advisory): Laravel environment manipulation via query string. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "laravel/framework",
@@ -312,7 +336,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -324,7 +348,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "laravel/framework v9.52.16 is affected by CVE-2025-27515 (medium advisory): Laravel has a File Validation Bypass. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2025-27515 (medium advisory): Laravel has a File Validation Bypass. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "laravel/framework",
@@ -351,13 +375,22 @@
                         "cve": "CVE-2025-27515",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "10.x",
                             "version": "v10.48.29",
                             "newest": "v10.50.3",
                             "on_installed_branch": false,
                             "php": "^8.1",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^9.0",
+                                    "holder": null
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -371,7 +404,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -383,7 +416,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "laravel/framework v9.52.16 is affected by PKSA-m5cs-t1y6-qpcs (medium advisory): Laravel Framework: Temporary Signed URL Path Confusion. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "laravel/framework v9.52.16 is affected by PKSA-m5cs-t1y6-qpcs (medium advisory): Laravel Framework: Temporary Signed URL Path Confusion. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "laravel/framework",
@@ -416,7 +449,30 @@
                             "newest": "v12.69.3",
                             "on_installed_branch": false,
                             "php": "^8.2",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^9.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "pragmarx/google2fa-laravel",
+                                    "version": "v2.2.0",
+                                    "link": "require",
+                                    "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -430,7 +486,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -442,7 +498,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "laravel/framework v9.52.16 is affected by CVE-2026-48019 (unrated advisory): Laravel CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2026-48019 (unrated advisory): Laravel CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "laravel/framework",
@@ -475,7 +531,30 @@
                             "newest": "v12.69.3",
                             "on_installed_branch": false,
                             "php": "^8.2",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^9.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "pragmarx/google2fa-laravel",
+                                    "version": "v2.2.0",
+                                    "link": "require",
+                                    "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -489,7 +568,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -501,7 +580,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "laravel/framework v9.52.16 is affected by CVE-2026-102279 (low advisory): Laravel: XSS in Debug Page Information. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "laravel/framework v9.52.16 is affected by CVE-2026-102279 (low advisory): Laravel: XSS in Debug Page Information. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "laravel/framework",
@@ -534,7 +613,30 @@
                             "newest": "v12.69.3",
                             "on_installed_branch": false,
                             "php": "^8.2",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^9.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "pragmarx/google2fa-laravel",
+                                    "version": "v2.2.0",
+                                    "link": "require",
+                                    "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                    "holder": {
+                                        "verdict": "ok",
+                                        "lead": null,
+                                        "flag_ids": [],
+                                        "replacement": null,
+                                        "next_step": null
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 2,
@@ -548,7 +650,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -614,8 +716,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 1,
-                            "records": 6
+                            "packages_with_records": 10,
+                            "records": 74
                         }
                     ]
                 }

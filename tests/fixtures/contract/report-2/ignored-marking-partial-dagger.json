@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -1086,13 +1086,13 @@
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 0,
+                "records": 1,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 0,
+                        "records": 1,
                         "reason": null
                     }
                 ],
@@ -1123,7 +1123,7 @@
                 "by": "project",
                 "pattern": "doctrine/cache",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "kept until 9.0 (\u2021)",
                 "reason_id": null,
                 "reason_by": "user",
                 "expires": null,

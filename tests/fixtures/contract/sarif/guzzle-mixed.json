@@ -357,7 +357,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 left-behind: branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.1.3; no releasing branch within reach. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 left-behind: branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.1.3; no releasing branch within reach. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle"
@@ -395,6 +395,7 @@
                         ],
                         "signal_ids": [
                             "S5",
+                            "S7",
                             "S8",
                             "S9"
                         ],
@@ -446,7 +447,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -458,7 +459,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle"
@@ -500,7 +501,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -512,7 +513,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31043 (high advisory): Fix failure to strip Authorization header on HTTP downgrade. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31043 (high advisory): Fix failure to strip Authorization header on HTTP downgrade. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -551,6 +552,7 @@
                         ],
                         "signal_ids": [
                             "S5",
+                            "S7",
                             "S8",
                             "S9"
                         ],
@@ -588,13 +590,105 @@
                         "cve": "CVE-2022-31043",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.7",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -605,7 +699,7 @@
                             "role": "security",
                             "advisory": "PKSA-2z36-j4q9-rsfy",
                             "severity": "high",
-                            "fix_kind": "update",
+                            "fix_kind": "upgrade",
                             "weight": 16,
                             "multiplier": 1,
                             "points": 16,
@@ -620,7 +714,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -632,7 +726,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-29248 (high advisory): Cross-domain cookie leakage. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-29248 (high advisory): Cross-domain cookie leakage. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -661,13 +755,105 @@
                         "cve": "CVE-2022-29248",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.6",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -681,7 +867,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -693,7 +879,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31042 (high advisory): Failure to strip the Cookie header on change in host or HTTP downgrade. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31042 (high advisory): Failure to strip the Cookie header on change in host or HTTP downgrade. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -722,13 +908,105 @@
                         "cve": "CVE-2022-31042",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.7",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -742,7 +1020,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -754,7 +1032,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69246 (high advisory): Guzzle: Noncanonical host can bypass host-based checks. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69246 (high advisory): Guzzle: Noncanonical host can bypass host-based checks. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -789,7 +1067,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -803,7 +1173,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -815,7 +1185,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31090 (high advisory): CURLOPT_HTTPAUTH option not cleared on change of origin. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31090 (high advisory): CURLOPT_HTTPAUTH option not cleared on change of origin. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -844,13 +1214,105 @@
                         "cve": "CVE-2022-31090",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.8",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -864,7 +1326,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -876,7 +1338,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31091 (high advisory): Change in port should be considered a change in origin. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31091 (high advisory): Change in port should be considered a change in origin. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -905,13 +1367,105 @@
                         "cve": "CVE-2022-31091",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.8",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -925,7 +1479,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -937,7 +1491,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55767 (medium advisory): Dot-only cookie domains match all hosts. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55767 (medium advisory): Dot-only cookie domains match all hosts. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -972,7 +1526,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -986,7 +1632,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -998,7 +1644,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67353 (medium advisory): Guzzle: Unbounded response cookies risk denial of service. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67353 (medium advisory): Guzzle: Unbounded response cookies risk denial of service. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1033,7 +1679,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1047,7 +1785,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -1059,7 +1797,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-59883 (medium advisory): Guzzle: Cookie Disclosure and Injection via IP-Address Domains. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-59883 (medium advisory): Guzzle: Cookie Disclosure and Injection via IP-Address Domains. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1094,7 +1832,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1108,7 +1938,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -1120,7 +1950,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69245 (medium advisory): Guzzle: Noncanonical cookie domain keeps subdomain scope. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69245 (medium advisory): Guzzle: Noncanonical cookie domain keeps subdomain scope. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1155,7 +1985,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1169,7 +2091,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -1181,7 +2103,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67354 (medium advisory): Guzzle: URI fragments disclosed in redirect Referer headers. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67354 (medium advisory): Guzzle: URI fragments disclosed in redirect Referer headers. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1216,7 +2138,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1230,7 +2244,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -1242,7 +2256,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55568 (medium advisory): Silent HTTPS proxy downgrade to cleartext. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55568 (medium advisory): Silent HTTPS proxy downgrade to cleartext. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1277,7 +2291,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1291,7 +2397,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -1303,7 +2409,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67339 (medium advisory): Guzzle: Proxy-Authorization headers can be sent to origin servers. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67339 (medium advisory): Guzzle: Proxy-Authorization headers can be sent to origin servers. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1338,7 +2444,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1352,7 +2550,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -1364,7 +2562,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67355 (medium advisory): Guzzle: Host-only cookie scope is not preserved. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67355 (medium advisory): Guzzle: Host-only cookie scope is not preserved. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1399,7 +2597,99 @@
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "csa/guzzle-bundle",
+                                    "version": "dev-compat-php",
+                                    "link": "require",
+                                    "constraint": "^5.3",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/cache-subscriber",
+                                    "version": "0.2.0",
+                                    "link": "require",
+                                    "constraint": "~5.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "guzzlehttp/log-subscriber",
+                                    "version": "1.0.1",
+                                    "link": "require",
+                                    "constraint": "~4.0 | ~5.0",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "find-alternative",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "prestashop/circuit-breaker",
+                                    "version": "v3.0.0",
+                                    "link": "require",
+                                    "constraint": "^5",
+                                    "holder": {
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.0"
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1413,7 +2703,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 34
                                 }
                             }
                         }
@@ -1457,7 +2747,15 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    }
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+                            }
+                        }
+                    ]
                 }
             ],
             "properties": {
@@ -1480,7 +2778,7 @@
                             "reason": null,
                             "message": null,
                             "packages_with_records": 1,
-                            "records": 14
+                            "records": 15
                         }
                     ]
                 }

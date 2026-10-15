@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 260
             }
         }
     }

@@ -275,6 +275,29 @@
                     "written_for_php": 7,
                     "released": "2018-08-08T15:08:14+00:00"
                 }
+            },
+            {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 1 flagged package: yosymfony/parser-utils (silent)",
+                "data": {
+                    "flagged": 1,
+                    "packages": [
+                        {
+                            "package": "yosymfony/parser-utils",
+                            "chain": [
+                                "yosymfony/toml",
+                                "yosymfony/parser-utils"
+                            ],
+                            "verdict": "high",
+                            "lead": "silent",
+                            "flag_ids": [
+                                "silent",
+                                "old-promise"
+                            ]
+                        }
+                    ]
+                }
             }
         ],
         "evidence": "silent: last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago); old-promise: released 2018-08-08 for PHP 7 (php \">=7.1\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",

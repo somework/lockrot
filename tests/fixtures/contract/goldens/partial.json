@@ -1,6 +1,6 @@
 {
     "score_text": "16 = vulnerable 16 [high advisory]",
-    "next_step_text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve",
+    "next_step_text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed v9.52.16 released 2023-10-03 (3.0 years ago); 9.x last released v9.52.22 2026-08-12 (0.1 years ago); newest release v11.57.0 2026-09-29 (less than three weeks ago); last push 2026-09-30 (less than three weeks ago)",

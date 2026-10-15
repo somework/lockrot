@@ -1,33 +1,17 @@
 [
     {
         "type": "issue",
-        "check_name": "lockrot/ok",
-        "description": "pagerfanta/twig v3.8.0 \u2014 finding ok (0).",
+        "check_name": "lockrot/left-behind",
+        "description": "pagerfanta/twig v3.8.0 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Bug Risk"
         ],
-        "severity": "info",
-        "fingerprint": "767a8f268c70724a8c4f61cd6dc0b73ece9884c75b04b5ac486c1406df8e53b2",
+        "severity": "major",
+        "fingerprint": "cdf74e481588370240b11612c0c13e0ca7882b214ae0d53993856231aeb14106",
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
-            }
-        }
-    },
-    {
-        "type": "issue",
-        "check_name": "lockrot/unchecked",
-        "description": "pagerfanta/twig v3.8.0 \u2014 finding ok (0) \u2014 checks missing: S2, S8 (undated releases).",
-        "categories": [
-            "Bug Risk"
-        ],
-        "severity": "info",
-        "fingerprint": "eb99b04331e7e25235e9f53173043f9cd27766a641f9964984de866e17ee6782",
-        "location": {
-            "path": "composer.lock",
-            "lines": {
-                "begin": 4
+                "begin": 26
             }
         }
     }

@@ -208,7 +208,7 @@
         "checks_skipped": [
             {
                 "check": "repository_activity",
-                "reason": "no_repository",
+                "reason": "offline",
                 "blocks": [
                     "S3",
                     "S4"
@@ -224,10 +224,10 @@
         },
         "activity": {
             "status": "not_read",
-            "reason": "no_repository",
-            "forge": null,
-            "host": null,
-            "repo": null,
+            "reason": "offline",
+            "forge": "github",
+            "host": "github.com",
+            "repo": "symfony/debug",
             "event": null,
             "archived": null,
             "fetched_at": null,
@@ -346,7 +346,7 @@
             },
             "branch_release_unmeasured": null,
             "push": null,
-            "push_unmeasured": "no_repository"
+            "push_unmeasured": "offline"
         },
         "baseline": null,
         "gate": {
@@ -381,7 +381,7 @@
     "lock": {
         "php": "^5.5.9|>=7.0.8",
         "released": "2020-10-24T10:57:07+00:00",
-        "repository": null,
+        "repository": "https://github.com/symfony/debug.git",
         "from_composer_repository": true,
         "dev": false,
         "branch_snapshot": false,
@@ -390,7 +390,7 @@
     "metadata": {
         "abandoned": true,
         "replacement": "symfony/error-handler",
-        "releases_listed": 3,
+        "releases_listed": 5,
         "has_stable_release": true,
         "last_stable_release": "2022-07-28T16:29:46+00:00",
         "last_stable_version": "v4.4.44",
@@ -450,9 +450,9 @@
                 "installed": false,
                 "highest": "v2.8.52",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2018-11-11T11:18:13+00:00",
                 "newest_dated": "v2.8.52",
-                "newest_dated_released": null,
+                "newest_dated_released": "2018-11-11T11:18:13+00:00",
                 "dated_by": null,
                 "php": ">=5.3.9",
                 "highest_php": ">=5.3.9",
@@ -1227,6 +1227,33 @@
         }
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": []
+    "notes": [
+        "offline: repository metadata served from Composer's cache",
+        "GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug"
+    ],
+    "note_details": [
+        {
+            "code": "offline",
+            "text": "offline: repository metadata served from Composer's cache",
+            "docs_url": "https://lockrot.dev/notes/#offline",
+            "sets_network_failures": false,
+            "data": {}
+        },
+        {
+            "code": "repository_activity_unreachable",
+            "text": "GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_unreachable",
+            "sets_network_failures": true,
+            "data": {
+                "forge_id": "github",
+                "repositories": [
+                    {
+                        "host": "github.com",
+                        "repo": "symfony/debug",
+                        "message": "not stubbed: https://api.github.com/repos/symfony/debug"
+                    }
+                ]
+            }
+        }
+    ]
 }

@@ -5,12 +5,13 @@
           replace it
       pinned       pinned to branch snapshot dev-master
       stale        last release 2019-01-23 (7.7 years ago)
+      pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
 
-1 package checked · 1 flagged: high 1
+2 packages checked · 1 flagged: high 1
 flags: pinned 1 · stale 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 libyears: the one package could not be measured
-advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

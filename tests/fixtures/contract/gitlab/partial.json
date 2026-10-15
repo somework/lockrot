@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/vulnerable",
-        "description": "laravel/framework v9.52.16 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 6 advisories: 2 high, 2 medium, 1 unrated, 1 low \u2014 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve.",
+        "description": "laravel/framework v9.52.16 \u2014 finding high (16 = vulnerable 16 [high advisory]) \u2014 vulnerable: 6 advisories: 2 high, 2 medium, 1 unrated, 1 low \u2014 1 of 6 fixed on 9.x; worst: PKSA-3r5d-mb8f-1qw9 Laravel Framework: CRLF injection in default email rule. Do: raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Security"
         ],
@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 34
             }
         }
     }

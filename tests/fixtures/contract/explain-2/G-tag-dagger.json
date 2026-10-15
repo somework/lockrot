@@ -306,6 +306,28 @@
                     "snapshot_time": "2018-06-01T00:00:00+00:00",
                     "tag_relation": "newer"
                 }
+            },
+            {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)",
+                "data": {
+                    "flagged": 1,
+                    "packages": [
+                        {
+                            "package": "friendsofsymfony/oauth2-php",
+                            "chain": [
+                                "friendsofsymfony/oauth-server-bundle",
+                                "friendsofsymfony/oauth2-php"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        }
+                    ]
+                }
             }
         ],
         "evidence": "pinned: pinned to branch snapshot dev-master; stale: last release 2019-01-23 (7.7 years ago)",
@@ -1145,8 +1167,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         }

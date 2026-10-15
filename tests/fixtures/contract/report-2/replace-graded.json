@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 2,
+                    "records": 7
                 }
             ]
         },
@@ -781,7 +781,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 7,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -1103,7 +1103,13 @@
                     "suggestion": "web-token/jwt-library",
                     "url": "https://packagist.org/packages/web-token/jwt-library",
                     "named_by": "repository",
-                    "finding": null
+                    "finding": {
+                        "verdict": "high",
+                        "lead": null,
+                        "flag_ids": [
+                            "vulnerable"
+                        ]
+                    }
                 },
                 "quiet_years": null,
                 "to_branch": null,
@@ -1129,7 +1135,7 @@
                 "commands": [],
                 "through": [],
                 "also": [],
-                "text": "replace with web-token/jwt-library (named by its registry)"
+                "text": "replace with web-token/jwt-library (named by its registry; itself high: vulnerable)"
             },
             "security": {
                 "status": "clear",
@@ -1206,6 +1212,53 @@
                         "marked_by": "repository",
                         "replacement": "web-token/jwt-library",
                         "replacement_url": "https://packagist.org/packages/web-token/jwt-library"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math (left-behind)",
+                    "data": {
+                        "flagged": 3,
+                        "packages": [
+                            {
+                                "package": "web-token/jwt-library",
+                                "chain": [
+                                    "web-token/jwt-key-mgmt",
+                                    "web-token/jwt-library"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "paragonie/sodium_compat",
+                                "chain": [
+                                    "web-token/jwt-key-mgmt",
+                                    "paragonie/sodium_compat"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "brick/math",
+                                "chain": [
+                                    "web-token/jwt-key-mgmt",
+                                    "web-token/jwt-library",
+                                    "brick/math"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],

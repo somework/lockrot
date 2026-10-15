@@ -1156,7 +1156,7 @@
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "5.x",
-                "version": "v5.4.52",
+                "version": "v5.4.0",
                 "newest": "v5.4.52",
                 "constraint": "^5.4",
                 "latest": null,
@@ -1174,23 +1174,24 @@
                         "kind": "flag",
                         "id": "left-behind",
                         "basis": "branch_releasing"
-                    },
+                    }
+                ],
+                "unverified": [
                     {
                         "kind": "flag",
                         "id": "old-promise",
-                        "basis": "released_after_ga"
+                        "reason": "undated"
                     }
                 ],
-                "unverified": [],
                 "adds": [],
                 "leaves": [],
-                "clears_all": true,
+                "clears_all": false,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 16,
+                    "verdict": "high",
+                    "lead": "old-promise",
                     "deciding_advisory": null,
-                    "at_most": false,
+                    "at_most": true,
                     "assumes": [
                         "clears_hold",
                         "composer_resolves",
@@ -1209,7 +1210,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "unchecked",

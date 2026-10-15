@@ -1,7 +1,7 @@
 {
  "pr": "6b",
  "source": {
-  "cases.json": "b0ed85dff80af5ed1c16346167793b005f04fa203f2aa6420705cfe47ca66ff9",
+  "cases.json": "9e2751c5e5bf276ce6ee0070450594eb5db7bc3ba4cf1a94c827748c8cc25fba",
   "model_run_date": "2026-10-14"
  },
  "suite": "every case and the composite pass the report-2 field reference (I21) with 0 violations",

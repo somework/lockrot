@@ -340,7 +340,7 @@
                     "level": "error",
                     "rank": 95.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{% use %}` template name. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46633 (critical advisory): PHP code injection via `{% use %}` template name. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -432,11 +432,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -465,7 +473,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -477,7 +485,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-49981 (high advisory): Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-49981 (high advisory): Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -528,11 +536,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -549,7 +565,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -561,7 +577,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-47732 (high advisory): Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-47732 (high advisory): Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -612,11 +628,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -633,7 +657,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -645,7 +669,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-24425 (high advisory): Possible sandbox bypass when using a source policy. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-24425 (high advisory): Possible sandbox bypass when using a source policy. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -696,11 +720,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -717,7 +749,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -729,7 +761,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48806 (medium advisory): Sandbox `__toString()` policy bypass via dynamic mapping keys. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48806 (medium advisory): Sandbox `__toString()` policy bypass via dynamic mapping keys. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -778,11 +810,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -799,7 +839,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -811,7 +851,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46638 (medium advisory): `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46638 (medium advisory): `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -860,11 +900,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -881,7 +929,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -893,7 +941,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48808 (medium advisory): Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48808 (medium advisory): Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -942,11 +990,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -963,7 +1019,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -975,7 +1031,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48807 (medium advisory): Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48807 (medium advisory): Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1024,11 +1080,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1045,7 +1109,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1057,7 +1121,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46627 (unrated advisory): Sandbox does not protect against resource exhaustion. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46627 (unrated advisory): Sandbox does not protect against resource exhaustion. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1106,11 +1170,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1127,7 +1199,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1139,7 +1211,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46636 (unrated advisory): Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46636 (unrated advisory): Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1188,11 +1260,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1209,7 +1289,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1221,7 +1301,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2024-51755 (low advisory): Unguarded calls to __isset() and to array-accesses when the sandbox is enabled. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2024-51755 (low advisory): Unguarded calls to __isset() and to array-accesses when the sandbox is enabled. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1270,11 +1350,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1291,7 +1379,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1303,7 +1391,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48805 (low advisory): Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-48805 (low advisory): Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1352,11 +1440,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1373,7 +1469,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1385,7 +1481,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46635 (low advisory): Sandbox property allowlist bypass via the `column` filter (array_column on objects). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46635 (low advisory): Sandbox property allowlist bypass via the `column` filter (array_column on objects). Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1434,11 +1530,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1455,7 +1559,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1467,7 +1571,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46628 (low advisory): The `spaceless` filter implicitly marks its output as safe. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2026-46628 (low advisory): The `spaceless` filter implicitly marks its output as safe. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1516,11 +1620,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1537,7 +1649,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1549,7 +1661,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "twig/twig v2.16.1 is affected by CVE-2024-51754 (low advisory): Unguarded calls to __toString() when nesting an object into an array. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "twig/twig v2.16.1 is affected by CVE-2024-51754 (low advisory): Unguarded calls to __toString() when nesting an object into an array. Do: raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "twig/twig",
@@ -1598,11 +1710,19 @@
                                     "link": "require",
                                     "constraint": "^1.41|^2.10",
                                     "holder": {
-                                        "verdict": "unknown",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "high",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "4.x",
+                                            "constraint": "^4.4.51"
+                                        }
                                     }
                                 }
                             ],
@@ -1619,7 +1739,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -1685,8 +1805,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 1,
-                            "records": 15
+                            "packages_with_records": 2,
+                            "records": 28
                         }
                     ]
                 }

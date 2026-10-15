@@ -10,6 +10,6 @@ flags: left-behind 1 · old-promise 1 · vulnerable 1 · 1 package carries more 
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 3 advisories: 3 low
 libyears: 5.9 behind across the one package · 5.9 from direct requirements · furthest behind symfony/yaml v3.4.47 at 5.9
-advisories: 1 package asked · packagist.org answered (3 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (5 on record for 1 package)
 
 <sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

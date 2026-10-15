@@ -756,7 +756,7 @@
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 5
                 }
             ]
         },
@@ -983,12 +983,12 @@
         "packages": {
             "vulnerable": 1,
             "unchecked": 0,
-            "ignored": 0,
+            "ignored": 1,
             "clear": 0
         },
         "advisories": {
             "counted": 3,
-            "ignored": 0
+            "ignored": 1
         },
         "severities": {
             "critical": 0,
@@ -1185,13 +1185,13 @@
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],
@@ -1203,8 +1203,18 @@
                     "unrated": 0,
                     "low": 3
                 },
-                "ignored": [],
-                "ignored_count": 0,
+                "ignored": [
+                    {
+                        "id": "PKSA-ign0-0000-0000",
+                        "cve": "CVE-2026-00001",
+                        "title": "an advisory the project ignores",
+                        "severity": "medium",
+                        "by": "audit.ignore",
+                        "matched": "id",
+                        "reason": "not reachable in our use (\u2021)"
+                    }
+                ],
+                "ignored_count": 1,
                 "fix_kind": "update",
                 "installed_branch_fixes": {
                     "fixed": 3,

@@ -10,8 +10,9 @@
                    untested
       vulnerable   2 advisories: 1 high, 1 medium — 1 of 2 fixed on 2.x; worst: CVE-2026-00011 an advisory only the
                    next major fixes (‡)
+      pulls in 1 flagged package: maxmind/web-service-common (left-behind)
 
-1 package checked · 1 flagged: critical 1
+2 packages checked · 1 flagged: critical 1
 flags: left-behind 1 · old-promise 1 · vulnerable 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 2 advisories: 1 high, 1 medium · packages-dev not checked (pass --dev)

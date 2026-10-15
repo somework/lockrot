@@ -242,7 +242,7 @@
                     "replacement": null,
                     "quiet_years": null,
                     "to_branch": "5.x",
-                    "version": "v5.4.52",
+                    "version": "v5.4.0",
                     "newest": "v5.4.52",
                     "constraint": "^5.4",
                     "latest": null,
@@ -271,26 +271,27 @@
                             "basis": "branch_releasing"
                         },
                         {
-                            "kind": "flag",
-                            "id": "old-promise",
-                            "basis": "released_after_ga"
-                        },
-                        {
                             "kind": "advisory",
                             "id": "PKSA-4wjj-gy1p-ft3r",
                             "basis": "outside_range"
                         }
                     ],
-                    "unverified": [],
+                    "unverified": [
+                        {
+                            "kind": "flag",
+                            "id": "old-promise",
+                            "reason": "undated"
+                        }
+                    ],
                     "adds": [],
                     "leaves": [],
-                    "clears_all": true,
+                    "clears_all": false,
                     "if_applied": {
-                        "total": 0,
-                        "verdict": "ok",
-                        "lead": null,
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": "old-promise",
                         "deciding_advisory": null,
-                        "at_most": false,
+                        "at_most": true,
                         "assumes": [
                             "clears_hold",
                             "composer_resolves"
@@ -306,7 +307,7 @@
                             "symfony/monolog-bridge:^5.4"
                         ]
                     ],
-                    "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+                    "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
                 }
             ],
             "text": "composer update symfony/monolog-bridge (gets v2.8.52) \u2014 clears the advisory; left-behind, old-promise stay"
@@ -573,7 +574,7 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 8,
+        "releases_listed": 9,
         "has_stable_release": true,
         "last_stable_release": "2026-08-30T01:18:12+00:00",
         "last_stable_version": "v6.4.45",
@@ -753,7 +754,7 @@
                     "unknown": 0,
                     "of": 1,
                     "fix_kind": "upgrade",
-                    "lowest": "v5.4.52",
+                    "lowest": "v5.4.0",
                     "newest": "v5.4.52",
                     "held_by": [
                         {
@@ -766,9 +767,9 @@
                         }
                     ],
                     "if_applied": {
-                        "total": 0,
-                        "verdict": "ok",
-                        "at_most": false,
+                        "total": 16,
+                        "verdict": "high",
+                        "at_most": true,
                         "assumes": [
                             "clears_hold",
                             "composer_resolves"

@@ -1,15 +1,15 @@
-### lockrot: 1 of 1 packages flagged — critical 1
+### lockrot: 1 of 4 packages flagged — critical 1
 
 **gate: fails** · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **critical** | `guzzlehttp/guzzle` | 6.5.8 | left-behind · vulnerable | `32 = left-behind 16 + vulnerable 16 [high advisory]`<br>**Do:** raise require.php to \>=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 9 advisories; 7.x needs php ^7.2.5 \|\| ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve<br>*left-behind:* branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 \|\| ^8.0 above the project's php ^7.2 \|\| ^8.0.0; no releasing branch within reach<br>*vulnerable:* 9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks | direct |
+| **critical** | `guzzlehttp/guzzle` | 6.5.8 | left-behind · vulnerable | `32 = left-behind 16 + vulnerable 16 [high advisory]`<br>**Do:** raise require.php to \>=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 9 advisories; 7.x needs php ^7.2.5 \|\| ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve<br>*left-behind:* branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 \|\| ^8.0 above the project's php ^7.2 \|\| ^8.0.0; no releasing branch within reach<br>*vulnerable:* 9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks<br>pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable) | direct |
 
 flags: left-behind 1 · vulnerable 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 9 advisories: 1 high, 8 medium
 libyears: 4.2 behind across the one package · 4.2 from direct requirements · furthest behind guzzlehttp/guzzle 6.5.8 at 4.2
-advisories: 1 package asked · packagist.org answered (9 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (22 on record for 3 packages)
 
-<sub>1 package checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>
+<sub>4 packages checked — data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run `composer lockrot --format=json` for details.</sub>

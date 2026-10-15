@@ -8,7 +8,7 @@
         "installed  v3.4.47   2020-10-24   5.9 years ago",
         "3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5",
         "newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3",
-        "last push            not read (no repository found)",
+        "last push            not read (no token)",
         "libyears 1.8 behind the newest stable release"
     ],
     "baseline_suffix": null,

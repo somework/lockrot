@@ -1189,7 +1189,7 @@
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "5.x",
-                "version": "v5.4.52",
+                "version": "v5.4.0",
                 "newest": "v5.4.52",
                 "constraint": "^5.4",
                 "latest": null,
@@ -1207,14 +1207,15 @@
                         "kind": "flag",
                         "id": "left-behind",
                         "basis": "branch_releasing"
-                    },
+                    }
+                ],
+                "unverified": [
                     {
                         "kind": "flag",
                         "id": "old-promise",
-                        "basis": "released_after_ga"
+                        "reason": "undated"
                     }
                 ],
-                "unverified": [],
                 "adds": [],
                 "leaves": [
                     {
@@ -1224,11 +1225,11 @@
                 ],
                 "clears_all": false,
                 "if_applied": {
-                    "total": 16,
-                    "verdict": "high",
-                    "lead": null,
+                    "total": 32,
+                    "verdict": "critical",
+                    "lead": "old-promise",
                     "deciding_advisory": "PKSA-4wjj-gy1p-ft3r",
-                    "at_most": false,
+                    "at_most": true,
                     "assumes": [
                         "clears_hold",
                         "composer_resolves"
@@ -1286,7 +1287,7 @@
                         "text": "no release fixes it"
                     }
                 ],
-                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",

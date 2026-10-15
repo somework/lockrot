@@ -16,7 +16,7 @@ fix, by package: composer update 1
 update now: composer update symfony/yaml
 libyears: 3.4 behind across the one package · 3.4 from direct requirements ·
 furthest behind symfony/yaml v5.4.23 at 3.4
-advisories: 1 package asked · packagist.org answered (3 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (5 on record for 1 package)
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

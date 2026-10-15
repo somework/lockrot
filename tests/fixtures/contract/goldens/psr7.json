@@ -1,6 +1,6 @@
 {
     "score_text": "16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory]",
-    "next_step_text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle — clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve",
+    "next_step_text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle — clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 1.9.1 released 2023-04-17 (3.5 years ago), the newest on 1.x; newest release 3.1.0 2026-08-24 (0.1 years ago); last push 2026-08-24 (0.1 years ago)",

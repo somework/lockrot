@@ -14,7 +14,7 @@ score     32 = vulnerable 32 [critical advisory]     critical from 32
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags
@@ -49,7 +49,7 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 
@@ -128,7 +128,7 @@ repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case D
 tubalmartin/cssmin v4.1.1 — high: old-promise · stale
@@ -188,7 +188,7 @@ flags
                PKSA-ft77-7h5f-p3r6 · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
     low        CVE-2026-45304  YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion ("Billion Laughs")
                PKSA-v5yj-8nmz-sk2q · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
-  feeds        packagist.org: 3 on record, 3 affect v5.4.23
+  feeds        packagist.org: 5 on record, 3 affect v5.4.23
   accepted     none
   not checked  nothing
 
@@ -200,7 +200,7 @@ repository metadata
    * 5.x      v5.4.53       2026-05-20   >=7.2.5    3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
      4.x      v4.4.45       2022-08-02   >=7.1.3    0 of 3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 3
-     2.x      v2.8.52       undated      >=5.3.9    0 of 3
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9    0 of 3
 
 == case F
 symfony/polyfill-intl-idn v1.37.0 — low: vulnerable
@@ -211,7 +211,7 @@ age       installed  v1.37.0   not read (no date)
           newest     v1.43.0   2026-09-23   less than three weeks ago     below release-warn-years 3
           last push            not read (allowlisted)
           libyears not measured: no date
-repository repository activity not asked (allowlisted)
+repository github.com/symfony/polyfill-intl-idn: not asked (allowlisted)
 
 score     2 = vulnerable 2 [low advisory]     low from 1
   security     vulnerable 2 (low advisory CVE-2026-46644)
@@ -255,6 +255,7 @@ flags
   pinned       S6 · pinned to branch snapshot dev-master
   stale        S2 high · last release 2019-01-23 (7.7 years ago)
   feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
   accepted     none
   not checked  S8 (a branch snapshot has no release branch)
 
@@ -263,26 +264,25 @@ repository metadata
      1.x      1.6.2         2019-01-23   ^5.5|^7.0
 
 == case wp-config
-roots/wp-config 1.0.0 — high: old-promise · stale
+roots/wp-config 1.0.0 — high: old-promise
   direct requirement (composer.json require)
 
 age       installed  1.0.0     2018-08-10   8.1 years ago
           1.x        1.0.0     2018-08-10   8.1 years ago                 past release-high-years 5
-          newest     1.0.0     2018-08-10   8.1 years ago                 past release-high-years 5
+          newest     v2.0.0-beta.12026-03-21   0.5 years ago                 below release-warn-years 3
           last push            2026-03-29   0.5 years ago                 below push-warn-years 3
-          libyears 0.0 behind the newest stable release
+          libyears 7.6 behind the newest stable release
 repository GitHub github.com/roots/wp-config: last push 2026-03-29 · fetched 2026-09-14
 
-score     18 = old-promise 16 + stale 2 [¼ of 8]     high from 16
-  maintenance  old-promise 16 (lead) · stale 2 (¼ of 8)
+score     16 = old-promise 16     high from 16
+  maintenance  old-promise 16 (lead)
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        test it on PHP 8.4 — 1.0.0 is its newest release
+do        test it on PHP 8.4
 
 flags
   old-promise  S5 · released 2018-08-10 for PHP 5 (php ">=5.6"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
-  stale        S2 high · last release 2018-08-10 (8.1 years ago)
   feeds        packagist.org: none on record
   accepted     none
   not checked  nothing
@@ -363,7 +363,8 @@ flags
                PKSA-pwsk-hy21-4gby · reported 2026-07-20 · 8 points · fix: php floor raise to 7.x from 7.14.2
     medium     CVE-2026-67355  Guzzle: Host-only cookie scope is not preserved
                PKSA-qxvb-2bpp-dnk6 · reported 2026-07-20 · 8 points · fix: php floor raise to 7.x from 7.15.1
-  feeds        packagist.org: 9 on record, 9 affect 6.5.8
+  feeds        packagist.org: 15 on record, 9 affect 6.5.8
+  pulls in     pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)
   accepted     none
   not checked  nothing
 
@@ -408,7 +409,7 @@ flags
                PKSA-ft77-7h5f-p3r6 · reported 2026-05-20 · 2 points · fix: php floor raise to 5.x from v5.4.52
     low        CVE-2026-45304  YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion ("Billion Laughs")
                PKSA-v5yj-8nmz-sk2q · reported 2026-05-20 · 2 points · fix: php floor raise to 5.x from v5.4.52
-  feeds        packagist.org: 3 on record, 3 affect v3.4.47
+  feeds        packagist.org: 5 on record, 3 affect v3.4.47
   accepted     none
   not checked  nothing
 
@@ -420,7 +421,7 @@ repository metadata
      5.x      v5.4.53       2026-05-20   >=7.2.5    3 of 3 · php floor raise (lowest fix); after it: at most 16, high, if Composer resolves it
      4.x      v4.4.45       2022-08-02   >=7.1.3    0 of 3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 3
-     2.x      v2.8.52       undated      >=5.3.9    0 of 3
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9    0 of 3
 
 == case psr7
 guzzlehttp/psr7 1.9.1 — high: left-behind · vulnerable
@@ -439,7 +440,7 @@ score     16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory]  
   reach        via guzzlehttp/guzzle: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle — clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle — clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind, PKSA-7qs6-zvnz-h66r, PKSA-gm5x-j3mz-71n9, PKSA-jj5t-2zs1-dcfm, PKSA-vznr-tgp9-fd7d
 
 flags
@@ -453,7 +454,7 @@ flags
                PKSA-jj5t-2zs1-dcfm · reported 2026-05-25 · 8 points · fix: php floor raise to 2.x from 2.10.2
     medium     CVE-2026-59882  guzzlehttp/psr7: Host Confusion via Weak URI Host Validation
                PKSA-vznr-tgp9-fd7d · reported 2026-07-21 · 8 points · fix: php floor raise to 2.x from 2.12.3
-  feeds        packagist.org: 4 on record, 4 affect 1.9.1
+  feeds        packagist.org: 6 on record, 4 affect 1.9.1
   accepted     none
   not checked  nothing
 
@@ -480,7 +481,7 @@ score     48 = old-promise 16 + vulnerable 32 [critical advisory]     critical f
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-n7sg-8f52-pqtf, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-6319-ffpf-gx66, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags
@@ -493,13 +494,13 @@ flags
     high       CVE-2026-47732  Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points
                PKSA-dpx1-78wg-1kqs · reported 2026-05-20 · 16 points · fix: php floor raise to 3.x from v3.26.0
     high       CVE-2022-39261  Possibility to load a template outside a configured directory when using the filesystem loader
-               PKSA-n7sg-8f52-pqtf · reported 2022-09-28 · 16 points · fix: composer update to 2.x from v2.15.3
+               PKSA-n7sg-8f52-pqtf · reported 2022-09-28 · 16 points · fix: upgrade to 2.x from v2.15.3
     medium     CVE-2026-48806  Sandbox `__toString()` policy bypass via dynamic mapping keys
                PKSA-1tmc-rt7x-12w6 · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
     medium     CVE-2026-46638  `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)
                PKSA-3mcc-k66d-pydb · reported 2026-05-20 · 8 points · fix: php floor raise to 3.x from v3.26.0
     medium     CVE-2024-45411  Possible sandbox bypass
-               PKSA-6319-ffpf-gx66 · reported 2024-09-09 · 8 points · fix: composer update to 2.x from v2.16.0
+               PKSA-6319-ffpf-gx66 · reported 2024-09-09 · 8 points · fix: upgrade to 2.x from v2.16.0
     medium     CVE-2026-48808  Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`
                PKSA-fbvq-z33h-r2np · reported 2026-05-27 · 8 points · fix: php floor raise to 3.x from v3.27.0
     medium     CVE-2026-48807  Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators
@@ -518,15 +519,16 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
-  feeds        packagist.org: 16 on record, 16 affect v1.43.1
+  feeds        packagist.org: 26 on record, 16 affect v1.43.1
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     3.x      v3.30.0       2026-09-25   >=8.1.0    16 of 16 · php floor raise (lowest fix); after it: at most 16, high, if Composer resolves it
-     2.x      v2.16.1       2024-09-09   >=7.1.3    2 of 16 · composer update; after it: at most 48, critical, if Composer resolves it
+     3.x      v3.30.0       2026-09-25   >=8.1.0    16 of 16 · php floor raise (lowest fix); held by composer.json and csa/guzzle-bundle and symfony/symfony; after it: at most 16, high, if Composer resolves it
+     2.x      v2.16.1       2024-09-09   >=7.1.3    2 of 16 · upgrade; held by composer.json; after it: at most 48, critical, if Composer resolves it
    * 1.x      v1.44.8       2024-09-09   >=7.2.5    2 of 16 · php floor raise; after it: at most 48, critical, if Composer resolves it
+note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
 == case xmlseclibs
 robrichards/xmlseclibs 3.1.1 — high: old-promise · vulnerable
@@ -555,7 +557,7 @@ flags
                PKSA-pr5h-1dpm-9x4k · reported 2026-03-13 · 16 points · fix: composer update to 3.x from 3.1.5
     medium     CVE-2025-66578  robrichards/xmlseclibs has an Libxml2 Canonicalization error which can bypass Digest/Signature validation
                PKSA-pcdf-qvqm-w4tv · reported 2025-12-08 · 8 points · fix: composer update to 3.x from 3.1.5
-  feeds        packagist.org: 2 on record, 2 affect 3.1.1
+  feeds        packagist.org: 4 on record, 2 affect 3.1.1
   accepted     none
   not checked  nothing
 
@@ -584,21 +586,21 @@ score     10 = left-behind 16 ÷ 2 transitive + vulnerable 2 [low advisory]     
   reach        via mautic/core-lib: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it
+do        move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind, PKSA-w9tt-7782-78jx
 
 flags
   left-behind  S8 · branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02)
   vulnerable   S9 · 1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter · lookup complete
     low        CVE-2026-102601  Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter
-               PKSA-w9tt-7782-78jx · reported 2026-09-29 · 2 points · fix: composer update to 3.x from 3.36.0
-  feeds        packagist.org: 1 on record, 1 affects 1.1.9
+               PKSA-w9tt-7782-78jx · reported 2026-09-29 · 2 points · fix: upgrade to 3.x from 3.36.0
+  feeds        packagist.org: 2 on record, 1 affects 1.1.9
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     3.x      3.36.0        2026-09-02   ^8.0.2     1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     3.x      3.36.0        2026-09-02   ^8.0.2     1 of 1 · upgrade (lowest fix); held by barryvdh/elfinder-flysystem-driver and league/flysystem-cached-adapter; after it: 0, ok, if Composer resolves it
      2.x      2.5.0         2022-09-17   ^7.2 || ^8.0 0 of 1
    * 1.x      1.1.10        2022-10-04   ^7.2.5 || ^8.0 0 of 1
      0.5.x    0.5.12        2014-11-05   >=5.4.0    0 of 1
@@ -660,6 +662,7 @@ flags
   abandoned    S1 high, S3 high · marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.0 years ago); last push 2019-09-16 (7.0 years ago)
   old-promise  S5 · released 2019-09-16 for PHP 5 (php ">=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
+  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
   accepted     none
   not checked  nothing
 
@@ -695,7 +698,7 @@ flags
                PKSA-zyf5-hrxv-hrd7 · reported 2026-09-01 · 16 points · fix: composer update to 2.x from 2.10.0
     medium     PKSA-m2dq-1fhr-29b1  league/commonmark: DisallowedRawHtml bypassed when a disallowed tag name ends the raw-HTML literal
                PKSA-m2dq-1fhr-29b1 · reported 2026-09-30 · 8 points · fix: composer update to 2.x from 2.10.3
-  feeds        packagist.org: 3 on record, 3 affect 2.9.1
+  feeds        packagist.org: 18 on record, 3 affect 2.9.1
   accepted     none
   not checked  nothing
 
@@ -791,8 +794,8 @@ score     10 = (left-behind 16 + old-promise 4 [¼ of 16]) ÷ 2 unreached     me
   reach        unreached: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then move league/uri to ^7.8 — clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it
-          clears left-behind, old-promise
+do        raise require.php to >=8.1, then move league/uri to ^7.8 — clears left-behind; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it
+          clears left-behind
 
 flags
   left-behind  S8 · branch 6.x last released 2022-09-13 (4.0 years ago); 7.x released 7.8.1 (2026-03-15), needs php ^8.1 above the project's php ^7.2.5 || ^8.0; no releasing branch within reach
@@ -861,6 +864,7 @@ flags
   silent       S2 high, S4 high · last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago)
   old-promise  S5 · released 2018-08-08 for PHP 7 (php ">=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: yosymfony/parser-utils (silent)
   accepted     none
   not checked  nothing
 
@@ -926,37 +930,41 @@ flags
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 8.x      v8.6.1        undated      ~8.4.0 || ~8.5.0
+   * 8.x      v8.6.1        commit 2026-01-24 ~8.4.0 || ~8.5.0
      7.x      v7.14.0       2026-01-24   ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0
      6.x      v6.13.1       2024-11-29   ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0
      5.x      v5.13.2       2022-01-03   —
 * the installed branch's highest tag has no release date — the repository leaves it undated, or dates it only by a commit other tags share (`commit …`: a subtree split, the day the directory last changed) — so S8 does not measure the branch
 
 == case pagerfanta
-pagerfanta/twig v3.8.0 — ok
+pagerfanta/twig v3.8.0 — high: left-behind
   direct requirement (composer.json require)
 
 age       installed  v3.8.0    2023-04-15   3.5 years ago
           3.x        v3.8.0    2023-04-15   3.5 years ago                 past release-warn-years 3
           newest               not read (undated releases)
           last push            2026-09-08   0.1 years ago                 below push-warn-years 3
-          libyears not measured: undated releases
+          libyears at least 1.9 behind the newest stable release
 repository GitHub github.com/Pagerfanta/twig: last push 2026-09-08 · fetched 2026-09-14
 
-score     0
+score     16 = left-behind 16     high from 16
+  maintenance  left-behind 16 (lead)
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        nothing to do: nothing counts
+do        raise require.php to >=8.1, then require pagerfanta/twig ^4.9 — clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
 
 flags
+  left-behind  S8 · branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach
   feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: pagerfanta/core (left-behind)
   accepted     none
   not checked  S2, S8 (undated releases)
 
 repository metadata
      branch   highest tag   released     php        fixes
-     4.x      v4.9.0        undated      ^8.1
+     4.x      v4.9.0        commit 2025-03-08 ^8.1
    * 3.x      v3.8.0        2023-04-15   ^7.4 || ^8.0
      2.x      v2.7.3        2021-07-25   ^7.2 || ^8.0
 
@@ -977,7 +985,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-2z36-j4q9-rsfy, PKSA-6d8m-6kgw-18zr, PKSA-fvw5-9t6n-nwvr, PKSA-gcrk-3vtt-1r14, PKSA-k1b4-kshy-xgbh, PKSA-yfw5-9gnj-n2c7, PKSA-93qv-9n9h-6k6p, PKSA-bbs6-q5q9-f3t4, PKSA-bcdd-5xc7-gwfb, PKSA-cnw1-2ytm-cgr8, PKSA-fy2t-3c5f-827y, PKSA-k22t-f949-t9g6, PKSA-pwsk-hy21-4gby, PKSA-qxvb-2bpp-dnk6
 
 flags
@@ -985,42 +993,43 @@ flags
   old-promise  S5 · released 2019-10-30 for PHP 5 (php ">=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 14 advisories: 6 high, 8 medium — none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade · lookup complete
     high       CVE-2022-31043  Fix failure to strip Authorization header on HTTP downgrade
-               PKSA-2z36-j4q9-rsfy · reported 2022-06-09 · 16 points · fix: composer update to 6.x from 6.5.7
+               PKSA-2z36-j4q9-rsfy · reported 2022-06-09 · 16 points · fix: upgrade to 6.x from 6.5.7
     high       CVE-2022-29248  Cross-domain cookie leakage
-               PKSA-6d8m-6kgw-18zr · reported 2022-05-25 · 16 points · fix: composer update to 6.x from 6.5.6
+               PKSA-6d8m-6kgw-18zr · reported 2022-05-25 · 16 points · fix: upgrade to 6.x from 6.5.6
     high       CVE-2022-31042  Failure to strip the Cookie header on change in host or HTTP downgrade
-               PKSA-fvw5-9t6n-nwvr · reported 2022-06-09 · 16 points · fix: composer update to 6.x from 6.5.7
+               PKSA-fvw5-9t6n-nwvr · reported 2022-06-09 · 16 points · fix: upgrade to 6.x from 6.5.7
     high       CVE-2026-69246  Guzzle: Noncanonical host can bypass host-based checks
-               PKSA-gcrk-3vtt-1r14 · reported 2026-08-03 · 16 points · fix: composer update to 7.x from 7.15.2
+               PKSA-gcrk-3vtt-1r14 · reported 2026-08-03 · 16 points · fix: upgrade to 7.x from 7.15.2
     high       CVE-2022-31090  CURLOPT_HTTPAUTH option not cleared on change of origin
-               PKSA-k1b4-kshy-xgbh · reported 2022-06-20 · 16 points · fix: composer update to 6.x from 6.5.8
+               PKSA-k1b4-kshy-xgbh · reported 2022-06-20 · 16 points · fix: upgrade to 6.x from 6.5.8
     high       CVE-2022-31091  Change in port should be considered a change in origin
-               PKSA-yfw5-9gnj-n2c7 · reported 2022-06-20 · 16 points · fix: composer update to 6.x from 6.5.8
+               PKSA-yfw5-9gnj-n2c7 · reported 2022-06-20 · 16 points · fix: upgrade to 6.x from 6.5.8
     medium     CVE-2026-55767  Dot-only cookie domains match all hosts
-               PKSA-93qv-9n9h-6k6p · reported 2026-06-18 · 8 points · fix: composer update to 7.x from 7.12.1
+               PKSA-93qv-9n9h-6k6p · reported 2026-06-18 · 8 points · fix: upgrade to 7.x from 7.12.1
     medium     CVE-2026-67353  Guzzle: Unbounded response cookies risk denial of service
-               PKSA-bbs6-q5q9-f3t4 · reported 2026-07-20 · 8 points · fix: composer update to 7.x from 7.15.1
+               PKSA-bbs6-q5q9-f3t4 · reported 2026-07-20 · 8 points · fix: upgrade to 7.x from 7.15.1
     medium     CVE-2026-59883  Guzzle: Cookie Disclosure and Injection via IP-Address Domains
-               PKSA-bcdd-5xc7-gwfb · reported 2026-07-20 · 8 points · fix: composer update to 7.x from 7.12.3
+               PKSA-bcdd-5xc7-gwfb · reported 2026-07-20 · 8 points · fix: upgrade to 7.x from 7.12.3
     medium     CVE-2026-69245  Guzzle: Noncanonical cookie domain keeps subdomain scope
-               PKSA-cnw1-2ytm-cgr8 · reported 2026-08-03 · 8 points · fix: composer update to 7.x from 7.15.2
+               PKSA-cnw1-2ytm-cgr8 · reported 2026-08-03 · 8 points · fix: upgrade to 7.x from 7.15.2
     medium     CVE-2026-67354  Guzzle: URI fragments disclosed in redirect Referer headers
-               PKSA-fy2t-3c5f-827y · reported 2026-07-20 · 8 points · fix: composer update to 7.x from 7.15.1
+               PKSA-fy2t-3c5f-827y · reported 2026-07-20 · 8 points · fix: upgrade to 7.x from 7.15.1
     medium     CVE-2026-55568  Silent HTTPS proxy downgrade to cleartext
-               PKSA-k22t-f949-t9g6 · reported 2026-06-18 · 8 points · fix: composer update to 7.x from 7.12.1
+               PKSA-k22t-f949-t9g6 · reported 2026-06-18 · 8 points · fix: upgrade to 7.x from 7.12.1
     medium     CVE-2026-67339  Guzzle: Proxy-Authorization headers can be sent to origin servers
-               PKSA-pwsk-hy21-4gby · reported 2026-07-20 · 8 points · fix: composer update to 7.x from 7.14.2
+               PKSA-pwsk-hy21-4gby · reported 2026-07-20 · 8 points · fix: upgrade to 7.x from 7.14.2
     medium     CVE-2026-67355  Guzzle: Host-only cookie scope is not preserved
-               PKSA-qxvb-2bpp-dnk6 · reported 2026-07-20 · 8 points · fix: composer update to 7.x from 7.15.1
-  feeds        packagist.org: 14 on record, 14 affect 5.3.4
+               PKSA-qxvb-2bpp-dnk6 · reported 2026-07-20 · 8 points · fix: upgrade to 7.x from 7.15.1
+  feeds        packagist.org: 15 on record, 14 affect 5.3.4
+  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · composer update (lowest fix); after it: at most 16, high, if Composer resolves it
-     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · composer update; after it: at most 16, high, if Composer resolves it
-     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · composer update; after it: 32, critical, if Composer resolves it
+     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · upgrade (lowest fix); held by composer.json and bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter; after it: at most 16, high, if Composer resolves it
+     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · upgrade; held by composer.json and bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter; after it: at most 16, high, if Composer resolves it
+     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · upgrade; held by composer.json and bdunogier/guzzle-site-authenticator and php-http/guzzle5-adapter; after it: 32, critical, if Composer resolves it
    * 5.x      5.3.4         2019-10-30   >=5.4.0    0 of 14
      4.x      4.2.4         2016-07-15   >=5.4.0    0 of 14
      3.x      v3.8.1        2014-01-28   >=5.3.3    0 of 14
@@ -1043,23 +1052,24 @@ score     32 = abandoned 32     critical from 32
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        replace with web-token/jwt-library (named by its registry)
+do        replace with web-token/jwt-library (named by its registry; itself high: vulnerable)
 
 flags
   abandoned    S1 high · marked abandoned by its registry, replacement: web-token/jwt-library
   feeds        packagist.org: none on record
+  pulls in     pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math (left-behind)
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-   * 3.x      3.4.8         undated      >=8.1
-     2.x      v2.2.11       undated      —
+   * 3.x      3.4.8         commit 2024-02-22 >=8.1
+     2.x      v2.2.11       commit 2021-03-17 —
      1.x      v1.3.10       2020-03-20   —
      0.5.x    v0.5.2        2017-12-02   ^7.1
      0.4.x    v0.4.1        2017-11-22   ^7.1
-     0.3.x    v0.3.2        undated      ^7.1
-     0.2.x    v0.2.3        undated      ^7.1
+     0.3.x    v0.3.2        commit 2017-11-17 ^7.1
+     0.2.x    v0.2.3        commit 2017-11-15 ^7.1
      0.1.x    v0.1.0        2017-11-13   ^7.1
      0.0.2    v0.0.2        2017-10-15   ^7.1
      0.0.1    v0.0.1        2017-10-15   ^7.1
@@ -1087,13 +1097,14 @@ do        replace it: its registry suggests "Symfony"
 flags
   abandoned    S1 high, S3 high · marked abandoned by its registry, replacement: Symfony; its repository is archived on GitHub; last release 2023-02-24 (3.6 years ago); last push 2023-02-24 (3.6 years ago)
   feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: doctrine/annotations (abandoned)
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
    * 6.x      v6.2.10       2023-02-24   >=7.2.5
-     5.x      v5.6.1        2020-08-25   >=7.1.3
+     5.x      v5.6.1        2020-08-25   >=7.2.5
      4.x      v4.0.0        2017-09-29   —
      3.x      v3.0.29       2017-12-14   —
      2.x      v2.3.4        2013-07-24   —
@@ -1115,29 +1126,29 @@ score     16 = left-behind 16 ÷ 2 transitive + vulnerable 8 [medium advisory]  
   reach        via mautic/core-lib: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        move symfony/routing to ^5.4.53 through mautic/core-lib — clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it
+do        move symfony/routing to ^5.4.53 through mautic/core-lib — clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind, PKSA-bf7t-jnpz-492k, PKSA-yc7t-91v9-99xs
 
 flags
   left-behind  S8 · branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28)
   vulnerable   S9 · 2 advisories: 2 medium — none fixed on 4.x; worst: CVE-2026-48784 UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization · lookup complete
     medium     CVE-2026-48784  UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` → Generated URL Collapses Off-Route Under RFC 3986 Normalization
-               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 8 points · fix: composer update to 5.x from v5.4.53
+               PKSA-bf7t-jnpz-492k · reported 2026-05-26 · 8 points · fix: upgrade to 5.x from v5.4.53
     medium     CVE-2026-45065  UrlGenerator Route-Requirement Bypass via Unanchored Regex Alternation → Off-Site //host URL Injection
-               PKSA-yc7t-91v9-99xs · reported 2026-05-20 · 8 points · fix: composer update to 5.x from v5.4.52
-  feeds        packagist.org: 2 on record, 2 affect v4.4.41
+               PKSA-yc7t-91v9-99xs · reported 2026-05-20 · 8 points · fix: upgrade to 5.x from v5.4.52
+  feeds        packagist.org: 4 on record, 2 affect v4.4.41
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      v8.1.8        2026-09-28   >=8.4.1    2 of 2 · composer update; after it: 0, ok, if Composer resolves it
-     7.x      v7.4.20       2026-09-28   >=8.2      2 of 2 · composer update; after it: 0, ok, if Composer resolves it
-     6.x      v6.4.47       2026-09-28   >=8.1      2 of 2 · composer update; after it: 0, ok, if Composer resolves it
-     5.x      v5.4.53       2026-05-22   >=7.2.5    2 of 2 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     8.x      v8.1.8        2026-09-28   >=8.4.1    2 of 2 · upgrade; held by friendsofsymfony/rest-bundle and mautic/core-lib and symfony/framework-bundle; after it: 0, ok, if Composer resolves it
+     7.x      v7.4.20       2026-09-28   >=8.2      2 of 2 · upgrade; held by friendsofsymfony/rest-bundle and mautic/core-lib and symfony/framework-bundle; after it: 0, ok, if Composer resolves it
+     6.x      v6.4.47       2026-09-28   >=8.1      2 of 2 · upgrade; held by mautic/core-lib and symfony/framework-bundle; after it: 0, ok, if Composer resolves it
+     5.x      v5.4.53       2026-05-22   >=7.2.5    2 of 2 · upgrade (lowest fix); held by mautic/core-lib; after it: 0, ok, if Composer resolves it
    * 4.x      v4.4.44       2022-07-20   >=7.1.3    0 of 2
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 2
-     2.x      v2.8.52       undated      >=5.3.9    0 of 2
+     2.x      v2.8.52       commit 2018-11-20 >=5.3.9    0 of 2
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
 == case unknown
@@ -1158,7 +1169,8 @@ score     0
 do        nothing to do: nothing counts
 
 flags
-  feeds        packagist.org: none on record
+  feeds        packagist.org: 112 on record, 0 affect 10.6.18
+  pulls in     pulls in 3 flagged packages: guzzlehttp/guzzle (vulnerable), pear/console_getopt (silent), pear/pear_exception (stale)
   accepted     none
   not checked  S3, S4 (not from a Composer repository) · S2, S8 (not from a Composer repository)
 
@@ -1250,7 +1262,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 — clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind, PKSA-2z36-j4q9-rsfy, PKSA-6d8m-6kgw-18zr, PKSA-fvw5-9t6n-nwvr, PKSA-gcrk-3vtt-1r14, PKSA-k1b4-kshy-xgbh, PKSA-yfw5-9gnj-n2c7, PKSA-93qv-9n9h-6k6p, PKSA-bbs6-q5q9-f3t4, PKSA-bcdd-5xc7-gwfb, PKSA-cnw1-2ytm-cgr8, PKSA-fy2t-3c5f-827y, PKSA-k22t-f949-t9g6, PKSA-pwsk-hy21-4gby, PKSA-qxvb-2bpp-dnk6
 
 flags
@@ -1258,17 +1270,17 @@ flags
   old-promise  S5 · released 2019-10-30 for PHP 5 (php ">=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 14 advisories: 6 high, 8 medium — none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade · lookup complete
     high       CVE-2022-31043  Fix failure to strip Authorization header on HTTP downgrade
-               PKSA-2z36-j4q9-rsfy · reported 2022-06-09 · 16 points · fix: composer update to 6.x from 6.5.7
+               PKSA-2z36-j4q9-rsfy · reported 2022-06-09 · 16 points · fix: upgrade to 6.x from 6.5.7
     high       CVE-2022-29248  Cross-domain cookie leakage
-               PKSA-6d8m-6kgw-18zr · reported 2022-05-25 · 16 points · fix: composer update to 6.x from 6.5.6
+               PKSA-6d8m-6kgw-18zr · reported 2022-05-25 · 16 points · fix: upgrade to 6.x from 6.5.6
     high       CVE-2022-31042  Failure to strip the Cookie header on change in host or HTTP downgrade
-               PKSA-fvw5-9t6n-nwvr · reported 2022-06-09 · 16 points · fix: composer update to 6.x from 6.5.7
+               PKSA-fvw5-9t6n-nwvr · reported 2022-06-09 · 16 points · fix: upgrade to 6.x from 6.5.7
     high       CVE-2026-69246  Guzzle: Noncanonical host can bypass host-based checks
                PKSA-gcrk-3vtt-1r14 · reported 2026-08-03 · 16 points · fix: php floor raise to 7.x from 7.15.2
     high       CVE-2022-31090  CURLOPT_HTTPAUTH option not cleared on change of origin
-               PKSA-k1b4-kshy-xgbh · reported 2022-06-20 · 16 points · fix: composer update to 6.x from 6.5.8
+               PKSA-k1b4-kshy-xgbh · reported 2022-06-20 · 16 points · fix: upgrade to 6.x from 6.5.8
     high       CVE-2022-31091  Change in port should be considered a change in origin
-               PKSA-yfw5-9gnj-n2c7 · reported 2022-06-20 · 16 points · fix: composer update to 6.x from 6.5.8
+               PKSA-yfw5-9gnj-n2c7 · reported 2022-06-20 · 16 points · fix: upgrade to 6.x from 6.5.8
     medium     CVE-2026-55767  Dot-only cookie domains match all hosts
                PKSA-93qv-9n9h-6k6p · reported 2026-06-18 · 8 points · fix: php floor raise to 7.x from 7.12.1
     medium     CVE-2026-67353  Guzzle: Unbounded response cookies risk denial of service
@@ -1285,20 +1297,22 @@ flags
                PKSA-pwsk-hy21-4gby · reported 2026-07-20 · 8 points · fix: php floor raise to 7.x from 7.14.2
     medium     CVE-2026-67355  Guzzle: Host-only cookie scope is not preserved
                PKSA-qxvb-2bpp-dnk6 · reported 2026-07-20 · 8 points · fix: php floor raise to 7.x from 7.15.1
-  feeds        packagist.org: 14 on record, 14 affect 5.3.4
+  feeds        packagist.org: 15 on record, 14 affect 5.3.4
+  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · php floor raise; after it: at most 16, high, if Composer resolves it
-     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · php floor raise (lowest fix); after it: at most 16, high, if Composer resolves it
-     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · composer update; after it: 32, critical, if Composer resolves it
+     8.x      8.2.0         2026-09-06   ^7.4 || ^8.0 14 of 14 · php floor raise; held by composer.json and csa/guzzle-bundle and guzzlehttp/cache-subscriber and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: at most 16, high, if Composer resolves it
+     7.x      7.15.5        2026-08-24   ^7.2.5 || ^8.0 14 of 14 · php floor raise (lowest fix); held by composer.json and csa/guzzle-bundle and guzzlehttp/cache-subscriber and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: at most 16, high, if Composer resolves it
+     6.x      6.5.8         2022-06-20   >=5.5      5 of 14 · upgrade; held by composer.json and csa/guzzle-bundle and guzzlehttp/cache-subscriber and guzzlehttp/log-subscriber and prestashop/circuit-breaker; after it: 32, critical, if Composer resolves it
    * 5.x      5.3.4         2019-10-30   >=5.4.0    0 of 14
      4.x      4.2.4         2016-07-15   >=5.4.0    0 of 14
      3.x      v3.8.1        2014-01-28   >=5.3.3    0 of 14
      2.x      v2.8.8        2012-10-16   >=5.3.2    0 of 14
      1.x      v1.0.4        2011-12-31   >=5.3.2    0 of 14
+note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
 == case joomla-filter
 joomla/filter 2.0.5 — medium: vulnerable
@@ -1323,7 +1337,7 @@ flags
   vulnerable   S9 · 1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter · lookup complete
     medium     CVE-2025-54476  Joomla! CMS vulnerable to XSS via the input filter
                PKSA-5x9t-bkbj-vmgp · reported 2025-09-30 · 8 points · fix: php floor raise to 3.x from 3.0.5
-  feeds        packagist.org: 1 on record, 1 affects 2.0.5
+  feeds        packagist.org: 2 on record, 1 affects 2.0.5
   accepted     none
   not checked  nothing
 
@@ -1353,7 +1367,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
 
 do        composer update symfony/monolog-bridge (gets v2.8.52) — clears the advisory; left-behind, old-promise stay
           clears PKSA-4wjj-gy1p-ft3r
-          also: require symfony/monolog-bridge ^5.4 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
+          also: require symfony/monolog-bridge ^5.4 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
 
 flags
   left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
@@ -1370,7 +1384,7 @@ repository metadata
      8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
      7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
      6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; held by composer.json; after it: 0, ok, if Composer resolves it
-     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade; held by composer.json; after it: 0, ok, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade; held by composer.json; after it: at most 16, high, if Composer resolves it
      4.x      v4.4.43       2022-06-16   >=7.1.3    1 of 1 · upgrade; held by composer.json; after it: 16, high, if Composer resolves it
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 1 of 1 · upgrade; held by composer.json; after it: 20, high, if Composer resolves it
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    1 of 1 · composer update (lowest fix); after it: 20, high, if Composer resolves it
@@ -1384,7 +1398,7 @@ age       installed  v1.37.0   not read (no date)
           newest     v1.43.0   2026-09-23   less than three weeks ago     below release-warn-years 3
           last push            not read (allowlisted)
           libyears not measured: no date
-repository repository activity not asked (allowlisted)
+repository github.com/symfony/polyfill-intl-idn: not asked (allowlisted)
 
 score     2 = vulnerable 2 [low advisory]     low from 1
   security     vulnerable 2 (low advisory CVE-2026-46644)
@@ -1455,7 +1469,7 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 4 points · fix: blocked to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 4 points · fix: blocked to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 
@@ -1481,48 +1495,48 @@ score     32 = vulnerable 32 [critical advisory]     critical from 32
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags
   vulnerable   S9 high · 15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst: CVE-2026-46633 PHP code injection via `{% use %}` template name · lookup complete
     critical   CVE-2026-46633  PHP code injection via `{% use %}` template name
-               PKSA-h8hf-ytnd-5t9q · reported 2026-05-20 · 32 points · fix: composer update to 3.x from v3.26.0
+               PKSA-h8hf-ytnd-5t9q · reported 2026-05-20 · 32 points · fix: upgrade to 3.x from v3.26.0
     high       CVE-2026-49981  Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`
-               PKSA-8zx5-v2nz-58pb · reported 2026-07-01 · 16 points · fix: composer update to 3.x from v3.27.0
+               PKSA-8zx5-v2nz-58pb · reported 2026-07-01 · 16 points · fix: upgrade to 3.x from v3.27.0
     high       CVE-2026-47732  Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points
-               PKSA-dpx1-78wg-1kqs · reported 2026-05-20 · 16 points · fix: composer update to 3.x from v3.26.0
+               PKSA-dpx1-78wg-1kqs · reported 2026-05-20 · 16 points · fix: upgrade to 3.x from v3.26.0
     high       CVE-2026-24425  Possible sandbox bypass when using a source policy
-               PKSA-gw7n-z4yx-7xjt · reported 2026-05-20 · 16 points · fix: composer update to 3.x from v3.26.0
+               PKSA-gw7n-z4yx-7xjt · reported 2026-05-20 · 16 points · fix: upgrade to 3.x from v3.26.0
     medium     CVE-2026-48806  Sandbox `__toString()` policy bypass via dynamic mapping keys
-               PKSA-1tmc-rt7x-12w6 · reported 2026-05-27 · 8 points · fix: composer update to 3.x from v3.27.0
+               PKSA-1tmc-rt7x-12w6 · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
     medium     CVE-2026-46638  `{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)
-               PKSA-3mcc-k66d-pydb · reported 2026-05-20 · 8 points · fix: composer update to 3.x from v3.26.0
+               PKSA-3mcc-k66d-pydb · reported 2026-05-20 · 8 points · fix: upgrade to 3.x from v3.26.0
     medium     CVE-2026-48808  Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`
-               PKSA-fbvq-z33h-r2np · reported 2026-05-27 · 8 points · fix: composer update to 3.x from v3.27.0
+               PKSA-fbvq-z33h-r2np · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
     medium     CVE-2026-48807  Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators
-               PKSA-xx6c-6d96-db2w · reported 2026-05-27 · 8 points · fix: composer update to 3.x from v3.27.0
+               PKSA-xx6c-6d96-db2w · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
     unrated    CVE-2026-46627  Sandbox does not protect against resource exhaustion
-               PKSA-kvv6-36cr-fkzb · reported 2026-05-20 · 8 points · fix: composer update to 3.x from v3.26.0
+               PKSA-kvv6-36cr-fkzb · reported 2026-05-20 · 8 points · fix: upgrade to 3.x from v3.26.0
     unrated    CVE-2026-46636  Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders
-               PKSA-yd6k-t2gh-1m43 · reported 2026-05-27 · 8 points · fix: composer update to 3.x from v3.27.0
+               PKSA-yd6k-t2gh-1m43 · reported 2026-05-27 · 8 points · fix: upgrade to 3.x from v3.27.0
     low        CVE-2024-51755  Unguarded calls to __isset() and to array-accesses when the sandbox is enabled
-               PKSA-2wrf-1xmk-1pky · reported 2024-11-06 · 2 points · fix: composer update to 3.x from v3.14.1
+               PKSA-2wrf-1xmk-1pky · reported 2024-11-06 · 2 points · fix: upgrade to 3.x from v3.14.1
     low        CVE-2026-48805  Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`
-               PKSA-g9zw-qxh8-pq8w · reported 2026-05-27 · 2 points · fix: composer update to 3.x from v3.27.0
+               PKSA-g9zw-qxh8-pq8w · reported 2026-05-27 · 2 points · fix: upgrade to 3.x from v3.27.0
     low        CVE-2026-46635  Sandbox property allowlist bypass via the `column` filter (array_column on objects)
-               PKSA-n14z-jjjg-g8vd · reported 2026-05-20 · 2 points · fix: composer update to 3.x from v3.26.0
+               PKSA-n14z-jjjg-g8vd · reported 2026-05-20 · 2 points · fix: upgrade to 3.x from v3.26.0
     low        CVE-2026-46628  The `spaceless` filter implicitly marks its output as safe
-               PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: composer update to 3.x from v3.26.0
+               PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: upgrade to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
-               PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: composer update to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+               PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: upgrade to 3.x from v3.14.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     3.x      v3.30.0       2026-09-25   >=8.1.0    15 of 15 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     3.x      v3.30.0       2026-09-25   >=8.1.0    15 of 15 · upgrade (lowest fix); held by composer.json and symfony/twig-bridge; after it: 0, ok, if Composer resolves it
    * 2.x      v2.16.1       2024-09-09   >=7.1.3    0 of 15
      1.x      v1.44.8       2024-09-09   >=7.2.5    0 of 15
 
@@ -1577,7 +1591,7 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 
@@ -1616,7 +1630,7 @@ repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case B-baselined‡
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
@@ -1635,7 +1649,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -1643,17 +1657,17 @@ flags
   old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
-               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: composer update to 5.x from v5.4.52
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
   feeds        packagist.org: 1 on record, 1 affects v2.6.13
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
@@ -1665,9 +1679,9 @@ symfony/debug v3.4.47 — critical: abandoned · old-promise
 age       installed  v3.4.47   2020-10-24   5.9 years ago
           3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5
           newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3
-          last push            not read (no repository found)
+          last push            not read (no token)
           libyears 1.8 behind the newest stable release
-repository repository activity not asked (no repository found)
+repository github.com/symfony/debug: not asked (no token)
 
 score     36 = abandoned 32 + old-promise 4 [¼ of 16]     critical from 32
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
@@ -1681,13 +1695,14 @@ flags
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S3, S4 (no repository found)
+  not checked  S3, S4 (no token)
 
 repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
+note: GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)
 
 == case tie‡
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
@@ -1706,8 +1721,8 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [medium
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4 — clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; a new major brings its own requirements, which lockrot does not solve
-          clears left-behind, old-promise
+do        require symfony/monolog-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
           also: no release fixes it
 
 flags
@@ -1757,7 +1772,7 @@ flags
                PKSA-ft77-7h5f-p3r6 · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
     low        CVE-2026-45304  YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion ("Billion Laughs")
                PKSA-v5yj-8nmz-sk2q · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
-  feeds        packagist.org: 3 on record, 3 affect v5.4.23
+  feeds        packagist.org: 5 on record, 4 affect v5.4.23
   accepted     none
   not checked  nothing
 
@@ -1769,7 +1784,7 @@ repository metadata
    * 5.x      v5.4.53       2026-05-20   >=7.2.5    3 of 3 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
      4.x      v4.4.45       2022-08-02   >=7.1.3    0 of 3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 3
-     2.x      v2.8.52       undated      >=5.3.9    0 of 3
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9    0 of 3
 
 == case E-ignored-whole‡
 symfony/yaml v5.4.23 — low: vulnerable
@@ -1780,7 +1795,7 @@ age       installed  v5.4.23   2023-04-23   3.4 years ago
           newest     v8.1.8    2026-09-26   less than three weeks ago     below release-warn-years 3
           last push            not read (allowlisted)
           libyears 3.4 behind the newest stable release
-repository repository activity not asked (allowlisted)
+repository github.com/symfony/yaml: not asked (allowlisted)
 
 score     2 = vulnerable 2 [low advisory]     low from 1
   security     vulnerable 2 (low advisory CVE-2026-45133)
@@ -1798,7 +1813,7 @@ flags
                PKSA-ft77-7h5f-p3r6 · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
     low        CVE-2026-45304  YAML Parser Exponential Memory Allocation via Recursive Collection-Alias Expansion ("Billion Laughs")
                PKSA-v5yj-8nmz-sk2q · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
-  feeds        packagist.org: 3 on record, 3 affect v5.4.23
+  feeds        packagist.org: 5 on record, 3 affect v5.4.23
   accepted     none
   not checked  S3, S4 (allowlisted)
 
@@ -1810,8 +1825,8 @@ repository metadata
    * 5.x      v5.4.53       2026-05-20   >=7.2.5    3 of 3 · composer update (lowest fix); after it: 0, finished, if Composer resolves it
      4.x      v4.4.45       2022-08-02   >=7.1.3    0 of 3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 3
-     2.x      v2.8.52       undated      >=5.3.9    0 of 3
-note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml: 3 counted advisories; accept them in Composer's audit policy if that is the decision
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9    0 of 3
+note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision
 
 == case hoa-tokenless‡
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
@@ -1820,9 +1835,9 @@ hoa/consistency 1.17.05.02 — high: abandoned · old-promise
 age       installed  1.17.05.022017-05-02   9.4 years ago
           1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
           newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            not read (no repository found)
+          last push            not read (no token)
           libyears 0.3 behind the newest stable release
-repository repository activity not asked (no repository found)
+repository github.com/hoaproject/Consistency: not asked (no token)
 
 score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     high from 16
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
@@ -1836,13 +1851,14 @@ flags
   old-promise  S5 · released 2017-05-02 for PHP 5 (php ">=5.5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S3, S4 (no repository found)
+  not checked  S3, S4 (no token)
 
 repository metadata
      branch   highest tag   released     php        fixes
      2.x      2.17.08.29    2017-08-29   >=7.1
    * 1.x      1.17.05.02    2017-05-02   >=5.5.0
      0.16.x   0.16.01.06    2016-01-06   —
+note: GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)
 
 == case C-offline‡
 symfony/debug v3.4.47 — critical: abandoned · old-promise
@@ -1851,9 +1867,9 @@ symfony/debug v3.4.47 — critical: abandoned · old-promise
 age       installed  v3.4.47   2020-10-24   5.9 years ago
           3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5
           newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3
-          last push            not read (no repository found)
+          last push            not read (offline)
           libyears 1.8 behind the newest stable release
-repository repository activity not asked (no repository found)
+repository github.com/symfony/debug: not asked (offline)
 
 score     36 = abandoned 32 + old-promise 4 [¼ of 16]     critical from 32
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
@@ -1866,17 +1882,19 @@ flags
   abandoned    S1 high · marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago)
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   accepted     none
-  not checked  S9 (offline) · S3, S4 (no repository found)
+  not checked  S9 (offline) · S3, S4 (offline)
 
 repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
+note: offline: repository metadata served from Composer's cache
+note: GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug
 
 == case B-dev‡
 symfony/monolog-bridge v2.6.13 — high: left-behind · old-promise · vulnerable
-  direct requirement (composer.json require)
+  direct requirement (composer.json require-dev)
 
 age       installed  v2.6.13   2016-01-14   10.7 years ago
           2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
@@ -1892,7 +1910,7 @@ score     18 = (left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high 
   dev          packages-dev: the score ÷ 2
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -1900,24 +1918,24 @@ flags
   old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
-               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: composer update to 5.x from v5.4.52
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
   feeds        packagist.org: 1 on record, 1 affects v2.6.13
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; after it: at most 8, medium, if Composer resolves it
-     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; after it: at most 8, medium, if Composer resolves it
-     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; after it: at most 8, medium, if Composer resolves it
-     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; held by composer.json; after it: at most 8, medium, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; held by composer.json; after it: at most 8, medium, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; held by composer.json; after it: at most 8, medium, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
 
 == case twig-dev‡
 twig/twig v2.16.1 — high: vulnerable
-  direct requirement (composer.json require)
+  direct requirement (composer.json require-dev)
 
 age       installed  v2.16.1   2024-09-09   2.1 years ago
           2.x        v2.16.1   2024-09-09   2.1 years ago                 below release-warn-years 3
@@ -1967,7 +1985,7 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 
@@ -2000,7 +2018,7 @@ flags
   vulnerable   S9 · 1 advisory: 1 medium — all fixed on 2.x (blocked); advisory: CVE-2025-54476 Joomla! CMS vulnerable to XSS via the input filter · lookup complete
     medium     CVE-2025-54476  Joomla! CMS vulnerable to XSS via the input filter
                PKSA-5x9t-bkbj-vmgp · reported 2025-09-30 · 8 points · fix: php floor raise to 3.x from 3.0.5
-  feeds        packagist.org: 1 on record, 1 affects 2.0.5
+  feeds        packagist.org: 2 on record, 1 affects 2.0.5
   accepted     none
   not checked  nothing
 
@@ -2068,7 +2086,7 @@ flags
                PKSA-v5yj-8nmz-sk2q · reported 2026-05-20 · 8 points · fix: composer update to 5.x from v5.4.52
     low        CVE-2026-45133  YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings
                PKSA-b14r-zh1d-vdrc · reported 2026-05-20 · 2 points · fix: composer update to 5.x from v5.4.52
-  feeds        packagist.org: 3 on record, 3 affect v5.4.23
+  feeds        packagist.org: 5 on record, 3 affect v5.4.23
   accepted     none
   not checked  nothing
 
@@ -2080,7 +2098,7 @@ repository metadata
    * 5.x      v5.4.53       2026-05-20   >=7.2.5    2 of 3 · composer update; after it: 16, high, if Composer resolves it
      4.x      v4.4.45       2022-08-02   >=7.1.3    0 of 3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 3
-     2.x      v2.8.52       undated      >=5.3.9    0 of 3
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9    0 of 3
 
 == case G-tag‡
 friendsofsymfony/oauth-server-bundle dev-master — high: pinned · stale
@@ -2105,6 +2123,7 @@ flags
   pinned       S6 · pinned to branch snapshot dev-master
   stale        S2 high · last release 2019-01-23 (7.7 years ago)
   feeds        packagist.org: none on record
+  pulls in     pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
   accepted     none
   not checked  S8 (a branch snapshot has no release branch)
 
@@ -2128,8 +2147,8 @@ score     20 = left-behind 16 + old-promise 4 [¼ of 16]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4 — clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
-          clears left-behind, old-promise
+do        require symfony/monolog-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
 
 flags
   left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
@@ -2163,7 +2182,7 @@ score     16 = left-behind 16     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require joomla/string ^3.0 — clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require joomla/string ^3.0 — clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears left-behind
 
 flags
@@ -2255,7 +2274,7 @@ score     16 = vulnerable 16 [high advisory]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-3r5d-mb8f-1qw9, PKSA-w7xr-vk7n-rstm, PKSA-8qx3-n5y5-vvnd, PKSA-m5cs-t1y6-qpcs, PKSA-mdq4-51ck-6kdq, PKSA-d5tc-s1qs-h781
 
 flags
@@ -2265,28 +2284,29 @@ flags
     high       CVE-2024-52301  Laravel environment manipulation via query string
                PKSA-w7xr-vk7n-rstm · reported 2024-11-12 · 16 points · fix: composer update to 9.x from v9.52.17
     medium     CVE-2025-27515  Laravel has a File Validation Bypass
-               PKSA-8qx3-n5y5-vvnd · reported 2025-03-05 · 8 points · fix: composer update to 10.x from v10.48.29
+               PKSA-8qx3-n5y5-vvnd · reported 2025-03-05 · 8 points · fix: upgrade to 10.x from v10.48.29
     medium     PKSA-m5cs-t1y6-qpcs  Laravel Framework: Temporary Signed URL Path Confusion
                PKSA-m5cs-t1y6-qpcs · reported 2026-06-17 · 8 points · fix: php floor raise to 12.x from v12.61.1
     unrated    CVE-2026-48019  Laravel CRLF injection in default email rule
                PKSA-mdq4-51ck-6kdq · reported 2026-05-19 · 8 points · fix: php floor raise to 12.x from v12.60.0
     low        CVE-2026-102279  Laravel: XSS in Debug Page Information
                PKSA-d5tc-s1qs-h781 · reported 2026-09-29 · 2 points · fix: php floor raise to 12.x from v12.69.0
-  feeds        packagist.org: 6 on record, 6 affect v9.52.16
+  feeds        packagist.org: 28 on record, 6 affect v9.52.16
+  pulls in     pulls in 11 flagged packages: league/commonmark (vulnerable), symfony/http-foundation (vulnerable), symfony/mime (vulnerable), symfony/process (vulnerable), nesbot/carbon (vulnerable) and 6 more
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     13.x     v13.34.0      2026-09-29   ^8.3       6 of 6 · php floor raise; after it: 0, ok, if Composer resolves it
-     12.x     v12.69.3      2026-09-29   ^8.2       6 of 6 · php floor raise (lowest fix); after it: 0, ok, if Composer resolves it
-     11.x     v11.57.0      2026-09-29   ^8.2       2 of 6 · php floor raise; after it: 16, high, if Composer resolves it
-     10.x     v10.50.3      2026-08-12   ^8.1       2 of 6 · composer update; after it: 16, high, if Composer resolves it
+     13.x     v13.34.0      2026-09-29   ^8.3       6 of 6 · php floor raise; held by composer.json and pragmarx/google2fa-laravel; after it: 0, ok, if Composer resolves it
+     12.x     v12.69.3      2026-09-29   ^8.2       6 of 6 · php floor raise (lowest fix); held by composer.json and pragmarx/google2fa-laravel; after it: 0, ok, if Composer resolves it
+     11.x     v11.57.0      2026-09-29   ^8.2       2 of 6 · php floor raise; held by composer.json; after it: 16, high, if Composer resolves it
+     10.x     v10.50.3      2026-08-12   ^8.1       2 of 6 · upgrade; held by composer.json; after it: 16, high, if Composer resolves it
    * 9.x      v9.52.22      2026-08-12   ^8.0.2     1 of 6 · composer update; after it: 16, high, if Composer resolves it
      8.x      v8.83.29      2024-11-20   ^7.3|^8.0  0 of 6
      7.x      v7.30.7       2024-11-12   ^7.2.5|^8.0 0 of 6
      6.x      v6.20.45      2024-11-12   ^7.2.5|^8.0 0 of 6
-     5.x      v5.8.38       2020-04-14   >=7.0      0 of 6
+     5.x      v5.8.38       2020-04-14   ^7.1.3     0 of 6
      4.x      v4.2.22       2016-11-12   >=5.4.0    0 of 6
 
 == case partial-op‡
@@ -2318,6 +2338,7 @@ flags
     medium     CVE-2026-00012  an advisory the installed branch fixes (‡)
                PKSA-part-0000-0002 · reported 2026-09-01 · 8 points · fix: composer update to 2.x from v2.13.0
   feeds        packagist.org: 2 on record, 2 affect v2.4.5
+  pulls in     pulls in 1 flagged package: maxmind/web-service-common (left-behind)
   accepted     none
   not checked  nothing
 
@@ -2351,7 +2372,7 @@ score     16 = vulnerable 16 [high advisory] (left-behind, old-promise accepted)
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
           clears PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -2359,17 +2380,17 @@ flags
   old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
-               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: composer update to 5.x from v5.4.52
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
   feeds        packagist.org: 1 on record, 1 affects v2.6.13
   accepted     left-behind, old-promise
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; after it: 0, finished, if Composer resolves it
-     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; after it: 0, finished, if Composer resolves it
-     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; after it: 0, finished, if Composer resolves it
-     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; held by composer.json; after it: 0, finished, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; held by composer.json; after it: 0, finished, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; held by composer.json; after it: 0, finished, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
@@ -2439,7 +2460,7 @@ repository metadata
      5.x      v5.4.45       2024-09-25   >=7.2.5
      4.x      v4.4.44       2022-07-20   >=7.1.3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-21 >=5.3.9
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
 == case snapshot-dead-line‡
@@ -2475,7 +2496,7 @@ repository metadata
      5.x      v5.4.45       2024-09-25   >=7.2.5
      4.x      v4.4.44       2022-07-20   >=7.1.3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-21 >=5.3.9
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
 == case snapshot-undated-line‡
@@ -2511,7 +2532,7 @@ repository metadata
      5.x      v5.4.45       2024-09-25   >=7.2.5
      4.x      v4.4.44       undated      >=7.1.3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-21 >=5.3.9
 note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
 
 == case installed-php-halved
@@ -2530,7 +2551,7 @@ score     18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive     hig
   reach        via web-auth/webauthn-lib: maintenance halved; security is never halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
+do        replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
 
 flags
   abandoned    S1 high · marked abandoned by its registry, replacement: web-auth/webauthn-lib
@@ -2542,7 +2563,7 @@ flags
 repository metadata
      branch   highest tag   released     php        fixes
      4.x      4.9.1         2024-07-11   —
-     3.x      v3.3.12       undated      >=7.2
+     3.x      v3.3.12       commit 2021-11-21 >=7.2
    * 2.x      v2.1.7        2019-09-04   ^7.1
 
 == case either-critical‡
@@ -2563,23 +2584,23 @@ score     68 = abandoned 32 + old-promise 4 [¼ of 16] + vulnerable 32 [critical
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
 do        replace with symfony/error-handler (named by its registry)
-          also: require symfony/debug ^4.4.0 — clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve
+          also: require symfony/debug ^4.4.0 — clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; held by composer.json (requires ~3.4); a new major brings its own requirements, which lockrot does not solve
 
 flags
   abandoned    S1 high, S3 high · marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitHub; last release 2022-07-28 (4.2 years ago); last push 2022-07-29 (4.2 years ago)
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 critical — none fixed on 3.x; advisory: CVE-2026-00003 an advisory added to show the either opening (‡) · lookup complete
     critical   CVE-2026-00003  an advisory added to show the either opening (‡)
-               PKSA-eith-0000-0001 · reported 2026-09-01 · 32 points · fix: composer update to 4.x from v4.4.0
+               PKSA-eith-0000-0001 · reported 2026-09-01 · 32 points · fix: upgrade to 4.x from v4.4.0
   feeds        packagist.org: 1 on record, 1 affects v3.4.47
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     4.x      v4.4.44       2022-07-28   >=7.1.3    1 of 1 · composer update (lowest fix); after it: at most 36, critical, if Composer resolves it
+     4.x      v4.4.44       2022-07-28   >=7.1.3    1 of 1 · upgrade (lowest fix); held by composer.json; after it: at most 36, critical, if Composer resolves it
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
-     2.x      v2.8.52       undated      >=5.3.9    0 of 1
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9    0 of 1
 
 == case either-low-dev‡
 balping/json-raw-encoder v1.0.2 — low: stale · vulnerable
@@ -2588,9 +2609,9 @@ balping/json-raw-encoder v1.0.2 — low: stale · vulnerable
 age       installed  v1.0.2    2023-03-27   3.5 years ago
           1.x        v1.0.2    2023-03-27   3.5 years ago                 past release-warn-years 3
           newest     v1.0.2    2023-03-27   3.5 years ago                 past release-warn-years 3
-          last push            not read (request failed)
+          last commit          2023-03-27   3.5 years ago                 past push-warn-years 3
           libyears 0.0 behind the newest stable release
-repository gitlab.com/balping/json-raw-encoder: not asked (request failed)
+repository GitLab gitlab.com/balping/json-raw-encoder: last commit 2023-03-27 · fetched 2026-09-14
 
 score     4 = (stale 8 ÷ 2 transitive + vulnerable 4 [low advisory 2 × 2: no reachable fix]) ÷ 2 dev     low from 1
   maintenance  stale 8 (lead)
@@ -2602,18 +2623,17 @@ score     4 = (stale 8 ÷ 2 transitive + vulnerable 4 [low advisory 2 × 2: no r
 do        no release fixes it
 
 flags
-  stale        S2 · last release 2023-03-27 (3.5 years ago)
+  stale        S2, S4 · last release 2023-03-27 (3.5 years ago); last commit 2023-03-27 (3.5 years ago)
   vulnerable   S9 · 1 advisory: 1 low — none fixed on 1.x; advisory: CVE-2026-00004 an advisory added to show the either opening (‡) · lookup complete
     low        CVE-2026-00004  an advisory added to show the either opening (‡)
                PKSA-eith-0000-0002 · reported 2026-09-01 · 4 points · fix: no fix
   feeds        packagist.org: 1 on record, 1 affects v1.0.2
   accepted     none
-  not checked  S3, S4 (request failed)
+  not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
    * 1.x      v1.0.2        2023-03-27   >=7.0      0 of 1
-note: GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true&per_page=1
 
 == case C-bitbucket‡
 symfony/debug v3.4.47 — critical: abandoned · old-promise
@@ -2622,9 +2642,9 @@ symfony/debug v3.4.47 — critical: abandoned · old-promise
 age       installed  v3.4.47   2020-10-24   5.9 years ago
           3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5
           newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3
-          last push            not read (no token)
+          last commit          2022-07-29   4.2 years ago                 past push-warn-years 3
           libyears 1.8 behind the newest stable release
-repository bitbucket.org/symfony/debug: not asked (no token)
+repository Bitbucket bitbucket.org/symfony/debug: last commit 2022-07-29 · fetched 2026-09-14
 
 score     36 = abandoned 32 + old-promise 4 [¼ of 16]     critical from 32
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
@@ -2634,18 +2654,17 @@ score     36 = abandoned 32 + old-promise 4 [¼ of 16]     critical from 32
 do        replace with symfony/error-handler (named by its registry)
 
 flags
-  abandoned    S1 high · marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago)
+  abandoned    S1 high · marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago)
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S3, S4 (no token)
+  not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
-note: Bitbucket credentials not set: repository activity checked for 0 candidate packages, 1 packages skipped (add bitbucket.org credentials to auth.json to check all)
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case C-gitlab-hosted‡
 symfony/debug v3.4.47 — critical: abandoned · old-promise
@@ -2654,9 +2673,9 @@ symfony/debug v3.4.47 — critical: abandoned · old-promise
 age       installed  v3.4.47   2020-10-24   5.9 years ago
           3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5
           newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3
-          last push            not read (host not supported)
+          last commit          2022-07-29   4.2 years ago                 past push-warn-years 3
           libyears 1.8 behind the newest stable release
-repository lockrot cannot ask gitlab.example.com about repository activity
+repository GitLab gitlab.example.com/gitlab/symfony/debug: last commit 2022-07-29, archived · fetched 2026-09-14
 
 score     36 = abandoned 32 + old-promise 4 [¼ of 16]     critical from 32
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
@@ -2666,18 +2685,17 @@ score     36 = abandoned 32 + old-promise 4 [¼ of 16]     critical from 32
 do        replace with symfony/error-handler (named by its registry)
 
 flags
-  abandoned    S1 high · marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago)
+  abandoned    S1 high, S3 high · marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitLab; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago)
   old-promise  S5 · released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S3, S4 (host not supported)
+  not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
-note: Repository activity not checked for 1 package on hosts lockrot cannot ask: gitlab.example.com (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case not-found‡
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
@@ -2686,9 +2704,9 @@ hoa/consistency 1.17.05.02 — high: abandoned · old-promise
 age       installed  1.17.05.022017-05-02   9.4 years ago
           1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
           newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            not read (no repository found)
+          last push            not read (repository not found)
           libyears 0.3 behind the newest stable release
-repository repository activity not asked (no repository found)
+repository GitHub github.com/hoaproject/Consistency: the host answered 404 (private, renamed or removed)
 
 score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     high from 16
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
@@ -2702,13 +2720,14 @@ flags
   old-promise  S5 · released 2017-05-02 for PHP 5 (php ">=5.5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S3, S4 (no repository found)
+  not checked  S3, S4 (repository not found)
 
 repository metadata
      branch   highest tag   released     php        fixes
      2.x      2.17.08.29    2017-08-29   >=7.1
    * 1.x      1.17.05.02    2017-05-02   >=5.5.0
      0.16.x   0.16.01.06    2016-01-06   —
+note: GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing
 
 == case gitlab-anon‡
 hoa/consistency 1.17.05.02 — high: abandoned · old-promise
@@ -2717,9 +2736,9 @@ hoa/consistency 1.17.05.02 — high: abandoned · old-promise
 age       installed  1.17.05.022017-05-02   9.4 years ago
           1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5
           newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5
-          last push            not read (request failed)
+          last commit          2021-04-28   5.4 years ago                 past push-high-years 5
           libyears 0.3 behind the newest stable release
-repository gitlab.com/hoaproject/Consistency: not asked (request failed)
+repository GitLab gitlab.com/hoaproject/Consistency: last commit 2021-04-28, archived flag not read (no token) · fetched 2026-09-14
 
 score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     high from 16
   maintenance  abandoned 32 (lead) · old-promise 4 (¼ of 16)
@@ -2729,18 +2748,17 @@ score     18 = (abandoned 32 + old-promise 4 [¼ of 16]) ÷ 2 transitive     hig
 do        find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package
 
 flags
-  abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)
+  abandoned    S1 high · marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago)
   old-promise  S5 · released 2017-05-02 for PHP 5 (php ">=5.5.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S3, S4 (request failed)
+  not checked  S3 (no token)
 
 repository metadata
      branch   highest tag   released     php        fixes
      2.x      2.17.08.29    2017-08-29   >=7.1
    * 1.x      1.17.05.02    2017-05-02   >=5.5.0
      0.16.x   0.16.01.06    2016-01-06   —
-note: GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1
 
 == case ignored-marking-only‡
 doctrine/annotations 2.0.2 — ok
@@ -2760,7 +2778,7 @@ score     0
 do        nothing to do: nothing counts
 
 flags
-  feeds        packagist.org: none on record
+  feeds        packagist.org: 1 on record, 0 affect 2.0.2
   S1 ignored   marked abandoned by its registry: ignored, config.policy.abandoned.ignore lists doctrine/* ("the annotations reader goes with the ORM 3 upgrade"); not counted.
   accepted     none
   not checked  nothing
@@ -2791,7 +2809,7 @@ do        —
 
 flags
   stale        S2 · last release 2022-05-20 (4.4 years ago)
-  feeds        packagist.org: none on record
+  feeds        packagist.org: 1 on record, 0 affect 2.1.1
   S1 ignored   marked abandoned by its registry: ignored, config.policy.abandoned.ignore lists doctrine/cache ("PSR-6 migration is planned for 9.0"); not counted.
   accepted     none
   not checked  nothing
@@ -2832,7 +2850,7 @@ repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 note: Composer's abandoned ignore list (config.audit.ignore-abandoned) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
 == case ignored-marking-unchecked‡
@@ -2842,9 +2860,9 @@ symfony/debug v3.4.47 — high: old-promise · stale
 age       installed  v3.4.47   2020-10-24   5.9 years ago
           3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5
           newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3
-          last push            not read (no repository found)
+          last push            not read (rate limited)
           libyears 1.8 behind the newest stable release
-repository repository activity not asked (no repository found)
+repository github.com/symfony/debug: not asked (rate limited)
 
 score     18 = old-promise 16 + stale 2 [¼ of 8]     high from 16
   maintenance  old-promise 16 (lead) · stale 2 (¼ of 8)
@@ -2860,13 +2878,14 @@ flags
   feeds        packagist.org: none on record
   S1 ignored   marked abandoned by its registry (replacement: symfony/error-handler): ignored, config.policy.abandoned.ignore lists symfony/debug ("removed in the 7.x upgrade"); not counted.
   accepted     none
-  not checked  S3, S4 (no repository found)
+  not checked  S3, S4 (rate limited)
 
 repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
+note: GitHub API rate limit reached; repository activity missing for 1 repositories
 note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.
 
 == case ignored-marking-partial‡
@@ -2888,7 +2907,7 @@ do        nothing to do: nothing counts
 
 flags
   stale        S2 · last release 2022-05-20 (4.4 years ago)
-  feeds        packagist.org: none on record
+  feeds        packagist.org: 1 on record, 0 affect 2.1.1
   S1 ignored   marked abandoned by its registry: ignored, config.policy.abandoned.ignore lists doctrine/cache ("PSR-6 migration is planned for 9.0"); not counted.
   accepted     stale
   not checked  nothing
@@ -2928,7 +2947,7 @@ repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case abandoned-ignore-unreadable‡
 symfony/debug v3.4.47 — critical: abandoned · old-promise
@@ -2959,7 +2978,7 @@ repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case feeds-drupal‡
 twig/twig v2.16.1 — critical: vulnerable
@@ -3012,7 +3031,7 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 
@@ -3055,12 +3074,13 @@ flags
     medium     CVE-2022-25770  Mautic has insufficient authentication in upgrade flow
                PKSA-ydwx-2n98-5dyf · reported 2024-09-18 · 8 points · fix: fix unknown
   feeds        packagist.org: 5 on record, 5 affect 4.3.x-dev
+  pulls in     pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise), symfony/http-foundation (left-behind) and 114 more
   accepted     none
   not checked  S3, S4 (not from a Composer repository) · S2, S8 (not from a Composer repository)
 
 repository metadata
   none — not from a Composer repository, not checked
-note: 1 package is not from a Composer repository: its release metadata and repository activity were not read
+note: 2 packages are not from a Composer repository: their release metadata and repository activity were not read
 
 == case unknown-origin
 bower-asset/jquery 3.7.1 — unknown
@@ -3104,8 +3124,8 @@ score     20 = left-behind 16 + old-promise 4 [¼ of 16]     high from 16
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4 — clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
-          clears left-behind, old-promise
+do        require symfony/monolog-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve
+          clears left-behind
 
 flags
   left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
@@ -3140,7 +3160,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -3148,17 +3168,17 @@ flags
   old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
-               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: composer update to 5.x from v5.4.52
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
   feeds        packagist.org: 1 on record, 1 affects v2.6.13
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
@@ -3180,7 +3200,7 @@ score     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high a
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve
+do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
@@ -3188,24 +3208,24 @@ flags
   old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
-               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: composer update to 5.x from v5.4.52
+               PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
   feeds        packagist.org: 1 on record, 1 affects v2.6.13
   accepted     none
   not checked  nothing
 
 repository metadata
      branch   highest tag   released     php        fixes
-     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; after it: at most 16, high, if Composer resolves it
-     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · composer update (lowest fix); after it: 0, ok, if Composer resolves it
+     8.x      v8.1.6        2026-08-30   >=8.4.1    1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     7.x      v7.4.18       2026-08-30   >=8.2      1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     6.x      v6.4.45       2026-08-30   >=8.1      1 of 1 · php floor raise; held by composer.json; after it: at most 16, high, if Composer resolves it
+     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
 
 == case require-dev-name‡
 symfony/var-dumper v4.4.47 — medium: left-behind
-  via symfony/error-handler > symfony/var-dumper: 1 hop from the nearest composer.json line; no line of composer.json names it
+  via symfony/error-handler > symfony/var-dumper: 1 hop; composer.json names it in require-dev, which this run did not walk (pass --dev)
 
 age       installed  v4.4.47   2022-10-03   4.0 years ago
           4.x        v4.4.47   2022-10-03   4.0 years ago                 past release-warn-years 3
@@ -3236,11 +3256,11 @@ repository metadata
      5.x      v5.4.48       2024-11-08   >=7.2.5
    * 4.x      v4.4.47       2022-10-03   >=7.1.3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case lock-only‡
 symfony/debug v3.4.47 — high: abandoned · old-promise
-  unreached: lockrot found no path from your require (require-dev counts only with --dev) to it
+  depth not measured: the run read no composer.json
 
 age       installed  v3.4.47   2020-10-24   5.9 years ago
           3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5
@@ -3267,7 +3287,7 @@ repository metadata
      branch   highest tag   released     php        fixes
      4.x      v4.4.44       2022-07-28   >=7.1.3
    * 3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
-     2.x      v2.8.52       undated      >=5.3.9
+     2.x      v2.8.52       commit 2018-11-11 >=5.3.9
 
 == case B-gate-flag
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
@@ -3325,7 +3345,7 @@ score     32 = vulnerable 32 [critical advisory]     critical from 32
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags
@@ -3360,7 +3380,7 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 
@@ -3466,7 +3486,7 @@ score     32 = vulnerable 32 [critical advisory]     critical from 32
   reach        direct requirement: maintenance not halved for reach
   bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
 
-do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
+do        raise require.php to >=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve
           clears PKSA-h8hf-ytnd-5t9q, PKSA-8zx5-v2nz-58pb, PKSA-dpx1-78wg-1kqs, PKSA-gw7n-z4yx-7xjt, PKSA-1tmc-rt7x-12w6, PKSA-3mcc-k66d-pydb, PKSA-fbvq-z33h-r2np, PKSA-xx6c-6d96-db2w, PKSA-kvv6-36cr-fkzb, PKSA-yd6k-t2gh-1m43, PKSA-2wrf-1xmk-1pky, PKSA-g9zw-qxh8-pq8w, PKSA-n14z-jjjg-g8vd, PKSA-sjvz-tbbr-vwth, PKSA-yhcn-xrg3-68b1
 
 flags
@@ -3501,7 +3521,7 @@ flags
                PKSA-sjvz-tbbr-vwth · reported 2026-05-20 · 2 points · fix: php floor raise to 3.x from v3.26.0
     low        CVE-2024-51754  Unguarded calls to __toString() when nesting an object into an array
                PKSA-yhcn-xrg3-68b1 · reported 2024-11-06 · 2 points · fix: php floor raise to 3.x from v3.14.1
-  feeds        packagist.org: 15 on record, 15 affect v2.16.1
+  feeds        packagist.org: 26 on record, 15 affect v2.16.1
   accepted     none
   not checked  nothing
 

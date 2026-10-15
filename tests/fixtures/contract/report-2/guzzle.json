@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 9
+                    "packages_with_records": 3,
+                    "records": 22
                 }
             ]
         },
@@ -781,7 +781,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 4,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -1272,13 +1272,13 @@
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 9,
+                "records": 15,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 9,
+                        "records": 15,
                         "reason": null
                     }
                 ],
@@ -1356,6 +1356,53 @@
                 "guzzlehttp/guzzle"
             ],
             "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)",
+                    "data": {
+                        "flagged": 3,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/psr7",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/psr7"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/promises",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/promises"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/polyfill-intl-idn",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "symfony/polyfill-intl-idn"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                },
                 {
                     "id": "S8",
                     "level": "warn",

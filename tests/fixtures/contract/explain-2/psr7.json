@@ -170,7 +170,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "2.x",
-            "version": "2.13.1",
+            "version": "2.13.0",
             "newest": "2.13.1",
             "constraint": "^2.13",
             "latest": null,
@@ -190,11 +190,18 @@
                     "link": "require",
                     "constraint": "^1.9",
                     "holder": {
-                        "verdict": "ok",
-                        "lead": null,
-                        "flag_ids": [],
+                        "verdict": "critical",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
                         "replacement": null,
-                        "next_step": null
+                        "next_step": {
+                            "kind": "raise-php",
+                            "to_branch": "7.x",
+                            "constraint": "^7.15.2"
+                        }
                     }
                 }
             ],
@@ -266,20 +273,20 @@
                 }
             ],
             "also": [],
-            "text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "security": {
             "status": "vulnerable",
             "check": "complete",
             "complete": true,
             "unchecked_reason": null,
-            "records": 4,
+            "records": 6,
             "feeds": [
                 {
                     "composer_repository": "composer repo (https://repo.packagist.org)",
                     "registry": "packagist.org",
                     "answer": "answered",
-                    "records": 4,
+                    "records": 6,
                     "reason": null
                 }
             ],
@@ -416,11 +423,18 @@
                                         "link": "require",
                                         "constraint": "^1.9",
                                         "holder": {
-                                            "verdict": "ok",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "critical",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "raise-php",
+                                                "to_branch": "7.x",
+                                                "constraint": "^7.15.2"
+                                            }
                                         }
                                     }
                                 ],
@@ -455,11 +469,18 @@
                                         "link": "require",
                                         "constraint": "^1.9",
                                         "holder": {
-                                            "verdict": "ok",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "critical",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "raise-php",
+                                                "to_branch": "7.x",
+                                                "constraint": "^7.15.2"
+                                            }
                                         }
                                     }
                                 ],
@@ -494,11 +515,18 @@
                                         "link": "require",
                                         "constraint": "^1.9",
                                         "holder": {
-                                            "verdict": "ok",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "critical",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "raise-php",
+                                                "to_branch": "7.x",
+                                                "constraint": "^7.15.2"
+                                            }
                                         }
                                     }
                                 ],
@@ -533,11 +561,18 @@
                                         "link": "require",
                                         "constraint": "^1.9",
                                         "holder": {
-                                            "verdict": "ok",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "critical",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "raise-php",
+                                                "to_branch": "7.x",
+                                                "constraint": "^7.15.2"
+                                            }
                                         }
                                     }
                                 ],
@@ -621,7 +656,7 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 6,
+        "releases_listed": 7,
         "has_stable_release": true,
         "last_stable_release": "2026-08-24T11:02:13+00:00",
         "last_stable_version": "3.1.0",
@@ -667,11 +702,18 @@
                             "link": "require",
                             "constraint": "^1.9",
                             "holder": {
-                                "verdict": "ok",
-                                "lead": null,
-                                "flag_ids": [],
+                                "verdict": "critical",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ],
                                 "replacement": null,
-                                "next_step": null
+                                "next_step": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "constraint": "^7.15.2"
+                                }
                             }
                         }
                     ],
@@ -721,11 +763,18 @@
                             "link": "require",
                             "constraint": "^1.9",
                             "holder": {
-                                "verdict": "ok",
-                                "lead": null,
-                                "flag_ids": [],
+                                "verdict": "critical",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ],
                                 "replacement": null,
-                                "next_step": null
+                                "next_step": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "constraint": "^7.15.2"
+                                }
                             }
                         }
                     ],
@@ -1519,8 +1568,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 4
+                    "packages_with_records": 2,
+                    "records": 21
                 }
             ]
         }

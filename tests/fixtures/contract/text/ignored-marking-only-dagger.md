@@ -7,7 +7,7 @@
 | ok | `doctrine/annotations` | 2.0.2 | ok | `0`<br>*abandoned marking ignored* (policy.abandoned: doctrine/\*): the annotations reader goes with the ORM 3 upgrade | mautic/core-lib |
 
 libyears: 0.0 behind across the one package
-advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
 
 - note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: doctrine/annotations. lockrot does not count the marking; an archived repository and the release and push dates still count.
 

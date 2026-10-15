@@ -18,6 +18,7 @@
   "baseline/regenerate-from-baseline-1": 1,
   "config": 33,
   "config/coverage": 40,
-  "config/repo-docs": 4
+  "config/repo-docs": 4,
+  "page": 1
  }
 }

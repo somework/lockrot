@@ -69843,7 +69843,7 @@
                         "highest_admits_target_php": true,
                         "highest_admits_project_php": false,
                         "highest_misses_project_php": "needs_newer",
-                        "released_years": null,
+                        "released_years": 1.6,
                         "fixes": null
                     },
                     {

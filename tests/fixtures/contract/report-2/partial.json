@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 6
+                    "packages_with_records": 10,
+                    "records": 74
                 }
             ]
         },
@@ -781,7 +781,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 2,
+    "packages_checked": 15,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -1131,7 +1131,30 @@
                     "raise_size": "minor"
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^9.0",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "pragmarx/google2fa-laravel",
+                        "version": "v2.2.0",
+                        "link": "require",
+                        "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "advisory",
@@ -1180,6 +1203,7 @@
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -1197,20 +1221,20 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 6,
+                "records": 28,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 6,
+                        "records": 28,
                         "reason": null
                     }
                 ],
@@ -1333,6 +1357,150 @@
             ],
             "signals": [
                 {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 11 flagged packages: league/commonmark (vulnerable), symfony/http-foundation (vulnerable), symfony/mime (vulnerable), symfony/process (vulnerable), nesbot/carbon (vulnerable) and 6 more",
+                    "data": {
+                        "flagged": 11,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/http-foundation",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/http-foundation"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/mime",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/mime"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/process",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/process"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "nesbot/carbon",
+                                "chain": [
+                                    "laravel/framework",
+                                    "nesbot/carbon"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/mailer",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/mailer"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/routing",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/routing"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "brick/math",
+                                "chain": [
+                                    "laravel/framework",
+                                    "brick/math"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "league/flysystem",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/flysystem"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/polyfill-intl-idn",
+                                "chain": [
+                                    "laravel/framework",
+                                    "egulias/email-validator",
+                                    "symfony/polyfill-intl-idn"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "league/config",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/commonmark",
+                                    "league/config"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "S9",
                     "level": "high",
                     "summary": "6 security advisories affect v9.52.16 (PKSA-3r5d-mb8f-1qw9, CVE-2024-52301, CVE-2025-27515 and 3 more); 5 fixed by v13.34.0, 1 fixed by v9.52.22",
@@ -1357,7 +1525,30 @@
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1399,13 +1590,22 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "10.x",
                                     "version": "v10.48.29",
                                     "newest": "v10.50.3",
                                     "on_installed_branch": false,
                                     "php": "^8.1",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1429,7 +1629,30 @@
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1453,7 +1676,30 @@
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1477,7 +1723,30 @@
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null

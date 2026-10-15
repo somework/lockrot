@@ -1,5 +1,7 @@
-::error file=composer.lock,line=4,title=lockrot%3A critical — abandoned · old-promise::symfony/debug v3.4.47: 36 = abandoned 32 + old-promise 4 [¼ of 16]. Do: replace with symfony/error-handler (named by its registry). abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago). old-promise: released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. checks missing: S9 (offline).
+::error file=composer.lock,line=12,title=lockrot%3A critical — abandoned · old-promise::symfony/debug v3.4.47: 36 = abandoned 32 + old-promise 4 [¼ of 16]. Do: replace with symfony/error-handler (named by its registry). abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago). old-promise: released 2020-10-24 for PHP 5 (php "^5.5.9|>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. checks missing: S9 (offline).
 ::error title=lockrot::advisories not checked: packagist.org not asked (offline)
+::notice title=lockrot::offline: repository metadata served from Composer's cache
+::notice title=lockrot::GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug
 flags: abandoned 1 · old-promise 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 security: no vulnerable package · advisories not checked

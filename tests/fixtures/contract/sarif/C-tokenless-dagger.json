@@ -126,7 +126,7 @@
                             },
                             "branch_release_unmeasured": null,
                             "push": null,
-                            "push_unmeasured": "no_repository"
+                            "push_unmeasured": "no_token"
                         },
                         "term": {
                             "part": "maintenance",
@@ -146,7 +146,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -199,7 +199,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -243,7 +243,15 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    }
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)"
+                            }
+                        }
+                    ]
                 }
             ],
             "properties": {

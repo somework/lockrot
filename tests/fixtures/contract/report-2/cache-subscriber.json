@@ -781,7 +781,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 4,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -1309,6 +1309,45 @@
                         "php_constraint": ">=5.4.0",
                         "written_for_php": 5,
                         "released": "2019-09-16T13:44:55+00:00"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                    "data": {
+                        "flagged": 2,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/ringphp",
+                                "chain": [
+                                    "guzzlehttp/cache-subscriber",
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/streams",
+                                "chain": [
+                                    "guzzlehttp/cache-subscriber",
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp",
+                                    "guzzlehttp/streams"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],

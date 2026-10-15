@@ -10,7 +10,7 @@
 
 1 package checked · 1 flagged: high 1
 flags: abandoned 1 · old-promise 1 · 1 package carries more than one
-depth: 1 of 1 flagged package is named by no line of composer.json · unreached 1
+depth: composer.json not read, so depth is not measured for 1 flagged package
 libyears: 1.8 behind across the one package · 0.0 from direct requirements ·
 furthest behind symfony/debug v3.4.47 at 1.8
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)

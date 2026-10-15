@@ -6,7 +6,7 @@
                    Unbounded Recursion in Nested Blocks, Sequences, and Mappings
       age: installed v5.4.23 released 2023-04-23 (3.4 years ago); 5.x last released v5.4.53 2026-05-20 (0.4 years
            ago); newest release v8.1.8 2026-09-26 (less than three weeks ago)
-      maintenance accepted (your ignore list)  accepted by the test
+      maintenance accepted (your ignore list)  symfony is upgraded on its own schedule (‡)
 
 1 package checked · 1 flagged: low 1
 flags: vulnerable 1
@@ -16,9 +16,9 @@ fix, by package: composer update 1
 update now: composer update symfony/yaml
 libyears: 3.4 behind across the one package · 3.4 from direct requirements ·
 furthest behind symfony/yaml v5.4.23 at 3.4
-advisories: 1 package asked · packagist.org answered (3 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (5 on record for 1 package)
 gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
-note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml: 3 counted advisories; accept
-them in Composer's audit policy if that is the decision
+note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3
+counted advisories; accept them in Composer's audit policy if that is the decision

@@ -11,7 +11,7 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
 security: 1 vulnerable package · 3 advisories: 2 high, 1 medium
 libyears: 0.1 behind across the one package · 0.0 from direct requirements · furthest behind league/commonmark 2.9.1 at 0.1
 pulled in by: `laravel/framework` 1 · `laravel/nightwatch` 1 · `spatie/laravel-markdown` 1
-advisories: 1 package asked · packagist.org answered (3 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (18 on record for 1 package)
 
 **Update now:** `composer update league/commonmark`
 

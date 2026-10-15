@@ -348,7 +348,7 @@
                         {
                             "level": "note",
                             "message": {
-                                "text": "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml: 3 counted advisories; accept them in Composer's audit policy if that is the decision"
+                                "text": "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
                             }
                         }
                     ]
@@ -374,7 +374,7 @@
                             "reason": null,
                             "message": null,
                             "packages_with_records": 1,
-                            "records": 3
+                            "records": 5
                         }
                     ]
                 }

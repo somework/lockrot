@@ -218,9 +218,9 @@
         "activity": {
             "status": "not_read",
             "reason": "allowlisted",
-            "forge": null,
-            "host": null,
-            "repo": null,
+            "forge": "github",
+            "host": "github.com",
+            "repo": "symfony/polyfill-intl-idn",
             "event": null,
             "archived": null,
             "fetched_at": null,
@@ -337,7 +337,7 @@
     "lock": {
         "php": ">=7.2",
         "released": null,
-        "repository": null,
+        "repository": "https://github.com/symfony/polyfill-intl-idn.git",
         "from_composer_repository": true,
         "dev": false,
         "branch_snapshot": false,

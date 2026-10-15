@@ -98,7 +98,8 @@
                         "signal_ids": [
                             "S2",
                             "S4",
-                            "S5"
+                            "S5",
+                            "S7"
                         ],
                         "age": {
                             "installed": {
@@ -148,7 +149,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -201,7 +202,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }

@@ -100,7 +100,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "5.x",
-            "version": "v5.4.48",
+            "version": "v5.4.0",
             "newest": "v5.4.48",
             "constraint": "^5.4",
             "latest": null,
@@ -580,7 +580,9 @@
         ],
         "depth": 1,
         "depth_unmeasured": null,
-        "named_in": [],
+        "named_in": [
+            "require-dev"
+        ],
         "direct_dependents": [
             "babdev/pagerfanta-bundle",
             "bdunogier/guzzle-site-authenticator",
@@ -704,7 +706,7 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 7,
+        "releases_listed": 10,
         "has_stable_release": true,
         "last_stable_release": "2026-09-03T16:02:27+00:00",
         "last_stable_version": "v8.1.7",
@@ -852,9 +854,9 @@
                 "installed": false,
                 "highest": "v2.8.52",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2018-11-11T11:18:13+00:00",
                 "newest_dated": "v2.8.52",
-                "newest_dated_released": null,
+                "newest_dated_released": "2018-11-11T11:18:13+00:00",
                 "dated_by": null,
                 "php": ">=5.3.9",
                 "highest_php": ">=5.3.9",

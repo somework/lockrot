@@ -126,7 +126,7 @@
                             },
                             "branch_release_unmeasured": null,
                             "push": null,
-                            "push_unmeasured": "no_repository"
+                            "push_unmeasured": "repository_not_found"
                         },
                         "term": {
                             "part": "maintenance",
@@ -146,7 +146,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -199,7 +199,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -252,7 +252,15 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    }
+                    },
+                    "toolExecutionNotifications": [
+                        {
+                            "level": "note",
+                            "message": {
+                                "text": "GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing"
+                            }
+                        }
+                    ]
                 }
             ],
             "properties": {

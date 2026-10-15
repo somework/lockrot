@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/left-behind",
-        "description": "league/flysystem 1.1.9 \u2014 finding medium (10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory]) \u2014 left-behind: branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02). Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it. (via mautic/core-lib)",
+        "description": "league/flysystem 1.1.9 \u2014 finding medium (10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory]) \u2014 left-behind: branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02). Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via mautic/core-lib)",
         "categories": [
             "Bug Risk"
         ],
@@ -11,14 +11,14 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 20
             }
         }
     },
     {
         "type": "issue",
         "check_name": "lockrot/vulnerable",
-        "description": "league/flysystem 1.1.9 \u2014 finding medium (10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 none fixed on 1.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter. Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it. (via mautic/core-lib)",
+        "description": "league/flysystem 1.1.9 \u2014 finding medium (10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 none fixed on 1.x; advisory: CVE-2026-102601 Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter. Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via mautic/core-lib)",
         "categories": [
             "Security"
         ],
@@ -27,7 +27,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 20
             }
         }
     }

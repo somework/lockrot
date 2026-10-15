@@ -128,7 +128,7 @@
                     "level": "error",
                     "rank": 50.0,
                     "message": {
-                        "text": "guzzlehttp/psr7 1.9.1 \u2014 finding high, 16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory] \u2014 left-behind: branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/psr7 1.9.1 \u2014 finding high, 16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory] \u2014 left-behind: branch 1.x last released 2023-04-17 (3.5 years ago); 3.x released 3.1.0 (2026-08-24), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/psr7"
@@ -213,7 +213,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -225,7 +225,7 @@
                     "level": "error",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-55766 (medium advisory): CRLF injection in HTTP start-line serialization. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-55766 (medium advisory): CRLF injection in HTTP start-line serialization. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/psr7",
@@ -311,11 +311,18 @@
                                     "link": "require",
                                     "constraint": "^1.9",
                                     "holder": {
-                                        "verdict": "ok",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "critical",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "7.x",
+                                            "constraint": "^7.15.2"
+                                        }
                                     }
                                 }
                             ],
@@ -344,7 +351,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -356,7 +363,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-49214 (medium advisory): CRLF injection via URI host component. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-49214 (medium advisory): CRLF injection via URI host component. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/psr7",
@@ -398,11 +405,18 @@
                                     "link": "require",
                                     "constraint": "^1.9",
                                     "holder": {
-                                        "verdict": "ok",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "critical",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "7.x",
+                                            "constraint": "^7.15.2"
+                                        }
                                     }
                                 }
                             ],
@@ -419,7 +433,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -431,7 +445,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-48998 (medium advisory): Host confusion via authority reinterpretation. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-48998 (medium advisory): Host confusion via authority reinterpretation. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/psr7",
@@ -473,11 +487,18 @@
                                     "link": "require",
                                     "constraint": "^1.9",
                                     "holder": {
-                                        "verdict": "ok",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "critical",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "7.x",
+                                            "constraint": "^7.15.2"
+                                        }
                                     }
                                 }
                             ],
@@ -494,7 +515,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -506,7 +527,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-59882 (medium advisory): guzzlehttp/psr7: Host Confusion via Weak URI Host Validation. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/psr7 1.9.1 is affected by CVE-2026-59882 (medium advisory): guzzlehttp/psr7: Host Confusion via Weak URI Host Validation. Do: raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/psr7",
@@ -548,11 +569,18 @@
                                     "link": "require",
                                     "constraint": "^1.9",
                                     "holder": {
-                                        "verdict": "ok",
-                                        "lead": null,
-                                        "flag_ids": [],
+                                        "verdict": "critical",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "vulnerable"
+                                        ],
                                         "replacement": null,
-                                        "next_step": null
+                                        "next_step": {
+                                            "kind": "raise-php",
+                                            "to_branch": "7.x",
+                                            "constraint": "^7.15.2"
+                                        }
                                     }
                                 }
                             ],
@@ -569,7 +597,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 19
                                 }
                             }
                         }
@@ -635,8 +663,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 1,
-                            "records": 4
+                            "packages_with_records": 2,
+                            "records": 21
                         }
                     ]
                 }

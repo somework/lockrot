@@ -136,11 +136,19 @@
                     "link": "require",
                     "constraint": "^1.41|^2.10",
                     "holder": {
-                        "verdict": "unknown",
-                        "lead": null,
-                        "flag_ids": [],
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
                         "replacement": null,
-                        "next_step": null
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "4.x",
+                            "constraint": "^4.4.51"
+                        }
                     }
                 }
             ],
@@ -255,20 +263,20 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "security": {
             "status": "vulnerable",
             "check": "complete",
             "complete": true,
             "unchecked_reason": null,
-            "records": 15,
+            "records": 26,
             "feeds": [
                 {
                     "composer_repository": "composer repo (https://repo.packagist.org)",
                     "registry": "packagist.org",
                     "answer": "answered",
-                    "records": 15,
+                    "records": 26,
                     "reason": null
                 }
             ],
@@ -388,11 +396,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -435,11 +451,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -482,11 +506,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -529,11 +561,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -576,11 +616,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -623,11 +671,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -670,11 +726,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -717,11 +781,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -764,11 +836,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -811,11 +891,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -858,11 +946,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -905,11 +1001,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -952,11 +1056,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -999,11 +1111,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -1046,11 +1166,19 @@
                                         "link": "require",
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
-                                            "verdict": "unknown",
-                                            "lead": null,
-                                            "flag_ids": [],
+                                            "verdict": "high",
+                                            "lead": "left-behind",
+                                            "flag_ids": [
+                                                "left-behind",
+                                                "old-promise",
+                                                "vulnerable"
+                                            ],
                                             "replacement": null,
-                                            "next_step": null
+                                            "next_step": {
+                                                "kind": "require",
+                                                "to_branch": "4.x",
+                                                "constraint": "^4.4.51"
+                                            }
                                         }
                                     }
                                 ],
@@ -1184,11 +1312,19 @@
                             "link": "require",
                             "constraint": "^1.41|^2.10",
                             "holder": {
-                                "verdict": "unknown",
-                                "lead": null,
-                                "flag_ids": [],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise",
+                                    "vulnerable"
+                                ],
                                 "replacement": null,
-                                "next_step": null
+                                "next_step": {
+                                    "kind": "require",
+                                    "to_branch": "4.x",
+                                    "constraint": "^4.4.51"
+                                }
                             }
                         }
                     ],
@@ -2013,8 +2149,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 15
+                    "packages_with_records": 2,
+                    "records": 28
                 }
             ]
         }

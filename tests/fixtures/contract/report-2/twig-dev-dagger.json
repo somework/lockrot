@@ -756,7 +756,7 @@
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 15
+                    "records": 26
                 }
             ]
         },
@@ -1255,13 +1255,13 @@
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -1333,7 +1333,7 @@
             "depth": 0,
             "depth_unmeasured": null,
             "named_in": [
-                "require"
+                "require-dev"
             ],
             "direct_dependents": [
                 "symfony/twig-bridge",

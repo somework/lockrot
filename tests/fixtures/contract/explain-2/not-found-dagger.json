@@ -224,7 +224,7 @@
         "checks_skipped": [
             {
                 "check": "repository_activity",
-                "reason": "no_repository",
+                "reason": "repository_not_found",
                 "blocks": [
                     "S3",
                     "S4"
@@ -239,11 +239,11 @@
             "message": null
         },
         "activity": {
-            "status": "not_read",
-            "reason": "no_repository",
-            "forge": null,
-            "host": null,
-            "repo": null,
+            "status": "not_found",
+            "reason": "repository_not_found",
+            "forge": "github",
+            "host": "github.com",
+            "repo": "hoaproject/Consistency",
             "event": null,
             "archived": null,
             "fetched_at": null,
@@ -341,7 +341,7 @@
             },
             "branch_release_unmeasured": null,
             "push": null,
-            "push_unmeasured": "no_repository"
+            "push_unmeasured": "repository_not_found"
         },
         "baseline": null,
         "gate": {
@@ -366,7 +366,7 @@
     "lock": {
         "php": ">=5.5.0",
         "released": "2017-05-02T12:18:12+00:00",
-        "repository": null,
+        "repository": "https://github.com/hoaproject/Consistency.git",
         "from_composer_repository": true,
         "dev": false,
         "branch_snapshot": false,
@@ -1212,6 +1212,24 @@
         }
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": []
+    "notes": [
+        "GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing"
+    ],
+    "note_details": [
+        {
+            "code": "repository_activity_not_found",
+            "text": "GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_not_found",
+            "sets_network_failures": false,
+            "data": {
+                "forge_id": "github",
+                "repositories": [
+                    {
+                        "host": "github.com",
+                        "repo": "hoaproject/Consistency"
+                    }
+                ]
+            }
+        }
+    ]
 }

@@ -79,7 +79,8 @@
                             "S1",
                             "S2",
                             "S3",
-                            "S4"
+                            "S4",
+                            "S7"
                         ],
                         "age": {
                             "installed": {
@@ -129,7 +130,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 26
                                 }
                             }
                         }
@@ -195,8 +196,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 0,
-                            "records": 0
+                            "packages_with_records": 1,
+                            "records": 1
                         }
                     ]
                 }

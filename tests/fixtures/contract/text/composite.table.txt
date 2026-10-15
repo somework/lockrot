@@ -3,8 +3,8 @@
       32 = vulnerable 32 [critical advisory]
       do: raise require.php to \>=8.1, then require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php \>=8.1.0,
           require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and
-          symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new
-          major brings its own requirements, which lockrot does not solve
+          symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to
+          move too; a new major brings its own requirements, which lockrot does not solve
       vulnerable   15 advisories: 1 critical, 3 high, 4 medium, 2 unrated, 5 low — none fixed on 2.x; worst:
                    CVE-2026-46633 PHP code injection via `{% use %}` template name
       age: installed v2.16.1 released 2024-09-09 (2.1 years ago), the newest on 2.x; newest release v3.30.0
@@ -35,6 +35,7 @@
           replace it
       pinned       pinned to branch snapshot dev-master
       stale        last release 2019-01-23 (7.7 years ago)
+      pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)
   tubalmartin/cssmin v4.1.1  direct  ·  old-promise · stale
       18 = old-promise 16 + stale 2 [¼ of 8]
       do: test it on PHP 8.4 — v4.1.1 is its newest release
@@ -73,7 +74,7 @@ update now: composer update symfony/yaml symfony/polyfill-intl-idn
 libyears: 17.9 behind across 5 of 7 packages · 17.9 from direct requirements ·
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: guzzlehttp/guzzle 1
-advisories: 7 packages asked · packagist.org answered (20 on record for 4 packages)
+advisories: 7 packages asked · packagist.org answered (36 on record for 6 packages)
 <fg=red>gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

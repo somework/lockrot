@@ -2,13 +2,13 @@
     "score_text": "18 = old-promise 16 + stale 2 [¼ of 8]",
     "next_step_text": "require symfony/debug ^4.4.44 — clears old-promise; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; stale stays; a new major brings its own requirements, which lockrot does not solve",
     "gate_line": null,
-    "run_gate_line": "gate: fails · --fail-on=high,unchecked · 1 finding fails it (high 1) · target php 8.4 (--target-php)",
+    "run_gate_line": "gate: fails · --fail-on=high,unchecked · 1 finding fails it (high 1, unchecked 1) · target php 8.4 (--target-php)",
     "age_line": "age: installed v3.4.47 released 2020-10-24 (5.9 years ago), the newest on 3.x; newest release v4.4.44 2022-07-28 (4.2 years ago)",
     "explain_age": [
         "installed  v3.4.47   2020-10-24   5.9 years ago",
         "3.x        v3.4.47   2020-10-24   5.9 years ago                 past release-high-years 5",
         "newest     v4.4.44   2022-07-28   4.2 years ago                 past release-warn-years 3",
-        "last push            not read (no repository found)",
+        "last push            not read (rate limited)",
         "libyears 1.8 behind the newest stable release"
     ],
     "baseline_suffix": null,

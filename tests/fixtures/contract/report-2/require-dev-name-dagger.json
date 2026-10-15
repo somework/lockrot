@@ -933,8 +933,8 @@
             "transitive": 1,
             "unreached": 0
         },
-        "not_in_composer_json": 1,
-        "require_dev_not_walked": 0,
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 1,
         "production": 1,
         "development": 0,
         "by_depth": [
@@ -1129,7 +1129,7 @@
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "5.x",
-                "version": "v5.4.48",
+                "version": "v5.4.0",
                 "newest": "v5.4.48",
                 "constraint": "^5.4",
                 "latest": null,
@@ -1609,7 +1609,9 @@
             ],
             "depth": 1,
             "depth_unmeasured": null,
-            "named_in": [],
+            "named_in": [
+                "require-dev"
+            ],
             "direct_dependents": [
                 "babdev/pagerfanta-bundle",
                 "bdunogier/guzzle-site-authenticator",

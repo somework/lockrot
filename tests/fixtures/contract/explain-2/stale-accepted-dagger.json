@@ -101,7 +101,7 @@
             "by": "project",
             "pattern": "akaunting/laravel-version",
             "version": null,
-            "reason": "accepted by the test",
+            "reason": "feature-complete, kept on purpose",
             "reason_id": null,
             "reason_by": "user",
             "expires": null,

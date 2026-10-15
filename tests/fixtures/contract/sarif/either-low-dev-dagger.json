@@ -65,7 +65,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "balping/json-raw-encoder v1.0.2 \u2014 finding low, 4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev \u2014 stale: last release 2023-03-27 (3.5 years ago). Do: no release fixes it."
+                        "text": "balping/json-raw-encoder v1.0.2 \u2014 finding low, 4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev \u2014 stale: last release 2023-03-27 (3.5 years ago); last commit 2023-03-27 (3.5 years ago). Do: no release fixes it."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "balping/json-raw-encoder"
@@ -98,8 +98,8 @@
                         ],
                         "signal_ids": [
                             "S2",
-                            "S9",
-                            "S10"
+                            "S4",
+                            "S9"
                         ],
                         "age": {
                             "installed": {
@@ -124,8 +124,12 @@
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
-                            "push": null,
-                            "push_unmeasured": "fetch_failed"
+                            "push": {
+                                "at": "2023-03-27T20:25:07+02:00",
+                                "years": 3.5,
+                                "level": "warn"
+                            },
+                            "push_unmeasured": null
                         },
                         "term": {
                             "part": "maintenance",
@@ -191,8 +195,8 @@
                         ],
                         "signal_ids": [
                             "S2",
-                            "S9",
-                            "S10"
+                            "S4",
+                            "S9"
                         ],
                         "age": {
                             "installed": {
@@ -217,8 +221,12 @@
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
-                            "push": null,
-                            "push_unmeasured": "fetch_failed"
+                            "push": {
+                                "at": "2023-03-27T20:25:07+02:00",
+                                "years": 3.5,
+                                "level": "warn"
+                            },
+                            "push_unmeasured": null
                         },
                         "advisory": "PKSA-eith-0000-0002",
                         "cve": "CVE-2026-00004",
@@ -298,15 +306,7 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    },
-                    "toolExecutionNotifications": [
-                        {
-                            "level": "note",
-                            "message": {
-                                "text": "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true&per_page=1"
-                            }
-                        }
-                    ]
+                    }
                 }
             ],
             "properties": {

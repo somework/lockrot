@@ -915,15 +915,15 @@
         "flagged": 1,
         "measured": 0,
         "unmeasured": {
-            "unreached": 1,
-            "no_composer_json": 0
+            "unreached": 0,
+            "no_composer_json": 1
         },
         "by_reach": {
             "direct": 0,
             "transitive": 0,
             "unreached": 1
         },
-        "not_in_composer_json": 1,
+        "not_in_composer_json": 0,
         "require_dev_not_walked": 0,
         "production": 1,
         "development": 0,
@@ -1260,7 +1260,7 @@
             "reach": "unreached",
             "chain": [],
             "depth": null,
-            "depth_unmeasured": "unreached",
+            "depth_unmeasured": "no_composer_json",
             "named_in": [],
             "direct_dependents": [],
             "signals": [

@@ -131,7 +131,7 @@
                     "role": "security",
                     "advisory": "PKSA-eith-0000-0001",
                     "severity": "critical",
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "weight": 32,
                     "multiplier": 1,
                     "points": 32,
@@ -234,7 +234,7 @@
                     "kind": "require",
                     "source": "vulnerable",
                     "merged": [],
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "reason": null,
                     "replacement": null,
                     "quiet_years": null,
@@ -251,7 +251,16 @@
                         "raise_size": null
                     },
                     "crosses_major": true,
-                    "held_by": [],
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "require",
+                            "constraint": "~3.4",
+                            "holder": null
+                        }
+                    ],
                     "clears": [
                         {
                             "kind": "advisory",
@@ -295,7 +304,7 @@
                             "symfony/debug:^4.4.0"
                         ]
                     ],
-                    "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+                    "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; held by composer.json (requires ~3.4); a new major brings its own requirements, which lockrot does not solve"
                 }
             ],
             "text": "replace with symfony/error-handler (named by its registry)"
@@ -325,7 +334,7 @@
             },
             "ignored": [],
             "ignored_count": 0,
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "installed_branch_fixes": {
                 "fixed": 0,
                 "unknown": 0,
@@ -467,13 +476,22 @@
                             "points": 32,
                             "deciding": true,
                             "fix": {
-                                "kind": "update",
+                                "kind": "upgrade",
                                 "to_branch": "4.x",
                                 "version": "v4.4.0",
                                 "newest": "v4.4.44",
                                 "on_installed_branch": false,
                                 "php": ">=7.1.3",
-                                "held_by": [],
+                                "held_by": [
+                                    {
+                                        "source": "root",
+                                        "package": null,
+                                        "version": null,
+                                        "link": "require",
+                                        "constraint": "~3.4",
+                                        "holder": null
+                                    }
+                                ],
                                 "reason": null
                             },
                             "baseline": null
@@ -554,7 +572,7 @@
     "metadata": {
         "abandoned": true,
         "replacement": "symfony/error-handler",
-        "releases_listed": 4,
+        "releases_listed": 6,
         "has_stable_release": true,
         "last_stable_release": "2022-07-28T16:29:46+00:00",
         "last_stable_version": "v4.4.44",
@@ -589,10 +607,19 @@
                     "fixed": 1,
                     "unknown": 0,
                     "of": 1,
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "lowest": "v4.4.0",
                     "newest": "v4.4.44",
-                    "held_by": [],
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "require",
+                            "constraint": "~3.4",
+                            "holder": null
+                        }
+                    ],
                     "if_applied": {
                         "total": 36,
                         "verdict": "critical",
@@ -640,9 +667,9 @@
                 "installed": false,
                 "highest": "v2.8.52",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2018-11-11T11:18:13+00:00",
                 "newest_dated": "v2.8.52",
-                "newest_dated_released": null,
+                "newest_dated_released": "2018-11-11T11:18:13+00:00",
                 "dated_by": null,
                 "php": ">=5.3.9",
                 "highest_php": ">=5.3.9",

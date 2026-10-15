@@ -3,12 +3,12 @@
     "next_step_text": "find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed 1.17.05.02 released 2017-05-02 (9.4 years ago), the newest on 1.x; newest release 2.17.08.29 2017-08-29 (9.1 years ago)",
+    "age_line": "age: installed 1.17.05.02 released 2017-05-02 (9.4 years ago), the newest on 1.x; newest release 2.17.08.29 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago)",
     "explain_age": [
         "installed  1.17.05.022017-05-02   9.4 years ago",
         "1.x        1.17.05.022017-05-02   9.4 years ago                 past release-high-years 5",
         "newest     2.17.08.292017-08-29   9.1 years ago                 past release-high-years 5",
-        "last push            not read (request failed)",
+        "last commit          2021-04-28   5.4 years ago                 past push-high-years 5",
         "libyears 0.3 behind the newest stable release"
     ],
     "baseline_suffix": null,

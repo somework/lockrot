@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/abandoned",
-        "description": "symfony/debug v3.4.47 \u2014 finding critical (36 = abandoned 32 + old-promise 4 [\u00bc of 16]) \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry).",
+        "description": "symfony/debug v3.4.47 \u2014 finding critical (36 = abandoned 32 + old-promise 4 [\u00bc of 16]) \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry).",
         "categories": [
             "Bug Risk"
         ],
@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 12
             }
         }
     },
@@ -27,7 +27,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 12
             }
         }
     }

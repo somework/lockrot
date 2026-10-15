@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 2,
+                    "records": 127
                 }
             ]
         },
@@ -781,7 +781,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 6,
     "packages_flagged": 0,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -1043,13 +1043,13 @@
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 0,
+                "records": 112,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 0,
+                        "records": 112,
                         "reason": null
                     }
                 ],
@@ -1121,7 +1121,58 @@
             "direct_dependents": [
                 "drupal/core"
             ],
-            "signals": [],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 3 flagged packages: guzzlehttp/guzzle (vulnerable), pear/console_getopt (silent), pear/pear_exception (stale)",
+                    "data": {
+                        "flagged": 3,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/guzzle",
+                                "chain": [
+                                    "drupal/core",
+                                    "guzzlehttp/guzzle"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "pear/console_getopt",
+                                "chain": [
+                                    "drupal/core",
+                                    "pear/archive_tar",
+                                    "pear/pear-core-minimal",
+                                    "pear/console_getopt"
+                                ],
+                                "verdict": "high",
+                                "lead": "silent",
+                                "flag_ids": [
+                                    "silent"
+                                ]
+                            },
+                            {
+                                "package": "pear/pear_exception",
+                                "chain": [
+                                    "drupal/core",
+                                    "pear/archive_tar",
+                                    "pear/pear-core-minimal",
+                                    "pear/pear_exception"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
             "evidence": "",
             "allowlist_reason": null,
             "data_date": null,

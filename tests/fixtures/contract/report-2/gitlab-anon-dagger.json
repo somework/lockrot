@@ -787,7 +787,7 @@
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
-    "network_failures": true,
+    "network_failures": false,
     "counts": {
         "critical": 0,
         "high": 1,
@@ -1034,27 +1034,8 @@
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [
-        "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1"
-    ],
-    "note_details": [
-        {
-            "code": "repository_activity_unreachable",
-            "text": "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1",
-            "docs_url": "https://lockrot.dev/notes/#repository_activity_unreachable",
-            "sets_network_failures": true,
-            "data": {
-                "forge_id": "gitlab",
-                "repositories": [
-                    {
-                        "host": "gitlab.com",
-                        "repo": "hoaproject/Consistency",
-                        "message": "not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1"
-                    }
-                ]
-            }
-        }
-    ],
+    "notes": [],
+    "note_details": [],
     "findings": [
         {
             "package": "hoa/consistency",
@@ -1076,20 +1057,21 @@
                     "baseline": null,
                     "signal_ids": [
                         "S1",
-                        "S2"
+                        "S2",
+                        "S4"
                     ],
                     "degree": {
                         "reasons": [
                             "marked"
                         ],
-                        "liveness_complete": false
+                        "liveness_complete": true
                     },
                     "headline": {
                         "unit": "reason",
                         "value": "marked",
                         "source": null
                     },
-                    "summary": "marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)"
+                    "summary": "marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago)"
                 },
                 {
                     "id": "old-promise",
@@ -1176,15 +1158,15 @@
                         },
                         "revealed": [
                             {
-                                "flag": "stale",
-                                "role": "corroborating"
+                                "flag": "silent",
+                                "role": "lead"
                             }
                         ],
-                        "total": 9,
-                        "verdict": "medium",
-                        "lead": "old-promise",
+                        "total": 18,
+                        "verdict": "high",
+                        "lead": "silent",
                         "deciding_advisory": null,
-                        "at_least": true
+                        "at_least": false
                     },
                     {
                         "remove": {
@@ -1273,11 +1255,10 @@
             "checks_missing": [],
             "checks_skipped": [
                 {
-                    "check": "repository_activity",
-                    "reason": "fetch_failed",
+                    "check": "repository_archived",
+                    "reason": "no_token",
                     "blocks": [
-                        "S3",
-                        "S4"
+                        "S3"
                     ]
                 }
             ],
@@ -1289,14 +1270,14 @@
                 "message": null
             },
             "activity": {
-                "status": "not_read",
-                "reason": "fetch_failed",
+                "status": "read",
+                "reason": null,
                 "forge": "gitlab",
                 "host": "gitlab.com",
                 "repo": "hoaproject/Consistency",
-                "event": null,
+                "event": "commit",
                 "archived": null,
-                "fetched_at": null,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
                 "cached_at": null
             },
             "allowlist": null,
@@ -1350,6 +1331,19 @@
                     }
                 },
                 {
+                    "id": "S4",
+                    "level": "high",
+                    "summary": "last commit 2021-04-28 (5.4 years ago)",
+                    "data": {
+                        "last_push": "2021-04-28T21:38:16+00:00",
+                        "repo": "hoaproject/Consistency",
+                        "host": "gitlab.com",
+                        "years": 5.4,
+                        "forge": "gitlab",
+                        "event": "commit"
+                    }
+                },
+                {
                     "id": "S5",
                     "level": "warn",
                     "summary": "released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
@@ -1363,7 +1357,7 @@
                     }
                 }
             ],
-            "evidence": "abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago); old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 0.33,
@@ -1390,8 +1384,12 @@
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
-                "push": null,
-                "push_unmeasured": "fetch_failed"
+                "push": {
+                    "at": "2021-04-28T21:38:16+00:00",
+                    "years": 5.4,
+                    "level": "high"
+                },
+                "push_unmeasured": null
             },
             "baseline": null,
             "gate": {

@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/abandoned",
-        "description": "web-token/jwt-key-mgmt 3.4.3 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: web-token/jwt-library. Do: replace with web-token/jwt-library (named by its registry).",
+        "description": "web-token/jwt-key-mgmt 3.4.3 \u2014 finding critical (32 = abandoned 32) \u2014 abandoned: marked abandoned by its registry, replacement: web-token/jwt-library. Do: replace with web-token/jwt-library (named by its registry; itself high: vulnerable).",
         "categories": [
             "Bug Risk"
         ],
@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 48
             }
         }
     }

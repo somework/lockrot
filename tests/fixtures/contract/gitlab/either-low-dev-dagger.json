@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/stale",
-        "description": "balping/json-raw-encoder v1.0.2 \u2014 finding low (4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev) \u2014 stale: last release 2023-03-27 (3.5 years ago). Do: no release fixes it. (via akaunting/laravel-apexcharts)",
+        "description": "balping/json-raw-encoder v1.0.2 \u2014 finding low (4 = (stale 8 \u00f7 2 transitive + vulnerable 4 [low advisory 2 \u00d7 2: no reachable fix]) \u00f7 2 dev) \u2014 stale: last release 2023-03-27 (3.5 years ago); last commit 2023-03-27 (3.5 years ago). Do: no release fixes it. (via akaunting/laravel-apexcharts)",
         "categories": [
             "Bug Risk"
         ],

@@ -18,7 +18,7 @@ security: 1 vulnerable package · 3 advisories: 3 low · packages-dev not checke
 fix, by package: php floor raise 1
 libyears: 5.9 behind across the one package · 5.9 from direct requirements ·
 furthest behind symfony/yaml v3.4.47 at 5.9
-advisories: 1 package asked · packagist.org answered (3 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (5 on record for 1 package)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

@@ -19,7 +19,7 @@ update now: composer update robrichards/xmlseclibs
 libyears: 6.0 behind across the one package · 0.0 from direct requirements ·
 furthest behind robrichards/xmlseclibs 3.1.1 at 6.0
 pulled in by: mautic/core-lib 1
-advisories: 1 package asked · packagist.org answered (2 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (4 on record for 1 package)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

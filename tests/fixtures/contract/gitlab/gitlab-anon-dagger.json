@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/abandoned",
-        "description": "hoa/consistency 1.17.05.02 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago). Do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package. (via lorisleiva/laravel-search-string)",
+        "description": "hoa/consistency 1.17.05.02 \u2014 finding high (18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive) \u2014 abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago). Do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package. (via lorisleiva/laravel-search-string)",
         "categories": [
             "Bug Risk"
         ],
@@ -11,7 +11,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 12
             }
         }
     },
@@ -27,7 +27,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 12
             }
         }
     }
