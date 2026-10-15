@@ -515,7 +515,7 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 
 | Kind | For | The line |
 |---|---|---|
-| `update` | an advisory or an old promise that the installed branch fixes | `composer update <package> (gets <version>)` |
+| `update` | an advisory or an old promise that the installed branch fixes | `composer update <package> (gets <version>)`, or `update it with Composer (gets <version>)` when the [command argument rule](schema.md#the-move) refuses the step |
 | `require` | a fix or a branch that a requirement must allow | `require <package> <constraint>`, or `move <package> to <constraint> through <dependents>` for a package you do not require |
 | `raise-php` | a fix or a branch that needs a higher `require.php` | `raise require.php to >=<version>, then require …` |
 | `blocked` | no fix or branch runs on the target PHP | `no move runs on the target: …` |

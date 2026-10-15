@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lockrot\Output;
-
-use Lockrot\Verdict\CommandArgument;
+namespace Lockrot\Verdict;
 
 /**
  * The renderings of an argv list (SPEC-0.14.md §5.6). The text formats print the POSIX rendering,

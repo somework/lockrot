@@ -58,22 +58,14 @@ final class CommandArgumentTest extends TestCase
         }
     }
 
-    /** A bare `--%` stops PowerShell parsing, and a name or version from data cannot pass an option to Composer. */
-    public function testALeadingDashPassesOnlyAsTheOptionThatLockrotWrites(): void
+    /** A name or a version from data cannot pass an option to Composer, not even `--no-update`. */
+    public function testALeadingDashPassesOnlyAsTheOptionOfARequireStep(): void
     {
-        foreach (['--%', '--working-dir=x', '-d', '-', '--no-update=1'] as $argument) {
-            self::assertFalse(CommandArgument::passes($argument), $argument);
+        self::assertTrue(CommandArgument::allPass(['composer', 'require', 'php:>=8.1', '--no-update']));
+        self::assertTrue(CommandArgument::allPass(['composer', 'update', 'a-b/c-d']));
+        foreach ([['composer', 'update', '--no-update'], ['composer', 'why-not', '--no-update', '1.0'], ['composer', 'why-not', 'a/b', '--no-update'], ['composer', 'require', 'a/b:^1', '--working-dir=x'], ['composer', 'update', '-d'], ['composer', 'update', '-'], ['composer', 'require', '--no-update=1']] as $argv) {
+            self::assertFalse(CommandArgument::allPass($argv), implode(' ', $argv));
         }
-        self::assertTrue(CommandArgument::passes('a-b'));
-    }
-
-    /** A package name from data never starts with `-`, not even as `--no-update`. */
-    public function testANameFromDataPassesOnlyWithoutALeadingDash(): void
-    {
-        self::assertTrue(CommandArgument::passesName('a-b/c-d'));
-        self::assertFalse(CommandArgument::passesName('--no-update'));
-        self::assertFalse(CommandArgument::passesName('--working-dir=x'));
-        self::assertFalse(CommandArgument::passesName('a/b%PATH%'));
     }
 
     public function testAnEmptyArgumentFails(): void

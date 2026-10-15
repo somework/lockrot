@@ -16,12 +16,12 @@ use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FindingBlock;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
-use Lockrot\Output\ShellCommand;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ShellCommand;
 
 /**
  * One case of tests/fixtures/flags/cases.json as lockrot writes it. The report holds the case

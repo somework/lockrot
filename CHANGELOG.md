@@ -69,10 +69,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tell now reach each Composer repository that publishes advisories. Action: set
   `extra.lockrot.advisory-lookup` to `composer-repositories` to keep 0.13's boundary.
   ([What lockrot contacts](https://github.com/somework/lockrot/blob/v0.14.0/SECURITY.md#what-lockrot-does-and-does-not-do))
-- **All formats:** `next_step.commands`, `security.update_now_command` and the `update now:` line
-  hold only arguments from one set that every shell quotes safely. A step with a version, branch or
-  name from the lock or a repository outside it is left out, so a hostile lock cannot inject into a
-  pasted command. This affects a reader who copies these commands. Action: if a step is missing,
+- **All formats:** `next_step.commands`, `security.update_now_command`, the `update now:` line and
+  the command in the `do:` line hold only arguments from one set that every shell quotes safely. A
+  step with a version, branch or name from the lock or a repository outside it is left out, so a
+  hostile lock cannot inject into a pasted command. This affects a reader who copies these commands. Action: if a step is missing,
   check that lock entry before you write the command by hand. ([The move](docs/schema.md#the-move))
 
 ### Added

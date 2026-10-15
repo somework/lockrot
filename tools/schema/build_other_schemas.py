@@ -539,8 +539,10 @@ def add_relations(D):
                [P(kind=E('tag', 'test'), latest=OBJ), P(kind=E('blocked'), source=E('pinned'), latest=OBJ), P(kind=E('blocked'), source=NOT('pinned'), latest=NULL),
                 P(kind=others('tag', 'test', 'blocked'), latest=NULL), P(kind=NOT(*MOVE_KINDS))])
         # the lead move of a transitive package may end with `composer why-not` checks, whatever its kind
-        relate(m, 'Kinds without a command write none but `composer why-not` checks; `update` always writes one (a transitive package included).',
-               [P(kind=E(*NO_COMMAND), commands={'items': {'items': [{'enum': ['composer']}, {'enum': ['why-not']}]}}), P(kind=E('update'), commands=MIN1),
+        relate(m, 'Kinds without a command write none but `composer why-not` checks. `update` writes only `composer update` and `composer why-not` steps. '
+                  'Its `composer update` step is left out when the command argument rule refuses it.',
+               [P(kind=E(*NO_COMMAND), commands={'items': {'items': [{'enum': ['composer']}, {'enum': ['why-not']}]}}),
+                P(kind=E('update'), commands={'items': {'items': [{'enum': ['composer']}, {'enum': ['update', 'why-not']}]}}),
                 P(kind=NOT(*(NO_COMMAND + ['update'])))])
         relate(m, '`clears_all` is true exactly when `leaves` and `unverified` are both empty.',
                [P(clears_all=E(True), leaves=EMPTY, unverified=EMPTY), {'properties': {'clears_all': E(False)}, 'anyOf': [P(leaves=MIN1), P(unverified=MIN1)]}])

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Lockrot\Tests\Unit\Output;
+namespace Lockrot\Tests\Unit\Verdict;
 
-use Lockrot\Output\ShellCommand;
+use Lockrot\Verdict\ShellCommand;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

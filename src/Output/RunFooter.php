@@ -11,6 +11,7 @@ use Lockrot\Analyzer\SecurityTotals;
 use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Security\Severity;
 use Lockrot\Verdict\ScoreModel;
+use Lockrot\Verdict\ShellCommand;
 
 /**
  * The run footer lines of the text formats.

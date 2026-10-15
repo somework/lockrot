@@ -10,13 +10,13 @@ use Lockrot\Json\JsonWriter;
 use Lockrot\Output\AgeText;
 use Lockrot\Output\CauseWords;
 use Lockrot\Output\RunGateText;
-use Lockrot\Output\ShellCommand;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\ScoreSweep;
 use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\ScoreModel;
+use Lockrot\Verdict\ShellCommand;
 use Lockrot\Version;
 
 /**
