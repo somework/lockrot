@@ -79,6 +79,11 @@ final class ContractBundle
         ['composer', 'update', 'a,b'],
         ['composer', 'update', 'a/b|c'],
         ['composer', 'update', '=a'],
+        ['a,b', 'update', 'vendor/package'],
+        ['-x', 'update', 'vendor/package'],
+        ['iex', 'calc'],
+        ['composer', 'exec', 'calc'],
+        ['composer', 'update', '   '],
     ];
 
     /** @var array<string, string> each written file's contents, by its path in the bundle */

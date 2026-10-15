@@ -381,22 +381,24 @@ comes in through others, `commands` (argv lists) and `text`. `also` holds the ot
 `kind` is an open set: show `text` for a kind you do not know.
 
 Each argument of `commands` and of `security.update_now_command` matches
-`^[A-Za-z0-9/._:@+=,^~*<>| -]+$`. Only lockrot's own option `--no-update` starts with `-`. An
-argument comes from the lock or a repository, so lockrot leaves out a step with an argument outside
-this set. The move keeps its `constraint`, `text` and other steps. Render each argv with one of these
+`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only lockrot's own option `--no-update`
+starts with `-`. The first argument is `composer`, and the second is `update`, `require` or
+`why-not`. An argument comes from the lock or a repository, so lockrot leaves out a step that breaks
+this rule. The move keeps its `constraint`, `text` and other steps. Render each argv with one of these
 renderings:
 
 | Shell | Rendering | Example |
 |---|---|---|
 | POSIX | Single-quote an argument with a character outside `[A-Za-z0-9/._:@%+=,-]`, or one that starts with `=` | `composer require 'php:>=8.1' --no-update` |
 | cmd.exe | Double-quote an argument with a space, a caret, a vertical bar, `<` or `>` | `composer require "php:>=8.1" --no-update` |
-| PowerShell | If each argument is inside `[A-Za-z0-9/._:-]`, write it bare. Else write the first argument, `--%`, then the cmd.exe rendering of the others | `composer --% require "php:>=8.1" --no-update` |
+| PowerShell | Write the first argument, `--%`, then the cmd.exe rendering of the others | `composer --% require "php:>=8.1" --no-update` |
 
-The PowerShell target is often `composer.bat`, and cmd.exe then parses the arguments again. After
-`--%`, PowerShell passes the rest of the line unchanged.
+The PowerShell target is often `composer.bat`, and cmd.exe then parses the arguments again.
+PowerShell can also read a bare version such as `1.10` as a number. After `--%`, PowerShell passes
+the rest of the line unchanged.
 
 !!! warning
-    If a report holds an argument outside the set, render no command for that argv, on any shell.
+    If an argv of a move breaks this rule, render none of that move's steps, on any shell.
     A report file can be edited, and no quoting is safe for such an argument on cmd.exe or PowerShell.
 
 ### Security {#advisories-with-no-fix-expected}

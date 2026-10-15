@@ -81,6 +81,24 @@ final class CommandArgumentTest extends TestCase
         self::assertFalse(CommandArgument::passes(''));
     }
 
+    /** Any other program or subcommand runs what the data names (`iex calc`, `composer exec calc`). */
+    public function testAnArgvPassesOnlyAsComposerWithAnAllowedSubcommand(): void
+    {
+        foreach (['update', 'require', 'why-not'] as $subcommand) {
+            self::assertTrue(CommandArgument::allPass(['composer', $subcommand, 'a/b']), $subcommand);
+        }
+        foreach ([['iex', 'calc'], ['composer', 'exec', 'calc'], ['composer', 'config', 'a', 'b'], ['bin/composer', 'update'], ['a,b', 'update'], ['-x', 'update'], ['composer'], []] as $argv) {
+            self::assertFalse(CommandArgument::allPass($argv), implode(' ', $argv));
+        }
+    }
+
+    public function testAnArgumentOfSpacesOnlyFails(): void
+    {
+        self::assertFalse(CommandArgument::passes(' '));
+        self::assertFalse(CommandArgument::passes('   '));
+        self::assertTrue(CommandArgument::passes('a/b:>=1.2 <2.0'));
+    }
+
     public function testAnArgvPassesOnlyWhenEachArgumentPasses(): void
     {
         self::assertTrue(CommandArgument::allPass(['composer', 'require', 'php:>=8.1', '--no-update']));
