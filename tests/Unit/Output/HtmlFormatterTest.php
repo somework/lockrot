@@ -206,7 +206,7 @@ final class HtmlFormatterTest extends TestCase
     {
         $page = $this->page($this->report([$this->finding('vendor/pkg')]));
 
-        self::assertStringContainsString('"https://lockrot.dev/schema/report-1.json"', $page);
+        self::assertStringContainsString('"$schema":"https://lockrot.dev/schema/report-2.json"', $page);
         self::assertStringNotContainsString('https:\/\/lockrot.dev', $page);
     }
 
