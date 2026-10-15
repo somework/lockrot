@@ -208,7 +208,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         $lockrot = self::documentOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain));
         $listed = [];
         foreach (self::DIFFERENCES[$id][$line] ?? [] as [$paths]) {
-            self::assertNotSame(Fields::only($model, $paths), Fields::only($lockrot, $paths), $id.' '.$line.': the fields agree with the model again: take '.implode(', ', $paths).' off DIFFERENCES');
+            foreach ($paths as $path) {
+                self::assertNotSame(Fields::only($model, [$path]), Fields::only($lockrot, [$path]), $id.' '.$line.': '.$path.' agrees with the model again: take it off DIFFERENCES');
+            }
             $listed = array_merge($listed, $paths);
         }
         $kept = array_values(array_diff(self::paths(self::LINES[$line]), $listed));

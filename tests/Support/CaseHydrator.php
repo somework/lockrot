@@ -301,7 +301,11 @@ final class CaseHydrator
             if ($facts['parent'] !== null) {
                 // The monorepo's tags replace the split package, so MonorepoParents dates the split tags by them.
                 $parent = JsonPath::stringAt($facts['parent'], ['name']);
-                $tags = array_map(static fn ($tag): array => (\is_array($tag) ? $tag : []) + ['replace' => [$name => 'self.version']], JsonPath::arrayAt($facts['parent'], ['releases']));
+                $tags = [];
+                foreach (JsonPath::arrayAt($facts['parent'], ['releases']) as $tag) {
+                    self::assertArray($tag);
+                    $tags[] = ['replace' => [$name => 'self.version'] + (\is_array($tag['replace'] ?? null) ? $tag['replace'] : [])] + $tag;
+                }
                 $byName[$parent] = PackageMetadata::fromPackages($parent, self::releases($parent, $tags, null, $registry), $clock->now());
             }
         }
