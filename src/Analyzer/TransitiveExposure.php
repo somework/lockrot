@@ -9,7 +9,6 @@ use Lockrot\Signal\Data\ExposedPackage;
 use Lockrot\Signal\Data\ExposureData;
 use Lockrot\Signal\Signal;
 use Lockrot\Verdict\Finding;
-use Lockrot\Verdict\FlagSet;
 
 /**
  * Signal S7, the parent-side view of transitive exposure (docs/verdicts.md#transitive-exposure).
@@ -120,8 +119,8 @@ final class TransitiveExposure
     }
 
     /**
-     * Names each package by its lead, which is report-1's verdict word on every package report-1
-     * flagged, and a package graded by its advisories alone by `vulnerable`.
+     * Names each package by its counted flags in flag order, `vulnerable` included (SPEC-0.14.md
+     * §2, S7).
      *
      * @param non-empty-list<ExposedPackage> $packages
      */
@@ -130,7 +129,7 @@ final class TransitiveExposure
         $count = \count($packages);
         $named = [];
         foreach (\array_slice($packages, 0, self::SUMMARY_NAMES) as $package) {
-            $named[] = $package->package().' ('.($package->lead() ?? FlagSet::VULNERABLE).')';
+            $named[] = $package->package().' ('.implode(' · ', $package->flagIds()).')';
         }
         $summary = \sprintf('pulls in %d flagged %s: %s', $count, $count === 1 ? 'package' : 'packages', implode(', ', $named));
         if ($count > self::SUMMARY_NAMES) {

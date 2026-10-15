@@ -323,4 +323,21 @@ final class TransitiveExposureTest extends TestCase
         self::assertSame('pulls in 1 flagged package: vendor/leaf (vulnerable)', $a->summary());
         self::assertNull(JsonPath::arrayAt(JsonPath::decoded($a->data()), ['packages', 0])['lead']);
     }
+
+    /** SPEC-0.14.md §2 S7: the summary names each package by its counted flags, `vulnerable` too, in flag order. */
+    public function testThePackageIsNamedByEachCountedFlag(): void
+    {
+        $packages = [['name' => 'root/a', 'version' => '1.0.0', 'require' => ['vendor/leaf' => '^1']], ['name' => 'vendor/leaf', 'version' => '1.0.0']];
+        $graph = DependencyGraph::fromLock(LockFile::fromArray(['packages' => $packages]), ProjectConfig::fromArray(['require' => ['root/a' => '^1']]), false);
+        $s2 = new Signal(Signal::LEVEL_WARN, 'last release 2022-05-20 (4.3 years ago)', SignalDataStub::of(Signal::S2, []));
+        $s9 = new Signal(Signal::LEVEL_HIGH, '1 advisory', SignalDataStub::of(Signal::S9, ['advisories' => [['id' => 'PKSA-1', 'severity' => 'high']], 'releases_read' => true, 'complete' => true]));
+        $leaf = (new FindingBuilder())->withPackage('vendor/leaf')->withSignals([$s2, $s9])->withChain($graph->shortestChain('vendor/leaf'))->withDirectDependents(['root/a'])
+            ->withFlags(FlagSet::fromSignals([$s2, $s9], null, [new CountedAdvisory('PKSA-1', 'high', 'update')]))->build();
+        $findings = [$this->finding($graph, 'root/a', Verdict::OK), $leaf];
+
+        $a = self::s7($this->byName(TransitiveExposure::attach($findings, $graph))['root/a']);
+
+        self::assertNotNull($a);
+        self::assertSame('pulls in 1 flagged package: vendor/leaf (stale · vulnerable)', $a->summary());
+    }
 }

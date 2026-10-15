@@ -328,7 +328,7 @@ final class AnalyzerTest extends TestCase
         $notChecked = $byName['vendor/direct']->signals()[1];
         self::assertSame(['S3', 'S4'], JsonPath::decoded($notChecked->data())['blocks']);
         self::assertStringContainsString('repository activity not checked', $notChecked->summary());
-        self::assertSame('pulls in 1 flagged package: vendor/transitive (silent); repository activity not checked (no token for the repository host), so S3 and S4 could not be read', Summaries::of($byName['vendor/direct']), 'nothing observed about the package itself: what it pulls in, and what was not checked');
+        self::assertSame('pulls in 1 flagged package: vendor/transitive (silent · old-promise); repository activity not checked (no token for the repository host), so S3 and S4 could not be read', Summaries::of($byName['vendor/direct']), 'nothing observed about the package itself: what it pulls in, and what was not checked');
         self::assertSame(['vendor/direct' => 1], $report->exposure());
     }
 
