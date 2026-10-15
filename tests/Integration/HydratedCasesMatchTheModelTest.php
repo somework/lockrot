@@ -144,7 +144,7 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         $name = CaseRecording::fileName($id);
         $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.$name.'.json');
         $explain = JsonPath::decodeFile(self::CONTRACT.'explain-2/'.$name.'.json');
-        $lockrot = self::fieldsOf(JsonPath::arrayAt($report, ['findings', 0]), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain), $line);
+        $lockrot = self::fieldsOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain), $line);
 
         if (isset(self::DIFFERENCES[$id][$line])) {
             self::assertNotSame($model, $lockrot, $id.' '.$line.': the fields agree with the model again: take the line off DIFFERENCES');
@@ -164,6 +164,23 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 self::assertNotSame('', $reason, $id.' '.$line);
             }
         }
+    }
+
+    /**
+     * A recording of a case with related packages holds a finding for each of them.
+     *
+     * @param array<mixed, mixed> $report
+     *
+     * @return array<mixed, mixed>
+     */
+    private static function findingOf(array $report, string $package): array
+    {
+        foreach (JsonPath::arrayAt($report, ['findings']) as $finding) {
+            if (\is_array($finding) && ($finding['package'] ?? null) === $package) {
+                return $finding;
+            }
+        }
+        self::fail($package.' has no finding in the recording');
     }
 
     /**

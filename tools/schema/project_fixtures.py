@@ -325,6 +325,9 @@ def package_facts(f, rows):
     def release(version, at, php, shared_commit=False):
         if version and version not in releases:
             releases[version] = dict({'version': version, 'time': at, 'php': php}, **({'shared_commit': True} if shared_commit else {}))
+        elif version and releases[version]['time'] is None:
+            # A version that a fix names before the date is known (the installed one) keeps that date.
+            releases[version]['time'] = at
     for r in rows:
         # A highest tag on a commit that other tags share is dated by that commit only (lockrot's shared-commit rule).
         shared = r['highest_released'] is None and r['highest_commit_date'] is not None
@@ -348,7 +351,7 @@ def package_facts(f, rows):
         row = by_branch.get(mv.get('to_branch'))
         lower = re.match(r'^\^(\d+\.\d+)$', mv.get('constraint') or '')
         if mv.get('version') is None and row is not None and lower:
-            release(('v' if row['highest'].startswith('v') else '') + lower.group(1) + '.0', None, row['php'])
+            release(('v' if (row['highest'] or '').startswith('v') else '') + lower.group(1) + '.0', None, row['php'])
     age = f.get('age') or {}
     s6 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S6'), None) or {}
     # A snapshot has no release date: its lock time is the snapshot's commit time.
