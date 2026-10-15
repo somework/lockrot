@@ -21,7 +21,8 @@
                    untested
       vulnerable   14 advisories: 6 high, 8 medium — none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip
                    Authorization header on HTTP downgrade
-      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
+      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned ·
+      old-promise)
   symfony/http-foundation v4.4.49  direct  ·  left-behind · vulnerable
       32 = left-behind 16 + vulnerable 16 [high advisory] (baseline: new package)
       do: require symfony/http-foundation ^5.4.50 — clears left-behind and 2 advisories; 5.x needs php \>=7.2.5, which
@@ -65,8 +66,8 @@
       silent       last release 2018-09-17 (8.1 years ago); last push 2018-10-01 (8.0 years ago)
       old-promise  released 2018-09-17 for PHP 7 (php "\>=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-      pulls in 15 flagged packages: hoa/consistency (abandoned), kphoen/rulerz-bridge (silent), hoa/compiler
-      (abandoned), hoa/event (abandoned), hoa/exception (abandoned) and 10 more
+      pulls in 15 flagged packages: hoa/consistency (abandoned · old-promise), kphoen/rulerz-bridge (silent ·
+      old-promise), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned) and 10 more
   mnapoli/piwik-twig-extension 3.0.0  direct  ·  silent · old-promise (baseline)
       36 = silent 32 + old-promise 4 [¼ of 16] (baseline: silent new)
       gate 36 = min(36, 2 × 32) (the score is lower); new: 32 = silent 32
@@ -87,7 +88,8 @@
       do: replace with php-http/guzzle7-adapter (named by its registry)
       abandoned    marked abandoned by its registry, replacement: php-http/guzzle7-adapter; its repository is archived
                    on GitHub; last release 2019-02-05 (7.7 years ago)
-      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
+      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned ·
+      old-promise)
   php-http/message-factory 1.1.0  direct  ·  abandoned (baseline)
       32 = abandoned 32 (baseline: known)
       gate 0 = min(32, 2 × 0) (the new facts bound it); new: 0
@@ -218,8 +220,8 @@
       old-promise  released 2018-09-18 for PHP 7 (php "\>=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
       stale        last release 2018-09-18 (8.1 years ago); last push 2022-09-02 (4.1 years ago)
-      pulls in 14 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned),
-      hoa/exception (abandoned), hoa/file (abandoned) and 9 more
+      pulls in 14 flagged packages: hoa/consistency (abandoned · old-promise), hoa/compiler (abandoned), hoa/event
+      (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more
   mgargano/simplehtmldom 1.5  direct  ·  old-promise (baseline) · stale (baseline)
       18 = old-promise 16 + stale 2 [¼ of 8] (baseline: known)
       gate 0 = min(18, 2 × 0) (the new facts bound it); new: 0
@@ -357,7 +359,7 @@
           (requires ^2.8); a new major brings its own requirements, which lockrot does not solve
       left-behind  branch 2.x last released 2021-12-15 (4.8 years ago); 3.x released 3.6.1 (2025-11-04), needs php ^8.0
                    above the project's php \>=7.4; no releasing branch within reach
-      pulls in 1 flagged package: willdurand/jsonp-callback-validator (old-promise)
+      pulls in 1 flagged package: willdurand/jsonp-callback-validator (old-promise · stale)
   lcobucci/jwt 4.1.5  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: raise require.php to \>=8.2, then require lcobucci/jwt ^5.6 — clears left-behind; 5.x needs php ~8.2.0 ||
@@ -419,7 +421,8 @@
           by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
-      pulls in 2 flagged packages: spomky-labs/otphp (left-behind), thecodingmachine/safe (left-behind)
+      pulls in 2 flagged packages: spomky-labs/otphp (left-behind · vulnerable), thecodingmachine/safe (left-behind ·
+      old-promise)
       checks missing: S2, S8 (undated releases)
   scheb/2fa-trusted-device v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
@@ -728,7 +731,8 @@
       8 = stale 8 (baseline: new package)
       do: —
       stale        last release 2023-08-21 (3.1 years ago); last push 2023-08-21 (3.1 years ago)
-      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
+      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned ·
+      old-promise)
   craue/config-bundle 2.7.0  direct  ·  stale
       8 = stale 8 (baseline: new package)
       do: —
@@ -743,13 +747,14 @@
       gate 0 = min(8, 2 × 0) (the new facts bound it); new: 0
       do: —
       stale        last release 2021-08-15 (5.2 years ago)
-      pulls in 1 flagged package: pragmarx/random (silent)
+      pulls in 1 flagged package: pragmarx/random (silent · old-promise)
   wallabag/phpepub 4.0.10  direct  ·  stale
       8 = stale 8 (baseline: new package)
       do: —
       stale        last release 2022-03-21 (4.6 years ago)
-      pulls in 5 flagged packages: grandt/binstring (silent), grandt/phpresizegif (silent), grandt/phpzipmerge (silent),
-      grandt/relativepath (silent), phpzip/phpzip (silent)
+      pulls in 5 flagged packages: grandt/binstring (silent · old-promise), grandt/phpresizegif (silent ·
+      old-promise), grandt/phpzipmerge (silent · old-promise), grandt/relativepath (silent · old-promise),
+      phpzip/phpzip (silent · old-promise)
   bacon/bacon-qr-code 2.0.8  via scheb/2fa-qr-code  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive (baseline: new package)
       do: raise require.php to \>=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code — clears

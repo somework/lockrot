@@ -26,9 +26,9 @@ critical (10)
       do: require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php
           >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new
           major brings its own requirements, which lockrot does not solve
-      left-behind  branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php
-                   >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-      old-promise  released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
+      left-behind  branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45
+                   (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+      old-promise  released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
       vulnerable   1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object
                    Deserialization in MonologBridge server:log Listener
@@ -42,7 +42,7 @@ critical (10)
                    || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach
       vulnerable   9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host
                    can bypass host-based checks
-      pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind),
+      pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind · vulnerable), guzzlehttp/promises (left-behind),
       symfony/polyfill-intl-idn (vulnerable)
   mautic/core-lib 4.3.x-dev  direct  ·  pinned · vulnerable
       32 = pinned 16 + vulnerable 16 [high advisory] (baseline: new package)
@@ -51,7 +51,8 @@ critical (10)
       vulnerable   5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in
                    UI upgrade process
       pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable),
-      twig/twig (vulnerable), robrichards/xmlseclibs (old-promise), symfony/http-foundation (left-behind) and 114 more
+      twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind
+      · vulnerable) and 114 more
   guzzlehttp/cache-subscriber 0.2.0  direct  ·  abandoned · old-promise
       36 = abandoned 32 + old-promise 4 [¼ of 16] (baseline: new package)
       do: find a replacement (none named)
@@ -59,7 +60,8 @@ critical (10)
                    years ago); last push 2019-09-16 (7.0 years ago)
       old-promise  released 2019-09-16 for PHP 5 (php ">=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
+      pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned ·
+      old-promise)
   symfony/debug v3.4.47  direct  ·  abandoned (baseline) · old-promise
       36 = abandoned 32 + old-promise 4 [¼ of 16] (baseline: old-promise covered by the recorded abandoned)
       gate 0 = min(36, 2 × 0) (the new facts bound it); new: 0
@@ -74,7 +76,7 @@ critical (10)
       silent       last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago)
       old-promise  released 2018-08-08 for PHP 7 (php ">=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
-      pulls in 1 flagged package: yosymfony/parser-utils (silent)
+      pulls in 1 flagged package: yosymfony/parser-utils (silent · old-promise)
   sensio/framework-extra-bundle v6.2.10  direct  ·  abandoned
       32 = abandoned 32 (baseline: new package)
       do: replace it: its registry suggests "Symfony"
@@ -364,7 +366,7 @@ libyears: at least 99.6 behind across 36 of 45 packages · 55.4 from direct requ
 furthest behind symfony/monolog-bridge v2.6.13 at 10.6
 pulled in by: mautic/core-lib 4 · guzzlehttp/guzzle 2 · akaunting/laravel-apexcharts 1 ·
 genealabs/laravel-model-caching 1 · jfcherng/php-diff 1 · … and 5 more
-advisories: 45 packages asked · packagist.org answered (567 on record for 84 packages)
+advisories: 45 packages asked · packagist.org answered (234 on record for 18 packages)
 baseline: 3 known · 34 new · 4 worsened · 0 stale (lockrot-baseline.json)
 gate: fails · --fail-on=high,unchecked ·
 25 findings fail it (high 24, unchecked 3); 2 reach it and are known to the baseline · target php 8.4 (--target-php)

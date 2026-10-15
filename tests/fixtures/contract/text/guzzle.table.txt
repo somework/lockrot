@@ -8,7 +8,7 @@
                    || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach
       vulnerable   9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host
                    can bypass host-based checks
-      pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind),
+      pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind · vulnerable), guzzlehttp/promises (left-behind),
       symfony/polyfill-intl-idn (vulnerable)
 
 4 packages checked · 1 flagged: critical 1

@@ -13730,7 +13730,7 @@ export const d_B_accepted_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -13745,7 +13745,7 @@ export const d_B_accepted_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -14018,20 +14018,20 @@ export const d_B_accepted_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -14048,7 +14048,7 @@ export const d_B_accepted_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -14111,7 +14111,7 @@ export const d_B_accepted_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -14127,7 +14127,7 @@ export const d_B_accepted_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -15210,7 +15210,7 @@ export const d_B_also_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -15225,7 +15225,7 @@ export const d_B_also_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -15605,20 +15605,20 @@ export const d_B_also_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -15635,7 +15635,7 @@ export const d_B_also_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -15681,7 +15681,7 @@ export const d_B_also_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 all fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 all fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -15689,7 +15689,7 @@ export const d_B_also_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -15705,7 +15705,7 @@ export const d_B_also_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -16796,7 +16796,7 @@ export const d_B_baselined_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -16815,7 +16815,7 @@ export const d_B_baselined_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -17120,20 +17120,20 @@ export const d_B_baselined_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -17150,7 +17150,7 @@ export const d_B_baselined_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -17209,7 +17209,7 @@ export const d_B_baselined_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -17217,7 +17217,7 @@ export const d_B_baselined_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -17233,7 +17233,7 @@ export const d_B_baselined_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -18367,7 +18367,7 @@ export const d_B_dev_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -18382,7 +18382,7 @@ export const d_B_dev_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -18695,20 +18695,20 @@ export const d_B_dev_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -18725,7 +18725,7 @@ export const d_B_dev_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -18780,7 +18780,7 @@ export const d_B_dev_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -18788,7 +18788,7 @@ export const d_B_dev_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -18804,7 +18804,7 @@ export const d_B_dev_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -19885,7 +19885,7 @@ export const d_B_gate_flag = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -19900,7 +19900,7 @@ export const d_B_gate_flag = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -20205,20 +20205,20 @@ export const d_B_gate_flag = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -20235,7 +20235,7 @@ export const d_B_gate_flag = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -20290,7 +20290,7 @@ export const d_B_gate_flag = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -20298,7 +20298,7 @@ export const d_B_gate_flag = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -20314,7 +20314,7 @@ export const d_B_gate_flag = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -21404,7 +21404,7 @@ export const d_B_gate_list = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -21419,7 +21419,7 @@ export const d_B_gate_list = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -21724,20 +21724,20 @@ export const d_B_gate_list = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -21754,7 +21754,7 @@ export const d_B_gate_list = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -21809,7 +21809,7 @@ export const d_B_gate_list = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -21817,7 +21817,7 @@ export const d_B_gate_list = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -21833,7 +21833,7 @@ export const d_B_gate_list = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -22907,7 +22907,7 @@ export const d_B_gate_none = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -22922,7 +22922,7 @@ export const d_B_gate_none = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -23227,20 +23227,20 @@ export const d_B_gate_none = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -23257,7 +23257,7 @@ export const d_B_gate_none = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -23312,7 +23312,7 @@ export const d_B_gate_none = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -23320,7 +23320,7 @@ export const d_B_gate_none = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -23336,7 +23336,7 @@ export const d_B_gate_none = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -24411,7 +24411,7 @@ export const d_B_offline_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -24426,7 +24426,7 @@ export const d_B_offline_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 }
             ],
             "score": {
@@ -24645,20 +24645,20 @@ export const d_B_offline_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -24675,7 +24675,7 @@ export const d_B_offline_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -24705,7 +24705,7 @@ export const d_B_offline_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -24713,7 +24713,7 @@ export const d_B_offline_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -24729,7 +24729,7 @@ export const d_B_offline_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -25822,7 +25822,7 @@ export const d_B_offline_high_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -25837,7 +25837,7 @@ export const d_B_offline_high_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 }
             ],
             "score": {
@@ -26056,20 +26056,20 @@ export const d_B_offline_high_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -26086,7 +26086,7 @@ export const d_B_offline_high_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -26116,7 +26116,7 @@ export const d_B_offline_high_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -26124,7 +26124,7 @@ export const d_B_offline_high_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -26140,7 +26140,7 @@ export const d_B_offline_high_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -27217,7 +27217,7 @@ export const d_B = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -27232,7 +27232,7 @@ export const d_B = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -27537,20 +27537,20 @@ export const d_B = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -27567,7 +27567,7 @@ export const d_B = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -27622,7 +27622,7 @@ export const d_B = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -27630,7 +27630,7 @@ export const d_B = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -27646,7 +27646,7 @@ export const d_B = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -52630,7 +52630,7 @@ export const d_cache_subscriber = {
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
                     "data": {
                         "flagged": 2,
                         "packages": [
@@ -54996,8 +54996,8 @@ export const d_composite = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 6,
-                    "records": 36
+                    "packages_with_records": 4,
+                    "records": 33
                 }
             ]
         },
@@ -56548,7 +56548,7 @@ export const d_composite = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -56563,7 +56563,7 @@ export const d_composite = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -56868,20 +56868,20 @@ export const d_composite = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -56898,7 +56898,7 @@ export const d_composite = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -56953,7 +56953,7 @@ export const d_composite = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -56961,7 +56961,7 @@ export const d_composite = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -56977,7 +56977,7 @@ export const d_composite = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -62848,7 +62848,7 @@ export const d_fail_on_config_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -62863,7 +62863,7 @@ export const d_fail_on_config_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -63168,20 +63168,20 @@ export const d_fail_on_config_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -63198,7 +63198,7 @@ export const d_fail_on_config_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -63253,7 +63253,7 @@ export const d_fail_on_config_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -63261,7 +63261,7 @@ export const d_fail_on_config_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -63277,7 +63277,7 @@ export const d_fail_on_config_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -64345,7 +64345,7 @@ export const d_fail_on_default_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -64360,7 +64360,7 @@ export const d_fail_on_default_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -64665,20 +64665,20 @@ export const d_fail_on_default_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -64695,7 +64695,7 @@ export const d_fail_on_default_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -64750,7 +64750,7 @@ export const d_fail_on_default_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -64758,7 +64758,7 @@ export const d_fail_on_default_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -64774,7 +64774,7 @@ export const d_fail_on_default_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -71017,7 +71017,7 @@ export const d_guzzle_5 = {
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
                     "data": {
                         "flagged": 2,
                         "packages": [
@@ -73732,7 +73732,7 @@ export const d_guzzle_mixed = {
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
                     "data": {
                         "flagged": 2,
                         "packages": [
@@ -76851,7 +76851,7 @@ export const d_guzzle = {
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)",
+                    "summary": "pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind \u00b7 vulnerable), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)",
                     "data": {
                         "flagged": 3,
                         "packages": [
@@ -92036,7 +92036,7 @@ export const d_local_path_advisory = {
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise), symfony/http-foundation (left-behind) and 114 more",
+                    "summary": "pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable) and 114 more",
                     "data": {
                         "flagged": 119,
                         "packages": [
@@ -99262,8 +99262,8 @@ export const d_ok_unchecked = {
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 0,
-            "shared_commit": 0,
-            "undated": 1,
+            "shared_commit": 1,
+            "undated": 0,
             "no_stable_release": 0,
             "undated_releases": 0
         },
@@ -99411,7 +99411,7 @@ export const d_ok_unchecked = {
             "replacement": null,
             "replacement_url": null,
             "note": null,
-            "libyears_unmeasured": "undated",
+            "libyears_unmeasured": "shared_commit",
             "libyears_at_least": false,
             "direct": false,
             "dev": false,
@@ -99458,7 +99458,7 @@ export const d_ok_unchecked = {
             "libyears": null,
             "age": {
                 "installed": null,
-                "installed_unmeasured": "undated",
+                "installed_unmeasured": "shared_commit",
                 "release": null,
                 "release_unmeasured": "undated_releases",
                 "branch_release": null,
@@ -119828,7 +119828,7 @@ export const d_silent = {
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 1 flagged package: yosymfony/parser-utils (silent)",
+                    "summary": "pulls in 1 flagged package: yosymfony/parser-utils (silent \u00b7 old-promise)",
                     "data": {
                         "flagged": 1,
                         "packages": [
@@ -127401,7 +127401,7 @@ export const d_tie_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -127764,7 +127764,7 @@ export const d_tie_dagger = {
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -127781,7 +127781,7 @@ export const d_tie_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -127827,7 +127827,7 @@ export const d_tie_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 medium \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 medium \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -127835,7 +127835,7 @@ export const d_tie_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -127851,7 +127851,7 @@ export const d_tie_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {

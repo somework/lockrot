@@ -308,7 +308,7 @@
     "metadata": {
         "abandoned": true,
         "replacement": "web-token/jwt-library",
-        "releases_listed": 20,
+        "releases_listed": 22,
         "has_stable_release": true,
         "last_stable_release": null,
         "last_stable_version": null,

@@ -195,6 +195,18 @@
         "Fixes: composer update · upgrade · php floor raise · fix unknown · blocked × 2 · no fix × 2"
       ]
     },
+    "pagerfanta": {
+      "document": "cases/pagerfanta.json",
+      "title": "lockrot: 1 of 1 package flagged",
+      "description": "lockrot flagged 1 of 1 package in composer.lock: 1 high. Each finding lists every flag that fired, the sum behind its grade, and its next step.",
+      "copy_summary": [
+        "lockrot report for wallabag/wallabag · data as of 2026-10-01 · lockrot 0.14.0 · score model 1 · target PHP 8.4",
+        "1 of 1 package flagged (100%): 1 graded high. Flags: left-behind 1.",
+        "In production · required directly · no security advisory · 1.9 libyears behind."
+      ],
+      "libyears_panel": "at least 1.90 libyears over 1 package · 1.90 from direct requirements · furthest behind: pagerfanta/twig v3.8.0, 1.90 or more",
+      "panel": null
+    },
     "empty-lock": {
       "document": "report-2/moodle-v3.json",
       "title": "lockrot: composer.lock holds no package",

@@ -6,7 +6,8 @@
       vulnerable   5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in
                    UI upgrade process
       pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable),
-      twig/twig (vulnerable), robrichards/xmlseclibs (old-promise), symfony/http-foundation (left-behind) and 114 more
+      twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind
+      · vulnerable) and 114 more
 
 128 packages checked · 1 flagged: critical 1
 flags: pinned 1 · vulnerable 1 · 1 package carries more than one

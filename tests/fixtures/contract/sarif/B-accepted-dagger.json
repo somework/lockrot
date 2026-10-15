@@ -87,7 +87,7 @@
                             "installed": {
                                 "at": "2016-01-14T10:11:35+00:00",
                                 "years": 10.7,
-                                "dated_by": null
+                                "dated_by": "symfony/symfony"
                             },
                             "installed_unmeasured": null,
                             "release": {
@@ -103,7 +103,7 @@
                                 "at": "2019-11-13T08:36:42+00:00",
                                 "years": 6.9,
                                 "level": "high",
-                                "dated_by": null
+                                "dated_by": "symfony/symfony"
                             },
                             "branch_release_unmeasured": null,
                             "push": {

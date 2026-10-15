@@ -350,7 +350,7 @@
             {
                 "id": "S7",
                 "level": "info",
-                "summary": "pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)",
+                "summary": "pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind \u00b7 vulnerable), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)",
                 "data": {
                     "flagged": 3,
                     "packages": [

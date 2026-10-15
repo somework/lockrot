@@ -150,7 +150,7 @@
           || ~8.5.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a
           new major brings its own requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
-      pulls in 3 flagged packages: spomky-labs/otphp (left-behind), symfony/security-guard (abandoned),
+      pulls in 3 flagged packages: spomky-labs/otphp (left-behind · vulnerable), symfony/security-guard (abandoned),
       thecodingmachine/safe (left-behind)
       checks missing: S2, S8 (undated releases)
   scheb/2fa-trusted-device v5.13.2  direct  ·  left-behind
@@ -179,16 +179,16 @@
       do: no tagged release to move to; review the snapshot, or replace it
       pinned       pinned to branch snapshot dev-master
       age: last push 2023-12-24 (2.8 years ago)
-      pulls in 14 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned),
-      hoa/exception (abandoned), hoa/file (abandoned) and 9 more
+      pulls in 14 flagged packages: hoa/consistency (abandoned · old-promise), hoa/compiler (abandoned), hoa/event
+      (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more
   wallabag/rulerz-bundle dev-master  direct  ·  pinned (baseline)
       16 = pinned 16 (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0
       do: no tagged release to move to; review the snapshot, or replace it
       pinned       pinned to branch snapshot dev-master
       age: last push 2023-12-24 (2.8 years ago)
-      pulls in 15 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned),
-      hoa/exception (abandoned), hoa/file (abandoned) and 10 more
+      pulls in 15 flagged packages: hoa/consistency (abandoned · old-promise), hoa/compiler (abandoned), hoa/event
+      (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more
   behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 transitive (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0
@@ -333,13 +333,14 @@
       8 = stale 8 (baseline: new package)
       do: —
       stale        last release 2021-08-15 (5.2 years ago)
-      pulls in 1 flagged package: pragmarx/random (silent)
+      pulls in 1 flagged package: pragmarx/random (silent · old-promise)
   wallabag/phpepub 4.0.10  direct  ·  stale
       8 = stale 8 (baseline: new package)
       do: —
       stale        last release 2022-03-21 (4.6 years ago)
-      pulls in 5 flagged packages: grandt/binstring (silent), grandt/phpresizegif (silent), grandt/phpzipmerge (silent),
-      grandt/relativepath (silent), phpzip/phpzip (silent)
+      pulls in 5 flagged packages: grandt/binstring (silent · old-promise), grandt/phpresizegif (silent ·
+      old-promise), grandt/phpzipmerge (silent · old-promise), grandt/relativepath (silent · old-promise),
+      phpzip/phpzip (silent · old-promise)
   sebastian/resource-operations 3.0.4  via phpunit/phpunit  ·  abandoned (baseline)
       8 = (abandoned 32 ÷ 2 transitive) ÷ 2 dev (baseline: known)
       gate 0 = min(8, 2 × 0) (the new facts bound it); new: 0

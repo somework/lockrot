@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **critical** | `mautic/core-lib` | 4.3.x-dev | pinned · vulnerable | `32 = pinned 16 + vulnerable 16 [high advisory]`<br>**Do:** no move: it is installed from a local path (your own package)<br>*pinned:* pinned to branch snapshot 4.3.x-dev<br>*vulnerable:* 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process<br>pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise), symfony/http-foundation (left-behind) and 114 more | direct |
+| **critical** | `mautic/core-lib` | 4.3.x-dev | pinned · vulnerable | `32 = pinned 16 + vulnerable 16 [high advisory]`<br>**Do:** no move: it is installed from a local path (your own package)<br>*pinned:* pinned to branch snapshot 4.3.x-dev<br>*vulnerable:* 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process<br>pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind · vulnerable) and 114 more | direct |
 
 flags: pinned 1 · vulnerable 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1

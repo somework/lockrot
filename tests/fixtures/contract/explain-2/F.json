@@ -380,7 +380,7 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 3,
+        "releases_listed": 5,
         "has_stable_release": true,
         "last_stable_release": "2026-09-23T14:40:04+00:00",
         "last_stable_version": "v1.43.0",

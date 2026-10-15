@@ -2,7 +2,7 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "f86f111fb6c0f34c84ce9e82f7110138b9ea248579960fb52fe1a4eeb721d936",
+        "tests/fixtures/flags/cases.json": "3c5856b212b3c16e431ce7f704b6c3b0c7574f33434570d34843b263f4fc36f1",
         "tests/fixtures/flags/composite.json": "ec59fa67eb480bc91772e4c4f9fba1736e6a338042ff9eba28e4238a9cf15d39",
         "tests/fixtures/flags/provenance.json": "eda0126d4ab3c7559b093be6966d7990468d6d9a6d6cf996c23f7846e4c480bc"
     },
@@ -49,7 +49,7 @@
     "case_lock": "each case is formatted beside a composer.lock of its lock entries, as tests/Support/CaseHydrator.php lockJson() lays it out",
     "model_goldens": {
         "compared": {
-            "age_line": 75,
+            "age_line": 89,
             "baseline_suffix": 90,
             "commands_cmd": 92,
             "commands_posix": 92,
@@ -59,7 +59,7 @@
             "score_text": 91
         },
         "inputs_differ": {
-            "age_line": 17,
+            "age_line": 3,
             "baseline_suffix": 2,
             "gate_line": 1,
             "next_step_text": 13,
@@ -69,7 +69,7 @@
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "e343f55161ec3aa49ddda3b19c5086b4ec579d35559e8865322be19984d919fe",
+        "sha256": "2797327d701307e511d5e315bddc9a69ec979b469bfd14691576dc4015362e59",
         "read_by": "tests/Integration/PageGoldensTest.php reads title and description; the other keys are the renderer's"
     },
     "bundle_sha256": "sha256 of the lines \"<sha256>  <path>\", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json"

@@ -1332,7 +1332,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise), symfony/http-foundation (left-behind) and 114 more",
+                    "summary": "pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable) and 114 more",
                     "data": {
                         "flagged": 119,
                         "packages": [

@@ -1283,7 +1283,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 1 flagged package: yosymfony/parser-utils (silent)",
+                    "summary": "pulls in 1 flagged package: yosymfony/parser-utils (silent \u00b7 old-promise)",
                     "data": {
                         "flagged": 1,
                         "packages": [

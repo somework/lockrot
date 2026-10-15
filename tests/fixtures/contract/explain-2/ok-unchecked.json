@@ -87,7 +87,7 @@
         "replacement": null,
         "replacement_url": null,
         "note": null,
-        "libyears_unmeasured": "undated",
+        "libyears_unmeasured": "shared_commit",
         "libyears_at_least": false,
         "direct": false,
         "dev": false,
@@ -134,7 +134,7 @@
         "libyears": null,
         "age": {
             "installed": null,
-            "installed_unmeasured": "undated",
+            "installed_unmeasured": "shared_commit",
             "release": null,
             "release_unmeasured": "undated_releases",
             "branch_release": null,
@@ -172,7 +172,7 @@
     },
     "lock": {
         "php": "~8.4.0 || ~8.5.0",
-        "released": null,
+        "released": "2026-01-24T13:27:55+00:00",
         "repository": "https://github.com/scheb/2fa-google-authenticator.git",
         "from_composer_repository": true,
         "dev": false,

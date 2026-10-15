@@ -532,7 +532,7 @@
             {
                 "id": "S7",
                 "level": "info",
-                "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
                 "data": {
                     "flagged": 2,
                     "packages": [

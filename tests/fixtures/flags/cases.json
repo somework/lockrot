@@ -4099,7 +4099,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -4108,13 +4108,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -4184,6 +4186,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -9619,7 +9634,8 @@
      {
       "version": "v1.37.0",
       "time": null,
-      "php": ">=7.2"
+      "php": ">=7.2",
+      "shared_commit": true
      },
      {
       "version": "v1.38.1",
@@ -15586,7 +15602,8 @@
        {
         "version": "v1.37.0",
         "time": null,
-        "php": ">=7.2"
+        "php": ">=7.2",
+        "shared_commit": true
        },
        {
         "version": "v1.38.1",
@@ -41378,7 +41395,7 @@
      {
       "name": "scheb/2fa-google-authenticator",
       "version": "v8.6.1",
-      "time": null,
+      "time": "2026-01-24T13:27:55+00:00",
       "php": "~8.4.0 || ~8.5.0",
       "dev": false,
       "origin": "packagist"
@@ -47492,7 +47509,8 @@
      {
       "version": "3.4.3",
       "time": null,
-      "php": ">=8.1"
+      "php": ">=8.1",
+      "shared_commit": true
      },
      {
       "version": "3.4.8",
@@ -62507,7 +62525,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -62516,13 +62534,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -62582,6 +62602,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -63796,7 +63829,8 @@
      {
       "version": "v1.37.0",
       "time": null,
-      "php": ">=7.2"
+      "php": ">=7.2",
+      "shared_commit": true
      },
      {
       "version": "v1.43.0",
@@ -73156,7 +73190,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -73165,13 +73199,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -73241,6 +73277,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -76060,12 +76109,14 @@
      {
       "version": "v2.6.13",
       "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -76125,6 +76176,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -84605,7 +84669,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": true,
       "origin": "packagist"
@@ -84614,13 +84678,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -84690,6 +84756,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -96640,7 +96719,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -96649,13 +96728,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -96705,6 +96786,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -108675,7 +108769,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -108684,13 +108778,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -108760,6 +108856,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -150689,7 +150798,8 @@
        {
         "version": "v8.83.8",
         "time": "2022-04-12T13:49:56+00:00",
-        "php": "^7.3|^8.0"
+        "php": "^7.3|^8.0",
+        "shared_commit": true
        },
        {
         "version": "v9.52.22",
@@ -150712,6 +150822,15 @@
        "reason": null,
        "pushed_at": "2024-01-14T14:38:53+00:00",
        "archived": true
+      },
+      "parent": {
+       "name": "laravel/framework",
+       "releases": [
+        {
+         "version": "v8.83.8",
+         "time": "2022-04-12T13:49:56+00:00"
+        }
+       ]
       },
       "chain": [
        "mautic/core-lib",
@@ -157638,7 +157757,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -157647,13 +157766,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -157703,6 +157824,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -159318,7 +159452,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -159327,13 +159461,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -159403,6 +159539,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -160997,7 +161146,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -161006,13 +161155,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -161082,6 +161233,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -166459,7 +166623,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -166468,13 +166632,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -166544,6 +166710,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -170674,7 +170853,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -170683,13 +170862,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -170759,6 +170940,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {
@@ -172352,7 +172546,7 @@
      {
       "name": "symfony/monolog-bridge",
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
+      "time": "2015-06-25T11:21:15+00:00",
       "php": ">=5.3.3",
       "dev": false,
       "origin": "packagist"
@@ -172361,13 +172555,15 @@
     "releases": [
      {
       "version": "v2.6.13",
-      "time": "2016-01-14T10:11:35+00:00",
-      "php": ">=5.3.3"
+      "time": "2015-06-25T11:21:15+00:00",
+      "php": ">=5.3.3",
+      "shared_commit": true
      },
      {
       "version": "v2.8.52",
       "time": "2019-11-13T08:36:42+00:00",
-      "php": ">=5.3.9"
+      "php": ">=5.3.9",
+      "shared_commit": true
      },
      {
       "version": "v3.4.47",
@@ -172437,6 +172633,19 @@
      "reason": null,
      "pushed_at": "2026-09-23T14:28:05+00:00",
      "archived": false
+    },
+    "parent": {
+     "name": "symfony/symfony",
+     "releases": [
+      {
+       "version": "v2.6.13",
+       "time": "2016-01-14T10:11:35+00:00"
+      },
+      {
+       "version": "v2.8.52",
+       "time": "2019-11-13T08:36:42+00:00"
+      }
+     ]
     },
     "dependents": {},
     "run": {

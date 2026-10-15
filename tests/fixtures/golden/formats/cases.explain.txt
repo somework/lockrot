@@ -63,8 +63,8 @@ repository metadata
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -80,8 +80,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -98,6 +98,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case C
 symfony/debug v3.4.47 — critical: abandoned · old-promise
@@ -364,7 +365,7 @@ flags
     medium     CVE-2026-67355  Guzzle: Host-only cookie scope is not preserved
                PKSA-qxvb-2bpp-dnk6 · reported 2026-07-20 · 8 points · fix: php floor raise to 7.x from 7.15.1
   feeds        packagist.org: 15 on record, 9 affect 6.5.8
-  pulls in     pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)
+  pulls in     pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind · vulnerable), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)
   accepted     none
   not checked  nothing
 
@@ -662,7 +663,7 @@ flags
   abandoned    S1 high, S3 high · marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.0 years ago); last push 2019-09-16 (7.0 years ago)
   old-promise  S5 · released 2019-09-16 for PHP 5 (php ">=5.4.0"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
-  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
+  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned · old-promise)
   accepted     none
   not checked  nothing
 
@@ -864,7 +865,7 @@ flags
   silent       S2 high, S4 high · last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago)
   old-promise  S5 · released 2018-08-08 for PHP 7 (php ">=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   feeds        packagist.org: none on record
-  pulls in     pulls in 1 flagged package: yosymfony/parser-utils (silent)
+  pulls in     pulls in 1 flagged package: yosymfony/parser-utils (silent · old-promise)
   accepted     none
   not checked  nothing
 
@@ -910,11 +911,11 @@ repository metadata
 scheb/2fa-google-authenticator v8.6.1 — ok
   via pimcore/pimcore > scheb/2fa-google-authenticator: 1 hop from the nearest composer.json line; no line of composer.json names it
 
-age       installed  v8.6.1    not read (no date)
+age       installed  v8.6.1    not read (dated only by a commit its tags share)
           8.x                  not read (undated releases)
           newest               not read (undated releases)
           last push            2026-07-10   0.2 years ago                 below push-warn-years 3
-          libyears not measured: no date
+          libyears not measured: dated only by a commit its tags share
 repository GitHub github.com/scheb/2fa-google-authenticator: last push 2026-07-10 · fetched 2026-09-14
 
 score     0
@@ -1021,7 +1022,7 @@ flags
     medium     CVE-2026-67355  Guzzle: Host-only cookie scope is not preserved
                PKSA-qxvb-2bpp-dnk6 · reported 2026-07-20 · 8 points · fix: upgrade to 7.x from 7.15.1
   feeds        packagist.org: 15 on record, 14 affect 5.3.4
-  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
+  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned · old-promise)
   accepted     none
   not checked  nothing
 
@@ -1298,7 +1299,7 @@ flags
     medium     CVE-2026-67355  Guzzle: Host-only cookie scope is not preserved
                PKSA-qxvb-2bpp-dnk6 · reported 2026-07-20 · 8 points · fix: php floor raise to 7.x from 7.15.1
   feeds        packagist.org: 15 on record, 14 affect 5.3.4
-  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)
+  pulls in     pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned · old-promise)
   accepted     none
   not checked  nothing
 
@@ -1352,8 +1353,8 @@ repository metadata
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -1370,8 +1371,8 @@ do        composer update symfony/monolog-bridge (gets v2.8.52) — clears the a
           also: require symfony/monolog-bridge ^5.4 — clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — all fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: composer update to 2.x from v2.8.52
@@ -1388,6 +1389,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    1 of 1 · upgrade; held by composer.json; after it: 16, high, if Composer resolves it
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 1 of 1 · upgrade; held by composer.json; after it: 20, high, if Composer resolves it
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    1 of 1 · composer update (lowest fix); after it: 20, high, if Composer resolves it
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case affected-range-unknown‡
 symfony/polyfill-intl-idn v1.37.0 — low: vulnerable
@@ -1636,8 +1638,8 @@ repository metadata
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -1653,8 +1655,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -1671,6 +1673,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case C-tokenless‡
 symfony/debug v3.4.47 — critical: abandoned · old-promise
@@ -1708,8 +1711,8 @@ note: GitHub token not set: repository activity checked for 0 candidate packages
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -1726,7 +1729,7 @@ do        require symfony/monolog-bridge ^5.4 — clears left-behind; 5.x needs 
           also: no release fixes it
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
   old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 · 1 advisory: 1 medium — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     medium     CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
@@ -1744,6 +1747,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case E-ignored‡
 symfony/yaml v5.4.23 — low: vulnerable
@@ -1896,8 +1900,8 @@ note: GitHub unreachable for 1 repositories: not stubbed: https://api.github.com
 symfony/monolog-bridge v2.6.13 — high: left-behind · old-promise · vulnerable
   direct requirement (composer.json require-dev)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -1914,8 +1918,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -1932,6 +1936,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case twig-dev‡
 twig/twig v2.16.1 — high: vulnerable
@@ -2135,8 +2140,8 @@ repository metadata
 symfony/monolog-bridge v2.6.13 — high: left-behind · old-promise
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -2151,8 +2156,8 @@ do        require symfony/monolog-bridge ^5.4 — clears left-behind; 5.x needs 
           clears left-behind
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   accepted     none
   not checked  S9 (offline)
 
@@ -2165,6 +2170,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
    * 2.x      v2.8.52       2019-11-13   >=5.3.9
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case holder-vuln‡
 joomla/string 2.0.1 — high: left-behind
@@ -2360,8 +2366,8 @@ repository metadata
 symfony/monolog-bridge v2.6.13 — high: vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -2376,8 +2382,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears the advisory; 5.x ne
           clears PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -2394,6 +2400,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 note: extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/monolog-bridge: 1 counted advisory; accept them in Composer's audit policy if that is the decision
 
 == case unreached-dev‡
@@ -3074,7 +3081,7 @@ flags
     medium     CVE-2022-25770  Mautic has insufficient authentication in upgrade flow
                PKSA-ydwx-2n98-5dyf · reported 2024-09-18 · 8 points · fix: fix unknown
   feeds        packagist.org: 5 on record, 5 affect 4.3.x-dev
-  pulls in     pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise), symfony/http-foundation (left-behind) and 114 more
+  pulls in     pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise · vulnerable), symfony/http-foundation (left-behind · vulnerable) and 114 more
   accepted     none
   not checked  S3, S4 (not from a Composer repository) · S2, S8 (not from a Composer repository)
 
@@ -3112,8 +3119,8 @@ note: 1 package is not from a Composer repository: its release metadata and repo
 symfony/monolog-bridge v2.6.13 — high: left-behind · old-promise
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -3128,8 +3135,8 @@ do        require symfony/monolog-bridge ^5.4 — clears left-behind; 5.x needs 
           clears left-behind
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   accepted     none
   not checked  S9 (offline)
 
@@ -3142,13 +3149,14 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8
    * 2.x      v2.8.52       2019-11-13   >=5.3.9
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case fail-on-config‡
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -3164,8 +3172,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -3182,13 +3190,14 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case fail-on-default‡
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -3204,8 +3213,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -3222,6 +3231,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case require-dev-name‡
 symfony/var-dumper v4.4.47 — medium: left-behind
@@ -3293,8 +3303,8 @@ repository metadata
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -3310,8 +3320,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -3328,6 +3338,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case A-gate-vulnerable
 twig/twig v2.16.1 — critical: vulnerable
@@ -3394,8 +3405,8 @@ repository metadata
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -3411,8 +3422,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -3429,13 +3440,14 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case B-gate-none
 symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable
   direct requirement (composer.json require)
 
-age       installed  v2.6.13   2016-01-14   10.7 years ago
-          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5
+age       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony
+          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony
           newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3
           last push            2026-09-23   less than three weeks ago     below push-warn-years 3
           libyears 10.6 behind the newest stable release
@@ -3451,8 +3463,8 @@ do        require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-pro
           clears left-behind, old-promise, PKSA-4wjj-gy1p-ft3r
 
 flags
-  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
-  old-promise  S5 · released 2016-01-14 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
+  left-behind  S8 high · branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)
+  old-promise  S5 · released 2015-06-25 for PHP 5 (php ">=5.3.3"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested
   vulnerable   S9 high · 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener · lookup complete
     high       CVE-2026-45077  Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener
                PKSA-4wjj-gy1p-ft3r · reported 2026-05-20 · 16 points · fix: upgrade to 5.x from v5.4.52
@@ -3469,6 +3481,7 @@ repository metadata
      4.x      v4.4.43       2022-06-16   >=7.1.3    0 of 1
      3.x      v3.4.47       2020-10-24   ^5.5.9|>=7.0.8 0 of 1
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1
+branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
 == case A-gate-critical
 twig/twig v2.16.1 — critical: vulnerable
