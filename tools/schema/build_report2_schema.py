@@ -468,9 +468,9 @@ def move_props(with_also):
                                       closed(['holders', 'crosses_major', 'transitive', 'unreached']), uniqueItems=True),
         'commands': arr(("The ordered commands a user runs, each an argv list (round 4), rendered per shell by §5.6's quoting (POSIX, cmd.exe, PowerShell); `[]` for a transitive "
                          "`require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`, attack round 1). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. "
-                         "Each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces, only lockrot's own option `--no-update` starts with `-`, the first argument is `composer` "
-                         "and the second is `update`, `require` or `why-not` (§5.6, the command argument rule): "
-                         "a step with an argument from the lock or a repository outside that set is left out, and the move keeps its `constraint`, `text` and other steps. "
+                         "The command argument rule (§5.6): each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. "
+                         "Only lockrot's own option `--no-update` starts with `-`. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
+                         "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. "
                          "A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell."),
                         arr('One command as its argument list (`["composer", "require", "php:>=8.1", "--no-update"]`).', {'type': 'string', 'minLength': 1}, minItems=1)),
     }
