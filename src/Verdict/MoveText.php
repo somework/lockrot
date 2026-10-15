@@ -68,7 +68,6 @@ final class MoveText
 
     private static function head(Move $move, MoveSubject $subject): string
     {
-        $package = $subject->package();
         switch ($move->kind()) {
             case Move::REPLACE:
                 return self::replace($move);
@@ -81,7 +80,7 @@ final class MoveText
 
                 return 'test it on PHP '.$subject->targetPhp().($latest !== null && $latest->isInstalled() ? ' — '.$latest->version().' is its newest release' : '');
             case Move::UPDATE:
-                return 'composer update '.$package.' (gets '.$move->newest().')'.self::clears($move);
+                return self::update($move).' (gets '.$move->newest().')'.self::clears($move);
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 return self::requirement($move, $subject);
@@ -100,6 +99,19 @@ final class MoveText
             default:
                 return $move->kind();
         }
+    }
+
+    /** The POSIX rendering of the move's `composer update` step, or words when the command argument rule refused it. */
+    private static function update(Move $move): string
+    {
+        foreach ($move->commands() as $argv) {
+            $rendered = $argv[1] === 'update' ? ShellCommand::posix($argv) : null;
+            if ($rendered !== null) {
+                return $rendered;
+            }
+        }
+
+        return 'update it with Composer';
     }
 
     private static function replace(Move $move): string

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support;
 
 use Lockrot\Json\JsonWriter;
+use Lockrot\Verdict\CommandArgument;
 
 /**
  * Counts report-2's root blocks and `run.score_rules_used` again from a decoded document's
@@ -312,7 +313,7 @@ final class RootRecount
             }
             $kind = self::str($security, 'fix_kind');
             $fixes[$kind] = ($fixes[$kind] ?? 0) + 1;
-            if ($kind === 'update') {
+            if ($kind === 'update' && CommandArgument::allPass(['composer', 'update', self::str($finding, 'package')])) {
                 $updateNow[] = self::str($finding, 'package');
             }
         }

@@ -380,6 +380,28 @@ touch), `held_by`, `php_check`, `if_applied` (the score after it), `through` for
 comes in through others, `commands` (argv lists) and `text`. `also` holds the other part's move.
 `kind` is an open set: show `text` for a kind you do not know.
 
+Each argument of `commands` and of `security.update_now_command` matches
+`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only `--no-update`, the Composer
+option that lockrot writes in a `require` step, starts with `-`. The first argument is `composer`,
+and the second is `update`, `require` or `why-not`. An argument comes from the lock or a
+repository, so lockrot leaves out a step that breaks this rule. The move keeps its `constraint`,
+`text` and other steps. `text` shows a command only as the POSIX rendering of a step in `commands`.
+Render each argv with one of these renderings:
+
+| Shell | Rendering | Example |
+|---|---|---|
+| POSIX | Single-quote an argument with a character outside `[A-Za-z0-9/._:@%+=,-]`, or one that starts with `=` | `composer require 'php:>=8.1' --no-update` |
+| cmd.exe | Double-quote an argument with a space, a caret, a vertical bar, `<` or `>` | `composer require "php:>=8.1" --no-update` |
+| PowerShell | Write the first argument, `--%`, then the cmd.exe rendering of the others | `composer --% require "php:>=8.1" --no-update` |
+
+The PowerShell target is often `composer.bat`, and cmd.exe then parses the arguments again.
+PowerShell can also read a bare version such as `1.10` as a number. After `--%`, PowerShell passes
+the rest of the line unchanged.
+
+!!! warning
+    If an argv of a move breaks this rule, render none of that move's steps, on any shell.
+    A report file can be edited, and no quoting is safe for such an argument on cmd.exe or PowerShell.
+
 ### Security {#advisories-with-no-fix-expected}
 
 `security` is one of three shapes, told apart by `status`:

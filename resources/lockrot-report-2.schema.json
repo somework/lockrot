@@ -4251,7 +4251,7 @@
           "uniqueItems": true
         },
         "commands": {
-          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. A page renders it as written and never builds a command from `constraint`.",
+          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only `--no-update`, the Composer option that lockrot writes in a `require` step, starts with `-`. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
           "type": "array",
           "items": {
             "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -4694,7 +4694,7 @@
           ]
         },
         {
-          "description": "Kinds without a command write none but `composer why-not` checks; `update` always writes one (a transitive package included).",
+          "description": "Kinds without a command write none but `composer why-not` checks. `update` writes only `composer update` and `composer why-not` steps. Its `composer update` step is left out when the command argument rule refuses it.",
           "anyOf": [
             {
               "properties": {
@@ -4736,7 +4736,21 @@
                   ]
                 },
                 "commands": {
-                  "minItems": 1
+                  "items": {
+                    "items": [
+                      {
+                        "enum": [
+                          "composer"
+                        ]
+                      },
+                      {
+                        "enum": [
+                          "update",
+                          "why-not"
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             },
@@ -5424,7 +5438,7 @@
           "uniqueItems": true
         },
         "commands": {
-          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. A page renders it as written and never builds a command from `constraint`.",
+          "description": "The ordered commands a user runs, each an argv list, rendered per shell by the quoting rules of https://lockrot.dev/schema/ (POSIX, cmd.exe, PowerShell); `[]` for a transitive `require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. The command argument rule: each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only `--no-update`, the Composer option that lockrot writes in a `require` step, starts with `-`. The first argument is `composer`, and the second is `update`, `require` or `why-not`. lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell.",
           "type": "array",
           "items": {
             "description": "One command as its argument list (`[\"composer\", \"require\", \"php:>=8.1\", \"--no-update\"]`).",
@@ -5853,7 +5867,7 @@
           ]
         },
         {
-          "description": "Kinds without a command write none but `composer why-not` checks; `update` always writes one (a transitive package included).",
+          "description": "Kinds without a command write none but `composer why-not` checks. `update` writes only `composer update` and `composer why-not` steps. Its `composer update` step is left out when the command argument rule refuses it.",
           "anyOf": [
             {
               "properties": {
@@ -5895,7 +5909,21 @@
                   ]
                 },
                 "commands": {
-                  "minItems": 1
+                  "items": {
+                    "items": [
+                      {
+                        "enum": [
+                          "composer"
+                        ]
+                      },
+                      {
+                        "enum": [
+                          "update",
+                          "why-not"
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             },
@@ -22327,7 +22355,7 @@
           }
         },
         "update_now": {
-          "description": "The packages whose `security.fix_kind` is `update`.",
+          "description": "The packages whose `security.fix_kind` is `update`, except a name outside the command argument set of `next_step.commands`.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/packageName"

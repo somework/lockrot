@@ -138,7 +138,8 @@ final class Move implements \JsonSerializable
 
     /**
      * The lead move: its `through[]` entries, the `composer why-not` command of each dependent whose newest
-     * release does not require the package, and the other part's move.
+     * release does not require the package (when its arguments pass {@see CommandArgument}), and the
+     * other part's move.
      *
      * @param list<ThroughEntry> $through
      * @param list<self>         $also
@@ -149,9 +150,9 @@ final class Move implements \JsonSerializable
         $clone->through = $through;
         $clone->also = $also;
         foreach ($through as $entry) {
-            $version = $entry->newestVersion();
-            if ($entry->newestRequires() === false && $version !== null) {
-                $clone->commands[] = ['composer', 'why-not', $entry->package(), $version];
+            $whyNot = ['composer', 'why-not', $entry->package(), $entry->newestVersion() ?? ''];
+            if ($entry->newestRequires() === false && CommandArgument::allPass($whyNot)) {
+                $clone->commands[] = $whyNot;
             }
         }
 

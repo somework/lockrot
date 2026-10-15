@@ -588,7 +588,7 @@ def _(d): d['findings'][0]['next_step']['clears'] = []
 @case('relation-move-6', 'D-partial-dagger', 'findings[0].next_step.latest')
 def _(d): d['findings'][0]['next_step']['latest'] = None
 @case('relation-move-7', 'E-ignored-dagger', 'findings[0].next_step.commands')
-def _(d): d['findings'][0]['next_step']['commands'] = []
+def _(d): d['findings'][0]['next_step']['commands'] = [['composer', 'require', 'symfony/yaml:^5.4.53']]
 @case('relation-move-9', 'rounded-dev-dagger', 'findings[0].next_step.if_applied.at_most')
 def _(d): d['findings'][0]['next_step']['if_applied']['at_most'] = True
 @case('relation-move-10', 'stale-only', 'findings[0].next_step.crosses_major')

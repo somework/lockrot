@@ -16,12 +16,12 @@ use Lockrot\Output\ExplainFormatter;
 use Lockrot\Output\FindingBlock;
 use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
-use Lockrot\Output\ShellCommand;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\FailOn;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ShellCommand;
 
 /**
  * One case of tests/fixtures/flags/cases.json as lockrot writes it. The report holds the case
@@ -163,8 +163,8 @@ final class CaseRecording
             'age_line' => AgeText::line($this->finding),
             'explain_age' => AgeText::block($this->finding, $this->thresholds()),
             'baseline_suffix' => FindingBlock::baselineSuffix($this->finding, $baseline === null ? null : $baseline->standingOf($this->finding->package())),
-            'commands_posix' => array_map([ShellCommand::class, 'posix'], $commands),
-            'commands_cmd' => array_map([ShellCommand::class, 'cmd'], $commands),
+            'commands_posix' => self::rendered(array_map([ShellCommand::class, 'posix'], $commands)),
+            'commands_cmd' => self::rendered(array_map([ShellCommand::class, 'cmd'], $commands)),
         ];
     }
 
@@ -185,6 +185,23 @@ final class CaseRecording
         $run = $this->report->run();
 
         return $run === null || $run->failOn() === null ? FailOn::none() : $run->failOn();
+    }
+
+    /**
+     * @param list<string|null> $commands each rendering of a move's commands
+     *
+     * @throws \UnexpectedValueException for a command that no shell renders: lockrot writes only argvs that pass CommandArgument
+     *
+     * @return list<string>
+     */
+    private static function rendered(array $commands): array
+    {
+        $rendered = array_values(array_filter($commands, 'is_string'));
+        if (\count($rendered) !== \count($commands)) {
+            throw new \UnexpectedValueException('a move holds a command that no shell renders');
+        }
+
+        return $rendered;
     }
 
     /** @param array<mixed, mixed> $run the case's report-2 `run` block */

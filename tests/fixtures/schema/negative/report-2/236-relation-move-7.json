@@ -1173,7 +1173,13 @@
      ]
     },
     "composer_moves_because": [],
-    "commands": [],
+    "commands": [
+     [
+      "composer",
+      "require",
+      "symfony/yaml:^5.4.53"
+     ]
+    ],
     "through": [],
     "also": [],
     "text": "composer update symfony/yaml (gets v5.4.53) — clears 3 advisories"

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Integration;
 
 use Lockrot\Output\AgeText;
-use Lockrot\Output\ShellCommand;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\Finding;
+use Lockrot\Verdict\ShellCommand;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
