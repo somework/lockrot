@@ -69,8 +69,8 @@
     "page_goldens": {
         "file": "page-goldens.json",
         "source": "the model's page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded",
-        "sha256": "2797327d701307e511d5e315bddc9a69ec979b469bfd14691576dc4015362e59",
-        "read_by": "tests/Integration/PageGoldensTest.php reads title and description; the other keys are the renderer's"
+        "sha256": "562527baf073860c4d3aade4c1cb7694ebe062203a5e8046015a14cac3a3f972",
+        "read_by": "tests/Integration/PageGoldensTest.php reads title and description and requires grade_line, figure_line and load_line; the other keys are the renderer's"
     },
     "bundle_sha256": "sha256 of the lines \"<sha256>  <path>\", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json"
 }

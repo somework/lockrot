@@ -123,7 +123,7 @@ $provenance = [
         'file' => 'page-goldens.json',
         'source' => 'the model\'s page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded',
         'sha256' => hash_file('sha256', $contract.'page-goldens.json'),
-        'read_by' => 'tests/Integration/PageGoldensTest.php reads title and description; the other keys are the renderer\'s',
+        'read_by' => 'tests/Integration/PageGoldensTest.php reads title and description and requires grade_line, figure_line and load_line; the other keys are the renderer\'s',
     ],
     'bundle_sha256' => 'sha256 of the lines "<sha256>  <path>", one per bundle file sorted by path below tests/fixtures/: every file of contract/ but cache/, provenance.json and bundle_sha256, and each baselined/*/check/report.bundle.json',
 ];
