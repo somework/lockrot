@@ -57,6 +57,9 @@ final class HostileCommandArgumentsTest extends TestCase
     public function testAHostileDependentVersionLeavesOutTheWhyNotStep(): void
     {
         $move = $this->move('psr7', 'guzzlehttp/psr7', static function (array $inputs): array {
+            $releases = JsonPath::arrayAt($inputs, ['packages', 'guzzlehttp/guzzle', 'releases']);
+            $inputs = self::with($inputs, ['packages', 'guzzlehttp/guzzle', 'releases'], self::renamed($releases, '8.2.0', '8.2.0+%PATH%'));
+
             return self::with($inputs, ['dependents', 'guzzlehttp/guzzle'], [
                 ['version' => '6.5.8', 'time' => '2022-06-20T22:16:07+00:00', 'require' => ['guzzlehttp/psr7' => '^1.9']],
                 ['version' => '8.2.0+%PATH%', 'time' => '2026-09-06T13:55:09+00:00', 'require' => []],
@@ -65,6 +68,7 @@ final class HostileCommandArgumentsTest extends TestCase
 
         self::assertSame([['composer', 'require', 'php:>=7.2.5', '--no-update']], $move['commands']);
         self::assertSame([false], array_column(JsonPath::arrayAt($move, ['through']), 'newest_requires'));
+        self::assertSame('8.2.0+%PATH%', JsonPath::stringAt($move, ['through', 0, 'newest_stable', 'version']));
     }
 
     /** The `do:` sentence names the action in words when the step is refused, and never prints the name as a shell word. */

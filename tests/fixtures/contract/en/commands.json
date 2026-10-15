@@ -119,7 +119,7 @@
             ],
             "posix": "composer require 'pagerfanta/twig:^4.9'",
             "cmd": "composer require \"pagerfanta/twig:^4.9\"",
-            "powershell": "composer require 'pagerfanta/twig:^4.9'"
+            "powershell": "composer --% require \"pagerfanta/twig:^4.9\""
         },
         {
             "argv": [
