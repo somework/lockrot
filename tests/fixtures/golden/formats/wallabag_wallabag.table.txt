@@ -142,15 +142,15 @@
       do: no tagged release to move to; review the snapshot, or replace it
       pinned       pinned to branch snapshot dev-master
       age: last push 2023-12-24 (2.7 years ago)
-      pulls in 14 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned),
-      hoa/exception (abandoned), hoa/file (abandoned) and 9 more
+      pulls in 14 flagged packages: hoa/consistency (abandoned · old-promise), hoa/compiler (abandoned), hoa/event
+      (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more
   wallabag/rulerz-bundle dev-master  direct  ·  pinned
       16 = pinned 16
       do: no tagged release to move to; review the snapshot, or replace it
       pinned       pinned to branch snapshot dev-master
       age: last push 2023-12-24 (2.7 years ago)
-      pulls in 15 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned),
-      hoa/exception (abandoned), hoa/file (abandoned) and 10 more
+      pulls in 15 flagged packages: hoa/consistency (abandoned · old-promise), hoa/compiler (abandoned), hoa/event
+      (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more
   behat/transliterator v1.5.0  via stof/doctrine-extensions-bundle  ·  abandoned
       16 = abandoned 32 ÷ 2 transitive
       do: find a replacement (none named); it comes in through stof/doctrine-extensions-bundle: replace or update that
@@ -271,13 +271,14 @@
       8 = stale 8
       do: —
       stale        last release 2021-08-15 (5.1 years ago)
-      pulls in 1 flagged package: pragmarx/random (silent)
+      pulls in 1 flagged package: pragmarx/random (silent · old-promise)
   wallabag/phpepub 4.0.10  direct  ·  stale
       8 = stale 8
       do: —
       stale        last release 2022-03-21 (4.5 years ago)
-      pulls in 5 flagged packages: grandt/binstring (silent), grandt/phpresizegif (silent), grandt/phpzipmerge (silent),
-      grandt/relativepath (silent), phpzip/phpzip (silent)
+      pulls in 5 flagged packages: grandt/binstring (silent · old-promise), grandt/phpresizegif (silent ·
+      old-promise), grandt/phpzipmerge (silent · old-promise), grandt/relativepath (silent · old-promise),
+      phpzip/phpzip (silent · old-promise)
   smalot/pdfparser v1.1.0  via j0k3r/graby  ·  left-behind
       8 = left-behind 16 ÷ 2 transitive
       do: move smalot/pdfparser to ^2.12 through j0k3r/graby — clears left-behind; 2.x needs php \>=7.1; the target php

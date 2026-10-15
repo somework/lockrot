@@ -3,7 +3,7 @@
       36 = abandoned 32 + old-promise 4 [¼ of 16]
       do: replace with symfony/error-handler (named by its registry)
       abandoned    marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2
-                   years ago)
+                   years ago); last commit 2022-07-29 (4.2 years ago)
       old-promise  released 2020-10-24 for PHP 5 (php "^5.5.9|\>=7.0.8"), before PHP 8 existed (8.0 GA 2020-11-26);
                    admits 8.4 untested
 
@@ -16,5 +16,3 @@ advisories: 1 package asked · packagist.org answered (0 on record for 0 package
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
-note: Bitbucket credentials not set: repository activity checked for 0 candidate packages, 1 packages skipped (add
-bitbucket.org credentials to auth.json to check all)

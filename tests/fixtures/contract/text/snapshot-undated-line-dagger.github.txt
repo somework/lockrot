@@ -1,4 +1,4 @@
-::warning file=composer.lock,line=4,title=lockrot%3A medium — pinned::symfony/event-dispatcher 4.4.x-dev: 8 = pinned 16 ÷ 2 transitive. Do: move it to a tag — the newest on its own line is v4.4.44, through mautic/core-lib; 4.x needs php >=7.1.3; not checked: left-behind, old-promise; what requires it must allow it. pinned: pinned to branch snapshot 4.4.x-dev. (via mautic/core-lib)
+::warning file=composer.lock,line=11,title=lockrot%3A medium — pinned::symfony/event-dispatcher 4.4.x-dev: 8 = pinned 16 ÷ 2 transitive. Do: move it to a tag — the newest on its own line is v4.4.44, through mautic/core-lib; 4.x needs php >=7.1.3; not checked: left-behind, old-promise; what requires it must allow it. pinned: pinned to branch snapshot 4.4.x-dev. (via mautic/core-lib)
 ::notice title=lockrot::1 package is not from a Composer repository: its release metadata and repository activity were not read
 flags: pinned 1
 depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 · deepest: symfony/event-dispatcher, 1 hop (mautic/core-lib › symfony/event-dispatcher)

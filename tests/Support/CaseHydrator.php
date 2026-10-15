@@ -22,13 +22,19 @@ use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryBatch;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryFeed;
+use Lockrot\Data\Advisory\AdvisoryIgnoreMatch;
 use Lockrot\Data\Advisory\AdvisoryLoaderInterface;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Advisory\AdvisoryRepository;
+use Lockrot\Data\Advisory\IgnoredAdvisory;
 use Lockrot\Data\Forge\ActivityClient;
 use Lockrot\Data\Forge\ActivityFetchPlanner;
+use Lockrot\Data\Forge\BitbucketApi;
 use Lockrot\Data\Forge\ForgeAuth;
+use Lockrot\Data\Forge\GitHubApi;
+use Lockrot\Data\Forge\GitLabApi;
 use Lockrot\Data\Forge\RepoLocator;
+use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
@@ -37,6 +43,7 @@ use Lockrot\Data\Repository\PackageMetadata;
 use Lockrot\Explain\Explanation;
 use Lockrot\Lock\LockFile;
 use Lockrot\Lock\ProjectConfig;
+use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\Contract\CaseRecording;
@@ -47,8 +54,10 @@ use Lockrot\Verdict\FailOn;
  * writes for it. The loaders answer from the case's `inputs` block, which
  * tools/schema/project_fixtures.py writes (`inputs_of`). Only the case's package and the measured
  * dependents have metadata, and a null `releases` leaves the package without it. `accept` holds the
- * flags that a project allowlist entry for the package accepts, null for every flag. A test can add
- * `other_advisories`, the advisories of the package's other versions.
+ * flags that a project allowlist entry for the package accepts, null for every flag, and
+ * `allowlist` the entry's pattern, version, reason and expiry date. `records` counts
+ * the feeds' advisories of the name on every version. A test can add `other_advisories`, the
+ * advisories of the package's other versions.
  */
 final class CaseHydrator
 {
@@ -168,7 +177,8 @@ final class CaseHydrator
         $seen = [];
         foreach ($ids === [] ? self::COMPOSITE : $ids as $id) {
             $inputs = JsonPath::arrayAt(self::case($id), ['inputs']);
-            $data = self::lockData(JsonPath::arrayAt($inputs, ['lock']), \is_array($inputs['activity'] ?? null) ? $inputs['activity'] : null, \is_array($inputs['abandoned'] ?? null) ? $inputs['abandoned'] : null);
+            $packages = self::packages($inputs);
+            $data = self::lockData(self::entries($inputs, $packages), $packages);
             foreach ($data as $section => $packages) {
                 foreach ($packages as $package) {
                     $name = JsonPath::stringAt($package, ['name']);
@@ -211,9 +221,12 @@ final class CaseHydrator
                     $findings[$package] = $finding;
                 }
             }
+            // The composite holds the case packages only, so it counts their records, not the related packages'.
+            $named = isset($findings[$package]) ? $findings[$package]->details()->advisoryLookup() : null;
+            $count = $named === null ? 0 : (int) $named->records();
             foreach ($report->advisoryLookup()->repositories() as $repository) {
                 $name = $repository->composerRepository();
-                $records[$name] = [($records[$name][0] ?? 0) + (int) $repository->records(), ($records[$name][1] ?? 0) + (int) $repository->packagesWithRecords()];
+                $records[$name] = [($records[$name][0] ?? 0) + $count, ($records[$name][1] ?? 0) + ($count === 0 ? 0 : 1)];
             }
             $at = $report->activityCacheOldestAt();
             $oldest = $at !== null && ($oldest === null || $at < $oldest) ? $at : $oldest;
@@ -262,50 +275,70 @@ final class CaseHydrator
             throw new \InvalidArgumentException('case '.JsonPath::stringAt($case, ['id']).' has no inputs block: check it for invariants only');
         }
         $run = JsonPath::arrayAt($inputs, ['run']);
-        $entries = JsonPath::arrayAt($inputs, ['lock']);
-        $package = JsonPath::stringAt($entries, [0, 'name']);
-        $activity = \is_array($inputs['activity'] ?? null) ? $inputs['activity'] : null;
-        $marking = \is_array($inputs['abandoned'] ?? null) ? $inputs['abandoned'] : null;
-        $lock = self::lock($entries, $activity, $marking);
-        /** @var array<string, mixed> $root */
-        $root = JsonPath::arrayAt($inputs, ['root']);
-        $project = ProjectConfig::fromArray($root);
+        $packages = self::packages($inputs);
+        $package = (string) array_key_first($packages);
+        $activity = $packages[$package]['activity'];
+        $lock = LockFile::fromArray(self::lockData(self::entries($inputs, $packages), $packages));
+        $root = self::root($inputs, $packages);
+        $project = $root === null ? ProjectConfig::empty() : ProjectConfig::fromArray($root);
         $clock = self::clock($case);
-        $locked = $lock->find($package);
-        if ($locked === null) {
+        if ($lock->find($package) === null) {
             throw new \InvalidArgumentException('the lock has no '.$package);
         }
-        // The releases come from the registry the lock entry reports to, so a marking names it as lockrot's metadata would.
-        $origin = JsonPath::has($entries, [0, 'origin']) ? JsonPath::stringAt($entries, [0, 'origin']) : 'packagist';
-        $registry = \in_array($origin, ['packagist', 'composer'], true) ? self::PACKAGIST : null;
-        $byName = \is_array($inputs['releases'] ?? null) ? [$package => PackageMetadata::fromPackages($package, self::releases($package, $inputs['releases'], $marking, $registry), $clock->now(), $locked->normalizedVersion())] : [];
-        foreach (\is_array($inputs['dependents'] ?? null) ? $inputs['dependents'] : [] as $name => $releases) {
+        $byName = [];
+        $dependents = \is_array($inputs['dependents'] ?? null) ? $inputs['dependents'] : [];
+        foreach ($packages as $name => $facts) {
+            $locked = $lock->find($name);
+            if ($facts['releases'] === null || $locked === null) {
+                continue;
+            }
+            // A related package that is also a measured dependent keeps what each of its releases requires.
+            $facts['releases'] = self::withRequires($facts['releases'], \is_array($dependents[$name] ?? null) ? $dependents[$name] : []);
+            // The releases come from the registry the lock entry reports to, so a marking names it as lockrot's metadata would.
+            $registry = \in_array($facts['lock']['origin'] ?? 'packagist', ['packagist', 'composer'], true) ? self::PACKAGIST : null;
+            $source = $facts['activity'] === null ? null : self::sourceUrl($facts['activity']);
+            $byName[$name] = PackageMetadata::fromPackages($name, self::releases($name, $facts['releases'], $facts['abandoned'], $registry, $source), $clock->now(), $locked->normalizedVersion());
+            if ($facts['parent'] !== null) {
+                // The monorepo's tags replace the split package, so MonorepoParents dates the split tags by them.
+                $parent = JsonPath::stringAt($facts['parent'], ['name']);
+                $tags = [];
+                foreach (JsonPath::arrayAt($facts['parent'], ['releases']) as $tag) {
+                    self::assertArray($tag);
+                    $tags[] = ['replace' => [$name => 'self.version'] + (\is_array($tag['replace'] ?? null) ? $tag['replace'] : [])] + $tag;
+                }
+                $byName[$parent] = PackageMetadata::fromPackages($parent, self::releases($parent, $tags, null, $registry), $clock->now());
+            }
+        }
+        foreach ($dependents as $name => $releases) {
             $dependent = $lock->find((string) $name);
             self::assertArray($releases);
-            if ($dependent !== null) {
+            if ($dependent !== null && !isset($byName[(string) $name])) {
                 $byName[(string) $name] = PackageMetadata::fromPackages((string) $name, self::releases((string) $name, $releases, null), $clock->now(), $dependent->normalizedVersion());
             }
         }
-        $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+        $auth = self::auth($activity);
+        $locator = self::locator(array_column($packages, 'activity'));
         $targetPhp = JsonPath::stringAt($run, ['target_php']);
         $projectPhp = \is_string($run['project_php'] ?? null) ? $run['project_php'] : null;
         $analyzer = new Analyzer(
             self::metadataLoader(new MetadataBatch($byName, [], [])),
-            new ActivityClient(new FakeHttpClient(self::activityAnswers($activity)), $auth),
+            new ActivityClient(new FakeHttpClient(self::activityAnswers(array_column($packages, 'activity'), $locator, $auth)), $auth),
             new ActivityFetchPlanner($auth),
-            new RepoLocator(),
+            $locator,
             BuiltinAllowlist::load(),
             SignalSet::default($clock, new Thresholds(), $targetPhp, PhpReleaseDates::load(), $projectPhp),
             $clock,
-            false,
-            self::advisoryLoader($package, self::advisories(\is_array($inputs['advisories'] ?? null) ? $inputs['advisories'] : []), self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null),
+            ($activity['reason'] ?? null) === NotCheckedRule::OFFLINE,
+            self::advisoryLoader($packages, self::advisories(\is_array($inputs['other_advisories'] ?? null) ? $inputs['other_advisories'] : []), \is_string($run['advisories_unchecked'] ?? null) ? $run['advisories_unchecked'] : null),
             null,
             self::abandonedIgnore(\is_array($inputs['abandoned_ignore'] ?? null) ? $inputs['abandoned_ignore'] : null)
         );
 
         if (\array_key_exists('accept', $inputs)) {
             $accept = \is_array($inputs['accept']) ? array_values(array_filter($inputs['accept'], 'is_string')) : null;
-            $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(new Allowlist([new AllowlistEntry($package, null, 'accepted by the test', null, AllowlistEntry::BY_PROJECT, $accept)])));
+            $entry = \is_array($inputs['allowlist'] ?? null) ? $inputs['allowlist'] : [];
+            $expires = self::optional($entry, 'expires');
+            $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(new Allowlist([new AllowlistEntry(self::optional($entry, 'pattern') ?? $package, self::optional($entry, 'version'), self::optional($entry, 'reason') ?? 'accepted by the test', $expires === null ? null : new \DateTimeImmutable($expires), AllowlistEntry::BY_PROJECT, $accept)])));
         }
 
         $includeDev = ($run['include_dev'] ?? false) === true;
@@ -345,34 +378,133 @@ final class CaseHydrator
     }
 
     /**
-     * @param array<mixed, mixed>      $entries
-     * @param array<mixed, mixed>|null $activity
-     * @param array<mixed, mixed>|null $marking  S1's marking: `by` the repository or the lock, and the replacement
+     * The case's package first, then each package of `packages`, by name: its lock entry, its
+     * releases (null when lockrot reads none), its advisories, its marking, its repository's answer,
+     * and the chains that link it into the lock.
+     *
+     * @param array<mixed, mixed> $inputs
+     *
+     * @return array<string, array{lock: array<mixed, mixed>, releases: array<mixed, mixed>|null, advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>, abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null, parent: array<mixed, mixed>|null, chains: list<list<string>>, dev: bool}>
      */
-    private static function lock(array $entries, ?array $activity, ?array $marking): LockFile
+    private static function packages(array $inputs): array
     {
-        return LockFile::fromArray(self::lockData($entries, $activity, $marking));
+        $case = JsonPath::arrayAt($inputs, ['lock', 0]);
+        $packages = [JsonPath::stringAt($case, ['name']) => self::factsOf($inputs, $case)];
+        foreach (\is_array($inputs['packages'] ?? null) ? $inputs['packages'] : [] as $name => $facts) {
+            self::assertArray($facts);
+            $packages[(string) $name] = self::factsOf($facts, JsonPath::arrayAt($facts, ['lock']));
+        }
+
+        return $packages;
     }
 
     /**
-     * @param array<mixed, mixed>      $entries
-     * @param array<mixed, mixed>|null $activity
-     * @param array<mixed, mixed>|null $marking
+     * @param array<mixed, mixed> $facts
+     * @param array<mixed, mixed> $entry
+     *
+     * @return array{lock: array<mixed, mixed>, releases: array<mixed, mixed>|null, advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>, abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null, parent: array<mixed, mixed>|null, chains: list<list<string>>, dev: bool}
+     */
+    private static function factsOf(array $facts, array $entry): array
+    {
+        $chains = [];
+        foreach (['chain', 'below'] as $key) {
+            if (\is_array($facts[$key] ?? null)) {
+                $chains[] = array_values(array_filter($facts[$key], 'is_string'));
+            }
+        }
+
+        return [
+            'lock' => $entry,
+            'releases' => \is_array($facts['releases'] ?? null) ? $facts['releases'] : null,
+            'advisories' => self::advisories(\is_array($facts['advisories'] ?? null) ? $facts['advisories'] : []),
+            'records' => \is_int($facts['records'] ?? null) ? $facts['records'] : null,
+            'ignored' => self::ignored(\is_array($facts['ignored'] ?? null) ? $facts['ignored'] : []),
+            'abandoned' => \is_array($facts['abandoned'] ?? null) ? $facts['abandoned'] : null,
+            'activity' => \is_array($facts['activity'] ?? null) ? $facts['activity'] : null,
+            'parent' => \is_array($facts['parent'] ?? null) ? $facts['parent'] : null,
+            'chains' => $chains,
+            'dev' => ($entry['dev'] ?? false) === true,
+        ];
+    }
+
+    /**
+     * The lock entries: the case's, each related package's, and an entry for each link of a chain
+     * that reaches a related package. A chain links each package to the next unless a link exists.
+     *
+     * @param array<mixed, mixed>                                                                $inputs
+     * @param array<string, array{lock: array<mixed, mixed>, chains: list<list<string>>, dev: bool}> $packages
+     *
+     * @return array<string, array<mixed, mixed>> by name, the case's package first
+     */
+    private static function entries(array $inputs, array $packages): array
+    {
+        $entries = [];
+        foreach (JsonPath::arrayAt($inputs, ['lock']) as $entry) {
+            self::assertArray($entry);
+            $entries[JsonPath::stringAt($entry, ['name'])] = $entry;
+        }
+        foreach ($packages as $name => $facts) {
+            $entries[$name] = $facts['lock'] + ($entries[$name] ?? []);
+            foreach ($facts['chains'] as $chain) {
+                foreach (\array_slice($chain, 0, -1) as $i => $parent) {
+                    $entries[$parent] ??= ['name' => $parent, 'version' => '1.0.0', 'dev' => $facts['dev'], 'origin' => 'packagist'];
+                    $require = \is_array($entries[$parent]['require'] ?? null) ? $entries[$parent]['require'] : [];
+                    $entries[$parent]['require'] = $require + [$chain[$i + 1] => '*'];
+                }
+            }
+        }
+
+        return $entries;
+    }
+
+    /**
+     * The root composer.json, with the head of each chain that reaches a related package, null for
+     * a run that read none.
+     *
+     * @param array<mixed, mixed>                                                 $inputs
+     * @param array<string, array{chains: list<list<string>>, dev: bool}> $packages
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function root(array $inputs, array $packages): ?array
+    {
+        /** @var array<string, mixed>|null $root */
+        $root = \is_array($inputs['root'] ?? null) ? $inputs['root'] : null;
+        if ($root === null) {
+            return null;
+        }
+        foreach (\array_slice($packages, 1) as $facts) {
+            $head = $facts['chains'][0][0] ?? null;
+            $section = $facts['dev'] ? 'require-dev' : 'require';
+            $require = \is_array($root[$section] ?? null) ? $root[$section] : [];
+            if ($head !== null && !isset($require[$head])) {
+                $root[$section] = $require + [$head => '*'];
+            }
+        }
+
+        return $root;
+    }
+
+    /**
+     * @param array<string, array<mixed, mixed>>                                                          $entries  by name
+     * @param array<string, array{abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null}> $packages S1's marking (`by` the repository or the lock, and the replacement) and the repository of each package that has facts
      *
      * @return array{packages: list<array<string, mixed>>, packages-dev: list<array<string, mixed>>}
      */
-    private static function lockData(array $entries, ?array $activity, ?array $marking): array
+    private static function lockData(array $entries, array $packages): array
     {
-        $packages = [];
+        $out = [];
         $dev = [];
-        foreach (array_values($entries) as $i => $entry) {
-            self::assertArray($entry);
+        // Composer writes each section sorted by name.
+        ksort($entries, \SORT_STRING);
+        foreach ($entries as $name => $entry) {
             $require = \is_array($entry['require'] ?? null) ? $entry['require'] : [];
             if (\is_string($entry['php'] ?? null)) {
                 $require = ['php' => $entry['php']] + $require;
             }
             $locked = ['name' => $entry['name'], 'version' => $entry['version'], 'require' => $require] + array_intersect_key($entry, ['conflict' => true]);
-            if ($i === 0 && $marking !== null && ($marking['by'] ?? null) === 'lock') {
+            $marking = $packages[$name]['abandoned'] ?? null;
+            if ($marking !== null && ($marking['by'] ?? null) === 'lock') {
                 $locked['abandoned'] = $marking['replacement'] ?? true;
             }
             if (\is_string($entry['time'] ?? null)) {
@@ -382,43 +514,57 @@ final class CaseHydrator
                 $locked['notification-url'] = self::PACKAGIST;
             }
             if (($entry['origin'] ?? null) === 'path') {
-                $locked['dist'] = ['type' => 'path', 'url' => '../'.JsonPath::stringAt($entry, ['name'])];
+                $locked['dist'] = ['type' => 'path', 'url' => '../'.$name];
             }
-            if ($i === 0 && $activity !== null) {
-                $locked['source'] = ['type' => 'git', 'url' => 'https://'.JsonPath::stringAt($activity, ['host']).'/'.JsonPath::stringAt($activity, ['repo']).'.git', 'reference' => 'case'];
+            $activity = $packages[$name]['activity'] ?? null;
+            if ($activity !== null) {
+                $locked['source'] = ['type' => 'git', 'url' => self::sourceUrl($activity), 'reference' => 'case'];
             }
             if (($entry['dev'] ?? false) === true) {
                 $dev[] = $locked;
             } else {
-                $packages[] = $locked;
+                $out[] = $locked;
             }
         }
 
-        return ['packages' => $packages, 'packages-dev' => $dev];
+        return ['packages' => $out, 'packages-dev' => $dev];
     }
 
     /**
      * @param array<mixed, mixed>      $releases
      * @param array<mixed, mixed>|null $marking  S1's marking: a registry marking marks every release
+     * @param ?string                  $source   the repository of the package's lock entry
      *
      * @return list<BasePackage>
      */
-    private static function releases(string $package, array $releases, ?array $marking, ?string $registry = null): array
+    private static function releases(string $package, array $releases, ?array $marking, ?string $registry = null, ?string $source = null): array
     {
         $versions = [];
+        $aliases = [];
         foreach ($releases as $release) {
             self::assertArray($release);
+            $version = JsonPath::stringAt($release, ['version']);
             // A null time is an undated release: Composer's loader reads one without a `time` key.
-            $versions[] = (new ArrayLoader())->load([
+            $data = [
                 'name' => $package,
-                'version' => JsonPath::stringAt($release, ['version']),
+                'version' => $version,
                 'require' => (\is_string($release['php'] ?? null) ? ['php' => $release['php']] : []) + (\is_array($release['require'] ?? null) ? $release['require'] : []),
             ] + (\is_string($release['time'] ?? null) ? ['time' => $release['time']] : [])
+              + (\is_array($release['replace'] ?? null) ? ['replace' => $release['replace']] : [])
               + ($marking !== null && ($marking['by'] ?? null) === 'repository' ? ['abandoned' => $marking['replacement'] ?? true] : [])
-              + ($registry !== null ? ['notification-url' => $registry] : []));
+              + ($registry !== null ? ['notification-url' => $registry] : []);
+            if (($release['shared_commit'] ?? false) === true) {
+                // Two more spellings of the release on its commit reach PackageMetadata::SHARED_COMMIT_TAGS.
+                $data['source'] = ['type' => 'git', 'url' => $source ?? 'https://github.com/'.$package.'.git', 'reference' => 'shared-'.$version];
+                $bare = ltrim($version, 'v');
+                foreach (['v' === $version[0] ? $bare : 'v'.$bare, $bare.'.0'] as $alias) {
+                    $aliases[] = (new ArrayLoader())->load(['version' => $alias] + $data);
+                }
+            }
+            $versions[] = (new ArrayLoader())->load($data);
         }
 
-        return $versions;
+        return array_merge($versions, $aliases);
     }
 
     /**
@@ -447,18 +593,134 @@ final class CaseHydrator
     }
 
     /**
+     * @param array<mixed, mixed> $records the case's `security.ignored[]`: `{id, cve, title, severity, by, matched, reason}`
+     *
+     * @return list<IgnoredAdvisory>
+     */
+    private static function ignored(array $records): array
+    {
+        $ignored = [];
+        foreach ($records as $record) {
+            self::assertArray($record);
+            $advisory = new Advisory(JsonPath::stringAt($record, ['id']), self::optional($record, 'cve'), self::optional($record, 'title'), null, self::optional($record, 'severity'), null, null);
+            $matched = JsonPath::stringAt($record, ['matched']);
+            $key = $matched === AdvisoryIgnoreMatch::CVE ? self::optional($record, 'cve') : JsonPath::stringAt($record, ['id']);
+            $ignored[] = new IgnoredAdvisory($advisory, new AdvisoryIgnoreMatch($matched, (string) $key, self::optional($record, 'reason'), JsonPath::stringAt($record, ['by'])));
+        }
+
+        return $ignored;
+    }
+
+    /**
+     * @param array<mixed, mixed> $releases
+     * @param array<mixed, mixed> $dependent the dependent's releases, each with its `require`
+     *
+     * @return array<mixed, mixed> $releases, each with the `require` of the same version of $dependent, then its other versions
+     */
+    private static function withRequires(array $releases, array $dependent): array
+    {
+        $out = [];
+        foreach ($releases as $release) {
+            self::assertArray($release);
+            foreach ($dependent as $i => $other) {
+                self::assertArray($other);
+                if (($other['version'] ?? null) === $release['version']) {
+                    $release['require'] = $other['require'] ?? [];
+                    unset($dependent[$i]);
+                }
+            }
+            $out[] = $release;
+        }
+
+        return array_merge($out, array_values($dependent));
+    }
+
+    /** @param array<mixed, mixed> $activity */
+    private static function sourceUrl(array $activity): string
+    {
+        return 'https://'.JsonPath::stringAt($activity, ['host']).'/'.JsonPath::stringAt($activity, ['repo']).'.git';
+    }
+
+    /**
+     * The credentials that the forge's answer needs. A GitHub repository that lockrot did not ask
+     * for want of a token gets none. lockrot asks Bitbucket only with credentials, and GitLab
+     * writes the archived flag only to an authenticated request, so such a read has Composer's
+     * credentials for the host.
+     *
      * @param array<mixed, mixed>|null $activity
+     */
+    private static function auth(?array $activity): ForgeAuth
+    {
+        $github = ($activity['reason'] ?? null) === NotCheckedRule::NO_TOKEN ? null : 'recorded';
+        $forge = $activity['forge'] ?? null;
+        $credentials = ($activity['status'] ?? null) === 'read' && ($forge === RepoRef::BITBUCKET || ($forge === RepoRef::GITLAB && ($activity['archived'] ?? null) !== null));
+        $host = $activity['host'] ?? null;
+
+        return new ForgeAuth(new Tokens($github, null), static fn (string $asked): bool => $credentials && $asked === $host);
+    }
+
+    /** @param list<array<mixed, mixed>|null> $activities a GitLab host other than gitlab.com is a configured `gitlab-domains` entry */
+    private static function locator(array $activities): RepoLocator
+    {
+        $domains = ['gitlab.com'];
+        foreach ($activities as $activity) {
+            $host = $activity['host'] ?? null;
+            if (($activity['forge'] ?? null) === RepoRef::GITLAB && \is_string($host) && !\in_array($host, $domains, true)) {
+                $domains[] = $host;
+            }
+        }
+
+        return new RepoLocator($domains);
+    }
+
+    /**
+     * The forge's answer to each request that lockrot makes: the activity of a read, a 404 for a
+     * repository not found, a 429 for a rate limit, and nothing for a repository not asked.
+     *
+     * @param list<array<mixed, mixed>|null> $activities
      *
      * @return array<string, \Lockrot\Data\Http\HttpResult>
      */
-    private static function activityAnswers(?array $activity): array
+    private static function activityAnswers(array $activities, RepoLocator $locator, ForgeAuth $auth): array
     {
-        if ($activity === null || ($activity['host'] ?? null) !== 'github.com') {
+        $answers = [];
+        foreach ($activities as $activity) {
+            $answers += $activity === null ? [] : self::answersOf($activity, $locator, $auth);
+        }
+
+        return $answers;
+    }
+
+    /**
+     * @param array<mixed, mixed> $activity
+     *
+     * @return array<string, \Lockrot\Data\Http\HttpResult>
+     */
+    private static function answersOf(array $activity, RepoLocator $locator, ForgeAuth $auth): array
+    {
+        $repo = $locator->locate(self::sourceUrl($activity));
+        if ($repo === null) {
             return [];
         }
-        $url = 'https://api.github.com/repos/'.JsonPath::stringAt($activity, ['repo']);
+        $api = [RepoRef::GITHUB => new GitHubApi(), RepoRef::GITLAB => new GitLabApi(), RepoRef::BITBUCKET => new BitbucketApi()][$repo->forge()];
+        $pushedAt = $activity['pushed_at'] ?? null;
+        $bodies = [
+            'repo' => ['archived' => $activity['archived'] ?? false, 'pushed_at' => $pushedAt],
+            'commits' => $repo->forge() === RepoRef::BITBUCKET ? ['values' => [['date' => $pushedAt]]] : [['committed_date' => $pushedAt]],
+            'project' => ['archived' => $activity['archived'] ?? null],
+        ];
+        $answers = [];
+        foreach ($api->requests($repo, $auth->isAuthenticated($repo)) as $role => $url) {
+            if ($activity['status'] === 'not_found') {
+                $answers[$url] = FakeHttpClient::status($url, 404);
+            } elseif (($activity['reason'] ?? null) === NotCheckedRule::RATE_LIMIT) {
+                $answers[$url] = FakeHttpClient::status($url, 429);
+            } elseif ($activity['status'] === 'read') {
+                $answers[$url] = FakeHttpClient::ok($url, (string) json_encode($bodies[$role]));
+            }
+        }
 
-        return [$url => FakeHttpClient::ok($url, (string) json_encode(['archived' => $activity['archived'] ?? false, 'pushed_at' => $activity['pushed_at'] ?? null]))];
+        return $answers;
     }
 
     private static function metadataLoader(MetadataBatch $batch): MetadataLoaderInterface
@@ -479,20 +741,36 @@ final class CaseHydrator
     }
 
     /**
-     * @param list<Advisory> $advisories the counted ones
-     * @param list<Advisory> $others     those on other versions of the package
-     * @param ?string        $unchecked  why the lookup did not run (`offline`), null when it answered
+     * Each package's counted advisories, the ignored ones and the feeds' records: `records` counts
+     * every advisory of the name on any version, else the advisories given count.
+     *
+     * @param array<string, array{advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>}> $packages
+     * @param list<Advisory>                                                                                 $others    those on other versions of the case's package
+     * @param ?string                                                                                        $unchecked why the lookup did not run (`offline`), null when it answered
      */
-    private static function advisoryLoader(string $package, array $advisories, array $others, ?string $unchecked): AdvisoryLoaderInterface
+    private static function advisoryLoader(array $packages, array $others, ?string $unchecked): AdvisoryLoaderInterface
     {
-        // A feed's records count every advisory of the name, on any version.
-        $records = \count(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->id(), array_merge($advisories, $others))));
         $repository = 'composer repo (https://repo.packagist.org)';
-        $feeds = $unchecked === null ? [AdvisoryFeed::answered($repository, $records)] : [];
-        $repositories = [$unchecked === null ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($records, $records === 0 ? 0 : 1) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)];
-        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, [$package => new AdvisoryNameCoverage($feeds, $unchecked === null ? $records : null, $unchecked)]);
-        $every = array_merge($advisories, $others);
-        $batch = new AdvisoryBatch($advisories === [] ? [] : [$package => $advisories], [], [], $every === [] ? [] : [$package => $every], $coverage, $unchecked === null);
+        $counted = [];
+        $ignored = [];
+        $every = [];
+        $names = [];
+        $total = 0;
+        $withRecords = 0;
+        foreach ($packages as $name => $facts) {
+            $all = array_merge($facts['advisories'], $others);
+            $others = [];
+            $records = $facts['records'] ?? \count(array_unique(array_map(static fn (Advisory $advisory): string => $advisory->id(), $all)));
+            $total += $records;
+            $withRecords += $records === 0 ? 0 : 1;
+            $names[$name] = new AdvisoryNameCoverage($unchecked === null ? [AdvisoryFeed::answered($repository, $records)] : [], $unchecked === null ? $records : null, $unchecked);
+            $counted += $facts['advisories'] === [] ? [] : [$name => $facts['advisories']];
+            $ignored += $facts['ignored'] === [] ? [] : [$name => $facts['ignored']];
+            $every += $all === [] ? [] : [$name => $all];
+        }
+        $repositories = [$unchecked === null ? AdvisoryRepository::of($repository, AdvisoryRepository::ANSWERED)->withRecords($total, $withRecords) : AdvisoryRepository::of($repository, AdvisoryRepository::NOT_ASKED, $unchecked)];
+        $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, $repositories, 0, $names);
+        $batch = new AdvisoryBatch($counted, [], $ignored, $every, $coverage, $unchecked === null);
 
         return new class ($batch) implements AdvisoryLoaderInterface {
             private AdvisoryBatch $batch;

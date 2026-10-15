@@ -149,7 +149,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "7.x",
-            "version": "7.8.1",
+            "version": "7.8.0",
             "newest": "7.8.1",
             "constraint": "^7.8",
             "latest": null,
@@ -167,23 +167,24 @@
                     "kind": "flag",
                     "id": "left-behind",
                     "basis": "branch_releasing"
-                },
+                }
+            ],
+            "unverified": [
                 {
                     "kind": "flag",
                     "id": "old-promise",
-                    "basis": "released_after_ga"
+                    "reason": "undated"
                 }
             ],
-            "unverified": [],
             "adds": [],
             "leaves": [],
-            "clears_all": true,
+            "clears_all": false,
             "if_applied": {
-                "total": 0,
-                "verdict": "ok",
-                "lead": null,
+                "total": 8,
+                "verdict": "medium",
+                "lead": "old-promise",
                 "deciding_advisory": null,
-                "at_most": false,
+                "at_most": true,
                 "assumes": [
                     "clears_hold",
                     "composer_resolves"
@@ -203,7 +204,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it"
+            "text": "raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it"
         },
         "security": {
             "status": "clear",
@@ -362,7 +363,7 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 5,
+        "releases_listed": 6,
         "has_stable_release": true,
         "last_stable_release": "2026-03-15T20:22:25+00:00",
         "last_stable_version": "7.8.1",

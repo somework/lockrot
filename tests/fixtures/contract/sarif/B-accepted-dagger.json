@@ -46,7 +46,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "symfony/monolog-bridge v2.6.13 is affected by CVE-2026-45077 (high advisory): Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener. Do: require symfony/monolog-bridge ^5.4.52 \u2014 clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "symfony/monolog-bridge v2.6.13 is affected by CVE-2026-45077 (high advisory): Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener. Do: require symfony/monolog-bridge ^5.4.52 \u2014 clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/monolog-bridge",
@@ -87,7 +87,7 @@
                             "installed": {
                                 "at": "2016-01-14T10:11:35+00:00",
                                 "years": 10.7,
-                                "dated_by": null
+                                "dated_by": "symfony/symfony"
                             },
                             "installed_unmeasured": null,
                             "release": {
@@ -103,7 +103,7 @@
                                 "at": "2019-11-13T08:36:42+00:00",
                                 "years": 6.9,
                                 "level": "high",
-                                "dated_by": null
+                                "dated_by": "symfony/symfony"
                             },
                             "branch_release_unmeasured": null,
                             "push": {
@@ -117,13 +117,22 @@
                         "cve": "CVE-2026-45077",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "5.x",
                             "version": "v5.4.52",
                             "newest": "v5.4.52",
                             "on_installed_branch": false,
                             "php": ">=7.2.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^2.6",
+                                    "holder": null
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -134,7 +143,7 @@
                             "role": "security",
                             "advisory": "PKSA-4wjj-gy1p-ft3r",
                             "severity": "high",
-                            "fix_kind": "update",
+                            "fix_kind": "upgrade",
                             "weight": 16,
                             "multiplier": 1,
                             "points": 16,

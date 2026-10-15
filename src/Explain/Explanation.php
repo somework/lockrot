@@ -12,6 +12,7 @@ use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\BranchRow;
+use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
 use Lockrot\Signal\Thresholds;
@@ -121,7 +122,7 @@ final class Explanation
     /** @return list<BranchRow> */
     private function rows(): array
     {
-        return BranchRow::all($this->facts, $this->floor, new Clock($this->report->generatedAt()));
+        return BranchRow::all($this->facts, $this->floor, new Clock($this->report->generatedAt()), $this->finding->signalData(LeftBehindData::class));
     }
 
     /**
@@ -263,16 +264,15 @@ final class Explanation
     }
 
     /**
-     * What a branch fixes of the counted advisories, null when none counts. The years are the age
-     * of the branch's newest release on the run clock.
+     * What a branch fixes of the counted advisories, null when none counts, and the age of the
+     * branch ({@see BranchRow::releasedYears()}).
      *
      * @return array{released_years: int|float|null, fixes: array<string, mixed>|null}
      */
     private function rowExtras(BranchRow $row): array
     {
         $fixes = $this->finding->details()->fixes();
-        $released = $row->highestReleased();
-        $out = ['released_years' => $released === null ? null : (new Clock($this->report->generatedAt()))->tenthsSince($released) / 10, 'fixes' => null];
+        $out = ['released_years' => $row->releasedYears(), 'fixes' => null];
         if ($fixes !== null) {
             foreach ($fixes->branches() as $branch) {
                 if ($branch->branch() === $row->branch()) {

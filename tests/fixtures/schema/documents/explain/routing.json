@@ -178,7 +178,29 @@
     "raise_size": null
    },
    "crosses_major": true,
-   "held_by": [],
+   "held_by": [
+    {
+     "source": "package",
+     "package": "mautic/core-lib",
+     "version": "4.3.x-dev",
+     "link": "require",
+     "constraint": "~4.4.0",
+     "holder": {
+      "verdict": "critical",
+      "lead": "pinned",
+      "flag_ids": [
+       "pinned",
+       "vulnerable"
+      ],
+      "replacement": null,
+      "next_step": {
+       "kind": "no-move",
+       "to_branch": null,
+       "constraint": null
+      }
+     }
+    }
+   ],
    "clears": [
     {
      "kind": "flag",
@@ -212,8 +234,8 @@
     ]
    },
    "composer_moves_because": [
-    "crosses_major",
-    "transitive"
+    "holders",
+    "crosses_major"
    ],
    "commands": [],
    "through": [
@@ -227,7 +249,7 @@
     }
    ],
    "also": [],
-   "text": "move symfony/routing to ^5.4.53 through mautic/core-lib — clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+   "text": "move symfony/routing to ^5.4.53 through mautic/core-lib — clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
   },
   "security": {
    "status": "vulnerable",
@@ -383,7 +405,29 @@
         "newest": "v5.4.53",
         "on_installed_branch": false,
         "php": ">=7.2.5",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "mautic/core-lib",
+          "version": "4.3.x-dev",
+          "link": "require",
+          "constraint": "~4.4.0",
+          "holder": {
+           "verdict": "critical",
+           "lead": "pinned",
+           "flag_ids": [
+            "pinned",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "no-move",
+            "to_branch": null,
+            "constraint": null
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -407,7 +451,29 @@
         "newest": "v5.4.53",
         "on_installed_branch": false,
         "php": ">=7.2.5",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "package",
+          "package": "mautic/core-lib",
+          "version": "4.3.x-dev",
+          "link": "require",
+          "constraint": "~4.4.0",
+          "holder": {
+           "verdict": "critical",
+           "lead": "pinned",
+           "flag_ids": [
+            "pinned",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "no-move",
+            "to_branch": null,
+            "constraint": null
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -527,7 +593,63 @@
      "fix_kind": "upgrade",
      "lowest": "v8.0.13",
      "newest": "v8.1.8",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "friendsofsymfony/rest-bundle",
+       "version": "3.3.0",
+       "link": "require",
+       "constraint": "^4.4|^5.3|^6.0",
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "next_step": null
+       }
+      },
+      {
+       "source": "package",
+       "package": "mautic/core-lib",
+       "version": "4.3.x-dev",
+       "link": "require",
+       "constraint": "~4.4.0",
+       "holder": {
+        "verdict": "critical",
+        "lead": "pinned",
+        "flag_ids": [
+         "pinned",
+         "vulnerable"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "no-move",
+         "to_branch": null,
+         "constraint": null
+        }
+       }
+      },
+      {
+       "source": "package",
+       "package": "symfony/framework-bundle",
+       "version": "v4.4.41",
+       "link": "require",
+       "constraint": "^4.4.12|^5.1.4",
+       "holder": {
+        "verdict": "medium",
+        "lead": "left-behind",
+        "flag_ids": [
+         "left-behind"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "require",
+         "to_branch": "8.x",
+         "constraint": "^8.1"
+        }
+       }
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
@@ -566,7 +688,63 @@
      "fix_kind": "upgrade",
      "lowest": "v7.4.13",
      "newest": "v7.4.20",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "friendsofsymfony/rest-bundle",
+       "version": "3.3.0",
+       "link": "require",
+       "constraint": "^4.4|^5.3|^6.0",
+       "holder": {
+        "verdict": "ok",
+        "lead": null,
+        "flag_ids": [],
+        "replacement": null,
+        "next_step": null
+       }
+      },
+      {
+       "source": "package",
+       "package": "mautic/core-lib",
+       "version": "4.3.x-dev",
+       "link": "require",
+       "constraint": "~4.4.0",
+       "holder": {
+        "verdict": "critical",
+        "lead": "pinned",
+        "flag_ids": [
+         "pinned",
+         "vulnerable"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "no-move",
+         "to_branch": null,
+         "constraint": null
+        }
+       }
+      },
+      {
+       "source": "package",
+       "package": "symfony/framework-bundle",
+       "version": "v4.4.41",
+       "link": "require",
+       "constraint": "^4.4.12|^5.1.4",
+       "holder": {
+        "verdict": "medium",
+        "lead": "left-behind",
+        "flag_ids": [
+         "left-behind"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "require",
+         "to_branch": "8.x",
+         "constraint": "^8.1"
+        }
+       }
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
@@ -605,7 +783,49 @@
      "fix_kind": "upgrade",
      "lowest": "v6.4.41",
      "newest": "v6.4.47",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "mautic/core-lib",
+       "version": "4.3.x-dev",
+       "link": "require",
+       "constraint": "~4.4.0",
+       "holder": {
+        "verdict": "critical",
+        "lead": "pinned",
+        "flag_ids": [
+         "pinned",
+         "vulnerable"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "no-move",
+         "to_branch": null,
+         "constraint": null
+        }
+       }
+      },
+      {
+       "source": "package",
+       "package": "symfony/framework-bundle",
+       "version": "v4.4.41",
+       "link": "require",
+       "constraint": "^4.4.12|^5.1.4",
+       "holder": {
+        "verdict": "medium",
+        "lead": "left-behind",
+        "flag_ids": [
+         "left-behind"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "require",
+         "to_branch": "8.x",
+         "constraint": "^8.1"
+        }
+       }
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
@@ -644,7 +864,29 @@
      "fix_kind": "upgrade",
      "lowest": "v5.4.53",
      "newest": "v5.4.53",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "mautic/core-lib",
+       "version": "4.3.x-dev",
+       "link": "require",
+       "constraint": "~4.4.0",
+       "holder": {
+        "verdict": "critical",
+        "lead": "pinned",
+        "flag_ids": [
+         "pinned",
+         "vulnerable"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "no-move",
+         "to_branch": null,
+         "constraint": null
+        }
+       }
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",

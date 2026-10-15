@@ -10,35 +10,16 @@
                     "informationUri": "https://github.com/somework/lockrot",
                     "rules": [
                         {
-                            "id": "lockrot/ok",
-                            "name": "ok",
+                            "id": "lockrot/left-behind",
+                            "name": "left-behind",
                             "shortDescription": {
-                                "text": "ok: Nothing counts"
+                                "text": "left-behind: The installed release branch stopped while a newer branch kept releasing"
                             },
                             "fullDescription": {
-                                "text": "No flag counts and no counted advisory affects the installed version."
+                                "text": "No stable release on the installed branch for release-warn-years, while a higher branch has released since."
                             },
                             "defaultConfiguration": {
-                                "level": "note"
-                            },
-                            "helpUri": "https://lockrot.dev/verdicts/",
-                            "properties": {
-                                "tags": [
-                                    "maintainability"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "lockrot/unchecked",
-                            "name": "unchecked",
-                            "shortDescription": {
-                                "text": "unchecked: A check did not run, and nothing else grades the package"
-                            },
-                            "fullDescription": {
-                                "text": "A check that the package needs did not run (S10), and no counted fact grades it. --fail-on=unchecked fails on it."
-                            },
-                            "defaultConfiguration": {
-                                "level": "note"
+                                "level": "warning"
                             },
                             "helpUri": "https://lockrot.dev/verdicts/",
                             "properties": {
@@ -58,11 +39,12 @@
             },
             "results": [
                 {
-                    "ruleId": "lockrot/ok",
+                    "ruleId": "lockrot/left-behind",
                     "ruleIndex": 0,
-                    "level": "note",
+                    "level": "error",
+                    "rank": 75.0,
                     "message": {
-                        "text": "pagerfanta/twig v3.8.0 \u2014 finding ok, 0"
+                        "text": "pagerfanta/twig v3.8.0 \u2014 finding high, 16 = left-behind 16 \u2014 left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach. Do: raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "pagerfanta/twig"
@@ -70,18 +52,22 @@
                     "properties": {
                         "package": "pagerfanta/twig",
                         "version": "v3.8.0",
-                        "verdict": "ok",
-                        "priority": "none",
-                        "lead": null,
-                        "score_total": 0,
-                        "score_text": "0",
+                        "verdict": "high",
+                        "priority": "high",
+                        "lead": "left-behind",
+                        "score_total": 16,
+                        "score_text": "16 = left-behind 16",
                         "score_model_id": 1,
-                        "flag_ids": [],
+                        "flag_ids": [
+                            "left-behind"
+                        ],
                         "direct": true,
                         "dev": false,
                         "data_date": "2026-10-01T17:41:20+00:00",
                         "baseline_status": null,
-                        "error_by": [],
+                        "error_by": [
+                            "high"
+                        ],
                         "chain": [
                             "pagerfanta/twig"
                         ],
@@ -90,6 +76,8 @@
                             "pagerfanta/twig"
                         ],
                         "signal_ids": [
+                            "S7",
+                            "S8",
                             "S10"
                         ],
                         "age": {
@@ -115,6 +103,15 @@
                                 "level": null
                             },
                             "push_unmeasured": null
+                        },
+                        "term": {
+                            "part": "maintenance",
+                            "flag": "left-behind",
+                            "role": "lead",
+                            "weight": 16,
+                            "divisor": 1,
+                            "points": 16,
+                            "contribution": 16
                         }
                     },
                     "locations": [
@@ -125,47 +122,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "ruleId": "lockrot/unchecked",
-                    "ruleIndex": 1,
-                    "level": "note",
-                    "message": {
-                        "text": "pagerfanta/twig v3.8.0: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it. checks missing: S2, S8 (undated releases)."
-                    },
-                    "partialFingerprints": {
-                        "lockrot/package": "pagerfanta/twig"
-                    },
-                    "properties": {
-                        "package": "pagerfanta/twig",
-                        "version": "v3.8.0",
-                        "verdict": "ok",
-                        "priority": "none",
-                        "lead": null,
-                        "score_total": 0,
-                        "score_text": "0",
-                        "score_model_id": 1,
-                        "flag_ids": [],
-                        "direct": true,
-                        "dev": false,
-                        "data_date": "2026-10-01T17:41:20+00:00",
-                        "baseline_status": null,
-                        "error_by": []
-                    },
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "composer.lock",
-                                    "uriBaseId": "%SRCROOT%"
-                                },
-                                "region": {
-                                    "startLine": 4
+                                    "startLine": 26
                                 }
                             }
                         }
@@ -175,26 +132,28 @@
             "invocations": [
                 {
                     "executionSuccessful": true,
-                    "exitCode": 0,
-                    "exitCodeDescription": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)",
+                    "exitCode": 1,
+                    "exitCodeDescription": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)",
                     "properties": {
                         "gate": {
-                            "fails": false,
-                            "tripped_by": [],
+                            "fails": true,
+                            "tripped_by": [
+                                "fail_on"
+                            ],
                             "fail_on_applied": true,
-                            "reaching": 0,
-                            "failing": 0,
+                            "reaching": 1,
+                            "failing": 1,
                             "exempt": {
                                 "baseline": 0
                             },
                             "failing_by": [
                                 {
                                     "value": "high",
-                                    "failing": 0
+                                    "failing": 1
                                 }
                             ],
                             "not_applied": [],
-                            "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+                            "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
                         },
                         "fail_on": "high",
                         "fail_on_source": "option",

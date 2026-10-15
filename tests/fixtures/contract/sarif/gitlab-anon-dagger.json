@@ -63,7 +63,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago). Do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package."
+                        "text": "hoa/consistency 1.17.05.02 \u2014 finding high, 18 = (abandoned 32 + old-promise 4 [\u00bc of 16]) \u00f7 2 transitive \u2014 abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago). Do: find a replacement (none named); it comes in through lorisleiva/laravel-search-string: replace or update that package."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "hoa/consistency"
@@ -100,6 +100,7 @@
                         "signal_ids": [
                             "S1",
                             "S2",
+                            "S4",
                             "S5"
                         ],
                         "age": {
@@ -125,8 +126,12 @@
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
-                            "push": null,
-                            "push_unmeasured": "fetch_failed"
+                            "push": {
+                                "at": "2021-04-28T21:38:16+00:00",
+                                "years": 5.4,
+                                "level": "high"
+                            },
+                            "push_unmeasured": null
                         },
                         "term": {
                             "part": "maintenance",
@@ -146,7 +151,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -199,7 +204,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -243,15 +248,7 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    },
-                    "toolExecutionNotifications": [
-                        {
-                            "level": "note",
-                            "message": {
-                                "text": "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1"
-                            }
-                        }
-                    ]
+                    }
                 }
             ],
             "properties": {

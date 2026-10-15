@@ -100,7 +100,7 @@
                     "role": "security",
                     "advisory": "PKSA-bf7t-jnpz-492k",
                     "severity": "medium",
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "weight": 8,
                     "multiplier": 1,
                     "points": 8,
@@ -161,7 +161,7 @@
             "kind": "require",
             "source": "vulnerable",
             "merged": [],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -178,7 +178,29 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "mautic/core-lib",
+                    "version": "4.3.x-dev",
+                    "link": "require",
+                    "constraint": "~4.4.0",
+                    "holder": {
+                        "verdict": "critical",
+                        "lead": "pinned",
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -212,8 +234,8 @@
                 ]
             },
             "composer_moves_because": [
-                "crosses_major",
-                "transitive"
+                "holders",
+                "crosses_major"
             ],
             "commands": [],
             "through": [
@@ -227,20 +249,20 @@
                 }
             ],
             "also": [],
-            "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+            "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "security": {
             "status": "vulnerable",
             "check": "complete",
             "complete": true,
             "unchecked_reason": null,
-            "records": 2,
+            "records": 4,
             "feeds": [
                 {
                     "composer_repository": "composer repo (https://repo.packagist.org)",
                     "registry": "packagist.org",
                     "answer": "answered",
-                    "records": 2,
+                    "records": 4,
                     "reason": null
                 }
             ],
@@ -254,7 +276,7 @@
             },
             "ignored": [],
             "ignored_count": 0,
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "installed_branch_fixes": {
                 "fixed": 0,
                 "unknown": 0,
@@ -377,13 +399,35 @@
                             "points": 8,
                             "deciding": true,
                             "fix": {
-                                "kind": "update",
+                                "kind": "upgrade",
                                 "to_branch": "5.x",
                                 "version": "v5.4.53",
                                 "newest": "v5.4.53",
                                 "on_installed_branch": false,
                                 "php": ">=7.2.5",
-                                "held_by": [],
+                                "held_by": [
+                                    {
+                                        "source": "package",
+                                        "package": "mautic/core-lib",
+                                        "version": "4.3.x-dev",
+                                        "link": "require",
+                                        "constraint": "~4.4.0",
+                                        "holder": {
+                                            "verdict": "critical",
+                                            "lead": "pinned",
+                                            "flag_ids": [
+                                                "pinned",
+                                                "vulnerable"
+                                            ],
+                                            "replacement": null,
+                                            "next_step": {
+                                                "kind": "no-move",
+                                                "to_branch": null,
+                                                "constraint": null
+                                            }
+                                        }
+                                    }
+                                ],
                                 "reason": null
                             },
                             "baseline": null
@@ -401,13 +445,35 @@
                             "points": 8,
                             "deciding": false,
                             "fix": {
-                                "kind": "update",
+                                "kind": "upgrade",
                                 "to_branch": "5.x",
                                 "version": "v5.4.52",
                                 "newest": "v5.4.53",
                                 "on_installed_branch": false,
                                 "php": ">=7.2.5",
-                                "held_by": [],
+                                "held_by": [
+                                    {
+                                        "source": "package",
+                                        "package": "mautic/core-lib",
+                                        "version": "4.3.x-dev",
+                                        "link": "require",
+                                        "constraint": "~4.4.0",
+                                        "holder": {
+                                            "verdict": "critical",
+                                            "lead": "pinned",
+                                            "flag_ids": [
+                                                "pinned",
+                                                "vulnerable"
+                                            ],
+                                            "replacement": null,
+                                            "next_step": {
+                                                "kind": "no-move",
+                                                "to_branch": null,
+                                                "constraint": null
+                                            }
+                                        }
+                                    }
+                                ],
                                 "reason": null
                             },
                             "baseline": null
@@ -488,7 +554,7 @@
     "metadata": {
         "abandoned": false,
         "replacement": null,
-        "releases_listed": 12,
+        "releases_listed": 14,
         "has_stable_release": true,
         "last_stable_release": "2026-09-28T19:13:15+00:00",
         "last_stable_version": "v8.1.8",
@@ -523,10 +589,66 @@
                     "fixed": 2,
                     "unknown": 0,
                     "of": 2,
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "lowest": "v8.0.13",
                     "newest": "v8.1.8",
-                    "held_by": [],
+                    "held_by": [
+                        {
+                            "source": "package",
+                            "package": "friendsofsymfony/rest-bundle",
+                            "version": "3.3.0",
+                            "link": "require",
+                            "constraint": "^4.4|^5.3|^6.0",
+                            "holder": {
+                                "verdict": "ok",
+                                "lead": null,
+                                "flag_ids": [],
+                                "replacement": null,
+                                "next_step": null
+                            }
+                        },
+                        {
+                            "source": "package",
+                            "package": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "constraint": "~4.4.0",
+                            "holder": {
+                                "verdict": "critical",
+                                "lead": "pinned",
+                                "flag_ids": [
+                                    "pinned",
+                                    "vulnerable"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "no-move",
+                                    "to_branch": null,
+                                    "constraint": null
+                                }
+                            }
+                        },
+                        {
+                            "source": "package",
+                            "package": "symfony/framework-bundle",
+                            "version": "v4.4.41",
+                            "link": "require",
+                            "constraint": "^4.4.12|^5.1.4",
+                            "holder": {
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "require",
+                                    "to_branch": "8.x",
+                                    "constraint": "^8.1"
+                                }
+                            }
+                        }
+                    ],
                     "if_applied": {
                         "total": 0,
                         "verdict": "ok",
@@ -562,10 +684,66 @@
                     "fixed": 2,
                     "unknown": 0,
                     "of": 2,
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "lowest": "v7.4.13",
                     "newest": "v7.4.20",
-                    "held_by": [],
+                    "held_by": [
+                        {
+                            "source": "package",
+                            "package": "friendsofsymfony/rest-bundle",
+                            "version": "3.3.0",
+                            "link": "require",
+                            "constraint": "^4.4|^5.3|^6.0",
+                            "holder": {
+                                "verdict": "ok",
+                                "lead": null,
+                                "flag_ids": [],
+                                "replacement": null,
+                                "next_step": null
+                            }
+                        },
+                        {
+                            "source": "package",
+                            "package": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "constraint": "~4.4.0",
+                            "holder": {
+                                "verdict": "critical",
+                                "lead": "pinned",
+                                "flag_ids": [
+                                    "pinned",
+                                    "vulnerable"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "no-move",
+                                    "to_branch": null,
+                                    "constraint": null
+                                }
+                            }
+                        },
+                        {
+                            "source": "package",
+                            "package": "symfony/framework-bundle",
+                            "version": "v4.4.41",
+                            "link": "require",
+                            "constraint": "^4.4.12|^5.1.4",
+                            "holder": {
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "require",
+                                    "to_branch": "8.x",
+                                    "constraint": "^8.1"
+                                }
+                            }
+                        }
+                    ],
                     "if_applied": {
                         "total": 0,
                         "verdict": "ok",
@@ -601,10 +779,52 @@
                     "fixed": 2,
                     "unknown": 0,
                     "of": 2,
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "lowest": "v6.4.41",
                     "newest": "v6.4.47",
-                    "held_by": [],
+                    "held_by": [
+                        {
+                            "source": "package",
+                            "package": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "constraint": "~4.4.0",
+                            "holder": {
+                                "verdict": "critical",
+                                "lead": "pinned",
+                                "flag_ids": [
+                                    "pinned",
+                                    "vulnerable"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "no-move",
+                                    "to_branch": null,
+                                    "constraint": null
+                                }
+                            }
+                        },
+                        {
+                            "source": "package",
+                            "package": "symfony/framework-bundle",
+                            "version": "v4.4.41",
+                            "link": "require",
+                            "constraint": "^4.4.12|^5.1.4",
+                            "holder": {
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "require",
+                                    "to_branch": "8.x",
+                                    "constraint": "^8.1"
+                                }
+                            }
+                        }
+                    ],
                     "if_applied": {
                         "total": 0,
                         "verdict": "ok",
@@ -640,10 +860,32 @@
                     "fixed": 2,
                     "unknown": 0,
                     "of": 2,
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "lowest": "v5.4.53",
                     "newest": "v5.4.53",
-                    "held_by": [],
+                    "held_by": [
+                        {
+                            "source": "package",
+                            "package": "mautic/core-lib",
+                            "version": "4.3.x-dev",
+                            "link": "require",
+                            "constraint": "~4.4.0",
+                            "holder": {
+                                "verdict": "critical",
+                                "lead": "pinned",
+                                "flag_ids": [
+                                    "pinned",
+                                    "vulnerable"
+                                ],
+                                "replacement": null,
+                                "next_step": {
+                                    "kind": "no-move",
+                                    "to_branch": null,
+                                    "constraint": null
+                                }
+                            }
+                        }
+                    ],
                     "if_applied": {
                         "total": 0,
                         "verdict": "ok",
@@ -722,9 +964,9 @@
                 "installed": false,
                 "highest": "v2.8.52",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2018-11-20T15:55:20+00:00",
                 "newest_dated": "v2.8.52",
-                "newest_dated_released": null,
+                "newest_dated_released": "2018-11-20T15:55:20+00:00",
                 "dated_by": null,
                 "php": ">=5.3.9",
                 "highest_php": ">=5.3.9",
@@ -1496,8 +1738,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 2
+                    "packages_with_records": 4,
+                    "records": 13
                 }
             ]
         }

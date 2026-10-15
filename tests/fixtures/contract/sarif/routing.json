@@ -86,7 +86,7 @@
                     "level": "error",
                     "rank": 50.0,
                     "message": {
-                        "text": "symfony/routing v4.4.41 \u2014 finding high, 16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory] \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28). Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it."
+                        "text": "symfony/routing v4.4.41 \u2014 finding high, 16 = left-behind 16 \u00f7 2 transitive + vulnerable 8 [medium advisory] \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.8 (2026-09-28). Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/routing"
@@ -171,7 +171,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 47
                                 }
                             }
                         }
@@ -183,7 +183,7 @@
                     "level": "error",
                     "rank": 55.0,
                     "message": {
-                        "text": "symfony/routing v4.4.41 is affected by CVE-2026-48784 (medium advisory): UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it."
+                        "text": "symfony/routing v4.4.41 is affected by CVE-2026-48784 (medium advisory): UrlGenerator Dot-Segment Encoding Skips Every Other Chained `../` or `./` \u2192 Generated URL Collapses Off-Route Under RFC 3986 Normalization. Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/routing",
@@ -255,13 +255,35 @@
                         "cve": "CVE-2026-48784",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "5.x",
                             "version": "v5.4.53",
                             "newest": "v5.4.53",
                             "on_installed_branch": false,
                             "php": ">=7.2.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "package",
+                                    "package": "mautic/core-lib",
+                                    "version": "4.3.x-dev",
+                                    "link": "require",
+                                    "constraint": "~4.4.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned",
+                                            "vulnerable"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -272,7 +294,7 @@
                             "role": "security",
                             "advisory": "PKSA-bf7t-jnpz-492k",
                             "severity": "medium",
-                            "fix_kind": "update",
+                            "fix_kind": "upgrade",
                             "weight": 8,
                             "multiplier": 1,
                             "points": 8,
@@ -287,7 +309,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 47
                                 }
                             }
                         }
@@ -299,7 +321,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "symfony/routing v4.4.41 is affected by CVE-2026-45065 (medium advisory): UrlGenerator Route-Requirement Bypass via Unanchored Regex Alternation \u2192 Off-Site //host URL Injection. Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it."
+                        "text": "symfony/routing v4.4.41 is affected by CVE-2026-45065 (medium advisory): UrlGenerator Route-Requirement Bypass via Unanchored Regex Alternation \u2192 Off-Site //host URL Injection. Do: move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/routing",
@@ -327,13 +349,35 @@
                         "cve": "CVE-2026-45065",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "5.x",
                             "version": "v5.4.52",
                             "newest": "v5.4.53",
                             "on_installed_branch": false,
                             "php": ">=7.2.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "package",
+                                    "package": "mautic/core-lib",
+                                    "version": "4.3.x-dev",
+                                    "link": "require",
+                                    "constraint": "~4.4.0",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "pinned",
+                                        "flag_ids": [
+                                            "pinned",
+                                            "vulnerable"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -347,7 +391,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 47
                                 }
                             }
                         }
@@ -421,8 +465,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 1,
-                            "records": 2
+                            "packages_with_records": 4,
+                            "records": 13
                         }
                     ]
                 }

@@ -8406,7 +8406,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 3 flagged packages: spomky-labs/otphp (left-behind), symfony/security-guard (abandoned), thecodingmachine/safe (left-behind)",
+                    "summary": "pulls in 3 flagged packages: spomky-labs/otphp (left-behind \u00b7 vulnerable), symfony/security-guard (abandoned), thecodingmachine/safe (left-behind)",
                     "data": {
                         "flagged": 3,
                         "packages": [
@@ -9782,7 +9782,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 14 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more",
+                    "summary": "pulls in 14 flagged packages: hoa/consistency (abandoned \u00b7 old-promise), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more",
                     "data": {
                         "flagged": 14,
                         "packages": [
@@ -10247,7 +10247,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 15 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more",
+                    "summary": "pulls in 15 flagged packages: hoa/consistency (abandoned \u00b7 old-promise), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 10 more",
                     "data": {
                         "flagged": 15,
                         "packages": [
@@ -17474,7 +17474,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 1 flagged package: pragmarx/random (silent)",
+                    "summary": "pulls in 1 flagged package: pragmarx/random (silent \u00b7 old-promise)",
                     "data": {
                         "flagged": 1,
                         "packages": [
@@ -17753,7 +17753,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 5 flagged packages: grandt/binstring (silent), grandt/phpresizegif (silent), grandt/phpzipmerge (silent), grandt/relativepath (silent), phpzip/phpzip (silent)",
+                    "summary": "pulls in 5 flagged packages: grandt/binstring (silent \u00b7 old-promise), grandt/phpresizegif (silent \u00b7 old-promise), grandt/phpzipmerge (silent \u00b7 old-promise), grandt/relativepath (silent \u00b7 old-promise), phpzip/phpzip (silent \u00b7 old-promise)",
                     "data": {
                         "flagged": 5,
                         "packages": [
@@ -33074,7 +33074,7 @@
                 {
                     "id": "S7",
                     "level": "info",
-                    "summary": "pulls in 13 flagged packages: sebastian/resource-operations (abandoned), phpunit/php-invoker (left-behind), phpunit/php-text-template (left-behind), phpunit/php-timer (left-behind), sebastian/code-unit (left-behind) and 8 more",
+                    "summary": "pulls in 13 flagged packages: sebastian/resource-operations (abandoned), phpunit/php-invoker (left-behind \u00b7 old-promise), phpunit/php-text-template (left-behind \u00b7 old-promise), phpunit/php-timer (left-behind \u00b7 old-promise), sebastian/code-unit (left-behind \u00b7 old-promise) and 8 more",
                     "data": {
                         "flagged": 13,
                         "packages": [

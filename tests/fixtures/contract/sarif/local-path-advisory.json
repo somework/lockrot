@@ -183,6 +183,7 @@
                         ],
                         "signal_ids": [
                             "S6",
+                            "S7",
                             "S9"
                         ],
                         "age": {
@@ -213,7 +214,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 693
                                 }
                             }
                         }
@@ -260,6 +261,7 @@
                         ],
                         "signal_ids": [
                             "S6",
+                            "S7",
                             "S9"
                         ],
                         "age": {
@@ -308,7 +310,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 693
                                 }
                             }
                         }
@@ -368,7 +370,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 693
                                 }
                             }
                         }
@@ -428,7 +430,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 693
                                 }
                             }
                         }
@@ -488,7 +490,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 693
                                 }
                             }
                         }
@@ -548,7 +550,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 693
                                 }
                             }
                         }
@@ -597,7 +599,7 @@
                         {
                             "level": "note",
                             "message": {
-                                "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+                                "text": "2 packages are not from a Composer repository: their release metadata and repository activity were not read"
                             }
                         }
                     ]
@@ -622,8 +624,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 1,
-                            "records": 5
+                            "packages_with_records": 44,
+                            "records": 230
                         }
                     ]
                 }

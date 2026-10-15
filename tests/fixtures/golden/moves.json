@@ -37,11 +37,19 @@
                     "link": "require",
                     "constraint": "^1.41|^2.10",
                     "holder": {
-                        "verdict": "unknown",
-                        "lead": null,
-                        "flag_ids": [],
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
                         "replacement": null,
-                        "next_step": null
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "4.x",
+                            "constraint": "^4.4.51"
+                        }
                     }
                 }
             ],
@@ -156,7 +164,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -469,11 +477,19 @@
                     "link": "require",
                     "constraint": "^1.41|^2.10",
                     "holder": {
-                        "verdict": "unknown",
-                        "lead": null,
-                        "flag_ids": [],
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
                         "replacement": null,
-                        "next_step": null
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "4.x",
+                            "constraint": "^4.4.51"
+                        }
                     }
                 }
             ],
@@ -588,7 +604,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -642,11 +658,19 @@
                     "link": "require",
                     "constraint": "^1.41|^2.10",
                     "holder": {
-                        "verdict": "unknown",
-                        "lead": null,
-                        "flag_ids": [],
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
                         "replacement": null,
-                        "next_step": null
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "4.x",
+                            "constraint": "^4.4.51"
+                        }
                     }
                 }
             ],
@@ -761,7 +785,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -782,7 +806,7 @@
             "kind": "require",
             "source": "vulnerable",
             "merged": [],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -799,7 +823,38 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^2.0",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "symfony/twig-bridge",
+                    "version": "v3.4.47",
+                    "link": "require",
+                    "constraint": "^1.41|^2.10",
+                    "holder": {
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise",
+                            "vulnerable"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "8.x",
+                            "constraint": "^8.1"
+                        }
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "advisory",
@@ -893,6 +948,7 @@
                 ]
             },
             "composer_moves_because": [
+                "holders",
                 "crosses_major"
             ],
             "commands": [
@@ -904,9 +960,9 @@
             ],
             "through": [],
             "also": [],
-            "text": "require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -1019,7 +1075,7 @@
             "kind": "require",
             "source": "vulnerable",
             "merged": [],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -1036,7 +1092,16 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
             "clears": [
                 {
                     "kind": "advisory",
@@ -1071,9 +1136,9 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -1159,7 +1224,7 @@
                     "replacement": null,
                     "quiet_years": null,
                     "to_branch": "5.x",
-                    "version": "v5.4.52",
+                    "version": "v5.4.0",
                     "newest": "v5.4.52",
                     "constraint": "^5.4",
                     "latest": null,
@@ -1188,26 +1253,27 @@
                             "basis": "branch_releasing"
                         },
                         {
-                            "kind": "flag",
-                            "id": "old-promise",
-                            "basis": "released_after_ga"
-                        },
-                        {
                             "kind": "advisory",
                             "id": "PKSA-4wjj-gy1p-ft3r",
                             "basis": "outside_range"
                         }
                     ],
-                    "unverified": [],
+                    "unverified": [
+                        {
+                            "kind": "flag",
+                            "id": "old-promise",
+                            "reason": "undated"
+                        }
+                    ],
                     "adds": [],
                     "leaves": [],
-                    "clears_all": true,
+                    "clears_all": false,
                     "if_applied": {
-                        "total": 0,
-                        "verdict": "ok",
-                        "lead": null,
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": "old-promise",
                         "deciding_advisory": null,
-                        "at_most": false,
+                        "at_most": true,
                         "assumes": [
                             "clears_hold",
                             "composer_resolves"
@@ -1223,7 +1289,7 @@
                             "symfony/monolog-bridge:^5.4"
                         ]
                     ],
-                    "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+                    "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
                 }
             ],
             "text": "composer update symfony/monolog-bridge (gets v2.8.52) \u2014 clears the advisory; left-behind, old-promise stay"
@@ -1256,7 +1322,7 @@
             "merged": [
                 "vulnerable"
             ],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -1273,7 +1339,16 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -1318,9 +1393,9 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -1341,7 +1416,7 @@
             "merged": [
                 "vulnerable"
             ],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -1358,7 +1433,16 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require-dev",
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -1403,9 +1487,9 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -1711,7 +1795,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "5.x",
-            "version": "v5.4.52",
+            "version": "v5.4.0",
             "newest": "v5.4.52",
             "constraint": "^5.4",
             "latest": null,
@@ -1729,23 +1813,24 @@
                     "kind": "flag",
                     "id": "left-behind",
                     "basis": "branch_releasing"
-                },
+                }
+            ],
+            "unverified": [
                 {
                     "kind": "flag",
                     "id": "old-promise",
-                    "basis": "released_after_ga"
+                    "reason": "undated"
                 }
             ],
-            "unverified": [],
             "adds": [],
             "leaves": [],
-            "clears_all": true,
+            "clears_all": false,
             "if_applied": {
-                "total": 0,
-                "verdict": "ok",
-                "lead": null,
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
                 "deciding_advisory": null,
-                "at_most": false,
+                "at_most": true,
                 "assumes": [
                     "clears_hold",
                     "composer_resolves",
@@ -1764,7 +1849,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
         }
     },
     "B-offline\u2021": {
@@ -1777,7 +1862,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "5.x",
-            "version": "v5.4.52",
+            "version": "v5.4.0",
             "newest": "v5.4.52",
             "constraint": "^5.4",
             "latest": null,
@@ -1795,23 +1880,24 @@
                     "kind": "flag",
                     "id": "left-behind",
                     "basis": "branch_releasing"
-                },
+                }
+            ],
+            "unverified": [
                 {
                     "kind": "flag",
                     "id": "old-promise",
-                    "basis": "released_after_ga"
+                    "reason": "undated"
                 }
             ],
-            "unverified": [],
             "adds": [],
             "leaves": [],
-            "clears_all": true,
+            "clears_all": false,
             "if_applied": {
-                "total": 0,
-                "verdict": "ok",
-                "lead": null,
+                "total": 16,
+                "verdict": "high",
+                "lead": "old-promise",
                 "deciding_advisory": null,
-                "at_most": false,
+                "at_most": true,
                 "assumes": [
                     "clears_hold",
                     "composer_resolves",
@@ -1830,7 +1916,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
         }
     },
     "C": {
@@ -3037,7 +3123,7 @@
                     "kind": "require",
                     "source": "vulnerable",
                     "merged": [],
-                    "fix_kind": "update",
+                    "fix_kind": "upgrade",
                     "reason": null,
                     "replacement": null,
                     "quiet_years": null,
@@ -3054,7 +3140,16 @@
                         "raise_size": null
                     },
                     "crosses_major": true,
-                    "held_by": [],
+                    "held_by": [
+                        {
+                            "source": "root",
+                            "package": null,
+                            "version": null,
+                            "link": "require",
+                            "constraint": "~3.4",
+                            "holder": null
+                        }
+                    ],
                     "clears": [
                         {
                             "kind": "advisory",
@@ -3098,12 +3193,12 @@
                             "symfony/debug:^4.4.0"
                         ]
                     ],
-                    "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+                    "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; held by composer.json (requires ~3.4); a new major brings its own requirements, which lockrot does not solve"
                 }
             ],
             "text": "replace with symfony/error-handler (named by its registry)"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -3188,7 +3283,7 @@
             "merged": [
                 "vulnerable"
             ],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -3205,7 +3300,16 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -3250,9 +3354,9 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -3273,7 +3377,7 @@
             "merged": [
                 "vulnerable"
             ],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -3290,7 +3394,16 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^2.6",
+                    "holder": null
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -3335,9 +3448,9 @@
             ],
             "through": [],
             "also": [],
-            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -3507,7 +3620,7 @@
             "merged": [
                 "vulnerable"
             ],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -3524,7 +3637,49 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "barryvdh/elfinder-flysystem-driver",
+                    "version": "v0.2.1",
+                    "link": "require",
+                    "constraint": "^1.0",
+                    "holder": {
+                        "verdict": "medium",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "require",
+                            "to_branch": "0.6.x",
+                            "constraint": "^0.6.0"
+                        }
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "league/flysystem-cached-adapter",
+                    "version": "1.1.0",
+                    "link": "require",
+                    "constraint": "~1.0",
+                    "holder": {
+                        "verdict": "low",
+                        "lead": "stale",
+                        "flag_ids": [
+                            "stale"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -3553,8 +3708,8 @@
                 ]
             },
             "composer_moves_because": [
-                "crosses_major",
-                "transitive"
+                "holders",
+                "crosses_major"
             ],
             "commands": [],
             "through": [
@@ -3568,9 +3723,9 @@
                 }
             ],
             "also": [],
-            "text": "move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+            "text": "move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -3768,7 +3923,7 @@
             "kind": "require",
             "source": "left-behind",
             "merged": [],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -3785,7 +3940,56 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^5.3.4",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "bdunogier/guzzle-site-authenticator",
+                    "version": "1.1.0",
+                    "link": "require",
+                    "constraint": "^5.3.1",
+                    "holder": {
+                        "verdict": "medium",
+                        "lead": "stale",
+                        "flag_ids": [
+                            "stale"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "php-http/guzzle5-adapter",
+                    "version": "2.0.0",
+                    "link": "require",
+                    "constraint": "^5.1",
+                    "holder": {
+                        "verdict": "critical",
+                        "lead": "abandoned",
+                        "flag_ids": [
+                            "abandoned"
+                        ],
+                        "replacement": "php-http/guzzle7-adapter",
+                        "next_step": {
+                            "kind": "replace",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -3884,6 +4088,7 @@
                 ]
             },
             "composer_moves_because": [
+                "holders",
                 "crosses_major"
             ],
             "commands": [
@@ -3895,9 +4100,9 @@
             ],
             "through": [],
             "also": [],
-            "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -3935,7 +4140,99 @@
                 "raise_size": "minor"
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "~5.0",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "csa/guzzle-bundle",
+                    "version": "dev-compat-php",
+                    "link": "require",
+                    "constraint": "^5.3",
+                    "holder": {
+                        "verdict": "high",
+                        "lead": "pinned",
+                        "flag_ids": [
+                            "pinned"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "guzzlehttp/cache-subscriber",
+                    "version": "0.2.0",
+                    "link": "require",
+                    "constraint": "~5.0",
+                    "holder": {
+                        "verdict": "critical",
+                        "lead": "abandoned",
+                        "flag_ids": [
+                            "abandoned",
+                            "old-promise"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "find-alternative",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "guzzlehttp/log-subscriber",
+                    "version": "1.0.1",
+                    "link": "require",
+                    "constraint": "~4.0 | ~5.0",
+                    "holder": {
+                        "verdict": "high",
+                        "lead": "abandoned",
+                        "flag_ids": [
+                            "abandoned",
+                            "old-promise"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "find-alternative",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "prestashop/circuit-breaker",
+                    "version": "v3.0.0",
+                    "link": "require",
+                    "constraint": "^5",
+                    "holder": {
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "old-promise"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "raise-php",
+                            "to_branch": "4.x",
+                            "constraint": "^4.0"
+                        }
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -4035,6 +4332,7 @@
                 ]
             },
             "composer_moves_because": [
+                "holders",
                 "crosses_major"
             ],
             "commands": [
@@ -4052,7 +4350,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -4184,7 +4482,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "3.x",
-            "version": "3.0.4",
+            "version": "3.0.0",
             "newest": "3.0.4",
             "constraint": "^3.0",
             "latest": null,
@@ -4204,11 +4502,17 @@
                     "link": "require",
                     "constraint": "^2.0",
                     "holder": {
-                        "verdict": "unknown",
+                        "verdict": "medium",
                         "lead": null,
-                        "flag_ids": [],
+                        "flag_ids": [
+                            "vulnerable"
+                        ],
                         "replacement": null,
-                        "next_step": null
+                        "next_step": {
+                            "kind": "raise-php",
+                            "to_branch": "3.x",
+                            "constraint": "^3.0.5"
+                        }
                     }
                 }
             ],
@@ -4253,7 +4557,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require joomla/string ^3.0 \u2014 clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require joomla/string ^3.0 \u2014 clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         }
     },
     "ignored-marking-archived\u2021": {
@@ -4413,7 +4717,13 @@
                 "suggestion": "web-auth/webauthn-lib",
                 "url": "https://packagist.org/packages/web-auth/webauthn-lib",
                 "named_by": "repository",
-                "finding": null
+                "finding": {
+                    "verdict": "high",
+                    "lead": "left-behind",
+                    "flag_ids": [
+                        "left-behind"
+                    ]
+                }
             },
             "quiet_years": null,
             "to_branch": null,
@@ -4464,7 +4774,7 @@
                 }
             ],
             "also": [],
-            "text": "replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
+            "text": "replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
         }
     },
     "joomla-filter": {
@@ -4662,7 +4972,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "2.x",
-            "version": "v2.5.4",
+            "version": "v2.5.0",
             "newest": "v2.5.4",
             "constraint": "^2.5",
             "latest": null,
@@ -5240,7 +5550,70 @@
         }
     },
     "pagerfanta": {
-        "next_step": null
+        "next_step": {
+            "kind": "raise-php",
+            "source": "left-behind",
+            "merged": [],
+            "fix_kind": null,
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "4.x",
+            "version": "v4.9.0",
+            "newest": "v4.9.0",
+            "constraint": "^4.9",
+            "latest": null,
+            "php_check": {
+                "requires": "^8.1",
+                "project_allows": false,
+                "target_runs": true,
+                "raise_to": ">=8.1",
+                "raise_size": "major"
+            },
+            "crosses_major": true,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "flag",
+                    "id": "left-behind",
+                    "basis": "branch_releasing"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold",
+                    "composer_resolves"
+                ]
+            },
+            "composer_moves_because": [
+                "crosses_major"
+            ],
+            "commands": [
+                [
+                    "composer",
+                    "require",
+                    "php:>=8.1",
+                    "--no-update"
+                ],
+                [
+                    "composer",
+                    "require",
+                    "pagerfanta/twig:^4.9"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+        }
     },
     "partial": {
         "next_step": {
@@ -5264,7 +5637,30 @@
                 "raise_size": "minor"
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^9.0",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "pragmarx/google2fa-laravel",
+                    "version": "v2.2.0",
+                    "link": "require",
+                    "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                    "holder": {
+                        "verdict": "ok",
+                        "lead": null,
+                        "flag_ids": [],
+                        "replacement": null,
+                        "next_step": null
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "advisory",
@@ -5313,6 +5709,7 @@
                 ]
             },
             "composer_moves_because": [
+                "holders",
                 "crosses_major"
             ],
             "commands": [
@@ -5330,7 +5727,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -5699,7 +6096,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "2.x",
-            "version": "2.13.1",
+            "version": "2.13.0",
             "newest": "2.13.1",
             "constraint": "^2.13",
             "latest": null,
@@ -5719,11 +6116,18 @@
                     "link": "require",
                     "constraint": "^1.9",
                     "holder": {
-                        "verdict": "ok",
-                        "lead": null,
-                        "flag_ids": [],
+                        "verdict": "critical",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
                         "replacement": null,
-                        "next_step": null
+                        "next_step": {
+                            "kind": "raise-php",
+                            "to_branch": "7.x",
+                            "constraint": "^7.15.2"
+                        }
                     }
                 }
             ],
@@ -5795,7 +6199,7 @@
                 }
             ],
             "also": [],
-            "text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -5823,7 +6227,13 @@
                 "suggestion": "web-token/jwt-library",
                 "url": "https://packagist.org/packages/web-token/jwt-library",
                 "named_by": "repository",
-                "finding": null
+                "finding": {
+                    "verdict": "high",
+                    "lead": null,
+                    "flag_ids": [
+                        "vulnerable"
+                    ]
+                }
             },
             "quiet_years": null,
             "to_branch": null,
@@ -5849,7 +6259,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "replace with web-token/jwt-library (named by its registry)"
+            "text": "replace with web-token/jwt-library (named by its registry; itself high: vulnerable)"
         }
     },
     "replace-text": {
@@ -5903,7 +6313,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "5.x",
-            "version": "v5.4.48",
+            "version": "v5.4.0",
             "newest": "v5.4.48",
             "constraint": "^5.4",
             "latest": null,
@@ -6400,7 +6810,7 @@
             "kind": "require",
             "source": "vulnerable",
             "merged": [],
-            "fix_kind": "update",
+            "fix_kind": "upgrade",
             "reason": null,
             "replacement": null,
             "quiet_years": null,
@@ -6417,7 +6827,29 @@
                 "raise_size": null
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "package",
+                    "package": "mautic/core-lib",
+                    "version": "4.3.x-dev",
+                    "link": "require",
+                    "constraint": "~4.4.0",
+                    "holder": {
+                        "verdict": "critical",
+                        "lead": "pinned",
+                        "flag_ids": [
+                            "pinned",
+                            "vulnerable"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "flag",
@@ -6451,8 +6883,8 @@
                 ]
             },
             "composer_moves_because": [
-                "crosses_major",
-                "transitive"
+                "holders",
+                "crosses_major"
             ],
             "commands": [],
             "through": [
@@ -6466,9 +6898,9 @@
                 }
             ],
             "also": [],
-            "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+            "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
-        "fix_kind": "update",
+        "fix_kind": "upgrade",
         "installed_branch_fixes": {
             "fixed": 0,
             "unknown": 0,
@@ -6793,7 +7225,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "5.x",
-            "version": "v5.4.52",
+            "version": "v5.4.0",
             "newest": "v5.4.52",
             "constraint": "^5.4",
             "latest": null,
@@ -6811,14 +7243,15 @@
                     "kind": "flag",
                     "id": "left-behind",
                     "basis": "branch_releasing"
-                },
+                }
+            ],
+            "unverified": [
                 {
                     "kind": "flag",
                     "id": "old-promise",
-                    "basis": "released_after_ga"
+                    "reason": "undated"
                 }
             ],
-            "unverified": [],
             "adds": [],
             "leaves": [
                 {
@@ -6828,11 +7261,11 @@
             ],
             "clears_all": false,
             "if_applied": {
-                "total": 16,
-                "verdict": "high",
-                "lead": null,
+                "total": 32,
+                "verdict": "critical",
+                "lead": "old-promise",
                 "deciding_advisory": "PKSA-4wjj-gy1p-ft3r",
-                "at_most": false,
+                "at_most": true,
                 "assumes": [
                     "clears_hold",
                     "composer_resolves"
@@ -6890,7 +7323,7 @@
                     "text": "no release fixes it"
                 }
             ],
-            "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; a new major brings its own requirements, which lockrot does not solve"
+            "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "none",
         "installed_branch_fixes": {
@@ -6928,7 +7361,57 @@
                 "raise_size": "major"
             },
             "crosses_major": true,
-            "held_by": [],
+            "held_by": [
+                {
+                    "source": "root",
+                    "package": null,
+                    "version": null,
+                    "link": "require",
+                    "constraint": "^1.38",
+                    "holder": null
+                },
+                {
+                    "source": "package",
+                    "package": "csa/guzzle-bundle",
+                    "version": "dev-compat-php",
+                    "link": "require",
+                    "constraint": "^1.34|^2.4",
+                    "holder": {
+                        "verdict": "high",
+                        "lead": "pinned",
+                        "flag_ids": [
+                            "pinned"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "no-move",
+                            "to_branch": null,
+                            "constraint": null
+                        }
+                    }
+                },
+                {
+                    "source": "package",
+                    "package": "symfony/symfony",
+                    "version": "v3.4.49",
+                    "link": "require",
+                    "constraint": "^1.41|^2.10",
+                    "holder": {
+                        "verdict": "critical",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind",
+                            "vulnerable"
+                        ],
+                        "replacement": null,
+                        "next_step": {
+                            "kind": "raise-php",
+                            "to_branch": "5.x",
+                            "constraint": "^5.4.53"
+                        }
+                    }
+                }
+            ],
             "clears": [
                 {
                     "kind": "advisory",
@@ -7033,6 +7516,7 @@
                 ]
             },
             "composer_moves_because": [
+                "holders",
                 "crosses_major"
             ],
             "commands": [
@@ -7050,7 +7534,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+            "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
         },
         "fix_kind": "raise-php",
         "installed_branch_fixes": {
@@ -7362,7 +7846,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "3.x",
-            "version": "v3.1.1",
+            "version": "v3.1.0",
             "newest": "v3.1.1",
             "constraint": "^3.1",
             "latest": null,
@@ -7424,7 +7908,7 @@
             "replacement": null,
             "quiet_years": null,
             "to_branch": "7.x",
-            "version": "7.8.1",
+            "version": "7.8.0",
             "newest": "7.8.1",
             "constraint": "^7.8",
             "latest": null,
@@ -7442,23 +7926,24 @@
                     "kind": "flag",
                     "id": "left-behind",
                     "basis": "branch_releasing"
-                },
+                }
+            ],
+            "unverified": [
                 {
                     "kind": "flag",
                     "id": "old-promise",
-                    "basis": "released_after_ga"
+                    "reason": "undated"
                 }
             ],
-            "unverified": [],
             "adds": [],
             "leaves": [],
-            "clears_all": true,
+            "clears_all": false,
             "if_applied": {
-                "total": 0,
-                "verdict": "ok",
-                "lead": null,
+                "total": 8,
+                "verdict": "medium",
+                "lead": "old-promise",
                 "deciding_advisory": null,
-                "at_most": false,
+                "at_most": true,
                 "assumes": [
                     "clears_hold",
                     "composer_resolves"
@@ -7478,7 +7963,7 @@
             ],
             "through": [],
             "also": [],
-            "text": "raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it"
+            "text": "raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it"
         }
     },
     "wp-config": {
@@ -7495,9 +7980,9 @@
             "newest": null,
             "constraint": null,
             "latest": {
-                "version": "1.0.0",
-                "released": "2018-08-10T14:18:38+00:00",
-                "is_installed": true,
+                "version": "v2.0.0-beta.1",
+                "released": "2026-03-21T17:18:34+00:00",
+                "is_installed": false,
                 "relation": null,
                 "snapshot_time": null
             },
@@ -7511,10 +7996,6 @@
                 {
                     "kind": "flag",
                     "id": "old-promise"
-                },
-                {
-                    "kind": "flag",
-                    "id": "stale"
                 }
             ],
             "clears_all": false,
@@ -7523,7 +8004,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "test it on PHP 8.4 \u2014 1.0.0 is its newest release"
+            "text": "test it on PHP 8.4"
         }
     },
     "xmlseclibs": {

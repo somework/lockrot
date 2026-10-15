@@ -175,7 +175,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -229,7 +229,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -241,7 +241,7 @@
                     "level": "error",
                     "rank": 95.0,
                     "message": {
-                        "text": "symfony/debug v3.4.47 is affected by CVE-2026-00003 (critical advisory): an advisory added to show the either opening (\u2021). Do: require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "symfony/debug v3.4.47 is affected by CVE-2026-00003 (critical advisory): an advisory added to show the either opening (\u2021). Do: require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; held by composer.json (requires ~3.4); a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/debug",
@@ -319,13 +319,22 @@
                         "cve": "CVE-2026-00003",
                         "severity": "critical",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "4.x",
                             "version": "v4.4.0",
                             "newest": "v4.4.44",
                             "on_installed_branch": false,
                             "php": ">=7.1.3",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "~3.4",
+                                    "holder": null
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 32,
@@ -336,7 +345,7 @@
                             "role": "security",
                             "advisory": "PKSA-eith-0000-0001",
                             "severity": "critical",
-                            "fix_kind": "update",
+                            "fix_kind": "upgrade",
                             "weight": 32,
                             "multiplier": 1,
                             "points": 32,
@@ -351,7 +360,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }

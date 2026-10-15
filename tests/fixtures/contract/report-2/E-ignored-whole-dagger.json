@@ -756,7 +756,7 @@
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 5
                 }
             ]
         },
@@ -1017,19 +1017,19 @@
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml: 3 counted advisories; accept them in Composer's audit policy if that is the decision"
+        "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
     ],
     "note_details": [
         {
             "code": "ignore_does_not_cover_advisories",
-            "text": "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml: 3 counted advisories; accept them in Composer's audit policy if that is the decision",
+            "text": "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision",
             "docs_url": "https://lockrot.dev/notes/#ignore_does_not_cover_advisories",
             "sets_network_failures": false,
             "data": {
                 "entries": [
                     {
                         "package": "symfony/yaml",
-                        "pattern": "symfony/yaml",
+                        "pattern": "symfony/*",
                         "advisories": [
                             "PKSA-b14r-zh1d-vdrc",
                             "PKSA-ft77-7h5f-p3r6",
@@ -1207,13 +1207,13 @@
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],
@@ -1297,9 +1297,9 @@
             "activity": {
                 "status": "not_read",
                 "reason": "allowlisted",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/yaml",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -1307,9 +1307,9 @@
             },
             "allowlist": {
                 "by": "project",
-                "pattern": "symfony/yaml",
+                "pattern": "symfony/*",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "symfony is upgraded on its own schedule (\u2021)",
                 "reason_id": null,
                 "reason_by": "user",
                 "expires": null,
@@ -1428,7 +1428,7 @@
                 }
             ],
             "evidence": "vulnerable: 3 advisories: 3 low \u2014 all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
-            "allowlist_reason": "accepted by the test",
+            "allowlist_reason": "symfony is upgraded on its own schedule (\u2021)",
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 3.43,
             "age": {

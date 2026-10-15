@@ -946,8 +946,8 @@
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 0,
-            "shared_commit": 0,
-            "undated": 1,
+            "shared_commit": 1,
+            "undated": 0,
             "no_stable_release": 0,
             "undated_releases": 0
         },
@@ -1095,7 +1095,7 @@
             "replacement": null,
             "replacement_url": null,
             "note": null,
-            "libyears_unmeasured": "undated",
+            "libyears_unmeasured": "shared_commit",
             "libyears_at_least": false,
             "direct": false,
             "dev": false,
@@ -1142,7 +1142,7 @@
             "libyears": null,
             "age": {
                 "installed": null,
-                "installed_unmeasured": "undated",
+                "installed_unmeasured": "shared_commit",
                 "release": null,
                 "release_unmeasured": "undated_releases",
                 "branch_release": null,

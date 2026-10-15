@@ -174,7 +174,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 35
                                 }
                             }
                         }
@@ -293,7 +293,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 35
                                 }
                             }
                         }
@@ -353,7 +353,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 35
                                 }
                             }
                         }
@@ -428,7 +428,7 @@
                             "reason": null,
                             "message": null,
                             "packages_with_records": 1,
-                            "records": 2
+                            "records": 4
                         }
                     ]
                 }

@@ -18,3 +18,5 @@ advisories: 0 packages asked, 1 not asked (offline) · packagist.org not asked (
 <fg=red>gate: fails · --fail-on=high,unchecked · 1 finding fails it (high 1, unchecked 1) · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
+note: offline: repository metadata served from Composer's cache
+note: GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug

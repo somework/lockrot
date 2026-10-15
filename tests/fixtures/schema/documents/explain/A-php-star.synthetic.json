@@ -114,13 +114,44 @@
    "latest": null,
    "php_check": {
     "requires": ">=8.1.0",
-    "project_allows": true,
+    "project_allows": null,
     "target_runs": true,
     "raise_to": null,
     "raise_size": null
    },
    "crosses_major": true,
-   "held_by": [],
+   "held_by": [
+    {
+     "source": "root",
+     "package": null,
+     "version": null,
+     "link": "require",
+     "constraint": "^2.0",
+     "holder": null
+    },
+    {
+     "source": "package",
+     "package": "symfony/twig-bridge",
+     "version": "v3.4.47",
+     "link": "require",
+     "constraint": "^1.41|^2.10",
+     "holder": {
+      "verdict": "high",
+      "lead": "left-behind",
+      "flag_ids": [
+       "left-behind",
+       "old-promise",
+       "vulnerable"
+      ],
+      "replacement": null,
+      "next_step": {
+       "kind": "require",
+       "to_branch": "4.x",
+       "constraint": "^4.4.51"
+      }
+     }
+    }
+   ],
    "clears": [
     {
      "kind": "advisory",
@@ -214,6 +245,7 @@
     ]
    },
    "composer_moves_because": [
+    "holders",
     "crosses_major"
    ],
    "commands": [
@@ -225,7 +257,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+   "text": "require twig/twig ^3.27.0 — clears 15 advisories; 3.x needs php >=8.1.0; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
   },
   "security": {
    "status": "vulnerable",
@@ -342,7 +374,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -390,7 +453,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -414,7 +508,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -438,7 +563,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -462,7 +618,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -486,7 +673,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -510,7 +728,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -534,7 +783,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -558,7 +838,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -582,7 +893,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -606,7 +948,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -630,7 +1003,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -654,7 +1058,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -678,7 +1113,38 @@
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51"
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -779,12 +1245,12 @@
     "php": ">=8.1.0",
     "highest_php": ">=8.1.0",
     "admits_target_php": true,
-    "admits_project_php": true,
-    "php_blocked_by": "project",
+    "admits_project_php": null,
+    "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
     "highest_admits_target_php": true,
-    "highest_admits_project_php": true,
+    "highest_admits_project_php": null,
     "highest_misses_project_php": null,
     "released_years": 0,
     "fixes": {
@@ -794,7 +1260,38 @@
      "fix_kind": "upgrade",
      "lowest": "v3.27.0",
      "newest": "v3.30.0",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "root",
+       "package": null,
+       "version": null,
+       "link": "require",
+       "constraint": "^2.0",
+       "holder": null
+      },
+      {
+       "source": "package",
+       "package": "symfony/twig-bridge",
+       "version": "v3.4.47",
+       "link": "require",
+       "constraint": "^1.41|^2.10",
+       "holder": {
+        "verdict": "high",
+        "lead": "left-behind",
+        "flag_ids": [
+         "left-behind",
+         "old-promise",
+         "vulnerable"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "require",
+         "to_branch": "4.x",
+         "constraint": "^4.4.51"
+        }
+       }
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",
@@ -818,12 +1315,12 @@
     "php": ">=7.1.3",
     "highest_php": ">=7.1.3",
     "admits_target_php": true,
-    "admits_project_php": true,
+    "admits_project_php": null,
     "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
     "highest_admits_target_php": true,
-    "highest_admits_project_php": true,
+    "highest_admits_project_php": null,
     "highest_misses_project_php": null,
     "released_years": 2.1,
     "fixes": {
@@ -849,12 +1346,12 @@
     "php": ">=7.2.5",
     "highest_php": ">=7.2.5",
     "admits_target_php": true,
-    "admits_project_php": true,
-    "php_blocked_by": "project",
+    "admits_project_php": null,
+    "php_blocked_by": null,
     "misses_target_php": null,
     "misses_project_php": null,
     "highest_admits_target_php": true,
-    "highest_admits_project_php": true,
+    "highest_admits_project_php": null,
     "highest_misses_project_php": null,
     "released_years": 2.1,
     "fixes": {

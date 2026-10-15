@@ -5,8 +5,9 @@
       silent       last release 2018-08-08 (8.1 years ago); last push 2020-08-08 (6.1 years ago)
       old-promise  released 2018-08-08 for PHP 7 (php "\>=7.1"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4
                    untested
+      pulls in 1 flagged package: yosymfony/parser-utils (silent · old-promise)
 
-1 package checked · 1 flagged: critical 1
+2 packages checked · 1 flagged: critical 1
 flags: silent 1 · old-promise 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 libyears: 0.0 behind across the one package

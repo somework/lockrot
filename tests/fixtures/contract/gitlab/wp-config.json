@@ -2,28 +2,12 @@
     {
         "type": "issue",
         "check_name": "lockrot/old-promise",
-        "description": "roots/wp-config 1.0.0 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 old-promise: released 2018-08-10 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4 \u2014 1.0.0 is its newest release.",
+        "description": "roots/wp-config 1.0.0 \u2014 finding high (16 = old-promise 16) \u2014 old-promise: released 2018-08-10 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: test it on PHP 8.4.",
         "categories": [
             "Bug Risk"
         ],
         "severity": "major",
         "fingerprint": "769a69b9b835e5bb4647ed4f8864998b72151ebe25ffd1a0138491abc5ac26e0",
-        "location": {
-            "path": "composer.lock",
-            "lines": {
-                "begin": 4
-            }
-        }
-    },
-    {
-        "type": "issue",
-        "check_name": "lockrot/stale",
-        "description": "roots/wp-config 1.0.0 \u2014 finding high (18 = old-promise 16 + stale 2 [\u00bc of 8]) \u2014 stale: last release 2018-08-10 (8.1 years ago). Do: test it on PHP 8.4 \u2014 1.0.0 is its newest release.",
-        "categories": [
-            "Bug Risk"
-        ],
-        "severity": "minor",
-        "fingerprint": "fbab1b7d2144afcb30dd737451cd490ec7461221cca9fc73e3cf5c1af2633dbd",
         "location": {
             "path": "composer.lock",
             "lines": {

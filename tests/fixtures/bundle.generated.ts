@@ -759,7 +759,7 @@ export const d_A_baselined_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 15
+                    "records": 26
                 }
             ]
         },
@@ -1256,13 +1256,13 @@ export const d_A_baselined_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -2654,7 +2654,7 @@ export const d_A_blocked_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 15
+                    "records": 26
                 }
             ]
         },
@@ -3106,13 +3106,13 @@ export const d_A_blocked_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -4377,8 +4377,8 @@ export const d_A_gate_critical = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 15
+                    "packages_with_records": 2,
+                    "records": 28
                 }
             ]
         },
@@ -4767,11 +4767,19 @@ export const d_A_gate_critical = {
                         "link": "require",
                         "constraint": "^1.41|^2.10",
                         "holder": {
-                            "verdict": "unknown",
-                            "lead": null,
-                            "flag_ids": [],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise",
+                                "vulnerable"
+                            ],
                             "replacement": null,
-                            "next_step": null
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "4.x",
+                                "constraint": "^4.4.51"
+                            }
                         }
                     }
                 ],
@@ -4886,20 +4894,20 @@ export const d_A_gate_critical = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -5019,11 +5027,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5066,11 +5082,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5113,11 +5137,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5160,11 +5192,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5207,11 +5247,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5254,11 +5302,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5301,11 +5357,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5348,11 +5412,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5395,11 +5467,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5442,11 +5522,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5489,11 +5577,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5536,11 +5632,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5583,11 +5687,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5630,11 +5742,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -5677,11 +5797,19 @@ export const d_A_gate_critical = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -6509,8 +6637,8 @@ export const d_A_gate_vulnerable = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 15
+                    "packages_with_records": 2,
+                    "records": 28
                 }
             ]
         },
@@ -6899,11 +7027,19 @@ export const d_A_gate_vulnerable = {
                         "link": "require",
                         "constraint": "^1.41|^2.10",
                         "holder": {
-                            "verdict": "unknown",
-                            "lead": null,
-                            "flag_ids": [],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise",
+                                "vulnerable"
+                            ],
                             "replacement": null,
-                            "next_step": null
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "4.x",
+                                "constraint": "^4.4.51"
+                            }
                         }
                     }
                 ],
@@ -7018,20 +7154,20 @@ export const d_A_gate_vulnerable = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -7151,11 +7287,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7198,11 +7342,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7245,11 +7397,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7292,11 +7452,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7339,11 +7507,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7386,11 +7562,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7433,11 +7617,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7480,11 +7672,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7527,11 +7727,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7574,11 +7782,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7621,11 +7837,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7668,11 +7892,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7715,11 +7947,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7762,11 +8002,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -7809,11 +8057,19 @@ export const d_A_gate_vulnerable = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -8653,8 +8909,8 @@ export const d_A_php_star_dagger = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 15
+                    "packages_with_records": 2,
+                    "records": 28
                 }
             ]
         },
@@ -8898,21 +9154,15 @@ export const d_A_php_star_dagger = {
             "low": 5
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "twig/twig"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "twig/twig"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -8987,7 +9237,7 @@ export const d_A_php_star_dagger = {
                         "role": "security",
                         "advisory": "PKSA-h8hf-ytnd-5t9q",
                         "severity": "critical",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 32,
                         "multiplier": 1,
                         "points": 32,
@@ -9016,7 +9266,7 @@ export const d_A_php_star_dagger = {
                 "kind": "require",
                 "source": "vulnerable",
                 "merged": [],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -9033,7 +9283,38 @@ export const d_A_php_star_dagger = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^2.0",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "symfony/twig-bridge",
+                        "version": "v3.4.47",
+                        "link": "require",
+                        "constraint": "^1.41|^2.10",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise",
+                                "vulnerable"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "8.x",
+                                "constraint": "^8.1"
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "advisory",
@@ -9127,6 +9408,7 @@ export const d_A_php_star_dagger = {
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -9138,20 +9420,20 @@ export const d_A_php_star_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -9165,7 +9447,7 @@ export const d_A_php_star_dagger = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -9249,13 +9531,44 @@ export const d_A_php_star_dagger = {
                                 "points": 32,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.26.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9273,13 +9586,44 @@ export const d_A_php_star_dagger = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.27.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9297,13 +9641,44 @@ export const d_A_php_star_dagger = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.26.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9321,13 +9696,44 @@ export const d_A_php_star_dagger = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.26.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9345,13 +9751,44 @@ export const d_A_php_star_dagger = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.27.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9369,13 +9806,44 @@ export const d_A_php_star_dagger = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.26.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9393,13 +9861,44 @@ export const d_A_php_star_dagger = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.27.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9417,13 +9916,44 @@ export const d_A_php_star_dagger = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.27.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9441,13 +9971,44 @@ export const d_A_php_star_dagger = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.26.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9465,13 +10026,44 @@ export const d_A_php_star_dagger = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.27.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9489,13 +10081,44 @@ export const d_A_php_star_dagger = {
                                 "points": 2,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.14.1",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9513,13 +10136,44 @@ export const d_A_php_star_dagger = {
                                 "points": 2,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.27.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9537,13 +10191,44 @@ export const d_A_php_star_dagger = {
                                 "points": 2,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.26.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9561,13 +10246,44 @@ export const d_A_php_star_dagger = {
                                 "points": 2,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.26.0",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -9585,13 +10301,44 @@ export const d_A_php_star_dagger = {
                                 "points": 2,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "v3.14.1",
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/twig-bridge",
+                                            "version": "v3.4.47",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "8.x",
+                                                    "constraint": "^8.1"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -10416,8 +11163,8 @@ export const d_A = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 15
+                    "packages_with_records": 2,
+                    "records": 28
                 }
             ]
         },
@@ -10806,11 +11553,19 @@ export const d_A = {
                         "link": "require",
                         "constraint": "^1.41|^2.10",
                         "holder": {
-                            "verdict": "unknown",
-                            "lead": null,
-                            "flag_ids": [],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise",
+                                "vulnerable"
+                            ],
                             "replacement": null,
-                            "next_step": null
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "4.x",
+                                "constraint": "^4.4.51"
+                            }
                         }
                     }
                 ],
@@ -10925,20 +11680,20 @@ export const d_A = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -11058,11 +11813,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11105,11 +11868,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11152,11 +11923,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11199,11 +11978,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11246,11 +12033,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11293,11 +12088,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11340,11 +12143,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11387,11 +12198,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11434,11 +12253,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11481,11 +12308,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11528,11 +12363,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11575,11 +12418,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11622,11 +12473,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11669,11 +12528,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -11716,11 +12583,19 @@ export const d_A = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -12793,21 +13668,15 @@ export const d_B_accepted_dagger = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/monolog-bridge"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/monolog-bridge"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -12861,7 +13730,7 @@ export const d_B_accepted_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -12876,7 +13745,7 @@ export const d_B_accepted_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -12932,7 +13801,7 @@ export const d_B_accepted_dagger = {
                         "role": "security",
                         "advisory": "PKSA-4wjj-gy1p-ft3r",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -12971,7 +13840,7 @@ export const d_B_accepted_dagger = {
                 "kind": "require",
                 "source": "vulnerable",
                 "merged": [],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -12988,7 +13857,16 @@ export const d_B_accepted_dagger = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^2.6",
+                        "holder": null
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "advisory",
@@ -13023,7 +13901,7 @@ export const d_B_accepted_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -13050,7 +13928,7 @@ export const d_B_accepted_dagger = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -13100,7 +13978,7 @@ export const d_B_accepted_dagger = {
                 "by": "project",
                 "pattern": "symfony/monolog-bridge",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "kept on 2.x on purpose (\u2021)",
                 "reason_id": null,
                 "reason_by": "user",
                 "expires": null,
@@ -13140,20 +14018,20 @@ export const d_B_accepted_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -13170,7 +14048,7 @@ export const d_B_accepted_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -13199,13 +14077,22 @@ export const d_B_accepted_dagger = {
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "5.x",
                                     "version": "v5.4.52",
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.6",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -13224,7 +14111,7 @@ export const d_B_accepted_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -13240,7 +14127,7 @@ export const d_B_accepted_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -14323,7 +15210,7 @@ export const d_B_also_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -14338,7 +15225,7 @@ export const d_B_also_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -14532,7 +15419,7 @@ export const d_B_also_dagger = {
                         "replacement": null,
                         "quiet_years": null,
                         "to_branch": "5.x",
-                        "version": "v5.4.52",
+                        "version": "v5.4.0",
                         "newest": "v5.4.52",
                         "constraint": "^5.4",
                         "latest": null,
@@ -14561,26 +15448,27 @@ export const d_B_also_dagger = {
                                 "basis": "branch_releasing"
                             },
                             {
-                                "kind": "flag",
-                                "id": "old-promise",
-                                "basis": "released_after_ga"
-                            },
-                            {
                                 "kind": "advisory",
                                 "id": "PKSA-4wjj-gy1p-ft3r",
                                 "basis": "outside_range"
                             }
                         ],
-                        "unverified": [],
+                        "unverified": [
+                            {
+                                "kind": "flag",
+                                "id": "old-promise",
+                                "reason": "undated"
+                            }
+                        ],
                         "adds": [],
                         "leaves": [],
-                        "clears_all": true,
+                        "clears_all": false,
                         "if_applied": {
-                            "total": 0,
-                            "verdict": "ok",
-                            "lead": null,
+                            "total": 16,
+                            "verdict": "high",
+                            "lead": "old-promise",
                             "deciding_advisory": null,
-                            "at_most": false,
+                            "at_most": true,
                             "assumes": [
                                 "clears_hold",
                                 "composer_resolves"
@@ -14596,7 +15484,7 @@ export const d_B_also_dagger = {
                                 "symfony/monolog-bridge:^5.4"
                             ]
                         ],
-                        "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
+                        "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
                     }
                 ],
                 "text": "composer update symfony/monolog-bridge (gets v2.8.52) \u2014 clears the advisory; left-behind, old-promise stay"
@@ -14717,20 +15605,20 @@ export const d_B_also_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -14747,7 +15635,7 @@ export const d_B_also_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -14793,7 +15681,7 @@ export const d_B_also_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 all fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 all fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -14801,7 +15689,7 @@ export const d_B_also_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -14817,7 +15705,7 @@ export const d_B_also_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -15862,21 +16750,15 @@ export const d_B_baselined_dagger = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/monolog-bridge"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/monolog-bridge"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -15914,7 +16796,7 @@ export const d_B_baselined_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -15933,7 +16815,7 @@ export const d_B_baselined_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -16007,7 +16889,7 @@ export const d_B_baselined_dagger = {
                         "role": "security",
                         "advisory": "PKSA-4wjj-gy1p-ft3r",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -16062,7 +16944,7 @@ export const d_B_baselined_dagger = {
                 "merged": [
                     "vulnerable"
                 ],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -16079,7 +16961,16 @@ export const d_B_baselined_dagger = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^2.6",
+                        "holder": null
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -16124,7 +17015,7 @@ export const d_B_baselined_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -16151,7 +17042,7 @@ export const d_B_baselined_dagger = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -16229,20 +17120,20 @@ export const d_B_baselined_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -16259,7 +17150,7 @@ export const d_B_baselined_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -16288,13 +17179,22 @@ export const d_B_baselined_dagger = {
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "5.x",
                                     "version": "v5.4.52",
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.6",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": {
@@ -16309,7 +17209,7 @@ export const d_B_baselined_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -16317,7 +17217,7 @@ export const d_B_baselined_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -16333,7 +17233,7 @@ export const d_B_baselined_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -16371,7 +17271,7 @@ export const d_B_baselined_dagger = {
                         "recorded": null,
                         "now": {
                             "severity": "high",
-                            "fix_kind": "update"
+                            "fix_kind": "upgrade"
                         }
                     }
                 ]
@@ -16408,7 +17308,7 @@ export const d_B_baselined_dagger = {
                                 "role": "security",
                                 "advisory": "PKSA-4wjj-gy1p-ft3r",
                                 "severity": "high",
-                                "fix_kind": "update",
+                                "fix_kind": "upgrade",
                                 "weight": 16,
                                 "multiplier": 1,
                                 "points": 16,
@@ -17425,21 +18325,15 @@ export const d_B_dev_dagger = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/monolog-bridge"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/monolog-bridge"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -17473,7 +18367,7 @@ export const d_B_dev_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -17488,7 +18382,7 @@ export const d_B_dev_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -17562,7 +18456,7 @@ export const d_B_dev_dagger = {
                         "role": "security",
                         "advisory": "PKSA-4wjj-gy1p-ft3r",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -17625,7 +18519,7 @@ export const d_B_dev_dagger = {
                 "merged": [
                     "vulnerable"
                 ],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -17642,7 +18536,16 @@ export const d_B_dev_dagger = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require-dev",
+                        "constraint": "^2.6",
+                        "holder": null
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -17687,7 +18590,7 @@ export const d_B_dev_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -17714,7 +18617,7 @@ export const d_B_dev_dagger = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -17783,7 +18686,7 @@ export const d_B_dev_dagger = {
             "depth": 0,
             "depth_unmeasured": null,
             "named_in": [
-                "require"
+                "require-dev"
             ],
             "direct_dependents": [
                 "symfony/monolog-bridge"
@@ -17792,20 +18695,20 @@ export const d_B_dev_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -17822,7 +18725,7 @@ export const d_B_dev_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -17851,13 +18754,22 @@ export const d_B_dev_dagger = {
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "5.x",
                                     "version": "v5.4.52",
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require-dev",
+                                            "constraint": "^2.6",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -17868,7 +18780,7 @@ export const d_B_dev_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -17876,7 +18788,7 @@ export const d_B_dev_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -17892,7 +18804,7 @@ export const d_B_dev_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -18973,7 +19885,7 @@ export const d_B_gate_flag = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -18988,7 +19900,7 @@ export const d_B_gate_flag = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -19293,20 +20205,20 @@ export const d_B_gate_flag = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -19323,7 +20235,7 @@ export const d_B_gate_flag = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -19378,7 +20290,7 @@ export const d_B_gate_flag = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -19386,7 +20298,7 @@ export const d_B_gate_flag = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -19402,7 +20314,7 @@ export const d_B_gate_flag = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -20492,7 +21404,7 @@ export const d_B_gate_list = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -20507,7 +21419,7 @@ export const d_B_gate_list = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -20812,20 +21724,20 @@ export const d_B_gate_list = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -20842,7 +21754,7 @@ export const d_B_gate_list = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -20897,7 +21809,7 @@ export const d_B_gate_list = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -20905,7 +21817,7 @@ export const d_B_gate_list = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -20921,7 +21833,7 @@ export const d_B_gate_list = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -21995,7 +22907,7 @@ export const d_B_gate_none = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -22010,7 +22922,7 @@ export const d_B_gate_none = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -22315,20 +23227,20 @@ export const d_B_gate_none = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -22345,7 +23257,7 @@ export const d_B_gate_none = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -22400,7 +23312,7 @@ export const d_B_gate_none = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -22408,7 +23320,7 @@ export const d_B_gate_none = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -22424,7 +23336,7 @@ export const d_B_gate_none = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -23499,7 +24411,7 @@ export const d_B_offline_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -23514,7 +24426,7 @@ export const d_B_offline_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 }
             ],
             "score": {
@@ -23607,7 +24519,7 @@ export const d_B_offline_dagger = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "5.x",
-                "version": "v5.4.52",
+                "version": "v5.4.0",
                 "newest": "v5.4.52",
                 "constraint": "^5.4",
                 "latest": null,
@@ -23625,23 +24537,24 @@ export const d_B_offline_dagger = {
                         "kind": "flag",
                         "id": "left-behind",
                         "basis": "branch_releasing"
-                    },
+                    }
+                ],
+                "unverified": [
                     {
                         "kind": "flag",
                         "id": "old-promise",
-                        "basis": "released_after_ga"
+                        "reason": "undated"
                     }
                 ],
-                "unverified": [],
                 "adds": [],
                 "leaves": [],
-                "clears_all": true,
+                "clears_all": false,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 16,
+                    "verdict": "high",
+                    "lead": "old-promise",
                     "deciding_advisory": null,
-                    "at_most": false,
+                    "at_most": true,
                     "assumes": [
                         "clears_hold",
                         "composer_resolves",
@@ -23660,7 +24573,7 @@ export const d_B_offline_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "unchecked",
@@ -23732,20 +24645,20 @@ export const d_B_offline_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -23762,7 +24675,7 @@ export const d_B_offline_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -23792,7 +24705,7 @@ export const d_B_offline_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -23800,7 +24713,7 @@ export const d_B_offline_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -23816,7 +24729,7 @@ export const d_B_offline_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -24909,7 +25822,7 @@ export const d_B_offline_high_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -24924,7 +25837,7 @@ export const d_B_offline_high_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 }
             ],
             "score": {
@@ -25017,7 +25930,7 @@ export const d_B_offline_high_dagger = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "5.x",
-                "version": "v5.4.52",
+                "version": "v5.4.0",
                 "newest": "v5.4.52",
                 "constraint": "^5.4",
                 "latest": null,
@@ -25035,23 +25948,24 @@ export const d_B_offline_high_dagger = {
                         "kind": "flag",
                         "id": "left-behind",
                         "basis": "branch_releasing"
-                    },
+                    }
+                ],
+                "unverified": [
                     {
                         "kind": "flag",
                         "id": "old-promise",
-                        "basis": "released_after_ga"
+                        "reason": "undated"
                     }
                 ],
-                "unverified": [],
                 "adds": [],
                 "leaves": [],
-                "clears_all": true,
+                "clears_all": false,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 16,
+                    "verdict": "high",
+                    "lead": "old-promise",
                     "deciding_advisory": null,
-                    "at_most": false,
+                    "at_most": true,
                     "assumes": [
                         "clears_hold",
                         "composer_resolves",
@@ -25070,7 +25984,7 @@ export const d_B_offline_high_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "unchecked",
@@ -25142,20 +26056,20 @@ export const d_B_offline_high_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -25172,7 +26086,7 @@ export const d_B_offline_high_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -25202,7 +26116,7 @@ export const d_B_offline_high_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -25210,7 +26124,7 @@ export const d_B_offline_high_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -25226,7 +26140,7 @@ export const d_B_offline_high_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -26303,7 +27217,7 @@ export const d_B = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -26318,7 +27232,7 @@ export const d_B = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -26623,20 +27537,20 @@ export const d_B = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -26653,7 +27567,7 @@ export const d_B = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -26708,7 +27622,7 @@ export const d_B = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -26716,7 +27630,7 @@ export const d_B = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -26732,7 +27646,7 @@ export const d_B = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -29201,23 +30115,8 @@ export const d_C_bitbucket_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [
-        "Bitbucket credentials not set: repository activity checked for 0 candidate packages, 1 packages skipped (add bitbucket.org credentials to auth.json to check all)"
-    ],
-    "note_details": [
-        {
-            "code": "repository_activity_anonymous_cap",
-            "text": "Bitbucket credentials not set: repository activity checked for 0 candidate packages, 1 packages skipped (add bitbucket.org credentials to auth.json to check all)",
-            "docs_url": "https://lockrot.dev/notes/#repository_activity_anonymous_cap",
-            "sets_network_failures": false,
-            "data": {
-                "forge_id": "bitbucket",
-                "checked": 0,
-                "skipped_no_token": 1,
-                "skipped_budget": 0
-            }
-        }
-    ],
+    "notes": [],
+    "note_details": [],
     "findings": [
         {
             "package": "symfony/debug",
@@ -29239,20 +30138,21 @@ export const d_C_bitbucket_dagger = {
                     "baseline": null,
                     "signal_ids": [
                         "S1",
-                        "S2"
+                        "S2",
+                        "S4"
                     ],
                     "degree": {
                         "reasons": [
                             "marked"
                         ],
-                        "liveness_complete": false
+                        "liveness_complete": true
                     },
                     "headline": {
                         "unit": "reason",
                         "value": "marked",
                         "source": null
                     },
-                    "summary": "marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago)"
+                    "summary": "marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago)"
                 },
                 {
                     "id": "old-promise",
@@ -29418,16 +30318,7 @@ export const d_C_bitbucket_dagger = {
                 "ignored_count": 0
             },
             "checks_missing": [],
-            "checks_skipped": [
-                {
-                    "check": "repository_activity",
-                    "reason": "no_token",
-                    "blocks": [
-                        "S3",
-                        "S4"
-                    ]
-                }
-            ],
+            "checks_skipped": [],
             "unchecked_accepted": [],
             "maintenance_judged": true,
             "metadata": {
@@ -29436,14 +30327,14 @@ export const d_C_bitbucket_dagger = {
                 "message": null
             },
             "activity": {
-                "status": "not_read",
-                "reason": "no_token",
+                "status": "read",
+                "reason": null,
                 "forge": "bitbucket",
                 "host": "bitbucket.org",
                 "repo": "symfony/debug",
-                "event": null,
-                "archived": null,
-                "fetched_at": null,
+                "event": "commit",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
                 "cached_at": null
             },
             "allowlist": null,
@@ -29499,6 +30390,19 @@ export const d_C_bitbucket_dagger = {
                     }
                 },
                 {
+                    "id": "S4",
+                    "level": "warn",
+                    "summary": "last commit 2022-07-29 (4.2 years ago)",
+                    "data": {
+                        "last_push": "2022-07-29T12:25:06+00:00",
+                        "repo": "symfony/debug",
+                        "host": "bitbucket.org",
+                        "years": 4.2,
+                        "forge": "bitbucket",
+                        "event": "commit"
+                    }
+                },
+                {
                     "id": "S5",
                     "level": "warn",
                     "summary": "released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
@@ -29512,7 +30416,7 @@ export const d_C_bitbucket_dagger = {
                     }
                 }
             ],
-            "evidence": "abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago); old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago); old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 1.76,
@@ -29539,8 +30443,12 @@ export const d_C_bitbucket_dagger = {
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
-                "push": null,
-                "push_unmeasured": "no_token"
+                "push": {
+                    "at": "2022-07-29T12:25:06+00:00",
+                    "years": 4.2,
+                    "level": "warn"
+                },
+                "push_unmeasured": null
             },
             "baseline": null,
             "gate": {
@@ -30579,26 +31487,8 @@ export const d_C_gitlab_hosted_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [
-        "Repository activity not checked for 1 package on hosts lockrot cannot ask: gitlab.example.com (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host."
-    ],
-    "note_details": [
-        {
-            "code": "repository_activity_host_not_supported",
-            "text": "Repository activity not checked for 1 package on hosts lockrot cannot ask: gitlab.example.com (1). A host that runs GitLab is asked once Composer's gitlab-domains lists it; lockrot cannot ask other forge software (Forgejo, Gitea) or a Subversion host.",
-            "docs_url": "https://lockrot.dev/notes/#repository_activity_host_not_supported",
-            "sets_network_failures": false,
-            "data": {
-                "hosts": [
-                    {
-                        "host": "gitlab.example.com",
-                        "packages": 1,
-                        "listed_in": null
-                    }
-                ]
-            }
-        }
-    ],
+    "notes": [],
+    "note_details": [],
     "findings": [
         {
             "package": "symfony/debug",
@@ -30620,20 +31510,23 @@ export const d_C_gitlab_hosted_dagger = {
                     "baseline": null,
                     "signal_ids": [
                         "S1",
-                        "S2"
+                        "S3",
+                        "S2",
+                        "S4"
                     ],
                     "degree": {
                         "reasons": [
-                            "marked"
+                            "marked",
+                            "archived"
                         ],
-                        "liveness_complete": false
+                        "liveness_complete": true
                     },
                     "headline": {
                         "unit": "reason",
-                        "value": "marked",
+                        "value": "archived",
                         "source": null
                     },
-                    "summary": "marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago)"
+                    "summary": "marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitLab; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago)"
                 },
                 {
                     "id": "old-promise",
@@ -30799,16 +31692,7 @@ export const d_C_gitlab_hosted_dagger = {
                 "ignored_count": 0
             },
             "checks_missing": [],
-            "checks_skipped": [
-                {
-                    "check": "repository_activity",
-                    "reason": "host_not_supported",
-                    "blocks": [
-                        "S3",
-                        "S4"
-                    ]
-                }
-            ],
+            "checks_skipped": [],
             "unchecked_accepted": [],
             "maintenance_judged": true,
             "metadata": {
@@ -30817,14 +31701,14 @@ export const d_C_gitlab_hosted_dagger = {
                 "message": null
             },
             "activity": {
-                "status": "not_read",
-                "reason": "host_not_supported",
-                "forge": null,
-                "host": "gitlab.example.com",
-                "repo": null,
-                "event": null,
-                "archived": null,
-                "fetched_at": null,
+                "status": "read",
+                "reason": null,
+                "forge": "gitlab",
+                "host": "gitlab.example.com/gitlab",
+                "repo": "symfony/debug",
+                "event": "commit",
+                "archived": true,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
                 "cached_at": null
             },
             "allowlist": null,
@@ -30880,6 +31764,29 @@ export const d_C_gitlab_hosted_dagger = {
                     }
                 },
                 {
+                    "id": "S3",
+                    "level": "high",
+                    "summary": "repository archived on GitLab",
+                    "data": {
+                        "repo": "symfony/debug",
+                        "host": "gitlab.example.com/gitlab",
+                        "forge": "gitlab"
+                    }
+                },
+                {
+                    "id": "S4",
+                    "level": "warn",
+                    "summary": "last commit 2022-07-29 (4.2 years ago)",
+                    "data": {
+                        "last_push": "2022-07-29T12:25:06+00:00",
+                        "repo": "symfony/debug",
+                        "host": "gitlab.example.com/gitlab",
+                        "years": 4.2,
+                        "forge": "gitlab",
+                        "event": "commit"
+                    }
+                },
+                {
                     "id": "S5",
                     "level": "warn",
                     "summary": "released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
@@ -30893,7 +31800,7 @@ export const d_C_gitlab_hosted_dagger = {
                     }
                 }
             ],
-            "evidence": "abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago); old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "abandoned: marked abandoned by its registry, replacement: symfony/error-handler; its repository is archived on GitLab; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago); old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 1.76,
@@ -30920,8 +31827,12 @@ export const d_C_gitlab_hosted_dagger = {
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
-                "push": null,
-                "push_unmeasured": "host_not_supported"
+                "push": {
+                    "at": "2022-07-29T12:25:06+00:00",
+                    "years": 4.2,
+                    "level": "warn"
+                },
+                "push_unmeasured": null
             },
             "baseline": null,
             "gate": {
@@ -31740,7 +32651,7 @@ export const d_C_offline_dagger = {
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
-    "network_failures": false,
+    "network_failures": true,
     "counts": {
         "critical": 1,
         "high": 0,
@@ -31969,8 +32880,35 @@ export const d_C_offline_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "offline: repository metadata served from Composer's cache",
+        "GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug"
+    ],
+    "note_details": [
+        {
+            "code": "offline",
+            "text": "offline: repository metadata served from Composer's cache",
+            "docs_url": "https://lockrot.dev/notes/#offline",
+            "sets_network_failures": false,
+            "data": {}
+        },
+        {
+            "code": "repository_activity_unreachable",
+            "text": "GitHub unreachable for 1 repositories: not stubbed: https://api.github.com/repos/symfony/debug",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_unreachable",
+            "sets_network_failures": true,
+            "data": {
+                "forge_id": "github",
+                "repositories": [
+                    {
+                        "host": "github.com",
+                        "repo": "symfony/debug",
+                        "message": "not stubbed: https://api.github.com/repos/symfony/debug"
+                    }
+                ]
+            }
+        }
+    ],
     "findings": [
         {
             "package": "symfony/debug",
@@ -32174,7 +33112,7 @@ export const d_C_offline_dagger = {
             "checks_skipped": [
                 {
                     "check": "repository_activity",
-                    "reason": "no_repository",
+                    "reason": "offline",
                     "blocks": [
                         "S3",
                         "S4"
@@ -32190,10 +33128,10 @@ export const d_C_offline_dagger = {
             },
             "activity": {
                 "status": "not_read",
-                "reason": "no_repository",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "reason": "offline",
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/debug",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -32312,7 +33250,7 @@ export const d_C_offline_dagger = {
                 },
                 "branch_release_unmeasured": null,
                 "push": null,
-                "push_unmeasured": "no_repository"
+                "push_unmeasured": "offline"
             },
             "baseline": null,
             "gate": {
@@ -33361,8 +34299,23 @@ export const d_C_tokenless_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)"
+    ],
+    "note_details": [
+        {
+            "code": "repository_activity_anonymous_cap",
+            "text": "GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_anonymous_cap",
+            "sets_network_failures": false,
+            "data": {
+                "forge_id": "github",
+                "checked": 0,
+                "skipped_no_token": 1,
+                "skipped_budget": 0
+            }
+        }
+    ],
     "findings": [
         {
             "package": "symfony/debug",
@@ -33566,7 +34519,7 @@ export const d_C_tokenless_dagger = {
             "checks_skipped": [
                 {
                     "check": "repository_activity",
-                    "reason": "no_repository",
+                    "reason": "no_token",
                     "blocks": [
                         "S3",
                         "S4"
@@ -33582,10 +34535,10 @@ export const d_C_tokenless_dagger = {
             },
             "activity": {
                 "status": "not_read",
-                "reason": "no_repository",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "reason": "no_token",
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/debug",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -33685,7 +34638,7 @@ export const d_C_tokenless_dagger = {
                 },
                 "branch_release_unmeasured": null,
                 "push": null,
-                "push_unmeasured": "no_repository"
+                "push_unmeasured": "no_token"
             },
             "baseline": null,
             "gate": {
@@ -36293,10 +37246,10 @@ export const d_D_partial_dagger = {
                 "by": "project",
                 "pattern": "tubalmartin/cssmin",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "a single-file minifier, finished",
                 "reason_id": null,
                 "reason_by": "user",
-                "expires": null,
+                "expires": "2027-03-31",
                 "flag_ids": [
                     "stale"
                 ]
@@ -38501,7 +39454,7 @@ export const d_E_ignored_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 5
                 }
             ]
         },
@@ -38728,12 +39681,12 @@ export const d_E_ignored_dagger = {
         "packages": {
             "vulnerable": 1,
             "unchecked": 0,
-            "ignored": 0,
+            "ignored": 1,
             "clear": 0
         },
         "advisories": {
             "counted": 3,
-            "ignored": 0
+            "ignored": 1
         },
         "severities": {
             "critical": 0,
@@ -38930,13 +39883,13 @@ export const d_E_ignored_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],
@@ -38948,8 +39901,18 @@ export const d_E_ignored_dagger = {
                     "unrated": 0,
                     "low": 3
                 },
-                "ignored": [],
-                "ignored_count": 0,
+                "ignored": [
+                    {
+                        "id": "PKSA-ign0-0000-0000",
+                        "cve": "CVE-2026-00001",
+                        "title": "an advisory the project ignores",
+                        "severity": "medium",
+                        "by": "audit.ignore",
+                        "matched": "id",
+                        "reason": "not reachable in our use (\u2021)"
+                    }
+                ],
+                "ignored_count": 1,
                 "fix_kind": "update",
                 "installed_branch_fixes": {
                     "fixed": 3,
@@ -39936,7 +40899,7 @@ export const d_E_ignored_whole_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 5
                 }
             ]
         },
@@ -40197,19 +41160,19 @@ export const d_E_ignored_whole_dagger = {
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml: 3 counted advisories; accept them in Composer's audit policy if that is the decision"
+        "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision"
     ],
     "note_details": [
         {
             "code": "ignore_does_not_cover_advisories",
-            "text": "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml: 3 counted advisories; accept them in Composer's audit policy if that is the decision",
+            "text": "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/yaml (ignore[] symfony/*): 3 counted advisories; accept them in Composer's audit policy if that is the decision",
             "docs_url": "https://lockrot.dev/notes/#ignore_does_not_cover_advisories",
             "sets_network_failures": false,
             "data": {
                 "entries": [
                     {
                         "package": "symfony/yaml",
-                        "pattern": "symfony/yaml",
+                        "pattern": "symfony/*",
                         "advisories": [
                             "PKSA-b14r-zh1d-vdrc",
                             "PKSA-ft77-7h5f-p3r6",
@@ -40387,13 +41350,13 @@ export const d_E_ignored_whole_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],
@@ -40477,9 +41440,9 @@ export const d_E_ignored_whole_dagger = {
             "activity": {
                 "status": "not_read",
                 "reason": "allowlisted",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/yaml",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -40487,9 +41450,9 @@ export const d_E_ignored_whole_dagger = {
             },
             "allowlist": {
                 "by": "project",
-                "pattern": "symfony/yaml",
+                "pattern": "symfony/*",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "symfony is upgraded on its own schedule (\u2021)",
                 "reason_id": null,
                 "reason_by": "user",
                 "expires": null,
@@ -40608,7 +41571,7 @@ export const d_E_ignored_whole_dagger = {
                 }
             ],
             "evidence": "vulnerable: 3 advisories: 3 low \u2014 all fixed on 5.x; worst: CVE-2026-45133 YAML Parser Stack Exhaustion via Unbounded Recursion in Nested Blocks, Sequences, and Mappings",
-            "allowlist_reason": "accepted by the test",
+            "allowlist_reason": "symfony is upgraded on its own schedule (\u2021)",
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 3.43,
             "age": {
@@ -41407,7 +42370,7 @@ export const d_E = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 5
                 }
             ]
         },
@@ -41836,13 +42799,13 @@ export const d_E = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],
@@ -43363,9 +44326,9 @@ export const d_F = {
             "activity": {
                 "status": "not_read",
                 "reason": "allowlisted",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/polyfill-intl-idn",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -44239,8 +45202,8 @@ export const d_G_tag_dagger = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -44265,7 +45228,7 @@ export const d_G_tag_dagger = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 2,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -44793,6 +45756,28 @@ export const d_G_tag_dagger = {
                         "last_stable_dated_by": null,
                         "snapshot_time": "2018-06-01T00:00:00+00:00",
                         "tag_relation": "newer"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "friendsofsymfony/oauth2-php",
+                                "chain": [
+                                    "friendsofsymfony/oauth-server-bundle",
+                                    "friendsofsymfony/oauth2-php"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],
@@ -45600,8 +46585,8 @@ export const d_G = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -45626,7 +46611,7 @@ export const d_G = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 2,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -46131,6 +47116,28 @@ export const d_G = {
                         "last_stable_dated_by": null,
                         "snapshot_time": "2022-03-24T10:22:23+00:00",
                         "tag_relation": "older"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "friendsofsymfony/oauth2-php",
+                                "chain": [
+                                    "friendsofsymfony/oauth-server-bundle",
+                                    "friendsofsymfony/oauth2-php"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],
@@ -50188,9 +51195,9 @@ export const d_affected_range_unknown_dagger = {
             "activity": {
                 "status": "not_read",
                 "reason": "allowlisted",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/polyfill-intl-idn",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -51090,7 +52097,7 @@ export const d_cache_subscriber = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 4,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -51618,6 +52625,45 @@ export const d_cache_subscriber = {
                         "php_constraint": ">=5.4.0",
                         "written_for_php": 5,
                         "released": "2019-09-16T13:44:55+00:00"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
+                    "data": {
+                        "flagged": 2,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/ringphp",
+                                "chain": [
+                                    "guzzlehttp/cache-subscriber",
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/streams",
+                                "chain": [
+                                    "guzzlehttp/cache-subscriber",
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp",
+                                    "guzzlehttp/streams"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],
@@ -52436,7 +53482,7 @@ export const d_commonmark = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 18
                 }
             ]
         },
@@ -52933,13 +53979,13 @@ export const d_commonmark = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 18,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 18,
                         "reason": null
                     }
                 ],
@@ -53951,7 +54997,7 @@ export const d_composite = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 4,
-                    "records": 20
+                    "records": 33
                 }
             ]
         },
@@ -54365,11 +55411,19 @@ export const d_composite = {
                         "link": "require",
                         "constraint": "^1.41|^2.10",
                         "holder": {
-                            "verdict": "unknown",
-                            "lead": null,
-                            "flag_ids": [],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise",
+                                "vulnerable"
+                            ],
                             "replacement": null,
-                            "next_step": null
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "4.x",
+                                "constraint": "^4.4.51"
+                            }
                         }
                     }
                 ],
@@ -54484,20 +55538,20 @@ export const d_composite = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.2 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.0) and symfony/twig-bridge v3.4.47 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -54617,11 +55671,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54664,11 +55726,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54711,11 +55781,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54758,11 +55836,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54805,11 +55891,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54852,11 +55946,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54899,11 +56001,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54946,11 +56056,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -54993,11 +56111,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -55040,11 +56166,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -55087,11 +56221,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -55134,11 +56276,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -55181,11 +56331,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -55228,11 +56386,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -55275,11 +56441,19 @@ export const d_composite = {
                                             "link": "require",
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
-                                                "verdict": "unknown",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.4.51"
+                                                }
                                             }
                                         }
                                     ],
@@ -55374,7 +56548,7 @@ export const d_composite = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -55389,7 +56563,7 @@ export const d_composite = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -55694,20 +56868,20 @@ export const d_composite = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -55724,7 +56898,7 @@ export const d_composite = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -55779,7 +56953,7 @@ export const d_composite = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -55787,7 +56961,7 @@ export const d_composite = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -55803,7 +56977,7 @@ export const d_composite = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -56478,6 +57652,28 @@ export const d_composite = {
                         "snapshot_time": "2022-03-24T10:22:23+00:00",
                         "tag_relation": "older"
                     }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: friendsofsymfony/oauth2-php (stale)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "friendsofsymfony/oauth2-php",
+                                "chain": [
+                                    "friendsofsymfony/oauth-server-bundle",
+                                    "friendsofsymfony/oauth2-php"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
+                    }
                 }
             ],
             "evidence": "pinned: pinned to branch snapshot dev-master; stale: last release 2019-01-23 (7.7 years ago)",
@@ -57007,13 +58203,13 @@ export const d_composite = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],
@@ -57498,9 +58694,9 @@ export const d_composite = {
             "activity": {
                 "status": "not_read",
                 "reason": "allowlisted",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/polyfill-intl-idn",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -58619,21 +59815,15 @@ export const d_either_critical_dagger = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/debug"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/debug"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -58765,7 +59955,7 @@ export const d_either_critical_dagger = {
                         "role": "security",
                         "advisory": "PKSA-eith-0000-0001",
                         "severity": "critical",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 32,
                         "multiplier": 1,
                         "points": 32,
@@ -58868,7 +60058,7 @@ export const d_either_critical_dagger = {
                         "kind": "require",
                         "source": "vulnerable",
                         "merged": [],
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "reason": null,
                         "replacement": null,
                         "quiet_years": null,
@@ -58885,7 +60075,16 @@ export const d_either_critical_dagger = {
                             "raise_size": null
                         },
                         "crosses_major": true,
-                        "held_by": [],
+                        "held_by": [
+                            {
+                                "source": "root",
+                                "package": null,
+                                "version": null,
+                                "link": "require",
+                                "constraint": "~3.4",
+                                "holder": null
+                            }
+                        ],
                         "clears": [
                             {
                                 "kind": "advisory",
@@ -58929,7 +60128,7 @@ export const d_either_critical_dagger = {
                                 "symfony/debug:^4.4.0"
                             ]
                         ],
-                        "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+                        "text": "require symfony/debug ^4.4.0 \u2014 clears the advisory; 4.x needs php >=7.1.3, which require.php allows; the target php 8.4 runs it; abandoned stays; not checked: old-promise; held by composer.json (requires ~3.4); a new major brings its own requirements, which lockrot does not solve"
                     }
                 ],
                 "text": "replace with symfony/error-handler (named by its registry)"
@@ -58959,7 +60158,7 @@ export const d_either_critical_dagger = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -59101,13 +60300,22 @@ export const d_either_critical_dagger = {
                                 "points": 32,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "4.x",
                                     "version": "v4.4.0",
                                     "newest": "v4.4.44",
                                     "on_installed_branch": false,
                                     "php": ">=7.1.3",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~3.4",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -59968,7 +61176,7 @@ export const d_either_low_dev_dagger = {
     "include_dev": true,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
-    "network_failures": true,
+    "network_failures": false,
     "counts": {
         "critical": 0,
         "high": 0,
@@ -60203,27 +61411,8 @@ export const d_either_low_dev_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [
-        "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true&per_page=1"
-    ],
-    "note_details": [
-        {
-            "code": "repository_activity_unreachable",
-            "text": "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true&per_page=1",
-            "docs_url": "https://lockrot.dev/notes/#repository_activity_unreachable",
-            "sets_network_failures": true,
-            "data": {
-                "forge_id": "gitlab",
-                "repositories": [
-                    {
-                        "host": "gitlab.com",
-                        "repo": "balping/json-raw-encoder",
-                        "message": "not stubbed: https://gitlab.com/api/v4/projects/balping%2Fjson-raw-encoder/repository/commits?all=true&per_page=1"
-                    }
-                ]
-            }
-        }
-    ],
+    "notes": [],
+    "note_details": [],
     "findings": [
         {
             "package": "balping/json-raw-encoder",
@@ -60244,17 +61433,18 @@ export const d_either_low_dev_dagger = {
                     "role": "lead",
                     "baseline": null,
                     "signal_ids": [
-                        "S2"
+                        "S2",
+                        "S4"
                     ],
                     "degree": {
-                        "liveness_complete": false
+                        "liveness_complete": true
                     },
                     "headline": {
                         "unit": "years",
                         "value": 3.5,
                         "source": "release"
                     },
-                    "summary": "last release 2023-03-27 (3.5 years ago)"
+                    "summary": "last release 2023-03-27 (3.5 years ago); last commit 2023-03-27 (3.5 years ago)"
                 },
                 {
                     "id": "vulnerable",
@@ -60460,16 +61650,7 @@ export const d_either_low_dev_dagger = {
                 "gets": null,
                 "partial": null
             },
-            "checks_missing": [
-                {
-                    "check": "repository_activity",
-                    "reason": "fetch_failed",
-                    "blocks": [
-                        "S3",
-                        "S4"
-                    ]
-                }
-            ],
+            "checks_missing": [],
             "checks_skipped": [],
             "unchecked_accepted": [],
             "maintenance_judged": true,
@@ -60479,14 +61660,14 @@ export const d_either_low_dev_dagger = {
                 "message": null
             },
             "activity": {
-                "status": "not_read",
-                "reason": "fetch_failed",
+                "status": "read",
+                "reason": null,
                 "forge": "gitlab",
                 "host": "gitlab.com",
                 "repo": "balping/json-raw-encoder",
-                "event": null,
-                "archived": null,
-                "fetched_at": null,
+                "event": "commit",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
                 "cached_at": null
             },
             "allowlist": null,
@@ -60529,6 +61710,19 @@ export const d_either_low_dev_dagger = {
                     }
                 },
                 {
+                    "id": "S4",
+                    "level": "warn",
+                    "summary": "last commit 2023-03-27 (3.5 years ago)",
+                    "data": {
+                        "last_push": "2023-03-27T20:25:07+02:00",
+                        "repo": "balping/json-raw-encoder",
+                        "host": "gitlab.com",
+                        "years": 3.5,
+                        "forge": "gitlab",
+                        "event": "commit"
+                    }
+                },
+                {
                     "id": "S9",
                     "level": "warn",
                     "summary": "1 security advisory affects v1.0.2 (CVE-2026-00004)",
@@ -60562,30 +61756,9 @@ export const d_either_low_dev_dagger = {
                         "releases_read": true,
                         "complete": true
                     }
-                },
-                {
-                    "id": "S10",
-                    "level": "info",
-                    "summary": "repository activity not checked (the request failed), so S3 and S4 could not be read",
-                    "data": {
-                        "unchecked": [
-                            {
-                                "check": "repository_activity",
-                                "reason": "fetch_failed",
-                                "blocks": [
-                                    "S3",
-                                    "S4"
-                                ]
-                            }
-                        ],
-                        "blocks": [
-                            "S3",
-                            "S4"
-                        ]
-                    }
                 }
             ],
-            "evidence": "stale: last release 2023-03-27 (3.5 years ago); vulnerable: 1 advisory: 1 low \u2014 none fixed on 1.x; advisory: CVE-2026-00004 an advisory added to show the either opening (\u2021)",
+            "evidence": "stale: last release 2023-03-27 (3.5 years ago); last commit 2023-03-27 (3.5 years ago); vulnerable: 1 advisory: 1 low \u2014 none fixed on 1.x; advisory: CVE-2026-00004 an advisory added to show the either opening (\u2021)",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 0,
@@ -60612,8 +61785,12 @@ export const d_either_low_dev_dagger = {
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
-                "push": null,
-                "push_unmeasured": "fetch_failed"
+                "push": {
+                    "at": "2023-03-27T20:25:07+02:00",
+                    "years": 3.5,
+                    "level": "warn"
+                },
+                "push_unmeasured": null
             },
             "baseline": null,
             "gate": {
@@ -61629,21 +62806,15 @@ export const d_fail_on_config_dagger = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/monolog-bridge"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/monolog-bridge"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -61677,7 +62848,7 @@ export const d_fail_on_config_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -61692,7 +62863,7 @@ export const d_fail_on_config_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -61766,7 +62937,7 @@ export const d_fail_on_config_dagger = {
                         "role": "security",
                         "advisory": "PKSA-4wjj-gy1p-ft3r",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -61821,7 +62992,7 @@ export const d_fail_on_config_dagger = {
                 "merged": [
                     "vulnerable"
                 ],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -61838,7 +63009,16 @@ export const d_fail_on_config_dagger = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^2.6",
+                        "holder": null
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -61883,7 +63063,7 @@ export const d_fail_on_config_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -61910,7 +63090,7 @@ export const d_fail_on_config_dagger = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -61988,20 +63168,20 @@ export const d_fail_on_config_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -62018,7 +63198,7 @@ export const d_fail_on_config_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -62047,13 +63227,22 @@ export const d_fail_on_config_dagger = {
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "5.x",
                                     "version": "v5.4.52",
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.6",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -62064,7 +63253,7 @@ export const d_fail_on_config_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -62072,7 +63261,7 @@ export const d_fail_on_config_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -62088,7 +63277,7 @@ export const d_fail_on_config_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -63114,21 +64303,15 @@ export const d_fail_on_default_dagger = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/monolog-bridge"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/monolog-bridge"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -63162,7 +64345,7 @@ export const d_fail_on_default_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -63177,7 +64360,7 @@ export const d_fail_on_default_dagger = {
                         "value": 5,
                         "source": null
                     },
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
                 },
                 {
                     "id": "vulnerable",
@@ -63251,7 +64434,7 @@ export const d_fail_on_default_dagger = {
                         "role": "security",
                         "advisory": "PKSA-4wjj-gy1p-ft3r",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -63306,7 +64489,7 @@ export const d_fail_on_default_dagger = {
                 "merged": [
                     "vulnerable"
                 ],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -63323,7 +64506,16 @@ export const d_fail_on_default_dagger = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^2.6",
+                        "holder": null
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -63368,7 +64560,7 @@ export const d_fail_on_default_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4.52 \u2014 clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -63395,7 +64587,7 @@ export const d_fail_on_default_dagger = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -63473,20 +64665,20 @@ export const d_fail_on_default_dagger = {
                 {
                     "id": "S5",
                     "level": "warn",
-                    "summary": "released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+                    "summary": "released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
                     "data": {
                         "target_php": "8.4",
                         "target_major": "8.0",
                         "ga_date": "2020-11-26",
                         "php_constraint": ">=5.3.3",
                         "written_for_php": 5,
-                        "released": "2016-01-14T10:11:35+00:00"
+                        "released": "2015-06-25T11:21:15+00:00"
                     }
                 },
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -63503,7 +64695,7 @@ export const d_fail_on_default_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -63532,13 +64724,22 @@ export const d_fail_on_default_dagger = {
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "5.x",
                                     "version": "v5.4.52",
                                     "newest": "v5.4.52",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^2.6",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -63549,7 +64750,7 @@ export const d_fail_on_default_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2015-06-25 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 high \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -63557,7 +64758,7 @@ export const d_fail_on_default_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -63573,7 +64774,7 @@ export const d_fail_on_default_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -64353,7 +65554,7 @@ export const d_feeds_drupal_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 15
+                    "records": 26
                 }
             ]
         },
@@ -64844,13 +66045,13 @@ export const d_feeds_drupal_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -66116,7 +67317,7 @@ export const d_flysystem = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 1
+                    "records": 2
                 }
             ]
         },
@@ -66141,7 +67342,7 @@ export const d_flysystem = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 3,
+    "packages_checked": 4,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -66380,21 +67581,15 @@ export const d_flysystem = {
             "low": 1
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "league/flysystem"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "league/flysystem"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -66506,7 +67701,7 @@ export const d_flysystem = {
                         "role": "security",
                         "advisory": "PKSA-w9tt-7782-78jx",
                         "severity": "low",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 2,
                         "multiplier": 1,
                         "points": 2,
@@ -66557,7 +67752,7 @@ export const d_flysystem = {
                 "merged": [
                     "vulnerable"
                 ],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -66574,7 +67769,49 @@ export const d_flysystem = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "package",
+                        "package": "barryvdh/elfinder-flysystem-driver",
+                        "version": "v0.2.1",
+                        "link": "require",
+                        "constraint": "^1.0",
+                        "holder": {
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "require",
+                                "to_branch": "0.6.x",
+                                "constraint": "^0.6.0"
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "league/flysystem-cached-adapter",
+                        "version": "1.1.0",
+                        "link": "require",
+                        "constraint": "~1.0",
+                        "holder": {
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -66603,8 +67840,8 @@ export const d_flysystem = {
                     ]
                 },
                 "composer_moves_because": [
-                    "crosses_major",
-                    "transitive"
+                    "holders",
+                    "crosses_major"
                 ],
                 "commands": [],
                 "through": [
@@ -66618,20 +67855,20 @@ export const d_flysystem = {
                     }
                 ],
                 "also": [],
-                "text": "move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+                "text": "move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 1,
+                "records": 2,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 1,
+                        "records": 2,
                         "reason": null
                     }
                 ],
@@ -66645,7 +67882,7 @@ export const d_flysystem = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -66769,13 +68006,55 @@ export const d_flysystem = {
                                 "points": 2,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "3.x",
                                     "version": "3.36.0",
                                     "newest": "3.36.0",
                                     "on_installed_branch": false,
                                     "php": "^8.0.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "package",
+                                            "package": "barryvdh/elfinder-flysystem-driver",
+                                            "version": "v0.2.1",
+                                            "link": "require",
+                                            "constraint": "^1.0",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "require",
+                                                    "to_branch": "0.6.x",
+                                                    "constraint": "^0.6.0"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "league/flysystem-cached-adapter",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "~1.0",
+                                            "holder": {
+                                                "verdict": "low",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -67621,7 +68900,7 @@ export const d_gitlab_anon_dagger = {
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
-    "network_failures": true,
+    "network_failures": false,
     "counts": {
         "critical": 0,
         "high": 1,
@@ -67868,27 +69147,8 @@ export const d_gitlab_anon_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [
-        "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1"
-    ],
-    "note_details": [
-        {
-            "code": "repository_activity_unreachable",
-            "text": "GitLab unreachable for 1 repositories: not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1",
-            "docs_url": "https://lockrot.dev/notes/#repository_activity_unreachable",
-            "sets_network_failures": true,
-            "data": {
-                "forge_id": "gitlab",
-                "repositories": [
-                    {
-                        "host": "gitlab.com",
-                        "repo": "hoaproject/Consistency",
-                        "message": "not stubbed: https://gitlab.com/api/v4/projects/hoaproject%2FConsistency/repository/commits?all=true&per_page=1"
-                    }
-                ]
-            }
-        }
-    ],
+    "notes": [],
+    "note_details": [],
     "findings": [
         {
             "package": "hoa/consistency",
@@ -67910,20 +69170,21 @@ export const d_gitlab_anon_dagger = {
                     "baseline": null,
                     "signal_ids": [
                         "S1",
-                        "S2"
+                        "S2",
+                        "S4"
                     ],
                     "degree": {
                         "reasons": [
                             "marked"
                         ],
-                        "liveness_complete": false
+                        "liveness_complete": true
                     },
                     "headline": {
                         "unit": "reason",
                         "value": "marked",
                         "source": null
                     },
-                    "summary": "marked abandoned by its registry; last release 2017-08-29 (9.1 years ago)"
+                    "summary": "marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago)"
                 },
                 {
                     "id": "old-promise",
@@ -68010,15 +69271,15 @@ export const d_gitlab_anon_dagger = {
                         },
                         "revealed": [
                             {
-                                "flag": "stale",
-                                "role": "corroborating"
+                                "flag": "silent",
+                                "role": "lead"
                             }
                         ],
-                        "total": 9,
-                        "verdict": "medium",
-                        "lead": "old-promise",
+                        "total": 18,
+                        "verdict": "high",
+                        "lead": "silent",
                         "deciding_advisory": null,
-                        "at_least": true
+                        "at_least": false
                     },
                     {
                         "remove": {
@@ -68107,11 +69368,10 @@ export const d_gitlab_anon_dagger = {
             "checks_missing": [],
             "checks_skipped": [
                 {
-                    "check": "repository_activity",
-                    "reason": "fetch_failed",
+                    "check": "repository_archived",
+                    "reason": "no_token",
                     "blocks": [
-                        "S3",
-                        "S4"
+                        "S3"
                     ]
                 }
             ],
@@ -68123,14 +69383,14 @@ export const d_gitlab_anon_dagger = {
                 "message": null
             },
             "activity": {
-                "status": "not_read",
-                "reason": "fetch_failed",
+                "status": "read",
+                "reason": null,
                 "forge": "gitlab",
                 "host": "gitlab.com",
                 "repo": "hoaproject/Consistency",
-                "event": null,
+                "event": "commit",
                 "archived": null,
-                "fetched_at": null,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
                 "cached_at": null
             },
             "allowlist": null,
@@ -68184,6 +69444,19 @@ export const d_gitlab_anon_dagger = {
                     }
                 },
                 {
+                    "id": "S4",
+                    "level": "high",
+                    "summary": "last commit 2021-04-28 (5.4 years ago)",
+                    "data": {
+                        "last_push": "2021-04-28T21:38:16+00:00",
+                        "repo": "hoaproject/Consistency",
+                        "host": "gitlab.com",
+                        "years": 5.4,
+                        "forge": "gitlab",
+                        "event": "commit"
+                    }
+                },
+                {
                     "id": "S5",
                     "level": "warn",
                     "summary": "released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
@@ -68197,7 +69470,7 @@ export const d_gitlab_anon_dagger = {
                     }
                 }
             ],
-            "evidence": "abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
+            "evidence": "abandoned: marked abandoned by its registry; last release 2017-08-29 (9.1 years ago); last commit 2021-04-28 (5.4 years ago); old-promise: released 2017-05-02 for PHP 5 (php \">=5.5.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 0.33,
@@ -68224,8 +69497,12 @@ export const d_gitlab_anon_dagger = {
                     "dated_by": null
                 },
                 "branch_release_unmeasured": null,
-                "push": null,
-                "push_unmeasured": "fetch_failed"
+                "push": {
+                    "at": "2021-04-28T21:38:16+00:00",
+                    "years": 5.4,
+                    "level": "high"
+                },
+                "push_unmeasured": null
             },
             "baseline": null,
             "gate": {
@@ -69008,7 +70285,7 @@ export const d_guzzle_5 = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 14
+                    "records": 15
                 }
             ]
         },
@@ -69033,7 +70310,7 @@ export const d_guzzle_5 = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 3,
+    "packages_checked": 5,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -69252,21 +70529,15 @@ export const d_guzzle_5 = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "guzzlehttp/guzzle"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "guzzlehttp/guzzle"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -69395,7 +70666,7 @@ export const d_guzzle_5 = {
                         "role": "security",
                         "advisory": "PKSA-2z36-j4q9-rsfy",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -69460,7 +70731,7 @@ export const d_guzzle_5 = {
                 "kind": "require",
                 "source": "left-behind",
                 "merged": [],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -69477,7 +70748,56 @@ export const d_guzzle_5 = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^5.3.4",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "bdunogier/guzzle-site-authenticator",
+                        "version": "1.1.0",
+                        "link": "require",
+                        "constraint": "^5.3.1",
+                        "holder": {
+                            "verdict": "medium",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "php-http/guzzle5-adapter",
+                        "version": "2.0.0",
+                        "link": "require",
+                        "constraint": "^5.1",
+                        "holder": {
+                            "verdict": "critical",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ],
+                            "replacement": "php-http/guzzle7-adapter",
+                            "next_step": {
+                                "kind": "replace",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -69576,6 +70896,7 @@ export const d_guzzle_5 = {
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -69587,20 +70908,20 @@ export const d_guzzle_5 = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 14,
+                "records": 15,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 14,
+                        "records": 15,
                         "reason": null
                     }
                 ],
@@ -69614,7 +70935,7 @@ export const d_guzzle_5 = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -69694,6 +71015,43 @@ export const d_guzzle_5 = {
                     }
                 },
                 {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
+                    "data": {
+                        "flagged": 2,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/ringphp",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/streams",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp",
+                                    "guzzlehttp/streams"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "S8",
                     "level": "high",
                     "summary": "branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06)",
@@ -69742,13 +71100,62 @@ export const d_guzzle_5 = {
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69766,13 +71173,62 @@ export const d_guzzle_5 = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.6",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69790,13 +71246,62 @@ export const d_guzzle_5 = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69814,13 +71319,62 @@ export const d_guzzle_5 = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.2",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69838,13 +71392,62 @@ export const d_guzzle_5 = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69862,13 +71465,62 @@ export const d_guzzle_5 = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69886,13 +71538,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.12.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69910,13 +71611,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69934,13 +71684,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.12.3",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69958,13 +71757,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.2",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -69982,13 +71830,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -70006,13 +71903,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.12.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -70030,13 +71976,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.14.2",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -70054,13 +72049,62 @@ export const d_guzzle_5 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -70890,7 +72934,7 @@ export const d_guzzle_mixed = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 14
+                    "records": 15
                 }
             ]
         },
@@ -70915,11 +72959,11 @@ export const d_guzzle_mixed = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 4,
+    "packages_checked": 7,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
-    "not_from_composer_repository": 0,
+    "not_from_composer_repository": 1,
     "packages_unchecked_accepted": 0,
     "network_failures": false,
     "counts": {
@@ -71146,8 +73190,21 @@ export const d_guzzle_mixed = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 1,
+                "advisories_asked": true
+            }
+        }
+    ],
     "findings": [
         {
             "package": "guzzlehttp/guzzle",
@@ -71271,7 +73328,7 @@ export const d_guzzle_mixed = {
                         "role": "security",
                         "advisory": "PKSA-2z36-j4q9-rsfy",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -71355,7 +73412,99 @@ export const d_guzzle_mixed = {
                     "raise_size": "minor"
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "~5.0",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "csa/guzzle-bundle",
+                        "version": "dev-compat-php",
+                        "link": "require",
+                        "constraint": "^5.3",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "pinned",
+                            "flag_ids": [
+                                "pinned"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "guzzlehttp/cache-subscriber",
+                        "version": "0.2.0",
+                        "link": "require",
+                        "constraint": "~5.0",
+                        "holder": {
+                            "verdict": "critical",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "find-alternative",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "guzzlehttp/log-subscriber",
+                        "version": "1.0.1",
+                        "link": "require",
+                        "constraint": "~4.0 | ~5.0",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "find-alternative",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "prestashop/circuit-breaker",
+                        "version": "v3.0.0",
+                        "link": "require",
+                        "constraint": "^5",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "raise-php",
+                                "to_branch": "4.x",
+                                "constraint": "^4.0"
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -71455,6 +73604,7 @@ export const d_guzzle_mixed = {
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -71472,20 +73622,20 @@ export const d_guzzle_mixed = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 14,
+                "records": 15,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 14,
+                        "records": 15,
                         "reason": null
                     }
                 ],
@@ -71580,6 +73730,43 @@ export const d_guzzle_mixed = {
                     }
                 },
                 {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
+                    "data": {
+                        "flagged": 2,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/ringphp",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/streams",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp",
+                                    "guzzlehttp/streams"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "S8",
                     "level": "high",
                     "summary": "branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.1.3; no releasing branch within reach",
@@ -71625,13 +73812,105 @@ export const d_guzzle_mixed = {
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71649,13 +73928,105 @@ export const d_guzzle_mixed = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.6",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71673,13 +74044,105 @@ export const d_guzzle_mixed = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71703,7 +74166,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71721,13 +74276,105 @@ export const d_guzzle_mixed = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71745,13 +74392,105 @@ export const d_guzzle_mixed = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71775,7 +74514,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71799,7 +74630,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71823,7 +74746,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71847,7 +74862,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71871,7 +74978,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71895,7 +75094,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71919,7 +75210,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -71943,7 +75326,99 @@ export const d_guzzle_mixed = {
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^5.3",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/cache-subscriber",
+                                            "version": "0.2.0",
+                                            "link": "require",
+                                            "constraint": "~5.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "guzzlehttp/log-subscriber",
+                                            "version": "1.0.1",
+                                            "link": "require",
+                                            "constraint": "~4.0 | ~5.0",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "find-alternative",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "prestashop/circuit-breaker",
+                                            "version": "v3.0.0",
+                                            "link": "require",
+                                            "constraint": "^5",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "old-promise"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "4.x",
+                                                    "constraint": "^4.0"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -72772,8 +76247,8 @@ export const d_guzzle = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 9
+                    "packages_with_records": 3,
+                    "records": 22
                 }
             ]
         },
@@ -72798,7 +76273,7 @@ export const d_guzzle = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 4,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -73289,13 +76764,13 @@ export const d_guzzle = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 9,
+                "records": 15,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 9,
+                        "records": 15,
                         "reason": null
                     }
                 ],
@@ -73373,6 +76848,53 @@ export const d_guzzle = {
                 "guzzlehttp/guzzle"
             ],
             "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind \u00b7 vulnerable), guzzlehttp/promises (left-behind), symfony/polyfill-intl-idn (vulnerable)",
+                    "data": {
+                        "flagged": 3,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/psr7",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/psr7"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/promises",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/promises"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/polyfill-intl-idn",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "symfony/polyfill-intl-idn"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                },
                 {
                     "id": "S8",
                     "level": "warn",
@@ -74725,8 +78247,23 @@ export const d_hoa_tokenless_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)"
+    ],
+    "note_details": [
+        {
+            "code": "repository_activity_anonymous_cap",
+            "text": "GitHub token not set: repository activity checked for 0 candidate packages, 1 packages skipped (set GITHUB_TOKEN to check all)",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_anonymous_cap",
+            "sets_network_failures": false,
+            "data": {
+                "forge_id": "github",
+                "checked": 0,
+                "skipped_no_token": 1,
+                "skipped_budget": 0
+            }
+        }
+    ],
     "findings": [
         {
             "package": "hoa/consistency",
@@ -74946,7 +78483,7 @@ export const d_hoa_tokenless_dagger = {
             "checks_skipped": [
                 {
                     "check": "repository_activity",
-                    "reason": "no_repository",
+                    "reason": "no_token",
                     "blocks": [
                         "S3",
                         "S4"
@@ -74962,10 +78499,10 @@ export const d_hoa_tokenless_dagger = {
             },
             "activity": {
                 "status": "not_read",
-                "reason": "no_repository",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "reason": "no_token",
+                "forge": "github",
+                "host": "github.com",
+                "repo": "hoaproject/Consistency",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -75063,7 +78600,7 @@ export const d_hoa_tokenless_dagger = {
                 },
                 "branch_release_unmeasured": null,
                 "push": null,
-                "push_unmeasured": "no_repository"
+                "push_unmeasured": "no_token"
             },
             "baseline": null,
             "gate": {
@@ -77265,8 +80802,8 @@ export const d_holder_vuln_dagger = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 2
                 }
             ]
         },
@@ -77611,7 +81148,7 @@ export const d_holder_vuln_dagger = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "3.x",
-                "version": "3.0.4",
+                "version": "3.0.0",
                 "newest": "3.0.4",
                 "constraint": "^3.0",
                 "latest": null,
@@ -77631,11 +81168,17 @@ export const d_holder_vuln_dagger = {
                         "link": "require",
                         "constraint": "^2.0",
                         "holder": {
-                            "verdict": "unknown",
+                            "verdict": "medium",
                             "lead": null,
-                            "flag_ids": [],
+                            "flag_ids": [
+                                "vulnerable"
+                            ],
                             "replacement": null,
-                            "next_step": null
+                            "next_step": {
+                                "kind": "raise-php",
+                                "to_branch": "3.x",
+                                "constraint": "^3.0.5"
+                            }
                         }
                     }
                 ],
@@ -77680,7 +81223,7 @@ export const d_holder_vuln_dagger = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require joomla/string ^3.0 \u2014 clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require joomla/string ^3.0 \u2014 clears left-behind; 3.x needs php ^8.1.0, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; held by joomla/filter 2.0.5 (requires ^2.0; itself medium: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "clear",
@@ -80003,8 +83546,8 @@ export const d_ignored_marking_only_dagger = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -80299,13 +83842,13 @@ export const d_ignored_marking_only_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 0,
+                "records": 1,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 0,
+                        "records": 1,
                         "reason": null
                     }
                 ],
@@ -81177,8 +84720,8 @@ export const d_ignored_marking_partial_dagger = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -81508,13 +85051,13 @@ export const d_ignored_marking_partial_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 0,
+                "records": 1,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 0,
+                        "records": 1,
                         "reason": null
                     }
                 ],
@@ -81545,7 +85088,7 @@ export const d_ignored_marking_partial_dagger = {
                 "by": "project",
                 "pattern": "doctrine/cache",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "kept until 9.0 (\u2021)",
                 "reason_id": null,
                 "reason_by": "user",
                 "expires": null,
@@ -82414,8 +85957,8 @@ export const d_ignored_marking_stale_dagger = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -82810,13 +86353,13 @@ export const d_ignored_marking_stale_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 0,
+                "records": 1,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 0,
+                        "records": 1,
                         "reason": null
                     }
                 ],
@@ -83742,7 +87285,7 @@ export const d_ignored_marking_unchecked_dagger = {
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
-    "network_failures": false,
+    "network_failures": true,
     "counts": {
         "critical": 0,
         "high": 1,
@@ -83933,11 +87476,11 @@ export const d_ignored_marking_unchecked_dagger = {
             },
             {
                 "value": "unchecked",
-                "failing": 0
+                "failing": 1
             }
         ],
         "not_applied": [],
-        "text": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (high 1) \u00b7 target php 8.4 (--target-php)"
+        "text": "gate: fails \u00b7 --fail-on=high,unchecked \u00b7 1 finding fails it (high 1, unchecked 1) \u00b7 target php 8.4 (--target-php)"
     },
     "security": {
         "check": "complete",
@@ -83972,9 +87515,26 @@ export const d_ignored_marking_unchecked_dagger = {
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
+        "GitHub API rate limit reached; repository activity missing for 1 repositories",
         "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count."
     ],
     "note_details": [
+        {
+            "code": "repository_activity_rate_limited",
+            "text": "GitHub API rate limit reached; repository activity missing for 1 repositories",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_rate_limited",
+            "sets_network_failures": true,
+            "data": {
+                "forge_id": "github",
+                "repositories": [
+                    {
+                        "host": "github.com",
+                        "repo": "symfony/debug",
+                        "message": "HTTP 429"
+                    }
+                ]
+            }
+        },
         {
             "code": "abandoned_markings_ignored",
             "text": "Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package: symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.",
@@ -84204,17 +87764,17 @@ export const d_ignored_marking_unchecked_dagger = {
                 "ignored": [],
                 "ignored_count": 0
             },
-            "checks_missing": [],
-            "checks_skipped": [
+            "checks_missing": [
                 {
                     "check": "repository_activity",
-                    "reason": "no_repository",
+                    "reason": "rate_limit",
                     "blocks": [
                         "S3",
                         "S4"
                     ]
                 }
             ],
+            "checks_skipped": [],
             "unchecked_accepted": [],
             "maintenance_judged": true,
             "metadata": {
@@ -84224,10 +87784,10 @@ export const d_ignored_marking_unchecked_dagger = {
             },
             "activity": {
                 "status": "not_read",
-                "reason": "no_repository",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "reason": "rate_limit",
+                "forge": "github",
+                "host": "github.com",
+                "repo": "symfony/debug",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -84301,6 +87861,27 @@ export const d_ignored_marking_unchecked_dagger = {
                         "written_for_php": 5,
                         "released": "2020-10-24T10:57:07+00:00"
                     }
+                },
+                {
+                    "id": "S10",
+                    "level": "info",
+                    "summary": "repository activity not checked (the host answered \"too many requests\"), so S3 and S4 could not be read",
+                    "data": {
+                        "unchecked": [
+                            {
+                                "check": "repository_activity",
+                                "reason": "rate_limit",
+                                "blocks": [
+                                    "S3",
+                                    "S4"
+                                ]
+                            }
+                        ],
+                        "blocks": [
+                            "S3",
+                            "S4"
+                        ]
+                    }
                 }
             ],
             "evidence": "old-promise: released 2020-10-24 for PHP 5 (php \"^5.5.9|>=7.0.8\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2022-07-28 (4.2 years ago)",
@@ -84331,7 +87912,7 @@ export const d_ignored_marking_unchecked_dagger = {
                 },
                 "branch_release_unmeasured": null,
                 "push": null,
-                "push_unmeasured": "no_repository"
+                "push_unmeasured": "rate_limit"
             },
             "baseline": null,
             "gate": {
@@ -84346,6 +87927,20 @@ export const d_ignored_marking_unchecked_dagger = {
                             {
                                 "kind": "flag",
                                 "id": "old-promise"
+                            }
+                        ]
+                    },
+                    {
+                        "value": "unchecked",
+                        "kind": "unchecked",
+                        "facts": [
+                            {
+                                "kind": "signal",
+                                "id": "S3"
+                            },
+                            {
+                                "kind": "signal",
+                                "id": "S4"
                             }
                         ]
                     }
@@ -85113,8 +88708,8 @@ export const d_installed_php_halved = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 3
                 }
             ]
         },
@@ -85540,7 +89135,13 @@ export const d_installed_php_halved = {
                     "suggestion": "web-auth/webauthn-lib",
                     "url": "https://packagist.org/packages/web-auth/webauthn-lib",
                     "named_by": "repository",
-                    "finding": null
+                    "finding": {
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind"
+                        ]
+                    }
                 },
                 "quiet_years": null,
                 "to_branch": null,
@@ -85591,7 +89192,7 @@ export const d_installed_php_halved = {
                     }
                 ],
                 "also": [],
-                "text": "replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
+                "text": "replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
             },
             "security": {
                 "status": "clear",
@@ -86515,7 +90116,7 @@ export const d_joomla_filter = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 1
+                    "records": 2
                 }
             ]
         },
@@ -86921,13 +90522,13 @@ export const d_joomla_filter = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 1,
+                "records": 2,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 1,
+                        "records": 2,
                         "reason": null
                     }
                 ],
@@ -87858,8 +91459,8 @@ export const d_local_path_advisory = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 5
+                    "packages_with_records": 44,
+                    "records": 230
                 }
             ]
         },
@@ -87884,11 +91485,11 @@ export const d_local_path_advisory = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 128,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
-    "not_from_composer_repository": 1,
+    "not_from_composer_repository": 2,
     "packages_unchecked_accepted": 0,
     "network_failures": false,
     "counts": {
@@ -88111,16 +91712,16 @@ export const d_local_path_advisory = {
     },
     "data_date": null,
     "notes": [
-        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+        "2 packages are not from a Composer repository: their release metadata and repository activity were not read"
     ],
     "note_details": [
         {
             "code": "not_from_composer_repository",
-            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "text": "2 packages are not from a Composer repository: their release metadata and repository activity were not read",
             "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
             "sets_network_failures": false,
             "data": {
-                "package_count": 1,
+                "package_count": 2,
                 "advisories_asked": true
             }
         }
@@ -88430,6 +92031,1533 @@ export const d_local_path_advisory = {
                         "last_stable_dated_by": null,
                         "snapshot_time": null,
                         "tag_relation": null
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable) and 114 more",
+                    "data": {
+                        "flagged": 119,
+                        "packages": [
+                            {
+                                "package": "mtdowling/jmespath.php",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "aws/aws-sdk-php",
+                                    "mtdowling/jmespath.php"
+                                ],
+                                "verdict": "critical",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "phpoffice/phpspreadsheet",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "phpoffice/phpspreadsheet"
+                                ],
+                                "verdict": "critical",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "twig/twig",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "oneup/uploader-bundle",
+                                    "twig/twig"
+                                ],
+                                "verdict": "critical",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "robrichards/xmlseclibs",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "lightsaml/sp-bundle",
+                                    "lightsaml/symfony-bridge",
+                                    "lightsaml/lightsaml",
+                                    "robrichards/xmlseclibs"
+                                ],
+                                "verdict": "high",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/http-foundation",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/http-foundation"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/monolog-bridge",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/monolog-bridge"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/process",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/process"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "aws/aws-sdk-php",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "aws/aws-sdk-php"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "composer/composer",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "composer/composer"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/guzzle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "guzzlehttp/guzzle"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "phpseclib/phpseclib",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "php-amqplib/rabbitmq-bundle",
+                                    "php-amqplib/php-amqplib",
+                                    "phpseclib/phpseclib"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "studio-42/elfinder",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "barryvdh/elfinder-flysystem-driver",
+                                    "studio-42/elfinder"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/mime",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "oneup/uploader-bundle",
+                                    "symfony/mime"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/oauth-subscriber",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "guzzlehttp/oauth-subscriber"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "psy/psysh",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "theofidry/psysh-bundle",
+                                    "psy/psysh"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/cache",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/cache"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/routing",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/routing"
+                                ],
+                                "verdict": "high",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "lightsaml/lightsaml",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "lightsaml/sp-bundle",
+                                    "lightsaml/symfony-bridge",
+                                    "lightsaml/lightsaml"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "misd/phone-number-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "misd/phone-number-bundle"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "mustangostang/spyc",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "matomo/device-detector",
+                                    "mustangostang/spyc"
+                                ],
+                                "verdict": "high",
+                                "lead": "silent",
+                                "flag_ids": [
+                                    "silent",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "php-http/message-factory",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "sparkpost/sparkpost",
+                                    "php-http/message",
+                                    "php-http/message-factory"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "stack/builder",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "stack/builder"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "stack/run",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "stack/run"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "tightenco/collect",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "tightenco/collect"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "composer/package-versions-deprecated",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "composer/package-versions-deprecated"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/annotations",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/annotations"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/cache",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/doctrine-bundle",
+                                    "doctrine/cache"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "gaufrette/extras",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "gaufrette/extras"
+                                ],
+                                "verdict": "high",
+                                "lead": "silent",
+                                "flag_ids": [
+                                    "silent"
+                                ]
+                            },
+                            {
+                                "package": "sensio/framework-extra-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "noxlogic/ratelimit-bundle",
+                                    "sensio/framework-extra-bundle"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "swiftmailer/swiftmailer",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/swiftmailer-bundle",
+                                    "swiftmailer/swiftmailer"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "symfony/debug",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/debug"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "symfony/inflector",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/property-access",
+                                    "symfony/inflector"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "symfony/security",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/security"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "symfony/swiftmailer-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/swiftmailer-bundle"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "theofidry/psysh-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "theofidry/psysh-bundle"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/psr7",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "aws/aws-sdk-php",
+                                    "guzzlehttp/psr7"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "joomla/filter",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "joomla/filter"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/twig-bridge",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/twig-bundle",
+                                    "symfony/twig-bridge"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "league/flysystem",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "barryvdh/elfinder-flysystem-driver",
+                                    "league/flysystem"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/http-client",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/http-client"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/validator",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/validator"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/yaml",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/yaml"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "barryvdh/elfinder-flysystem-driver",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "barryvdh/elfinder-flysystem-driver"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "knplabs/gaufrette",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "knplabs/gaufrette"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "maennchen/zipstream-php",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "phpoffice/phpspreadsheet",
+                                    "maennchen/zipstream-php"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "malkusch/lock",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "bandwidth-throttle/token-bucket",
+                                    "malkusch/lock"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "mrclay/minify",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "mrclay/minify"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "sendgrid/sendgrid",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "sendgrid/sendgrid"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "simshaun/recurr",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "simshaun/recurr"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "twilio/sdk",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "twilio/sdk"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "bandwidth-throttle/token-bucket",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "bandwidth-throttle/token-bucket"
+                                ],
+                                "verdict": "medium",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise",
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "leezy/pheanstalk-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "leezy/pheanstalk-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise",
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "lightsaml/sp-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "lightsaml/sp-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise",
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "lightsaml/symfony-bridge",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "lightsaml/sp-bundle",
+                                    "lightsaml/symfony-bridge"
+                                ],
+                                "verdict": "medium",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise",
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "voku/stop-words",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "jbroadway/urlify",
+                                    "voku/stop-words"
+                                ],
+                                "verdict": "medium",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise",
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "composer/pcre",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "composer/composer",
+                                    "composer/pcre"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "composer/xdebug-handler",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "composer/composer",
+                                    "composer/xdebug-handler"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/collections",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/orm",
+                                    "doctrine/collections"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/dbal",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/doctrine-bundle",
+                                    "doctrine/dbal"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/deprecations",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/orm",
+                                    "doctrine/deprecations"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/doctrine-migrations-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/doctrine-migrations-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/event-manager",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/orm",
+                                    "doctrine/event-manager"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/instantiator",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/orm",
+                                    "doctrine/instantiator"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/lexer",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/annotations",
+                                    "doctrine/lexer"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/migrations",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/doctrine-migrations-bundle",
+                                    "doctrine/migrations"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "doctrine/persistence",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "doctrine/data-fixtures",
+                                    "doctrine/persistence"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "egulias/email-validator",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/swiftmailer-bundle",
+                                    "swiftmailer/swiftmailer",
+                                    "egulias/email-validator"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "friendsofsymfony/oauth-server-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "friendsofsymfony/oauth-server-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "pinned",
+                                "flag_ids": [
+                                    "pinned"
+                                ]
+                            },
+                            {
+                                "package": "geoip2/geoip2",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "geoip2/geoip2"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/promises",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "aws/aws-sdk-php",
+                                    "guzzlehttp/promises"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "helios-ag/fm-elfinder-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "helios-ag/fm-elfinder-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "intervention/image",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "barryvdh/elfinder-flysystem-driver",
+                                    "intervention/image"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "ip2location/ip2location-php",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "ip2location/ip2location-php"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "jms/serializer-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "jms/serializer-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "joomla/string",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "joomla/filter",
+                                    "joomla/string"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "matomo/device-detector",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "matomo/device-detector"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "maxmind/web-service-common",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "geoip2/geoip2",
+                                    "maxmind/web-service-common"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "monolog/monolog",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/monolog-bridge",
+                                    "monolog/monolog"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "noxlogic/ratelimit-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "noxlogic/ratelimit-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "oneup/uploader-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "oneup/uploader-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "predis/predis",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "predis/predis"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "ramsey/uuid",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "ramsey/uuid"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "sendgrid/php-http-client",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "sendgrid/sendgrid",
+                                    "sendgrid/php-http-client"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/asset",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/asset"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/config",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/config"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/console",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/console"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/css-selector",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/css-selector"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/dependency-injection",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/dependency-injection"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/doctrine-bridge",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/doctrine-bridge"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/dotenv",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/dotenv"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/error-handler",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/framework-bundle",
+                                    "symfony/error-handler"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/event-dispatcher",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/event-dispatcher"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/event-dispatcher-contracts",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "oneup/uploader-bundle",
+                                    "symfony/event-dispatcher-contracts"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/expression-language",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/expression-language"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/filesystem",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/filesystem"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/finder",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/finder"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/form",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/form"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/framework-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/framework-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/intl",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/intl"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/monolog-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/monolog-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "symfony/options-resolver",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/options-resolver"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/property-access",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/property-access"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/security-acl",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/security-acl"
+                                ],
+                                "verdict": "medium",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "symfony/security-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/security-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/stopwatch",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/stopwatch"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/templating",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/templating"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/translation",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/translation"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/twig-bundle",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "symfony/twig-bundle"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/var-dumper",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "tightenco/collect",
+                                    "symfony/var-dumper"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "voku/portable-ascii",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "jbroadway/urlify",
+                                    "voku/portable-ascii"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "symfony/polyfill-intl-idn",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "oneup/uploader-bundle",
+                                    "symfony/mime",
+                                    "symfony/polyfill-intl-idn"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "friendsofsymfony/oauth2-php",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "friendsofsymfony/oauth-server-bundle",
+                                    "friendsofsymfony/oauth2-php"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "league/flysystem-cached-adapter",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "barryvdh/elfinder-flysystem-driver",
+                                    "league/flysystem-cached-adapter"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "markbaker/complex",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "phpoffice/phpspreadsheet",
+                                    "markbaker/complex"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "markbaker/matrix",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "phpoffice/phpspreadsheet",
+                                    "markbaker/matrix"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "paragonie/random_compat",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "friendsofsymfony/oauth-server-bundle",
+                                    "paragonie/random_compat"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "sparkpost/sparkpost",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "sparkpost/sparkpost"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "willdurand/jsonp-callback-validator",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "friendsofsymfony/rest-bundle",
+                                    "willdurand/jsonp-callback-validator"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            },
+                            {
+                                "package": "willdurand/negotiation",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "friendsofsymfony/rest-bundle",
+                                    "willdurand/negotiation"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
                     }
                 },
                 {
@@ -89522,15 +94650,15 @@ export const d_lock_only_dagger = {
         "flagged": 1,
         "measured": 0,
         "unmeasured": {
-            "unreached": 1,
-            "no_composer_json": 0
+            "unreached": 0,
+            "no_composer_json": 1
         },
         "by_reach": {
             "direct": 0,
             "transitive": 0,
             "unreached": 1
         },
-        "not_in_composer_json": 1,
+        "not_in_composer_json": 0,
         "require_dev_not_walked": 0,
         "production": 1,
         "development": 0,
@@ -89867,7 +94995,7 @@ export const d_lock_only_dagger = {
             "reach": "unreached",
             "chain": [],
             "depth": null,
-            "depth_unmeasured": "unreached",
+            "depth_unmeasured": "no_composer_json",
             "named_in": [],
             "direct_dependents": [],
             "signals": [
@@ -91117,7 +96245,7 @@ export const d_many_dependents = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "2.x",
-                "version": "v2.5.4",
+                "version": "v2.5.0",
                 "newest": "v2.5.4",
                 "constraint": "^2.5",
                 "latest": null,
@@ -92805,8 +97933,26 @@ export const d_not_found_dagger = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing"
+    ],
+    "note_details": [
+        {
+            "code": "repository_activity_not_found",
+            "text": "GitHub did not answer for 1 repositories (private, renamed or removed); repository activity missing",
+            "docs_url": "https://lockrot.dev/notes/#repository_activity_not_found",
+            "sets_network_failures": false,
+            "data": {
+                "forge_id": "github",
+                "repositories": [
+                    {
+                        "host": "github.com",
+                        "repo": "hoaproject/Consistency"
+                    }
+                ]
+            }
+        }
+    ],
     "findings": [
         {
             "package": "hoa/consistency",
@@ -93026,7 +98172,7 @@ export const d_not_found_dagger = {
             "checks_skipped": [
                 {
                     "check": "repository_activity",
-                    "reason": "no_repository",
+                    "reason": "repository_not_found",
                     "blocks": [
                         "S3",
                         "S4"
@@ -93041,11 +98187,11 @@ export const d_not_found_dagger = {
                 "message": null
             },
             "activity": {
-                "status": "not_read",
-                "reason": "no_repository",
-                "forge": null,
-                "host": null,
-                "repo": null,
+                "status": "not_found",
+                "reason": "repository_not_found",
+                "forge": "github",
+                "host": "github.com",
+                "repo": "hoaproject/Consistency",
                 "event": null,
                 "archived": null,
                 "fetched_at": null,
@@ -93143,7 +98289,7 @@ export const d_not_found_dagger = {
                 },
                 "branch_release_unmeasured": null,
                 "push": null,
-                "push_unmeasured": "no_repository"
+                "push_unmeasured": "repository_not_found"
             },
             "baseline": null,
             "gate": {
@@ -94116,8 +99262,8 @@ export const d_ok_unchecked = {
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 0,
-            "shared_commit": 0,
-            "undated": 1,
+            "shared_commit": 1,
+            "undated": 0,
             "no_stable_release": 0,
             "undated_releases": 0
         },
@@ -94265,7 +99411,7 @@ export const d_ok_unchecked = {
             "replacement": null,
             "replacement_url": null,
             "note": null,
-            "libyears_unmeasured": "undated",
+            "libyears_unmeasured": "shared_commit",
             "libyears_at_least": false,
             "direct": false,
             "dev": false,
@@ -94312,7 +99458,7 @@ export const d_ok_unchecked = {
             "libyears": null,
             "age": {
                 "installed": null,
-                "installed_unmeasured": "undated",
+                "installed_unmeasured": "shared_commit",
                 "release": null,
                 "release_unmeasured": "undated_releases",
                 "branch_release": null,
@@ -96402,7 +101548,7 @@ export const d_pagerfanta = {
         },
         "score_rules_used": {
             "counted": 0,
-            "lead-first": 0,
+            "lead-first": 1,
             "corroborating-share": 0,
             "advisory-points": 0,
             "no-reachable-fix-multiplier": 0,
@@ -96412,8 +101558,8 @@ export const d_pagerfanta = {
             "sum": 0,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 0,
-            "zero-verdicts": 1,
+            "band-floors": 1,
+            "zero-verdicts": 0,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -96421,8 +101567,8 @@ export const d_pagerfanta = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
-    "packages_flagged": 0,
+    "packages_checked": 3,
+    "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
     "not_from_composer_repository": 0,
@@ -96430,12 +101576,12 @@ export const d_pagerfanta = {
     "network_failures": false,
     "counts": {
         "critical": 0,
-        "high": 0,
+        "high": 1,
         "medium": 0,
         "low": 0,
         "unknown": 0,
         "finished": 0,
-        "ok": 1
+        "ok": 0
     },
     "abandoned": {
         "total": 0,
@@ -96444,10 +101590,10 @@ export const d_pagerfanta = {
     },
     "priorities": {
         "critical": 0,
-        "high": 0,
+        "high": 1,
         "medium": 0,
         "low": 0,
-        "none": 1
+        "none": 0
     },
     "flags": {
         "abandoned": {
@@ -96493,15 +101639,15 @@ export const d_pagerfanta = {
             }
         },
         "left-behind": {
-            "carrying": 0,
-            "leading": 0,
+            "carrying": 1,
+            "leading": 1,
             "accepted": {
                 "all": 0,
                 "in_graded": 0
             },
             "by_verdict": {
                 "critical": 0,
-                "high": 0,
+                "high": 1,
                 "medium": 0,
                 "low": 0
             }
@@ -96552,30 +101698,35 @@ export const d_pagerfanta = {
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 0,
-        "measured": 0,
+        "flagged": 1,
+        "measured": 1,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
-            "direct": 0,
+            "direct": 1,
             "transitive": 0,
             "unreached": 0
         },
         "not_in_composer_json": 0,
         "require_dev_not_walked": 0,
-        "production": 0,
+        "production": 1,
         "development": 0,
-        "by_depth": [],
-        "max_depth": null,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
         "deepest": []
     },
     "libyears": {
-        "total": null,
-        "direct_requirements": null,
-        "measured": 0,
-        "at_least_count": 0,
+        "total": 1.9,
+        "direct_requirements": 1.9,
+        "measured": 1,
+        "at_least_count": 1,
         "unmeasured": {
             "not_from_composer_repository": 0,
             "unavailable": 0,
@@ -96584,29 +101735,36 @@ export const d_pagerfanta = {
             "shared_commit": 0,
             "undated": 0,
             "no_stable_release": 0,
-            "undated_releases": 1
+            "undated_releases": 0
         },
-        "furthest_behind": null,
+        "furthest_behind": {
+            "package": "pagerfanta/twig",
+            "version": "v3.8.0",
+            "libyears": 1.9,
+            "at_least": true
+        },
         "packages": 1
     },
     "baseline": null,
     "gate": {
-        "fails": false,
-        "tripped_by": [],
+        "fails": true,
+        "tripped_by": [
+            "fail_on"
+        ],
         "fail_on_applied": true,
-        "reaching": 0,
-        "failing": 0,
+        "reaching": 1,
+        "failing": 1,
         "exempt": {
             "baseline": 0
         },
         "failing_by": [
             {
                 "value": "high",
-                "failing": 0
+                "failing": 1
             }
         ],
         "not_applied": [],
-        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
     },
     "security": {
         "check": "complete",
@@ -96652,19 +101810,138 @@ export const d_pagerfanta = {
                 "target_runs": true,
                 "project_allows": true
             },
-            "verdict": "ok",
-            "priority": "none",
-            "lead": null,
+            "verdict": "high",
+            "priority": "high",
+            "lead": "left-behind",
             "rank": 1,
-            "flags": [],
+            "flags": [
+                {
+                    "id": "left-behind",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S8"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "years",
+                        "value": 3.5,
+                        "source": "branch"
+                    },
+                    "summary": "branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach"
+                }
+            ],
             "score": {
                 "model": 1,
-                "total": 0,
-                "exact": 0,
+                "total": 16,
+                "exact": 16,
+                "rounded_down": false,
+                "band": {
+                    "floor": 16,
+                    "next": "critical",
+                    "to_next": 16
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "left-behind",
+                        "role": "lead",
+                        "weight": 16,
+                        "divisor": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
                 "accepted": [],
-                "text": "0"
+                "without": [],
+                "text": "16 = left-behind 16"
             },
-            "next_step": null,
+            "next_step": {
+                "kind": "raise-php",
+                "source": "left-behind",
+                "merged": [],
+                "fix_kind": null,
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "4.x",
+                "version": "v4.9.0",
+                "newest": "v4.9.0",
+                "constraint": "^4.9",
+                "latest": null,
+                "php_check": {
+                    "requires": "^8.1",
+                    "project_allows": false,
+                    "target_runs": true,
+                    "raise_to": ">=8.1",
+                    "raise_size": "major"
+                },
+                "crosses_major": true,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "left-behind",
+                        "basis": "branch_releasing"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "composer_moves_because": [
+                    "crosses_major"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "php:>=8.1",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "require",
+                        "pagerfanta/twig:^4.9"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            },
             "security": {
                 "status": "clear",
                 "check": "complete",
@@ -96724,8 +102001,8 @@ export const d_pagerfanta = {
             "replacement": null,
             "replacement_url": null,
             "note": null,
-            "libyears_unmeasured": "undated_releases",
-            "libyears_at_least": false,
+            "libyears_unmeasured": null,
+            "libyears_at_least": true,
             "direct": true,
             "dev": false,
             "reach": "direct",
@@ -96741,6 +102018,55 @@ export const d_pagerfanta = {
                 "pagerfanta/twig"
             ],
             "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: pagerfanta/core (left-behind)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "pagerfanta/core",
+                                "chain": [
+                                    "pagerfanta/twig",
+                                    "pagerfanta/core"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "S8",
+                    "level": "warn",
+                    "summary": "branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
+                    "data": {
+                        "branch": "3.x",
+                        "branch_last_release": "2023-04-15T16:39:14+00:00",
+                        "branch_last_version": "v3.8.0",
+                        "years": 3.5,
+                        "newest_branch": "4.x",
+                        "newest_version": "v4.9.0",
+                        "newest_release": "2025-03-08T02:17:34+00:00",
+                        "newest_php": "^8.1",
+                        "newest_within_reach": false,
+                        "floor_php": ">=7.4",
+                        "floor_source": "project",
+                        "reachable_branch": null,
+                        "reachable_version": null,
+                        "reachable_release": null,
+                        "suggested_constraint": null,
+                        "dated_by": null,
+                        "reachable_php": null,
+                        "reachable_admits": null,
+                        "newest_years": 1.6,
+                        "reachable_years": null
+                    }
+                },
                 {
                     "id": "S10",
                     "level": "info",
@@ -96763,10 +102089,10 @@ export const d_pagerfanta = {
                     }
                 }
             ],
-            "evidence": "",
+            "evidence": "left-behind: branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1 above the project's php >=7.4; no releasing branch within reach",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
-            "libyears": null,
+            "libyears": 1.9,
             "age": {
                 "installed": {
                     "at": "2023-04-15T16:39:14+00:00",
@@ -96793,10 +102119,21 @@ export const d_pagerfanta = {
             },
             "baseline": null,
             "gate": {
-                "reaches_fail_on": false,
-                "fails": false,
+                "reaches_fail_on": true,
+                "fails": true,
                 "exempt_by": null,
-                "by": [],
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "flag",
+                                "id": "left-behind"
+                            }
+                        ]
+                    }
+                ],
                 "basis": null
             }
         }
@@ -97586,7 +102923,7 @@ export const d_partial_op_dagger = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 2,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -98226,6 +103563,28 @@ export const d_partial_op_dagger = {
                         "php_constraint": ">=5.3.1",
                         "written_for_php": 5,
                         "released": "2017-01-31T17:28:48+00:00"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: maxmind/web-service-common (left-behind)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "maxmind/web-service-common",
+                                "chain": [
+                                    "geoip2/geoip2",
+                                    "maxmind/web-service-common"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            }
+                        ]
                     }
                 },
                 {
@@ -99133,8 +104492,8 @@ export const d_partial = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 6
+                    "packages_with_records": 10,
+                    "records": 74
                 }
             ]
         },
@@ -99159,7 +104518,7 @@ export const d_partial = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 2,
+    "packages_checked": 15,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -99509,7 +104868,30 @@ export const d_partial = {
                     "raise_size": "minor"
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^9.0",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "pragmarx/google2fa-laravel",
+                        "version": "v2.2.0",
+                        "link": "require",
+                        "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                        "holder": {
+                            "verdict": "ok",
+                            "lead": null,
+                            "flag_ids": [],
+                            "replacement": null,
+                            "next_step": null
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "advisory",
@@ -99558,6 +104940,7 @@ export const d_partial = {
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -99575,20 +104958,20 @@ export const d_partial = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 \u2014 clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 6,
+                "records": 28,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 6,
+                        "records": 28,
                         "reason": null
                     }
                 ],
@@ -99711,6 +105094,150 @@ export const d_partial = {
             ],
             "signals": [
                 {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 11 flagged packages: league/commonmark (vulnerable), symfony/http-foundation (vulnerable), symfony/mime (vulnerable), symfony/process (vulnerable), nesbot/carbon (vulnerable) and 6 more",
+                    "data": {
+                        "flagged": 11,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/http-foundation",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/http-foundation"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/mime",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/mime"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/process",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/process"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "nesbot/carbon",
+                                "chain": [
+                                    "laravel/framework",
+                                    "nesbot/carbon"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/mailer",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/mailer"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/routing",
+                                "chain": [
+                                    "laravel/framework",
+                                    "symfony/routing"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "brick/math",
+                                "chain": [
+                                    "laravel/framework",
+                                    "brick/math"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            },
+                            {
+                                "package": "league/flysystem",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/flysystem"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "symfony/polyfill-intl-idn",
+                                "chain": [
+                                    "laravel/framework",
+                                    "egulias/email-validator",
+                                    "symfony/polyfill-intl-idn"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "league/config",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/commonmark",
+                                    "league/config"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "S9",
                     "level": "high",
                     "summary": "6 security advisories affect v9.52.16 (PKSA-3r5d-mb8f-1qw9, CVE-2024-52301, CVE-2025-27515 and 3 more); 5 fixed by v13.34.0, 1 fixed by v9.52.22",
@@ -99735,7 +105262,30 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -99777,13 +105327,22 @@ export const d_partial = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "10.x",
                                     "version": "v10.48.29",
                                     "newest": "v10.50.3",
                                     "on_installed_branch": false,
                                     "php": "^8.1",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -99807,7 +105366,30 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -99831,7 +105413,30 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -99855,7 +105460,30 @@ export const d_partial = {
                                     "newest": "v12.69.3",
                                     "on_installed_branch": false,
                                     "php": "^8.2",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^9.0",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "pragmarx/google2fa-laravel",
+                                            "version": "v2.2.0",
+                                            "link": "require",
+                                            "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                                            "holder": {
+                                                "verdict": "ok",
+                                                "lead": null,
+                                                "flag_ids": [],
+                                                "replacement": null,
+                                                "next_step": null
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -103321,7 +108949,7 @@ export const d_policy_off_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 1
+                    "records": 2
                 }
             ]
         },
@@ -103731,13 +109359,13 @@ export const d_policy_off_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 1,
+                "records": 2,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 1,
+                        "records": 2,
                         "reason": null
                     }
                 ],
@@ -104668,8 +110296,8 @@ export const d_psr7 = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 4
+                    "packages_with_records": 2,
+                    "records": 21
                 }
             ]
         },
@@ -105109,7 +110737,7 @@ export const d_psr7 = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "2.x",
-                "version": "2.13.1",
+                "version": "2.13.0",
                 "newest": "2.13.1",
                 "constraint": "^2.13",
                 "latest": null,
@@ -105129,11 +110757,18 @@ export const d_psr7 = {
                         "link": "require",
                         "constraint": "^1.9",
                         "holder": {
-                            "verdict": "ok",
-                            "lead": null,
-                            "flag_ids": [],
+                            "verdict": "critical",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ],
                             "replacement": null,
-                            "next_step": null
+                            "next_step": {
+                                "kind": "raise-php",
+                                "to_branch": "7.x",
+                                "constraint": "^7.15.2"
+                            }
                         }
                     }
                 ],
@@ -105205,20 +110840,20 @@ export const d_psr7 = {
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=7.2.5, then move guzzlehttp/psr7 to ^2.13 through guzzlehttp/guzzle \u2014 clears left-behind and 4 advisories; 2.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; held by guzzlehttp/guzzle 6.5.8 (requires ^1.9; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 4,
+                "records": 6,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 4,
+                        "records": 6,
                         "reason": null
                     }
                 ],
@@ -105355,11 +110990,18 @@ export const d_psr7 = {
                                             "link": "require",
                                             "constraint": "^1.9",
                                             "holder": {
-                                                "verdict": "ok",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "7.x",
+                                                    "constraint": "^7.15.2"
+                                                }
                                             }
                                         }
                                     ],
@@ -105394,11 +111036,18 @@ export const d_psr7 = {
                                             "link": "require",
                                             "constraint": "^1.9",
                                             "holder": {
-                                                "verdict": "ok",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "7.x",
+                                                    "constraint": "^7.15.2"
+                                                }
                                             }
                                         }
                                     ],
@@ -105433,11 +111082,18 @@ export const d_psr7 = {
                                             "link": "require",
                                             "constraint": "^1.9",
                                             "holder": {
-                                                "verdict": "ok",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "7.x",
+                                                    "constraint": "^7.15.2"
+                                                }
                                             }
                                         }
                                     ],
@@ -105472,11 +111128,18 @@ export const d_psr7 = {
                                             "link": "require",
                                             "constraint": "^1.9",
                                             "holder": {
-                                                "verdict": "ok",
-                                                "lead": null,
-                                                "flag_ids": [],
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
                                                 "replacement": null,
-                                                "next_step": null
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "7.x",
+                                                    "constraint": "^7.15.2"
+                                                }
                                             }
                                         }
                                     ],
@@ -106308,8 +111971,8 @@ export const d_replace_graded = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 2,
+                    "records": 7
                 }
             ]
         },
@@ -106334,7 +111997,7 @@ export const d_replace_graded = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 7,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -106656,7 +112319,13 @@ export const d_replace_graded = {
                     "suggestion": "web-token/jwt-library",
                     "url": "https://packagist.org/packages/web-token/jwt-library",
                     "named_by": "repository",
-                    "finding": null
+                    "finding": {
+                        "verdict": "high",
+                        "lead": null,
+                        "flag_ids": [
+                            "vulnerable"
+                        ]
+                    }
                 },
                 "quiet_years": null,
                 "to_branch": null,
@@ -106682,7 +112351,7 @@ export const d_replace_graded = {
                 "commands": [],
                 "through": [],
                 "also": [],
-                "text": "replace with web-token/jwt-library (named by its registry)"
+                "text": "replace with web-token/jwt-library (named by its registry; itself high: vulnerable)"
             },
             "security": {
                 "status": "clear",
@@ -106759,6 +112428,53 @@ export const d_replace_graded = {
                         "marked_by": "repository",
                         "replacement": "web-token/jwt-library",
                         "replacement_url": "https://packagist.org/packages/web-token/jwt-library"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math (left-behind)",
+                    "data": {
+                        "flagged": 3,
+                        "packages": [
+                            {
+                                "package": "web-token/jwt-library",
+                                "chain": [
+                                    "web-token/jwt-key-mgmt",
+                                    "web-token/jwt-library"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "paragonie/sodium_compat",
+                                "chain": [
+                                    "web-token/jwt-key-mgmt",
+                                    "paragonie/sodium_compat"
+                                ],
+                                "verdict": "medium",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "brick/math",
+                                "chain": [
+                                    "web-token/jwt-key-mgmt",
+                                    "web-token/jwt-library",
+                                    "brick/math"
+                                ],
+                                "verdict": "medium",
+                                "lead": "left-behind",
+                                "flag_ids": [
+                                    "left-behind"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],
@@ -107560,8 +113276,8 @@ export const d_replace_text = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 1
                 }
             ]
         },
@@ -107586,7 +113302,7 @@ export const d_replace_text = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 3,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -108049,6 +113765,28 @@ export const d_replace_text = {
                         "years": 3.6,
                         "forge": "github",
                         "event": "push"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: doctrine/annotations (abandoned)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "doctrine/annotations",
+                                "chain": [
+                                    "sensio/framework-extra-bundle",
+                                    "doctrine/annotations"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],
@@ -109044,8 +114782,8 @@ export const d_require_dev_name_dagger = {
             "transitive": 1,
             "unreached": 0
         },
-        "not_in_composer_json": 1,
-        "require_dev_not_walked": 0,
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 1,
         "production": 1,
         "development": 0,
         "by_depth": [
@@ -109240,7 +114978,7 @@ export const d_require_dev_name_dagger = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "5.x",
-                "version": "v5.4.48",
+                "version": "v5.4.0",
                 "newest": "v5.4.48",
                 "constraint": "^5.4",
                 "latest": null,
@@ -109720,7 +115458,9 @@ export const d_require_dev_name_dagger = {
             ],
             "depth": 1,
             "depth_unmeasured": null,
-            "named_in": [],
+            "named_in": [
+                "require-dev"
+            ],
             "direct_dependents": [
                 "babdev/pagerfanta-bundle",
                 "bdunogier/guzzle-site-authenticator",
@@ -111974,8 +117714,8 @@ export const d_routing = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 2
+                    "packages_with_records": 4,
+                    "records": 13
                 }
             ]
         },
@@ -112000,7 +117740,7 @@ export const d_routing = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 2,
+    "packages_checked": 4,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -112236,21 +117976,15 @@ export const d_routing = {
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "symfony/routing"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "symfony/routing"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -112364,7 +118098,7 @@ export const d_routing = {
                         "role": "security",
                         "advisory": "PKSA-bf7t-jnpz-492k",
                         "severity": "medium",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 8,
                         "multiplier": 1,
                         "points": 8,
@@ -112425,7 +118159,7 @@ export const d_routing = {
                 "kind": "require",
                 "source": "vulnerable",
                 "merged": [],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -112442,7 +118176,29 @@ export const d_routing = {
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "package",
+                        "package": "mautic/core-lib",
+                        "version": "4.3.x-dev",
+                        "link": "require",
+                        "constraint": "~4.4.0",
+                        "holder": {
+                            "verdict": "critical",
+                            "lead": "pinned",
+                            "flag_ids": [
+                                "pinned",
+                                "vulnerable"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -112476,8 +118232,8 @@ export const d_routing = {
                     ]
                 },
                 "composer_moves_because": [
-                    "crosses_major",
-                    "transitive"
+                    "holders",
+                    "crosses_major"
                 ],
                 "commands": [],
                 "through": [
@@ -112491,20 +118247,20 @@ export const d_routing = {
                     }
                 ],
                 "also": [],
-                "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+                "text": "move symfony/routing to ^5.4.53 through mautic/core-lib \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5; the target php 8.4 runs it; held by mautic/core-lib 4.3.x-dev (requires ~4.4.0; itself pinned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 2,
+                "records": 4,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 2,
+                        "records": 4,
                         "reason": null
                     }
                 ],
@@ -112518,7 +118274,7 @@ export const d_routing = {
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -112641,13 +118397,35 @@ export const d_routing = {
                                 "points": 8,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "5.x",
                                     "version": "v5.4.53",
                                     "newest": "v5.4.53",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "package",
+                                            "package": "mautic/core-lib",
+                                            "version": "4.3.x-dev",
+                                            "link": "require",
+                                            "constraint": "~4.4.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -112665,13 +118443,35 @@ export const d_routing = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "5.x",
                                     "version": "v5.4.52",
                                     "newest": "v5.4.53",
                                     "on_installed_branch": false,
                                     "php": ">=7.2.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "package",
+                                            "package": "mautic/core-lib",
+                                            "version": "4.3.x-dev",
+                                            "link": "require",
+                                            "constraint": "~4.4.0",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -113526,7 +119326,7 @@ export const d_silent = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 2,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -114023,6 +119823,29 @@ export const d_silent = {
                         "php_constraint": ">=7.1",
                         "written_for_php": 7,
                         "released": "2018-08-08T15:08:14+00:00"
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: yosymfony/parser-utils (silent \u00b7 old-promise)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "yosymfony/parser-utils",
+                                "chain": [
+                                    "yosymfony/toml",
+                                    "yosymfony/parser-utils"
+                                ],
+                                "verdict": "high",
+                                "lead": "silent",
+                                "flag_ids": [
+                                    "silent",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
                     }
                 }
             ],
@@ -119166,7 +124989,7 @@ export const d_stale_accepted_dagger = {
                 "by": "project",
                 "pattern": "akaunting/laravel-version",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "feature-complete, kept on purpose",
                 "reason_id": null,
                 "reason_by": "user",
                 "expires": null,
@@ -121578,7 +127401,7 @@ export const d_tie_dagger = {
                         "value": 6.9,
                         "source": "branch"
                     },
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)"
                 },
                 {
                     "id": "old-promise",
@@ -121725,7 +127548,7 @@ export const d_tie_dagger = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "5.x",
-                "version": "v5.4.52",
+                "version": "v5.4.0",
                 "newest": "v5.4.52",
                 "constraint": "^5.4",
                 "latest": null,
@@ -121743,14 +127566,15 @@ export const d_tie_dagger = {
                         "kind": "flag",
                         "id": "left-behind",
                         "basis": "branch_releasing"
-                    },
+                    }
+                ],
+                "unverified": [
                     {
                         "kind": "flag",
                         "id": "old-promise",
-                        "basis": "released_after_ga"
+                        "reason": "undated"
                     }
                 ],
-                "unverified": [],
                 "adds": [],
                 "leaves": [
                     {
@@ -121760,11 +127584,11 @@ export const d_tie_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": {
-                    "total": 16,
-                    "verdict": "high",
-                    "lead": null,
+                    "total": 32,
+                    "verdict": "critical",
+                    "lead": "old-promise",
                     "deciding_advisory": "PKSA-4wjj-gy1p-ft3r",
-                    "at_most": false,
+                    "at_most": true,
                     "assumes": [
                         "clears_hold",
                         "composer_resolves"
@@ -121822,7 +127646,7 @@ export const d_tie_dagger = {
                         "text": "no release fixes it"
                     }
                 ],
-                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/monolog-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; 1 advisory stays; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
@@ -121940,7 +127764,7 @@ export const d_tie_dagger = {
                 {
                     "id": "S8",
                     "level": "high",
-                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
+                    "summary": "branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07)",
                     "data": {
                         "branch": "2.x",
                         "branch_last_release": "2019-11-13T08:36:42+00:00",
@@ -121957,7 +127781,7 @@ export const d_tie_dagger = {
                         "reachable_version": "v5.4.52",
                         "reachable_release": "2026-05-07T16:46:23+00:00",
                         "suggested_constraint": "^5.4",
-                        "dated_by": null,
+                        "dated_by": "symfony/symfony",
                         "reachable_php": ">=7.2.5",
                         "reachable_admits": {
                             "project": true,
@@ -122003,7 +127827,7 @@ export const d_tie_dagger = {
                     }
                 }
             ],
-            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 medium \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
+            "evidence": "left-behind: branch 2.x last released 2019-11-13 (6.9 years ago, dated by symfony/symfony); 6.x released v6.4.45 (2026-08-30), needs php >=8.1 above the project's php >=7.2.5; 5.x released v5.4.52 (2026-05-07); old-promise: released 2016-01-14 for PHP 5 (php \">=5.3.3\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; vulnerable: 1 advisory: 1 medium \u2014 none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
             "libyears": 10.62,
@@ -122011,7 +127835,7 @@ export const d_tie_dagger = {
                 "installed": {
                     "at": "2016-01-14T10:11:35+00:00",
                     "years": 10.7,
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "installed_unmeasured": null,
                 "release": {
@@ -122027,7 +127851,7 @@ export const d_tie_dagger = {
                     "at": "2019-11-13T08:36:42+00:00",
                     "years": 6.9,
                     "level": "high",
-                    "dated_by": null
+                    "dated_by": "symfony/symfony"
                 },
                 "branch_release_unmeasured": null,
                 "push": {
@@ -122821,8 +128645,8 @@ export const d_twig_1 = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 16
+                    "packages_with_records": 2,
+                    "records": 130
                 }
             ]
         },
@@ -122851,7 +128675,7 @@ export const d_twig_1 = {
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
-    "not_from_composer_repository": 0,
+    "not_from_composer_repository": 1,
     "packages_unchecked_accepted": 0,
     "network_failures": false,
     "counts": {
@@ -123078,8 +128902,21 @@ export const d_twig_1 = {
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+    ],
+    "note_details": [
+        {
+            "code": "not_from_composer_repository",
+            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
+            "sets_network_failures": false,
+            "data": {
+                "package_count": 1,
+                "advisories_asked": true
+            }
+        }
+    ],
     "findings": [
         {
             "package": "twig/twig",
@@ -123243,7 +129080,57 @@ export const d_twig_1 = {
                     "raise_size": "major"
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^1.38",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "csa/guzzle-bundle",
+                        "version": "dev-compat-php",
+                        "link": "require",
+                        "constraint": "^1.34|^2.4",
+                        "holder": {
+                            "verdict": "high",
+                            "lead": "pinned",
+                            "flag_ids": [
+                                "pinned"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "symfony/symfony",
+                        "version": "v3.4.49",
+                        "link": "require",
+                        "constraint": "^1.41|^2.10",
+                        "holder": {
+                            "verdict": "critical",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "raise-php",
+                                "to_branch": "5.x",
+                                "constraint": "^5.4.53"
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "advisory",
@@ -123348,6 +129235,7 @@ export const d_twig_1 = {
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -123365,20 +129253,20 @@ export const d_twig_1 = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 16 advisories; 3.x needs php >=8.1.0, require.php allows 7.1.3 (a major raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ^1.38) and csa/guzzle-bundle dev-compat-php (requires ^1.34|^2.4; itself pinned) and symfony/symfony v3.4.49 (requires ^1.41|^2.10; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 16,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 16,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -123526,7 +129414,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123550,7 +129488,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123574,7 +129562,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123592,13 +129630,22 @@ export const d_twig_1 = {
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "2.x",
                                     "version": "v2.15.3",
                                     "newest": "v2.16.1",
                                     "on_installed_branch": false,
                                     "php": ">=7.1.3",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123622,7 +129669,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123646,7 +129743,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123664,13 +129811,22 @@ export const d_twig_1 = {
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "2.x",
                                     "version": "v2.16.0",
                                     "newest": "v2.16.1",
                                     "on_installed_branch": false,
                                     "php": ">=7.1.3",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123694,7 +129850,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123718,7 +129924,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123742,7 +129998,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123766,7 +130072,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123790,7 +130146,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123814,7 +130220,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123838,7 +130294,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123862,7 +130368,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -123886,7 +130442,57 @@ export const d_twig_1 = {
                                     "newest": "v3.30.0",
                                     "on_installed_branch": false,
                                     "php": ">=8.1.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^1.38",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "csa/guzzle-bundle",
+                                            "version": "dev-compat-php",
+                                            "link": "require",
+                                            "constraint": "^1.34|^2.4",
+                                            "holder": {
+                                                "verdict": "high",
+                                                "lead": "pinned",
+                                                "flag_ids": [
+                                                    "pinned"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "symfony/symfony",
+                                            "version": "v3.4.49",
+                                            "link": "require",
+                                            "constraint": "^1.41|^2.10",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "left-behind",
+                                                "flag_ids": [
+                                                    "left-behind",
+                                                    "vulnerable"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "raise-php",
+                                                    "to_branch": "5.x",
+                                                    "constraint": "^5.4.53"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -124716,7 +131322,7 @@ export const d_twig_dev_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 15
+                    "records": 26
                 }
             ]
         },
@@ -125215,13 +131821,13 @@ export const d_twig_dev_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 15,
+                "records": 26,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 15,
+                        "records": 26,
                         "reason": null
                     }
                 ],
@@ -125293,7 +131899,7 @@ export const d_twig_dev_dagger = {
             "depth": 0,
             "depth_unmeasured": null,
             "named_in": [
-                "require"
+                "require-dev"
             ],
             "direct_dependents": [
                 "symfony/twig-bridge",
@@ -127703,8 +134309,8 @@ export const d_unknown = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 2,
+                    "records": 127
                 }
             ]
         },
@@ -127729,7 +134335,7 @@ export const d_unknown = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 1,
+    "packages_checked": 6,
     "packages_flagged": 0,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -127991,13 +134597,13 @@ export const d_unknown = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 0,
+                "records": 112,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 0,
+                        "records": 112,
                         "reason": null
                     }
                 ],
@@ -128069,7 +134675,58 @@ export const d_unknown = {
             "direct_dependents": [
                 "drupal/core"
             ],
-            "signals": [],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 3 flagged packages: guzzlehttp/guzzle (vulnerable), pear/console_getopt (silent), pear/pear_exception (stale)",
+                    "data": {
+                        "flagged": 3,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/guzzle",
+                                "chain": [
+                                    "drupal/core",
+                                    "guzzlehttp/guzzle"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            },
+                            {
+                                "package": "pear/console_getopt",
+                                "chain": [
+                                    "drupal/core",
+                                    "pear/archive_tar",
+                                    "pear/pear-core-minimal",
+                                    "pear/console_getopt"
+                                ],
+                                "verdict": "high",
+                                "lead": "silent",
+                                "flag_ids": [
+                                    "silent"
+                                ]
+                            },
+                            {
+                                "package": "pear/pear_exception",
+                                "chain": [
+                                    "drupal/core",
+                                    "pear/archive_tar",
+                                    "pear/pear-core-minimal",
+                                    "pear/pear_exception"
+                                ],
+                                "verdict": "low",
+                                "lead": "stale",
+                                "flag_ids": [
+                                    "stale"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
             "evidence": "",
             "allowlist_reason": null,
             "data_date": null,
@@ -128858,7 +135515,7 @@ export const d_unrated_dagger = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 5
                 }
             ]
         },
@@ -129256,13 +135913,13 @@ export const d_unrated_dagger = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],
@@ -130638,7 +137295,7 @@ export const d_unreached_dev_dagger = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "3.x",
-                "version": "v3.1.1",
+                "version": "v3.1.0",
                 "newest": "v3.1.1",
                 "constraint": "^3.1",
                 "latest": null,
@@ -131977,7 +138634,7 @@ export const d_unreached_move = {
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "7.x",
-                "version": "7.8.1",
+                "version": "7.8.0",
                 "newest": "7.8.1",
                 "constraint": "^7.8",
                 "latest": null,
@@ -131995,23 +138652,24 @@ export const d_unreached_move = {
                         "kind": "flag",
                         "id": "left-behind",
                         "basis": "branch_releasing"
-                    },
+                    }
+                ],
+                "unverified": [
                     {
                         "kind": "flag",
                         "id": "old-promise",
-                        "basis": "released_after_ga"
+                        "reason": "undated"
                     }
                 ],
-                "unverified": [],
                 "adds": [],
                 "leaves": [],
-                "clears_all": true,
+                "clears_all": false,
                 "if_applied": {
-                    "total": 0,
-                    "verdict": "ok",
-                    "lead": null,
+                    "total": 8,
+                    "verdict": "medium",
+                    "lead": "old-promise",
                     "deciding_advisory": null,
-                    "at_most": false,
+                    "at_most": true,
                     "assumes": [
                         "clears_hold",
                         "composer_resolves"
@@ -132031,7 +138689,7 @@ export const d_unreached_move = {
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind and old-promise; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it"
+                "text": "raise require.php to >=8.1, then move league/uri to ^7.8 \u2014 clears left-behind; 7.x needs php ^8.1, require.php allows 7.2.5 (a major raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve; lockrot found no path from your requirements to it, so what requires it must allow it"
             },
             "security": {
                 "status": "clear",
@@ -134245,7 +140903,7 @@ export const d_wp_config = {
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
-            "corroborating-share": 1,
+            "corroborating-share": 0,
             "advisory-points": 0,
             "no-reachable-fix-multiplier": 0,
             "security-max": 0,
@@ -134265,7 +140923,7 @@ export const d_wp_config = {
     "activity_cache_age_hours": null,
     "packages_checked": 1,
     "packages_flagged": 1,
-    "packages_multi_flag": 1,
+    "packages_multi_flag": 0,
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
@@ -134363,7 +141021,7 @@ export const d_wp_config = {
             }
         },
         "stale": {
-            "carrying": 1,
+            "carrying": 0,
             "leading": 0,
             "accepted": {
                 "all": 0,
@@ -134371,7 +141029,7 @@ export const d_wp_config = {
             },
             "by_verdict": {
                 "critical": 0,
-                "high": 1,
+                "high": 0,
                 "medium": 0,
                 "low": 0
             }
@@ -134419,8 +141077,8 @@ export const d_wp_config = {
         "deepest": []
     },
     "libyears": {
-        "total": 0,
-        "direct_requirements": 0,
+        "total": 7.61,
+        "direct_requirements": 7.61,
         "measured": 1,
         "at_least_count": 0,
         "unmeasured": {
@@ -134433,7 +141091,12 @@ export const d_wp_config = {
             "no_stable_release": 0,
             "undated_releases": 0
         },
-        "furthest_behind": null,
+        "furthest_behind": {
+            "package": "roots/wp-config",
+            "version": "1.0.0",
+            "libyears": 7.61,
+            "at_least": false
+        },
         "packages": 1
     },
     "baseline": null,
@@ -134520,42 +141183,25 @@ export const d_wp_config = {
                         "source": null
                     },
                     "summary": "released 2018-08-10 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested"
-                },
-                {
-                    "id": "stale",
-                    "role": "corroborating",
-                    "baseline": null,
-                    "signal_ids": [
-                        "S2"
-                    ],
-                    "degree": {
-                        "liveness_complete": true
-                    },
-                    "headline": {
-                        "unit": "years",
-                        "value": 8.1,
-                        "source": "release"
-                    },
-                    "summary": "last release 2018-08-10 (8.1 years ago)"
                 }
             ],
             "score": {
                 "model": 1,
-                "total": 18,
-                "exact": 18,
+                "total": 16,
+                "exact": 16,
                 "rounded_down": false,
                 "band": {
                     "floor": 16,
                     "next": "critical",
-                    "to_next": 14
+                    "to_next": 16
                 },
                 "decided_by": "maintenance",
                 "parts": {
                     "maintenance": {
                         "status": "counted",
-                        "contribution": 18,
+                        "contribution": 16,
                         "alone": {
-                            "total": 18,
+                            "total": 16,
                             "verdict": "high"
                         }
                     },
@@ -134579,46 +141225,12 @@ export const d_wp_config = {
                         "divisor": 1,
                         "points": 16,
                         "contribution": 16
-                    },
-                    {
-                        "part": "maintenance",
-                        "flag": "stale",
-                        "role": "corroborating",
-                        "weight": 8,
-                        "divisor": 4,
-                        "points": 2,
-                        "contribution": 2
                     }
                 ],
                 "modifiers": [],
                 "accepted": [],
-                "without": [
-                    {
-                        "remove": {
-                            "kind": "flag",
-                            "id": "old-promise"
-                        },
-                        "revealed": [],
-                        "total": 8,
-                        "verdict": "medium",
-                        "lead": "stale",
-                        "deciding_advisory": null,
-                        "at_least": false
-                    },
-                    {
-                        "remove": {
-                            "kind": "flag",
-                            "id": "stale"
-                        },
-                        "revealed": [],
-                        "total": 16,
-                        "verdict": "high",
-                        "lead": "old-promise",
-                        "deciding_advisory": null,
-                        "at_least": false
-                    }
-                ],
-                "text": "18 = old-promise 16 + stale 2 [\u00bc of 8]"
+                "without": [],
+                "text": "16 = old-promise 16"
             },
             "next_step": {
                 "kind": "test",
@@ -134633,9 +141245,9 @@ export const d_wp_config = {
                 "newest": null,
                 "constraint": null,
                 "latest": {
-                    "version": "1.0.0",
-                    "released": "2018-08-10T14:18:38+00:00",
-                    "is_installed": true,
+                    "version": "v2.0.0-beta.1",
+                    "released": "2026-03-21T17:18:34+00:00",
+                    "is_installed": false,
                     "relation": null,
                     "snapshot_time": null
                 },
@@ -134649,10 +141261,6 @@ export const d_wp_config = {
                     {
                         "kind": "flag",
                         "id": "old-promise"
-                    },
-                    {
-                        "kind": "flag",
-                        "id": "stale"
                     }
                 ],
                 "clears_all": false,
@@ -134661,7 +141269,7 @@ export const d_wp_config = {
                 "commands": [],
                 "through": [],
                 "also": [],
-                "text": "test it on PHP 8.4 \u2014 1.0.0 is its newest release"
+                "text": "test it on PHP 8.4"
             },
             "security": {
                 "status": "clear",
@@ -134731,17 +141339,6 @@ export const d_wp_config = {
             ],
             "signals": [
                 {
-                    "id": "S2",
-                    "level": "high",
-                    "summary": "last release 2018-08-10 (8.1 years ago)",
-                    "data": {
-                        "last_release": "2018-08-10T14:18:38+00:00",
-                        "last_version": "1.0.0",
-                        "years": 8.1,
-                        "dated_by": null
-                    }
-                },
-                {
                     "id": "S5",
                     "level": "warn",
                     "summary": "released 2018-08-10 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
@@ -134755,10 +141352,10 @@ export const d_wp_config = {
                     }
                 }
             ],
-            "evidence": "old-promise: released 2018-08-10 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested; stale: last release 2018-08-10 (8.1 years ago)",
+            "evidence": "old-promise: released 2018-08-10 for PHP 5 (php \">=5.6\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",
             "allowlist_reason": null,
             "data_date": "2026-10-01T17:41:20+00:00",
-            "libyears": 0,
+            "libyears": 7.61,
             "age": {
                 "installed": {
                     "at": "2018-08-10T14:18:38+00:00",
@@ -134767,10 +141364,10 @@ export const d_wp_config = {
                 },
                 "installed_unmeasured": null,
                 "release": {
-                    "version": "1.0.0",
-                    "at": "2018-08-10T14:18:38+00:00",
-                    "years": 8.1,
-                    "level": "high",
+                    "version": "v2.0.0-beta.1",
+                    "at": "2026-03-21T17:18:34+00:00",
+                    "years": 0.5,
+                    "level": null,
                     "dated_by": null
                 },
                 "release_unmeasured": null,
@@ -135570,7 +142167,7 @@ export const d_xmlseclibs = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 2
+                    "records": 4
                 }
             ]
         },
@@ -136110,13 +142707,13 @@ export const d_xmlseclibs = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 2,
+                "records": 4,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 2,
+                        "records": 4,
                         "reason": null
                     }
                 ],
@@ -137117,7 +143714,7 @@ export const d_yaml_3_4 = {
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 3
+                    "records": 5
                 }
             ]
         },
@@ -137648,13 +144245,13 @@ export const d_yaml_3_4 = {
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 3,
+                "records": 5,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 3,
+                        "records": 5,
                         "reason": null
                     }
                 ],

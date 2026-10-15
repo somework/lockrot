@@ -1,8 +1,9 @@
 <options=bold><fg=red>high (1)</fg=red></options=bold>
   web-auth/metadata-service v2.1.7  via web-auth/webauthn-lib  ·  abandoned · left-behind
       18 = (abandoned 32 + left-behind 4 [¼ of 16]) ÷ 2 transitive
-      do: replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace
-          or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it
+      do: replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through
+          web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no
+          longer requires it
       abandoned    marked abandoned by its registry, replacement: web-auth/webauthn-lib
       left-behind  branch 2.x last released 2019-09-04 (7.1 years ago); 4.x released 4.9.1 (2024-07-11)
 
@@ -13,7 +14,7 @@ deepest: web-auth/metadata-service, 1 hop (web-auth/webauthn-lib › web-auth/me
 libyears: 4.9 behind across the one package · 0.0 from direct requirements ·
 furthest behind web-auth/metadata-service v2.1.7 at 4.9
 pulled in by: web-auth/webauthn-lib 1
-advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
+advisories: 1 package asked · packagist.org answered (3 on record for 1 package)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

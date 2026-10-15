@@ -756,7 +756,7 @@
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 14
+                    "records": 15
                 }
             ]
         },
@@ -781,7 +781,7 @@
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 3,
+    "packages_checked": 5,
     "packages_flagged": 1,
     "packages_multi_flag": 1,
     "include_dev": false,
@@ -1000,21 +1000,15 @@
             "low": 0
         },
         "fixes": {
-            "update": 1,
-            "upgrade": 0,
+            "update": 0,
+            "upgrade": 1,
             "raise-php": 0,
             "unknown": 0,
             "blocked": 0,
             "none": 0
         },
-        "update_now": [
-            "guzzlehttp/guzzle"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "guzzlehttp/guzzle"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-01T17:41:20+00:00",
@@ -1143,7 +1137,7 @@
                         "role": "security",
                         "advisory": "PKSA-2z36-j4q9-rsfy",
                         "severity": "high",
-                        "fix_kind": "update",
+                        "fix_kind": "upgrade",
                         "weight": 16,
                         "multiplier": 1,
                         "points": 16,
@@ -1208,7 +1202,7 @@
                 "kind": "require",
                 "source": "left-behind",
                 "merged": [],
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "reason": null,
                 "replacement": null,
                 "quiet_years": null,
@@ -1225,7 +1219,56 @@
                     "raise_size": null
                 },
                 "crosses_major": true,
-                "held_by": [],
+                "held_by": [
+                    {
+                        "source": "root",
+                        "package": null,
+                        "version": null,
+                        "link": "require",
+                        "constraint": "^5.3.4",
+                        "holder": null
+                    },
+                    {
+                        "source": "package",
+                        "package": "bdunogier/guzzle-site-authenticator",
+                        "version": "1.1.0",
+                        "link": "require",
+                        "constraint": "^5.3.1",
+                        "holder": {
+                            "verdict": "medium",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ],
+                            "replacement": null,
+                            "next_step": {
+                                "kind": "no-move",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    },
+                    {
+                        "source": "package",
+                        "package": "php-http/guzzle5-adapter",
+                        "version": "2.0.0",
+                        "link": "require",
+                        "constraint": "^5.1",
+                        "holder": {
+                            "verdict": "critical",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ],
+                            "replacement": "php-http/guzzle7-adapter",
+                            "next_step": {
+                                "kind": "replace",
+                                "to_branch": null,
+                                "constraint": null
+                            }
+                        }
+                    }
+                ],
                 "clears": [
                     {
                         "kind": "flag",
@@ -1324,6 +1367,7 @@
                     ]
                 },
                 "composer_moves_because": [
+                    "holders",
                     "crosses_major"
                 ],
                 "commands": [
@@ -1335,20 +1379,20 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
             },
             "security": {
                 "status": "vulnerable",
                 "check": "complete",
                 "complete": true,
                 "unchecked_reason": null,
-                "records": 14,
+                "records": 15,
                 "feeds": [
                     {
                         "composer_repository": "composer repo (https://repo.packagist.org)",
                         "registry": "packagist.org",
                         "answer": "answered",
-                        "records": 14,
+                        "records": 15,
                         "reason": null
                     }
                 ],
@@ -1362,7 +1406,7 @@
                 },
                 "ignored": [],
                 "ignored_count": 0,
-                "fix_kind": "update",
+                "fix_kind": "upgrade",
                 "installed_branch_fixes": {
                     "fixed": 0,
                     "unknown": 0,
@@ -1442,6 +1486,43 @@
                     }
                 },
                 {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
+                    "data": {
+                        "flagged": 2,
+                        "packages": [
+                            {
+                                "package": "guzzlehttp/ringphp",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            },
+                            {
+                                "package": "guzzlehttp/streams",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "guzzlehttp/ringphp",
+                                    "guzzlehttp/streams"
+                                ],
+                                "verdict": "high",
+                                "lead": "abandoned",
+                                "flag_ids": [
+                                    "abandoned",
+                                    "old-promise"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
                     "id": "S8",
                     "level": "high",
                     "summary": "branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06)",
@@ -1490,13 +1571,62 @@
                                 "points": 16,
                                 "deciding": true,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1514,13 +1644,62 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.6",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1538,13 +1717,62 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.7",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1562,13 +1790,62 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.2",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1586,13 +1863,62 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1610,13 +1936,62 @@
                                 "points": 16,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "6.x",
                                     "version": "6.5.8",
                                     "newest": "6.5.8",
                                     "on_installed_branch": false,
                                     "php": ">=5.5",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1634,13 +2009,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.12.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1658,13 +2082,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1682,13 +2155,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.12.3",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1706,13 +2228,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.2",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1730,13 +2301,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1754,13 +2374,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.12.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1778,13 +2447,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.14.2",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null
@@ -1802,13 +2520,62 @@
                                 "points": 8,
                                 "deciding": false,
                                 "fix": {
-                                    "kind": "update",
+                                    "kind": "upgrade",
                                     "to_branch": "7.x",
                                     "version": "7.15.1",
                                     "newest": "7.15.5",
                                     "on_installed_branch": false,
                                     "php": "^7.2.5 || ^8.0",
-                                    "held_by": [],
+                                    "held_by": [
+                                        {
+                                            "source": "root",
+                                            "package": null,
+                                            "version": null,
+                                            "link": "require",
+                                            "constraint": "^5.3.4",
+                                            "holder": null
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "bdunogier/guzzle-site-authenticator",
+                                            "version": "1.1.0",
+                                            "link": "require",
+                                            "constraint": "^5.3.1",
+                                            "holder": {
+                                                "verdict": "medium",
+                                                "lead": "stale",
+                                                "flag_ids": [
+                                                    "stale"
+                                                ],
+                                                "replacement": null,
+                                                "next_step": {
+                                                    "kind": "no-move",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "source": "package",
+                                            "package": "php-http/guzzle5-adapter",
+                                            "version": "2.0.0",
+                                            "link": "require",
+                                            "constraint": "^5.1",
+                                            "holder": {
+                                                "verdict": "critical",
+                                                "lead": "abandoned",
+                                                "flag_ids": [
+                                                    "abandoned"
+                                                ],
+                                                "replacement": "php-http/guzzle7-adapter",
+                                                "next_step": {
+                                                    "kind": "replace",
+                                                    "to_branch": null,
+                                                    "constraint": null
+                                                }
+                                            }
+                                        }
+                                    ],
                                     "reason": null
                                 },
                                 "baseline": null

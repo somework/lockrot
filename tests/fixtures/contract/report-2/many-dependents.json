@@ -1129,7 +1129,7 @@
                 "replacement": null,
                 "quiet_years": null,
                 "to_branch": "2.x",
-                "version": "v2.5.4",
+                "version": "v2.5.0",
                 "newest": "v2.5.4",
                 "constraint": "^2.5",
                 "latest": null,

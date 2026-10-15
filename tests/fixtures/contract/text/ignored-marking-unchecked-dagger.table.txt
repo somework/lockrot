@@ -7,6 +7,7 @@
                    admits 8.4 untested
       stale        last release 2022-07-28 (4.2 years ago)
       abandoned marking ignored (policy.abandoned: symfony/debug): removed in the 7.x upgrade
+      checks missing: S3, S4 (rate limited)
 
 3 packages checked · 1 flagged: high 1
 flags: old-promise 1 · stale 1 · 1 package carries more than one
@@ -14,8 +15,9 @@ depth: every flagged package is named in composer.json · direct 1
 libyears: 1.8 behind across the one package · 1.8 from direct requirements ·
 furthest behind symfony/debug v3.4.47 at 1.8
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)
-<fg=red>gate: fails · --fail-on=high,unchecked · 1 finding fails it (high 1) · target php 8.4 (--target-php)</fg=red>
+<fg=red>gate: fails · --fail-on=high,unchecked · 1 finding fails it (high 1, unchecked 1) · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.
+note: GitHub API rate limit reached; repository activity missing for 1 repositories
 note: Composer's abandoned ignore list (config.policy.abandoned.ignore) covers the abandoned marking of 1 package:
 symfony/debug. lockrot does not count the marking; an archived repository and the release and push dates still count.

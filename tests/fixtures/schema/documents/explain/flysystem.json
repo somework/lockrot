@@ -166,7 +166,49 @@
     "raise_size": null
    },
    "crosses_major": true,
-   "held_by": [],
+   "held_by": [
+    {
+     "source": "package",
+     "package": "barryvdh/elfinder-flysystem-driver",
+     "version": "v0.2.1",
+     "link": "require",
+     "constraint": "^1.0",
+     "holder": {
+      "verdict": "medium",
+      "lead": "left-behind",
+      "flag_ids": [
+       "left-behind",
+       "old-promise"
+      ],
+      "replacement": null,
+      "next_step": {
+       "kind": "require",
+       "to_branch": "0.6.x",
+       "constraint": "^0.6.0"
+      }
+     }
+    },
+    {
+     "source": "package",
+     "package": "league/flysystem-cached-adapter",
+     "version": "1.1.0",
+     "link": "require",
+     "constraint": "~1.0",
+     "holder": {
+      "verdict": "low",
+      "lead": "stale",
+      "flag_ids": [
+       "stale"
+      ],
+      "replacement": null,
+      "next_step": {
+       "kind": "no-move",
+       "to_branch": null,
+       "constraint": null
+      }
+     }
+    }
+   ],
    "clears": [
     {
      "kind": "flag",
@@ -195,8 +237,8 @@
     ]
    },
    "composer_moves_because": [
-    "crosses_major",
-    "transitive"
+    "holders",
+    "crosses_major"
    ],
    "commands": [],
    "through": [
@@ -210,7 +252,7 @@
     }
    ],
    "also": [],
-   "text": "move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it"
+   "text": "move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
   },
   "security": {
    "status": "vulnerable",
@@ -472,7 +514,49 @@
      "fix_kind": "upgrade",
      "lowest": "3.36.0",
      "newest": "3.36.0",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "package",
+       "package": "barryvdh/elfinder-flysystem-driver",
+       "version": "v0.2.1",
+       "link": "require",
+       "constraint": "^1.0",
+       "holder": {
+        "verdict": "medium",
+        "lead": "left-behind",
+        "flag_ids": [
+         "left-behind",
+         "old-promise"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "require",
+         "to_branch": "0.6.x",
+         "constraint": "^0.6.0"
+        }
+       }
+      },
+      {
+       "source": "package",
+       "package": "league/flysystem-cached-adapter",
+       "version": "1.1.0",
+       "link": "require",
+       "constraint": "~1.0",
+       "holder": {
+        "verdict": "low",
+        "lead": "stale",
+        "flag_ids": [
+         "stale"
+        ],
+        "replacement": null,
+        "next_step": {
+         "kind": "no-move",
+         "to_branch": null,
+         "constraint": null
+        }
+       }
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",

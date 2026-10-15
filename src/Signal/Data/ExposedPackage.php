@@ -44,6 +44,12 @@ final class ExposedPackage implements \JsonSerializable
         return $this->lead;
     }
 
+    /** @return list<string> */
+    public function flagIds(): array
+    {
+        return $this->flagIds;
+    }
+
     /** @return array{package: string, chain: list<string>, verdict: string, lead: ?string, flag_ids: list<string>} */
     public function jsonSerialize(): array
     {

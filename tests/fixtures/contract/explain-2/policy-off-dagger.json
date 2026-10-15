@@ -155,13 +155,13 @@
             "check": "complete",
             "complete": true,
             "unchecked_reason": null,
-            "records": 1,
+            "records": 2,
             "feeds": [
                 {
                     "composer_repository": "composer repo (https://repo.packagist.org)",
                     "registry": "packagist.org",
                     "answer": "answered",
-                    "records": 1,
+                    "records": 2,
                     "reason": null
                 }
             ],
@@ -1249,7 +1249,7 @@
                     "reason": null,
                     "message": null,
                     "packages_with_records": 1,
-                    "records": 1
+                    "records": 2
                 }
             ]
         }

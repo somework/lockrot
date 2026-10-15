@@ -1,12 +1,12 @@
 {
     "score_text": "20 = left-behind 16 + old-promise 4 [¼ of 16]",
-    "next_step_text": "require symfony/monolog-bridge ^5.4 — clears left-behind and old-promise; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve",
+    "next_step_text": "require symfony/monolog-bridge ^5.4 — clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · advisories not applied to 1 package: not checked (offline) · target php 8.4 (--target-php)",
-    "age_line": "age: installed v2.6.13 released 2016-01-14 (10.7 years ago); 2.x last released v2.8.52 2019-11-13 (6.9 years ago); newest release v6.4.45 2026-08-30 (0.1 years ago); last push 2026-09-23 (less than three weeks ago)",
+    "age_line": "age: installed v2.6.13 released 2016-01-14 (10.7 years ago, dated by symfony/symfony); 2.x last released v2.8.52 2019-11-13 (6.9 years ago, dated by symfony/symfony); newest release v6.4.45 2026-08-30 (0.1 years ago); last push 2026-09-23 (less than three weeks ago)",
     "explain_age": [
-        "installed  v2.6.13   2016-01-14   10.7 years ago",
-        "2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5",
+        "installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony",
+        "2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony",
         "newest     v6.4.45   2026-08-30   0.1 years ago                 below release-warn-years 3",
         "last push            2026-09-23   less than three weeks ago     below push-warn-years 3",
         "libyears 10.6 behind the newest stable release"

@@ -10,8 +10,9 @@
 
 35 packages checked · 1 flagged: medium 1
 flags: left-behind 1
-depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
-deepest: symfony/var-dumper, 1 hop (symfony/error-handler › symfony/var-dumper)
+depth: every flagged package is named in composer.json · 1 hop 1 ·
+deepest: symfony/var-dumper, 1 hop (symfony/error-handler › symfony/var-dumper) ·
+1 more is named only in require-dev, which this run did not walk (pass --dev)
 libyears: 3.9 behind across the one package · 0.0 from direct requirements ·
 furthest behind symfony/var-dumper v4.4.47 at 3.9
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)

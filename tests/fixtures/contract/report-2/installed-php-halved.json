@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 3
                 }
             ]
         },
@@ -1182,7 +1182,13 @@
                     "suggestion": "web-auth/webauthn-lib",
                     "url": "https://packagist.org/packages/web-auth/webauthn-lib",
                     "named_by": "repository",
-                    "finding": null
+                    "finding": {
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "flag_ids": [
+                            "left-behind"
+                        ]
+                    }
                 },
                 "quiet_years": null,
                 "to_branch": null,
@@ -1233,7 +1239,7 @@
                     }
                 ],
                 "also": [],
-                "text": "replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
+                "text": "replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
             },
             "security": {
                 "status": "clear",

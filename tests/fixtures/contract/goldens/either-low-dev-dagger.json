@@ -3,12 +3,12 @@
     "next_step_text": "no release fixes it",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
-    "age_line": "age: installed v1.0.2 released 2023-03-27 (3.5 years ago), its newest release",
+    "age_line": "age: installed v1.0.2 released 2023-03-27 (3.5 years ago), its newest release; last commit 2023-03-27 (3.5 years ago)",
     "explain_age": [
         "installed  v1.0.2    2023-03-27   3.5 years ago",
         "1.x        v1.0.2    2023-03-27   3.5 years ago                 past release-warn-years 3",
         "newest     v1.0.2    2023-03-27   3.5 years ago                 past release-warn-years 3",
-        "last push            not read (request failed)",
+        "last commit          2023-03-27   3.5 years ago                 past push-warn-years 3",
         "libyears 0.0 behind the newest stable release"
     ],
     "baseline_suffix": null,

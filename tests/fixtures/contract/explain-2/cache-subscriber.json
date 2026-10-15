@@ -306,6 +306,45 @@
                     "written_for_php": 5,
                     "released": "2019-09-16T13:44:55+00:00"
                 }
+            },
+            {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned \u00b7 old-promise), guzzlehttp/streams (abandoned \u00b7 old-promise)",
+                "data": {
+                    "flagged": 2,
+                    "packages": [
+                        {
+                            "package": "guzzlehttp/ringphp",
+                            "chain": [
+                                "guzzlehttp/cache-subscriber",
+                                "guzzlehttp/guzzle",
+                                "guzzlehttp/ringphp"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "guzzlehttp/streams",
+                            "chain": [
+                                "guzzlehttp/cache-subscriber",
+                                "guzzlehttp/guzzle",
+                                "guzzlehttp/ringphp",
+                                "guzzlehttp/streams"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ]
+                        }
+                    ]
+                }
             }
         ],
         "evidence": "abandoned: marked abandoned by its registry; its repository is archived on GitHub; last release 2019-09-16 (7.0 years ago); last push 2019-09-16 (7.0 years ago); old-promise: released 2019-09-16 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested",

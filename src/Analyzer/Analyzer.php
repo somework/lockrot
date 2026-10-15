@@ -43,6 +43,7 @@ use Lockrot\Security\PackageFixes;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
+use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
@@ -636,7 +637,7 @@ final class Analyzer
             $finding,
             $subject,
             $facts->metadata(),
-            BranchRow::all($facts, $floor, $this->clock, null, $details->fixes()),
+            BranchRow::all($facts, $floor, $this->clock, $finding->signalData(LeftBehindData::class), $details->fixes()),
             $details->fixes(),
             $finder,
             $floor,

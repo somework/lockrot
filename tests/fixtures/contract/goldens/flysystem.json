@@ -1,6 +1,6 @@
 {
     "score_text": "10 = left-behind 16 ÷ 2 transitive + vulnerable 2 [low advisory]",
-    "next_step_text": "move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it",
+    "next_step_text": "move league/flysystem to ^3.36 through mautic/core-lib — clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve",
     "gate_line": null,
     "run_gate_line": "gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 1.1.9 released 2021-12-09 (4.8 years ago); 1.x last released 1.1.10 2022-10-04 (4.0 years ago); newest release 3.36.0 2026-09-02 (0.1 years ago); last push 2026-09-02 (0.1 years ago)",

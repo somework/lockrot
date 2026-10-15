@@ -65,7 +65,7 @@
                     "level": "warning",
                     "rank": 50.0,
                     "message": {
-                        "text": "league/flysystem 1.1.9 \u2014 finding medium, 10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory] \u2014 left-behind: branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02). Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it."
+                        "text": "league/flysystem 1.1.9 \u2014 finding medium, 10 = left-behind 16 \u00f7 2 transitive + vulnerable 2 [low advisory] \u2014 left-behind: branch 1.x last released 2022-10-04 (4.0 years ago); 3.x released 3.36.0 (2026-09-02). Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "league/flysystem"
@@ -149,7 +149,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 20
                                 }
                             }
                         }
@@ -161,7 +161,7 @@
                     "level": "warning",
                     "rank": 20.0,
                     "message": {
-                        "text": "league/flysystem 1.1.9 is affected by CVE-2026-102601 (low advisory): Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter. Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it."
+                        "text": "league/flysystem 1.1.9 is affected by CVE-2026-102601 (low advisory): Flysystem: WhitespacePathNormalizer's control-character (CorruptedPathDetected) check is bypassed by malformed UTF-8 in the path, affecting every adapter. Do: move league/flysystem to ^3.36 through mautic/core-lib \u2014 clears left-behind and the advisory; 3.x needs php ^8.0.2; the target php 8.4 runs it; held by barryvdh/elfinder-flysystem-driver v0.2.1 (requires ^1.0; itself left-behind) and league/flysystem-cached-adapter 1.1.0 (requires ~1.0; itself stale); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "league/flysystem",
@@ -232,13 +232,55 @@
                         "cve": "CVE-2026-102601",
                         "severity": "low",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "3.x",
                             "version": "3.36.0",
                             "newest": "3.36.0",
                             "on_installed_branch": false,
                             "php": "^8.0.2",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "package",
+                                    "package": "barryvdh/elfinder-flysystem-driver",
+                                    "version": "v0.2.1",
+                                    "link": "require",
+                                    "constraint": "^1.0",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "left-behind",
+                                        "flag_ids": [
+                                            "left-behind",
+                                            "old-promise"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "require",
+                                            "to_branch": "0.6.x",
+                                            "constraint": "^0.6.0"
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "league/flysystem-cached-adapter",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "~1.0",
+                                    "holder": {
+                                        "verdict": "low",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 2,
@@ -249,7 +291,7 @@
                             "role": "security",
                             "advisory": "PKSA-w9tt-7782-78jx",
                             "severity": "low",
-                            "fix_kind": "update",
+                            "fix_kind": "upgrade",
                             "weight": 2,
                             "multiplier": 1,
                             "points": 2,
@@ -264,7 +306,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 20
                                 }
                             }
                         }
@@ -337,7 +379,7 @@
                             "reason": null,
                             "message": null,
                             "packages_with_records": 1,
-                            "records": 1
+                            "records": 2
                         }
                     ]
                 }

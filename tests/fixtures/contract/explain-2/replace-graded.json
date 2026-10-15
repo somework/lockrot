@@ -99,7 +99,13 @@
                 "suggestion": "web-token/jwt-library",
                 "url": "https://packagist.org/packages/web-token/jwt-library",
                 "named_by": "repository",
-                "finding": null
+                "finding": {
+                    "verdict": "high",
+                    "lead": null,
+                    "flag_ids": [
+                        "vulnerable"
+                    ]
+                }
             },
             "quiet_years": null,
             "to_branch": null,
@@ -125,7 +131,7 @@
             "commands": [],
             "through": [],
             "also": [],
-            "text": "replace with web-token/jwt-library (named by its registry)"
+            "text": "replace with web-token/jwt-library (named by its registry; itself high: vulnerable)"
         },
         "security": {
             "status": "clear",
@@ -203,6 +209,53 @@
                     "replacement": "web-token/jwt-library",
                     "replacement_url": "https://packagist.org/packages/web-token/jwt-library"
                 }
+            },
+            {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 3 flagged packages: web-token/jwt-library (vulnerable), paragonie/sodium_compat (vulnerable), brick/math (left-behind)",
+                "data": {
+                    "flagged": 3,
+                    "packages": [
+                        {
+                            "package": "web-token/jwt-library",
+                            "chain": [
+                                "web-token/jwt-key-mgmt",
+                                "web-token/jwt-library"
+                            ],
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "paragonie/sodium_compat",
+                            "chain": [
+                                "web-token/jwt-key-mgmt",
+                                "paragonie/sodium_compat"
+                            ],
+                            "verdict": "medium",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "brick/math",
+                            "chain": [
+                                "web-token/jwt-key-mgmt",
+                                "web-token/jwt-library",
+                                "brick/math"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        }
+                    ]
+                }
             }
         ],
         "evidence": "abandoned: marked abandoned by its registry, replacement: web-token/jwt-library",
@@ -255,14 +308,14 @@
     "metadata": {
         "abandoned": true,
         "replacement": "web-token/jwt-library",
-        "releases_listed": 12,
+        "releases_listed": 22,
         "has_stable_release": true,
         "last_stable_release": null,
         "last_stable_version": null,
         "last_stable_dated_by": null,
         "installed_release": null,
         "installed_release_dated_by": null,
-        "repository": null,
+        "repository": "https://github.com/web-token/jwt-key-mgmt.git",
         "type": "library",
         "data_date": "2026-10-01T17:41:20+00:00",
         "branches": [
@@ -271,9 +324,9 @@
                 "installed": true,
                 "highest": "3.4.8",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2024-02-22T07:19:34+00:00",
                 "newest_dated": "3.4.8",
-                "newest_dated_released": null,
+                "newest_dated_released": "2024-02-22T07:19:34+00:00",
                 "dated_by": null,
                 "php": ">=8.1",
                 "highest_php": ">=8.1",
@@ -293,9 +346,9 @@
                 "installed": false,
                 "highest": "v2.2.11",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2021-03-17T14:55:52+00:00",
                 "newest_dated": "v2.2.11",
-                "newest_dated_released": null,
+                "newest_dated_released": "2021-03-17T14:55:52+00:00",
                 "dated_by": null,
                 "php": null,
                 "highest_php": null,
@@ -381,9 +434,9 @@
                 "installed": false,
                 "highest": "v0.3.2",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2017-11-17T12:36:11+00:00",
                 "newest_dated": "v0.3.2",
-                "newest_dated_released": null,
+                "newest_dated_released": "2017-11-17T12:36:11+00:00",
                 "dated_by": null,
                 "php": "^7.1",
                 "highest_php": "^7.1",
@@ -403,9 +456,9 @@
                 "installed": false,
                 "highest": "v0.2.3",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2017-11-15T20:33:14+00:00",
                 "newest_dated": "v0.2.3",
-                "newest_dated_released": null,
+                "newest_dated_released": "2017-11-15T20:33:14+00:00",
                 "dated_by": null,
                 "php": "^7.1",
                 "highest_php": "^7.1",
@@ -1256,8 +1309,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 2,
+                    "records": 7
                 }
             ]
         }

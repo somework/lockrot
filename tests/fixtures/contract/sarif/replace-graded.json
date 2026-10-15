@@ -44,7 +44,7 @@
                     "level": "error",
                     "rank": 100.0,
                     "message": {
-                        "text": "web-token/jwt-key-mgmt 3.4.3 \u2014 finding critical, 32 = abandoned 32 \u2014 abandoned: marked abandoned by its registry, replacement: web-token/jwt-library. Do: replace with web-token/jwt-library (named by its registry)."
+                        "text": "web-token/jwt-key-mgmt 3.4.3 \u2014 finding critical, 32 = abandoned 32 \u2014 abandoned: marked abandoned by its registry, replacement: web-token/jwt-library. Do: replace with web-token/jwt-library (named by its registry; itself high: vulnerable)."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "web-token/jwt-key-mgmt"
@@ -76,7 +76,8 @@
                             "web-token/jwt-key-mgmt"
                         ],
                         "signal_ids": [
-                            "S1"
+                            "S1",
+                            "S7"
                         ],
                         "age": {
                             "installed": null,
@@ -110,7 +111,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 48
                                 }
                             }
                         }
@@ -176,8 +177,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 0,
-                            "records": 0
+                            "packages_with_records": 2,
+                            "records": 7
                         }
                     ]
                 }

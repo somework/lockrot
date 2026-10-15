@@ -68,15 +68,15 @@ final class CaseHydratorTest extends TestCase
         self::assertSame([JsonPath::stringAt($recorded, ['by']), JsonPath::arrayAt($recorded, ['rules'])], [JsonPath::stringAt($finding, ['abandoned_ignored', 'by']), JsonPath::arrayAt($finding, ['abandoned_ignored', 'rules'])]);
     }
 
-    /** Case C has a release without a date: lockrot reads it as undated, and the case still hydrates. */
+    /** Case snapshot-undated-line‡ has a release without a date: lockrot reads it as undated, and the case still hydrates. */
     public function testACaseWithAnUndatedReleaseHydrates(): void
     {
-        $case = CaseHydrator::case('C');
+        $case = CaseHydrator::case('snapshot-undated-line‡');
         $undated = 0;
         foreach (JsonPath::arrayAt($case, ['inputs', 'releases']) as $release) {
             $undated += \is_array($release) && \array_key_exists('time', $release) && $release['time'] === null ? 1 : 0;
         }
-        self::assertGreaterThan(0, $undated, 'case C records an undated release');
+        self::assertGreaterThan(0, $undated, 'case snapshot-undated-line‡ records an undated release');
 
         $packages = array_column(JsonPath::arrayAt(CaseHydrator::report($case)->toArray(), ['findings']), 'package');
 

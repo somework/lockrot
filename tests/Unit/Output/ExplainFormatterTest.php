@@ -73,10 +73,10 @@ final class ExplainFormatterTest extends TestCase
             }
         }
 
-        self::assertStringStartsWith("symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable\n  direct requirement (composer.json require)\n\nage       installed  v2.6.13   2016-01-14   10.7 years ago\n", $text);
+        self::assertStringStartsWith("symfony/monolog-bridge v2.6.13 — critical: left-behind · old-promise · vulnerable\n  direct requirement (composer.json require)\n\nage       installed  v2.6.13   2016-01-14   10.7 years ago                dated by symfony/symfony\n", $text);
         self::assertSame(['age', 'repository', 'score', 'do', 'flags', 'repository metadata'], $blocks);
         self::assertStringContainsString("\nscore     36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]     critical from 32\n  maintenance  left-behind 16 (lead) · old-promise 4 (¼ of 16)\n  security     vulnerable 16 (high advisory CVE-2026-45077)\n  reach        direct requirement: maintenance not halved for reach\n  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)\n", $text);
-        self::assertStringContainsString("\n          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5\n", $text);
+        self::assertStringContainsString("\n          2.x        v2.8.52   2019-11-13   6.9 years ago                 past release-high-years 5; dated by symfony/symfony\n", $text);
         self::assertStringContainsString("\n  feeds        packagist.org: 1 on record, 1 affects v2.6.13\n  accepted     none\n  not checked  nothing\n", $text);
         self::assertStringContainsString("\n     5.x      v5.4.52       2026-05-07   >=7.2.5    1 of 1 · upgrade (lowest fix); held by composer.json; after it: 0, ok, if Composer resolves it\n", $text);
         self::assertStringContainsString("\n   * 2.x      v2.8.52       2019-11-13   >=5.3.9    0 of 1\n", $text);

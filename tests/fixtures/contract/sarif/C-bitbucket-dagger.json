@@ -63,7 +63,7 @@
                     "level": "error",
                     "rank": 100.0,
                     "message": {
-                        "text": "symfony/debug v3.4.47 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry)."
+                        "text": "symfony/debug v3.4.47 \u2014 finding critical, 36 = abandoned 32 + old-promise 4 [\u00bc of 16] \u2014 abandoned: marked abandoned by its registry, replacement: symfony/error-handler; last release 2022-07-28 (4.2 years ago); last commit 2022-07-29 (4.2 years ago). Do: replace with symfony/error-handler (named by its registry)."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "symfony/debug"
@@ -100,6 +100,7 @@
                         "signal_ids": [
                             "S1",
                             "S2",
+                            "S4",
                             "S5"
                         ],
                         "age": {
@@ -125,8 +126,12 @@
                                 "dated_by": null
                             },
                             "branch_release_unmeasured": null,
-                            "push": null,
-                            "push_unmeasured": "no_token"
+                            "push": {
+                                "at": "2022-07-29T12:25:06+00:00",
+                                "years": 4.2,
+                                "level": "warn"
+                            },
+                            "push_unmeasured": null
                         },
                         "term": {
                             "part": "maintenance",
@@ -146,7 +151,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -199,7 +204,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 12
                                 }
                             }
                         }
@@ -243,15 +248,7 @@
                         ],
                         "mode": "check",
                         "strict_network": false
-                    },
-                    "toolExecutionNotifications": [
-                        {
-                            "level": "note",
-                            "message": {
-                                "text": "Bitbucket credentials not set: repository activity checked for 0 candidate packages, 1 packages skipped (add bitbucket.org credentials to auth.json to check all)"
-                            }
-                        }
-                    ]
+                    }
                 }
             ],
             "properties": {

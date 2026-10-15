@@ -11,7 +11,7 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 4 hops 1 �
 security: 1 vulnerable package · 2 advisories: 1 high, 1 medium
 libyears: 6.0 behind across the one package · 0.0 from direct requirements · furthest behind robrichards/xmlseclibs 3.1.1 at 6.0
 pulled in by: `mautic/core-lib` 1
-advisories: 1 package asked · packagist.org answered (2 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (4 on record for 1 package)
 
 **Update now:** `composer update robrichards/xmlseclibs`
 

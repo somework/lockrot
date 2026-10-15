@@ -8,15 +8,17 @@
                    || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach
       vulnerable   9 advisories: 1 high, 8 medium — none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host
                    can bypass host-based checks
+      pulls in 3 flagged packages: guzzlehttp/psr7 (left-behind · vulnerable), guzzlehttp/promises (left-behind),
+      symfony/polyfill-intl-idn (vulnerable)
 
-1 package checked · 1 flagged: critical 1
+4 packages checked · 1 flagged: critical 1
 flags: left-behind 1 · vulnerable 1 · 1 package carries more than one
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 9 advisories: 1 high, 8 medium · packages-dev not checked (pass --dev)
 fix, by package: php floor raise 1
 libyears: 4.2 behind across the one package · 4.2 from direct requirements ·
 furthest behind guzzlehttp/guzzle 6.5.8 at 4.2
-advisories: 1 package asked · packagist.org answered (9 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (22 on record for 3 packages)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

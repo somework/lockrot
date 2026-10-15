@@ -357,7 +357,7 @@
                     "level": "error",
                     "rank": 75.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 left-behind: branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06). Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 left-behind: branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06). Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle"
@@ -394,6 +394,7 @@
                         ],
                         "signal_ids": [
                             "S5",
+                            "S7",
                             "S8",
                             "S9"
                         ],
@@ -445,7 +446,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -457,7 +458,7 @@
                     "level": "warning",
                     "rank": 25.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical, 36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory] \u2014 old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle"
@@ -499,7 +500,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -511,7 +512,7 @@
                     "level": "error",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31043 (high advisory): Fix failure to strip Authorization header on HTTP downgrade. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31043 (high advisory): Fix failure to strip Authorization header on HTTP downgrade. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -549,6 +550,7 @@
                         ],
                         "signal_ids": [
                             "S5",
+                            "S7",
                             "S8",
                             "S9"
                         ],
@@ -586,13 +588,62 @@
                         "cve": "CVE-2022-31043",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.7",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -603,7 +654,7 @@
                             "role": "security",
                             "advisory": "PKSA-2z36-j4q9-rsfy",
                             "severity": "high",
-                            "fix_kind": "update",
+                            "fix_kind": "upgrade",
                             "weight": 16,
                             "multiplier": 1,
                             "points": 16,
@@ -618,7 +669,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -630,7 +681,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-29248 (high advisory): Cross-domain cookie leakage. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-29248 (high advisory): Cross-domain cookie leakage. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -659,13 +710,62 @@
                         "cve": "CVE-2022-29248",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.6",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -679,7 +779,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -691,7 +791,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31042 (high advisory): Failure to strip the Cookie header on change in host or HTTP downgrade. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31042 (high advisory): Failure to strip the Cookie header on change in host or HTTP downgrade. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -720,13 +820,62 @@
                         "cve": "CVE-2022-31042",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.7",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -740,7 +889,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -752,7 +901,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69246 (high advisory): Guzzle: Noncanonical host can bypass host-based checks. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69246 (high advisory): Guzzle: Noncanonical host can bypass host-based checks. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -781,13 +930,62 @@
                         "cve": "CVE-2026-69246",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.15.2",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -801,7 +999,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -813,7 +1011,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31090 (high advisory): CURLOPT_HTTPAUTH option not cleared on change of origin. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31090 (high advisory): CURLOPT_HTTPAUTH option not cleared on change of origin. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -842,13 +1040,62 @@
                         "cve": "CVE-2022-31090",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.8",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -862,7 +1109,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -874,7 +1121,7 @@
                     "level": "warning",
                     "rank": 80.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31091 (high advisory): Change in port should be considered a change in origin. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2022-31091 (high advisory): Change in port should be considered a change in origin. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -903,13 +1150,62 @@
                         "cve": "CVE-2022-31091",
                         "severity": "high",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "6.x",
                             "version": "6.5.8",
                             "newest": "6.5.8",
                             "on_installed_branch": false,
                             "php": ">=5.5",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 16,
@@ -923,7 +1219,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -935,7 +1231,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55767 (medium advisory): Dot-only cookie domains match all hosts. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55767 (medium advisory): Dot-only cookie domains match all hosts. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -964,13 +1260,62 @@
                         "cve": "CVE-2026-55767",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.12.1",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -984,7 +1329,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -996,7 +1341,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67353 (medium advisory): Guzzle: Unbounded response cookies risk denial of service. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67353 (medium advisory): Guzzle: Unbounded response cookies risk denial of service. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1025,13 +1370,62 @@
                         "cve": "CVE-2026-67353",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.15.1",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1045,7 +1439,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -1057,7 +1451,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-59883 (medium advisory): Guzzle: Cookie Disclosure and Injection via IP-Address Domains. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-59883 (medium advisory): Guzzle: Cookie Disclosure and Injection via IP-Address Domains. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1086,13 +1480,62 @@
                         "cve": "CVE-2026-59883",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.12.3",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1106,7 +1549,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -1118,7 +1561,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69245 (medium advisory): Guzzle: Noncanonical cookie domain keeps subdomain scope. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-69245 (medium advisory): Guzzle: Noncanonical cookie domain keeps subdomain scope. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1147,13 +1590,62 @@
                         "cve": "CVE-2026-69245",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.15.2",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1167,7 +1659,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -1179,7 +1671,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67354 (medium advisory): Guzzle: URI fragments disclosed in redirect Referer headers. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67354 (medium advisory): Guzzle: URI fragments disclosed in redirect Referer headers. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1208,13 +1700,62 @@
                         "cve": "CVE-2026-67354",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.15.1",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1228,7 +1769,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -1240,7 +1781,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55568 (medium advisory): Silent HTTPS proxy downgrade to cleartext. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-55568 (medium advisory): Silent HTTPS proxy downgrade to cleartext. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1269,13 +1810,62 @@
                         "cve": "CVE-2026-55568",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.12.1",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1289,7 +1879,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -1301,7 +1891,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67339 (medium advisory): Guzzle: Proxy-Authorization headers can be sent to origin servers. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67339 (medium advisory): Guzzle: Proxy-Authorization headers can be sent to origin servers. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1330,13 +1920,62 @@
                         "cve": "CVE-2026-67339",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.14.2",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1350,7 +1989,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -1362,7 +2001,7 @@
                     "level": "warning",
                     "rank": 55.0,
                     "message": {
-                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67355 (medium advisory): Guzzle: Host-only cookie scope is not preserved. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve."
+                        "text": "guzzlehttp/guzzle 5.3.4 is affected by CVE-2026-67355 (medium advisory): Guzzle: Host-only cookie scope is not preserved. Do: require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "guzzlehttp/guzzle",
@@ -1391,13 +2030,62 @@
                         "cve": "CVE-2026-67355",
                         "severity": "medium",
                         "fix": {
-                            "kind": "update",
+                            "kind": "upgrade",
                             "to_branch": "7.x",
                             "version": "7.15.1",
                             "newest": "7.15.5",
                             "on_installed_branch": false,
                             "php": "^7.2.5 || ^8.0",
-                            "held_by": [],
+                            "held_by": [
+                                {
+                                    "source": "root",
+                                    "package": null,
+                                    "version": null,
+                                    "link": "require",
+                                    "constraint": "^5.3.4",
+                                    "holder": null
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "bdunogier/guzzle-site-authenticator",
+                                    "version": "1.1.0",
+                                    "link": "require",
+                                    "constraint": "^5.3.1",
+                                    "holder": {
+                                        "verdict": "medium",
+                                        "lead": "stale",
+                                        "flag_ids": [
+                                            "stale"
+                                        ],
+                                        "replacement": null,
+                                        "next_step": {
+                                            "kind": "no-move",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "source": "package",
+                                    "package": "php-http/guzzle5-adapter",
+                                    "version": "2.0.0",
+                                    "link": "require",
+                                    "constraint": "^5.1",
+                                    "holder": {
+                                        "verdict": "critical",
+                                        "lead": "abandoned",
+                                        "flag_ids": [
+                                            "abandoned"
+                                        ],
+                                        "replacement": "php-http/guzzle7-adapter",
+                                        "next_step": {
+                                            "kind": "replace",
+                                            "to_branch": null,
+                                            "constraint": null
+                                        }
+                                    }
+                                }
+                            ],
                             "reason": null
                         },
                         "points": 8,
@@ -1411,7 +2099,7 @@
                                     "uriBaseId": "%SRCROOT%"
                                 },
                                 "region": {
-                                    "startLine": 4
+                                    "startLine": 18
                                 }
                             }
                         }
@@ -1478,7 +2166,7 @@
                             "reason": null,
                             "message": null,
                             "packages_with_records": 1,
-                            "records": 14
+                            "records": 15
                         }
                     ]
                 }

@@ -156,7 +156,13 @@
                 "suggestion": "web-auth/webauthn-lib",
                 "url": "https://packagist.org/packages/web-auth/webauthn-lib",
                 "named_by": "repository",
-                "finding": null
+                "finding": {
+                    "verdict": "high",
+                    "lead": "left-behind",
+                    "flag_ids": [
+                        "left-behind"
+                    ]
+                }
             },
             "quiet_years": null,
             "to_branch": null,
@@ -207,7 +213,7 @@
                 }
             ],
             "also": [],
-            "text": "replace with web-auth/webauthn-lib (named by its registry); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
+            "text": "replace with web-auth/webauthn-lib (named by its registry; itself high: left-behind); it comes in through web-auth/webauthn-lib: replace or update that package; the newest release of web-auth/webauthn-lib (5.3.9) no longer requires it"
         },
         "security": {
             "status": "clear",
@@ -382,7 +388,7 @@
     "metadata": {
         "abandoned": true,
         "replacement": "web-auth/webauthn-lib",
-        "releases_listed": 3,
+        "releases_listed": 5,
         "has_stable_release": true,
         "last_stable_release": "2024-07-11T09:06:25+00:00",
         "last_stable_version": "4.9.1",
@@ -420,9 +426,9 @@
                 "installed": false,
                 "highest": "v3.3.12",
                 "highest_released": null,
-                "highest_commit_date": null,
+                "highest_commit_date": "2021-11-21T11:14:31+00:00",
                 "newest_dated": "v3.3.12",
-                "newest_dated_released": null,
+                "newest_dated_released": "2021-11-21T11:14:31+00:00",
                 "dated_by": null,
                 "php": ">=7.2",
                 "highest_php": ">=7.2",
@@ -1207,8 +1213,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 0,
-                    "records": 0
+                    "packages_with_records": 1,
+                    "records": 3
                 }
             ]
         }

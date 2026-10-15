@@ -202,7 +202,16 @@
     "raise_size": null
    },
    "crosses_major": true,
-   "held_by": [],
+   "held_by": [
+    {
+     "source": "root",
+     "package": null,
+     "version": null,
+     "link": "require-dev",
+     "constraint": "^2.6",
+     "holder": null
+    }
+   ],
    "clears": [
     {
      "kind": "flag",
@@ -247,7 +256,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+   "text": "require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve"
   },
   "security": {
    "status": "vulnerable",
@@ -417,7 +426,16 @@
         "newest": "v5.4.52",
         "on_installed_branch": false,
         "php": ">=7.2.5",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require-dev",
+          "constraint": "^2.6",
+          "holder": null
+         }
+        ],
         "reason": null
        },
        "baseline": null
@@ -537,7 +555,16 @@
      "fix_kind": "raise-php",
      "lowest": "v8.0.12",
      "newest": "v8.1.6",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "root",
+       "package": null,
+       "version": null,
+       "link": "require-dev",
+       "constraint": "^2.6",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 8,
       "verdict": "medium",
@@ -576,7 +603,16 @@
      "fix_kind": "raise-php",
      "lowest": "v7.4.12",
      "newest": "v7.4.18",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "root",
+       "package": null,
+       "version": null,
+       "link": "require-dev",
+       "constraint": "^2.6",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 8,
       "verdict": "medium",
@@ -615,7 +651,16 @@
      "fix_kind": "raise-php",
      "lowest": "v6.4.40",
      "newest": "v6.4.45",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "root",
+       "package": null,
+       "version": null,
+       "link": "require-dev",
+       "constraint": "^2.6",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 8,
       "verdict": "medium",
@@ -654,7 +699,16 @@
      "fix_kind": "upgrade",
      "lowest": "v5.4.52",
      "newest": "v5.4.52",
-     "held_by": [],
+     "held_by": [
+      {
+       "source": "root",
+       "package": null,
+       "version": null,
+       "link": "require-dev",
+       "constraint": "^2.6",
+       "holder": null
+      }
+     ],
      "if_applied": {
       "total": 0,
       "verdict": "ok",

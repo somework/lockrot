@@ -2873,7 +2873,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                        "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned · old-promise)",
                         "data": {
                             "flagged": 2,
                             "packages": [
@@ -6640,7 +6640,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 15 flagged packages: hoa/consistency (abandoned), kphoen/rulerz-bridge (silent), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned) and 10 more",
+                        "summary": "pulls in 15 flagged packages: hoa/consistency (abandoned · old-promise), kphoen/rulerz-bridge (silent · old-promise), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned) and 10 more",
                         "data": {
                             "flagged": 15,
                             "packages": [
@@ -7901,7 +7901,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                        "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned · old-promise)",
                         "data": {
                             "flagged": 2,
                             "packages": [
@@ -14921,7 +14921,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 14 flagged packages: hoa/consistency (abandoned), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more",
+                        "summary": "pulls in 14 flagged packages: hoa/consistency (abandoned · old-promise), hoa/compiler (abandoned), hoa/event (abandoned), hoa/exception (abandoned), hoa/file (abandoned) and 9 more",
                         "data": {
                             "flagged": 14,
                             "packages": [
@@ -21665,7 +21665,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 1 flagged package: willdurand/jsonp-callback-validator (old-promise)",
+                        "summary": "pulls in 1 flagged package: willdurand/jsonp-callback-validator (old-promise · stale)",
                         "data": {
                             "flagged": 1,
                             "packages": [
@@ -24212,7 +24212,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 2 flagged packages: spomky-labs/otphp (left-behind), thecodingmachine/safe (left-behind)",
+                        "summary": "pulls in 2 flagged packages: spomky-labs/otphp (left-behind · vulnerable), thecodingmachine/safe (left-behind · old-promise)",
                         "data": {
                             "flagged": 2,
                             "packages": [
@@ -39024,7 +39024,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned)",
+                        "summary": "pulls in 2 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned · old-promise)",
                         "data": {
                             "flagged": 2,
                             "packages": [
@@ -39867,7 +39867,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 1 flagged package: pragmarx/random (silent)",
+                        "summary": "pulls in 1 flagged package: pragmarx/random (silent · old-promise)",
                         "data": {
                             "flagged": 1,
                             "packages": [
@@ -40161,7 +40161,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 5 flagged packages: grandt/binstring (silent), grandt/phpresizegif (silent), grandt/phpzipmerge (silent), grandt/relativepath (silent), phpzip/phpzip (silent)",
+                        "summary": "pulls in 5 flagged packages: grandt/binstring (silent · old-promise), grandt/phpresizegif (silent · old-promise), grandt/phpzipmerge (silent · old-promise), grandt/relativepath (silent · old-promise), phpzip/phpzip (silent · old-promise)",
                         "data": {
                             "flagged": 5,
                             "packages": [
@@ -49371,7 +49371,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 2 flagged packages: willdurand/jsonp-callback-validator (old-promise), willdurand/negotiation (stale)",
+                        "summary": "pulls in 2 flagged packages: willdurand/jsonp-callback-validator (old-promise · stale), willdurand/negotiation (stale)",
                         "data": {
                             "flagged": 2,
                             "packages": [
@@ -51610,7 +51610,7 @@
                     {
                         "id": "S7",
                         "level": "info",
-                        "summary": "pulls in 3 flagged packages: guzzlehttp/ringphp (abandoned), guzzlehttp/streams (abandoned), symfony/http-client (vulnerable)",
+                        "summary": "pulls in 3 flagged packages: guzzlehttp/ringphp (abandoned · old-promise), guzzlehttp/streams (abandoned · old-promise), symfony/http-client (vulnerable)",
                         "data": {
                             "flagged": 3,
                             "packages": [
@@ -69843,7 +69843,7 @@
                         "highest_admits_target_php": true,
                         "highest_admits_project_php": false,
                         "highest_misses_project_php": "needs_newer",
-                        "released_years": null,
+                        "released_years": 1.6,
                         "fixes": null
                     },
                     {

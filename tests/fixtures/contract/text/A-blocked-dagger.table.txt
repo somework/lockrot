@@ -14,7 +14,7 @@ security: 1 vulnerable package · 15 advisories: 1 critical, 3 high, 4 medium, 2
 packages-dev not checked (pass --dev)
 fix, by package: blocked 1
 libyears: 2.0 behind across the one package · 2.0 from direct requirements · furthest behind twig/twig v2.16.1 at 2.0
-advisories: 1 package asked · packagist.org answered (15 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (26 on record for 1 package)
 <fg=red>gate: fails · --fail-on=high · 1 finding fails it · target php 8.0 (--target-php)</fg=red>
 Data as of 2026-10-01 (package repositories, repository hosts) · score model 1. Run composer lockrot --format=json for
 details.

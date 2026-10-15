@@ -1136,7 +1136,30 @@
      "raise_size": "minor"
     },
     "crosses_major": true,
-    "held_by": [],
+    "held_by": [
+     {
+      "source": "root",
+      "package": null,
+      "version": null,
+      "link": "require",
+      "constraint": "^9.0",
+      "holder": null
+     },
+     {
+      "source": "package",
+      "package": "pragmarx/google2fa-laravel",
+      "version": "v2.2.0",
+      "link": "require",
+      "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+      "holder": {
+       "verdict": "ok",
+       "lead": null,
+       "flag_ids": [],
+       "replacement": null,
+       "next_step": null
+      }
+     }
+    ],
     "clears": [
      {
       "kind": "advisory",
@@ -1185,6 +1208,7 @@
      ]
     },
     "composer_moves_because": [
+     "holders",
      "crosses_major"
     ],
     "commands": [
@@ -1202,7 +1226,7 @@
     ],
     "through": [],
     "also": [],
-    "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+    "text": "raise require.php to >=8.2, then require laravel/framework ^12.69.0 — clears 6 advisories; 12.x needs php ^8.2, require.php allows 8.1 (a minor raise); the target php 8.4 runs it; held by composer.json (requires ^9.0) and pragmarx/google2fa-laravel v2.2.0 (requires ^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0; itself ok: ); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
    },
    "security": {
     "status": "vulnerable",
@@ -1506,7 +1530,30 @@
          "newest": "v12.69.3",
          "on_installed_branch": false,
          "php": "^8.2",
-         "held_by": [],
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^9.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "pragmarx/google2fa-laravel",
+           "version": "v2.2.0",
+           "link": "require",
+           "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+           "holder": {
+            "verdict": "ok",
+            "lead": null,
+            "flag_ids": [],
+            "replacement": null,
+            "next_step": null
+           }
+          }
+         ],
          "reason": null
         },
         "baseline": null
@@ -1554,7 +1601,16 @@
          "newest": "v10.50.3",
          "on_installed_branch": false,
          "php": "^8.1",
-         "held_by": [],
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^9.0",
+           "holder": null
+          }
+         ],
          "reason": null
         },
         "baseline": null
@@ -1578,7 +1634,30 @@
          "newest": "v12.69.3",
          "on_installed_branch": false,
          "php": "^8.2",
-         "held_by": [],
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^9.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "pragmarx/google2fa-laravel",
+           "version": "v2.2.0",
+           "link": "require",
+           "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+           "holder": {
+            "verdict": "ok",
+            "lead": null,
+            "flag_ids": [],
+            "replacement": null,
+            "next_step": null
+           }
+          }
+         ],
          "reason": null
         },
         "baseline": null
@@ -1602,7 +1681,30 @@
          "newest": "v12.69.3",
          "on_installed_branch": false,
          "php": "^8.2",
-         "held_by": [],
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^9.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "pragmarx/google2fa-laravel",
+           "version": "v2.2.0",
+           "link": "require",
+           "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+           "holder": {
+            "verdict": "ok",
+            "lead": null,
+            "flag_ids": [],
+            "replacement": null,
+            "next_step": null
+           }
+          }
+         ],
          "reason": null
         },
         "baseline": null
@@ -1626,7 +1728,30 @@
          "newest": "v12.69.3",
          "on_installed_branch": false,
          "php": "^8.2",
-         "held_by": [],
+         "held_by": [
+          {
+           "source": "root",
+           "package": null,
+           "version": null,
+           "link": "require",
+           "constraint": "^9.0",
+           "holder": null
+          },
+          {
+           "source": "package",
+           "package": "pragmarx/google2fa-laravel",
+           "version": "v2.2.0",
+           "link": "require",
+           "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+           "holder": {
+            "verdict": "ok",
+            "lead": null,
+            "flag_ids": [],
+            "replacement": null,
+            "next_step": null
+           }
+          }
+         ],
          "reason": null
         },
         "baseline": null

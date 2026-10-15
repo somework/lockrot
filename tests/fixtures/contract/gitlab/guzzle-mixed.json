@@ -2,7 +2,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/left-behind",
-        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 left-behind: branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.1.3; no releasing branch within reach. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve.",
+        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 left-behind: branch 5.x last released 2019-10-30 (6.9 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.1.3; no releasing branch within reach. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Bug Risk"
         ],
@@ -11,14 +11,14 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 34
             }
         }
     },
     {
         "type": "issue",
         "check_name": "lockrot/old-promise",
-        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve.",
+        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 old-promise: released 2019-10-30 for PHP 5 (php \">=5.4.0\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Bug Risk"
         ],
@@ -27,14 +27,14 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 34
             }
         }
     },
     {
         "type": "issue",
         "check_name": "lockrot/vulnerable",
-        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 vulnerable: 14 advisories: 6 high, 8 medium \u2014 none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; a new major brings its own requirements, which lockrot does not solve.",
+        "description": "guzzlehttp/guzzle 5.3.4 \u2014 finding critical (36 = left-behind 16 + old-promise 4 [\u00bc of 16] + vulnerable 16 [high advisory]) \u2014 vulnerable: 14 advisories: 6 high, 8 medium \u2014 none fixed on 5.x; worst: CVE-2022-31043 Fix failure to strip Authorization header on HTTP downgrade. Do: raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 14 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.1.3 (a minor raise); the target php 8.4 runs it; not checked: old-promise; held by composer.json (requires ~5.0) and csa/guzzle-bundle dev-compat-php (requires ^5.3; itself pinned) and guzzlehttp/cache-subscriber 0.2.0 (requires ~5.0; itself abandoned) and guzzlehttp/log-subscriber 1.0.1 (requires ~4.0 | ~5.0; itself abandoned) and prestashop/circuit-breaker v3.0.0 (requires ^5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Security"
         ],
@@ -43,7 +43,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 4
+                "begin": 34
             }
         }
     }

@@ -1,6 +1,6 @@
 {
     "score_text": "36 = left-behind 16 + old-promise 4 [¼ of 16] + vulnerable 16 [high advisory]",
-    "next_step_text": "require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve",
+    "next_step_text": "require guzzlehttp/guzzle ^8.2 — clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 5.3.4 released 2019-10-30 (6.9 years ago), the newest on 5.x; newest release 8.2.0 2026-09-06 (0.1 years ago); last push 2026-09-06 (0.1 years ago)",

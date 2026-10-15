@@ -111,6 +111,29 @@ final class ExplanationTest extends TestCase
     }
 
     /**
+     * pagerfanta/twig: 4.x's highest tag shares its commit, so it has no release date, and S8
+     * dates the branch by that commit. The row's age is S8's (SPEC-0.14.md §7.6.2).
+     */
+    public function testAHigherBranchOnASharedCommitIsAsOldAsS8DatesIt(): void
+    {
+        $loader = new ArrayLoader();
+        $on = static fn (string $version, ?string $commit, string $time): array => array_filter(['name' => 'vendor/pkg', 'version' => $version, 'time' => $time, 'source' => $commit === null ? null : ['type' => 'git', 'url' => 'https://github.com/vendor/pkg.git', 'reference' => $commit]]);
+        $metadata = PackageMetadata::fromPackages('vendor/pkg', [
+            $loader->load($on('4.9.0', 'split', '2025-03-08T02:17:34+00:00')),
+            $loader->load($on('4.8.0', 'split', '2025-03-08T02:17:34+00:00')),
+            $loader->load($on('4.7.0', 'split', '2025-03-08T02:17:34+00:00')),
+            $loader->load($on('3.8.0', null, '2023-04-15T16:39:14+00:00')),
+        ], new \DateTimeImmutable(F::NOW));
+        $s8 = new Signal(Signal::LEVEL_WARN, 'branch 3.x', SignalDataStub::of(Signal::S8, ['branch' => '3.x', 'newest_branch' => '4.x', 'newest_version' => '4.9.0', 'newest_release' => '2025-03-08T02:17:34+00:00']));
+        $explanation = new Explanation($this->finding('3.8.0', Verdict::LEFT_BEHIND, [$s8]), F::facts(F::package(['version' => '3.8.0']), $metadata), new Thresholds(), '8.4', $this->report());
+
+        $higher = JsonPath::arrayAt($explanation->toArray(), ['metadata', 'branches', 0]);
+
+        self::assertSame(['4.x', null], [$higher['branch'], $higher['highest_released']]);
+        self::assertSame(1.5, $higher['released_years'], '555 days before the run clock');
+    }
+
+    /**
      * composer/composer 2.x: the highest tag 2.10.3 is older than the LTS backport 2.2.30. The
      * Release branches line prints `highest_php` beside `highest`, and the floor answers read `php`.
      */

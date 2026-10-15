@@ -48,12 +48,12 @@ final class BranchRow
      * Highest branch first, the keys ordered as the versions they are (`10` above `9`, `0.3` above
      * `0.0.3`). Empty when lockrot did not read the package's metadata.
      *
-     * @param ?Signal       $s8    the package's S8: it dates a branch whose highest tag has no trusted date
+     * @param ?LeftBehindData $s8 the package's S8: it dates a branch whose highest tag has no trusted date
      * @param ?PackageFixes $fixes the release scan of the package, null when it has no counted advisory
      *
      * @return list<self>
      */
-    public static function all(PackageFacts $facts, PhpFloor $floor, Clock $clock, ?Signal $s8 = null, ?PackageFixes $fixes = null): array
+    public static function all(PackageFacts $facts, PhpFloor $floor, Clock $clock, ?LeftBehindData $s8 = null, ?PackageFixes $fixes = null): array
     {
         $metadata = $facts->metadata();
         if ($metadata === null) {
@@ -67,7 +67,6 @@ final class BranchRow
         foreach ($fixes === null ? [] : $fixes->branches() as $branchFixes) {
             $fixesByBranch[$branchFixes->branch()] = $branchFixes;
         }
-        $s8Data = $s8 === null ? null : $s8->data();
         $rows = [];
         foreach ($keys as $key) {
             $release = $byBranch[$key];
@@ -92,8 +91,8 @@ final class BranchRow
             $row->highestAdmitsProjectPhp = $floor->admitsProject($row->highestPhp);
             $row->highestMissesProjectPhp = $floor->missesProject($row->highestPhp);
             $released = $row->highestReleased;
-            if ($released === null && $s8Data instanceof LeftBehindData && $s8Data->newestBranch() === $row->branch) {
-                $released = new \DateTimeImmutable($s8Data->newestRelease());
+            if ($released === null && $s8 !== null && $s8->newestBranch() === $row->branch) {
+                $released = new \DateTimeImmutable($s8->newestRelease());
             }
             $row->releasedYears = $released === null ? null : $clock->tenthsSince($released) / 10;
             $row->fixes = $fixesByBranch[$row->branch] ?? null;

@@ -1,7 +1,6 @@
-::error file=composer.lock,line=4,title=lockrot%3A high — vulnerable (high advisory)::symfony/monolog-bridge v2.6.13: 16 = vulnerable 16 [high advisory] (left-behind, old-promise accepted). Do: require symfony/monolog-bridge ^5.4.52 — clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve. vulnerable: 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener.
+::error file=composer.lock,line=4,title=lockrot%3A high — vulnerable (high advisory)::symfony/monolog-bridge v2.6.13: 16 = vulnerable 16 [high advisory] (left-behind, old-promise accepted). Do: require symfony/monolog-bridge ^5.4.52 — clears the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^2.6); a new major brings its own requirements, which lockrot does not solve. vulnerable: 1 advisory: 1 high — none fixed on 2.x; advisory: CVE-2026-45077 Unauthenticated PHP Object Deserialization in MonologBridge server:log Listener.
 ::notice title=lockrot::extra.lockrot.ignore[] accepts maintenance flags only, not advisories: symfony/monolog-bridge: 1 counted advisory; accept them in Composer's audit policy if that is the decision
 flags: vulnerable 1
 depth: every flagged package is named in composer.json · direct 1
 security: 1 vulnerable package · 1 advisory: 1 high
-update now: composer update symfony/monolog-bridge
 gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)

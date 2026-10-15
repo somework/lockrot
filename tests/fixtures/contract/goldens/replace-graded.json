@@ -1,6 +1,6 @@
 {
     "score_text": "32 = abandoned 32",
-    "next_step_text": "replace with web-token/jwt-library (named by its registry)",
+    "next_step_text": "replace with web-token/jwt-library (named by its registry; itself high: vulnerable)",
     "gate_line": null,
     "run_gate_line": "gate: fails · --fail-on=high · 1 finding fails it · target php 8.4 (--target-php)",
     "age_line": "age: installed 3.4.3, release date not known (no date); last push 2025-05-07 (1.4 years ago)",

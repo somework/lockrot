@@ -1197,10 +1197,10 @@
                 "by": "project",
                 "pattern": "tubalmartin/cssmin",
                 "version": null,
-                "reason": "accepted by the test",
+                "reason": "a single-file minifier, finished",
                 "reason_id": null,
                 "reason_by": "user",
-                "expires": null,
+                "expires": "2027-03-31",
                 "flag_ids": [
                     "stale"
                 ]

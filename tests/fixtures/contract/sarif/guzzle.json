@@ -266,6 +266,7 @@
                             "guzzlehttp/guzzle"
                         ],
                         "signal_ids": [
+                            "S7",
                             "S8",
                             "S9"
                         ],
@@ -363,6 +364,7 @@
                             "guzzlehttp/guzzle"
                         ],
                         "signal_ids": [
+                            "S7",
                             "S8",
                             "S9"
                         ],
@@ -978,8 +980,8 @@
                             "outcome": "answered",
                             "reason": null,
                             "message": null,
-                            "packages_with_records": 1,
-                            "records": 9
+                            "packages_with_records": 3,
+                            "records": 22
                         }
                     ]
                 }

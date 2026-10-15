@@ -313,6 +313,1533 @@
                 }
             },
             {
+                "id": "S7",
+                "level": "info",
+                "summary": "pulls in 119 flagged packages: mtdowling/jmespath.php (vulnerable), phpoffice/phpspreadsheet (vulnerable), twig/twig (vulnerable), robrichards/xmlseclibs (old-promise \u00b7 vulnerable), symfony/http-foundation (left-behind \u00b7 vulnerable) and 114 more",
+                "data": {
+                    "flagged": 119,
+                    "packages": [
+                        {
+                            "package": "mtdowling/jmespath.php",
+                            "chain": [
+                                "mautic/core-lib",
+                                "aws/aws-sdk-php",
+                                "mtdowling/jmespath.php"
+                            ],
+                            "verdict": "critical",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "phpoffice/phpspreadsheet",
+                            "chain": [
+                                "mautic/core-lib",
+                                "phpoffice/phpspreadsheet"
+                            ],
+                            "verdict": "critical",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "twig/twig",
+                            "chain": [
+                                "mautic/core-lib",
+                                "oneup/uploader-bundle",
+                                "twig/twig"
+                            ],
+                            "verdict": "critical",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "robrichards/xmlseclibs",
+                            "chain": [
+                                "mautic/core-lib",
+                                "lightsaml/sp-bundle",
+                                "lightsaml/symfony-bridge",
+                                "lightsaml/lightsaml",
+                                "robrichards/xmlseclibs"
+                            ],
+                            "verdict": "high",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/http-foundation",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/http-foundation"
+                            ],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/monolog-bridge",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/monolog-bridge"
+                            ],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/process",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/process"
+                            ],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "aws/aws-sdk-php",
+                            "chain": [
+                                "mautic/core-lib",
+                                "aws/aws-sdk-php"
+                            ],
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "composer/composer",
+                            "chain": [
+                                "mautic/core-lib",
+                                "composer/composer"
+                            ],
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "guzzlehttp/guzzle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "guzzlehttp/guzzle"
+                            ],
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "phpseclib/phpseclib",
+                            "chain": [
+                                "mautic/core-lib",
+                                "php-amqplib/rabbitmq-bundle",
+                                "php-amqplib/php-amqplib",
+                                "phpseclib/phpseclib"
+                            ],
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "studio-42/elfinder",
+                            "chain": [
+                                "mautic/core-lib",
+                                "barryvdh/elfinder-flysystem-driver",
+                                "studio-42/elfinder"
+                            ],
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/mime",
+                            "chain": [
+                                "mautic/core-lib",
+                                "oneup/uploader-bundle",
+                                "symfony/mime"
+                            ],
+                            "verdict": "high",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "guzzlehttp/oauth-subscriber",
+                            "chain": [
+                                "mautic/core-lib",
+                                "guzzlehttp/oauth-subscriber"
+                            ],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "psy/psysh",
+                            "chain": [
+                                "mautic/core-lib",
+                                "theofidry/psysh-bundle",
+                                "psy/psysh"
+                            ],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/cache",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/cache"
+                            ],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/routing",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/routing"
+                            ],
+                            "verdict": "high",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "lightsaml/lightsaml",
+                            "chain": [
+                                "mautic/core-lib",
+                                "lightsaml/sp-bundle",
+                                "lightsaml/symfony-bridge",
+                                "lightsaml/lightsaml"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "misd/phone-number-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "misd/phone-number-bundle"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "mustangostang/spyc",
+                            "chain": [
+                                "mautic/core-lib",
+                                "matomo/device-detector",
+                                "mustangostang/spyc"
+                            ],
+                            "verdict": "high",
+                            "lead": "silent",
+                            "flag_ids": [
+                                "silent",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "php-http/message-factory",
+                            "chain": [
+                                "mautic/core-lib",
+                                "sparkpost/sparkpost",
+                                "php-http/message",
+                                "php-http/message-factory"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "stack/builder",
+                            "chain": [
+                                "mautic/core-lib",
+                                "stack/builder"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "stack/run",
+                            "chain": [
+                                "mautic/core-lib",
+                                "stack/run"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "tightenco/collect",
+                            "chain": [
+                                "mautic/core-lib",
+                                "tightenco/collect"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned",
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "composer/package-versions-deprecated",
+                            "chain": [
+                                "mautic/core-lib",
+                                "composer/package-versions-deprecated"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/annotations",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/annotations"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/cache",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/doctrine-bundle",
+                                "doctrine/cache"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "gaufrette/extras",
+                            "chain": [
+                                "mautic/core-lib",
+                                "gaufrette/extras"
+                            ],
+                            "verdict": "high",
+                            "lead": "silent",
+                            "flag_ids": [
+                                "silent"
+                            ]
+                        },
+                        {
+                            "package": "sensio/framework-extra-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "noxlogic/ratelimit-bundle",
+                                "sensio/framework-extra-bundle"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "swiftmailer/swiftmailer",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/swiftmailer-bundle",
+                                "swiftmailer/swiftmailer"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "symfony/debug",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/debug"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "symfony/inflector",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/property-access",
+                                "symfony/inflector"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "symfony/security",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/security"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "symfony/swiftmailer-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/swiftmailer-bundle"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "theofidry/psysh-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "theofidry/psysh-bundle"
+                            ],
+                            "verdict": "high",
+                            "lead": "abandoned",
+                            "flag_ids": [
+                                "abandoned"
+                            ]
+                        },
+                        {
+                            "package": "guzzlehttp/psr7",
+                            "chain": [
+                                "mautic/core-lib",
+                                "aws/aws-sdk-php",
+                                "guzzlehttp/psr7"
+                            ],
+                            "verdict": "medium",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "joomla/filter",
+                            "chain": [
+                                "mautic/core-lib",
+                                "joomla/filter"
+                            ],
+                            "verdict": "medium",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/twig-bridge",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/twig-bundle",
+                                "symfony/twig-bridge"
+                            ],
+                            "verdict": "medium",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "league/flysystem",
+                            "chain": [
+                                "mautic/core-lib",
+                                "barryvdh/elfinder-flysystem-driver",
+                                "league/flysystem"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/http-client",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/http-client"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/validator",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/validator"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "symfony/yaml",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/yaml"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "barryvdh/elfinder-flysystem-driver",
+                            "chain": [
+                                "mautic/core-lib",
+                                "barryvdh/elfinder-flysystem-driver"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "knplabs/gaufrette",
+                            "chain": [
+                                "mautic/core-lib",
+                                "knplabs/gaufrette"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "maennchen/zipstream-php",
+                            "chain": [
+                                "mautic/core-lib",
+                                "phpoffice/phpspreadsheet",
+                                "maennchen/zipstream-php"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "malkusch/lock",
+                            "chain": [
+                                "mautic/core-lib",
+                                "bandwidth-throttle/token-bucket",
+                                "malkusch/lock"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "mrclay/minify",
+                            "chain": [
+                                "mautic/core-lib",
+                                "mrclay/minify"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "sendgrid/sendgrid",
+                            "chain": [
+                                "mautic/core-lib",
+                                "sendgrid/sendgrid"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "simshaun/recurr",
+                            "chain": [
+                                "mautic/core-lib",
+                                "simshaun/recurr"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "twilio/sdk",
+                            "chain": [
+                                "mautic/core-lib",
+                                "twilio/sdk"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind",
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "bandwidth-throttle/token-bucket",
+                            "chain": [
+                                "mautic/core-lib",
+                                "bandwidth-throttle/token-bucket"
+                            ],
+                            "verdict": "medium",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise",
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "leezy/pheanstalk-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "leezy/pheanstalk-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise",
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "lightsaml/sp-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "lightsaml/sp-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise",
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "lightsaml/symfony-bridge",
+                            "chain": [
+                                "mautic/core-lib",
+                                "lightsaml/sp-bundle",
+                                "lightsaml/symfony-bridge"
+                            ],
+                            "verdict": "medium",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise",
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "voku/stop-words",
+                            "chain": [
+                                "mautic/core-lib",
+                                "jbroadway/urlify",
+                                "voku/stop-words"
+                            ],
+                            "verdict": "medium",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise",
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "composer/pcre",
+                            "chain": [
+                                "mautic/core-lib",
+                                "composer/composer",
+                                "composer/pcre"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "composer/xdebug-handler",
+                            "chain": [
+                                "mautic/core-lib",
+                                "composer/composer",
+                                "composer/xdebug-handler"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/collections",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/orm",
+                                "doctrine/collections"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/dbal",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/doctrine-bundle",
+                                "doctrine/dbal"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/deprecations",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/orm",
+                                "doctrine/deprecations"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/doctrine-migrations-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/doctrine-migrations-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/event-manager",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/orm",
+                                "doctrine/event-manager"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/instantiator",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/orm",
+                                "doctrine/instantiator"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/lexer",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/annotations",
+                                "doctrine/lexer"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/migrations",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/doctrine-migrations-bundle",
+                                "doctrine/migrations"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "doctrine/persistence",
+                            "chain": [
+                                "mautic/core-lib",
+                                "doctrine/data-fixtures",
+                                "doctrine/persistence"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "egulias/email-validator",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/swiftmailer-bundle",
+                                "swiftmailer/swiftmailer",
+                                "egulias/email-validator"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "friendsofsymfony/oauth-server-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "friendsofsymfony/oauth-server-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "pinned",
+                            "flag_ids": [
+                                "pinned"
+                            ]
+                        },
+                        {
+                            "package": "geoip2/geoip2",
+                            "chain": [
+                                "mautic/core-lib",
+                                "geoip2/geoip2"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "guzzlehttp/promises",
+                            "chain": [
+                                "mautic/core-lib",
+                                "aws/aws-sdk-php",
+                                "guzzlehttp/promises"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "helios-ag/fm-elfinder-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "helios-ag/fm-elfinder-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "intervention/image",
+                            "chain": [
+                                "mautic/core-lib",
+                                "barryvdh/elfinder-flysystem-driver",
+                                "intervention/image"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "ip2location/ip2location-php",
+                            "chain": [
+                                "mautic/core-lib",
+                                "ip2location/ip2location-php"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "jms/serializer-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "jms/serializer-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "joomla/string",
+                            "chain": [
+                                "mautic/core-lib",
+                                "joomla/filter",
+                                "joomla/string"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "matomo/device-detector",
+                            "chain": [
+                                "mautic/core-lib",
+                                "matomo/device-detector"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "maxmind/web-service-common",
+                            "chain": [
+                                "mautic/core-lib",
+                                "geoip2/geoip2",
+                                "maxmind/web-service-common"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "monolog/monolog",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/monolog-bridge",
+                                "monolog/monolog"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "noxlogic/ratelimit-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "noxlogic/ratelimit-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "oneup/uploader-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "oneup/uploader-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "predis/predis",
+                            "chain": [
+                                "mautic/core-lib",
+                                "predis/predis"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "ramsey/uuid",
+                            "chain": [
+                                "mautic/core-lib",
+                                "ramsey/uuid"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "sendgrid/php-http-client",
+                            "chain": [
+                                "mautic/core-lib",
+                                "sendgrid/sendgrid",
+                                "sendgrid/php-http-client"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/asset",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/asset"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/config",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/config"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/console",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/console"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/css-selector",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/css-selector"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/dependency-injection",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/dependency-injection"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/doctrine-bridge",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/doctrine-bridge"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/dotenv",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/dotenv"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/error-handler",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/framework-bundle",
+                                "symfony/error-handler"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/event-dispatcher",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/event-dispatcher"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/event-dispatcher-contracts",
+                            "chain": [
+                                "mautic/core-lib",
+                                "oneup/uploader-bundle",
+                                "symfony/event-dispatcher-contracts"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/expression-language",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/expression-language"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/filesystem",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/filesystem"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/finder",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/finder"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/form",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/form"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/framework-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/framework-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/intl",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/intl"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/monolog-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/monolog-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "symfony/options-resolver",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/options-resolver"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/property-access",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/property-access"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/security-acl",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/security-acl"
+                            ],
+                            "verdict": "medium",
+                            "lead": "old-promise",
+                            "flag_ids": [
+                                "old-promise"
+                            ]
+                        },
+                        {
+                            "package": "symfony/security-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/security-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/stopwatch",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/stopwatch"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/templating",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/templating"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/translation",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/translation"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/twig-bundle",
+                            "chain": [
+                                "mautic/core-lib",
+                                "symfony/twig-bundle"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/var-dumper",
+                            "chain": [
+                                "mautic/core-lib",
+                                "tightenco/collect",
+                                "symfony/var-dumper"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "voku/portable-ascii",
+                            "chain": [
+                                "mautic/core-lib",
+                                "jbroadway/urlify",
+                                "voku/portable-ascii"
+                            ],
+                            "verdict": "medium",
+                            "lead": "left-behind",
+                            "flag_ids": [
+                                "left-behind"
+                            ]
+                        },
+                        {
+                            "package": "symfony/polyfill-intl-idn",
+                            "chain": [
+                                "mautic/core-lib",
+                                "oneup/uploader-bundle",
+                                "symfony/mime",
+                                "symfony/polyfill-intl-idn"
+                            ],
+                            "verdict": "low",
+                            "lead": null,
+                            "flag_ids": [
+                                "vulnerable"
+                            ]
+                        },
+                        {
+                            "package": "friendsofsymfony/oauth2-php",
+                            "chain": [
+                                "mautic/core-lib",
+                                "friendsofsymfony/oauth-server-bundle",
+                                "friendsofsymfony/oauth2-php"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "league/flysystem-cached-adapter",
+                            "chain": [
+                                "mautic/core-lib",
+                                "barryvdh/elfinder-flysystem-driver",
+                                "league/flysystem-cached-adapter"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "markbaker/complex",
+                            "chain": [
+                                "mautic/core-lib",
+                                "phpoffice/phpspreadsheet",
+                                "markbaker/complex"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "markbaker/matrix",
+                            "chain": [
+                                "mautic/core-lib",
+                                "phpoffice/phpspreadsheet",
+                                "markbaker/matrix"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "paragonie/random_compat",
+                            "chain": [
+                                "mautic/core-lib",
+                                "friendsofsymfony/oauth-server-bundle",
+                                "paragonie/random_compat"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "sparkpost/sparkpost",
+                            "chain": [
+                                "mautic/core-lib",
+                                "sparkpost/sparkpost"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "willdurand/jsonp-callback-validator",
+                            "chain": [
+                                "mautic/core-lib",
+                                "friendsofsymfony/rest-bundle",
+                                "willdurand/jsonp-callback-validator"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        },
+                        {
+                            "package": "willdurand/negotiation",
+                            "chain": [
+                                "mautic/core-lib",
+                                "friendsofsymfony/rest-bundle",
+                                "willdurand/negotiation"
+                            ],
+                            "verdict": "low",
+                            "lead": "stale",
+                            "flag_ids": [
+                                "stale"
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
                 "id": "S9",
                 "level": "high",
                 "summary": "5 security advisories affect 4.3.x-dev (CVE-2022-25768, CVE-2024-47058, CVE-2024-47050 and 2 more)",
@@ -1237,24 +2764,24 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 5
+                    "packages_with_records": 44,
+                    "records": 230
                 }
             ]
         }
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [
-        "1 package is not from a Composer repository: its release metadata and repository activity were not read"
+        "2 packages are not from a Composer repository: their release metadata and repository activity were not read"
     ],
     "note_details": [
         {
             "code": "not_from_composer_repository",
-            "text": "1 package is not from a Composer repository: its release metadata and repository activity were not read",
+            "text": "2 packages are not from a Composer repository: their release metadata and repository activity were not read",
             "docs_url": "https://lockrot.dev/notes/#not_from_composer_repository",
             "sets_network_failures": false,
             "data": {
-                "package_count": 1,
+                "package_count": 2,
                 "advisories_asked": true
             }
         }
