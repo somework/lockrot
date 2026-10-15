@@ -58,12 +58,25 @@ final class ContractBundle
     private const COMMANDS = ['next_step.commands'];
     /** Up to this many score lines per grammar path of the sweep, as the model's score-lines.json keeps. */
     private const LINES_PER_PATH = 4;
-    /** Commands whose quoting differs between the shells, beside the commands that the cases write. */
+    /**
+     * Commands whose quoting differs between the shells, beside the commands that the cases write, and
+     * the hostile rows of SPEC-0.14.md §5.6 that every shell refuses (`null`).
+     */
     private const QUOTING_ROWS = [
         ['composer', 'require', 'vendor/package:^2.0 || ^3.0'],
         ['composer', 'require', 'vendor/package:>=1.2 <2.0'],
         ['composer', 'config', 'extra.lockrot.reason', "the team's fork"],
         ['composer', 'require', 'vendor/package:~1.4,!=1.4.2'],
+        ['composer', 'require', 'vendor/package:dev-x%CMDCMDLINE:~0,1%&calc&rem '],
+        ['composer', 'require', 'vendor/package:dev-x!PATH!'],
+        ['composer', 'update', "vendor/package\r"],
+        ['composer', 'update', "vendor/package\ncalc"],
+        ['composer', 'update', "vendor/package\0"],
+        ['composer', 'require', "vendor/package:x\u{2019};calc;\u{2019}"],
+        ['composer', 'update', '--%'],
+        ['composer', 'why-not', 'vendor/package', '--working-dir=x'],
+        ['composer', 'update', '@name'],
+        ['composer', 'update', 'a,b'],
     ];
 
     /** @var array<string, string> each written file's contents, by its path in the bundle */
@@ -197,19 +210,6 @@ final class ContractBundle
         return $keyed;
     }
 
-    /**
-     * A PowerShell rendering of $argv (SPEC-0.14.md §5.6): a word with a character outside the POSIX set
-     * is single-quoted, its quotes doubled.
-     *
-     * @param list<string> $argv
-     */
-    public static function powershell(array $argv): string
-    {
-        return implode(' ', array_map(static function (string $word): string {
-            return preg_match('{^[A-Za-z0-9/._:@%+=,-]+$}', $word) === 1 ? $word : "'".str_replace("'", "''", $word)."'";
-        }, $argv));
-    }
-
     private function recordCases(): void
     {
         foreach (JsonPath::arrayAt(JsonPath::decodeFile(CaseHydrator::CASES), ['cases']) as $case) {
@@ -266,7 +266,7 @@ final class ContractBundle
         $this->put('en/years-phrases.json', ['pairs' => array_map(static fn (float $value): array => ['value' => $value, 'phrase' => AgeText::ago($value)], array_values(array_unique($years, \SORT_REGULAR)))]);
         $rows = [];
         foreach (array_merge(array_values($this->argvs), self::QUOTING_ROWS) as $argv) {
-            $rows[implode("\0", $argv)] = ['argv' => $argv, 'posix' => ShellCommand::posix($argv), 'cmd' => ShellCommand::cmd($argv), 'powershell' => self::powershell($argv)];
+            $rows[implode("\0", $argv)] = ['argv' => $argv, 'posix' => ShellCommand::posix($argv), 'cmd' => ShellCommand::cmd($argv), 'powershell' => ShellCommand::powershell($argv)];
         }
         ksort($rows);
         $this->put('en/commands.json', ['rows' => array_values($rows)]);

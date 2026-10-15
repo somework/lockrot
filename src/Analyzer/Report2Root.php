@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Analyzer;
 
+use Lockrot\Verdict\CommandArgument;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\ScoreModel;
@@ -109,7 +110,7 @@ final class Report2Root
         $packages = [];
         foreach ($findings as $finding) {
             $standing = $finding->securityStanding();
-            if ($standing->isVulnerable() && $standing->fixKind() === 'update') {
+            if ($standing->isVulnerable() && $standing->fixKind() === 'update' && CommandArgument::passes($finding->package())) {
                 $packages[] = $finding->package();
             }
         }

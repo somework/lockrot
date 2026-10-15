@@ -102,7 +102,7 @@ final class MoveBuilder
             $leaves,
             $ifApplied,
             $because,
-            self::commands($kind, $subject, $constraint, $phpCheck, $latest),
+            self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest)),
             $subject
         );
     }
@@ -276,6 +276,23 @@ final class MoveBuilder
         }
 
         return $because;
+    }
+
+    /**
+     * @param list<list<string>> $commands
+     *
+     * @return list<list<string>> the steps whose arguments pass {@see CommandArgument}
+     */
+    private static function runnable(array $commands): array
+    {
+        $runnable = [];
+        foreach ($commands as $argv) {
+            if (CommandArgument::allPass($argv)) {
+                $runnable[] = $argv;
+            }
+        }
+
+        return $runnable;
     }
 
     /** @return list<list<string>> */

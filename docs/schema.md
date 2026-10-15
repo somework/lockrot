@@ -380,6 +380,22 @@ touch), `held_by`, `php_check`, `if_applied` (the score after it), `through` for
 comes in through others, `commands` (argv lists) and `text`. `also` holds the other part's move.
 `kind` is an open set: show `text` for a kind you do not know.
 
+Each argument of `commands` and of `security.update_now_command` matches
+`^[A-Za-z0-9/._:@+=,^~*<>| -]+$`. Only lockrot's own option `--no-update` starts with `-`. An
+argument comes from the lock or a repository, so lockrot leaves out a step with an argument outside
+this set. The move keeps its `constraint`, `text` and other steps. Render each argv with one of these
+quotings:
+
+| Shell | Quote an argument when it has | Quoting |
+|---|---|---|
+| POSIX | a character outside `[A-Za-z0-9/._:@%+=,-]` | `'…'` |
+| cmd.exe | a space, a caret, a vertical bar, `<` or `>` | `"…"` |
+| PowerShell | a character outside `[A-Za-z0-9/._:-]` | `'…'` |
+
+!!! warning
+    If a report holds an argument outside the set, render no command for that argv, on any shell.
+    A report file can be edited, and no quoting is safe for such an argument on cmd.exe or PowerShell.
+
 ### Security {#advisories-with-no-fix-expected}
 
 `security` is one of three shapes, told apart by `status`:

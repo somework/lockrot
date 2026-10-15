@@ -69,6 +69,16 @@ final class Report2RootTest extends TestCase
         self::assertSame(1, $security['fix_unknown']);
     }
 
+    /** A package name outside the command argument set, such as `--working-dir=x` in a hostile lock, is not written into `update now`. */
+    public function testUpdateNowLeavesOutAPackageNameOutsideTheCommandArgumentSet(): void
+    {
+        $security = self::security([self::vulnerable('acme/a', [['high', 'update']]), self::vulnerable('--working-dir=x', [['high', 'update']]), self::vulnerable('acme/b%PATH%', [['high', 'update']])]);
+
+        self::assertSame(['acme/a'], $security['update_now']);
+        self::assertSame(['composer', 'update', 'acme/a'], $security['update_now_command']);
+        self::assertNull(self::security([self::vulnerable('--working-dir=x', [['high', 'update']])])['update_now_command']);
+    }
+
     public function testSecurityWithMixedChecksIsPartialAndWithNoFindingComplete(): void
     {
         $finding = fn (string $check): Finding => self::withDetails((new FindingBuilder())->build(), $check, 0);

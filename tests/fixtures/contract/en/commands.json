@@ -7,9 +7,9 @@
                 "extra.lockrot.reason",
                 "the team's fork"
             ],
-            "posix": "composer config extra.lockrot.reason 'the team'\\''s fork'",
-            "cmd": "composer config extra.lockrot.reason \"the team's fork\"",
-            "powershell": "composer config extra.lockrot.reason 'the team''s fork'"
+            "posix": null,
+            "cmd": null,
+            "powershell": null
         },
         {
             "argv": [
@@ -208,11 +208,71 @@
             "argv": [
                 "composer",
                 "require",
+                "vendor/package:dev-x!PATH!"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "vendor/package:dev-x%CMDCMDLINE:~0,1%&calc&rem "
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
+                "vendor/package:x’;calc;’"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "require",
                 "vendor/package:~1.4,!=1.4.2"
             ],
-            "posix": "composer require 'vendor/package:~1.4,!=1.4.2'",
-            "cmd": "composer require \"vendor/package:~1.4,!=1.4.2\"",
-            "powershell": "composer require 'vendor/package:~1.4,!=1.4.2'"
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "--%"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "@name"
+            ],
+            "posix": "composer update @name",
+            "cmd": "composer update @name",
+            "powershell": "composer update '@name'"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "a,b"
+            ],
+            "posix": "composer update a,b",
+            "cmd": "composer update a,b",
+            "powershell": "composer update 'a,b'"
         },
         {
             "argv": [
@@ -277,6 +337,36 @@
         {
             "argv": [
                 "composer",
+                "update",
+                "vendor/package\u0000"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "vendor/package\ncalc"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "vendor/package\r"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
+        },
+        {
+            "argv": [
+                "composer",
                 "why-not",
                 "genealabs/laravel-model-caching",
                 "13.1.11"
@@ -295,6 +385,17 @@
             "posix": "composer why-not guzzlehttp/guzzle 8.2.0",
             "cmd": "composer why-not guzzlehttp/guzzle 8.2.0",
             "powershell": "composer why-not guzzlehttp/guzzle 8.2.0"
+        },
+        {
+            "argv": [
+                "composer",
+                "why-not",
+                "vendor/package",
+                "--working-dir=x"
+            ],
+            "posix": null,
+            "cmd": null,
+            "powershell": null
         },
         {
             "argv": [

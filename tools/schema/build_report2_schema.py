@@ -468,7 +468,9 @@ def move_props(with_also):
                                       closed(['holders', 'crosses_major', 'transitive', 'unreached']), uniqueItems=True),
         'commands': arr(("The ordered commands a user runs, each an argv list (round 4), rendered per shell by §5.6's quoting (POSIX, cmd.exe, PowerShell); `[]` for a transitive "
                          "`require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`, attack round 1). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. "
-                         "A page renders it as written and never builds a command from `constraint`."),
+                         "Each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$`, and only lockrot's own option `--no-update` starts with `-` (§5.6, the command argument rule): "
+                         "a step with an argument from the lock or a repository outside that set is left out, and the move keeps its `constraint`, `text` and other steps. "
+                         "A page renders it as written and never builds a command from `constraint`. A page that reads an argument outside the set renders no command for that argv, on any shell."),
                         arr('One command as its argument list (`["composer", "require", "php:>=8.1", "--no-update"]`).', {'type': 'string', 'minLength': 1}, minItems=1)),
     }
     if with_also:
@@ -1461,7 +1463,7 @@ defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8
     'severities': obj('Counted advisories per severity, every severity present.', {k: COUNT(f'Counted `{k}` advisories.') for k in SEVERITIES}),
     'fixes': obj('Vulnerable findings per `security.fix_kind`, every known fix kind present (fix kinds are open: a later kind is an extra key).',
                  {k: COUNT(f'Findings whose `security.fix_kind` is `{k}`.') for k in FIX_KINDS}, additionalProperties=INT0),
-    'update_now': arr('The packages whose `security.fix_kind` is `update` (§5.3).', ref('packageName')),
+    'update_now': arr('The packages whose `security.fix_kind` is `update` (§5.3), except a name outside the command argument set of `next_step.commands` (§5.6).', ref('packageName')),
     'update_now_command': nul(("The one command the overview's \"Update now\" copies, as an argv list (`[\"composer\", \"update\", <update_now…>]`); null exactly when "
                                "`update_now` is empty, and then the line is hidden (attack round 1: a page never builds a command, and a bare `composer update` updates the whole lock)."),
                               {'description': 'The argv: `composer`, `update`, then each package of `update_now` in its order.', 'type': 'array',
