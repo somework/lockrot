@@ -57,7 +57,14 @@ final class HtmlFormatterTest extends TestCase
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('html needs a lockrot-report release that reads report-2 (this build vendors one that reads [1]); use --format=json meanwhile');
 
-        (new HtmlFormatter())->format(new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0));
+        (new HtmlFormatter(null, [1]))->format(new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0));
+    }
+
+    public function testTheVendoredRendererRendersReport2(): void
+    {
+        $page = (new HtmlFormatter())->format($this->report([$this->finding('vendor/pkg')]));
+
+        self::assertSame(2, J::intAt(self::payloadOf($page), ['report', 'lockrot', 'schema']));
     }
 
     public function testThePageIsOneFileWithItsStylesAndScriptInline(): void
