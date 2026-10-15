@@ -12,9 +12,9 @@ use Lockrot\Data\Repository\InstalledRelease;
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\BranchRow;
+use Lockrot\Signal\Data\LeftBehindData;
 use Lockrot\Signal\PackageFacts;
 use Lockrot\Signal\PhpFloor;
-use Lockrot\Signal\Signal;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Verdict\Finding;
 
@@ -122,12 +122,7 @@ final class Explanation
     /** @return list<BranchRow> */
     private function rows(): array
     {
-        $s8 = null;
-        foreach ($this->finding->signals() as $signal) {
-            $s8 = $signal->id() === Signal::S8 ? $signal : $s8;
-        }
-
-        return BranchRow::all($this->facts, $this->floor, new Clock($this->report->generatedAt()), $s8);
+        return BranchRow::all($this->facts, $this->floor, new Clock($this->report->generatedAt()), $this->finding->signalData(LeftBehindData::class));
     }
 
     /**
