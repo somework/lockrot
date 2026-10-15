@@ -59,7 +59,7 @@ final class CommandArgumentTest extends TestCase
     }
 
     /** A bare `--%` stops PowerShell parsing, and a name or version from data cannot pass an option to Composer. */
-    public function testALeadingDashPassesOnlyAsLockrotsOwnOption(): void
+    public function testALeadingDashPassesOnlyAsTheOptionThatLockrotWrites(): void
     {
         foreach (['--%', '--working-dir=x', '-d', '-', '--no-update=1'] as $argument) {
             self::assertFalse(CommandArgument::passes($argument), $argument);
@@ -67,7 +67,7 @@ final class CommandArgumentTest extends TestCase
         self::assertTrue(CommandArgument::passes('a-b'));
     }
 
-    /** A package name from data never starts with `-`, not even as lockrot's own option. */
+    /** A package name from data never starts with `-`, not even as `--no-update`. */
     public function testANameFromDataPassesOnlyWithoutALeadingDash(): void
     {
         self::assertTrue(CommandArgument::passesName('a-b/c-d'));

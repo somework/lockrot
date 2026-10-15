@@ -381,11 +381,11 @@ comes in through others, `commands` (argv lists) and `text`. `also` holds the ot
 `kind` is an open set: show `text` for a kind you do not know.
 
 Each argument of `commands` and of `security.update_now_command` matches
-`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only lockrot's own option `--no-update`
-starts with `-`. The first argument is `composer`, and the second is `update`, `require` or
-`why-not`. An argument comes from the lock or a repository, so lockrot leaves out a step that breaks
-this rule. The move keeps its `constraint`, `text` and other steps. Render each argv with one of these
-renderings:
+`^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. Only `--no-update`, the Composer
+option that lockrot writes, starts with `-`. The first argument is `composer`, and the second is
+`update`, `require` or `why-not`. An argument comes from the lock or a repository, so lockrot leaves
+out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. Render
+each argv with one of these renderings:
 
 | Shell | Rendering | Example |
 |---|---|---|

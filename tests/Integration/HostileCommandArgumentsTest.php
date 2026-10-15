@@ -49,7 +49,7 @@ final class HostileCommandArgumentsTest extends TestCase
         self::assertSame([false], array_column(JsonPath::arrayAt($move, ['through']), 'newest_requires'));
     }
 
-    /** A name that starts with `-` would pass an option to Composer, lockrot's own `--no-update` included. */
+    /** A name that starts with `-` would pass an option to Composer, `--no-update` included. */
     public function testAPackageNamedAsAnOptionWritesNoUpdateCommand(): void
     {
         foreach (['--working-dir=x', '--no-update'] as $name) {
