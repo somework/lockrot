@@ -15,9 +15,10 @@ use Lockrot\Verdict\CommandArgument;
  */
 final class ShellCommand
 {
-    private const POSIX_SAFE = '~^[A-Za-z0-9/._:@%+=,-]+$~D';
+    /** zsh expands a bare word that starts with `=` to a command path. */
+    private const POSIX_SAFE = '~^(?!=)[A-Za-z0-9/._:@%+=,-]+$~D';
     private const CMD_SPECIAL = '~[ ^|<>]~';
-    private const POWERSHELL_SAFE = '~^[A-Za-z0-9/._:-]+$~D';
+    private const POWERSHELL_BARE = '~^[A-Za-z0-9/._:-]+$~D';
 
     /** @param list<string> $argv */
     public static function posix(array $argv): ?string
@@ -32,13 +33,22 @@ final class ShellCommand
     }
 
     /**
-     * A bare `@name` splats and a bare `a,b` is an array, so the bare set is narrower than POSIX's.
+     * The target is often `composer.bat`, and cmd.exe parses `|`, `<`, `>` and `^` again in an
+     * argument that PowerShell does not double-quote. After `--%`, PowerShell passes the cmd.exe
+     * rendering verbatim to an `.exe` or a `.bat` target.
      *
      * @param list<string> $argv
      */
     public static function powershell(array $argv): ?string
     {
-        return self::rendered($argv, static fn (string $argument): string => preg_match(self::POWERSHELL_SAFE, $argument) === 1 ? $argument : "'".$argument."'");
+        if (!CommandArgument::allPass($argv)) {
+            return null;
+        }
+        if (preg_grep(self::POWERSHELL_BARE, $argv) === $argv) {
+            return implode(' ', $argv);
+        }
+
+        return $argv[0].' --% '.self::cmd(\array_slice($argv, 1));
     }
 
     /**

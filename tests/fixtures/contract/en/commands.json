@@ -19,7 +19,7 @@
             ],
             "posix": "composer require 'friendsofsymfony/oauth-server-bundle:^1.6.2'",
             "cmd": "composer require \"friendsofsymfony/oauth-server-bundle:^1.6.2\"",
-            "powershell": "composer require 'friendsofsymfony/oauth-server-bundle:^1.6.2'"
+            "powershell": "composer --% require \"friendsofsymfony/oauth-server-bundle:^1.6.2\""
         },
         {
             "argv": [
@@ -29,7 +29,7 @@
             ],
             "posix": "composer require 'geoip2/geoip2:^3.4'",
             "cmd": "composer require \"geoip2/geoip2:^3.4\"",
-            "powershell": "composer require 'geoip2/geoip2:^3.4'"
+            "powershell": "composer --% require \"geoip2/geoip2:^3.4\""
         },
         {
             "argv": [
@@ -39,7 +39,7 @@
             ],
             "posix": "composer require 'guzzlehttp/guzzle:^7.15.2'",
             "cmd": "composer require \"guzzlehttp/guzzle:^7.15.2\"",
-            "powershell": "composer require 'guzzlehttp/guzzle:^7.15.2'"
+            "powershell": "composer --% require \"guzzlehttp/guzzle:^7.15.2\""
         },
         {
             "argv": [
@@ -49,7 +49,7 @@
             ],
             "posix": "composer require 'guzzlehttp/guzzle:^8.2'",
             "cmd": "composer require \"guzzlehttp/guzzle:^8.2\"",
-            "powershell": "composer require 'guzzlehttp/guzzle:^8.2'"
+            "powershell": "composer --% require \"guzzlehttp/guzzle:^8.2\""
         },
         {
             "argv": [
@@ -59,7 +59,7 @@
             ],
             "posix": "composer require 'joomla/filter:^3.0.5'",
             "cmd": "composer require \"joomla/filter:^3.0.5\"",
-            "powershell": "composer require 'joomla/filter:^3.0.5'"
+            "powershell": "composer --% require \"joomla/filter:^3.0.5\""
         },
         {
             "argv": [
@@ -69,7 +69,7 @@
             ],
             "posix": "composer require 'joomla/string:^3.0'",
             "cmd": "composer require \"joomla/string:^3.0\"",
-            "powershell": "composer require 'joomla/string:^3.0'"
+            "powershell": "composer --% require \"joomla/string:^3.0\""
         },
         {
             "argv": [
@@ -79,7 +79,7 @@
             ],
             "posix": "composer require 'laravel/framework:^12.69.0'",
             "cmd": "composer require \"laravel/framework:^12.69.0\"",
-            "powershell": "composer require 'laravel/framework:^12.69.0'"
+            "powershell": "composer --% require \"laravel/framework:^12.69.0\""
         },
         {
             "argv": [
@@ -100,7 +100,7 @@
             ],
             "posix": "composer require 'php:>=7.2.5' --no-update",
             "cmd": "composer require \"php:>=7.2.5\" --no-update",
-            "powershell": "composer require 'php:>=7.2.5' --no-update"
+            "powershell": "composer --% require \"php:>=7.2.5\" --no-update"
         },
         {
             "argv": [
@@ -111,7 +111,7 @@
             ],
             "posix": "composer require 'php:>=8.1' --no-update",
             "cmd": "composer require \"php:>=8.1\" --no-update",
-            "powershell": "composer require 'php:>=8.1' --no-update"
+            "powershell": "composer --% require \"php:>=8.1\" --no-update"
         },
         {
             "argv": [
@@ -122,7 +122,7 @@
             ],
             "posix": "composer require 'php:>=8.2' --no-update",
             "cmd": "composer require \"php:>=8.2\" --no-update",
-            "powershell": "composer require 'php:>=8.2' --no-update"
+            "powershell": "composer --% require \"php:>=8.2\" --no-update"
         },
         {
             "argv": [
@@ -132,7 +132,7 @@
             ],
             "posix": "composer require 'symfony/debug:^4.4.0'",
             "cmd": "composer require \"symfony/debug:^4.4.0\"",
-            "powershell": "composer require 'symfony/debug:^4.4.0'"
+            "powershell": "composer --% require \"symfony/debug:^4.4.0\""
         },
         {
             "argv": [
@@ -142,7 +142,7 @@
             ],
             "posix": "composer require 'symfony/debug:^4.4.44'",
             "cmd": "composer require \"symfony/debug:^4.4.44\"",
-            "powershell": "composer require 'symfony/debug:^4.4.44'"
+            "powershell": "composer --% require \"symfony/debug:^4.4.44\""
         },
         {
             "argv": [
@@ -152,7 +152,7 @@
             ],
             "posix": "composer require 'symfony/monolog-bridge:^5.4'",
             "cmd": "composer require \"symfony/monolog-bridge:^5.4\"",
-            "powershell": "composer require 'symfony/monolog-bridge:^5.4'"
+            "powershell": "composer --% require \"symfony/monolog-bridge:^5.4\""
         },
         {
             "argv": [
@@ -162,7 +162,7 @@
             ],
             "posix": "composer require 'symfony/monolog-bridge:^5.4.52'",
             "cmd": "composer require \"symfony/monolog-bridge:^5.4.52\"",
-            "powershell": "composer require 'symfony/monolog-bridge:^5.4.52'"
+            "powershell": "composer --% require \"symfony/monolog-bridge:^5.4.52\""
         },
         {
             "argv": [
@@ -172,7 +172,7 @@
             ],
             "posix": "composer require 'symfony/yaml:^5.4.52'",
             "cmd": "composer require \"symfony/yaml:^5.4.52\"",
-            "powershell": "composer require 'symfony/yaml:^5.4.52'"
+            "powershell": "composer --% require \"symfony/yaml:^5.4.52\""
         },
         {
             "argv": [
@@ -182,7 +182,7 @@
             ],
             "posix": "composer require 'twig/twig:^3.27.0'",
             "cmd": "composer require \"twig/twig:^3.27.0\"",
-            "powershell": "composer require 'twig/twig:^3.27.0'"
+            "powershell": "composer --% require \"twig/twig:^3.27.0\""
         },
         {
             "argv": [
@@ -192,7 +192,7 @@
             ],
             "posix": "composer require 'vendor/package:>=1.2 <2.0'",
             "cmd": "composer require \"vendor/package:>=1.2 <2.0\"",
-            "powershell": "composer require 'vendor/package:>=1.2 <2.0'"
+            "powershell": "composer --% require \"vendor/package:>=1.2 <2.0\""
         },
         {
             "argv": [
@@ -202,7 +202,7 @@
             ],
             "posix": "composer require 'vendor/package:^2.0 || ^3.0'",
             "cmd": "composer require \"vendor/package:^2.0 || ^3.0\"",
-            "powershell": "composer require 'vendor/package:^2.0 || ^3.0'"
+            "powershell": "composer --% require \"vendor/package:^2.0 || ^3.0\""
         },
         {
             "argv": [
@@ -258,11 +258,21 @@
             "argv": [
                 "composer",
                 "update",
+                "=a"
+            ],
+            "posix": "composer update '=a'",
+            "cmd": "composer update =a",
+            "powershell": "composer --% update =a"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
                 "@name"
             ],
             "posix": "composer update @name",
             "cmd": "composer update @name",
-            "powershell": "composer update '@name'"
+            "powershell": "composer --% update @name"
         },
         {
             "argv": [
@@ -272,7 +282,17 @@
             ],
             "posix": "composer update a,b",
             "cmd": "composer update a,b",
-            "powershell": "composer update 'a,b'"
+            "powershell": "composer --% update a,b"
+        },
+        {
+            "argv": [
+                "composer",
+                "update",
+                "a/b|c"
+            ],
+            "posix": "composer update 'a/b|c'",
+            "cmd": "composer update \"a/b|c\"",
+            "powershell": "composer --% update \"a/b|c\""
         },
         {
             "argv": [

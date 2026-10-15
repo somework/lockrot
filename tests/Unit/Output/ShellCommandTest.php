@@ -39,6 +39,12 @@ final class ShellCommandTest extends TestCase
         self::assertSame('a/b@1.0,c+e=f', ShellCommand::posix(['a/b@1.0,c+e=f']));
     }
 
+    /** zsh expands a bare word that starts with `=` to a command path. */
+    public function testPosixSingleQuotesAnArgumentThatStartsWithAnEqualsSign(): void
+    {
+        self::assertSame("x '=a' a=b", ShellCommand::posix(['x', '=a', 'a=b']));
+    }
+
     public function testCmdDoubleQuotesAnArgumentWithASpaceOrAMetacharacter(): void
     {
         self::assertSame('composer require "twig/twig:^3.27.0"', ShellCommand::cmd(['composer', 'require', 'twig/twig:^3.27.0']));
@@ -50,13 +56,24 @@ final class ShellCommandTest extends TestCase
         self::assertSame('x @name a,b a~b a*b', ShellCommand::cmd(['x', '@name', 'a,b', 'a~b', 'a*b']));
     }
 
-    /** A bare `@name` splats and a bare `a,b` is an array, so both are single-quoted. */
-    public function testPowershellSingleQuotesAnArgumentOutsideItsBareSet(): void
+    public function testPowershellLeavesAnArgvOfItsBareSetBare(): void
     {
-        self::assertSame("composer require 'php:>=8.1' --no-update", ShellCommand::powershell(['composer', 'require', 'php:>=8.1', '--no-update']));
         self::assertSame('composer update a/b c-d.e_f:1', ShellCommand::powershell(['composer', 'update', 'a/b', 'c-d.e_f:1']));
-        foreach (['@name', 'a,b', 'a+b', 'a=b', 'a b', 'a^b', 'a~b', 'a*b', 'a|b', 'a<b', 'a>b'] as $argument) {
-            self::assertSame("x '".$argument."'", ShellCommand::powershell(['x', $argument]), $argument);
+    }
+
+    /**
+     * A bare `@name` splats, a bare `a,b` is an array, and `composer.bat` hands a `|` to cmd.exe.
+     * After `--%`, PowerShell passes the cmd.exe rendering verbatim.
+     */
+    public function testPowershellWritesTheCmdRenderingAfterTheStopParsingToken(): void
+    {
+        self::assertSame('composer --% require "php:>=8.1" --no-update', ShellCommand::powershell(['composer', 'require', 'php:>=8.1', '--no-update']));
+        self::assertSame('composer --% update "a/b|c"', ShellCommand::powershell(['composer', 'update', 'a/b|c']));
+        foreach (['@name', 'a,b', 'a+b', 'a=b', 'a~b', 'a*b'] as $argument) {
+            self::assertSame('composer --% update '.$argument, ShellCommand::powershell(['composer', 'update', $argument]), $argument);
+        }
+        foreach (['a b', 'a^b', 'a|b', 'a<b', 'a>b'] as $argument) {
+            self::assertSame('composer --% update "'.$argument.'"', ShellCommand::powershell(['composer', 'update', $argument]), $argument);
         }
     }
 

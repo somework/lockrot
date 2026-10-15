@@ -384,13 +384,16 @@ Each argument of `commands` and of `security.update_now_command` matches
 `^[A-Za-z0-9/._:@+=,^~*<>| -]+$`. Only lockrot's own option `--no-update` starts with `-`. An
 argument comes from the lock or a repository, so lockrot leaves out a step with an argument outside
 this set. The move keeps its `constraint`, `text` and other steps. Render each argv with one of these
-quotings:
+renderings:
 
-| Shell | Quote an argument when it has | Quoting |
+| Shell | Rendering | Example |
 |---|---|---|
-| POSIX | a character outside `[A-Za-z0-9/._:@%+=,-]` | `'…'` |
-| cmd.exe | a space, a caret, a vertical bar, `<` or `>` | `"…"` |
-| PowerShell | a character outside `[A-Za-z0-9/._:-]` | `'…'` |
+| POSIX | Single-quote an argument with a character outside `[A-Za-z0-9/._:@%+=,-]`, or one that starts with `=` | `composer require 'php:>=8.1' --no-update` |
+| cmd.exe | Double-quote an argument with a space, a caret, a vertical bar, `<` or `>` | `composer require "php:>=8.1" --no-update` |
+| PowerShell | If each argument is inside `[A-Za-z0-9/._:-]`, write it bare. Else write the first argument, `--%`, then the cmd.exe rendering of the others | `composer --% require "php:>=8.1" --no-update` |
+
+The PowerShell target is often `composer.bat`, and cmd.exe then parses the arguments again. After
+`--%`, PowerShell passes the rest of the line unchanged.
 
 !!! warning
     If a report holds an argument outside the set, render no command for that argv, on any shell.
