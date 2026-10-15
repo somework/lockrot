@@ -121,7 +121,7 @@ $provenance = [
     'model_goldens' => $meta['goldens'],
     'page_goldens' => [
         'file' => 'page-goldens.json',
-        'source' => 'the model\'s page goldens of six documents (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded',
+        'source' => 'the model\'s page goldens (security-axis/r3/page-goldens.json in the private model), copied byte for byte and not recorded',
         'sha256' => hash_file('sha256', $contract.'page-goldens.json'),
         'read_by' => 'tests/Integration/PageGoldensTest.php reads title and description; the other keys are the renderer\'s',
     ],

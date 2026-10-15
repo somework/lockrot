@@ -232,14 +232,17 @@ final class MoveTest extends TestCase
         self::assertSame(['require', '^5.4.53', 'v5.4.53'], [JsonPath::stringAt($finding, ['next_step', 'kind']), JsonPath::stringAt($finding, ['next_step', 'constraint']), JsonPath::stringAt($finding, ['next_step', 'version'])]);
     }
 
-    /** A package the project does not require gets no root `composer require`, and names what it comes in through. */
+    /**
+     * A package the project does not require gets no root `composer require`, and names what it comes in
+     * through. mautic/core-lib's `~4.4.0` holds it, so Composer moves it for its holders.
+     */
     public function testATransitiveMoveWritesNoRequireCommand(): void
     {
         $move = JsonPath::arrayAt(self::hydrated(CaseHydrator::case('routing')), ['next_step']);
 
         self::assertSame('require', $move['kind']);
         self::assertSame([], $move['commands']);
-        self::assertSame(['crosses_major', 'transitive'], $move['composer_moves_because']);
+        self::assertSame(['holders', 'crosses_major'], $move['composer_moves_because']);
         self::assertStringStartsWith('move symfony/routing to ^5.4.53 through mautic/core-lib', JsonPath::stringAt($move, ['text']));
     }
 

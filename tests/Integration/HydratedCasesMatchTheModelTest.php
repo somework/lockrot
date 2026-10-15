@@ -90,8 +90,32 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     /**
      * The lines of a case whose fields differ from the model's, each with the reason that real data
      * cannot give lockrot the model's fields.
+     *
+     * @var array<string, array<string, string>>
      */
-    private const DIFFERENCES = [];
+    private const DIFFERENCES = [
+        'C-bitbucket‡' => [
+            'answer' => self::BITBUCKET,
+            'why' => self::BITBUCKET,
+            'checks' => self::BITBUCKET,
+            'security_row' => self::BITBUCKET,
+        ],
+        'tie‡' => [
+            'answer' => self::TIE,
+            'why' => self::TIE,
+            'checks' => self::TIE,
+            'security_row' => self::TIE,
+        ],
+        'psr7' => ['security_row' => self::NEWEST_TAG_ONLY],
+        'B-also‡' => ['security_row' => self::NEWEST_TAG_ONLY],
+        'xmlseclibs' => ['security_row' => self::NEWEST_TAG_ONLY.' The model also classes the 4.x row `upgrade` because it lies above the installed branch. In the mautic-v4 lock, only lightsaml/lightsaml requires the package, with `~2.0|~3.0|~4.0`. That constraint admits 4.x, so lockrot classes the row `update` (§5.3).'],
+    ];
+
+    private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot cannot raise S3 for a Bitbucket repository.';
+
+    private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
+
+    private const NEWEST_TAG_ONLY = 'The model knows only the newest tag of each branch, so `fixes.lowest` is null and `if_applied` is an upper bound (`at_most`). lockrot reads the fixing release of each branch and names it, and its `if_applied` is exact.';
 
     /** @return iterable<string, array{string, string}> */
     public static function caseLines(): iterable

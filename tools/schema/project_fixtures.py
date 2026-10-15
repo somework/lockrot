@@ -30,6 +30,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -313,27 +314,24 @@ def project_explain(doc, proj):
     return out
 
 
-def inputs_of(case):
-    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows and
-    lockrot reads its releases, or when it needs a run input that the hydrator does not take (see unhydrated()).
-
-    The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix or
-    a move names. `dependents` holds the `require` names of each direct dependent that C08 measured, and `abandoned` the
-    marking that S1 reads. `accept`, when present, holds the flags of the case's project allowlist entry."""
-    f, det, run = case['finding'], case.get('details') or {}, case['run']
-    rows = ((det.get('metadata') or {}).get('branches')) or []
-    unread = f['metadata']['status'] == 'not_from_composer_repository'
-    if (not rows and not unread) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
-        return None
+def package_facts(f, rows):
+    """The facts of one package that the hydrator turns into its lock entry, its releases, its advisories and its
+    repository's answer, from its finding and its branch rows. `releases` is absent for a package that lockrot reads no
+    release of."""
     s9 = next((s for s in f['signals'] if s['id'] == 'S9'), None)
     advisories = (s9 or {}).get('data', {}).get('advisories', [])
     releases = {}
 
-    def release(version, at, php):
+    def release(version, at, php, shared_commit=False):
         if version and version not in releases:
-            releases[version] = {'version': version, 'time': at, 'php': php}
+            releases[version] = dict({'version': version, 'time': at, 'php': php}, **({'shared_commit': True} if shared_commit else {}))
     for r in rows:
-        release(r['highest'], r['highest_released'], r['php'])
+        # A highest tag on a commit that other tags share is dated by that commit only (lockrot's shared-commit rule).
+        shared = r['highest_released'] is None and r['highest_commit_date'] is not None
+        release(r['highest'], r['highest_commit_date'] if shared else r['highest_released'], r.get('highest_php', r['php']), shared)
+        # A backport on a lower minor can be the branch's newest dated release: it carries the row's php.
+        if r['newest_dated'] != r['highest']:
+            release(r['newest_dated'], r['newest_dated_released'], r['php'])
         # The model dates a branch by its newest release only, so a lower release stays undated.
         lowest = (r.get('fixes') or {}).get('lowest')
         release(lowest, None, r['php'])
@@ -343,12 +341,75 @@ def inputs_of(case):
         row = by_branch.get(fx['to_branch'])
         if fx['version'] and row is not None:
             release(fx['version'], None, row['php'])
+    # A move whose release the model does not know (version null) admits its constraint's lowest release, which the model
+    # cannot date: an undated release there leaves what the move clears unverified, as the model leaves it.
+    ns = f.get('next_step') or {}
+    for mv in [ns] + (ns.get('also') or []):
+        row = by_branch.get(mv.get('to_branch'))
+        lower = re.match(r'^\^(\d+\.\d+)$', mv.get('constraint') or '')
+        if mv.get('version') is None and row is not None and lower:
+            release(('v' if row['highest'].startswith('v') else '') + lower.group(1) + '.0', None, row['php'])
     age = f.get('age') or {}
     s6 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S6'), None) or {}
     # A snapshot has no release date: its lock time is the snapshot's commit time.
     installed_at = (age.get('installed') or {}).get('at') or s6.get('snapshot_time')
     release(f['version'], installed_at, f['installed_php']['requires'])
-    root_require = {f['package']: '*'} if f['direct'] else {}
+    # The newest release that S2 measures can be a pre-release, which no branch row names.
+    newest = age.get('release') or {}
+    release(newest.get('version'), newest.get('at'), None)
+    s1 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S1'), None)
+    marking = None if s1 is None else {'by': s1['marked_by'], 'replacement': s1['replacement']}
+    if marking is None and f.get('abandoned_ignored'):
+        # S1 does not fire on a marking that Composer's ignore list covers: the marking is in abandoned_ignored.
+        held = f['abandoned_ignored']['marking']
+        marking = {'by': held['marked_by'], 'replacement': held['replacement']}
+    act = f.get('activity') or {}
+    push = age.get('push') or {}
+    facts = {
+        'lock': {'name': f['package'], 'version': f['version'], 'time': installed_at, 'php': f['installed_php']['requires'], 'dev': f['dev'],
+                 'origin': f['origin']['kind']},
+        'releases': sorted(releases.values(), key=lambda r: r['version']),
+        'advisories': [{'id': a['id'], 'cve': a['cve'], 'title': a['title'], 'link': a['link'], 'reported_at': a['reported_at'],
+                        'severity': a['severity_published'], 'affected_versions': a['affected_versions']} for a in advisories],
+        # The feeds' records count every advisory of the name, on any version: more than the counted ones.
+        'records': f['security'].get('records'),
+        # The advisories that affect the installed version and that the project's audit policy ignores.
+        'ignored': f['security']['ignored'],
+        'abandoned': marking,
+        # The lock's `source` names the repository, and the hydrator answers as the forge answered the model: `status` and
+        # `reason` say how. A package that lockrot never asks still names its repository there.
+        'activity': {'forge': act['forge'], 'host': act['host'], 'repo': act['repo'], 'status': act['status'], 'reason': act['reason'],
+                     'pushed_at': push.get('at'), 'archived': act['archived']} if act.get('host') else None,
+    }
+    if f['metadata']['status'] == 'not_from_composer_repository':
+        # lockrot reads no release of a package that is not from a Composer repository.
+        del facts['releases']
+    return facts
+
+
+def rows_of(details):
+    return (((details or {}).get('metadata') or {}).get('branches')) or []
+
+
+def inputs_of(case):
+    """What a hydrator feeds the Analyzer to rebuild the case: null when the case carries no branch rows and
+    lockrot reads its releases, or when it needs a run input that the hydrator does not take (see unhydrated()).
+
+    The lock links the case's chain and its other direct dependents to the package, and holds every holder that a fix, a
+    move or a branch row names. `dependents` holds the `require` names of each direct dependent that C08 measured, and
+    `abandoned` the marking that S1 reads. `accept`, when present, holds the flags of the case's project allowlist entry.
+    `packages` holds the facts of each package that the case's finding grades by name (a holder, the replacement, an S7
+    package), with the chain that reaches it from the root and the one from the case's package."""
+    f, run = case['finding'], case['run']
+    rows = rows_of(case.get('details'))
+    unread = f['metadata']['status'] == 'not_from_composer_repository'
+    if (not rows and not unread) or f['metadata']['status'] not in ('read', 'not_from_composer_repository') or unhydrated(case):
+        return None
+    facts = package_facts(f, rows)
+    advisories = (next((s for s in f['signals'] if s['id'] == 'S9'), None) or {}).get('data', {}).get('advisories', [])
+    root_require = {f['package']: '*'} if f['direct'] and 'require' in f['named_in'] else {}
+    # A name that only require-dev holds counts for the walk only with --dev.
+    root_dev = {f['package']: '*'} if 'require-dev' in f['named_in'] else {}
     lock = {}
     through = {e['package']: e for e in (f.get('next_step') or {}).get('through') or []}
 
@@ -370,7 +431,8 @@ def inputs_of(case):
             requires_it = (through.get(name) or {}).get('installed_requires') is not False or len(chain) < 3
             entry(name).setdefault('require', {})[f['package'] if requires_it else chain[-2]] = '*'
     moves = [m for m in [f.get('next_step')] if m] + [m for m in ((f.get('next_step') or {}).get('also') or [])]
-    held = [h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m['held_by']]
+    held = ([h for a in advisories for h in a['fix']['held_by']] + [h for m in moves for h in m['held_by']]
+            + [h for r in rows for h in ((r.get('fixes') or {}).get('held_by') or [])])
     root_links = {}
     for h in held:
         if h['source'] == 'root':
@@ -390,29 +452,23 @@ def inputs_of(case):
         if newest and newest['version'] != e['installed_version']:
             own.append({'version': newest['version'], 'time': newest['released'], 'require': {f['package']: '*'} if e['newest_requires'] else {}})
         dependents[name] = own
-    s1 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S1'), None)
-    marking = None if s1 is None else {'by': s1['marked_by'], 'replacement': s1['replacement']}
-    if marking is None and f.get('abandoned_ignored'):
-        # S1 does not fire on a marking that Composer's ignore list covers: the marking is in abandoned_ignored.
-        held = f['abandoned_ignored']['marking']
-        marking = {'by': held['marked_by'], 'replacement': held['replacement']}
-    act = f.get('activity') or {}
-    push = age.get('push') or {}
-    inputs = {
-        'root': dict({'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **dict(root_require, **root_links.pop('require', {})))}, **root_links),
-        'lock': [{'name': f['package'], 'version': f['version'], 'time': installed_at, 'php': f['installed_php']['requires'], 'dev': f['dev'],
-                  'origin': f['origin']['kind']}] + list(lock.values()),
-        'releases': sorted(releases.values(), key=lambda r: r['version']),
-        'advisories': [{'id': a['id'], 'cve': a['cve'], 'title': a['title'], 'link': a['link'], 'reported_at': a['reported_at'],
-                        'severity': a['severity_published'], 'affected_versions': a['affected_versions']} for a in advisories],
-        'abandoned': marking,
-        'dependents': dependents,
-        # A package that lockrot never asks still names its repository in the lock's `source`.
-        'activity': ({'host': act['host'], 'repo': act['repo'], 'pushed_at': None, 'archived': None} if unread and act.get('host') else None)
-        if act.get('status') != 'read' else {'host': act['host'], 'repo': act['repo'], 'pushed_at': push.get('at'), 'archived': act['archived']},
-        'run': {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev'],
-                'advisories_unchecked': f['security']['unchecked_reason']},
-    }
+    root = dict({'name': run['root_package'], 'require': dict({'php': run['project_php']} if run['project_php'] else {}, **dict(root_require, **root_links.pop('require', {})))}, **root_links)
+    if root_dev:
+        root['require-dev'] = dict(root_dev, **root.get('require-dev', {}))
+    inputs = dict({
+        # A run that read no composer.json has no root.
+        'root': None if f['depth_unmeasured'] == 'no_composer_json' else root,
+        'lock': [facts['lock']] + list(lock.values()),
+    }, **{k: v for k, v in facts.items() if k != 'lock'})
+    inputs['dependents'] = dependents
+    inputs['run'] = {'target_php': run['target_php'], 'project_php': run['project_php'], 'fail_on': run['fail_on'], 'include_dev': run['include_dev'],
+                     'advisories_unchecked': f['security']['unchecked_reason']}
+    s7 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S7'), None) or {}
+    below = {p['package']: p['chain'] for p in s7.get('packages', [])}
+    related = case.get('related') or {}
+    if related:
+        inputs['packages'] = {name: dict(package_facts(r['finding'], rows_of(r.get('details'))), chain=r['finding']['chain'], below=below.get(name))
+                              for name, r in sorted(related.items())}
     # Composer's abandoned ignore list of the project, as `policy.abandoned.ignore` or `audit.ignore-abandoned` holds it.
     ignored = f.get('abandoned_ignored')
     if ignored is not None:
@@ -421,10 +477,9 @@ def inputs_of(case):
     allowlist = f.get('allowlist')
     if allowlist is not None and allowlist['by'] == 'project':
         inputs['accept'] = allowlist['flag_ids']
-    if unread:
-        # lockrot reads no release of a package that is not from a Composer repository.
-        del inputs['releases']
-    if f['origin']['kind'] == 'vcs' and act.get('host'):
+        inputs['allowlist'] = {k: allowlist[k] for k in ('pattern', 'version', 'reason', 'expires')}
+    act = f.get('activity') or {}
+    if f['origin']['kind'] == 'vcs' and act.get('host') and inputs['root'] is not None:
         # The project's vcs repository serves the package: lockrot names its origin from it.
         inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
@@ -466,6 +521,8 @@ DOCUMENT_SETS = [('report-2', 'corpus', True), ('report-2-variants', 'variants',
 DOCUMENT_SETS += [(os.path.join('baseline-2', sub), os.path.join('baseline', sub), False)
                   for sub in ('cases', 'corpus', 'earlier', 'gate-rows', 'regenerate', 'regenerate-from-baseline-1')]
 DOCUMENT_SETS += [('config-2', 'config', False)] + [(os.path.join('config-2', sub), os.path.join('config', sub), False) for sub in ('coverage', 'repo-docs')]
+# The page goldens' own documents: values no closed list holds, so no strict schema reads them.
+DOCUMENT_SETS += [('page', 'page', False)]
 # Files of the model's directories that are not documents.
 NOT_DOCUMENTS = ('INDEX.json', 'EXPECT.json', 'corrections.json')
 
@@ -513,6 +570,8 @@ def main():
         if c.get('details') is not None:
             c['details'] = project_details(case['details'], proj)
         c['inputs'] = inputs_of(case)
+        # The related packages' findings feed the inputs only.
+        c.pop('related', None)
         if c['inputs'] is None:
             without_inputs.append(case['id'])
         cases.append(c)
