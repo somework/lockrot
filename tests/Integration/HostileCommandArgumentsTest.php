@@ -7,7 +7,6 @@ namespace Lockrot\Tests\Integration;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\JsonPath;
-use Lockrot\Verdict\CommandArgument;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -61,17 +60,19 @@ final class HostileCommandArgumentsTest extends TestCase
         self::assertSame([[], null], [JsonPath::arrayAt($report, ['security', 'update_now']), JsonPath::arrayAt($report, ['security'])['update_now_command']]);
     }
 
-    public function testAHostileBranchInTheLockWritesOnlyArgumentsOfTheSet(): void
+    /** The installed branch names no step: the move's steps come from the releases. */
+    public function testAHostileBranchInTheLockKeepsTheStepsOfTheReleases(): void
     {
-        foreach (['E' => 'symfony/yaml', 'G-tag‡' => 'friendsofsymfony/oauth-server-bundle'] as $id => $package) {
+        $expected = [
+            'E' => ['symfony/yaml', [['composer', 'require', 'symfony/yaml:^8.1.8']]],
+            'G-tag‡' => ['friendsofsymfony/oauth-server-bundle', [['composer', 'require', 'friendsofsymfony/oauth-server-bundle:^1.6.2']]],
+        ];
+        foreach ($expected as $id => [$package, $commands]) {
             $move = self::move($id, $package, static function (array $inputs): array {
                 return self::with($inputs, ['lock', 0, 'version'], 'dev-x%PATH%');
             });
 
-            foreach (JsonPath::arrayAt($move, ['commands']) as $argv) {
-                self::assertIsArray($argv);
-                self::assertTrue(CommandArgument::allPass(array_values(array_filter($argv, 'is_string'))), $id.': '.json_encode($argv, \JSON_THROW_ON_ERROR));
-            }
+            self::assertSame($commands, $move['commands'], $id);
         }
     }
 
