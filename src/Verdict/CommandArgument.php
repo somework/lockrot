@@ -22,6 +22,12 @@ final class CommandArgument
         return preg_match(self::SET, $argument) === 1 && ($argument[0] !== '-' || isset(self::OPTIONS[$argument]));
     }
 
+    /** A whole argument that a package name fills: data never passes an option, lockrot's own included. */
+    public static function passesName(string $name): bool
+    {
+        return self::passes($name) && $name[0] !== '-';
+    }
+
     /** @param list<string> $argv */
     public static function allPass(array $argv): bool
     {

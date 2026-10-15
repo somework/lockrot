@@ -151,7 +151,7 @@ final class Move implements \JsonSerializable
         $clone->also = $also;
         foreach ($through as $entry) {
             $whyNot = ['composer', 'why-not', $entry->package(), $entry->newestVersion() ?? ''];
-            if ($entry->newestRequires() === false && CommandArgument::allPass($whyNot)) {
+            if ($entry->newestRequires() === false && CommandArgument::passesName($entry->package()) && CommandArgument::allPass($whyNot)) {
                 $clone->commands[] = $whyNot;
             }
         }

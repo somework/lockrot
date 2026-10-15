@@ -110,7 +110,7 @@ final class Report2Root
         $packages = [];
         foreach ($findings as $finding) {
             $standing = $finding->securityStanding();
-            if ($standing->isVulnerable() && $standing->fixKind() === 'update' && CommandArgument::passes($finding->package())) {
+            if ($standing->isVulnerable() && $standing->fixKind() === 'update' && CommandArgument::passesName($finding->package())) {
                 $packages[] = $finding->package();
             }
         }

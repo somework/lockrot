@@ -49,15 +49,33 @@ final class HostileCommandArgumentsTest extends TestCase
         self::assertSame([false], array_column(JsonPath::arrayAt($move, ['through']), 'newest_requires'));
     }
 
-    /** A name that starts with `-` would pass an option to Composer. */
+    /** A name that starts with `-` would pass an option to Composer, lockrot's own `--no-update` included. */
     public function testAPackageNamedAsAnOptionWritesNoUpdateCommand(): void
     {
-        $report = self::report('E', static function (array $inputs): array {
-            return self::with($inputs, ['lock', 0, 'name'], '--working-dir=x');
+        foreach (['--working-dir=x', '--no-update'] as $name) {
+            $report = self::report('E', static function (array $inputs) use ($name): array {
+                return self::with($inputs, ['lock', 0, 'name'], $name);
+            });
+
+            self::assertSame([], JsonPath::arrayAt($report, ['findings', 0, 'next_step', 'commands']), $name);
+            self::assertSame([[], null], [JsonPath::arrayAt($report, ['security', 'update_now']), JsonPath::arrayAt($report, ['security'])['update_now_command']], $name);
+        }
+    }
+
+    public function testADependentNamedAsAnOptionWritesNoWhyNotStep(): void
+    {
+        $move = self::move('psr7', 'guzzlehttp/psr7', static function (array $inputs): array {
+            $inputs = self::with($inputs, ['lock', 1, 'name'], '--no-update');
+            $inputs = self::with($inputs, ['root', 'require'], ['php' => '^7.2 || ^8.0.0', '--no-update' => '*']);
+
+            return self::with($inputs, ['dependents'], ['--no-update' => [
+                ['version' => '6.5.8', 'time' => '2022-06-20T22:16:07+00:00', 'require' => ['guzzlehttp/psr7' => '^1.9']],
+                ['version' => '8.2.0', 'time' => '2026-09-06T13:55:09+00:00', 'require' => []],
+            ]]);
         });
 
-        self::assertSame([], JsonPath::arrayAt($report, ['findings', 0, 'next_step', 'commands']));
-        self::assertSame([[], null], [JsonPath::arrayAt($report, ['security', 'update_now']), JsonPath::arrayAt($report, ['security'])['update_now_command']]);
+        self::assertSame([['composer', 'require', 'php:>=7.2.5', '--no-update']], $move['commands']);
+        self::assertSame([false], array_column(JsonPath::arrayAt($move, ['through']), 'newest_requires'));
     }
 
     /** The installed branch names no step: the move's steps come from the releases. */

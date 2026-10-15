@@ -301,7 +301,7 @@ final class MoveBuilder
         $package = $subject->package();
         switch ($kind) {
             case Move::UPDATE:
-                return [['composer', 'update', $package]];
+                return CommandArgument::passesName($package) ? [['composer', 'update', $package]] : [];
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 $commands = [];

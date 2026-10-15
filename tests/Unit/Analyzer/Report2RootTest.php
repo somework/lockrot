@@ -69,10 +69,10 @@ final class Report2RootTest extends TestCase
         self::assertSame(1, $security['fix_unknown']);
     }
 
-    /** A package name outside the command argument set, such as `--working-dir=x` in a hostile lock, is not written into `update now`. */
+    /** A package name outside the command argument set, or one that starts with `-`, is not written into `update now`. */
     public function testUpdateNowLeavesOutAPackageNameOutsideTheCommandArgumentSet(): void
     {
-        $security = self::security([self::vulnerable('acme/a', [['high', 'update']]), self::vulnerable('--working-dir=x', [['high', 'update']]), self::vulnerable('acme/b%PATH%', [['high', 'update']])]);
+        $security = self::security([self::vulnerable('acme/a', [['high', 'update']]), self::vulnerable('--working-dir=x', [['high', 'update']]), self::vulnerable('acme/b%PATH%', [['high', 'update']]), self::vulnerable('--no-update', [['high', 'update']])]);
 
         self::assertSame(['acme/a'], $security['update_now']);
         self::assertSame(['composer', 'update', 'acme/a'], $security['update_now_command']);

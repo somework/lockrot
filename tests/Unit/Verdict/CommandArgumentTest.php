@@ -67,6 +67,15 @@ final class CommandArgumentTest extends TestCase
         self::assertTrue(CommandArgument::passes('a-b'));
     }
 
+    /** A package name from data never starts with `-`, not even as lockrot's own option. */
+    public function testANameFromDataPassesOnlyWithoutALeadingDash(): void
+    {
+        self::assertTrue(CommandArgument::passesName('a-b/c-d'));
+        self::assertFalse(CommandArgument::passesName('--no-update'));
+        self::assertFalse(CommandArgument::passesName('--working-dir=x'));
+        self::assertFalse(CommandArgument::passesName('a/b%PATH%'));
+    }
+
     public function testAnEmptyArgumentFails(): void
     {
         self::assertFalse(CommandArgument::passes(''));
