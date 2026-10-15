@@ -23,14 +23,14 @@ final class MoveContractTest extends TestCase
     private const BY_POSITION = 'the model classes a higher branch `upgrade` by its position : no link of the inputs excludes the release, so lockrot classes it `update`';
     private const TIE = 'the model removes S5 from the case to make the tie : the installed release is older than PHP 8.0, so lockrot raises S5 and the move differs';
     private const S9_VERSION = 'the model leaves this S9 `fix.version` null : SPEC §5.3 names the lowest release that fixes the advisory, and lockrot writes it and the links that hold it';
-    private const LOWEST = 'the model leaves `lowest` null on a row whose only read release is its newest : lockrot names that release';
+    private const LOWEST = 'the model names a row\'s `lowest` only when an S9 fix names it : lockrot names the row\'s candidate (P2b)';
 
     /**
      * The fields of a hydrated finding that differ from the case's, each list with its reason. Every
      * other field of `next_step`, `also[]`, `security.move_in`, `security.fix_kind`, each branch
      * row's `fixes` (`rows.`) and each S9 `fix` (`s9.`) must be equal. Each reference also leaves
-     * out the text, the replacement's url and finding, and each holder's finding: they read packages
-     * that the inputs do not analyse.
+     * out the text, the replacement's url and finding, and each holder's finding: they read other
+     * packages' findings.
      */
     private const DIFFERENCES = [
         'psr7' => [[['version'], self::VERSION], [['rows.lowest'], self::LOWEST]],
@@ -360,11 +360,6 @@ final class MoveContractTest extends TestCase
             foreach ($fields as $field) {
                 $skipped[] = $field;
             }
-        }
-        if (\in_array('next_step', $skipped, true)) {
-            self::assertNotSame(JsonPath::stringAt($golden, ['score', 'text']), JsonPath::stringAt($lockrot, ['score', 'text']), $id.': the scores differ');
-
-            return;
         }
         $expected = self::reference($golden, $goldenRows, $skipped);
         $actual = self::reference($lockrot, $lockrotRows, $skipped);

@@ -221,9 +221,12 @@ final class CaseHydrator
                     $findings[$package] = $finding;
                 }
             }
+            // The composite holds the case packages only, so it counts their records, not the related packages'.
+            $named = isset($findings[$package]) ? $findings[$package]->details()->advisoryLookup() : null;
+            $count = $named === null ? 0 : (int) $named->records();
             foreach ($report->advisoryLookup()->repositories() as $repository) {
                 $name = $repository->composerRepository();
-                $records[$name] = [($records[$name][0] ?? 0) + (int) $repository->records(), ($records[$name][1] ?? 0) + (int) $repository->packagesWithRecords()];
+                $records[$name] = [($records[$name][0] ?? 0) + $count, ($records[$name][1] ?? 0) + ($count === 0 ? 0 : 1)];
             }
             $at = $report->activityCacheOldestAt();
             $oldest = $at !== null && ($oldest === null || $at < $oldest) ? $at : $oldest;
@@ -295,6 +298,12 @@ final class CaseHydrator
             $registry = \in_array($facts['lock']['origin'] ?? 'packagist', ['packagist', 'composer'], true) ? self::PACKAGIST : null;
             $source = $facts['activity'] === null ? null : self::sourceUrl($facts['activity']);
             $byName[$name] = PackageMetadata::fromPackages($name, self::releases($name, $facts['releases'], $facts['abandoned'], $registry, $source), $clock->now(), $locked->normalizedVersion());
+            if ($facts['parent'] !== null) {
+                // The monorepo's tags replace the split package, so MonorepoParents dates the split tags by them.
+                $parent = JsonPath::stringAt($facts['parent'], ['name']);
+                $tags = array_map(static fn ($tag): array => (\is_array($tag) ? $tag : []) + ['replace' => [$name => 'self.version']], JsonPath::arrayAt($facts['parent'], ['releases']));
+                $byName[$parent] = PackageMetadata::fromPackages($parent, self::releases($parent, $tags, null, $registry), $clock->now());
+            }
         }
         foreach ($dependents as $name => $releases) {
             $dependent = $lock->find((string) $name);
@@ -371,7 +380,7 @@ final class CaseHydrator
      *
      * @param array<mixed, mixed> $inputs
      *
-     * @return array<string, array{lock: array<mixed, mixed>, releases: array<mixed, mixed>|null, advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>, abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null, chains: list<list<string>>, dev: bool}>
+     * @return array<string, array{lock: array<mixed, mixed>, releases: array<mixed, mixed>|null, advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>, abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null, parent: array<mixed, mixed>|null, chains: list<list<string>>, dev: bool}>
      */
     private static function packages(array $inputs): array
     {
@@ -389,7 +398,7 @@ final class CaseHydrator
      * @param array<mixed, mixed> $facts
      * @param array<mixed, mixed> $entry
      *
-     * @return array{lock: array<mixed, mixed>, releases: array<mixed, mixed>|null, advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>, abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null, chains: list<list<string>>, dev: bool}
+     * @return array{lock: array<mixed, mixed>, releases: array<mixed, mixed>|null, advisories: list<Advisory>, records: ?int, ignored: list<IgnoredAdvisory>, abandoned: array<mixed, mixed>|null, activity: array<mixed, mixed>|null, parent: array<mixed, mixed>|null, chains: list<list<string>>, dev: bool}
      */
     private static function factsOf(array $facts, array $entry): array
     {
@@ -408,6 +417,7 @@ final class CaseHydrator
             'ignored' => self::ignored(\is_array($facts['ignored'] ?? null) ? $facts['ignored'] : []),
             'abandoned' => \is_array($facts['abandoned'] ?? null) ? $facts['abandoned'] : null,
             'activity' => \is_array($facts['activity'] ?? null) ? $facts['activity'] : null,
+            'parent' => \is_array($facts['parent'] ?? null) ? $facts['parent'] : null,
             'chains' => $chains,
             'dev' => ($entry['dev'] ?? false) === true,
         ];
@@ -536,6 +546,7 @@ final class CaseHydrator
                 'version' => $version,
                 'require' => (\is_string($release['php'] ?? null) ? ['php' => $release['php']] : []) + (\is_array($release['require'] ?? null) ? $release['require'] : []),
             ] + (\is_string($release['time'] ?? null) ? ['time' => $release['time']] : [])
+              + (\is_array($release['replace'] ?? null) ? ['replace' => $release['replace']] : [])
               + ($marking !== null && ($marking['by'] ?? null) === 'repository' ? ['abandoned' => $marking['replacement'] ?? true] : [])
               + ($registry !== null ? ['notification-url' => $registry] : []);
             if (($release['shared_commit'] ?? false) === true) {

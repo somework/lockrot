@@ -24,6 +24,7 @@ final class PageGoldensTest extends TestCase
     /** The goldens whose PHP inputs differ from the model's, with the reason. */
     private const PINNED = [
         'policy-off' => 'the hydrated lock holds joomla/filter and the three packages that require it, and the model\'s case document counts its one finding',
+        'pagerfanta' => 'the hydrated lock holds pagerfanta/twig and the packages that its finding names, and the model\'s case document counts its one finding',
     ];
 
     /** @return iterable<string, array{string}> */

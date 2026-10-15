@@ -346,6 +346,7 @@ def package_facts(f, rows):
             release(fx['version'], None, row['php'])
     # A move whose release the model does not know (version null) admits its constraint's lowest release, which the model
     # cannot date: an undated release there leaves what the move clears unverified, as the model leaves it.
+    # shortcut: assumes an undated `X.Y.0` release, which a real branch can lack or date; upgrade when the model holds each branch's releases.
     ns = f.get('next_step') or {}
     for mv in [ns] + (ns.get('also') or []):
         row = by_branch.get(mv.get('to_branch'))
@@ -366,6 +367,26 @@ def package_facts(f, rows):
         # S1 does not fire on a marking that Composer's ignore list covers: the marking is in abandoned_ignored.
         held = f['abandoned_ignored']['marking']
         marking = {'by': held['marked_by'], 'replacement': held['replacement']}
+    # A split package's tag shares its commit with its other spellings, so lockrot dates it by the monorepo's tag of the
+    # same version (`dated_by`). The split tag keeps its own time: S5 reads it.
+    parent = None
+    for part, version in (('installed', f['version']), ('branch_release', (age.get('branch_release') or {}).get('version'))):
+        dated = age.get(part) or {}
+        if dated.get('dated_by') and version in releases:
+            parent = parent or {'name': dated['dated_by'], 'releases': []}
+            parent['releases'].append({'version': version, 'time': dated['at']})
+            releases[version]['shared_commit'] = True
+    s5 = next((sg['data'] for sg in f['signals'] if sg['id'] == 'S5'), None) or {}
+    if age.get('installed_unmeasured') == 'shared_commit' and f['version'] in releases:
+        # The installed tag shares its commit, and no parent dates it: lockrot sets the lock's date aside as a commit date.
+        # The model holds that commit's date only for a branch's highest tag, so a lower tag stays undated.
+        row = next((r for r in rows if r['installed'] and r['highest'] == f['version']), {})
+        own = releases[f['version']]['time'] or s5.get('released') or row.get('highest_commit_date')
+        releases[f['version']].update(shared_commit=True, time=own)
+        installed_at = installed_at or own
+    if parent and f['version'] in [r['version'] for r in parent['releases']] and s5.get('released'):
+        releases[f['version']]['time'] = s5['released']
+        installed_at = s5['released']
     act = f.get('activity') or {}
     push = age.get('push') or {}
     facts = {
@@ -384,6 +405,8 @@ def package_facts(f, rows):
         'activity': {'forge': act['forge'], 'host': act['host'], 'repo': act['repo'], 'status': act['status'], 'reason': act['reason'],
                      'pushed_at': push.get('at'), 'archived': act['archived']} if act.get('host') else None,
     }
+    if parent:
+        facts['parent'] = parent
     if f['metadata']['status'] == 'not_from_composer_repository':
         # lockrot reads no release of a package that is not from a Composer repository.
         del facts['releases']

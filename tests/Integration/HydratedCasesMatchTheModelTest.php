@@ -14,8 +14,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * lockrot-report renders the answer, the Why lines, Checks, Release branches and Security of each
- * case from the case's finding, run and branch rows (SPEC-0.14.md §7.9.8, §7.9.13). The model's
+ * lockrot-report renders the answer, the Why lines, Checks, Release branches, the age line and
+ * Security of each case from the case's finding, run and branch rows (SPEC-0.14.md §7.9.8, §7.9.13). The model's
  * goldens (`cases[].golden`) render those fields of the model's case. Where lockrot's recording of
  * the hydrated case has the same fields, the page writes the model's golden. Each field list holds
  * the paths that the model's renderer of that line reads.
@@ -78,6 +78,10 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'details.metadata.branches[].{branch,highest,highest_admits_project_php,highest_admits_target_php,highest_misses_project_php,highest_php,installed,released_years}',
             'age.branch_release.{version,years}', 'installed_php.{requires,target_runs}', 'package', 'version',
         ],
+        'age' => [
+            'activity.event', 'age.installed.{at,dated_by,years}', 'age.installed_unmeasured', 'age.branch_release.{at,dated_by,version,years}',
+            'age.release.{at,dated_by,version,years}', 'age.push.{at,years}', 'branch', 'version',
+        ],
         'security_row' => [
             'details.metadata.branches[].{branch,highest}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,of}',
             'details.metadata.branches[].fixes.held_by[].{package,source}',
@@ -88,34 +92,91 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     ];
 
     /**
-     * The lines of a case whose fields differ from the model's, each with the reason that real data
-     * cannot give lockrot the model's fields.
+     * The paths of a case's line that differ from the model's, each list with its reason. Real data
+     * cannot give lockrot the model's fields there, or the model approximates them, as the reason
+     * names. Every other path of the line must be equal.
      *
-     * @var array<string, array<string, string>>
+     * @var array<string, array<string, list<array{list<string>, string}>>>
      */
     private const DIFFERENCES = [
-        'C-bitbucket‡' => [
-            'answer' => self::BITBUCKET,
-            'why' => self::BITBUCKET,
-            'checks' => self::BITBUCKET,
-            'security_row' => self::BITBUCKET,
+        'F' => ['age' => [[['age.installed_unmeasured'], self::INSTALLED_COMMIT]]],
+        'replace-graded' => ['age' => [[['age.installed_unmeasured'], self::INSTALLED_COMMIT]]],
+        'affected-range-unknown‡' => ['age' => [[['age.installed_unmeasured'], self::INSTALLED_COMMIT]]],
+        'psr7' => [
+            'security_row' => [
+                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
+            ],
+        ],
+        'xmlseclibs' => [
+            'security_row' => [
+                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
+                [['details.metadata.branches[].fixes.fix_kind'], self::BY_POSITION],
+            ],
+        ],
+        'B-also‡' => [
+            'security_row' => [
+                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
+                [['details.metadata.branches[].fixes.if_applied.at_most', 'details.metadata.branches[].fixes.if_applied.total', 'details.metadata.branches[].fixes.if_applied.verdict'], self::IF_APPLIED],
+            ],
         ],
         'tie‡' => [
-            'answer' => self::TIE,
-            'why' => self::TIE,
-            'checks' => self::TIE,
-            'security_row' => self::TIE,
+            'answer' => [
+                [['flags[].degree.liveness_complete', 'flags[].degree.reasons', 'flags[].headline.source', 'flags[].headline.value', 'flags[].id', 'flags[].role', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'next_step.unverified[].id', 'score.terms[].fix_kind', 'score.terms[].flag', 'score.terms[].multiplier', 'score.terms[].part', 'score.terms[].severity', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.forge', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::TIE],
+            ],
+            'why' => [
+                [['next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'score.exact', 'score.total', 'score.terms[].advisory', 'score.terms[].fix_kind', 'score.terms[].flag', 'score.terms[].multiplier', 'score.terms[].part', 'score.terms[].points', 'score.terms[].role', 'score.terms[].severity', 'score.terms[].weight', 'score.without[].at_least', 'score.without[].lead', 'score.without[].total', 'score.without[].verdict', 'score.without[].remove.id', 'score.without[].remove.kind', 'score.without[].revealed[].flag', 'score.without[].revealed[].role', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].data.advisories[].fix.to_branch', 'signals[].id'], self::TIE],
+            ],
+            'checks' => [
+                [['signals[].id'], self::TIE],
+            ],
+            'security_row' => [
+                [['signals[].data.advisories[].fix.kind', 'signals[].id'], self::TIE],
+            ],
         ],
-        'psr7' => ['security_row' => self::NEWEST_TAG_ONLY],
-        'B-also‡' => ['security_row' => self::NEWEST_TAG_ONLY],
-        'xmlseclibs' => ['security_row' => self::NEWEST_TAG_ONLY.' The model also classes the 4.x row `upgrade` because it lies above the installed branch. In the mautic-v4 lock, only lightsaml/lightsaml requires the package, with `~2.0|~3.0|~4.0`. That constraint admits 4.x, so lockrot classes the row `update` (§5.3).'],
+        'C-bitbucket‡' => [
+            'answer' => [
+                [['flags[].degree.reasons', 'flags[].headline.value', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.forge', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::BITBUCKET],
+            ],
+            'why' => [
+                [['signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].data.advisories[].fix.to_branch', 'signals[].id'], self::BITBUCKET],
+            ],
+            'checks' => [
+                [['signals[].id'], self::BITBUCKET],
+            ],
+            'security_row' => [
+                [['signals[].data.advisories[].fix.kind', 'signals[].id'], self::BITBUCKET],
+            ],
+        ],
     ];
 
-    private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot cannot raise S3 for a Bitbucket repository.';
+    private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';
+
+    private const BITBUCKET = 'The model marks the repository archived on Bitbucket (S3). Bitbucket\'s repository API has no archived field, so lockrot cannot raise S3 for a Bitbucket repository, and each later signal moves up one place.';
 
     private const TIE = 'The model removes S5 from the case to make the tie. The installed release requires php >=5.3.3 and is older than the PHP 8.0 release, so lockrot raises S5 (old-promise).';
 
-    private const NEWEST_TAG_ONLY = 'The model knows only the newest tag of each branch, so `fixes.lowest` is null and `if_applied` is an upper bound (`at_most`). lockrot reads the fixing release of each branch and names it, and its `if_applied` is exact.';
+    private const LOWEST = 'The model names a row\'s `fixes.lowest` only when an S9 fix names it. lockrot names the row\'s candidate (P2b).';
+
+    private const BY_POSITION = 'The model classes a branch above the installed one `upgrade` by its position. No link of the hydrated lock holds the package to its installed major, so lockrot classes the row `update` (§5.3).';
+
+    private const IF_APPLIED = 'The score after a move to the row follows its `fixes.lowest`. The model judges the row\'s newest tag as an upper bound, and lockrot judges its candidate exactly.';
+
+    /** The paths of a line that no case with inputs fills, each with its reason. */
+    private const UNFILLED = [
+        'score.accepted[].if_counted.modifiers[].after' => self::ONLY_PSR_LOG,
+        'score.accepted[].if_counted.modifiers[].before' => self::ONLY_PSR_LOG,
+        'score.accepted[].if_counted.modifiers[].divide_by' => self::ONLY_PSR_LOG,
+        'score.accepted[].if_counted.modifiers[].reason' => self::ONLY_PSR_LOG,
+        'age.release.dated_by' => 'No case of the model dates its newest release by a monorepo parent.',
+        'security.partial.unverified' => 'No case of the model leaves a fact of a partial fix unverified.',
+        'unchecked_accepted[].accepted_by.reason' => self::ACCEPT_UNCHECKED,
+        'unchecked_accepted[].check' => self::ACCEPT_UNCHECKED,
+        'unchecked_accepted[].reason' => self::ACCEPT_UNCHECKED,
+    ];
+
+    private const ONLY_PSR_LOG = 'Only psr-log accepts a flag on a halved finding, and it carries no branch rows, so the projector gives it no inputs.';
+
+    private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
 
     /** @return iterable<string, array{string, string}> */
     public static function caseLines(): iterable
@@ -140,30 +201,69 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     public function testTheRecordingHasTheModelsFieldsOfEachLine(string $id, string $line): void
     {
         $case = CaseHydrator::case($id);
-        $model = self::fieldsOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null), $line);
+        $model = self::documentOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null));
         $name = CaseRecording::fileName($id);
         $report = JsonPath::decodeFile(self::CONTRACT.'report-2/'.$name.'.json');
         $explain = JsonPath::decodeFile(self::CONTRACT.'explain-2/'.$name.'.json');
-        $lockrot = self::fieldsOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain), $line);
-
-        if (isset(self::DIFFERENCES[$id][$line])) {
-            self::assertNotSame($model, $lockrot, $id.' '.$line.': the fields agree with the model again: take the line off DIFFERENCES');
-
-            return;
+        $lockrot = self::documentOf(self::findingOf($report, JsonPath::stringAt($case, ['finding', 'package'])), JsonPath::arrayAt($report, ['run']), self::branchesOf($explain));
+        $listed = [];
+        foreach (self::DIFFERENCES[$id][$line] ?? [] as [$paths]) {
+            self::assertNotSame(Fields::only($model, $paths), Fields::only($lockrot, $paths), $id.' '.$line.': the fields agree with the model again: take '.implode(', ', $paths).' off DIFFERENCES');
+            $listed = array_merge($listed, $paths);
         }
-        self::assertSame($model, $lockrot, $id.' '.$line.': the recording differs from the model in the fields that the line reads');
+        $kept = array_values(array_diff(self::paths(self::LINES[$line]), $listed));
+
+        self::assertSame(Fields::only($model, $kept), Fields::only($lockrot, $kept), $id.' '.$line.': the recording differs from the model in the fields that the line reads');
     }
 
-    /** Each reason names a field that the line reads. */
+    /** Each listed path is one that its line reads, and each list has a reason. */
     public function testEveryListedDifferenceIsALineWithAReason(): void
     {
         foreach (self::DIFFERENCES as $id => $lines) {
             self::assertIsArray(CaseHydrator::case((string) $id)['inputs'] ?? null, $id.' has no inputs, so no recording');
-            foreach ($lines as $line => $reason) {
+            foreach ($lines as $line => $groups) {
                 self::assertArrayHasKey($line, self::LINES, $id);
-                self::assertNotSame('', $reason, $id.' '.$line);
+                foreach ($groups as [$paths, $reason]) {
+                    self::assertSame([], array_values(array_diff($paths, self::paths(self::LINES[$line]))), $id.' '.$line.': the line reads no such path');
+                    self::assertNotSame('', $reason, $id.' '.$line);
+                }
             }
         }
+    }
+
+    /** Each path of a line is filled by the model's or lockrot's fields of some case, or listed in UNFILLED. */
+    public function testEveryPathOfALineIsFilledByACase(): void
+    {
+        $filled = [];
+        foreach (self::caseLines() as [$id, $line]) {
+            $case = CaseHydrator::case($id);
+            $model = self::documentOf(JsonPath::arrayAt($case, ['finding']), JsonPath::arrayAt($case, ['run']), self::branchesOf($case['details'] ?? null));
+            foreach (self::paths(self::LINES[$line]) as $path) {
+                $filled[$path] = ($filled[$path] ?? false) || self::holdsAValue(Fields::only($model, [$path]));
+            }
+        }
+        self::assertNotSame([], $filled);
+
+        $unfilled = array_keys(array_filter($filled, static fn (bool $is): bool => !$is));
+        sort($unfilled);
+        $listed = array_keys(self::UNFILLED);
+        sort($listed);
+        self::assertSame($listed, $unfilled, 'list each path that no case fills in UNFILLED, and take each filled path off it');
+    }
+
+    /** @param mixed $node */
+    private static function holdsAValue($node): bool
+    {
+        if (!\is_array($node)) {
+            return $node !== null;
+        }
+        foreach ($node as $value) {
+            if (self::holdsAValue($value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -202,11 +302,9 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      *
      * @return array<mixed, mixed>
      */
-    private static function fieldsOf(array $finding, array $run, array $branches, string $line): array
+    private static function documentOf(array $finding, array $run, array $branches): array
     {
-        $document = $finding + ['run' => $run, 'details' => ['metadata' => ['branches' => $branches]]];
-
-        return Fields::only($document, self::paths(self::LINES[$line]));
+        return $finding + ['run' => $run, 'details' => ['metadata' => ['branches' => $branches]]];
     }
 
     /**
