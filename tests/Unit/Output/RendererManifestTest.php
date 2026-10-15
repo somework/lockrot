@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
-use Lockrot\Analyzer\Report;
-use Lockrot\Exception\ConfigException;
-use Lockrot\Output\HtmlFormatter;
-use Lockrot\Output\JsonFormatter;
+use Lockrot\Analyzer\RunSettings;
+use Lockrot\Tests\Support\Contract\ContractBundle;
+use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -79,21 +78,28 @@ final class RendererManifestTest extends TestCase
         }
     }
 
-    public function testHtmlRefusesUnlessTheManifestReadsTheReportSchemaLockrotWrites(): void
+    public function testTheManifestReadsTheReportSchemaLockrotWrites(): void
     {
         $schema = self::manifest()['schema'] ?? null;
         self::assertIsArray($schema);
-        $majors = $schema['report'] ?? null;
-        self::assertIsArray($majors);
+        self::assertSame([2], $schema['report'] ?? null, 'the renderer reads report-2 only');
+    }
 
-        $renders = true;
-        try {
-            (new HtmlFormatter())->format(new Report([], [], new \DateTimeImmutable('2026-09-14T00:00:00+00:00'), 0, 0));
-        } catch (ConfigException $refused) {
-            $renders = false;
-        }
+    /**
+     * The renderer release ran its contract tests against one recorded bundle and one version of
+     * each grammar. A page vendored against other values renders strings that lockrot does not
+     * write.
+     */
+    public function testTheRendererWasTestedAgainstTheGoldenFile(): void
+    {
+        $contract = self::manifest()['contract'] ?? null;
+        self::assertIsArray($contract, 'the manifest pins the contract its renderer was tested against');
 
-        self::assertSame(\in_array(JsonFormatter::SCHEMA, $majors, true), $renders, 'html refuses unless the manifest lists the report number lockrot writes');
+        self::assertSame([
+            'bundle_sha256' => trim((string) file_get_contents(ContractBundle::DIRECTORY.'/bundle_sha256')),
+            'score_text_grammar' => ScoreModel::SCORE_TEXT_GRAMMAR,
+            'text_grammar' => RunSettings::TEXT_GRAMMAR,
+        ], $contract);
     }
 
     public function testNothingElseIsVendored(): void
