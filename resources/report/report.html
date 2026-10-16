@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-lMINvS+8RKaJpgDJJ5rZaSSKP6vbe7VCnmiDts+r7AQ='; style-src 'sha256-Aknnj8pkYRECeoTYacQvoqxYxxwXEMyWE0fH8BBkssk='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TyXm77r+EV/qlX5cMAbwUOACkC1lC4FbL+ZVk8zaPsI='; style-src 'sha256-bJoDelrH+bnFHYY7nbg0U4ap8k+j4wBTTn2wlVZ+/cU='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -52,6 +52,13 @@
   --low-soft: #dfe9ee;
   --none: #366b4b;
   --none-soft: #dcebe1;
+  --flag-abandoned: #2a78d6;
+  --flag-silent: #eb6834;
+  --flag-pinned: #1baf7a;
+  --flag-left-behind: #eda100;
+  --flag-old-promise: #e87ba4;
+  --flag-stale: #008300;
+  --flag-vulnerable: #6250d6;
   --shadow: 0 1px 2px rgba(15, 26, 25, 0.06), 0 8px 24px -12px rgba(15, 26, 25, 0.18);
   --backdrop: rgba(4, 12, 11, 0.55);
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -104,6 +111,13 @@
     --low-soft: #1b2830;
     --none: #71b98a;
     --none-soft: #16291d;
+    --flag-abandoned: #3987e5;
+    --flag-silent: #d95926;
+    --flag-pinned: #199e70;
+    --flag-left-behind: #c98500;
+    --flag-old-promise: #d55181;
+    --flag-stale: #008300;
+    --flag-vulnerable: #9085e9;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.8);
     color-scheme: dark;
   }
@@ -131,6 +145,13 @@
   --low-soft: #1b2830;
   --none: #71b98a;
   --none-soft: #16291d;
+  --flag-abandoned: #3987e5;
+  --flag-silent: #d95926;
+  --flag-pinned: #199e70;
+  --flag-left-behind: #c98500;
+  --flag-old-promise: #d55181;
+  --flag-stale: #008300;
+  --flag-vulnerable: #9085e9;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.8);
   color-scheme: dark;
 }
@@ -1401,6 +1422,13 @@ button.pill {
   background: var(--accent);
   border-color: var(--accent);
 }
+.detail-timeline-row.is-collapsed {
+  visibility: hidden;
+  min-height: 0;
+  height: 0;
+  overflow: hidden;
+  border-top: 0;
+}
 .detail-timeline-row.is-folded .detail-timeline-branch,
 .detail-timeline-row.is-folded .detail-timeline-latest {
   color: var(--muted);
@@ -2285,6 +2313,20 @@ button.pill {
   font-size: 12px;
   color: var(--muted);
 }
+.d2-branches {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 0 12px;
+  border-bottom: 1px solid var(--border);
+  container-type: inline-size;
+}
+.d2-branches-line {
+  margin: 0;
+  font: 19px/1.35 var(--serif);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
 @media (max-width: 480px) {
   .d2-row {
     grid-template-columns: minmax(0, 1fr);
@@ -2380,750 +2422,6 @@ button.pill {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-}
-.ledger {
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 22px 20px 20px;
-}
-
-.ledger-block {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-.ledger-lead {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 18px 32px;
-  align-items: start;
-}
-@media (min-width: 760px) {
-  .ledger-lead {
-    grid-template-columns: minmax(0, max-content) max-content;
-    justify-content: start;
-  }
-}
-@media (min-width: 1181px) {
-  .ledger-lead {
-    column-gap: 56px;
-  }
-}
-
-.lead-answer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  min-width: 0;
-}
-
-.lead-figure {
-  margin: 0;
-  display: flex;
-  align-items: flex-end;
-  gap: 14px;
-}
-.lead-num {
-  font: 600 76px/0.8 var(--sans);
-  letter-spacing: -0.035em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-.lead-of {
-  display: flex;
-  flex-direction: column;
-  font: 20px/1.2 var(--serif);
-  color: var(--ink-2);
-  padding-bottom: 1px;
-}
-.lead-share {
-  color: var(--muted);
-}
-.lead-scope {
-  margin: -4px 0 0;
-  overflow: hidden;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--muted);
-}
-.lead-scope b {
-  font-weight: 600;
-  color: var(--ink-2);
-  font-variant-numeric: tabular-nums;
-}
-.ledger-lead.is-clean .lead-figure {
-  align-items: center;
-  gap: 12px;
-}
-.clean-mark {
-  flex: none;
-  color: var(--tone);
-}
-.lead-clean {
-  font: 26px/1.15 var(--serif);
-  color: var(--tone);
-  text-wrap: balance;
-}
-.lead-empty {
-  color: var(--ink-2);
-}
-.lead-chips {
-  gap: 6px;
-}
-.lead-chips .legend-btn {
-  font-size: 13.5px;
-  padding: 5px 12px 5px 10px;
-  gap: 7px;
-}
-.lead-chips .legend-btn .count {
-  color: var(--tone);
-  font-weight: 600;
-}
-.lead-chips .legend-btn-dim .count {
-  color: var(--muted);
-  font-weight: 400;
-}
-
-.lead-waffle {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-.lead-waffle-cap {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 14px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.waffle {
-  --cell: 14px;
-  --gap: 3px;
-  --rows: var(--rows-xwide);
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(var(--rows), var(--cell));
-  grid-auto-columns: var(--cell);
-  gap: var(--gap);
-  width: max-content;
-  max-width: 100%;
-}
-@media (max-width: 1439px) {
-  .waffle {
-    --rows: var(--rows-wide);
-  }
-}
-@media (max-width: 1180px) {
-  .waffle {
-    --cell: 10px;
-    --gap: 2px;
-    --rows: var(--rows-mid);
-  }
-}
-@media (max-width: 759px) {
-  .lead-num {
-    font-size: 60px;
-  }
-  .lead-of {
-    font-size: 17px;
-  }
-  .lead-chips .legend-btn {
-    font-size: 13px;
-    padding: 4px 10px 4px 9px;
-  }
-  .waffle {
-    --cell: 9px;
-    --gap: 2px;
-    --rows: var(--rows-narrow);
-  }
-}
-.waffle-cell {
-  border-radius: 2px;
-  background: var(--tone);
-  transition: opacity 0.15s ease;
-}
-.waffle-rest {
-  background: var(--surface-3);
-}
-.waffle.is-clean .waffle-rest {
-  background: color-mix(in srgb, var(--none) 32%, var(--surface));
-}
-.ledger:has(.lead-chips [aria-pressed="true"]) :is(.waffle-cell, .legend-seg) {
-  opacity: 0.25;
-}
-.ledger:has(.lead-chips .tone-crit[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-crit,
-.ledger:has(.lead-chips .tone-high[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-high,
-.ledger:has(.lead-chips .tone-med[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-med,
-.ledger:has(.lead-chips .tone-low[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-low {
-  opacity: 1;
-}
-.ledger:has(.lead-chips .tone-crit:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-crit),
-.ledger:has(.lead-chips .tone-high:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-high),
-.ledger:has(.lead-chips .tone-med:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-med),
-.ledger:has(.lead-chips .tone-low:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-low) {
-  opacity: 0.2;
-}
-.ledger:has(.lead-chips .tone-crit:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-crit,
-.ledger:has(.lead-chips .tone-high:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-high,
-.ledger:has(.lead-chips .tone-med:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-med,
-.ledger:has(.lead-chips .tone-low:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-low {
-  opacity: 1;
-}
-.ledger-tier {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
-}
-.ledger-tier > .ledger-block {
-  padding: 0 28px;
-  border-left: 1px solid var(--border);
-}
-.ledger-tier > .ledger-block:first-child {
-  padding-left: 0;
-  border-left: 0;
-}
-.ledger-tier > .ledger-block:last-child {
-  padding-right: 0;
-}
-@media (max-width: 1180px) {
-  .ledger-tier > .ledger-block {
-    padding: 0 20px;
-  }
-}
-@media (max-width: 959px) {
-  .ledger-tier {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  }
-  .ledger-tier > .ledger-verdicts {
-    grid-row: span 2;
-  }
-  .ledger-tier > .ledger-advisories {
-    padding-right: 0;
-    padding-bottom: 16px;
-  }
-  .ledger-tier > .ledger-libyears {
-    grid-column: 2;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-}
-@media (max-width: 759px) {
-  .ledger-tier {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 16px;
-  }
-  .ledger-tier > .ledger-block,
-  .ledger-tier > .ledger-verdicts,
-  .ledger-tier > .ledger-advisories,
-  .ledger-tier > .ledger-libyears {
-    grid-row: auto;
-    grid-column: auto;
-    padding: 0;
-    border-left: 0;
-    border-top: 0;
-  }
-  .ledger-tier > .ledger-block + .ledger-block {
-    padding-top: 16px;
-    border-top: 1px dashed var(--border);
-  }
-}
-.ledger-verdicts > .ledger-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 8px;
-}
-.ledger-head-note {
-  white-space: nowrap;
-  font-weight: 400;
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  text-transform: none;
-}
-.ledger-fig {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 2px 8px;
-}
-.ledger-fig-num {
-  font: 600 26px/1 var(--sans);
-  letter-spacing: -0.01em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-.ledger-fig-unit {
-  font: 15px/1.25 var(--serif);
-  color: var(--ink-2);
-}
-.ledger-fig-text {
-  font: 16px/1.35 var(--serif);
-  color: var(--tone);
-}
-
-.ledger-note {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--muted);
-}
-.ledger-note b {
-  color: var(--ink-2);
-  font-weight: 600;
-}
-.ledger-note .mono {
-  font-size: 12px;
-  color: var(--ink-2);
-}
-.ledger-block > .ci-tag {
-  align-self: flex-start;
-}
-.verdict-bars {
-  --unit: 16px;
-  display: grid;
-  grid-template-columns: max-content minmax(0, calc(var(--longest, 1) * var(--unit))) max-content;
-  gap: 1px 14px;
-  margin-inline: -8px;
-}
-@media (max-width: 759px) {
-  .verdict-bars {
-    --unit: 12px;
-  }
-}
-.legend-btn.legend-btn-bar {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: subgrid;
-  align-items: center;
-  padding: 5px 8px;
-  border-radius: var(--radius-s);
-  background: transparent;
-  border-color: transparent;
-  font-size: 13px;
-  text-align: left;
-  color: var(--ink-2);
-}
-.legend-btn.legend-btn-bar:hover:not([aria-pressed="true"]) {
-  background: var(--surface-2);
-  border-color: transparent;
-}
-.legend-btn.legend-btn-bar[aria-pressed="true"] {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--ink);
-}
-.legend-btn.legend-btn-bar .count {
-  font-weight: 600;
-  color: var(--ink);
-}
-.legend-track {
-  display: block;
-  height: 10px;
-}
-.legend-fill {
-  display: flex;
-  gap: 1px;
-  height: 100%;
-  min-width: 3px;
-  border-radius: 2px;
-  overflow: hidden;
-}
-.legend-seg {
-  flex: 1 1 0;
-  min-width: 2px;
-  background: var(--tone);
-  transition: opacity 0.15s ease;
-}
-.ledger-quiet-label {
-  margin-right: 2px;
-  color: var(--muted);
-}
-.advisory-chips {
-  align-items: center;
-}
-.advisory-squares {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-.advisory-square {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  background: var(--tone);
-}
-.ledger-fold {
-  margin-top: 16px;
-  border-top: 1px solid var(--border);
-}
-.ledger-fold > summary {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 12px 0 2px;
-}
-.ledger-fold > summary::after {
-  margin-top: 5px;
-}
-.ledger-fold-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-.ledger-fold-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-2);
-}
-.ledger-fold-peek {
-  font: 12px/1.4 var(--mono);
-  color: var(--muted);
-  overflow: hidden;
-}
-.ledger-fold > .ledger-tier {
-  margin-top: 10px;
-  padding-top: 0;
-  border-top: 0;
-}
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 6px;
-  font-size: 12px;
-}
-.legend-btn {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 3px 10px 3px 8px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: inherit;
-  font: inherit;
-  transition:
-    background-color 0.12s ease,
-    border-color 0.12s ease,
-    color 0.12s ease;
-}
-
-.legend-btn:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-3);
-  color: var(--ink);
-}
-
-.legend-btn[aria-pressed="true"] {
-  background: var(--tone-soft);
-  border-color: var(--tone);
-  color: var(--tone);
-}
-.legend-btn-dim {
-  color: var(--muted);
-}
-.legend-btn-dim .swatch {
-  opacity: 0.4;
-}
-
-.legend-btn .swatch {
-  background: var(--tone);
-}
-
-.swatch {
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  display: inline-block;
-}
-
-.legend-btn .count {
-  font-family: var(--mono);
-  font-style: normal;
-  color: var(--muted);
-}
-@media (forced-colors: active) {
-  .legend-btn .swatch,
-  .legend-seg,
-  .waffle-cell,
-  .advisory-square {
-    forced-color-adjust: none;
-    background: CanvasText;
-  }
-  .legend-btn-dim .swatch {
-    background: ButtonText;
-    opacity: 1;
-  }
-  .waffle-rest,
-  .waffle.is-clean .waffle-rest {
-    background: Canvas;
-    outline: 1px solid CanvasText;
-    outline-offset: -1px;
-  }
-  .legend-btn.legend-btn-bar {
-    forced-color-adjust: none;
-    background: Canvas;
-    border-color: Canvas;
-    color: CanvasText;
-  }
-  .legend-btn.legend-btn-bar .count {
-    color: CanvasText;
-  }
-  .legend-btn.legend-btn-bar:hover:not([aria-pressed="true"]) {
-    background: Canvas;
-    border-color: CanvasText;
-  }
-  .legend-btn.legend-btn-bar:focus-visible {
-    outline-color: Highlight;
-  }
-  .legend-btn[aria-pressed="true"] {
-    forced-color-adjust: none;
-    background: Highlight;
-    border-color: Highlight;
-    color: HighlightText;
-  }
-  .legend-btn[aria-pressed="true"] .swatch,
-  .legend-btn[aria-pressed="true"] .legend-seg {
-    background: HighlightText;
-  }
-  .legend-btn[aria-pressed="true"] .count {
-    color: HighlightText;
-  }
-}
-.overview2-gate {
-  grid-column: 1 / -1;
-  contain: inline-size;
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  margin: 0;
-  padding: 6px 10px;
-  font: 13px/1.45 var(--mono);
-  color: var(--ink);
-  background: var(--tone-soft);
-  border: 1px solid color-mix(in srgb, var(--tone) 45%, transparent);
-  border-radius: var(--radius-s);
-  print-color-adjust: exact;
-}
-.overview2-gate-mark {
-  flex: none;
-  font-weight: 700;
-  color: var(--tone);
-}
-.overview2-gate-text {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.overview2 .ledger-head-note {
-  white-space: normal;
-}
-.overview2-flag-bars {
-  grid-template-columns:
-    max-content minmax(0, calc(var(--longest, 1) * var(--unit)))
-    max-content minmax(min(12em, 40vw), 1fr);
-}
-.overview2-split {
-  font-size: 11.5px;
-  color: var(--muted);
-  white-space: normal;
-}
-.advisory-square.is-outlined,
-.legend-btn.is-outlined .swatch {
-  background: transparent;
-  box-shadow: inset 0 0 0 2px var(--tone);
-}
-
-.overview2-libyears {
-  overflow-wrap: anywhere;
-}
-
-@media (max-width: 759px) {
-  .overview2-gate {
-    font-size: 12px;
-  }
-}
-
-@media (forced-colors: active) {
-  .overview2-gate {
-    border-color: CanvasText;
-  }
-  .advisory-square.is-outlined,
-  .legend-btn.is-outlined .swatch {
-    background: Canvas;
-    box-shadow: inset 0 0 0 2px CanvasText;
-  }
-}
-.overview2-update .d2-copy {
-  margin: 4px 0 0;
-}
-.gate-fact {
-  color: var(--muted);
-}
-.gate-word {
-  font-weight: 600;
-  color: var(--ink);
-}
-.gate-word.is-fails {
-  font-weight: 700;
-}
-.gate-flag {
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-.gate-dashes {
-  letter-spacing: 0.1em;
-}
-.run-meta .gate-flag {
-  font-size: 11px;
-  font-weight: 500;
-}
-@media screen {
-  .topbar[data-fact="short"] .gate-fact-more {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-}
-.gate-sep,
-.gate-quiet {
-  color: var(--muted);
-}
-.rail {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  position: sticky;
-  top: 196px;
-}
-
-@media (max-width: 860px) {
-  .rail {
-    position: static;
-  }
-}
-
-.rail-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.opts {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-@media (max-width: 860px) {
-  .opts {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-}
-
-.opt {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 7px;
-  border-radius: 5px;
-  border: 1px solid transparent;
-  background: none;
-  cursor: pointer;
-  text-align: left;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-
-.opt:hover {
-  background: var(--surface-2);
-}
-
-.opt[aria-pressed="true"] {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--ink);
-  font-weight: 500;
-}
-
-.opt .c {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-}
-.rail-path {
-  display: block;
-  margin-top: 2px;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ink-2);
-  overflow-wrap: anywhere;
-}
-
-.rail-empty {
-  margin: 0;
-  font-size: 12.5px;
-  color: var(--muted);
-}
-.opts > .opt:not(.opt-gate) + .opt-gate {
-  position: relative;
-  margin-top: 7px;
-}
-.opts > .opt:not(.opt-gate) + .opt-gate::before {
-  content: "";
-  position: absolute;
-  inset: -5px 7px auto;
-  border-top: 1px solid var(--border);
-}
-@media (max-width: 860px) {
-  .opts > .opt:not(.opt-gate) + .opt-gate {
-    margin-top: 0;
-  }
-  .opts > .opt:not(.opt-gate) + .opt-gate::before {
-    display: none;
-  }
-}
-@media (forced-colors: active) {
-  .opt-gate[aria-pressed="true"] {
-    border-color: Highlight;
-    font-weight: 700;
-  }
-}
-.ci-tag {
-  display: inline-block;
-  padding: 0 6px 0 5px;
-  border: 1px solid var(--high);
-  border-left-width: 3px;
-  border-radius: var(--radius-s);
-  background: var(--high-soft);
-  font-family: var(--cond);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 17px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink);
-  white-space: nowrap;
-  vertical-align: 1px;
-  print-color-adjust: exact;
-  -webkit-print-color-adjust: exact;
 }
 .pkg-link-btn {
   background: none;
@@ -3265,421 +2563,6 @@ button.pill {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-.al-top {
-  margin: 4px 0 14px;
-}
-.al-answer {
-  margin: 0;
-  max-width: 50em;
-  font-family: var(--serif);
-  font-size: 18px;
-  line-height: 1.34;
-  color: var(--ink-2);
-  text-wrap: pretty;
-}
-.al-answer b {
-  font-weight: 600;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-.al-answer .mono {
-  font-size: 0.8em;
-  font-weight: 600;
-  color: var(--ink);
-}
-.al-scope {
-  margin: 4px 0 0;
-  font-size: 12.5px;
-  color: var(--muted);
-}
-.al-scope b {
-  color: var(--ink);
-  font-weight: 600;
-}
-.al-partial {
-  margin: 8px 0 0;
-  max-width: 50em;
-  padding: 6px 12px 7px;
-  border-left: 3px solid var(--high);
-  background: var(--surface);
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--ink-2);
-  print-color-adjust: exact;
-  -webkit-print-color-adjust: exact;
-}
-.al-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.al-empty .al-answer {
-  max-width: 36em;
-}
-.al-clean {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--tone);
-}
-.aledger {
-  container: aledger / inline-size;
-  --al-pad-l: 14px;
-  --al-pad-r: 10px;
-  --al-gap: 10px;
-  --al-sev: 78px;
-  --al-fix: 150px;
-  --al-age: 168px;
-  --al-num: 34px;
-}
-.al-head {
-  display: none;
-}
-.advgroup {
-  margin-top: 22px;
-}
-.advgroup:first-of-type,
-.al-head + .advgroup {
-  margin-top: 6px;
-}
-.al-group-head {
-  padding: 0 var(--al-pad-r) 8px var(--al-pad-l);
-  border-bottom: 1px solid var(--border-strong);
-  line-height: 1.35;
-}
-.al-group-head h2 {
-  display: inline;
-  margin: 0 12px 0 0;
-  font-family: var(--cond);
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.al-group-count {
-  margin-right: 12px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.adv-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.adv {
-  --row-bg: var(--bg);
-  position: relative;
-  display: grid;
-  grid-template-columns: var(--al-sev) minmax(0, 1fr);
-  grid-template-areas:
-    "sev pkg"
-    "title title"
-    "ids ids"
-    "aff aff"
-    "fix fix";
-  column-gap: var(--al-gap);
-  row-gap: 2px;
-  align-items: baseline;
-  padding: 8px var(--al-pad-r) 8px var(--al-pad-l);
-  border-bottom: 1px solid var(--border);
-  background: var(--row-bg);
-  font-size: 13px;
-  line-height: 18px;
-  cursor: pointer;
-  transition: background-color 0.12s ease;
-}
-.adv:hover {
-  --row-bg: var(--surface);
-}
-.adv[aria-current="true"] {
-  --row-bg: var(--accent-soft);
-}
-.adv[aria-current="true"]::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -1px;
-  bottom: 0;
-  width: 3px;
-  background: var(--accent);
-}
-.adv:focus-visible {
-  outline-offset: -2px;
-}
-.adv > * {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.ac-sev {
-  grid-area: sev;
-  white-space: nowrap;
-  overflow-wrap: normal;
-  font-family: var(--cond);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--tone);
-  print-color-adjust: exact;
-  -webkit-print-color-adjust: exact;
-}
-
-.ac-title {
-  grid-area: title;
-  font-weight: 500;
-  color: var(--ink);
-  text-wrap: pretty;
-}
-.ac-ids {
-  grid-area: ids;
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 10px;
-  font-size: 11.5px;
-  line-height: 17px;
-  color: var(--muted);
-}
-.ac-id {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-2);
-  overflow-wrap: normal;
-  white-space: nowrap;
-}
-.ac-nocve {
-  font-style: italic;
-  white-space: nowrap;
-}
-.ac-reported {
-  white-space: nowrap;
-}
-
-.ac-pkg {
-  grid-area: pkg;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 10px;
-}
-.ac-name {
-  color: var(--ink);
-}
-.ac-name b {
-  font-weight: 600;
-}
-.ac-ver {
-  font-family: var(--mono);
-  font-size: 11.5px;
-  color: var(--muted);
-}
-.ac-name.is-ditto {
-  color: var(--muted);
-}
-.ac-name.is-ditto b {
-  font-weight: 500;
-}
-.ac-reach {
-  font-size: 12px;
-  color: var(--ink-2);
-}
-
-.ac-aff {
-  grid-area: aff;
-  color: var(--muted);
-  font-size: 12px;
-}
-.ac-aff .mono {
-  font-size: 11.5px;
-  color: var(--ink-2);
-}
-
-.ac-fix {
-  grid-area: fix;
-  font-size: 12px;
-  color: var(--muted);
-}
-.ac-fixver {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.ac-where {
-  white-space: nowrap;
-}
-.ac-fix.is-branch .ac-where {
-  color: var(--none);
-  font-weight: 500;
-}
-.ac-fix.is-none .ac-where {
-  color: var(--ink-2);
-}
-.ac-fix.is-unchecked .ac-where {
-  color: var(--muted);
-  font-style: italic;
-}
-@container aledger (min-width: 480px) {
-  .al-head,
-  .adv {
-    --al-fix: 200px;
-  }
-  .adv {
-    grid-template-columns: var(--al-sev) minmax(0, 1fr) var(--al-fix);
-    grid-template-areas:
-      "sev title fix"
-      "sev pkg aff"
-      "sev ids age";
-    row-gap: 1px;
-  }
-  .ac-fix,
-  .ac-aff {
-    text-align: right;
-  }
-  .al-head {
-    grid-template-columns: var(--al-sev) minmax(0, 1fr) var(--al-fix);
-    grid-template-areas: "sev adv age";
-    column-gap: var(--al-gap);
-  }
-  .al-col-pkg,
-  .al-col-aff,
-  .al-col-fix {
-    display: none;
-  }
-  .al-head {
-    position: sticky;
-    top: var(--topbar-h);
-    z-index: 3;
-    display: grid;
-    align-items: end;
-    height: 40px;
-    padding: 0 var(--al-pad-r) 0 var(--al-pad-l);
-    background: var(--bg);
-    border-bottom: 1px solid var(--border-strong);
-    box-shadow: 0 -3px 0 var(--bg);
-    font-family: var(--cond);
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .al-col {
-    min-width: 0;
-    padding-bottom: 7px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .al-col-sev {
-    grid-area: sev;
-  }
-  .al-col-adv {
-    grid-area: adv;
-  }
-}
-@container aledger (min-width: 900px) {
-  .al-head,
-  .adv {
-    grid-template-columns:
-      var(--al-sev) minmax(0, 1.9fr) minmax(0, 1.2fr) minmax(0, 0.62fr) minmax(0, 0.7fr)
-      var(--al-age);
-    grid-template-areas:
-      "sev title pkg aff fix age"
-      "sev ids pkg aff fix age";
-    column-gap: 14px;
-  }
-  .al-head {
-    grid-template-areas: "sev adv pkg aff fix age";
-    height: 44px;
-  }
-  .al-col-pkg,
-  .al-col-aff,
-  .al-col-fix {
-    display: block;
-  }
-  .al-col-pkg {
-    grid-area: pkg;
-  }
-  .al-col-aff {
-    grid-area: aff;
-  }
-  .al-col-fix {
-    grid-area: fix;
-  }
-  .adv {
-    align-items: center;
-    row-gap: 0;
-    padding-block: 6px;
-  }
-  .ac-fix,
-  .ac-aff {
-    text-align: left;
-  }
-  .ac-fix .ac-where {
-    display: block;
-  }
-  .ac-lbl {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-  .ac-pkg {
-    flex-direction: column;
-  }
-  .ac-reach {
-    display: block;
-  }
-}
-@media (forced-colors: active) {
-  .adv[aria-current="true"]::before {
-    forced-color-adjust: none;
-  }
-  .adv[aria-current="true"]::before {
-    background: Highlight;
-  }
-  .adv[aria-current="true"] {
-    outline: 2px solid Highlight;
-    outline-offset: -2px;
-  }
-}
-@media print {
-  .al-head {
-    position: static;
-    box-shadow: none;
-  }
-  .adv,
-  .adv:hover,
-  .adv[aria-current="true"] {
-    --row-bg: transparent;
-    break-inside: avoid;
-  }
-  .adv[aria-current="true"]::before {
-    display: none;
-  }
-}
-.advisories2 .ac2-range {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-}
-
-.advisories2 .ac2-note {
-  display: block;
-  font-size: 11.5px;
-  color: var(--muted);
 }
 .fledger {
   container: fledger / inline-size;
@@ -4306,6 +3189,1492 @@ button.pill {
   font: 500 9.5px/1 var(--mono);
   letter-spacing: 0;
 }
+.f2-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 10px 20px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.f2-strip-figure {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+.f2-strip-chips {
+  gap: 4px 6px;
+}
+.f2-strip-back {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+.f2-strip-back:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 759px) {
+  .f2-strip {
+    position: relative;
+    padding: 10px 16px;
+  }
+  .f2-strip-back {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+  }
+}
+.gate-fact {
+  color: var(--muted);
+}
+.gate-word {
+  font-weight: 600;
+  color: var(--ink);
+}
+.gate-word.is-fails {
+  font-weight: 700;
+}
+.gate-flag {
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.gate-dashes {
+  letter-spacing: 0.1em;
+}
+.run-meta .gate-flag {
+  font-size: 11px;
+  font-weight: 500;
+}
+@media screen {
+  .topbar[data-fact="short"] .gate-fact-more {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+.gate-sep,
+.gate-quiet {
+  color: var(--muted);
+}
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: sticky;
+  top: 196px;
+}
+
+@media (max-width: 860px) {
+  .rail {
+    position: static;
+  }
+}
+
+.rail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.opts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+@media (max-width: 860px) {
+  .opts {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.opt:hover {
+  background: var(--surface-2);
+}
+
+.opt[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.opt .c {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.rail-path {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.rail-empty {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.opts > .opt:not(.opt-gate) + .opt-gate {
+  position: relative;
+  margin-top: 7px;
+}
+.opts > .opt:not(.opt-gate) + .opt-gate::before {
+  content: "";
+  position: absolute;
+  inset: -5px 7px auto;
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 860px) {
+  .opts > .opt:not(.opt-gate) + .opt-gate {
+    margin-top: 0;
+  }
+  .opts > .opt:not(.opt-gate) + .opt-gate::before {
+    display: none;
+  }
+}
+@media (forced-colors: active) {
+  .opt-gate[aria-pressed="true"] {
+    border-color: Highlight;
+    font-weight: 700;
+  }
+}
+.ci-tag {
+  display: inline-block;
+  padding: 0 6px 0 5px;
+  border: 1px solid var(--high);
+  border-left-width: 3px;
+  border-radius: var(--radius-s);
+  background: var(--high-soft);
+  font-family: var(--cond);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 17px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+  vertical-align: 1px;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.ledger {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 22px 20px 20px;
+}
+
+.ledger-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.ledger-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px 32px;
+  align-items: start;
+}
+@media (min-width: 760px) {
+  .ledger-lead {
+    grid-template-columns: minmax(0, max-content) max-content;
+    justify-content: start;
+  }
+}
+@media (min-width: 1181px) {
+  .ledger-lead {
+    column-gap: 56px;
+  }
+}
+
+.lead-answer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.ov-grade {
+  margin: 0;
+  font: 26px/1.35 var(--serif);
+  color: var(--ink);
+  text-wrap: balance;
+}
+.ov-grade-sep {
+  color: var(--muted);
+}
+.ov-grade .clean-mark {
+  margin-right: 10px;
+  vertical-align: -5px;
+}
+.ov-grade-chip {
+  display: inline-block;
+  padding: 0 9px 2px;
+  border: 1px solid var(--tone);
+  border-radius: var(--radius-m);
+  background: var(--tone-soft);
+  color: var(--tone);
+  font-weight: 600;
+  text-decoration: none;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+  transition: background-color 0.12s ease;
+}
+.ov-grade-chip:hover {
+  background: color-mix(in srgb, var(--tone) 18%, var(--tone-soft));
+}
+.ov-grade.tone-none {
+  color: var(--tone);
+}
+.ov-figure {
+  margin: -4px 0 0;
+  font: 18px/1.3 var(--serif);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.ov-empty {
+  margin: 0;
+  font: 26px/1.15 var(--serif);
+  color: var(--ink-2);
+}
+.lead-scope {
+  margin: -4px 0 0;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.lead-scope b {
+  font-weight: 600;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.clean-mark {
+  flex: none;
+  color: var(--tone);
+}
+.lead-chips {
+  gap: 6px;
+}
+.lead-chips .legend-btn {
+  font-size: 13.5px;
+  padding: 5px 12px 5px 10px;
+  gap: 7px;
+}
+.lead-chips .legend-btn .count {
+  color: var(--tone);
+  font-weight: 600;
+}
+.lead-chips .legend-btn-dim .count {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.lead-waffle {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.lead-waffle-cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.waffle {
+  --cell: 14px;
+  --gap: 3px;
+  --rows: var(--rows-xwide);
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--rows), var(--cell));
+  grid-auto-columns: var(--cell);
+  gap: var(--gap);
+  width: max-content;
+  max-width: 100%;
+}
+@media (max-width: 1439px) {
+  .waffle {
+    --rows: var(--rows-wide);
+  }
+}
+@media (max-width: 1180px) {
+  .waffle {
+    --cell: 10px;
+    --gap: 2px;
+    --rows: var(--rows-mid);
+  }
+}
+@media (max-width: 759px) {
+  .ov-grade {
+    font-size: 22px;
+  }
+  .ov-figure {
+    font-size: 16px;
+  }
+  .lead-chips .legend-btn {
+    font-size: 13px;
+    padding: 4px 10px 4px 9px;
+  }
+  .waffle {
+    --cell: 9px;
+    --gap: 2px;
+    --rows: var(--rows-narrow);
+  }
+}
+.waffle-cell {
+  border-radius: 2px;
+  background: var(--tone);
+  transition: opacity 0.15s ease;
+}
+.waffle-rest {
+  background: var(--surface-3);
+}
+.waffle.is-clean .waffle-rest {
+  background: color-mix(in srgb, var(--none) 32%, var(--surface));
+}
+.ledger:has(.lead-chips [aria-pressed="true"]) :is(.waffle-cell, .legend-seg) {
+  opacity: 0.25;
+}
+.ledger:has(.lead-chips .tone-crit[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-crit,
+.ledger:has(.lead-chips .tone-high[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-high,
+.ledger:has(.lead-chips .tone-med[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-med,
+.ledger:has(.lead-chips .tone-low[aria-pressed="true"]) :is(.waffle-cell, .legend-seg).tone-low {
+  opacity: 1;
+}
+.ledger:has(.lead-chips .tone-crit:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-crit),
+.ledger:has(.lead-chips .tone-high:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-high),
+.ledger:has(.lead-chips .tone-med:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-med),
+.ledger:has(.lead-chips .tone-low:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg):not(.tone-low) {
+  opacity: 0.2;
+}
+.ledger:has(.lead-chips .tone-crit:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-crit,
+.ledger:has(.lead-chips .tone-high:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-high,
+.ledger:has(.lead-chips .tone-med:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-med,
+.ledger:has(.lead-chips .tone-low:is(:hover, :focus-visible)) :is(.waffle-cell, .legend-seg).tone-low {
+  opacity: 1;
+}
+.ledger-verdicts > .ledger-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+}
+.ledger-head-note {
+  white-space: nowrap;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.ledger-fig {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+.ledger-fig-num {
+  font: 600 26px/1 var(--sans);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.ledger-fig-unit {
+  font: 15px/1.25 var(--serif);
+  color: var(--ink-2);
+}
+.ledger-fig-text {
+  font: 16px/1.35 var(--serif);
+  color: var(--tone);
+}
+
+.ledger-note {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.ledger-note b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.ledger-note .mono {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.ledger-block > .ci-tag {
+  align-self: flex-start;
+}
+.verdict-bars {
+  --unit: 16px;
+  display: grid;
+  grid-template-columns: max-content minmax(0, calc(var(--longest, 1) * var(--unit))) max-content;
+  gap: 1px 14px;
+  margin-inline: -8px;
+}
+@media (max-width: 759px) {
+  .verdict-bars {
+    --unit: 12px;
+  }
+}
+.legend-btn.legend-btn-bar {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: var(--radius-s);
+  background: transparent;
+  border-color: transparent;
+  font-size: 13px;
+  text-align: left;
+  color: var(--ink-2);
+}
+.legend-btn.legend-btn-bar:hover:not([aria-pressed="true"]) {
+  background: var(--surface-2);
+  border-color: transparent;
+}
+.legend-btn.legend-btn-bar[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.legend-btn.legend-btn-bar .count {
+  font-weight: 600;
+  color: var(--ink);
+}
+.legend-track {
+  display: block;
+  height: 10px;
+}
+.legend-fill {
+  display: flex;
+  gap: 1px;
+  height: 100%;
+  min-width: 3px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.legend-seg {
+  flex: 1 1 0;
+  min-width: 2px;
+  background: var(--tone);
+  transition: opacity 0.15s ease;
+}
+.ledger-quiet-label {
+  margin-right: 2px;
+  color: var(--muted);
+}
+.advisory-chips {
+  align-items: center;
+}
+.advisory-squares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.advisory-square {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--tone);
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  font-size: 12px;
+}
+.legend-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px 3px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  font: inherit;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.legend-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
+.legend-btn[aria-pressed="true"] {
+  background: var(--tone-soft);
+  border-color: var(--tone);
+  color: var(--tone);
+}
+.legend-btn-dim {
+  color: var(--muted);
+}
+.legend-btn-dim .swatch {
+  opacity: 0.4;
+}
+
+.legend-btn .swatch {
+  background: var(--tone);
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.legend-btn .count {
+  font-family: var(--mono);
+  font-style: normal;
+  color: var(--muted);
+}
+@media (forced-colors: active) {
+  .legend-btn .swatch,
+  .legend-seg,
+  .waffle-cell,
+  .advisory-square {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+  .legend-btn-dim .swatch {
+    background: ButtonText;
+    opacity: 1;
+  }
+  .waffle-rest,
+  .waffle.is-clean .waffle-rest {
+    background: Canvas;
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+  .legend-btn.legend-btn-bar {
+    forced-color-adjust: none;
+    background: Canvas;
+    border-color: Canvas;
+    color: CanvasText;
+  }
+  .legend-btn.legend-btn-bar .count {
+    color: CanvasText;
+  }
+  .legend-btn.legend-btn-bar:hover:not([aria-pressed="true"]) {
+    background: Canvas;
+    border-color: CanvasText;
+  }
+  .legend-btn.legend-btn-bar:focus-visible {
+    outline-color: Highlight;
+  }
+  .legend-btn[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+  .legend-btn[aria-pressed="true"] .swatch,
+  .legend-btn[aria-pressed="true"] .legend-seg {
+    background: HighlightText;
+  }
+  .legend-btn[aria-pressed="true"] .count {
+    color: HighlightText;
+  }
+}
+.overview2-gate {
+  grid-column: 1 / -1;
+  contain: inline-size;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 6px 10px;
+  font: 13px/1.45 var(--mono);
+  color: var(--ink);
+  background: var(--tone-soft);
+  border: 1px solid color-mix(in srgb, var(--tone) 45%, transparent);
+  border-radius: var(--radius-s);
+  print-color-adjust: exact;
+}
+.overview2-gate-mark {
+  flex: none;
+  font-weight: 700;
+  color: var(--tone);
+}
+.overview2-gate-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ov .ledger-head-note {
+  white-space: normal;
+}
+.overview2-flag-bars {
+  grid-template-columns:
+    max-content minmax(0, calc(var(--longest, 1) * var(--unit)))
+    max-content minmax(min(10em, 22vw), 1fr) max-content;
+}
+.overview2-split {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: normal;
+}
+.overview2-points {
+  font: 600 12px var(--mono);
+  color: var(--ink-2);
+  text-align: right;
+  white-space: nowrap;
+}
+.advisory-square.is-outlined,
+.legend-btn.is-outlined .swatch {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--tone);
+}
+
+.overview2-libyears {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 759px) {
+  .overview2-gate {
+    font-size: 12px;
+  }
+}
+
+@media (forced-colors: active) {
+  .overview2-gate {
+    border-color: CanvasText;
+  }
+  .advisory-square.is-outlined,
+  .legend-btn.is-outlined .swatch {
+    background: Canvas;
+    box-shadow: inset 0 0 0 2px CanvasText;
+  }
+}
+.overview2-update .d2-copy {
+  margin: 4px 0 0;
+}
+.al-top {
+  margin: 4px 0 14px;
+}
+.al-answer {
+  margin: 0;
+  max-width: 50em;
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.34;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.al-answer b {
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.al-answer .mono {
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--ink);
+}
+.al-scope {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.al-scope b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.al-partial {
+  margin: 8px 0 0;
+  max-width: 50em;
+  padding: 6px 12px 7px;
+  border-left: 3px solid var(--high);
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.al-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.al-empty .al-answer {
+  max-width: 36em;
+}
+.al-clean {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--tone);
+}
+.aledger {
+  container: aledger / inline-size;
+  --al-pad-l: 14px;
+  --al-pad-r: 10px;
+  --al-gap: 10px;
+  --al-sev: 78px;
+  --al-fix: 150px;
+  --al-age: 168px;
+  --al-num: 34px;
+}
+.al-head {
+  display: none;
+}
+.advgroup {
+  margin-top: 22px;
+}
+.advgroup:first-of-type,
+.al-head + .advgroup {
+  margin-top: 6px;
+}
+.al-group-head {
+  padding: 0 var(--al-pad-r) 8px var(--al-pad-l);
+  border-bottom: 1px solid var(--border-strong);
+  line-height: 1.35;
+}
+.al-group-head h2 {
+  display: inline;
+  margin: 0 12px 0 0;
+  font-family: var(--cond);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.al-group-count {
+  margin-right: 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.adv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.adv {
+  --row-bg: var(--bg);
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--al-sev) minmax(0, 1fr);
+  grid-template-areas:
+    "sev pkg"
+    "title title"
+    "ids ids"
+    "aff aff"
+    "fix fix";
+  column-gap: var(--al-gap);
+  row-gap: 2px;
+  align-items: baseline;
+  padding: 8px var(--al-pad-r) 8px var(--al-pad-l);
+  border-bottom: 1px solid var(--border);
+  background: var(--row-bg);
+  font-size: 13px;
+  line-height: 18px;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+.adv:hover {
+  --row-bg: var(--surface);
+}
+.adv[aria-current="true"] {
+  --row-bg: var(--accent-soft);
+}
+.adv[aria-current="true"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+.adv:focus-visible {
+  outline-offset: -2px;
+}
+.adv > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ac-sev {
+  grid-area: sev;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  font-family: var(--cond);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tone);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.ac-title {
+  grid-area: title;
+  font-weight: 500;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.ac-ids {
+  grid-area: ids;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  font-size: 11.5px;
+  line-height: 17px;
+  color: var(--muted);
+}
+.ac-id {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+.ac-nocve {
+  font-style: italic;
+  white-space: nowrap;
+}
+.ac-reported {
+  white-space: nowrap;
+}
+
+.ac-pkg {
+  grid-area: pkg;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 10px;
+}
+.ac-name {
+  color: var(--ink);
+}
+.ac-name b {
+  font-weight: 600;
+}
+.ac-ver {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.ac-name.is-ditto {
+  color: var(--muted);
+}
+.ac-name.is-ditto b {
+  font-weight: 500;
+}
+.ac-reach {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.ac-aff {
+  grid-area: aff;
+  color: var(--muted);
+  font-size: 12px;
+}
+.ac-aff .mono {
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+.ac-fix {
+  grid-area: fix;
+  font-size: 12px;
+  color: var(--muted);
+}
+.ac-fixver {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ac-where {
+  white-space: nowrap;
+}
+.ac-fix.is-branch .ac-where {
+  color: var(--none);
+  font-weight: 500;
+}
+.ac-fix.is-none .ac-where {
+  color: var(--ink-2);
+}
+.ac-fix.is-unchecked .ac-where {
+  color: var(--muted);
+  font-style: italic;
+}
+@container aledger (min-width: 480px) {
+  .al-head,
+  .adv {
+    --al-fix: 200px;
+  }
+  .adv {
+    grid-template-columns: var(--al-sev) minmax(0, 1fr) var(--al-fix);
+    grid-template-areas:
+      "sev title fix"
+      "sev pkg aff"
+      "sev ids age";
+    row-gap: 1px;
+  }
+  .ac-fix,
+  .ac-aff {
+    text-align: right;
+  }
+  .al-head {
+    grid-template-columns: var(--al-sev) minmax(0, 1fr) var(--al-fix);
+    grid-template-areas: "sev adv age";
+    column-gap: var(--al-gap);
+  }
+  .al-col-pkg,
+  .al-col-aff,
+  .al-col-fix {
+    display: none;
+  }
+  .al-head {
+    position: sticky;
+    top: var(--topbar-h);
+    z-index: 3;
+    display: grid;
+    align-items: end;
+    height: 40px;
+    padding: 0 var(--al-pad-r) 0 var(--al-pad-l);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border-strong);
+    box-shadow: 0 -3px 0 var(--bg);
+    font-family: var(--cond);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .al-col {
+    min-width: 0;
+    padding-bottom: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .al-col-sev {
+    grid-area: sev;
+  }
+  .al-col-adv {
+    grid-area: adv;
+  }
+}
+@container aledger (min-width: 900px) {
+  .al-head,
+  .adv {
+    grid-template-columns:
+      var(--al-sev) minmax(0, 1.9fr) minmax(0, 1.2fr) minmax(0, 0.62fr) minmax(0, 0.7fr)
+      var(--al-age);
+    grid-template-areas:
+      "sev title pkg aff fix age"
+      "sev ids pkg aff fix age";
+    column-gap: 14px;
+  }
+  .al-head {
+    grid-template-areas: "sev adv pkg aff fix age";
+    height: 44px;
+  }
+  .al-col-pkg,
+  .al-col-aff,
+  .al-col-fix {
+    display: block;
+  }
+  .al-col-pkg {
+    grid-area: pkg;
+  }
+  .al-col-aff {
+    grid-area: aff;
+  }
+  .al-col-fix {
+    grid-area: fix;
+  }
+  .adv {
+    align-items: center;
+    row-gap: 0;
+    padding-block: 6px;
+  }
+  .ac-fix,
+  .ac-aff {
+    text-align: left;
+  }
+  .ac-fix .ac-where {
+    display: block;
+  }
+  .ac-lbl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .ac-pkg {
+    flex-direction: column;
+  }
+  .ac-reach {
+    display: block;
+  }
+}
+@media (forced-colors: active) {
+  .adv[aria-current="true"]::before {
+    forced-color-adjust: none;
+  }
+  .adv[aria-current="true"]::before {
+    background: Highlight;
+  }
+  .adv[aria-current="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+@media print {
+  .al-head {
+    position: static;
+    box-shadow: none;
+  }
+  .adv,
+  .adv:hover,
+  .adv[aria-current="true"] {
+    --row-bg: transparent;
+    break-inside: avoid;
+  }
+  .adv[aria-current="true"]::before {
+    display: none;
+  }
+}
+.advisories2 .al-lead {
+  margin: 4px 0 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.advisories2 .al-lead .al-partial,
+.advisories2 .al-lead .al-scope {
+  margin: 0;
+}
+.advisories2 .ac2-range {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.advisories2 .ac2-note {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.ov {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.ov > * {
+  min-width: 0;
+  padding-block: 20px;
+  border-top: 1px solid var(--border);
+}
+.ov > .ov-lead {
+  padding-top: 0;
+  border-top: 0;
+}
+.ov > :empty {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .ov {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-areas:
+      "lead lead"
+      "flags security"
+      "weighs weighs"
+      "expo libyears";
+  }
+  .ov-security,
+  .ov-libyears {
+    padding-left: 24px;
+    border-left: 1px solid var(--border);
+  }
+  .ov-flags,
+  .ov-expo {
+    padding-right: 24px;
+  }
+}
+@media (min-width: 1181px) {
+  .ov {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "lead lead lead"
+      "flags security libyears"
+      "weighs weighs expo";
+  }
+  .ov-flags,
+  .ov-security,
+  .ov-weighs {
+    padding-right: 28px;
+  }
+  .ov-security,
+  .ov-libyears,
+  .ov-expo {
+    padding-left: 28px;
+    border-left: 1px solid var(--border);
+  }
+}
+@media (min-width: 760px) {
+  .ov-lead {
+    grid-area: lead;
+  }
+  .ov-flags {
+    grid-area: flags;
+  }
+  .ov-security {
+    grid-area: security;
+  }
+  .ov-weighs {
+    grid-area: weighs;
+  }
+  .ov-expo {
+    grid-area: expo;
+  }
+  .ov-libyears {
+    grid-area: libyears;
+  }
+}
+a.legend-btn,
+.ov-ex-row {
+  text-decoration: none;
+}
+.ov-link {
+  color: var(--accent-ink);
+  text-underline-offset: 3px;
+}
+.wm-load {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.wm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.wm-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.wm-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wm-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  grid-template-areas:
+    "label total"
+    "bar bar"
+    "text text";
+  column-gap: 12px;
+  row-gap: 4px;
+  align-items: center;
+  padding: 7px 0;
+  border-top: 1px solid var(--border);
+}
+.wm-row:first-child {
+  border-top: 0;
+}
+@media (min-width: 760px) {
+  .wm-row {
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 3ch;
+    grid-template-areas:
+      "label bar total"
+      ". text text";
+  }
+}
+.wm-label {
+  grid-area: label;
+  min-width: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.wm-reach {
+  font-size: 12px;
+  color: var(--muted);
+}
+.wm-total {
+  grid-area: total;
+  font: 600 13px var(--mono);
+  text-align: right;
+}
+.wm-text {
+  grid-area: text;
+  min-width: 0;
+  font: 11.5px/1.4 var(--mono);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.wm-bar {
+  --wm-seg-min: 4px;
+  grid-area: bar;
+  position: relative;
+  display: flex;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--surface-2);
+}
+.wm-seg,
+.wm-swatch {
+  background: var(--flag, var(--ink-2));
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.wm-seg {
+  position: relative;
+  flex: none;
+  height: 100%;
+  border-right: 2px solid var(--surface);
+}
+.wm-seg:last-child {
+  border-right: 0;
+}
+.wm-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.wm [data-flag="abandoned"] {
+  --flag: var(--flag-abandoned);
+}
+.wm [data-flag="silent"] {
+  --flag: var(--flag-silent);
+}
+.wm [data-flag="pinned"] {
+  --flag: var(--flag-pinned);
+}
+.wm [data-flag="left-behind"] {
+  --flag: var(--flag-left-behind);
+}
+.wm [data-flag="old-promise"] {
+  --flag: var(--flag-old-promise);
+}
+.wm [data-flag="stale"] {
+  --flag: var(--flag-stale);
+}
+.wm [data-flag="vulnerable"] {
+  --flag: var(--flag-vulnerable);
+}
+.wm-seg.is-cut::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  background: var(--surface);
+  transform: skewX(-24deg);
+}
+.ov-ex {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(60px, 0.9fr) max-content;
+  column-gap: 12px;
+  margin: 0 -6px;
+  padding: 0;
+  list-style: none;
+}
+.ov-ex > li,
+.ov-ex-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+.ov-ex-row {
+  padding: 3px 6px;
+  border-radius: var(--radius-s);
+  color: var(--ink);
+  font-size: 13px;
+}
+.ov-ex-row:hover {
+  background: var(--surface-2);
+}
+.ov-ex-name {
+  overflow-wrap: anywhere;
+}
+.ov-ex-track {
+  height: 10px;
+}
+.ov-ex-fill {
+  display: block;
+  height: 100%;
+  min-width: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ink-2) 55%, transparent);
+  print-color-adjust: exact;
+}
+.ov-ex-count {
+  font: 600 13px var(--mono);
+  text-align: right;
+}
+.ov-ly {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.ov-ly caption {
+  padding-bottom: 6px;
+  text-align: left;
+  color: var(--muted);
+}
+.ov-ly th {
+  padding: 0 8px 6px 0;
+  border-bottom: 1px solid var(--border-strong);
+  font: 600 10.5px var(--sans);
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.ov-ly td {
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: baseline;
+  overflow-wrap: anywhere;
+}
+.ov-ly .num {
+  font-family: var(--mono);
+  text-align: right;
+  white-space: nowrap;
+}
+.ov-ly-version {
+  font: 12px var(--mono);
+  color: var(--muted);
+}
+.ov-ly-grade {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1px solid var(--tone);
+  border-radius: 3px;
+  background: var(--tone-soft);
+  color: var(--tone);
+  font: 600 11.5px/1 var(--sans);
+  white-space: nowrap;
+  print-color-adjust: exact;
+}
+
+@media (forced-colors: active) {
+  .ov-ex-fill {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+  .wm-bar {
+    --wm-seg-min: 6px;
+    forced-color-adjust: none;
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+  .wm-seg,
+  .wm-swatch {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background: var(--flag-pattern, Canvas);
+  }
+  [data-flag="abandoned"] {
+    --flag-pattern: CanvasText;
+  }
+  [data-flag="silent"] {
+    --flag-pattern: repeating-linear-gradient(0deg, CanvasText 0 1px, Canvas 1px 3px);
+  }
+  [data-flag="pinned"] {
+    --flag-pattern: repeating-linear-gradient(90deg, CanvasText 0 1px, Canvas 1px 3px);
+  }
+  [data-flag="left-behind"] {
+    --flag-pattern: repeating-linear-gradient(45deg, CanvasText 0 1px, Canvas 1px 4px);
+  }
+  [data-flag="old-promise"] {
+    --flag-pattern: repeating-linear-gradient(-45deg, CanvasText 0 1px, Canvas 1px 4px);
+  }
+  [data-flag="stale"] {
+    --flag-pattern: radial-gradient(circle, CanvasText 0 1px, Canvas 1.3px) 0 0 / 4px 4px;
+  }
+  [data-flag="vulnerable"] {
+    --flag-pattern:
+      repeating-linear-gradient(45deg, CanvasText 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(-45deg, CanvasText 0 1px, Canvas 1px 4px);
+  }
+}
+
+@media print {
+  .wm-seg {
+    border: 1px solid var(--ink);
+  }
+  .wm-text {
+    color: var(--ink-2);
+  }
+}
 @media screen {
   .p2 {
     container: p2 / inline-size;
@@ -4455,6 +4824,13 @@ button.pill {
   max-width: 72ch;
   font: 17px/1.4 var(--serif);
   color: var(--ink);
+}
+.r2-depth {
+  margin: 0;
+  max-width: 72ch;
+  font: 15px/1.45 var(--serif);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
 }
 .r2-list,
 .r2-kids {
@@ -4996,6 +5372,13 @@ button.pill {
     --low-soft: #dfe9ee;
     --none: #366b4b;
     --none-soft: #dcebe1;
+    --flag-abandoned: #2a78d6;
+    --flag-silent: #eb6834;
+    --flag-pinned: #1baf7a;
+    --flag-left-behind: #eda100;
+    --flag-old-promise: #e87ba4;
+    --flag-stale: #008300;
+    --flag-vulnerable: #6250d6;
     --shadow: none;
     --gutter: 0px;
     color-scheme: light;
@@ -5083,21 +5466,11 @@ button.pill {
   .pill,
   .fgroup-head h2,
   .lead-chips .count,
-  .lead-clean {
+  .ov-grade {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-  .ledger-fold > summary {
-    display: none;
-  }
-  .ledger-fold::details-content {
-    content-visibility: visible;
-    display: block;
-    height: auto;
-  }
-  .ledger-fold {
-    border-top: 0;
-  }
+
   .ledger,
   .ledger-lead {
     break-inside: avoid;
@@ -6082,6 +6455,11 @@ button.pill {
 		"type-symfony-pack": "a Symfony pack, which only lists dependencies"
 	};
 	var allowlistReason = (id) => Object.hasOwn(ALLOWLIST_REASONS, id) ? ALLOWLIST_REASONS[id] ?? null : null;
+	var ZERO_VERDICT_WHEN = {
+		allowlisted: "allowlisted",
+		no_metadata: "no metadata"
+	};
+	var zeroVerdictWhen = (id) => wordFor(ZERO_VERDICT_WHEN, id);
 	var SKIPPED_CHECKS = {
 		repository_activity: "its repository activity",
 		repository_archived: "its archived flag",
@@ -6578,8 +6956,10 @@ button.pill {
 		const known = new Set(run.score_model.severities.map(({ id }) => id));
 		const others = [...new Set(pairs.map((pair) => pair.row.severity).filter((id) => !known.has(id)))].map((id) => `${pairs.filter((pair) => pair.row.severity === id).length} ${id}`);
 		const noun = isNarrowed ? ["matching advisory", "matching advisories"] : ["advisory", "advisories"];
+		const count = `${plural(pairs.length, noun[0], noun[1])} on ${plural(packages, "package", "packages")}`;
 		return {
-			text: `${plural(pairs.length, noun[0], noun[1])} on ${plural(packages, "package", "packages")}, by severity: ${[...severities, ...others].join(", ")}.`,
+			text: `${count}, by severity: ${[...severities, ...others].join(", ")}.`,
+			head: `${count}.`,
 			narrowed: isNarrowed ? `Only advisories that match the filter are counted; without it there ${unfiltered === 1 ? "is" : "are"} ${unfiltered}.` : null
 		};
 	}
@@ -6973,6 +7353,7 @@ button.pill {
 			case "radius": return report.findings.filter((f) => graded.includes(f.verdict));
 			case "advisories": return report.findings.filter((f) => isSecurityVulnerable(f.security));
 			case "packages": return report.findings;
+			case "overview":
 			case "run": return [];
 		}
 	}
@@ -7103,6 +7484,7 @@ button.pill {
 		return [
 			baseline !== null && here.some((f) => f.baseline !== null) ? groupOf(scope, "since", `Since ${baseline.path}`, SINCE_ROWS) : null,
 			runFails2(report) ? groupOf(scope, "gate", "This run", [["fails", "Fails this run"]]) : null,
+			groupOf(scope, "verdict", "Grade", report.run.graded_verdicts.map((id) => [id, id])),
 			groupOf(scope, "flag", "Flag", report.run.flag_ids.map((id) => [id, id])),
 			groupOf(scope, "sev", "Severity", report.run.score_model.severities.map(({ id }) => [id, id])),
 			groupOf(scope, "fix", "Fix", [...report.run.score_model.fix_kinds].sort((a, b) => a.ease - b.ease).map(({ id }) => [id, fixLabel(id)])),
@@ -7315,6 +7697,7 @@ button.pill {
 		"S10"
 	];
 	var VIEWS = [
+		"overview",
 		"findings",
 		"advisories",
 		"packages",
@@ -7748,8 +8131,8 @@ button.pill {
 		blocked: ", by a release your target does not run",
 		update: ""
 	});
-	var graded = (finding) => isScoreGraded(finding.score) ? finding.score : null;
-	var halvingPrinted = (finding, reason) => printedModifiers(graded(finding)?.modifiers ?? []).some((m) => m.reason === reason);
+	var graded$1 = (finding) => isScoreGraded(finding.score) ? finding.score : null;
+	var halvingPrinted = (finding, reason) => printedModifiers(graded$1(finding)?.modifiers ?? []).some((m) => m.reason === reason);
 	function rootsWords(run) {
 		return run.include_dev ? "your composer.json's require or require-dev" : "your composer.json's require (require-dev counts only with --dev)";
 	}
@@ -7780,7 +8163,7 @@ button.pill {
 		return beforeVerb ? `a ${severity}-severity advisory` : `a ${severity} one`;
 	}
 	function vulnerableSentence(finding, run) {
-		const score = graded(finding);
+		const score = graded$1(finding);
 		const term = score?.terms.find(isTermSecurity);
 		const deciding = advisoryRows(finding).find((row) => row.deciding);
 		if (!score || !term || !deciding || !isSecurityVulnerable(finding.security)) return "";
@@ -7942,7 +8325,7 @@ button.pill {
 		})()}.`;
 	}
 	function partialFacts(finding, partial) {
-		const of = graded(finding)?.parts.security.of ?? 0;
+		const of = graded$1(finding)?.parts.security.of ?? 0;
 		const flags = partial.clears.filter((c) => c.kind === "flag").map((c) => c.id);
 		const advisories = partial.clears.filter((c) => c.kind === "advisory").length;
 		return joinAnd([...flags, `${advisories} of its ${of} advisories`]);
@@ -8103,7 +8486,7 @@ button.pill {
 		return (first.endsWith(":") ? [`${first} ${lowerFirst(second)}`, ...rest] : sentences).join(" ");
 	}
 	function answerText(finding, run) {
-		const score = graded(finding);
+		const score = graded$1(finding);
 		return score ? gradedAnswer(finding, score, run) : zeroAnswer(finding, run);
 	}
 	//#endregion
@@ -8498,13 +8881,14 @@ button.pill {
 			"aria-hidden": "true"
 		}, guide.level)) });
 	}
-	function LaneRow({ lane, span, guides, level, folded = false }) {
+	function LaneRow({ lane, span, guides, level, folded = false, collapsed = false }) {
 		const tone = lane.installed && level !== null ? LEVEL_TONE[level] : null;
 		const classes = [
 			"detail-timeline-row",
 			...lane.installed ? ["is-mine"] : [],
 			...lane.newest ? ["is-newest"] : [],
 			...folded ? ["is-folded"] : [],
+			...collapsed ? ["is-collapsed"] : [],
 			...tone === null ? [] : ["is-toned", toneClass(tone)]
 		].join(" ");
 		const words = laneWords(lane);
@@ -8512,6 +8896,7 @@ button.pill {
 			role: "row",
 			className: classes,
 			"data-branch": lane.branch,
+			"aria-hidden": collapsed || void 0,
 			children: [
 				u$1("span", {
 					role: "rowheader",
@@ -8611,12 +8996,13 @@ button.pill {
 					]
 				})
 			]
-		}), open && fold.lanes.map((lane) => u$1(LaneRow, {
+		}), fold.lanes.map((lane) => u$1(LaneRow, {
 			lane,
 			span,
 			guides,
 			level: null,
-			folded: true
+			folded: true,
+			collapsed: !open
 		}, lane.branch))] });
 	}
 	function BranchTimeline2({ finding, metadata, run, summaryId }) {
@@ -9739,18 +10125,27 @@ button.pill {
 									children: feeds
 								})
 							}),
-							branches !== null && u$1(Row, {
-								label: DETAIL_WORDS.branches,
-								children: [u$1("p", {
-									className: "d2-row-text",
-									id: branchesId,
-									children: branches
-								}), u$1(BranchTimeline2, {
-									finding,
-									metadata,
-									run,
-									summaryId: branchesId
-								}, finding.package)]
+							branches !== null && u$1("section", {
+								className: "d2-branches",
+								"aria-labelledby": `${branchesId}-head`,
+								children: [
+									u$1("h3", {
+										className: "d2-row-label",
+										id: `${branchesId}-head`,
+										children: DETAIL_WORDS.branches
+									}),
+									u$1("p", {
+										className: "d2-branches-line",
+										id: branchesId,
+										children: branches
+									}),
+									u$1(BranchTimeline2, {
+										finding,
+										metadata,
+										run,
+										summaryId: branchesId
+									}, finding.package)
+								]
 							}),
 							age !== null && u$1(Row, {
 								label: DETAIL_WORDS.age,
@@ -9817,41 +10212,136 @@ button.pill {
 		}, finding.package);
 	}
 	//#endregion
-	//#region src/domain/libyearsPanel.ts
-	var SEPARATOR = " · ";
-	var UNMEASURED_ORDER = [
-		"not_from_composer_repository",
-		"unavailable",
-		"not_found",
-		"branch_snapshot",
-		"shared_commit",
-		"undated",
-		"no_stable_release",
-		"undated_releases"
-	];
-	var schemaRank = (cause) => {
-		const rank = UNMEASURED_ORDER.indexOf(cause);
-		return rank === -1 ? UNMEASURED_ORDER.length : rank;
-	};
-	function measuredParts({ libyears }) {
-		if (libyears.measured === 0) return ["no package measured"];
-		const bound = libyears.at_least_count > 0 ? "at least " : "";
-		const worst = libyears.furthest_behind;
-		return [
-			`${bound}${decimal(libyears.total ?? 0, 2)} libyears over ${plural(libyears.measured, "package", "packages")}`,
-			`${decimal(libyears.direct_requirements ?? 0, 2)} from direct requirements`,
-			...worst === null ? [] : [`furthest behind: ${worst.package} ${worst.version}, ${decimal(worst.libyears, 2)}${worst.at_least ? " or more" : ""}`]
-		];
+	//#region src/domain/age.ts
+	function thresholdYears(thresholds, name) {
+		for (const [n, years] of thresholds) if (n === name) return years;
+		return null;
 	}
-	function libyearsPanel(report) {
-		const unmeasured = Object.entries(report.libyears.unmeasured).filter(([, count]) => count > 0).sort(([a], [b]) => schemaRank(a) - schemaRank(b)).map(([cause, count]) => `${count} not measured (${causeWord(cause, "")})`);
-		return [...measuredParts(report), ...unmeasured].join(SEPARATOR);
+	var AXIS_FLOOR_YEARS = 10;
+	function ageAxis(thresholds) {
+		const legend = pair(thresholds, "release") ?? pair(thresholds, "push");
+		if (legend === null) return null;
+		return {
+			...legend,
+			max: Math.max(AXIS_FLOOR_YEARS, 2 * legend.high)
+		};
+	}
+	function pair(thresholds, kind) {
+		const warn = thresholdYears(thresholds, `${kind}-warn-years`);
+		const high = thresholdYears(thresholds, `${kind}-high-years`);
+		return warn !== null && high !== null ? {
+			warn,
+			high
+		} : null;
+	}
+	var WEIGHS_WORDS = {
+		head: "Weighs most",
+		note: "highest score first, one segment per flag",
+		legend: "Flags in the bars",
+		transitive: "transitive",
+		dev: "dev"
+	};
+	var GRADE_HEAD = "Project grade:";
+	var NOTHING_FLAGGED = "nothing flagged";
+	var HIGH = "high";
+	var graded = (report) => {
+		const verdicts = report.run.graded_verdicts;
+		return report.findings.filter((f) => verdicts.includes(f.verdict) && isScoreGraded(f.score));
+	};
+	var total = (f) => isScoreGraded(f.score) ? f.score.total : 0;
+	var sum = (values) => values.reduce((a, b) => a + b, 0);
+	function highOrWorse({ run }) {
+		const verdicts = run.graded_verdicts;
+		return verdicts.slice(0, verdicts.indexOf(HIGH) + 1);
+	}
+	function gradeLine(report) {
+		const { counts, packages_checked: checked, security } = report;
+		if (checked === 0) return null;
+		const byVerdict = counts;
+		const grade = report.run.graded_verdicts.find((v) => (byVerdict[v] ?? 0) > 0) ?? null;
+		const worse = sum(highOrWorse(report).map((v) => byVerdict[v] ?? 0));
+		const known = graded(report).filter((f) => f.baseline?.status === "known").length;
+		const clauses = [
+			...grade === null ? [] : [plural(byVerdict[grade] ?? 0, `${grade} finding`, `${grade} findings`), `${String(worse)} of ${plural(checked, "package", "packages")} high or worse`],
+			...security.check === "partial" || security.check === "not_run" ? [lookupWord(security.check, null)] : [],
+			...counts.unknown > 0 ? [`${String(counts.unknown)} not judged`] : [],
+			...report.baseline !== null && known > 0 ? [`${String(known)} known to the baseline`] : []
+		];
+		return {
+			grade,
+			link: grade === null ? null : {
+				view: "findings",
+				filters: { verdict: [grade] }
+			},
+			clauses
+		};
+	}
+	var gradeLineHead = ({ grade }) => `${GRADE_HEAD} ${grade ?? NOTHING_FLAGGED}`;
+	function figureLine({ packages_checked: checked, packages_flagged: flagged, counts }) {
+		if (checked === 0) return null;
+		return `${String(flagged)} of ${plural(checked, "package", "packages")} flagged · ${String(counts.ok)} ok · ${String(counts.finished)} ${zeroVerdictWhen("allowlisted")}`;
+	}
+	function loadLine(report) {
+		if (report.packages_checked === 0) return null;
+		const findings = graded(report);
+		if (findings.length === 0) return `0 points: ${NOTHING_FLAGGED}`;
+		const worse = highOrWorse(report);
+		const load = sum(findings.map(total));
+		const high = sum(findings.filter((f) => worse.includes(f.verdict)).map(total));
+		const share = load === 0 ? "" : ` (${String(Math.floor(100 * high / load))} %)`;
+		const dev = findings.filter((f) => f.dev);
+		return [
+			`${String(load)} points on ${plural(report.packages_flagged, "flagged package", "flagged packages")}`,
+			`${String(high)}${share} from high or worse`,
+			`score model ${String(report.run.score_model.id)}`,
+			...dev.length === 0 ? [] : [`${String(sum(dev.map(total)))} from packages-dev`]
+		].join(" · ");
+	}
+	function flagPoints(report) {
+		const points = new Map();
+		for (const { score } of graded(report)) {
+			if (!isScoreGraded(score)) continue;
+			for (const term of score.terms) points.set(term.flag, (points.get(term.flag) ?? 0) + term.contribution);
+		}
+		return points;
+	}
+	var pointsText = (points) => `${Number.isInteger(points) ? String(points) : decimal(points, 1)} pts`;
+	function weighsMost(report) {
+		if (report.packages_checked === 0) return null;
+		const ranked = [...graded(report)].sort((a, b) => total(b) - total(a));
+		const shown = ranked.slice(0, 10);
+		const others = ranked.slice(10);
+		const rows = shown.map((f) => {
+			const bar = scoreBar(f.score, report.run);
+			return {
+				package: f.package,
+				grade: f.verdict,
+				total: total(f),
+				unit: pluralNoun(total(f), "point", "points"),
+				reach: [...f.direct ? [] : [WEIGHS_WORDS.transitive], ...f.dev ? [WEIGHS_WORDS.dev] : []],
+				text: f.score.text,
+				segments: bar.segments,
+				over: bar.over,
+				link: {
+					view: "findings",
+					pkg: f.package
+				}
+			};
+		});
+		const drawn = new Set(rows.flatMap(({ segments }) => segments.map(({ flag }) => flag)));
+		const order = report.run.score_model.flag_order;
+		return {
+			rows,
+			legend: [...order.filter((flag) => drawn.has(flag)), ...[...drawn].filter((flag) => !order.includes(flag))],
+			rest: others.length === 0 ? null : `${plural(others.length, "more flagged package holds", "more flagged packages hold")} ${String(sum(others.map(total)))} points`,
+			restLink: { view: "findings" }
+		};
 	}
 	//#endregion
 	//#region src/domain/overviewBand.ts
 	var OVERVIEW_WORDS = {
 		band: "Overview",
-		flagged: "Flagged packages",
+		emptyLock: "No packages in this lock",
 		grades: "Grade",
 		perPackage: "One square per package",
 		flags: "Flags",
@@ -9861,27 +10351,9 @@ button.pill {
 		bySeverity: "Advisories by severity",
 		byFix: "By fix (packages)",
 		updateNow: "Update now",
-		libyears: "Libyears",
-		more: "More about this lock"
+		libyears: "Libyears"
 	};
 	var packages$1 = (n) => plural(n, "package", "packages");
-	function leadFigure({ packages_checked: checked, packages_flagged: flagged }) {
-		if (checked === 0) return {
-			kind: "empty",
-			text: "No packages in this lock"
-		};
-		if (flagged === 0) return {
-			kind: "clean",
-			text: `Nothing flagged in ${packages$1(checked)}`
-		};
-		return {
-			kind: "flagged",
-			figure: String(flagged),
-			of: `of ${packages$1(checked)}`,
-			flagged: "flagged",
-			share: `· ${sharePhrase(flagged, checked)} of the lock`
-		};
-	}
 	var leadScope = (report) => scopeClauses(report);
 	function gradeChips({ counts, run, packages_checked: checked }) {
 		if (checked === 0) return [];
@@ -9905,6 +10377,7 @@ button.pill {
 	};
 	function flagBars(report) {
 		const flags = rootFlags(report);
+		const points = flagPoints(report);
 		return report.run.score_model.flag_order.flatMap((flag) => {
 			const entry = flags[flag];
 			if (entry === void 0 || entry.carrying === 0) return [];
@@ -9918,7 +10391,8 @@ button.pill {
 				flag,
 				carrying: entry.carrying,
 				parts,
-				split
+				split,
+				points: pointsText(points.get(flag) ?? 0)
 			}];
 		});
 	}
@@ -9966,422 +10440,540 @@ button.pill {
 				outlined: countsAs !== null,
 				count: bySeverity[id] ?? 0
 			})).filter(({ count }) => count > 0),
-			fixes: fixCounts(report).map(({ label, count }) => ({
-				label,
-				count
-			}))
+			fixes: fixCounts(report)
 		};
-	}
-	function foldPeek2(report) {
-		const flags = flagBars(report).length;
-		const advisories = report.security.advisories.counted;
-		const { libyears } = report;
-		return [
-			flags === 0 ? "no flag" : plural(flags, "flag", "flags"),
-			advisories === 0 ? "no advisory" : plural(advisories, "advisory", "advisories"),
-			...libyears.measured > 0 ? [`${fixed(libyears.total, 1)} libyears`] : []
-		];
 	}
 	function updateNowArgv({ security }) {
 		const argv = security.update_now_command;
 		if (argv === null || !argv.every((arg) => typeof arg === "string")) return null;
 		return argv;
 	}
-	//#endregion
-	//#region src/ui/ledger/CleanMark.tsx
-	function CleanMark({ size }) {
-		return u$1("svg", {
-			className: "clean-mark",
-			width: size,
-			height: size,
-			viewBox: "0 0 30 30",
-			"aria-hidden": "true",
-			children: [u$1("circle", {
-				cx: "15",
-				cy: "15",
-				r: "13.5",
-				fill: "none",
-				stroke: "currentColor",
-				"stroke-width": "2"
-			}), u$1("path", {
-				d: "M9 15.5l4 4 8-8.5",
-				fill: "none",
-				stroke: "currentColor",
-				"stroke-width": "2.4",
-				"stroke-linecap": "round",
-				"stroke-linejoin": "round"
-			})]
-		});
-	}
-	//#endregion
-	//#region src/ui/ledger/Waffle.tsx
-	var COLUMNS = {
-		narrow: 26,
-		mid: 26,
-		wide: 38,
-		xwide: 50
+	var OVERVIEW_TAB_WORDS = {
+		exposure: "Blast radius",
+		exposureNote: "flagged packages each direct requirement pulls in",
+		libyearsTop: `Furthest behind, top 8`,
+		package: "Package",
+		libyears: "Libyears",
+		grade: "Grade",
+		overview: "Overview"
 	};
-	var BUDGETS = Object.keys(COLUMNS);
-	function Waffle({ runs, total }) {
-		const flagged = runs.reduce((sum, run) => sum + run.count, 0);
-		const squares = Math.max(total, flagged);
-		const tones = runs.flatMap((run) => Array.from({ length: run.count }, () => toneClass(run.tone)));
-		const rows = Object.fromEntries(BUDGETS.map((b) => [b, waffleRows(squares, COLUMNS[b])]));
-		const cells = Array.from({ length: squares }, (_, index) => {
-			const tone = tones[index];
-			return u$1("i", { className: tone === void 0 ? "waffle-cell waffle-rest" : `waffle-cell ${tone}` }, index);
-		});
-		return u$1("div", {
-			className: flagged === 0 ? "waffle is-clean" : "waffle",
-			"aria-hidden": "true",
-			style: {
-				"--rows-narrow": String(rows.narrow),
-				"--rows-mid": String(rows.mid),
-				"--rows-wide": String(rows.wide),
-				"--rows-xwide": String(rows.xwide)
-			},
-			children: cells
-		});
-	}
-	//#endregion
-	//#region src/ui/report/Overview.tsx
-	function useToggle(group) {
-		const { state, dispatch } = useReport();
+	var findingsLink = (filters) => ({
+		view: "findings",
+		filters
+	});
+	function exposureBars(report) {
+		const rows = report.exposure.slice(0, 8).map(({ package: name, flagged }) => ({
+			package: name,
+			flagged
+		}));
+		const rest = report.exposure.length - rows.length;
+		const names = report.unattributed.map(({ package: name }) => name);
 		return {
-			pressed: (key) => state.filters[group].includes(key),
-			toggle: (key) => () => {
-				dispatch({
-					type: "toggle",
-					group,
-					key
-				});
-			}
+			rows,
+			longest: Math.max(1, ...rows.map(({ flagged }) => flagged)),
+			more: rest > 0 ? `${rest} more in Blast radius` : null,
+			shared: names.length > 0 ? `${RADIUS_WORDS.shared(names.length)}: ${names.join(", ")}.` : null,
+			link: { view: "radius" }
 		};
 	}
-	function Figure({ lead }) {
-		if (lead.kind === "empty") return u$1("p", {
-			className: "lead-figure",
-			children: u$1("span", {
-				className: "lead-clean lead-empty",
-				children: lead.text
-			})
-		});
-		if (lead.kind === "clean") return u$1("p", {
-			className: `lead-figure ${toneClass("none")}`,
-			children: [u$1(CleanMark, { size: 30 }), u$1("span", {
-				className: `lead-clean ${toneClass("none")}`,
-				children: lead.text
-			})]
+	function libyearsTop(report) {
+		const graded = report.run.graded_verdicts;
+		return report.findings.flatMap((f) => f.libyears === null ? [] : [{
+			f,
+			years: f.libyears
+		}]).sort((a, b) => b.years - a.years || (a.f.package < b.f.package ? -1 : a.f.package > b.f.package ? 1 : 0)).slice(0, 8).map(({ f, years }) => ({
+			package: f.package,
+			version: f.version,
+			libyears: `${f.libyears_at_least ? "≥ " : ""}${decimal(years, 1)}`,
+			grade: f.verdict,
+			link: {
+				view: graded.includes(f.verdict) ? "findings" : "packages",
+				pkg: f.package
+			}
+		}));
+	}
+	var stripFlagged = ({ packages_flagged: flagged }) => `${flagged} flagged`;
+	var exposureUnit = (flagged) => pluralNoun(flagged, "flagged package", "flagged packages");
+	//#endregion
+	//#region src/ui/views/EmptyState.tsx
+	function EmptyState({ reason }) {
+		const { dispatch } = useReport();
+		if (reason === "clean") return u$1("p", {
+			className: "empty",
+			children: "Nothing was flagged."
 		});
 		return u$1("p", {
-			className: "lead-figure",
-			children: [u$1("span", {
-				className: "lead-num",
-				children: lead.figure
-			}), u$1("span", {
-				className: "lead-of",
+			className: "empty",
+			children: [
+				"Nothing matches this filter.",
+				" ",
+				u$1("button", {
+					type: "button",
+					className: "icon-btn",
+					onClick: () => {
+						dispatch({ type: "clear" });
+					},
+					children: "Clear filters"
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/views/AgeScale.tsx
+	function pct$2(value, max) {
+		return `${Math.min(100, Math.max(0, value / max * 100))}%`;
+	}
+	function AgeAxis({ axis, caption = "Years since release", whose = "" }) {
+		const label = `age axis${whose ? ` (${whose})` : ""}: years since the last release, 0 to ${axis.max} and more; warn at ${axis.warn} years, high at ${axis.high} years`;
+		return u$1("span", {
+			className: "fhead-age",
+			role: "img",
+			"aria-label": label,
+			title: label,
+			children: u$1("span", {
+				className: "fhead-axis",
+				"aria-hidden": "true",
 				children: [
 					u$1("span", {
-						className: "lead-of-line",
-						children: lead.of
+						className: "fhead-axis-label",
+						children: caption
 					}),
-					" ",
 					u$1("span", {
-						className: "lead-of-line",
-						children: [
-							lead.flagged,
-							" ",
-							u$1("span", {
-								className: "lead-share",
-								children: lead.share
-							})
-						]
+						className: "fhead-tick is-start",
+						children: "0"
+					}),
+					u$1("span", {
+						className: "fhead-tick is-warn tone-med",
+						style: { left: pct$2(axis.warn, axis.max) },
+						children: [axis.warn, "y"]
+					}),
+					u$1("span", {
+						className: "fhead-tick is-high tone-crit",
+						style: { left: pct$2(axis.high, axis.max) },
+						children: [axis.high, "y"]
+					}),
+					u$1("span", {
+						className: "fhead-tick is-end",
+						children: [axis.max, "y+"]
 					})
 				]
-			})]
+			})
 		});
 	}
-	var GATE_TONES = {
-		fails: "crit",
-		not_applied: "low",
-		off: "low",
-		passes: "none"
-	};
-	function GateLine({ report, className }) {
-		const state = gateState(report);
-		return u$1("p", {
-			className: `${className} ${toneClass(GATE_TONES[state])}`,
-			children: [GATE_GLYPHS[state] !== "" && u$1("span", {
-				className: "overview2-gate-mark",
+	//#endregion
+	//#region src/ui/rowCursor.ts
+	function pickCursor(rendered, selected, lastOpened) {
+		if (selected !== null && rendered.includes(selected)) return selected;
+		if (lastOpened !== null && rendered.includes(lastOpened)) return lastOpened;
+		return rendered[0] ?? null;
+	}
+	function rowTabIndex(pkg, cursor, first = true) {
+		return first && pkg === cursor ? 0 : -1;
+	}
+	function innerTabIndex(pkg, cursor, first = true) {
+		return first && pkg === cursor ? void 0 : -1;
+	}
+	function firstRows(rows, pkg, key) {
+		const seen = new Set();
+		const first = new Set();
+		for (const row of rows) {
+			const name = pkg(row);
+			if (seen.has(name)) continue;
+			seen.add(name);
+			first.add(key(row));
+		}
+		return first;
+	}
+	//#endregion
+	//#region src/ui/rowOpen.ts
+	function openInteractions(pkg, dispatch) {
+		return { onClick: (event) => {
+			const target = event.target;
+			if (target.closest("a, button, [popover], [data-no-open]")) return;
+			const row = target.closest("[data-pkg]");
+			if (row !== null && row !== event.currentTarget) return;
+			dispatch({
+				type: "select",
+				pkg
+			});
+		} };
+	}
+	//#endregion
+	//#region src/ui/report/FindingRow.tsx
+	function pct$1(value, max) {
+		return `${Math.min(100, Math.max(0, value / max * 100))}%`;
+	}
+	function AgeCell2({ finding, run, axis }) {
+		const reading = axis === null ? null : ageReading(finding, run);
+		if (axis === null || reading === null) return u$1("span", { className: "fcell fc-age f2-age is-empty" });
+		const label = ageScaleLabel(reading);
+		const tone = toneClass(levelTone(reading.level));
+		return u$1("span", {
+			className: "fcell fc-age f2-age",
+			role: "img",
+			"aria-label": label,
+			title: label,
+			children: [u$1("span", {
+				className: "age-track",
 				"aria-hidden": "true",
-				children: GATE_GLYPHS[state]
+				children: [
+					u$1("span", {
+						className: "age-guide is-warn",
+						style: { left: pct$1(reading.warn, axis.max) }
+					}),
+					u$1("span", {
+						className: "age-guide is-high",
+						style: { left: pct$1(reading.high, axis.max) }
+					}),
+					u$1("span", {
+						className: reading.years > axis.max ? `age-bar ${tone} is-over` : `age-bar ${tone}`,
+						style: { width: pct$1(reading.years, axis.max) }
+					})
+				]
 			}), u$1("span", {
-				className: "overview2-gate-text",
-				children: report.gate.text
+				className: `age-num is-toned ${tone}`,
+				"aria-hidden": "true",
+				children: decimal(reading.years, 1)
 			})]
 		});
 	}
-	function Lead({ report }) {
-		const lead = leadFigure(report);
-		const chips = gradeChips(report);
-		const scope = lead.kind === "flagged" ? leadScope(report) : [];
-		const grades = useToggle("verdict");
-		return u$1("div", {
-			className: `ledger-lead${lead.kind === "flagged" ? "" : ` is-${lead.kind}`}`,
+	function NextStep({ finding, run }) {
+		const { cursor } = useReport();
+		const words = nextStepWords(finding, run);
+		const href = words.href === null ? null : safeHref(words.href);
+		const title = words.title ?? void 0;
+		return u$1("span", {
+			className: "fcell f2-next",
+			children: [href === null ? u$1("span", {
+				title,
+				children: words.text
+			}) : u$1("a", {
+				className: "lnk",
+				href,
+				title,
+				target: "_blank",
+				rel: "noopener noreferrer",
+				tabIndex: innerTabIndex(finding.package, cursor),
+				children: words.text
+			}), words.held && u$1("span", {
+				className: "f2-held",
+				children: [" ", "· held"]
+			})]
+		});
+	}
+	function PackageName$1({ finding }) {
+		const slash = finding.package.indexOf("/");
+		return u$1("span", {
+			className: "fcell fc-pkg f2-pkg",
 			children: [
-				u$1("div", {
-					className: "lead-answer",
+				slash > 0 && u$1(S, { children: [u$1("span", {
+					className: "fc-vendor",
+					children: finding.package.slice(0, slash + 1)
+				}), u$1("wbr", {})] }),
+				u$1("span", {
+					className: "fc-name fc-unit",
+					children: finding.package.slice(slash + 1)
+				}),
+				" ",
+				u$1("span", {
+					className: "fc-ver",
+					children: finding.version
+				})
+			]
+		});
+	}
+	function FindingRow2({ finding, run, axis, hideAccepted }) {
+		const { state, dispatch, cursor } = useReport();
+		const spoken = `${g()}-spoken`;
+		const accepted = maintenanceAccepted(finding);
+		return u$1("li", {
+			className: `frow f2-row ${toneClass(gradeTone(finding.verdict))}`,
+			"data-pkg": finding.package,
+			"aria-label": finding.package,
+			"aria-describedby": spoken,
+			"aria-current": state.pkg === finding.package ? "true" : void 0,
+			tabIndex: rowTabIndex(finding.package, cursor),
+			...openInteractions(finding.package, dispatch),
+			children: [
+				u$1("span", {
+					className: "fcell f2-score",
 					children: [
 						u$1("span", {
-							className: "eyebrow",
-							children: OVERVIEW_WORDS.flagged
+							className: "f2-num",
+							"aria-hidden": "true",
+							children: finding.score.total
 						}),
-						u$1(Figure, { lead }),
-						scope.length > 0 && u$1("p", {
-							className: "lead-scope",
-							children: scope.join(" · ")
+						u$1(ScoreBar, {
+							score: finding.score,
+							run
 						}),
-						chips.length > 0 && u$1("div", {
-							className: "legend lead-chips",
-							role: "group",
-							"aria-label": OVERVIEW_WORDS.grades,
-							children: chips.map(({ grade, count }) => u$1(LegendButton, {
-								tone: verdictTone(report.run.score_model, grade),
-								dim: count === 0,
-								pressed: grades.pressed(grade),
-								label: grade,
-								count,
-								onToggle: grades.toggle(grade)
-							}, grade))
+						u$1("span", {
+							className: "vh",
+							id: spoken,
+							children: rowSpoken(finding)
 						})
 					]
 				}),
-				report.packages_checked > 0 && u$1("figure", {
-					className: "lead-waffle",
-					children: [u$1(Waffle, {
-						runs: chips.filter(({ count }) => count > 0).map(({ grade, count }) => ({
-							tone: verdictTone(report.run.score_model, grade),
-							count
-						})),
-						total: report.packages_checked
-					}), u$1("figcaption", {
-						className: "lead-waffle-cap",
-						children: OVERVIEW_WORDS.perPackage
+				u$1(PackageName$1, { finding }),
+				u$1("span", {
+					className: "fcell f2-flags",
+					children: [u$1(FlagPills, {
+						finding,
+						run,
+						hideAccepted
+					}), accepted !== null && u$1("span", {
+						className: "f2-accepted",
+						children: accepted
 					})]
 				}),
-				u$1(GateLine, {
-					report,
-					className: "overview2-gate"
+				u$1(AgeCell2, {
+					finding,
+					run,
+					axis
+				}),
+				u$1("span", {
+					className: "fcell f2-reach",
+					children: reachWord(finding)
+				}),
+				u$1(NextStep, {
+					finding,
+					run
 				})
 			]
 		});
 	}
-	function FlagBarButton({ bar, longest, model }) {
-		const flags = useToggle("flag");
-		const pressed = flags.pressed(bar.flag);
-		return u$1("button", {
-			type: "button",
-			className: "legend-btn legend-btn-bar",
-			"aria-pressed": pressed,
-			title: filterTitle(bar.flag, pressed),
-			onClick: flags.toggle(bar.flag),
+	//#endregion
+	//#region src/ui/report/FindingsView.tsx
+	function byGrade(findings) {
+		const groups = [];
+		for (const finding of findings) {
+			const current = groups.at(-1);
+			if (current?.verdict === finding.verdict) current.findings.push(finding);
+			else groups.push({
+				verdict: finding.verdict,
+				findings: [finding]
+			});
+		}
+		return groups;
+	}
+	function NoteLine({ note }) {
+		const { dispatch } = useReport();
+		const { shown, more } = cappedPackages(note.packages);
+		return u$1("p", {
+			className: "note f2-note",
 			children: [
-				bar.flag,
+				note.text,
+				":",
 				" ",
-				u$1("span", {
-					className: "legend-track",
-					"aria-hidden": "true",
-					children: u$1("span", {
-						className: "legend-fill",
-						style: { width: `${bar.carrying / longest * 100}%` },
-						children: bar.parts.map(({ grade, count }) => u$1("span", {
-							className: `legend-seg ${toneClass(verdictTone(model, grade))}`,
-							style: { flexGrow: count }
-						}, grade))
-					})
-				}),
-				u$1("i", {
-					className: "count",
-					children: bar.carrying
-				}),
-				" ",
-				u$1("span", {
-					className: "overview2-split",
-					children: bar.split
-				})
+				shown.map((pkg, i) => u$1("span", { children: [i > 0 && ", ", u$1("button", {
+					type: "button",
+					className: "pkg-link-btn",
+					onClick: () => {
+						dispatch({
+							type: "select",
+							pkg
+						});
+					},
+					children: pkg
+				})] }, pkg)),
+				more !== null && ` ${more}`,
+				"."
 			]
 		});
 	}
-	function FlagsBlock({ report }) {
-		if (report.packages_flagged === 0) return null;
-		const bars = flagBars(report);
-		const multi = multiFlagLine(report);
-		const depth = depthSentence(report);
-		const accepted = acceptedLine(report);
-		const longest = Math.max(1, ...bars.map(({ carrying }) => carrying));
+	function ColumnHead({ run, axis }) {
 		return u$1("div", {
-			className: "ledger-block ledger-verdicts",
-			children: [
-				u$1("p", {
-					className: "eyebrow ledger-head",
-					children: [OVERVIEW_WORDS.flags, bars.length > 0 && u$1("span", {
-						className: "ledger-head-note",
-						children: OVERVIEW_WORDS.flagsNote
-					})]
-				}),
-				bars.length > 0 && u$1("div", {
-					className: "verdict-bars overview2-flag-bars",
-					style: { "--longest": String(longest) },
-					children: bars.map((bar) => u$1(FlagBarButton, {
-						bar,
-						longest,
-						model: report.run.score_model
-					}, bar.flag))
-				}),
-				multi !== null && u$1("p", {
-					className: "ledger-note",
-					children: multi
-				}),
-				depth !== null && u$1("p", {
-					className: "ledger-note",
-					children: depth
-				}),
-				accepted !== null && u$1("p", {
-					className: "ledger-note",
-					children: accepted
-				})
-			]
-		});
-	}
-	var severityTone = (model, { band, outlined }) => `${toneClass(verdictTone(model, band))}${outlined ? " is-outlined" : ""}`;
-	function SecurityBlock({ report }) {
-		const block = securityBlock(report);
-		const severities = useToggle("sev");
-		const updateNow = updateNowArgv(report);
-		return u$1("div", {
-			className: "ledger-block ledger-advisories",
+			className: "fhead f2-head",
 			children: [
 				u$1("span", {
-					className: "eyebrow ledger-head",
-					children: OVERVIEW_WORDS.security
-				}),
-				u$1("p", {
-					className: "ledger-fig",
-					children: [block.figure !== null && u$1(S, { children: [u$1("span", {
-						className: "ledger-fig-num",
-						children: block.figure
-					}), " "] }), u$1("span", {
-						className: block.figure === null ? "ledger-fig-text" : "ledger-fig-unit",
-						children: block.unit
-					})]
-				}),
-				block.note !== null && u$1("p", {
-					className: "ledger-note",
-					children: block.note
-				}),
-				block.severities.length > 0 && u$1(S, { children: [u$1("div", {
-					className: "advisory-squares",
+					className: "fhead-col f2-head-score",
 					"aria-hidden": "true",
-					children: block.severities.map((severity) => Array.from({ length: severity.count }, (_, index) => u$1("i", { className: `advisory-square ${severityTone(report.run.score_model, severity)}` }, `${severity.id}-${index}`)))
-				}), u$1("div", {
-					className: "legend advisory-chips",
-					role: "group",
-					"aria-label": OVERVIEW_WORDS.bySeverity,
 					children: [u$1("span", {
-						className: "ledger-quiet-label",
-						"aria-hidden": "true",
-						children: OVERVIEW_WORDS.bySeverity
-					}), block.severities.map((severity) => {
-						const pressed = severities.pressed(severity.id);
-						return u$1("button", {
-							type: "button",
-							className: `legend-btn ${severityTone(report.run.score_model, severity)}`,
-							"aria-pressed": pressed,
-							title: filterTitle(severity.id, pressed),
-							onClick: severities.toggle(severity.id),
-							children: [
-								u$1("i", {
-									className: "swatch",
-									"aria-hidden": "true"
-								}),
-								severity.id,
-								" ",
-								u$1("i", {
-									className: "count",
-									children: severity.count
-								})
-							]
-						}, severity.id);
+						className: "f2-head-label",
+						children: FINDINGS_HEAD.score
+					}), u$1("span", {
+						className: "f2-head-axis",
+						children: [u$1("span", {
+							className: "f2-head-tick",
+							children: "0"
+						}), bandTicks(run).map((tick) => u$1("span", {
+							className: "f2-head-tick",
+							style: { left: `${tick.at * 100}%` },
+							children: tick.floor
+						}, tick.floor))]
 					})]
-				})] }),
-				block.fixes.length > 0 && u$1("p", {
-					className: "ledger-note",
-					children: [
-						OVERVIEW_WORDS.byFix,
-						":",
-						" ",
-						block.fixes.map(({ label, count }, index) => u$1(S, { children: [
-							index > 0 && " · ",
-							label,
-							" ",
-							u$1("b", { children: count })
-						] }, label))
-					]
 				}),
-				updateNow !== null && u$1("div", {
-					className: "overview2-update",
-					children: u$1(CopyMove, {
-						argvs: [updateNow],
-						label: OVERVIEW_WORDS.updateNow
-					})
+				u$1("span", {
+					className: "fhead-col f2-head-pkg",
+					"aria-hidden": "true",
+					children: FINDINGS_HEAD.pkg
+				}),
+				u$1("span", {
+					className: "fhead-col f2-head-flags",
+					"aria-hidden": "true",
+					children: FINDINGS_HEAD.flags
+				}),
+				axis ? u$1(AgeAxis, {
+					axis,
+					caption: FINDINGS_HEAD.age
+				}) : u$1("span", { className: "fhead-age" }),
+				u$1("span", {
+					className: "fhead-col f2-head-reach",
+					"aria-hidden": "true",
+					children: FINDINGS_HEAD.reach
+				}),
+				u$1("span", {
+					className: "fhead-col f2-head-next",
+					"aria-hidden": "true",
+					children: FINDINGS_HEAD.next
 				})
 			]
 		});
 	}
-	function LibyearsBlock({ report }) {
+	function PrintedScale({ run }) {
 		return u$1("div", {
-			className: "ledger-block ledger-libyears",
-			children: [u$1("span", {
-				className: "eyebrow ledger-head",
-				children: OVERVIEW_WORDS.libyears
-			}), u$1("p", {
-				className: "ledger-note overview2-libyears",
-				children: libyearsPanel(report)
-			})]
-		});
-	}
-	function Tier({ report }) {
-		return u$1("div", {
-			className: "ledger-tier",
+			className: "f2-print-scale",
+			"aria-hidden": "true",
 			children: [
-				u$1(FlagsBlock, { report }),
-				u$1(SecurityBlock, { report }),
-				u$1(LibyearsBlock, { report })
+				u$1("span", { className: "f2-print-gap" }),
+				u$1("span", {
+					className: "f2-print-axis",
+					children: [u$1("span", {
+						className: "f2-head-tick",
+						children: "0"
+					}), bandTicks(run).map((tick) => u$1("span", {
+						className: "f2-head-tick",
+						style: { left: `${tick.at * 100}%` },
+						children: tick.floor
+					}, tick.floor))]
+				}),
+				u$1("span", { children: FINDINGS_HEAD.score })
 			]
 		});
 	}
-	function Overview2({ narrow = false }) {
+	function Group$1({ verdict, findings, axis }) {
 		const { state } = useReport();
 		const { report } = useReport2();
-		if (state.view === "run") return null;
-		const empty = report.packages_checked === 0;
+		const printed = usePrinted();
+		const hideAccepted = state.filters.accepted.includes(HIDE_ACCEPTED);
+		const rows = (members) => members.map((finding) => u$1(FindingRow2, {
+			finding,
+			run: report.run,
+			axis,
+			hideAccepted
+		}, finding.package));
 		return u$1("section", {
-			className: "ledger overview2",
-			"data-surface": "overview",
-			"aria-label": OVERVIEW_WORDS.band,
-			children: [u$1(Lead, { report }), !empty && (narrow ? u$1("details", {
-				className: "ledger-fold",
-				children: [u$1("summary", { children: u$1("span", {
-					className: "ledger-fold-summary",
-					children: [u$1("span", {
-						className: "ledger-fold-title",
-						children: OVERVIEW_WORDS.more
-					}), u$1("span", {
-						className: "ledger-fold-peek",
-						children: foldPeek2(report).join(" · ")
+			className: `fgroup ${toneClass(gradeTone(verdict))}`,
+			children: [
+				u$1("header", {
+					className: "fgroup-head",
+					children: [u$1("h2", { children: verdict }), u$1("span", {
+						className: "fgroup-count",
+						children: packagesCount(findings.length)
 					})]
-				}) }), u$1(Tier, { report })]
-			}) : u$1(Tier, { report }))]
+				}),
+				printed && u$1(PrintedScale, { run: report.run }),
+				runSegments(findings).map((segment) => {
+					const first = segment.findings[0]?.package ?? "";
+					if (segment.key === null) return u$1("ul", {
+						className: "frows",
+						"aria-label": gradeListLabel(verdict),
+						children: rows(segment.findings)
+					}, first);
+					const note = runNote(segment.key, segment.findings.length);
+					return u$1("div", {
+						className: "frun",
+						children: [u$1("p", {
+							className: "frun-note",
+							children: note
+						}), u$1("ul", {
+							className: "frows",
+							"aria-label": note,
+							children: rows(segment.findings)
+						})]
+					}, first);
+				})
+			]
+		});
+	}
+	function Notes$1({ report }) {
+		const ignored = ignoredNote(report);
+		const unchecked = uncheckedNote(report);
+		return u$1(S, { children: [ignored !== null && u$1(NoteLine, { note: ignored }), unchecked !== null && u$1(NoteLine, { note: unchecked })] });
+	}
+	function FindingsStrip() {
+		const { state, dispatch } = useReport();
+		const { report } = useReport2();
+		if (report.packages_flagged === 0) return null;
+		const pressed = state.filters.verdict;
+		return u$1("div", {
+			className: "f2-strip",
+			children: [
+				u$1("p", {
+					className: "f2-strip-figure",
+					children: stripFlagged(report)
+				}),
+				u$1("div", {
+					className: "legend f2-strip-chips",
+					role: "group",
+					"aria-label": OVERVIEW_WORDS.grades,
+					children: gradeChips(report).map(({ grade, count }) => u$1(LegendButton, {
+						tone: verdictTone(report.run.score_model, grade),
+						dim: count === 0,
+						pressed: pressed.includes(grade),
+						label: grade,
+						count,
+						onToggle: () => {
+							dispatch({
+								type: "toggle",
+								group: "verdict",
+								key: grade
+							});
+						}
+					}, grade))
+				}),
+				u$1("a", {
+					className: "ov-link f2-strip-back",
+					href: "#",
+					onClick: (event) => {
+						event.preventDefault();
+						dispatch({
+							type: "view",
+							view: "overview"
+						});
+					},
+					children: [
+						OVERVIEW_TAB_WORDS.overview,
+						" ",
+						u$1("span", {
+							"aria-hidden": "true",
+							children: "›"
+						})
+					]
+				})
+			]
+		});
+	}
+	function FindingsView2() {
+		const { state } = useReport();
+		const { report } = useReport2();
+		const rows = applyFilters2(report, state, "findings");
+		const thresholds = report.run.thresholds;
+		const axis = thresholds === null ? null : ageAxis(Object.entries(thresholds));
+		return u$1("section", {
+			className: "f2",
+			"data-surface": "findings",
+			children: [u$1(Notes$1, { report }), rows.length === 0 ? u$1(EmptyState, { reason: population2(report, "findings").length === 0 ? "clean" : "filtered" }) : u$1("div", {
+				className: "fledger f2-ledger",
+				children: [u$1(ColumnHead, {
+					run: report.run,
+					axis
+				}), byGrade(rows).map((group) => u$1(Group$1, {
+					verdict: group.verdict,
+					findings: group.findings,
+					axis
+				}, group.verdict))]
+			})]
 		});
 	}
 	//#endregion
@@ -10570,6 +11162,8 @@ button.pill {
 		libyears: "For each package, the years between the release installed and its newest stable release, summed. It counts every drift, healthy patches included, so it says how far behind the lock is and nothing about why: no flag or gate reads it.",
 		score: "How the score adds the flags up is on the Run tab:",
 		accept: "A package you consider finished can be accepted the way lockrot's built-in list accepts one: an extra.lockrot.ignore entry in composer.json, with a reason. Its accepted flags stay listed and weigh 0.",
+		listKeys: "On a tab with a list:",
+		everyKeys: "On every tab:",
 		search: "Search keys:",
 		searchKeys: [
 			"flag:",
@@ -10679,14 +11273,23 @@ button.pill {
 						u$1("p", {
 							className: "prose",
 							children: [
+								GLOSSARY2_WORDS.listKeys,
+								" ",
 								u$1("kbd", { children: "/" }),
 								" to search · ",
 								u$1("kbd", { children: "j" }),
 								" ",
 								u$1("kbd", { children: "k" }),
-								" to move · ",
+								" to move ·",
+								" ",
 								u$1("kbd", { children: "Enter" }),
-								" to open ·",
+								" to open."
+							]
+						}),
+						u$1("p", {
+							className: "prose",
+							children: [
+								GLOSSARY2_WORDS.everyKeys,
 								" ",
 								u$1("kbd", { children: "Esc" }),
 								" to close · ",
@@ -11220,6 +11823,7 @@ button.pill {
 		return IGNORE;
 	}
 	function decideSlash(input) {
+		if (input.overview) return IGNORE;
 		if (!input.sheetOpen) return {
 			type: "focusSearch",
 			closeDetail: false
@@ -11289,7 +11893,8 @@ button.pill {
 			selected: context.selected,
 			rendered: key === "j" || key === "k" ? context.rendered() : [],
 			sheetOpen: context.sheetOpen,
-			searchAvailable: context.search !== null
+			searchAvailable: context.search !== null,
+			overview: context.overview
 		};
 	}
 	function findRow(root, pkg) {
@@ -11482,7 +12087,7 @@ button.pill {
 		accepted: []
 	};
 	var INITIAL_STATE = {
-		view: "findings",
+		view: "overview",
 		q: "",
 		pkg: null,
 		sort: "verdict",
@@ -11494,6 +12099,10 @@ button.pill {
 	//#endregion
 	//#region src/ui/Tabs.tsx
 	var TABS = [
+		{
+			view: "overview",
+			label: "Overview"
+		},
 		{
 			view: "findings",
 			label: "Findings"
@@ -11517,6 +12126,7 @@ button.pill {
 	];
 	function tabCounts(report) {
 		return {
+			overview: "",
 			findings: String(population2(report, "findings").length),
 			advisories: String(report.findings.reduce((n, f) => n + advisoryRows(f).length, 0)),
 			packages: String(report.findings.length),
@@ -11766,64 +12376,532 @@ button.pill {
 		});
 	}
 	//#endregion
-	//#region src/ui/rowCursor.ts
-	function pickCursor(rendered, selected, lastOpened) {
-		if (selected !== null && rendered.includes(selected)) return selected;
-		if (lastOpened !== null && rendered.includes(lastOpened)) return lastOpened;
-		return rendered[0] ?? null;
-	}
-	function rowTabIndex(pkg, cursor, first = true) {
-		return first && pkg === cursor ? 0 : -1;
-	}
-	function innerTabIndex(pkg, cursor, first = true) {
-		return first && pkg === cursor ? void 0 : -1;
-	}
-	function firstRows(rows, pkg, key) {
-		const seen = new Set();
-		const first = new Set();
-		for (const row of rows) {
-			const name = pkg(row);
-			if (seen.has(name)) continue;
-			seen.add(name);
-			first.add(key(row));
-		}
-		return first;
-	}
-	//#endregion
-	//#region src/ui/rowOpen.ts
-	function openInteractions(pkg, dispatch) {
-		return { onClick: (event) => {
-			const target = event.target;
-			if (target.closest("a, button, [popover], [data-no-open]")) return;
-			const row = target.closest("[data-pkg]");
-			if (row !== null && row !== event.currentTarget) return;
-			dispatch({
-				type: "select",
-				pkg
-			});
-		} };
-	}
-	//#endregion
-	//#region src/ui/views/EmptyState.tsx
-	function EmptyState({ reason }) {
-		const { dispatch } = useReport();
-		if (reason === "clean") return u$1("p", {
-			className: "empty",
-			children: "Nothing was flagged."
+	//#region src/ui/ledger/CleanMark.tsx
+	function CleanMark({ size }) {
+		return u$1("svg", {
+			className: "clean-mark",
+			width: size,
+			height: size,
+			viewBox: "0 0 30 30",
+			"aria-hidden": "true",
+			children: [u$1("circle", {
+				cx: "15",
+				cy: "15",
+				r: "13.5",
+				fill: "none",
+				stroke: "currentColor",
+				"stroke-width": "2"
+			}), u$1("path", {
+				d: "M9 15.5l4 4 8-8.5",
+				fill: "none",
+				stroke: "currentColor",
+				"stroke-width": "2.4",
+				"stroke-linecap": "round",
+				"stroke-linejoin": "round"
+			})]
 		});
+	}
+	//#endregion
+	//#region src/domain/libyearsPanel.ts
+	var SEPARATOR = " · ";
+	var UNMEASURED_ORDER = [
+		"not_from_composer_repository",
+		"unavailable",
+		"not_found",
+		"branch_snapshot",
+		"shared_commit",
+		"undated",
+		"no_stable_release",
+		"undated_releases"
+	];
+	var schemaRank = (cause) => {
+		const rank = UNMEASURED_ORDER.indexOf(cause);
+		return rank === -1 ? UNMEASURED_ORDER.length : rank;
+	};
+	function measuredParts({ libyears }) {
+		if (libyears.measured === 0) return ["no package measured"];
+		const bound = libyears.at_least_count > 0 ? "at least " : "";
+		const worst = libyears.furthest_behind;
+		return [
+			`${bound}${decimal(libyears.total ?? 0, 2)} libyears over ${plural(libyears.measured, "package", "packages")}`,
+			`${decimal(libyears.direct_requirements ?? 0, 2)} from direct requirements`,
+			...worst === null ? [] : [`furthest behind: ${worst.package} ${worst.version}, ${decimal(worst.libyears, 2)}${worst.at_least ? " or more" : ""}`]
+		];
+	}
+	function libyearsPanel(report) {
+		const unmeasured = Object.entries(report.libyears.unmeasured).filter(([, count]) => count > 0).sort(([a], [b]) => schemaRank(a) - schemaRank(b)).map(([cause, count]) => `${count} not measured (${causeWord(cause, "")})`);
+		return [...measuredParts(report), ...unmeasured].join(SEPARATOR);
+	}
+	//#endregion
+	//#region src/ui/ledger/Waffle.tsx
+	var COLUMNS = {
+		narrow: 26,
+		mid: 26,
+		wide: 38,
+		xwide: 50
+	};
+	var BUDGETS = Object.keys(COLUMNS);
+	function Waffle({ runs, total }) {
+		const flagged = runs.reduce((sum, run) => sum + run.count, 0);
+		const squares = Math.max(total, flagged);
+		const tones = runs.flatMap((run) => Array.from({ length: run.count }, () => toneClass(run.tone)));
+		const rows = Object.fromEntries(BUDGETS.map((b) => [b, waffleRows(squares, COLUMNS[b])]));
+		const cells = Array.from({ length: squares }, (_, index) => {
+			const tone = tones[index];
+			return u$1("i", { className: tone === void 0 ? "waffle-cell waffle-rest" : `waffle-cell ${tone}` }, index);
+		});
+		return u$1("div", {
+			className: flagged === 0 ? "waffle is-clean" : "waffle",
+			"aria-hidden": "true",
+			style: {
+				"--rows-narrow": String(rows.narrow),
+				"--rows-mid": String(rows.mid),
+				"--rows-wide": String(rows.wide),
+				"--rows-xwide": String(rows.xwide)
+			},
+			children: cells
+		});
+	}
+	//#endregion
+	//#region src/state/hash.ts
+	var FILTER_GROUP_SET = new Set(FILTER_GROUPS);
+	var VIEW_SET = new Set(VIEWS);
+	function isFilterGroup(key) {
+		return FILTER_GROUP_SET.has(key);
+	}
+	function serializeHash(state) {
+		const parts = [];
+		if (state.q.trim() !== "") parts.push("q=" + encodeURIComponent(state.q));
+		for (const group of FILTER_GROUPS) {
+			const on = state.filters[group];
+			if (on.length > 0) parts.push(group + "=" + encodeURIComponent(on.join(",")));
+		}
+		if (state.pkg) parts.push("pkg=" + encodeURIComponent(state.pkg));
+		if (state.view !== "overview" || parts.length > 0) parts.unshift("view=" + state.view);
+		return parts.join("&");
+	}
+	function linkState(target) {
+		return {
+			...INITIAL_STATE,
+			view: target.view,
+			q: target.q ?? "",
+			pkg: target.pkg ?? null,
+			filters: {
+				...EMPTY_FILTERS,
+				...target.filters
+			}
+		};
+	}
+	var linkHref = (target) => "#" + serializeHash(linkState(target));
+	function addFilterKey(filters, group, key) {
+		const current = filters[group];
+		return current.includes(key) ? filters : {
+			...filters,
+			[group]: [...current, key]
+		};
+	}
+	function parseHash(fragment, base) {
+		const h = fragment.startsWith("#") ? fragment.slice(1) : fragment;
+		let view = null;
+		let listKey = false;
+		let q = base.q;
+		let pkg = base.pkg;
+		let filters = base.filters;
+		for (const piece of h === "" ? [] : h.split("&")) {
+			const i = piece.indexOf("=");
+			if (i < 0) continue;
+			const key = piece.slice(0, i);
+			if (key === "q" || key === "pkg" || isFilterGroup(key)) listKey = true;
+			let value;
+			try {
+				value = decodeURIComponent(piece.slice(i + 1));
+			} catch {
+				continue;
+			}
+			if (key === "view") {
+				if (VIEW_SET.has(value)) view = value;
+				continue;
+			}
+			if (key === "q") {
+				q = value;
+				continue;
+			}
+			if (key === "pkg") {
+				pkg = value;
+				continue;
+			}
+			if (isFilterGroup(key)) {
+				for (const part of value.split(",")) if (part !== "") filters = addFilterKey(filters, key, part);
+			}
+		}
+		return {
+			...base,
+			view: view ?? (listKey ? "findings" : "overview"),
+			q,
+			pkg,
+			filters
+		};
+	}
+	var HashSync = class {
+		disabled = false;
+		writeHash(state, win) {
+			if (this.disabled) return;
+			const h = serializeHash(state);
+			if (h === (win.location.hash.startsWith("#") ? win.location.hash.slice(1) : win.location.hash)) return;
+			try {
+				const url = h ? "#" + h : win.location.pathname + win.location.search;
+				win.history.replaceState(null, "", url);
+			} catch {
+				this.disabled = true;
+			}
+		}
+	};
+	//#endregion
+	//#region src/ui/report/TabLink.tsx
+	function TabLink({ target, className, label, children }) {
+		const { dispatch } = useReport();
+		return u$1("a", {
+			className,
+			href: linkHref(target),
+			"aria-label": label,
+			onClick: (event) => {
+				if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+				event.preventDefault();
+				const next = linkState(target);
+				dispatch({
+					type: "focus",
+					view: next.view,
+					filters: next.filters,
+					q: next.q,
+					...next.pkg === null ? {} : { pkg: next.pkg }
+				});
+			},
+			children
+		});
+	}
+	//#endregion
+	//#region src/ui/report/Overview.tsx
+	function useToggle(group) {
+		const { state, dispatch } = useReport();
+		return {
+			pressed: (key) => state.filters[group].includes(key),
+			toggle: (key) => () => {
+				dispatch({
+					type: "toggle",
+					group,
+					key
+				});
+			}
+		};
+	}
+	function GradeLineView({ report }) {
+		const line = gradeLine(report);
+		if (line === null) return null;
+		const clean = line.grade === null;
 		return u$1("p", {
-			className: "empty",
+			className: `ov-grade${clean ? ` ${toneClass("none")}` : ""}`,
 			children: [
-				"Nothing matches this filter.",
-				" ",
-				u$1("button", {
-					type: "button",
-					className: "icon-btn",
-					onClick: () => {
-						dispatch({ type: "clear" });
-					},
-					children: "Clear filters"
+				clean && u$1(CleanMark, { size: 26 }),
+				line.grade === null || line.link === null ? gradeLineHead(line) : u$1(S, { children: [
+					GRADE_HEAD,
+					" ",
+					u$1(TabLink, {
+						target: line.link,
+						className: `ov-grade-chip ${toneClass(verdictTone(report.run.score_model, line.grade))}`,
+						children: line.grade
+					})
+				] }),
+				line.clauses.map((clause, index) => u$1(S, { children: [u$1("span", {
+					className: "ov-grade-sep",
+					children: " · "
+				}), clause] }, index))
+			]
+		});
+	}
+	var GATE_TONES = {
+		fails: "crit",
+		not_applied: "low",
+		off: "low",
+		passes: "none"
+	};
+	function GateLine({ report, className }) {
+		const state = gateState(report);
+		return u$1("p", {
+			className: `${className} ${toneClass(GATE_TONES[state])}`,
+			children: [GATE_GLYPHS[state] !== "" && u$1("span", {
+				className: "overview2-gate-mark",
+				"aria-hidden": "true",
+				children: GATE_GLYPHS[state]
+			}), u$1("span", {
+				className: "overview2-gate-text",
+				children: report.gate.text
+			})]
+		});
+	}
+	function Lead({ report }) {
+		const chips = gradeChips(report);
+		const figure = figureLine(report);
+		const scope = leadScope(report);
+		return u$1("div", {
+			className: "ledger-lead",
+			children: [
+				u$1("div", {
+					className: "lead-answer",
+					children: [
+						figure === null ? u$1("p", {
+							className: "ov-empty",
+							children: OVERVIEW_WORDS.emptyLock
+						}) : u$1(S, { children: [u$1(GradeLineView, { report }), u$1("p", {
+							className: "ov-figure",
+							children: figure
+						})] }),
+						scope.length > 0 && u$1("p", {
+							className: "lead-scope",
+							children: scope.join(" · ")
+						}),
+						chips.length > 0 && u$1("div", {
+							className: "legend lead-chips",
+							role: "group",
+							"aria-label": OVERVIEW_WORDS.grades,
+							children: chips.map(({ grade, count }) => u$1(TabLink, {
+								target: findingsLink({ verdict: [grade] }),
+								className: `legend-btn ${toneClass(verdictTone(report.run.score_model, grade))}${count === 0 ? " legend-btn-dim" : ""}`,
+								children: [
+									u$1("i", {
+										className: "swatch",
+										"aria-hidden": "true"
+									}),
+									grade,
+									" ",
+									u$1("i", {
+										className: "count",
+										children: count
+									})
+								]
+							}, grade))
+						})
+					]
+				}),
+				report.packages_checked > 0 && u$1("figure", {
+					className: "lead-waffle",
+					children: [u$1(Waffle, {
+						runs: chips.filter(({ count }) => count > 0).map(({ grade, count }) => ({
+							tone: verdictTone(report.run.score_model, grade),
+							count
+						})),
+						total: report.packages_checked
+					}), u$1("figcaption", {
+						className: "lead-waffle-cap",
+						children: OVERVIEW_WORDS.perPackage
+					})]
+				}),
+				u$1(GateLine, {
+					report,
+					className: "overview2-gate"
 				})
+			]
+		});
+	}
+	function FlagBarLink({ bar, longest, model }) {
+		return u$1(TabLink, {
+			target: findingsLink({ flag: [bar.flag] }),
+			className: "legend-btn legend-btn-bar",
+			children: [
+				bar.flag,
+				" ",
+				u$1("span", {
+					className: "legend-track",
+					"aria-hidden": "true",
+					children: u$1("span", {
+						className: "legend-fill",
+						style: { width: `${bar.carrying / longest * 100}%` },
+						children: bar.parts.map(({ grade, count }) => u$1("span", {
+							className: `legend-seg ${toneClass(verdictTone(model, grade))}`,
+							style: { flexGrow: count }
+						}, grade))
+					})
+				}),
+				u$1("i", {
+					className: "count",
+					children: bar.carrying
+				}),
+				" ",
+				u$1("span", {
+					className: "overview2-split",
+					children: bar.split
+				}),
+				" ",
+				u$1("span", {
+					className: "overview2-points",
+					children: bar.points
+				})
+			]
+		});
+	}
+	function FlagsBlock({ report }) {
+		if (report.packages_flagged === 0) return null;
+		const bars = flagBars(report);
+		const multi = multiFlagLine(report);
+		const depth = depthSentence(report);
+		const accepted = acceptedLine(report);
+		const longest = Math.max(1, ...bars.map(({ carrying }) => carrying));
+		return u$1("div", {
+			className: "ledger-block ledger-verdicts",
+			children: [
+				u$1("p", {
+					className: "eyebrow ledger-head",
+					children: [OVERVIEW_WORDS.flags, bars.length > 0 && u$1("span", {
+						className: "ledger-head-note",
+						children: OVERVIEW_WORDS.flagsNote
+					})]
+				}),
+				bars.length > 0 && u$1("div", {
+					className: "verdict-bars overview2-flag-bars",
+					style: { "--longest": String(longest) },
+					children: bars.map((bar) => u$1(FlagBarLink, {
+						bar,
+						longest,
+						model: report.run.score_model
+					}, bar.flag))
+				}),
+				multi !== null && u$1("p", {
+					className: "ledger-note",
+					children: multi
+				}),
+				depth !== null && u$1("p", {
+					className: "ledger-note",
+					children: depth
+				}),
+				accepted !== null && u$1("p", {
+					className: "ledger-note",
+					children: accepted
+				})
+			]
+		});
+	}
+	var severityTone = (model, { band, outlined }) => `${toneClass(verdictTone(model, band))}${outlined ? " is-outlined" : ""}`;
+	function SecurityBlock({ report, answer, linked = false }) {
+		const block = securityBlock(report);
+		const severities = useToggle("sev");
+		const updateNow = updateNowArgv(report);
+		return u$1("div", {
+			className: "ledger-block ledger-advisories",
+			children: [
+				u$1("span", {
+					className: "eyebrow ledger-head",
+					children: OVERVIEW_WORDS.security
+				}),
+				answer ?? u$1(S, { children: [u$1("p", {
+					className: "ledger-fig",
+					children: [block.figure !== null && u$1(S, { children: [u$1("span", {
+						className: "ledger-fig-num",
+						children: block.figure
+					}), " "] }), u$1("span", {
+						className: block.figure === null ? "ledger-fig-text" : "ledger-fig-unit",
+						children: block.unit
+					})]
+				}), block.note !== null && u$1("p", {
+					className: "ledger-note",
+					children: block.note
+				})] }),
+				block.severities.length > 0 && u$1(S, { children: [u$1("div", {
+					className: "advisory-squares",
+					"aria-hidden": "true",
+					children: block.severities.map((severity) => Array.from({ length: severity.count }, (_, index) => u$1("i", { className: `advisory-square ${severityTone(report.run.score_model, severity)}` }, `${severity.id}-${index}`)))
+				}), u$1("div", {
+					className: "legend advisory-chips",
+					role: "group",
+					"aria-label": OVERVIEW_WORDS.bySeverity,
+					children: [u$1("span", {
+						className: "ledger-quiet-label",
+						"aria-hidden": "true",
+						children: OVERVIEW_WORDS.bySeverity
+					}), block.severities.map((severity) => {
+						if (linked) return u$1(TabLink, {
+							target: {
+								view: "advisories",
+								filters: { sev: [severity.id] }
+							},
+							className: `legend-btn ${severityTone(report.run.score_model, severity)}`,
+							children: [
+								u$1("i", {
+									className: "swatch",
+									"aria-hidden": "true"
+								}),
+								severity.id,
+								" ",
+								u$1("i", {
+									className: "count",
+									children: severity.count
+								})
+							]
+						}, severity.id);
+						const pressed = severities.pressed(severity.id);
+						return u$1("button", {
+							type: "button",
+							className: `legend-btn ${severityTone(report.run.score_model, severity)}`,
+							"aria-pressed": pressed,
+							title: filterTitle(severity.id, pressed),
+							onClick: severities.toggle(severity.id),
+							children: [
+								u$1("i", {
+									className: "swatch",
+									"aria-hidden": "true"
+								}),
+								severity.id,
+								" ",
+								u$1("i", {
+									className: "count",
+									children: severity.count
+								})
+							]
+						}, severity.id);
+					})]
+				})] }),
+				block.fixes.length > 0 && u$1("p", {
+					className: "ledger-note",
+					children: [
+						OVERVIEW_WORDS.byFix,
+						":",
+						" ",
+						block.fixes.map(({ kind, label, count }, index) => u$1(S, { children: [index > 0 && " · ", linked ? u$1(TabLink, {
+							target: findingsLink({ fix: [kind] }),
+							className: "ov-link",
+							children: [
+								label,
+								" ",
+								u$1("b", { children: count })
+							]
+						}) : u$1(S, { children: [
+							label,
+							" ",
+							u$1("b", { children: count })
+						] })] }, label))
+					]
+				}),
+				updateNow !== null && u$1("div", {
+					className: "overview2-update",
+					children: u$1(CopyMove, {
+						argvs: [updateNow],
+						label: OVERVIEW_WORDS.updateNow
+					})
+				})
+			]
+		});
+	}
+	function LibyearsBlock({ report, children }) {
+		return u$1("div", {
+			className: "ledger-block ledger-libyears",
+			children: [
+				u$1("span", {
+					className: "eyebrow ledger-head",
+					children: OVERVIEW_WORDS.libyears
+				}),
+				u$1("p", {
+					className: "ledger-note overview2-libyears",
+					children: libyearsPanel(report)
+				}),
+				children
 			]
 		});
 	}
@@ -11960,7 +13038,7 @@ button.pill {
 			]
 		});
 	}
-	function Group$1({ group, run, first }) {
+	function Group({ group, run, first }) {
 		return u$1("section", {
 			className: `advgroup is-${group.kind}`,
 			children: [u$1("header", {
@@ -11998,9 +13076,31 @@ button.pill {
 			})
 		});
 	}
+	function Answer({ report, answer, counted }) {
+		const hedge = advisoryLookupHedge(report);
+		return u$1(S, { children: [
+			u$1("p", {
+				className: "al-answer",
+				children: counted ? answer.head : answer.text
+			}),
+			hedge !== null && u$1("p", {
+				className: "al-partial",
+				children: [
+					u$1(CheckIncompleteTag, {}),
+					" ",
+					u$1("span", { children: hedge })
+				]
+			}),
+			answer.narrowed !== null && u$1("p", {
+				className: "al-scope",
+				children: answer.narrowed
+			})
+		] });
+	}
 	function AdvisoriesView2() {
 		const { state } = useReport();
 		const { report } = useReport2();
+		const printed = usePrinted();
 		const { run } = report;
 		if (population2(report, "advisories").length === 0) return u$1("section", {
 			className: "advisories2",
@@ -12012,32 +13112,29 @@ button.pill {
 		const unfiltered = advisoryPairs2(population2(report, "advisories"), EMPTY_FILTERS).length;
 		const groups = advisoryGroups2(run, pairs);
 		const answer = advisoryAnswer2(run, pairs, unfiltered);
-		const hedge = advisoryLookupHedge(report);
 		const first = firstRows(groups.flatMap((group) => group.pairs), (pair) => pair.finding.package, pairKey);
+		const listed = groups.length > 0;
 		return u$1("section", {
 			className: "advisories2",
 			"data-surface": "advisories",
 			"aria-label": "Advisories",
-			children: groups.length === 0 ? u$1(EmptyState, { reason: "filtered" }) : u$1(S, { children: [u$1("div", {
+			children: [!printed && u$1("div", {
+				className: "al-lead",
+				children: u$1(SecurityBlock, {
+					report,
+					answer: listed ? u$1(Answer, {
+						report,
+						answer,
+						counted: answer.narrowed === null
+					}) : void 0
+				})
+			}), !listed ? u$1(EmptyState, { reason: "filtered" }) : u$1(S, { children: [printed && u$1("div", {
 				className: "al-top",
-				children: [
-					u$1("p", {
-						className: "al-answer",
-						children: answer.text
-					}),
-					hedge !== null && u$1("p", {
-						className: "al-partial",
-						children: [
-							u$1(CheckIncompleteTag, {}),
-							" ",
-							u$1("span", { children: hedge })
-						]
-					}),
-					answer.narrowed !== null && u$1("p", {
-						className: "al-scope",
-						children: answer.narrowed
-					})
-				]
+				children: u$1(Answer, {
+					report,
+					answer,
+					counted: false
+				})
 			}), u$1("div", {
 				className: "aledger no-axis",
 				children: [u$1("div", {
@@ -12065,402 +13162,287 @@ button.pill {
 							children: ADVISORY_HEAD.fix
 						})
 					]
-				}), groups.map((group) => u$1(Group$1, {
+				}), groups.map((group) => u$1(Group, {
 					group,
 					run,
 					first
 				}, `${group.kind}:${group.toBranch ?? ""}`))]
-			})] })
+			})] })]
 		});
 	}
 	//#endregion
-	//#region src/domain/age.ts
-	function thresholdYears(thresholds, name) {
-		for (const [n, years] of thresholds) if (n === name) return years;
-		return null;
-	}
-	var AXIS_FLOOR_YEARS = 10;
-	function ageAxis(thresholds) {
-		const legend = pair(thresholds, "release") ?? pair(thresholds, "push");
-		if (legend === null) return null;
-		return {
-			...legend,
-			max: Math.max(AXIS_FLOOR_YEARS, 2 * legend.high)
-		};
-	}
-	function pair(thresholds, kind) {
-		const warn = thresholdYears(thresholds, `${kind}-warn-years`);
-		const high = thresholdYears(thresholds, `${kind}-high-years`);
-		return warn !== null && high !== null ? {
-			warn,
-			high
-		} : null;
-	}
-	//#endregion
-	//#region src/ui/views/AgeScale.tsx
-	function pct$2(value, max) {
-		return `${Math.min(100, Math.max(0, value / max * 100))}%`;
-	}
-	function AgeAxis({ axis, caption = "Years since release", whose = "" }) {
-		const label = `age axis${whose ? ` (${whose})` : ""}: years since the last release, 0 to ${axis.max} and more; warn at ${axis.warn} years, high at ${axis.high} years`;
+	//#region src/ui/report/OverviewView.tsx
+	function WeighsBar({ row }) {
 		return u$1("span", {
-			className: "fhead-age",
-			role: "img",
-			"aria-label": label,
-			title: label,
-			children: u$1("span", {
-				className: "fhead-axis",
-				"aria-hidden": "true",
-				children: [
-					u$1("span", {
-						className: "fhead-axis-label",
-						children: caption
-					}),
-					u$1("span", {
-						className: "fhead-tick is-start",
-						children: "0"
-					}),
-					u$1("span", {
-						className: "fhead-tick is-warn tone-med",
-						style: { left: pct$2(axis.warn, axis.max) },
-						children: [axis.warn, "y"]
-					}),
-					u$1("span", {
-						className: "fhead-tick is-high tone-crit",
-						style: { left: pct$2(axis.high, axis.max) },
-						children: [axis.high, "y"]
-					}),
-					u$1("span", {
-						className: "fhead-tick is-end",
-						children: [axis.max, "y+"]
-					})
-				]
-			})
+			className: row.over ? "wm-bar is-over" : "wm-bar",
+			"aria-hidden": "true",
+			children: row.segments.map((segment, i) => u$1("span", {
+				className: segment.cut ? "wm-seg is-cut" : "wm-seg",
+				"data-flag": segment.flag,
+				style: { width: `max(var(--wm-seg-min), ${String(segment.width * 100)}%)` }
+			}, `${String(i)}-${segment.flag}`))
 		});
 	}
-	//#endregion
-	//#region src/ui/report/FindingRow.tsx
-	function pct$1(value, max) {
-		return `${Math.min(100, Math.max(0, value / max * 100))}%`;
-	}
-	function AgeCell2({ finding, run, axis }) {
-		const reading = axis === null ? null : ageReading(finding, run);
-		if (axis === null || reading === null) return u$1("span", { className: "fcell fc-age f2-age is-empty" });
-		const label = ageScaleLabel(reading);
-		const tone = toneClass(levelTone(reading.level));
-		return u$1("span", {
-			className: "fcell fc-age f2-age",
-			role: "img",
-			"aria-label": label,
-			title: label,
-			children: [u$1("span", {
-				className: "age-track",
-				"aria-hidden": "true",
-				children: [
-					u$1("span", {
-						className: "age-guide is-warn",
-						style: { left: pct$1(reading.warn, axis.max) }
-					}),
-					u$1("span", {
-						className: "age-guide is-high",
-						style: { left: pct$1(reading.high, axis.max) }
-					}),
-					u$1("span", {
-						className: reading.years > axis.max ? `age-bar ${tone} is-over` : `age-bar ${tone}`,
-						style: { width: pct$1(reading.years, axis.max) }
-					})
-				]
-			}), u$1("span", {
-				className: `age-num is-toned ${tone}`,
-				"aria-hidden": "true",
-				children: decimal(reading.years, 1)
-			})]
-		});
-	}
-	function NextStep({ finding, run }) {
-		const { cursor } = useReport();
-		const words = nextStepWords(finding, run);
-		const href = words.href === null ? null : safeHref(words.href);
-		const title = words.title ?? void 0;
-		return u$1("span", {
-			className: "fcell f2-next",
-			children: [href === null ? u$1("span", {
-				title,
-				children: words.text
-			}) : u$1("a", {
-				className: "lnk",
-				href,
-				title,
-				target: "_blank",
-				rel: "noopener noreferrer",
-				tabIndex: innerTabIndex(finding.package, cursor),
-				children: words.text
-			}), words.held && u$1("span", {
-				className: "f2-held",
-				children: [" ", "· held"]
-			})]
-		});
-	}
-	function PackageName$1({ finding }) {
-		const slash = finding.package.indexOf("/");
-		return u$1("span", {
-			className: "fcell fc-pkg f2-pkg",
-			children: [
-				slash > 0 && u$1(S, { children: [u$1("span", {
-					className: "fc-vendor",
-					children: finding.package.slice(0, slash + 1)
-				}), u$1("wbr", {})] }),
-				u$1("span", {
-					className: "fc-name fc-unit",
-					children: finding.package.slice(slash + 1)
-				}),
-				" ",
-				u$1("span", {
-					className: "fc-ver",
-					children: finding.version
-				})
-			]
-		});
-	}
-	function FindingRow2({ finding, run, axis, hideAccepted }) {
-		const { state, dispatch, cursor } = useReport();
-		const spoken = `${g()}-spoken`;
-		const accepted = maintenanceAccepted(finding);
+	function WeighsItem({ row, model }) {
 		return u$1("li", {
-			className: `frow f2-row ${toneClass(gradeTone(finding.verdict))}`,
-			"data-pkg": finding.package,
-			"aria-label": finding.package,
-			"aria-describedby": spoken,
-			"aria-current": state.pkg === finding.package ? "true" : void 0,
-			tabIndex: rowTabIndex(finding.package, cursor),
-			...openInteractions(finding.package, dispatch),
+			className: "wm-row",
 			children: [
 				u$1("span", {
-					className: "fcell f2-score",
+					className: "wm-label",
 					children: [
+						u$1(TabLink, {
+							target: row.link,
+							className: "ov-link wm-pkg",
+							children: row.package
+						}),
+						" ",
 						u$1("span", {
-							className: "f2-num",
-							"aria-hidden": "true",
-							children: finding.score.total
+							className: `ov-ly-grade ${toneClass(verdictTone(model, row.grade))}`,
+							children: row.grade
 						}),
-						u$1(ScoreBar, {
-							score: finding.score,
-							run
-						}),
+						" ",
 						u$1("span", {
 							className: "vh",
-							id: spoken,
-							children: rowSpoken(finding)
+							children: [
+								row.total,
+								" ",
+								row.unit
+							]
+						}),
+						row.reach.length > 0 && u$1("span", {
+							className: "wm-reach",
+							children: [" ", row.reach.join(" · ")]
 						})
 					]
 				}),
-				u$1(PackageName$1, { finding }),
 				u$1("span", {
-					className: "fcell f2-flags",
-					children: [u$1(FlagPills, {
-						finding,
-						run,
-						hideAccepted
-					}), accepted !== null && u$1("span", {
-						className: "f2-accepted",
-						children: accepted
-					})]
+					className: "wm-total",
+					"aria-hidden": "true",
+					children: row.total
 				}),
-				u$1(AgeCell2, {
-					finding,
-					run,
-					axis
-				}),
+				u$1(WeighsBar, { row }),
 				u$1("span", {
-					className: "fcell f2-reach",
-					children: reachWord(finding)
-				}),
-				u$1(NextStep, {
-					finding,
-					run
+					className: "wm-text",
+					children: row.text
 				})
 			]
 		});
 	}
-	//#endregion
-	//#region src/ui/report/FindingsView.tsx
-	function byGrade(findings) {
-		const groups = [];
-		for (const finding of findings) {
-			const current = groups.at(-1);
-			if (current?.verdict === finding.verdict) current.findings.push(finding);
-			else groups.push({
-				verdict: finding.verdict,
-				findings: [finding]
-			});
-		}
-		return groups;
-	}
-	function NoteLine({ note }) {
-		const { dispatch } = useReport();
-		const { shown, more } = cappedPackages(note.packages);
-		return u$1("p", {
-			className: "note f2-note",
-			children: [
-				note.text,
-				":",
-				" ",
-				shown.map((pkg, i) => u$1("span", { children: [i > 0 && ", ", u$1("button", {
-					type: "button",
-					className: "pkg-link-btn",
-					onClick: () => {
-						dispatch({
-							type: "select",
-							pkg
-						});
-					},
-					children: pkg
-				})] }, pkg)),
-				more !== null && ` ${more}`,
-				"."
-			]
-		});
-	}
-	function ColumnHead({ run, axis }) {
+	function WeighsMostBlock({ report }) {
+		const chart = weighsMost(report);
+		const load = loadLine(report);
+		if (chart === null || load === null) return null;
 		return u$1("div", {
-			className: "fhead f2-head",
+			className: "ledger-block wm",
 			children: [
-				u$1("span", {
-					className: "fhead-col f2-head-score",
-					"aria-hidden": "true",
-					children: [u$1("span", {
-						className: "f2-head-label",
-						children: FINDINGS_HEAD.score
-					}), u$1("span", {
-						className: "f2-head-axis",
-						children: [u$1("span", {
-							className: "f2-head-tick",
-							children: "0"
-						}), bandTicks(run).map((tick) => u$1("span", {
-							className: "f2-head-tick",
-							style: { left: `${tick.at * 100}%` },
-							children: tick.floor
-						}, tick.floor))]
-					})]
+				u$1("p", {
+					className: "eyebrow ledger-head",
+					children: [
+						WEIGHS_WORDS.head,
+						" ",
+						chart.rows.length > 0 && u$1("span", {
+							className: "ledger-head-note",
+							children: WEIGHS_WORDS.note
+						})
+					]
 				}),
-				u$1("span", {
-					className: "fhead-col f2-head-pkg",
-					"aria-hidden": "true",
-					children: FINDINGS_HEAD.pkg
+				u$1("p", {
+					className: "wm-load",
+					children: load
 				}),
-				u$1("span", {
-					className: "fhead-col f2-head-flags",
-					"aria-hidden": "true",
-					children: FINDINGS_HEAD.flags
+				chart.legend.length > 0 && u$1("ul", {
+					className: "wm-legend",
+					"aria-label": WEIGHS_WORDS.legend,
+					children: chart.legend.map((flag) => u$1("li", {
+						className: "wm-key",
+						children: [u$1("i", {
+							className: "wm-swatch",
+							"data-flag": flag,
+							"aria-hidden": "true"
+						}), flag]
+					}, flag))
 				}),
-				axis ? u$1(AgeAxis, {
-					axis,
-					caption: FINDINGS_HEAD.age
-				}) : u$1("span", { className: "fhead-age" }),
-				u$1("span", {
-					className: "fhead-col f2-head-reach",
-					"aria-hidden": "true",
-					children: FINDINGS_HEAD.reach
+				chart.rows.length > 0 && u$1("ol", {
+					className: "wm-list",
+					children: chart.rows.map((row) => u$1(WeighsItem, {
+						row,
+						model: report.run.score_model
+					}, row.package))
 				}),
-				u$1("span", {
-					className: "fhead-col f2-head-next",
-					"aria-hidden": "true",
-					children: FINDINGS_HEAD.next
+				chart.rest !== null && u$1("p", {
+					className: "ledger-note",
+					children: u$1(TabLink, {
+						target: chart.restLink,
+						className: "ov-link",
+						children: [
+							chart.rest,
+							" ",
+							u$1("span", {
+								"aria-hidden": "true",
+								children: "›"
+							})
+						]
+					})
 				})
 			]
 		});
 	}
-	function PrintedScale({ run }) {
+	function ExposureBlock({ report }) {
+		const bars = exposureBars(report);
+		if (bars.rows.length === 0 && bars.shared === null) return null;
 		return u$1("div", {
-			className: "f2-print-scale",
-			"aria-hidden": "true",
+			className: "ledger-block ov-exposure",
 			children: [
-				u$1("span", { className: "f2-print-gap" }),
-				u$1("span", {
-					className: "f2-print-axis",
-					children: [u$1("span", {
-						className: "f2-head-tick",
-						children: "0"
-					}), bandTicks(run).map((tick) => u$1("span", {
-						className: "f2-head-tick",
-						style: { left: `${tick.at * 100}%` },
-						children: tick.floor
-					}, tick.floor))]
+				u$1("p", {
+					className: "eyebrow ledger-head",
+					children: [
+						OVERVIEW_TAB_WORDS.exposure,
+						" ",
+						u$1("span", {
+							className: "ledger-head-note",
+							children: OVERVIEW_TAB_WORDS.exposureNote
+						})
+					]
 				}),
-				u$1("span", { children: FINDINGS_HEAD.score })
-			]
-		});
-	}
-	function Group({ verdict, findings, axis }) {
-		const { state } = useReport();
-		const { report } = useReport2();
-		const printed = usePrinted();
-		const hideAccepted = state.filters.accepted.includes(HIDE_ACCEPTED);
-		const rows = (members) => members.map((finding) => u$1(FindingRow2, {
-			finding,
-			run: report.run,
-			axis,
-			hideAccepted
-		}, finding.package));
-		return u$1("section", {
-			className: `fgroup ${toneClass(gradeTone(verdict))}`,
-			children: [
-				u$1("header", {
-					className: "fgroup-head",
-					children: [u$1("h2", { children: verdict }), u$1("span", {
-						className: "fgroup-count",
-						children: packagesCount(findings.length)
-					})]
+				bars.rows.length > 0 && u$1("ul", {
+					className: "ov-ex",
+					children: bars.rows.map((row) => u$1("li", { children: u$1(TabLink, {
+						target: bars.link,
+						className: "ov-ex-row",
+						children: [
+							u$1("span", {
+								className: "ov-ex-name",
+								children: row.package
+							}),
+							u$1("span", {
+								className: "ov-ex-track",
+								"aria-hidden": "true",
+								children: u$1("span", {
+									className: "ov-ex-fill",
+									style: { width: `${row.flagged / bars.longest * 100}%` }
+								})
+							}),
+							u$1("span", {
+								className: "ov-ex-count",
+								children: [row.flagged, u$1("span", {
+									className: "vh",
+									children: [" ", exposureUnit(row.flagged)]
+								})]
+							})
+						]
+					}) }, row.package))
 				}),
-				printed && u$1(PrintedScale, { run: report.run }),
-				runSegments(findings).map((segment) => {
-					const first = segment.findings[0]?.package ?? "";
-					if (segment.key === null) return u$1("ul", {
-						className: "frows",
-						"aria-label": gradeListLabel(verdict),
-						children: rows(segment.findings)
-					}, first);
-					const note = runNote(segment.key, segment.findings.length);
-					return u$1("div", {
-						className: "frun",
-						children: [u$1("p", {
-							className: "frun-note",
-							children: note
-						}), u$1("ul", {
-							className: "frows",
-							"aria-label": note,
-							children: rows(segment.findings)
-						})]
-					}, first);
+				bars.more !== null && u$1("p", {
+					className: "ledger-note",
+					children: u$1(TabLink, {
+						target: bars.link,
+						className: "ov-link",
+						children: [
+							bars.more,
+							" ",
+							u$1("span", {
+								"aria-hidden": "true",
+								children: "›"
+							})
+						]
+					})
+				}),
+				bars.shared !== null && u$1("p", {
+					className: "ledger-note",
+					children: bars.shared
 				})
 			]
 		});
 	}
-	function Notes$1({ report }) {
-		const ignored = ignoredNote(report);
-		const unchecked = uncheckedNote(report);
-		return u$1(S, { children: [ignored !== null && u$1(NoteLine, { note: ignored }), unchecked !== null && u$1(NoteLine, { note: unchecked })] });
+	function LibyearsTable({ report }) {
+		const rows = libyearsTop(report);
+		if (rows.length === 0) return null;
+		const model = report.run.score_model;
+		return u$1("table", {
+			className: "ov-ly",
+			children: [
+				u$1("caption", {
+					className: "eyebrow",
+					children: OVERVIEW_TAB_WORDS.libyearsTop
+				}),
+				u$1("thead", { children: u$1("tr", { children: [
+					u$1("th", {
+						scope: "col",
+						children: OVERVIEW_TAB_WORDS.package
+					}),
+					u$1("th", {
+						scope: "col",
+						className: "num",
+						children: OVERVIEW_TAB_WORDS.libyears
+					}),
+					u$1("th", {
+						scope: "col",
+						children: OVERVIEW_TAB_WORDS.grade
+					})
+				] }) }),
+				u$1("tbody", { children: rows.map((row) => u$1("tr", { children: [
+					u$1("td", { children: [
+						u$1(TabLink, {
+							target: row.link,
+							className: "ov-link",
+							children: row.package
+						}),
+						" ",
+						u$1("span", {
+							className: "ov-ly-version",
+							children: row.version
+						})
+					] }),
+					u$1("td", {
+						className: "num",
+						children: row.libyears
+					}),
+					u$1("td", { children: u$1("span", {
+						className: `ov-ly-grade ${toneClass(verdictTone(model, row.grade))}`,
+						children: row.grade
+					}) })
+				] }, row.package)) })
+			]
+		});
 	}
-	function FindingsView2() {
-		const { state } = useReport();
+	function OverviewView2() {
 		const { report } = useReport2();
-		const rows = applyFilters2(report, state, "findings");
-		const thresholds = report.run.thresholds;
-		const axis = thresholds === null ? null : ageAxis(Object.entries(thresholds));
+		const empty = report.packages_checked === 0;
 		return u$1("section", {
-			className: "f2",
-			"data-surface": "findings",
-			children: [u$1(Notes$1, { report }), rows.length === 0 ? u$1(EmptyState, { reason: population2(report, "findings").length === 0 ? "clean" : "filtered" }) : u$1("div", {
-				className: "fledger f2-ledger",
-				children: [u$1(ColumnHead, {
-					run: report.run,
-					axis
-				}), byGrade(rows).map((group) => u$1(Group, {
-					verdict: group.verdict,
-					findings: group.findings,
-					axis
-				}, group.verdict))]
-			})]
+			className: "ledger ov",
+			"data-surface": "overview",
+			"aria-label": OVERVIEW_WORDS.band,
+			children: [u$1("div", {
+				className: "ov-lead",
+				children: u$1(Lead, { report })
+			}), !empty && u$1(S, { children: [
+				u$1("div", {
+					className: "ov-flags",
+					children: u$1(FlagsBlock, { report })
+				}),
+				u$1("div", {
+					className: "ov-security",
+					children: u$1(SecurityBlock, {
+						report,
+						linked: true
+					})
+				}),
+				u$1("div", {
+					className: "ov-weighs",
+					children: u$1(WeighsMostBlock, { report })
+				}),
+				u$1("div", {
+					className: "ov-expo",
+					children: u$1(ExposureBlock, { report })
+				}),
+				u$1("div", {
+					className: "ov-libyears",
+					children: u$1(LibyearsBlock, {
+						report,
+						children: u$1(LibyearsTable, { report })
+					})
+				})
+			] })]
 		});
 	}
 	//#endregion
@@ -12904,6 +13886,7 @@ button.pill {
 		const { state } = useReport();
 		const { report } = useReport2();
 		const narrow = useNarrow();
+		const depth = usePrinted() ? null : depthSentence(report);
 		const layout = radiusLayout2(report, applyFilters2(report, state, "radius"), population2(report, "radius"));
 		const input = {
 			disclosure: state.disclosure,
@@ -12924,6 +13907,10 @@ button.pill {
 			"data-surface": "radius",
 			"aria-label": "Blast radius",
 			children: [
+				depth !== null && u$1("p", {
+					className: "r2-depth",
+					children: depth
+				}),
 				u$1("p", {
 					className: "r2-answer",
 					children: radiusAnswer2(layout)
@@ -13547,7 +14534,7 @@ button.pill {
 	}
 	function SectionBody({ section }) {
 		switch (section) {
-			case "summary": return u$1(Overview2, { narrow: false });
+			case "summary": return u$1(OverviewView2, {});
 			case "findings": return u$1(FindingsView2, {});
 			case "advisories": return u$1(AdvisoriesView2, {});
 			case "radius": return u$1(RadiusView2, {});
@@ -13559,7 +14546,7 @@ button.pill {
 		}
 	}
 	var SECTION_VIEW = {
-		summary: "findings",
+		summary: "overview",
 		findings: "findings",
 		advisories: "advisories",
 		radius: "radius",
@@ -13894,86 +14881,6 @@ button.pill {
 		] });
 	}
 	//#endregion
-	//#region src/state/hash.ts
-	var FILTER_GROUP_SET = new Set(FILTER_GROUPS);
-	var VIEW_SET = new Set(VIEWS);
-	function isFilterGroup(key) {
-		return FILTER_GROUP_SET.has(key);
-	}
-	function serializeHash(state) {
-		const parts = [];
-		if (state.view !== "findings") parts.push("view=" + state.view);
-		if (state.q.trim() !== "") parts.push("q=" + encodeURIComponent(state.q));
-		for (const group of FILTER_GROUPS) {
-			const on = state.filters[group];
-			if (on.length > 0) parts.push(group + "=" + encodeURIComponent(on.join(",")));
-		}
-		if (state.pkg) parts.push("pkg=" + encodeURIComponent(state.pkg));
-		return parts.join("&");
-	}
-	function addFilterKey(filters, group, key) {
-		const current = filters[group];
-		return current.includes(key) ? filters : {
-			...filters,
-			[group]: [...current, key]
-		};
-	}
-	function parseHash(fragment, base) {
-		const h = fragment.startsWith("#") ? fragment.slice(1) : fragment;
-		if (h === "") return base;
-		let view = base.view;
-		let q = base.q;
-		let pkg = base.pkg;
-		let filters = base.filters;
-		for (const piece of h.split("&")) {
-			const i = piece.indexOf("=");
-			if (i < 0) continue;
-			const key = piece.slice(0, i);
-			let value;
-			try {
-				value = decodeURIComponent(piece.slice(i + 1));
-			} catch {
-				continue;
-			}
-			if (key === "view") {
-				if (VIEW_SET.has(value)) view = value;
-				continue;
-			}
-			if (key === "q") {
-				q = value;
-				continue;
-			}
-			if (key === "pkg") {
-				pkg = value;
-				continue;
-			}
-			if (isFilterGroup(key)) {
-				for (const part of value.split(",")) if (part !== "") filters = addFilterKey(filters, key, part);
-			}
-		}
-		return {
-			...base,
-			view,
-			q,
-			pkg,
-			filters
-		};
-	}
-	var HashSync = class {
-		disabled = false;
-		writeHash(state, win) {
-			if (this.disabled) return;
-			const h = serializeHash(state);
-			if (h === (win.location.hash.startsWith("#") ? win.location.hash.slice(1) : win.location.hash)) return;
-			try {
-				const url = h ? "#" + h : win.location.pathname + win.location.search;
-				win.history.replaceState(null, "", url);
-			} catch {
-				this.disabled = true;
-			}
-		}
-	};
-	//#endregion
 	//#region src/state/reducer.ts
 	var FIRST_DESCENDING = ["libyears", "score"];
 	function toggleFilterKey(filters, group, key) {
@@ -14011,8 +14918,8 @@ button.pill {
 			case "focus": return {
 				...state,
 				view: action.view ?? "findings",
-				q: action.keepQuery === true ? state.q : "",
-				pkg: null,
+				q: action.q ?? (action.keepQuery === true ? state.q : ""),
+				pkg: action.pkg ?? null,
 				filters: action.filters
 			};
 			case "sort": {
@@ -14059,11 +14966,11 @@ button.pill {
 		const sync = A(null);
 		const latest = A(state);
 		latest.current = state;
-		h(() => {
+		_(() => {
 			sync.current ??= new HashSync();
 			sync.current.writeHash(state, window);
 		}, [state]);
-		h(() => {
+		_(() => {
 			const onHashChange = () => {
 				dispatch({
 					type: "restore",
@@ -14082,6 +14989,7 @@ button.pill {
 	function CurrentView() {
 		const { state } = useReport();
 		switch (state.view) {
+			case "overview": return u$1(OverviewView2, {});
 			case "findings": return u$1(FindingsView2, {});
 			case "advisories": return u$1(AdvisoriesView2, {});
 			case "packages": return u$1(PackagesView2, {});
@@ -14198,7 +15106,7 @@ button.pill {
 	function useShortcuts(deps) {
 		const latest = A(deps);
 		latest.current = deps;
-		h(() => {
+		_(() => {
 			const onKeyDown = (event) => {
 				const current = latest.current;
 				const { model, state } = current;
@@ -14207,7 +15115,8 @@ button.pill {
 					dialogOpen: current.glossaryOpen,
 					selected: state.pkg,
 					rendered: () => renderedPackages2(model.report, state, state.view, current.narrow),
-					sheetOpen: current.sheet
+					sheetOpen: current.sheet,
+					overview: state.view === "overview"
 				}));
 				if (prevents(decision)) event.preventDefault();
 				applyKey(decision, current);
@@ -14218,13 +15127,6 @@ button.pill {
 			};
 		}, []);
 	}
-	function LedgerSlot({ narrow, inert }) {
-		return u$1("div", {
-			className: "ledger-band",
-			inert,
-			children: u$1(Overview2, { narrow })
-		});
-	}
 	function RailSlot({ narrow, inert }) {
 		const { state } = useReport();
 		if (!narrow) return u$1("div", {
@@ -14232,8 +15134,8 @@ button.pill {
 			inert,
 			children: u$1(Rail, {})
 		});
-		const { scope, signal, fix, since, gate, flag, accepted } = state.filters;
-		const on = scope.length + signal.length + fix.length + since.length + gate.length + flag.length + accepted.length;
+		const { verdict, scope, signal, sev, fix, since, gate, flag, accepted } = state.filters;
+		const on = verdict.length + scope.length + signal.length + sev.length + fix.length + since.length + gate.length + flag.length + accepted.length;
 		return u$1("details", {
 			className: "rail-fold",
 			inert,
@@ -14252,15 +15154,18 @@ button.pill {
 		const narrow = useNarrow();
 		const [state, rawDispatch] = useHashState(q((next) => {
 			const filters = fitFilters2(model.report, next.filters);
-			return filters === next.filters ? next : {
+			const pkg = next.view === "overview" ? null : next.pkg;
+			return filters === next.filters && pkg === next.pkg ? next : {
 				...next,
-				filters
+				filters,
+				pkg
 			};
 		}, [model]));
 		const [anchoredDispatch, keepRowInPlace] = useRowAnchor(rawDispatch, state.pkg);
 		const openedByReader = A(false);
 		const dispatch = q((action) => {
 			if (action.type === "select" && action.pkg !== null) openedByReader.current = true;
+			if (action.type === "focus" && action.pkg !== void 0) openedByReader.current = true;
 			anchoredDispatch(action);
 		}, [anchoredDispatch]);
 		const theme = useTheme();
@@ -14309,6 +15214,11 @@ button.pill {
 			listFocused.current = false;
 			const panel = document.getElementById(`${idBase}-panel`);
 			if (typeof panel?.scrollIntoView === "function") panel.scrollIntoView({ block: "start" });
+			const active = document.activeElement;
+			if (active !== null && active !== document.body && document.contains(active)) return;
+			const row = state.pkg === null ? null : findRow(document, state.pkg);
+			if (row !== null && !sheet) focusRow(row);
+			else panel?.focus({ preventScroll: true });
 		}, [state]);
 		h(() => {
 			if (!tabChangedByReader.current) return;
@@ -14407,9 +15317,10 @@ button.pill {
 					className: "print-doc",
 					ref: printHost
 				}),
-				u$1("main", { children: [state.view !== "run" && u$1(LedgerSlot, {
-					narrow,
-					inert: sheet
+				u$1("main", { children: [state.view === "findings" && u$1("div", {
+					className: "ledger-band",
+					inert: sheet,
+					children: u$1(FindingsStrip, {})
 				}), u$1("div", {
 					className: shellClass,
 					children: [
@@ -14422,8 +15333,9 @@ button.pill {
 							id: panelId,
 							role: "tabpanel",
 							"aria-labelledby": tabId(idBase, state.view),
+							tabIndex: -1,
 							inert: sheet,
-							children: [u$1(SearchBar, { inputRef: search }), u$1(CurrentView, {})]
+							children: [state.view !== "overview" && u$1(SearchBar, { inputRef: search }), u$1(CurrentView, {})]
 						}),
 						state.pkg !== null && u$1("div", {
 							ref: detailScrollRef,
@@ -14538,7 +15450,7 @@ button.pill {
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.1";
+	var version = "0.14.0-rc.2";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");

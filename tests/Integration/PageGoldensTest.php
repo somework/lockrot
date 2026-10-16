@@ -10,7 +10,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The page's title and description equal the model's page goldens (tests/fixtures/contract/page-goldens.json).
+ * The page's title and description equal the model's page goldens (tests/fixtures/contract/page-goldens.json),
+ * and every golden holds the Overview lines that lockrot-report renders.
  * Where the contract bundle holds lockrot's own report-2 of a golden's document, the title reads its
  * root fields, which must equal the model's. Else lockrot cannot rebuild the document (a corpus run
  * of 0.13, a case with no inputs), and the title reads the model's root fields.
@@ -20,6 +21,9 @@ final class PageGoldensTest extends TestCase
     private const CONTRACT = __DIR__.'/../fixtures/contract/';
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/';
     private const GRADES = ['critical', 'high', 'medium', 'low'];
+
+    /** The Overview lines of SPEC §7.9.4 that lockrot-report computes from report-2 fields. An empty lock shows none of them. */
+    private const OVERVIEW_LINES = ['grade_line', 'figure_line', 'load_line'];
 
     /** The goldens whose PHP inputs differ from the model's, with the reason. */
     private const PINNED = [
@@ -33,6 +37,16 @@ final class PageGoldensTest extends TestCase
         $goldens = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']);
         self::assertNotSame([], $goldens);
         foreach (array_diff(array_keys($goldens), array_keys(self::PINNED)) as $id) {
+            yield (string) $id => [(string) $id];
+        }
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function provideEveryGolden(): iterable
+    {
+        $goldens = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens']);
+        self::assertNotSame([], $goldens);
+        foreach (array_keys($goldens) as $id) {
             yield (string) $id => [(string) $id];
         }
     }
@@ -75,6 +89,25 @@ final class PageGoldensTest extends TestCase
 
         self::assertSame(JsonPath::stringAt($golden, ['title']), $heading->title());
         self::assertSame(JsonPath::stringAt($golden, ['description']), $heading->description());
+    }
+
+    /**
+     * @dataProvider provideEveryGolden
+     */
+    #[DataProvider('provideEveryGolden')]
+    public function testEveryGoldenHoldsTheOverviewLines(string $id): void
+    {
+        $golden = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens', $id]);
+        $empty = JsonPath::intAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['packages_checked']) === 0;
+
+        foreach (self::OVERVIEW_LINES as $line) {
+            self::assertArrayHasKey($line, $golden, $id.': re-record page-goldens.json from the model');
+            if ($empty) {
+                self::assertNull($golden[$line], $id.': '.$line);
+            } else {
+                self::assertNotSame('', JsonPath::stringAt($golden, [$line]), $id.': '.$line);
+            }
+        }
     }
 
     /**

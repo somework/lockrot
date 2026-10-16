@@ -42,7 +42,8 @@ documents of the cases that the hydrator cannot rebuild (`contract/provenance.js
 
 `contract/page-goldens.json` is the model's page goldens of six documents, copied from the model and
 not recorded (`contract/provenance.json` `page_goldens`). `PageGoldensTest` holds the page title and
-description to it. The other keys are for lockrot-report.
+description to it and requires `grade_line`, `figure_line` and `load_line`. The other keys are for
+lockrot-report.
 
 ## Other fixtures
 
