@@ -14,11 +14,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * lockrot-report renders the answer, the Why lines, Checks, Release branches, the age line and
- * Security of each case from the case's finding, run and branch rows (SPEC-0.14.md §7.9.8, §7.9.13). The model's
- * goldens (`cases[].golden`) render those fields of the model's case. Where lockrot's recording of
+ * lockrot-report renders the blocks of the detail sheet, the Why lines and Checks of each case from
+ * the case's finding, run and branch rows (SPEC-0.14.md §7.9.8, §7.9.13). The model's goldens
+ * (`cases[].golden`, §7.9.14) render those fields of the model's case. Where lockrot's recording of
  * the hydrated case has the same fields, the page writes the model's golden. Each field list holds
- * the paths that the model's renderer of that line reads.
+ * the paths that the model's renderer of that golden reads.
  *
  * @coversNothing
  *
@@ -30,37 +30,94 @@ final class HydratedCasesMatchTheModelTest extends TestCase
 {
     private const CONTRACT = __DIR__.'/../fixtures/contract/';
 
-    /** The fields that each line reads: dotted keys of the finding, `run.` and `details.`; `{a,b}` reads each. */
+    /**
+     * The fields that each block golden reads (SPEC-0.14.md §7.9.14): dotted keys of the finding, `run.` and `details.`; `{a,b}`
+     * reads each.
+     */
     private const LINES = [
-        'answer' => [
-            'activity.host', 'allowlist.{by,flag_ids,reason,reason_by,reason_id}', 'branch', 'depth_unmeasured', 'direct', 'direct_dependents',
-            'from_composer_repository', 'maintenance_judged', 'named_in', 'package', 'verdict', 'version', 'checks_missing[].{blocks,reason}',
-            'checks_skipped[].{check,reason}', 'flags[].degree.{liveness_complete,reasons}', 'flags[].headline.{source,value}',
-            'flags[].{id,role}', 'installed_php.{requires,target_runs}', 'metadata.status', 'next_step.adds[].{basis,id}',
-            'next_step.also[].clears[].{id,kind}', 'next_step.also[].{clears_all,constraint,kind,to_branch}',
-            'next_step.also[].leaves[].{id,kind}', 'next_step.also[].php_check.{project_allows,requires,target_runs}',
-            'next_step.also[].unverified[].id', 'next_step.clears[].{id,kind}',
-            'next_step.{clears_all,composer_moves_because,constraint,crosses_major,kind,newest,reason,source,to_branch}',
-            'next_step.held_by[].{constraint,package,source,version}', 'next_step.held_by[].holder.{flag_ids,lead,verdict}',
-            'next_step.latest.{is_installed,relation,version}', 'next_step.leaves[].{id,kind}',
-            'next_step.php_check.{project_allows,raise_size,raise_to,requires,target_runs}', 'next_step.replacement.finding.{flag_ids,verdict}',
-            'next_step.replacement.package', 'next_step.through[].{newest_requires,package}', 'next_step.through[].newest_stable.version',
-            'next_step.unverified[].id', 'origin.{kind,local}', 'score.accepted[].flag', 'score.accepted[].if_counted.{at_least,total,verdict}',
-            'score.accepted[].if_counted.modifiers[].{after,before,divide_by,reason}', 'score.decided_by',
-            'score.modifiers[].{after,applies_to,before,reason}', 'score.parts.maintenance.alone.verdict', 'score.parts.maintenance.status',
-            'score.parts.security.alone.verdict', 'score.parts.security.of', 'score.terms[].{fix_kind,flag,multiplier,part,severity}',
-            'security.{ignored_count,status,unchecked_reason,worst}', 'security.installed_branch_fixes.{fix_kind,fixed,of,unknown}',
-            'security.partial.clears[].{id,kind}', 'security.partial.if_applied.{assumes,at_most,total,verdict}',
-            'security.partial.{unverified,version}', 'signals[].data.advisories[].{cve,deciding,id,title}',
-            'signals[].data.{branch,event,forge,marked_by,newest_branch,newest_php,newest_version,newest_years,reachable_branch,reachable_version,reachable_years,reason,replacement,target_php,version,written_for_php,years}',
-            'signals[].id', 'unchecked_accepted[].accepted_by.reason', 'unchecked_accepted[].{check,reason}',
-            'run.{include_dev,project_php_lowest,target_php}',
+        'verdict_line' => [
+            'verdict', 'score.total', 'score.modifiers[].{after,applies_to,before}', 'score.parts.maintenance.alone.verdict',
+            'score.parts.security.alone.verdict', 'run.graded_verdicts', 'activity.{event,forge,host}', 'age.push.years', 'age.release.years',
+            'branch', 'replacement', 'version', 'details.metadata.branches[].{branch,highest,installed}', 'details.metadata.branches[].fixes.fixed',
+            'flags[].degree.{liveness_complete,reasons}', 'flags[].headline.{source,value}', 'flags[].{id,role}', 'next_step.{kind,to_branch}',
+            'next_step.replacement.{package,url}', 'score.decided_by', 'score.parts.security.of', 'score.terms[].{flag,part,severity}',
+            'security.{status,worst}', 'security.installed_branch_fixes.{fix_kind,fixed,of,unknown}',
+            'signals[].data.advisories[].{cve,deciding,id,title}',
+            'signals[].data.{branch,event,marked_by,newest_branch,newest_php,newest_version,newest_years,reachable_branch,reachable_version,reachable_years,reason,replacement,target_php,version,written_for_php,years}',
+            'signals[].id', 'run.score_model.severities[].{counts_as,id}', 'run.target_php',
+        ],
+        'readings' => [
+            'activity.{event,forge,host}', 'age.push.years', 'age.release.years', 'branch', 'replacement', 'version',
+            'details.metadata.branches[].{branch,highest,installed}', 'details.metadata.branches[].fixes.fixed',
+            'flags[].degree.{liveness_complete,reasons}', 'flags[].headline.{source,value}', 'flags[].{id,role}', 'next_step.{kind,to_branch}',
+            'next_step.replacement.{package,url}', 'score.decided_by', 'score.parts.security.of', 'score.terms[].{flag,part,severity}',
+            'security.{status,worst}', 'security.installed_branch_fixes.{fix_kind,fixed,of,unknown}',
+            'signals[].data.advisories[].{cve,deciding,id,title}',
+            'signals[].data.{branch,event,marked_by,newest_branch,newest_php,newest_version,newest_years,reachable_branch,reachable_version,reachable_years,reason,replacement,target_php,version,written_for_php,years}',
+            'signals[].id', 'run.score_model.severities[].{counts_as,id}', 'run.target_php',
+        ],
+        'qualifiers' => [
+            'activity.host', 'allowlist.{by,expires,flag_ids,pattern,reason,reason_by,reason_id}', 'checks_missing[].{blocks,check,reason}',
+            'checks_skipped[].{blocks,check,reason}', 'depth_unmeasured', 'dev', 'direct_dependents', 'flags[].id', 'from_composer_repository',
+            'gate.{exempt_by,fails,reaches_fail_on}', 'gate.by[].{kind,value}', 'gate.by[].facts[].{id,kind}', 'installed_php.{requires,target_runs}',
+            'maintenance_judged', 'metadata.status', 'named_in', 'next_step.{kind,reason,source}', 'origin.{kind,local}', 'package', 'reach',
+            'score.modifiers[].{after,applies_to,before,divide_by,reason}', 'score.parts.maintenance.status', 'score.terms[].flag',
+            'signals[].data.advisories[].{cve,id}', 'signals[].id', 'unchecked_accepted[].accepted_by.reason', 'unchecked_accepted[].{check,reason}',
+            'verdict', 'version', 'run.gates[].{kind,threshold,value}', 'run.{include_dev,signal_ids,target_php}',
+        ],
+        'moves' => [
+            'next_step.{clears_all,commands,composer_moves_because,constraint,crosses_major,kind,newest,reason,source,to_branch,version}',
+            'next_step.adds[].{basis,id}', 'next_step.clears[].{id,kind}', 'next_step.leaves[].{id,kind}', 'next_step.unverified[].{id,kind}',
+            'next_step.if_applied.{assumes,at_most,total,verdict}', 'next_step.latest.{is_installed,relation,version}',
+            'next_step.php_check.{project_allows,raise_size,raise_to,requires,target_runs}', 'next_step.replacement.{package,url}',
+            'next_step.replacement.finding.{flag_ids,verdict}', 'next_step.through[].{newest_requires,package}',
+            'next_step.through[].newest_stable.version',
+            'next_step.also[].{clears_all,commands,composer_moves_because,constraint,crosses_major,kind,newest,reason,source,to_branch,version}',
+            'next_step.also[].adds[].{basis,id}', 'next_step.also[].clears[].{id,kind}', 'next_step.also[].leaves[].{id,kind}',
+            'next_step.also[].unverified[].{id,kind}', 'next_step.also[].if_applied.{assumes,at_most,total,verdict}',
+            'next_step.also[].latest.{is_installed,relation,version}',
+            'next_step.also[].php_check.{project_allows,raise_size,raise_to,requires,target_runs}', 'next_step.also[].replacement.{package,url}',
+            'next_step.also[].replacement.finding.{flag_ids,verdict}', 'next_step.also[].through[].{newest_requires,package}',
+            'next_step.also[].through[].newest_stable.version', 'depth_unmeasured', 'direct', 'direct_dependents', 'flags[].id',
+            'installed_php.{requires,target_runs}', 'metadata.status', 'origin.kind', 'package', 'replacement', 'score.terms[].flag',
+            'signals[].data.advisories[].id', 'version', 'run.{include_dev,project_php_lowest,target_php}',
+        ],
+        'held_by' => [
+            'next_step.held_by[].{constraint,package,source,version}', 'next_step.held_by[].holder.{flag_ids,verdict}',
+            'next_step.held_by[].holder.next_step.{constraint,kind,to_branch}', 'next_step.also[].held_by[].{constraint,package,source,version}',
+            'next_step.also[].held_by[].holder.{flag_ids,verdict}', 'next_step.also[].held_by[].holder.next_step.{constraint,kind,to_branch}',
+            'run.graded_verdicts',
+        ],
+        'security' => [
+            'details.metadata.branches[].{branch,installed}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,of}',
+            'details.metadata.branches[].fixes.held_by[].{package,source}',
+            'details.metadata.branches[].fixes.if_applied.{assumes,at_most,total,verdict}', 'next_step.held_by[].{package,source}',
+            'next_step.to_branch', 'origin.kind', 'package', 'score.parts.security.of',
+            'security.{check,fix_kind,ignored_count,records,status,unchecked_reason}', 'security.counts.{critical,high,low,medium,unrated}',
+            'security.ignored[].{by,cve,id,reason,severity}', 'security.partial.clears[].{id,kind}',
+            'security.partial.if_applied.{assumes,at_most,total,verdict}', 'security.partial.{unverified,version}',
+            'signals[].data.advisories[].{affected_versions,cve,deciding,id,severity}',
+            'signals[].data.advisories[].fix.{kind,on_installed_branch,to_branch,version}', 'signals[].id', 'version',
+            'run.score_model.severities[].{counts_as,id}',
+        ],
+        'branches_lead' => [
+            'age.branch_release.{version,years}', 'branch', 'details.metadata.branches[].{branch,installed}', 'next_step.to_branch', 'signals[].id',
+            'signals[].data.{newest_branch,newest_version,newest_years,reachable_branch,reachable_version,reachable_years}', 'version',
+        ],
+        'branch_rows' => [
+            'age.branch_release.{dated_by,version,years}', 'next_step.to_branch',
+            'details.metadata.branches[].{branch,dated_by,highest,highest_admits_project_php,highest_admits_target_php,highest_misses_project_php,highest_php,installed,released_years}',
+        ],
+        'age_rows' => [
+            'activity.event', 'age.installed.{at,dated_by,years}',
+            'age.{branch_release_unmeasured,installed_unmeasured,push_unmeasured,release_unmeasured}',
+            'age.branch_release.{at,dated_by,version,years}', 'age.release.{at,dated_by,version,years}', 'age.push.{at,years}', 'branch',
+            'details.metadata.branches[].{branch,newest_dated}', 'origin.kind', 'version',
         ],
         'why' => [
             'abandoned_ignored.by', 'abandoned_ignored.rules[].{constraints,pattern,reason}', 'activity.host', 'allowlist.by',
             'checks_missing[].{blocks,reason}', 'checks_skipped[].{check,reason}', 'from_composer_repository', 'lead', 'maintenance_judged',
-            'reach', 'verdict', 'metadata.status', 'next_step.adds[].id', 'next_step.if_applied.{assumes,at_most,total,verdict}',
-            'next_step.unverified[].{id,kind}', 'origin.kind', 'score.accepted[].flag', 'score.accepted[].if_counted.{at_least,total,verdict}',
+            'reach', 'verdict', 'metadata.status', 'origin.kind', 'score.accepted[].flag', 'score.accepted[].if_counted.{at_least,total,verdict}',
             'score.accepted[].if_counted.modifiers[].{after,before,divide_by,reason}', 'score.band.{floor,next,to_next}',
             'score.{decided_by,exact,rounded_down,total}', 'score.modifiers[].{after,applies_to,before,divide_by,reason}',
             'score.parts.maintenance.alone.verdict', 'score.parts.maintenance.status', 'score.parts.security.alone.verdict',
@@ -74,21 +131,6 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'abandoned_ignored', 'from_composer_repository', 'checks_missing[].{blocks,reason}', 'checks_skipped[].{blocks,check,reason}',
             'origin.kind', 'signals[].id', 'unchecked_accepted[].{check,reason}', 'run.signal_ids',
         ],
-        'branches' => [
-            'details.metadata.branches[].{branch,highest,highest_admits_project_php,highest_admits_target_php,highest_misses_project_php,highest_php,installed,released_years}',
-            'age.branch_release.{version,years}', 'installed_php.{requires,target_runs}', 'package', 'version',
-        ],
-        'age' => [
-            'activity.event', 'age.installed.{at,dated_by,years}', 'age.installed_unmeasured', 'age.branch_release.{at,dated_by,version,years}',
-            'age.release.{at,dated_by,version,years}', 'age.push.{at,years}', 'branch', 'version',
-        ],
-        'security_row' => [
-            'details.metadata.branches[].{branch,highest}', 'details.metadata.branches[].fixes.{fix_kind,fixed,lowest,of}',
-            'details.metadata.branches[].fixes.held_by[].{package,source}',
-            'details.metadata.branches[].fixes.if_applied.{assumes,at_most,total,verdict}', 'origin.kind',
-            'security.{check,fix_kind,ignored_count,records,status,unchecked_reason}', 'security.counts.{critical,high,low,medium,unrated}',
-            'signals[].data.advisories[].fix.kind', 'signals[].id',
-        ],
     ];
 
     /**
@@ -99,43 +141,172 @@ final class HydratedCasesMatchTheModelTest extends TestCase
      * @var array<string, array<string, list<array{list<string>, string}>>>
      */
     private const DIFFERENCES = [
-        'F' => ['age' => [[['age.installed_unmeasured'], self::INSTALLED_COMMIT]]],
-        'replace-graded' => ['age' => [[['age.installed_unmeasured'], self::INSTALLED_COMMIT]]],
-        'affected-range-unknown‡' => ['age' => [[['age.installed_unmeasured'], self::INSTALLED_COMMIT]]],
+        'A' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'F' => [
+            'age_rows' => [
+                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
+            ],
+        ],
         'psr7' => [
-            'security_row' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+            'security' => [
                 [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
+            ],
+        ],
+        'twig-1' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
             ],
         ],
         'xmlseclibs' => [
-            'security_row' => [
-                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
+            'security' => [
                 [['details.metadata.branches[].fixes.fix_kind'], self::BY_POSITION],
+                [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'flysystem' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'commonmark' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'unreached-move' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'many-dependents' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'pagerfanta' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'replace-graded' => [
+            'age_rows' => [
+                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
             ],
         ],
         'B-also‡' => [
-            'security_row' => [
+            'moves' => [
+                [['next_step.also[].version'], self::MOVE_VERSION],
+            ],
+            'security' => [
                 [['details.metadata.branches[].fixes.lowest'], self::LOWEST],
                 [['details.metadata.branches[].fixes.if_applied.at_most', 'details.metadata.branches[].fixes.if_applied.total', 'details.metadata.branches[].fixes.if_applied.verdict'], self::IF_APPLIED],
             ],
         ],
+        'long-range‡' => [
+            'age_rows' => [
+                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
+            ],
+        ],
+        'affected-range-unknown‡' => [
+            'age_rows' => [
+                [['age.installed_unmeasured'], self::INSTALLED_COMMIT],
+            ],
+        ],
+        'A-blocked‡' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'A-php-star‡' => [
+            'held_by' => [
+                [['next_step.held_by[].holder.next_step.constraint', 'next_step.held_by[].holder.next_step.to_branch'], self::PHP_STAR],
+            ],
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'A-baselined‡' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
         'tie‡' => [
-            'answer' => [
-                [['flags[].degree.liveness_complete', 'flags[].degree.reasons', 'flags[].headline.source', 'flags[].headline.value', 'flags[].id', 'flags[].role', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'next_step.unverified[].id', 'score.terms[].fix_kind', 'score.terms[].flag', 'score.terms[].multiplier', 'score.terms[].part', 'score.terms[].severity', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.forge', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::TIE],
+            'verdict_line' => [
+                [['score.total', 'flags[].degree.liveness_complete', 'flags[].degree.reasons', 'flags[].headline.source', 'flags[].headline.value', 'flags[].id', 'flags[].role', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::TIE],
+            ],
+            'readings' => [
+                [['flags[].degree.liveness_complete', 'flags[].degree.reasons', 'flags[].headline.source', 'flags[].headline.value', 'flags[].id', 'flags[].role', 'score.terms[].flag', 'score.terms[].part', 'score.terms[].severity', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::TIE],
+            ],
+            'qualifiers' => [
+                [['flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].id'], self::TIE],
+            ],
+            'moves' => [
+                [['next_step.version', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.also[].leaves[].id', 'next_step.also[].leaves[].kind', 'flags[].id', 'score.terms[].flag', 'signals[].data.advisories[].id'], self::TIE],
+            ],
+            'security' => [
+                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::TIE],
+            ],
+            'branches_lead' => [
+                [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::TIE],
             ],
             'why' => [
-                [['next_step.if_applied.at_most', 'next_step.if_applied.total', 'next_step.if_applied.verdict', 'next_step.unverified[].id', 'next_step.unverified[].kind', 'score.exact', 'score.total', 'score.terms[].advisory', 'score.terms[].fix_kind', 'score.terms[].flag', 'score.terms[].multiplier', 'score.terms[].part', 'score.terms[].points', 'score.terms[].role', 'score.terms[].severity', 'score.terms[].weight', 'score.without[].at_least', 'score.without[].lead', 'score.without[].total', 'score.without[].verdict', 'score.without[].remove.id', 'score.without[].remove.kind', 'score.without[].revealed[].flag', 'score.without[].revealed[].role', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].data.advisories[].fix.to_branch', 'signals[].id'], self::TIE],
+                [['score.exact', 'score.total', 'score.terms[].advisory', 'score.terms[].fix_kind', 'score.terms[].flag', 'score.terms[].multiplier', 'score.terms[].part', 'score.terms[].points', 'score.terms[].role', 'score.terms[].severity', 'score.terms[].weight', 'score.without[].at_least', 'score.without[].lead', 'score.without[].total', 'score.without[].verdict', 'score.without[].remove.id', 'score.without[].remove.kind', 'score.without[].revealed[].flag', 'score.without[].revealed[].role', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].data.advisories[].fix.to_branch', 'signals[].id'], self::TIE],
             ],
             'checks' => [
                 [['signals[].id'], self::TIE],
             ],
-            'security_row' => [
-                [['signals[].data.advisories[].fix.kind', 'signals[].id'], self::TIE],
+        ],
+        'twig-dev‡' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'B-offline‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'holder-vuln‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'partial-op‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'unreached-dev‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
         'C-bitbucket‡' => [
-            'answer' => [
-                [['flags[].degree.reasons', 'flags[].headline.value', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.forge', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::BITBUCKET],
+            'verdict_line' => [
+                [['flags[].degree.reasons', 'flags[].headline.value', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::BITBUCKET],
+            ],
+            'readings' => [
+                [['flags[].degree.reasons', 'flags[].headline.value', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].title', 'signals[].data.branch', 'signals[].data.event', 'signals[].data.marked_by', 'signals[].data.newest_branch', 'signals[].data.newest_php', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years', 'signals[].data.reason', 'signals[].data.replacement', 'signals[].data.target_php', 'signals[].data.version', 'signals[].data.written_for_php', 'signals[].data.years', 'signals[].id'], self::BITBUCKET],
+            ],
+            'qualifiers' => [
+                [['signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].id'], self::BITBUCKET],
+            ],
+            'moves' => [
+                [['signals[].data.advisories[].id'], self::BITBUCKET],
+            ],
+            'security' => [
+                [['signals[].data.advisories[].affected_versions', 'signals[].data.advisories[].cve', 'signals[].data.advisories[].deciding', 'signals[].data.advisories[].id', 'signals[].data.advisories[].severity', 'signals[].data.advisories[].fix.kind', 'signals[].data.advisories[].fix.on_installed_branch', 'signals[].data.advisories[].fix.to_branch', 'signals[].data.advisories[].fix.version', 'signals[].id'], self::BITBUCKET],
+            ],
+            'branches_lead' => [
+                [['signals[].id', 'signals[].data.newest_branch', 'signals[].data.newest_version', 'signals[].data.newest_years', 'signals[].data.reachable_branch', 'signals[].data.reachable_version', 'signals[].data.reachable_years'], self::BITBUCKET],
             ],
             'why' => [
                 [['signals[].data.advisories[].cve', 'signals[].data.advisories[].id', 'signals[].data.advisories[].fix.to_branch', 'signals[].id'], self::BITBUCKET],
@@ -143,11 +314,39 @@ final class HydratedCasesMatchTheModelTest extends TestCase
             'checks' => [
                 [['signals[].id'], self::BITBUCKET],
             ],
-            'security_row' => [
-                [['signals[].data.advisories[].fix.kind', 'signals[].id'], self::BITBUCKET],
+        ],
+        'feeds-drupal‡' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'B-offline-high‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'require-dev-name‡' => [
+            'moves' => [
+                [['next_step.version'], self::MOVE_VERSION],
+            ],
+        ],
+        'A-gate-vulnerable' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
+            ],
+        ],
+        'A-gate-critical' => [
+            'security' => [
+                [['signals[].data.advisories[].fix.version'], self::FIX_VERSION],
             ],
         ],
     ];
+
+    private const MOVE_VERSION = 'The model names a move\'s `version` from the advisory ranges, because the reports carry only each branch\'s newest tag. lockrot names the release of the move\'s row (P2b). The move card prints `newest` and reads `version` only when `newest` is null.';
+
+    private const FIX_VERSION = 'The model reads an advisory\'s fix version from its affected range, because the reports carry only each branch\'s newest tag. lockrot reads every release of the branch and names its lowest release outside the range.';
+
+    private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
 
     private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';
 
@@ -172,9 +371,43 @@ final class HydratedCasesMatchTheModelTest extends TestCase
         'unchecked_accepted[].accepted_by.reason' => self::ACCEPT_UNCHECKED,
         'unchecked_accepted[].check' => self::ACCEPT_UNCHECKED,
         'unchecked_accepted[].reason' => self::ACCEPT_UNCHECKED,
+        'next_step.also[].reason' => 'No also[] move of a case with inputs is a no-move.',
+        'next_step.also[].adds[].basis' => self::ALSO_ADDS,
+        'next_step.also[].adds[].id' => self::ALSO_ADDS,
+        'next_step.also[].latest.is_installed' => self::ALSO_LATEST,
+        'next_step.also[].latest.relation' => self::ALSO_LATEST,
+        'next_step.also[].latest.version' => self::ALSO_LATEST,
+        'next_step.also[].php_check.raise_size' => self::ALSO_RAISE,
+        'next_step.also[].php_check.raise_to' => self::ALSO_RAISE,
+        'next_step.also[].replacement.package' => self::ALSO_REPLACE,
+        'next_step.also[].replacement.url' => self::ALSO_REPLACE,
+        'next_step.also[].replacement.finding.flag_ids' => self::ALSO_REPLACE,
+        'next_step.also[].replacement.finding.verdict' => self::ALSO_REPLACE,
+        'next_step.also[].through[].newest_requires' => self::ALSO_THROUGH,
+        'next_step.also[].through[].package' => self::ALSO_THROUGH,
+        'next_step.also[].through[].newest_stable.version' => self::ALSO_THROUGH,
+        'next_step.also[].held_by[].package' => self::ALSO_HELD,
+        'next_step.also[].held_by[].version' => self::ALSO_HELD,
+        'next_step.also[].held_by[].holder.flag_ids' => self::ALSO_HELD,
+        'next_step.also[].held_by[].holder.verdict' => self::ALSO_HELD,
+        'next_step.also[].held_by[].holder.next_step.constraint' => self::ALSO_HELD,
+        'next_step.also[].held_by[].holder.next_step.kind' => self::ALSO_HELD,
+        'next_step.also[].held_by[].holder.next_step.to_branch' => self::ALSO_HELD,
     ];
 
     private const ONLY_PSR_LOG = 'Only psr-log accepts a flag on a halved finding, and it carries no branch rows, so the projector gives it no inputs.';
+
+    private const ALSO_ADDS = 'No also[] move of a case with inputs adds a flag.';
+
+    private const ALSO_LATEST = 'No also[] move of a case with inputs is a tag, test or blocked move.';
+
+    private const ALSO_RAISE = 'No also[] move of a case with inputs raises require.php.';
+
+    private const ALSO_REPLACE = 'No also[] move of a case with inputs is a replace move.';
+
+    private const ALSO_THROUGH = 'An also[] move carries no through[] (I14f).';
+
+    private const ALSO_HELD = 'No also[] move of a case with inputs is held by a package.';
 
     private const ACCEPT_UNCHECKED = 'The cases that accept an unchecked check need an accept-unchecked entry of the project, which the hydrator does not take (`unhydrated()`).';
 

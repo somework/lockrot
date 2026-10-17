@@ -1391,6 +1391,37 @@ repository metadata
    * 2.x      v2.8.52       2019-11-13   >=5.3.9    1 of 1 · composer update (lowest fix); after it: 20, high, if Composer resolves it
 branch 2.x dated by symfony/symfony, the monorepo this package is split out of: its own tags there are dated by a commit other tags share, the monorepo's by their release
 
+== case long-range‡
+symfony/polyfill-intl-idn v1.37.0 — low: vulnerable
+  via guzzlehttp/guzzle > symfony/polyfill-intl-idn: 1 hop from the nearest composer.json line; no line of composer.json names it
+
+age       installed  v1.37.0   not read (no date)
+          1.x        v1.43.0   2026-09-23   less than three weeks ago     below release-warn-years 3
+          newest     v1.43.0   2026-09-23   less than three weeks ago     below release-warn-years 3
+          last push            not read (allowlisted)
+          libyears not measured: no date
+repository github.com/symfony/polyfill-intl-idn: not asked (allowlisted)
+
+score     2 = vulnerable 2 [low advisory]     low from 1
+  security     vulnerable 2 (low advisory CVE-2026-46644)
+  reach        via guzzlehttp/guzzle: maintenance would be halved (none counts); security is never halved for reach
+  bands        low 1 · medium 8 · high 16 · critical 32 (score model 1, verdicts.md#score)
+
+do        composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory
+          clears PKSA-dwsq-ppd2-mb1x
+
+flags
+  vulnerable   S9 · 1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence · lookup complete
+    low        CVE-2026-46644  symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence
+               PKSA-dwsq-ppd2-mb1x · reported 2026-05-26 · 2 points · fix: composer update to 1.x from v1.38.1
+  feeds        packagist.org: 1 on record, 1 affects v1.37.0
+  accepted     none
+  not checked  S3, S4 (allowlisted)
+
+repository metadata
+     branch   highest tag   released     php        fixes
+   * 1.x      v1.43.0       2026-09-23   >=7.2      1 of 1 · composer update (lowest fix); after it: 0, finished, if Composer resolves it
+
 == case affected-range-unknown‡
 symfony/polyfill-intl-idn v1.37.0 — low: vulnerable
   via guzzlehttp/guzzle > symfony/polyfill-intl-idn: 1 hop from the nearest composer.json line; no line of composer.json names it

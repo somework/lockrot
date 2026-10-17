@@ -1,0 +1,18 @@
+[
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "symfony/polyfill-intl-idn v1.37.0 \u2014 finding low (2 = vulnerable 2 [low advisory]) \u2014 vulnerable: 1 advisory: 1 low \u2014 all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence. Do: composer update symfony/polyfill-intl-idn (gets v1.43.0) \u2014 clears the advisory. (via guzzlehttp/guzzle)",
+        "categories": [
+            "Security"
+        ],
+        "severity": "minor",
+        "fingerprint": "19de73f53788f29eb50856bb90ffd1e800d1d3126a36bfa5a23a8b7490f0b588",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 12
+            }
+        }
+    }
+]

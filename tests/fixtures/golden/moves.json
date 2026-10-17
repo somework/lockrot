@@ -4962,6 +4962,101 @@
             "text": "replace with symfony/error-handler (named by its registry); lockrot found no path from your requirements to it: `composer why` names what requires it"
         }
     },
+    "long-range\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "1.x",
+            "version": "v1.38.1",
+            "newest": "v1.43.0",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": ">=7.2",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-dwsq-ppd2-mb1x",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "finished",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "symfony/polyfill-intl-idn"
+                ],
+                [
+                    "composer",
+                    "why-not",
+                    "guzzlehttp/guzzle",
+                    "8.2.0"
+                ]
+            ],
+            "through": [
+                {
+                    "package": "guzzlehttp/guzzle",
+                    "installed_version": "6.5.8",
+                    "installed_requires": true,
+                    "newest_stable": {
+                        "version": "8.2.0",
+                        "released": "2026-09-06T13:55:09+00:00"
+                    },
+                    "newest_requires": false,
+                    "newest_requires_unmeasured": null
+                }
+            ],
+            "also": [],
+            "text": "composer update symfony/polyfill-intl-idn (gets v1.43.0) \u2014 clears the advisory"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 1,
+            "unknown": 0,
+            "of": 1,
+            "fix_kind": "update",
+            "lowest": "v1.38.1",
+            "newest": "v1.43.0",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "finished",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "many-dependents": {
         "next_step": {
             "kind": "require",
