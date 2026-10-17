@@ -9,6 +9,7 @@ use Composer\Composer;
 use Composer\Config;
 use Composer\Factory;
 use Composer\IO\IOInterface;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Composer\Util\Platform;
@@ -40,7 +41,11 @@ use Lockrot\Output\ReportTargets;
 use Lockrot\Output\RunGateText;
 use Lockrot\Output\TerminalText;
 use Lockrot\Output\TerminalWidth;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveCheckers;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -61,7 +66,7 @@ final class LockrotCommand extends BaseCommand
     /** The formats a CI step parses: writing one prints the upgrade notice. */
     private const NOTICE_FORMATS = ['json', 'sarif', 'gitlab'];
 
-    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer */
+    /** @var callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer */
     private $analyzerFactory;
 
     /**
@@ -82,7 +87,7 @@ final class LockrotCommand extends BaseCommand
     private ?array $htmlReads;
 
     /**
-     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string): Analyzer $analyzerFactory
+     * @param null|callable(IOInterface, Config, list<RepositoryInterface>, LockrotConfig, Tokens, Clock, Deadline, ?string, (\Closure(): MoveChecks)|null): Analyzer $analyzerFactory
      * @param list<int>|null                                                                                                       $htmlReads       the report numbers the html renderer reads, its manifest's unless given
      */
     public function __construct(?callable $analyzerFactory = null, ?array $htmlReads = null)
@@ -194,7 +199,7 @@ final class LockrotCommand extends BaseCommand
             $cwd = (string) getcwd();
             $composerFile = self::composerFile();
             $project = ProjectConfig::fromFile($composerFile);
-            [$config, $repositories] = $this->composerBootstrap($io, is_file($composerFile));
+            [$config, $repositories, $root] = $this->composerBootstrap($io, is_file($composerFile));
             // LOCKROT_DISABLE needs no check here: run() answered it before any of this was read.
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $project->platformPhp());
             if (self::wantsUpgradeNotice($input, $lockrot)) {
@@ -225,7 +230,8 @@ final class LockrotCommand extends BaseCommand
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
             $markdownMaxBytes = self::markdownMaxBytes($input);
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
-            $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never());
+            $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never()));
+            $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks);
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
             // baseline must not block it.
             if (\is_string($explain)) {
@@ -628,7 +634,9 @@ final class LockrotCommand extends BaseCommand
      * The repositories are rebuilt from Config, not taken from the instance's RepositoryManager: in
      * plugin mode its HttpDownloader predates this command, so --offline could not reach it.
      *
-     * @return array{0: Config, 1: list<RepositoryInterface>}
+     * The root package is Composer's, null without composer.json: then no move is checked.
+     *
+     * @return array{0: Config, 1: list<RepositoryInterface>, 2: ?RootPackageInterface}
      */
     private function composerBootstrap(IOInterface $io, bool $hasComposerJson): array
     {
@@ -640,7 +648,7 @@ final class LockrotCommand extends BaseCommand
         $eventDispatcher = $composer instanceof Composer ? $composer->getEventDispatcher() : null;
         $manager = RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config), $eventDispatcher);
 
-        return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager))];
+        return [$config, array_values(RepositoryFactory::defaultRepos($io, $config, $manager)), $composer instanceof Composer ? $composer->getPackage() : null];
     }
 
     /**

@@ -27,6 +27,7 @@ use Lockrot\Signal\Rule\AbandonedRule;
 use Lockrot\Signal\Rule\AdvisoryRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Solver\MoveCheck;
 
 /**
  * The facts report-2 writes about a finding beside its signals: how the metadata, the advisory
@@ -409,17 +410,17 @@ final class FindingDetails
     }
 
     /**
-     * A branch row's `fixes`, with the score after a move to its candidate.
+     * A branch row's `fixes`, with the score after a move to its candidate and Composer's check of that move.
      *
-     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied}
+     * @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied, check: ?MoveCheck}
      */
     public function rowFixes(BranchFixes $row): array
     {
-        return self::branchFixes($row, $this->moves()->rowIfApplied($row->branch()));
+        return self::branchFixes($row, $this->moves()->rowIfApplied($row->branch()), $this->moves()->rowCheck($row->branch()));
     }
 
-    /** @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied} */
-    public static function branchFixes(BranchFixes $row, ?IfApplied $ifApplied): array
+    /** @return array{fixed: int, unknown: int, of: int, fix_kind: ?string, lowest: ?string, newest: ?string, held_by: list<Holder>, if_applied: ?IfApplied, check: ?MoveCheck} */
+    public static function branchFixes(BranchFixes $row, ?IfApplied $ifApplied, ?MoveCheck $check = null): array
     {
         $candidate = $row->candidate();
 
@@ -432,6 +433,7 @@ final class FindingDetails
             'newest' => $row->newest(),
             'held_by' => $candidate === null ? [] : $candidate->heldBy(),
             'if_applied' => $ifApplied,
+            'check' => $check,
         ];
     }
 

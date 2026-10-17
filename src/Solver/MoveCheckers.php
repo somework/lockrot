@@ -6,7 +6,6 @@ namespace Lockrot\Solver;
 
 use Composer\Config;
 use Composer\Package\RootPackageInterface;
-use Composer\Package\Version\VersionParser;
 use Composer\Policy\ListPolicyConfig;
 use Composer\Policy\PolicyConfig;
 use Composer\Repository\PlatformRepository;
@@ -54,7 +53,7 @@ final class MoveCheckers
         $source = new RepositoryVersions($repositories, $notFromComposerRepository, $offline, $deadline);
         $solver = new ComposerSolver($root, $lock->lockedRepository(), new PlatformRepository([], $overrides), $source, []);
 
-        return new SolverChecker($solver, $notFromComposerRepository, (new VersionParser())->normalize($php), self::blocksAdvisories($config), $deadline);
+        return new SolverChecker($solver, $notFromComposerRepository, $php, self::blocksAdvisories($config), $deadline);
     }
 
     /**

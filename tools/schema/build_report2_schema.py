@@ -207,11 +207,30 @@ defs['factBaseline'] = nul("A fact's state against the baseline entry (§6.4 \"P
     }))
 
 # holders and php checks
-HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding (§5.3, round 2).", {
+MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_time_budget', 'not_from_composer_repository', 'composer_too_old', 'no_composer_json']
+defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether `composer update --dry-run` or `composer require --dry-run` installs it from the lock, in which form, "
+                         "or why lockrot did not ask. Null on a kind that runs no Composer request (`replace find-alternative test blocked` and the `no-*` kinds), "
+                         "and in a run that checks no move."),
+    obj('The check of one move.', {
+        'result': closed(['resolves', 'refused', 'not_checked'], ("`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and "
+                                                                 "`held_by` names the holds; `not_checked`: lockrot did not ask, `reason` says why. Closed (§8.2).")),
+        'form': nul(("The first form that resolves: `inline` (`composer update vendor/pkg:^1.2`, or `composer require` for a root requirement), "
+                     "`with-dependencies` (adds `--with-dependencies`) or `with-all-dependencies` (adds `--with-all-dependencies`); null unless `result` is `resolves`. Closed."),
+                    closed(['inline', 'with-dependencies', 'with-all-dependencies'])),
+        'reason': nul(("Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the "
+                       "`moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), "
+                       "`install_time_budget`, `not_from_composer_repository`, `composer_too_old`, `no_composer_json`. An open set (§8.2)."),
+                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
+    }, allOf=[{'description': '`form` is set exactly on `resolves`, and `reason` exactly on `not_checked`.',
+               'anyOf': [{'properties': {'result': {'enum': ['resolves']}, 'form': {'type': 'string'}, 'reason': {'type': 'null'}}},
+                         {'properties': {'result': {'enum': ['refused']}, 'form': {'type': 'null'}, 'reason': {'type': 'null'}}},
+                         {'properties': {'result': {'enum': ['not_checked']}, 'form': {'type': 'null'}, 'reason': {'type': 'string'}}}]}]))
+HOLDER_MOVE = obj("The holder's own move, `{kind, to_branch, constraint, check}` of its `next_step`, so a sentence writes \"its own move, require ^4.4.51\" without reading another finding (§5.3, round 2).", {
     'kind': open_set(['replace', 'find-alternative', 'tag', 'require', 'update', 'raise-php', 'test', 'blocked', 'no-tag', 'no-move', 'no-fix', 'no-single-fix'],
                      "The holder's `next_step.kind` (an open set, as `next_step.kind`).", HYPHEN),
     'to_branch': nul("The holder's `next_step.to_branch`.", ref('branchLabel')),
     'constraint': nul("The holder's `next_step.constraint`.", {'type': 'string'}),
+    'check': ref('moveCheck'),
 })
 defs['holder'] = nul(("The holder's own finding in this report, for display only (no score reads it; §5.3): `{verdict, lead, flag_ids[], replacement, next_step}`. "
                       "Null for the root, and for a holder that is not a finding of this report."),
@@ -222,11 +241,16 @@ defs['holder'] = nul(("The holder's own finding in this report, for display only
         'replacement': nul("The holder's `replacement` (a Composer package name), so an abandoned holder reads \"held by abandoned symfony/x (replacement: …)\".", ref('packageName')),
         'next_step': nul("The holder's own move; null when the holder's finding has no move (score 0).", HOLDER_MOVE),
     }))
-defs['heldBy'] = obj("One link that excludes the move or the fix (§5.3 \"held_by[] entries\"): the root's or a locked package's `require`, `require-dev` or `conflict`.", {
-    'source': closed(['root', 'package'], 'Who holds it: `root` (composer.json) or `package` (a locked package). Closed (§8.2).'),
-    'package': nul('The locked package that holds it; null for `source: root`.', ref('packageName')),
-    'version': nul("That package's locked version; null for `source: root`.", {'type': 'string'}),
-    'link': closed(['require', 'require-dev', 'conflict'], 'The link that excludes it. Closed (§8.2).'),
+defs['heldBy'] = obj(("One link that excludes the move or the fix (§5.3): the root's or a locked package's `require`, `require-dev` or `conflict`, "
+                      "and on a move that Composer's solver refuses, each hold that the refusal names. The entries are distinct, the root first, then by `package`, "
+                      "then by `link` in the order of its enum, then by `target`."), {
+    'source': closed(['root', 'package'], 'Who holds it: `root` (composer.json) or `package` (a locked package, or the moved package at its target release). Closed (§8.2).'),
+    'package': nul('The package that holds it; null for `source: root`.', ref('packageName')),
+    'version': nul("That package's version: the locked one, or the target release's; null for `source: root`.", {'type': 'string'}),
+    'link': closed(['require', 'require-dev', 'conflict', 'root-require', 'platform'], ("The link that excludes it: `require`, `require-dev` and `conflict` of the lock, "
+                   "`root-require` (a root requirement on `target`, a package that the move needs at another version), `platform` (a requirement on the platform "
+                   "package `target`, such as `php`). Closed (§8.2).")),
+    'target': nul("The package that the link points to when it is not the moved package; null when it is.", {'type': 'string', 'minLength': 1}),
     'constraint': d('The constraint as the link writes it, quoted and never interpreted ("requires ^2.0").', {'type': 'string', 'minLength': 1}),
     'holder': ref('holder'),
 })
@@ -376,7 +400,8 @@ defs['ifApplied'] = nul(("The score after the move (§5.6): an engine rerun on t
         'deciding_advisory': nul("The rerun's deciding advisory id; null when none.", ref('advisoryId')),
         'at_most': d('True ⇔ `unverified` is not empty: an upper bound, printed "at most 16, high" (I14).', {'type': 'boolean'}),
         'assumes': arr(("The conditions the rerun takes as given (§5.6): `clears_hold` always, `composer_resolves` when `held_by` or `composer_moves_because` is not empty, "
-                        "`no_new_advisories` when the batched lookup of the move's own versions did not run (§5.3, critic round)."),
+                        "`no_new_advisories` when the batched lookup of the move's own versions did not run (§5.3, critic round). A move that `check` resolves "
+                        "does not assume `composer_resolves`."),
                        open_set(['clears_hold', 'composer_resolves', 'no_new_advisories'], 'An assumption; an open set (§8.2, round 2).'), uniqueItems=True, minItems=1),
     }, allOf=[{'description': ZERO_OR_GRADE_DESC, 'anyOf': ZERO_OR_GRADE}]))
 defs['latest'] = nul("The tag the move names, on `tag`, `blocked` (pinned) and `test` moves (§5.6): for a branch-alias snapshot (`5.4.x-dev`) the newest tag on its own line, "
@@ -460,6 +485,7 @@ def move_props(with_also):
         'leaves': arr('Counted facts the move neither clears nor leaves unverified (§5.6).', ref('fact')),
         'clears_all': d('`leaves` and `unverified` both empty (§7.6): "it clears all three" is read, not counted.', {'type': 'boolean'}),
         'if_applied': ref('ifApplied'),
+        'check': ref('moveCheck'),
         'composer_moves_because': arr(("Why the move needs more than the project's own command, one clause each: `holders` (`held_by` names a package), `crosses_major` (a "
                                        "`require`, `raise-php` or `tag` move to a new major), `transitive` (not direct, `direct_dependents` not empty, and `held_by` names none of "
                                        "them), `unreached` (not direct and no direct dependent: lockrot found no path from the requirements it walked). `transitive` and `unreached` "
@@ -469,7 +495,9 @@ def move_props(with_also):
         'commands': arr(("The ordered commands a user runs, each an argv list (round 4), rendered per shell by §5.6's quoting (POSIX, cmd.exe, PowerShell); `[]` for a transitive "
                          "`require` and for the kinds without a command; a transitive `raise-php` holds only its php step (`composer require php:>=8.1 --no-update`, attack round 1). The lead move of a transitive package then adds one `composer why-not <dependent> <version>` per `through` entry whose `newest_requires` is false. "
                          "The command argument rule (§5.6): each argument matches `^[A-Za-z0-9/._:@+=,^~*<>| -]+$` and holds more than spaces. "
-                         "Only `--no-update`, the Composer option that lockrot writes in a `require` step, starts with `-`. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
+                         "An `update` step names its constraint inline (`vendor/pkg:^1.2`), except on a Composer that refuses an inline constraint on a package composer.json does not require. "
+                         "A move that `check` resolves only with its dependencies ends its step with `--with-dependencies` or `--with-all-dependencies`, and a move that `check` refuses has no `update` or `require` step. "
+                         "Only lockrot's own options start with `-`: `--no-update` in a `require` step, and `--with-dependencies` and `--with-all-dependencies` in an `update` or `require` step. The first argument is `composer`, and the second is `update`, `require` or `why-not`. "
                          "lockrot leaves out a step that breaks this rule. The move keeps its `constraint`, `text` and other steps. `text` shows a command only as the POSIX rendering of a step here. "
                          "A page renders it as written and never builds a command from `constraint`. A page that reads an argv that breaks this rule renders none of that move's steps, on any shell."),
                         arr('One command as its argument list (`["composer", "require", "php:>=8.1", "--no-update"]`).', {'type': 'string', 'minLength': 1}, minItems=1)),
@@ -512,6 +540,7 @@ defs['branchFixes'] = obj(("How many counted advisories one branch fixes, and th
                                          "move other packages, `no_new_advisories` when the batched lookup did not run.",
                                          open_set(['clears_hold', 'composer_resolves', 'no_new_advisories'], 'An assumption; an open set.'), uniqueItems=True, minItems=1),
                       }, allOf=[{'description': ZERO_OR_GRADE_DESC, 'anyOf': ZERO_OR_GRADE}])),
+    'check': ref('moveCheck'),
 })
 defs['ignoredAdvisory'] = obj("An advisory Composer's audit ignore lists match (§5.1): not counted, never in S9 (round 4), listed here on every `security` shape.", {
     'id': ref('advisoryId'),
@@ -1316,6 +1345,14 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'text_grammar': d('The version of the sentence grammars: MoveText, GateText, FlagSentence, SignalSentence, NoteSentence, the suffix and the command renderings (§7.11, round 4). ScoreText is versioned apart, by `score_model.score_text_grammar`.', INT1),
     'score_model': ref('scoreModel'),
     'advisory_lookup': ref('advisoryLookup'),
+    'move_check': nul("How Composer's solver checked the run's moves (§5.6); null when the run checked no move.", obj('The move check of the run.', {
+        'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
+        'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.', {'type': 'boolean'}),
+        'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
+                                                                   "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
+        'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. The open set of `check.reason`.",
+                      {'type': 'string', 'pattern': SNAKE, 'x-known-values': MOVE_CHECK_REASONS}),
+    })),
     'score_rules_used': {'description': ("Rule id → the number of findings on which the rule changed or decided a number (each count's predicate is a field test: "
                                          "graded findings; score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for "
                                          "`sort`. Keyed by `score_model.rules[].id`; an id absent from it shows no count. Keys follow the rule-id grammar, so a later id validates "
@@ -1351,11 +1388,13 @@ NOTE_CODES = ['offline', 'metadata_unavailable', 'monorepo_parent_unavailable', 
               'repository_activity_not_checked', 'repository_activity_anonymous_cap', 'repository_activity_rate_limited', 'repository_activity_unreachable',
               'repository_activity_not_found', 'not_from_composer_repository', 'baseline_target_differs',
               'baseline_fix_model_differs', 'ignore_does_not_cover_advisories', 'advisories_disabled_by_policy',
-              'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable', 'repository_activity_host_not_supported']
+              'abandoned_markings_ignored', 'abandoned_not_audited_by_composer', 'abandoned_ignore_unreadable', 'repository_activity_host_not_supported',
+              'moves_not_checked', 'update_now_reduced', 'update_now_refused']
 NOTE_DEFS = {c: 'note' + ''.join(w.capitalize() for w in c.split('_')) for c in NOTE_CODES}
 for c in NOTE_CODES:
     if c in ('advisories_disabled_by_policy', 'repository_activity_host_not_supported', 'abandoned_markings_ignored', 'abandoned_not_audited_by_composer',
-             'abandoned_ignore_unreadable', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories'):
+             'abandoned_ignore_unreadable', 'baseline_target_differs', 'baseline_fix_model_differs', 'ignore_does_not_cover_advisories',
+             'moves_not_checked', 'update_now_reduced', 'update_now_refused'):
         continue
     defs[NOTE_DEFS[c]] = copy.deepcopy(R1['definitions'][NOTE_DEFS[c]])
 defs['noteAdvisoriesNotChecked']['description'] = ("`advisories_not_checked` (0.13's code and data, reworded, §6.2): no advisory was looked up, so no finding is graded "
@@ -1407,6 +1446,21 @@ defs['noteBaselineFixModelDiffers'] = obj('`baseline_fix_model_differs`: lockrot
 defs['noteIgnoreDoesNotCoverAdvisories'] = obj('`ignore_does_not_cover_advisories`: `ignore[]` entries whose package carries a counted advisory.', {
     'entries': arr('The entries.', obj('One entry.', {'package': ref('packageName'), 'pattern': d('The `ignore[]` pattern.', {'type': 'string'}),
                                                       'advisories': arr('The counted advisory ids.', ref('advisoryId'), minItems=1)}), minItems=1)})
+PROBLEM = d("Composer's problem text as a `--dry-run` prints it, without colour. Foreign text, not contract.", {'type': 'string', 'minLength': 1})
+defs['noteMovesNotChecked'] = obj(("`moves_not_checked`: Composer's solver refuses a partial update of a name outside the lock, so it would refuse every move. "
+                                   "Each move's `check` reads `not_checked` with `reason` `baseline_refused`."), {
+    'reason': open_set(['baseline_refused'], 'Why no move is checked. An open set.'),
+    'php': d('The php version that the solve ran at: `config.platform.php` in the target minor, else the target minor at its newest patch (`8.4.99`).', {'type': 'string', 'minLength': 1}),
+    'problem': PROBLEM,
+})
+defs['noteUpdateNowReduced'] = obj(("`update_now_reduced`: Composer refuses the members of `security.update_now` together, so the command leaves out the members "
+                                    "that the refusal names."), {
+    'left_out': arr('The members that `update_now_command` leaves out, in report order.', ref('packageName'), minItems=1, uniqueItems=True),
+    'problem': PROBLEM,
+})
+defs['noteUpdateNowRefused'] = obj("`update_now_refused`: Composer refuses the members of `security.update_now` together, even without the members its refusal names.", {
+    'problem': PROBLEM,
+})
 defs['noteCode'] = copy.deepcopy(R1['definitions']['noteCode'])
 defs['noteCode']['x-known-values'] = NOTE_CODES
 defs['noteDetail'] = copy.deepcopy(R1['definitions']['noteDetail'])
@@ -1464,11 +1518,14 @@ defs['rootSecurity'] = obj("The root security block (SPEC root block, §7.6, §8
     'severities': obj('Counted advisories per severity, every severity present.', {k: COUNT(f'Counted `{k}` advisories.') for k in SEVERITIES}),
     'fixes': obj('Vulnerable findings per `security.fix_kind`, every known fix kind present (fix kinds are open: a later kind is an extra key).',
                  {k: COUNT(f'Findings whose `security.fix_kind` is `{k}`.') for k in FIX_KINDS}, additionalProperties=INT0),
-    'update_now': arr('The packages whose `security.fix_kind` is `update` (§5.3), except a name outside the command argument set of `next_step.commands` (§5.6).', ref('packageName')),
-    'update_now_command': nul(("The one command the overview's \"Update now\" copies, as an argv list (`[\"composer\", \"update\", <update_now…>]`); null exactly when "
-                               "`update_now` is empty, and then the line is hidden (attack round 1: a page never builds a command, and a bare `composer update` updates the whole lock)."),
-                              {'description': 'The argv: `composer`, `update`, then each package of `update_now` in its order.', 'type': 'array',
-                               'items': [{'enum': ['composer']}, {'enum': ['update']}], 'additionalItems': {'$ref': '#/definitions/packageName'}, 'minItems': 3}),
+    'update_now': arr(("The vulnerable packages whose lead move is an `update` that Composer's solver resolves inline, in report order; in a run that checks no move, "
+                       "the packages whose `security.fix_kind` is `update` (§5.3). A name outside the command argument set of `next_step.commands` (§5.6) is left out."), ref('packageName')),
+    'update_now_command': nul(("The one command the overview's \"Update now\" copies, as an argv list: `composer`, `update`, then each member with its constraint inline "
+                               "(`vendor/pkg:^1.2`) in the order of `update_now`. Composer's solver checked it as one request: a member that the combined request refuses is "
+                               "left out (the `update_now_reduced` note). Null when `update_now` is empty, and when Composer refuses the members together (the "
+                               "`update_now_refused` note); then the line is hidden (attack round 1: a page never builds a command, and a bare `composer update` updates the whole lock)."),
+                              {'description': 'The argv: `composer`, `update`, then one argument per member.', 'type': 'array',
+                               'items': [{'enum': ['composer']}, {'enum': ['update']}], 'additionalItems': {'type': 'string', 'minLength': 1}, 'minItems': 3}),
     'fix_unknown': COUNT('Vulnerable findings whose `security.fix_kind` is `unknown` (§5.3; equal to `fixes.unknown`, kept for the CLI line).'),
 })
 LIBY = copy.deepcopy(R1['properties']['libyears'])
@@ -1669,8 +1726,8 @@ def add_relations_round4(defs):
     relate(defs['findingFlag'], '`headline.source` is null when `headline.value` is.', [P(headline=P(value={'not': NULL})), P(headline=P(source=NULL))])
     relate(defs['withoutRow'], '`at_least` is true only on a row that removes `abandoned` or `pinned` (the rows whose rerun lockrot could not fully read).',
            [P(at_least=E(False)), P(remove=P(kind=E('flag'), id=E('abandoned', 'pinned')))])
-    relate(defs['rootSecurity'], '`update_now_command` is null exactly when `update_now` is empty.',
-           [P(update_now=EMPTY, update_now_command=NULL), P(update_now=MIN1, update_now_command={'type': 'array'})])
+    relate(defs['rootSecurity'], '`update_now_command` is null when `update_now` is empty.',
+           [P(update_now=EMPTY, update_now_command=NULL), P(update_now=MIN1)])
     run = defs['run']
     relate(run, ['`project_php_lowest` is null when `project_php` is (no `require.php`, so no lowest).',
                  '`verdicts` is the seven verdicts in their fixed order.', '`graded_verdicts` is the four grades in their fixed order.',

@@ -13,12 +13,13 @@ use Lockrot\Security\PhpCheck;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\ConstraintOpenness;
 use Lockrot\Signal\Data\NoReleaseData;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\MoveQuery;
 
 /**
  * Judges a {@see MoveDraft}: what it clears for every version it admits, what it leaves, adds and
- * cannot check, its PHP, what holds it, its commands as argv lists and the score after it
- * (docs/verdicts.md#move). lockrot does not solve dependencies: `assumes` says what the rerun takes as
- * given.
+ * cannot check, its PHP, what holds it, Composer's check of it, its commands as argv lists and the
+ * score after it (docs/verdicts.md#move). `assumes` says what the rerun takes as given.
  *
  * @internal
  */
@@ -68,19 +69,27 @@ final class MoveBuilder
         $toBranch = $row !== null && \in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::BLOCKED, Move::TAG], true) ? $row->branch() : null;
         $installed = $context->installedBranch();
         $crosses = $toBranch === null || $installed === null ? null : (self::major($toBranch) !== self::major($installed) || (strpos($installed, '0.') === 0 && $toBranch !== $installed));
-        $heldBy = $lower !== null && $kind !== Move::TAG ? $lower->heldBy() : [];
         $subject = $context->subject();
+        $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $draft->constraint() : null;
+        $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
+        $checks = $context->checks();
+        $query = $checks === null ? null : self::query($kind, $subject, $constraint, $version, $phpCheck);
+        $outcome = $query === null || $checks === null ? null : $checks->check($query);
+        $check = $outcome === null ? null : $outcome->check();
+        $heldBy = $lower !== null && $kind !== Move::TAG ? $lower->heldBy() : [];
+        if ($outcome !== null && $outcome->check()->isRefused()) {
+            $heldBy = Holder::distinct(array_merge($heldBy, $outcome->holds()));
+        }
         $because = self::because($kind, $crosses, $heldBy, $subject);
         $ifApplied = null;
         if (\in_array($kind, [Move::UPDATE, Move::REQUIRE, Move::RAISE_PHP, Move::TAG], true)) {
-            $assumes = array_merge([IfApplied::CLEARS_HOLD], $because !== [] || $heldBy !== [] ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
+            $resolves = $check !== null && $check->isResolved();
+            $assumes = array_merge([IfApplied::CLEARS_HOLD], !$resolves && ($because !== [] || $heldBy !== []) ? [IfApplied::COMPOSER_RESOLVES] : [], $context->advisoriesComplete() ? [] : [IfApplied::NO_NEW_ADVISORIES]);
             $ifApplied = self::rerun($draft, $clears, $unverified, $adds, $context, $assumes);
         }
-        $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $draft->constraint() : null;
-        $version = \in_array($kind, Move::ROW_KINDS, true) ? ($lower === null ? null : $lower->release()->pretty()) : ($kind === Move::TAG && $latest !== null ? $latest->version() : null);
         $s2 = $finding->signalData(NoReleaseData::class);
 
-        return new Move(
+        return (new Move(
             $kind,
             $draft->source(),
             $merged,
@@ -102,9 +111,37 @@ final class MoveBuilder
             $leaves,
             $ifApplied,
             $because,
-            self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest)),
+            self::runnable(self::commands($kind, $subject, $constraint, $phpCheck, $latest, $version, $check, $checks)),
             $subject
-        );
+        ))->withCheck($check);
+    }
+
+    /**
+     * The Composer request of a move that runs one: `composer require` for a package that
+     * composer.json requires, else `composer update` with the constraint inline.
+     */
+    private static function query(string $kind, MoveSubject $subject, ?string $constraint, ?string $version, ?PhpCheck $phpCheck): ?MoveQuery
+    {
+        if ($version === null) {
+            return null;
+        }
+        $caret = '^'.ltrim($version, 'vV');
+        $php = $phpCheck === null ? null : $phpCheck->raiseTo();
+        switch ($kind) {
+            case Move::UPDATE:
+                return MoveQuery::update($subject->package(), $caret, $version);
+            case Move::REQUIRE:
+            case Move::RAISE_PHP:
+                if ($constraint === null) {
+                    return null;
+                }
+
+                return $subject->isDirect() ? MoveQuery::require($subject->package(), $constraint, $version, $php) : MoveQuery::update($subject->package(), $constraint, $version, $php);
+            case Move::TAG:
+                return $subject->isDirect() ? MoveQuery::require($subject->package(), $caret, $version) : MoveQuery::update($subject->package(), $caret, $version);
+            default:
+                return null;
+        }
     }
 
     /** @return list<string> the counted maintenance flags in flag order */
@@ -295,13 +332,24 @@ final class MoveBuilder
         return $runnable;
     }
 
-    /** @return list<list<string>> */
-    private static function commands(string $kind, MoveSubject $subject, ?string $constraint, ?PhpCheck $phpCheck, ?Latest $latest): array
+    /**
+     * The steps of the form that the check resolved, with its option. A refused move has none, and
+     * a move that the check did not run on has the inline form.
+     *
+     * @return list<list<string>>
+     */
+    private static function commands(string $kind, MoveSubject $subject, ?string $constraint, ?PhpCheck $phpCheck, ?Latest $latest, ?string $version, ?MoveCheck $check, ?MoveChecks $checks): array
     {
+        if ($check !== null && $check->isRefused()) {
+            return [];
+        }
+        $option = $check === null ? [] : array_values(array_intersect_key(MoveCheck::OPTIONS, [(string) $check->form() => true]));
         $package = $subject->package();
         switch ($kind) {
             case Move::UPDATE:
-                return [['composer', 'update', $package]];
+                $inline = $checks !== null && $version !== null && $checks->writesInline($subject->isDirect());
+
+                return [array_merge(['composer', 'update', $inline ? $package.':^'.ltrim((string) $version, 'vV') : $package], $option)];
             case Move::REQUIRE:
             case Move::RAISE_PHP:
                 $commands = [];
@@ -309,12 +357,12 @@ final class MoveBuilder
                     $commands[] = ['composer', 'require', 'php:'.$phpCheck->raiseTo(), '--no-update'];
                 }
                 if ($subject->isDirect() && $constraint !== null) {
-                    $commands[] = ['composer', 'require', $package.':'.$constraint];
+                    $commands[] = array_merge(['composer', 'require', $package.':'.$constraint], $option);
                 }
 
                 return $commands;
             case Move::TAG:
-                return $subject->isDirect() && $latest !== null ? [['composer', 'require', $package.':^'.ltrim($latest->version(), 'vV')]] : [];
+                return $subject->isDirect() && $latest !== null ? [array_merge(['composer', 'require', $package.':^'.ltrim($latest->version(), 'vV')], $option)] : [];
             default:
                 return [];
         }

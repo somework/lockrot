@@ -25,6 +25,9 @@ interface MoveChecker
     /** @param array<string, string> $inline name => constraint: one `composer update` of every name */
     public function combined(array $inline): CheckOutcome;
 
+    /** The php version that the solve runs at, as Composer's problem text names it; null when nothing solves. */
+    public function platformPhp(): ?string;
+
     /** The version of the Composer that solves, null when nothing solves. */
     public function composerVersion(): ?string;
 

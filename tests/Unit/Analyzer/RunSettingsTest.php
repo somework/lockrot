@@ -97,7 +97,7 @@ final class RunSettingsTest extends TestCase
         $keys = array_keys((new RunSettings(null, null, '8.4', RunSettings::SOURCE_OPTION, null, null, RunSettings::SOURCE_DEFAULT, null))->toArray(['counted' => 0], null, AdvisoryLookup::of(AdvisoryCoverage::none(), [])));
 
         self::assertSame(['project', 'root_package', 'target_php', 'target_php_source', 'project_php', 'project_php_lowest', 'lock_file', 'fail_on', 'fail_on_source', 'gates',
-            'strict_network', 'mode', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts', 'signal_ids', 'fix_model', 'text_grammar', 'score_model', 'advisory_lookup', 'score_rules_used'], $keys);
+            'strict_network', 'mode', 'include_dev', 'thresholds', 'flag_ids', 'verdicts', 'graded_verdicts', 'signal_ids', 'fix_model', 'text_grammar', 'score_model', 'advisory_lookup', 'move_check', 'score_rules_used'], $keys);
     }
 
     /** A run that records a target PHP or a fail-on records the source that set it: no default stands in. */

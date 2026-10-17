@@ -26,8 +26,9 @@ final class Holder implements \JsonSerializable
     public const ROOT_REQUIRE = 'root-require';
     public const PLATFORM = 'platform';
 
-    /** `held_by[]`'s order: the root first, then by package, then by link, then by target. */
+    /** `held_by[]`'s order: the root first, then by package, then by link in this order, then by target. */
     private const SOURCE_ORDER = [self::ROOT => 0, self::PACKAGE => 1];
+    private const LINK_ORDER = [self::REQUIRE => 0, self::REQUIRE_DEV => 1, self::CONFLICT => 2, self::ROOT_REQUIRE => 3, self::PLATFORM => 4];
 
     /** @var self::ROOT|self::PACKAGE */
     private string $source;
@@ -128,8 +129,8 @@ final class Holder implements \JsonSerializable
             $kept[$key] ??= $holder;
         }
         $kept = array_values($kept);
-        usort($kept, static fn (self $a, self $b): int => [self::SOURCE_ORDER[$a->source], (string) $a->package, $a->link, (string) $a->target, $a->constraint]
-            <=> [self::SOURCE_ORDER[$b->source], (string) $b->package, $b->link, (string) $b->target, $b->constraint]);
+        usort($kept, static fn (self $a, self $b): int => [self::SOURCE_ORDER[$a->source], $a->source === self::ROOT ? '' : (string) $a->package, self::LINK_ORDER[$a->link], (string) $a->target, $a->constraint]
+            <=> [self::SOURCE_ORDER[$b->source], $b->source === self::ROOT ? '' : (string) $b->package, self::LINK_ORDER[$b->link], (string) $b->target, $b->constraint]);
 
         return $kept;
     }

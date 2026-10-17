@@ -48,6 +48,7 @@ final class MoveContext
     /** @var list<ConstraintInterface> */
     private array $own;
     private bool $advisoriesComplete;
+    private ?MoveChecks $checks = null;
 
     /**
      * @param list<BranchRow>                    $rows      highest branch first
@@ -72,6 +73,20 @@ final class MoveContext
         $this->ranges = $ranges;
         $this->own = $own;
         $this->advisoriesComplete = $advisoriesComplete;
+    }
+
+    /** A copy whose moves Composer's solver checks. Without it a move carries no check. */
+    public function withChecks(MoveChecks $checks): self
+    {
+        $clone = clone $this;
+        $clone->checks = $checks;
+
+        return $clone;
+    }
+
+    public function checks(): ?MoveChecks
+    {
+        return $this->checks;
     }
 
     public function finding(): Finding

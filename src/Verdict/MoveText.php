@@ -6,6 +6,7 @@ namespace Lockrot\Verdict;
 
 use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Holder;
+use Lockrot\Solver\MoveCheck;
 
 /**
  * `next_step.text`, text grammar 1: rendered from the move object, the package and the run alone.
@@ -26,6 +27,17 @@ final class MoveText
         'affected_range_unknown' => 'no move: no advisory names the versions it affects, so lockrot names no fix',
         'metadata_not_read' => 'no move: lockrot did not read its releases, so it names none',
         'local_package' => 'no move: it is installed from a local path (your own package)',
+    ];
+
+    /** Why lockrot did not ask Composer's solver about the move, by `check.reason`. */
+    private const NOT_CHECKED = [
+        MoveCheck::BASELINE_REFUSED => 'Composer refuses the lock itself',
+        MoveCheck::UNLOADED_NAME => 'a package it needs could not be loaded',
+        MoveCheck::OFFLINE => "a package it needs is not in Composer's cache",
+        MoveCheck::INSTALL_TIME_BUDGET => 'the install-time budget ran out',
+        MoveCheck::NOT_FROM_COMPOSER_REPOSITORY => 'no Composer repository serves it',
+        MoveCheck::COMPOSER_TOO_OLD => 'this Composer has no solver that lockrot can use',
+        MoveCheck::NO_COMPOSER_JSON => 'the project has no composer.json',
     ];
 
     private const ADDS = [
@@ -53,7 +65,25 @@ final class MoveText
             $text .= '; '.$through;
         }
 
-        return $text;
+        return $text.self::checked($move->check());
+    }
+
+    /** D10: what Composer's solver said about the move, or why lockrot did not ask it. */
+    private static function checked(?MoveCheck $check): string
+    {
+        if ($check === null) {
+            return '';
+        }
+        switch ($check->result()) {
+            case MoveCheck::RESOLVES:
+                return "; Composer's solver checked it against the lock";
+            case MoveCheck::REFUSED:
+                return "; Composer's solver refuses it against the lock";
+            default:
+                $reason = (string) $check->reason();
+
+                return '; not checked with Composer\'s solver ('.(self::NOT_CHECKED[$reason] ?? $reason).'), so it holds only if Composer resolves it';
+        }
     }
 
     /** @param list<string> $names */
@@ -246,16 +276,26 @@ final class MoveText
 
     private static function holderWords(Holder $holder): string
     {
+        $link = self::linkWords($holder);
         if ($holder->source() === Holder::ROOT) {
-            return 'composer.json (requires '.$holder->constraint().')';
+            return 'composer.json ('.$link.')';
         }
-        $bits = ['requires '.$holder->constraint()];
+        $bits = [$link];
         $finding = $holder->finding();
         if ($finding !== null && $finding->isGraded()) {
             $bits[] = $finding->lead() !== null ? 'itself '.$finding->lead() : 'itself '.$finding->verdict().': '.implode(' · ', $finding->flagIds());
         }
 
         return $holder->package().' '.$holder->version().' ('.implode('; ', $bits).')';
+    }
+
+    /** `requires ^1.0`, `conflicts with <5.3`, `requires symfony/console ^4.4`: the link and its target. */
+    private static function linkWords(Holder $holder): string
+    {
+        $target = $holder->target();
+        $verb = $holder->link() === Holder::CONFLICT ? 'conflicts with ' : 'requires ';
+
+        return $verb.($target === null ? '' : $target.' ').$holder->constraint();
     }
 
     private static function because(string $reason, Move $move, MoveSubject $subject): string
@@ -265,7 +305,10 @@ final class MoveText
             case Move::HOLDERS:
                 return 'the packages that hold it may need to move too';
             case Move::CROSSES_MAJOR:
-                return (strpos((string) $move->toBranch(), '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements, which lockrot does not solve';
+                $check = $move->check();
+                $solved = $check !== null && $check->result() !== MoveCheck::NOT_CHECKED;
+
+                return (strpos((string) $move->toBranch(), '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements'.($solved ? '' : ', which lockrot does not solve');
             case Move::TRANSITIVE:
                 $dependents = $subject->dependents();
 

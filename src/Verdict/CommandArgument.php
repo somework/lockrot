@@ -14,8 +14,11 @@ namespace Lockrot\Verdict;
  */
 final class CommandArgument
 {
-    /** The Composer option that lockrot writes, by its subcommand: anywhere else, a leading `-` came from data. */
-    private const OPTIONS = ['require' => ['--no-update' => true]];
+    /** The Composer options that lockrot writes, by subcommand: anywhere else, a leading `-` came from data. */
+    private const OPTIONS = [
+        'update' => ['--with-dependencies' => true, '--with-all-dependencies' => true],
+        'require' => ['--no-update' => true, '--with-dependencies' => true, '--with-all-dependencies' => true],
+    ];
     private const SUBCOMMANDS = ['update' => true, 'require' => true, 'why-not' => true];
     private const SET = '{^(?! +$)[A-Za-z0-9/._:@+=,^~*<>| -]+$}D';
 

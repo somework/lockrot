@@ -26,12 +26,12 @@ final class HolderTest extends TestCase
                 ['root', 'require', null, null],
                 ['root', 'root-require', null, 'symfony/console'],
                 ['package', 'require', 'acme/handler', null],
-                ['package', 'conflict', 'symfony/yaml', 'symfony/console'],
                 ['package', 'require', 'symfony/yaml', 'php'],
+                ['package', 'conflict', 'symfony/yaml', 'symfony/console'],
             ],
             array_map(static fn (Holder $hold): array => [$hold->source(), $hold->link(), $hold->source() === Holder::ROOT ? null : $hold->package(), $hold->target()], $holds)
         );
-        self::assertSame('v5.4.54', $holds[3]->version(), 'the first of two that differ only in the version');
+        self::assertSame('v5.4.54', $holds[4]->version(), 'the first of two that differ only in the version');
     }
 
     public function testTheTargetIsWrittenBesideTheLink(): void

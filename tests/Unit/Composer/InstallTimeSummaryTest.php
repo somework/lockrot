@@ -14,6 +14,7 @@ use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryFactory;
 use Composer\Repository\RepositoryInterface;
 use Lockrot\Allowlist\BuiltinAllowlist;
@@ -243,6 +244,7 @@ final class InstallTimeSummaryTest extends TestCase
         $config = $server->config();
         $composer = new Composer();
         $composer->setConfig($config);
+        $composer->setPackage(new RootPackage('__root__', '1.0.0.0', '1.0.0'));
         $composer->setRepositoryManager(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)));
 
         return new InstallerEvent(InstallerEvents::PRE_OPERATIONS_EXEC, $composer, $io, $devMode, $executeOperations, $transaction);

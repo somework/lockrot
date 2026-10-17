@@ -28,11 +28,11 @@ final class NextStep
         $security = $score->deciding() === null ? null : self::securityDraft($context);
         $maintenance = $finding->lead() === null ? null : MaintenanceMove::draft($context, $finding->lead());
         $fixKind = $security === null ? null : $security->fixKind();
-        $rows = self::rowsIfApplied($context);
+        [$rows, $rowChecks] = self::rowsIfApplied($context);
         $partial = self::partial($context);
         [$main, $other] = self::lead($security, $maintenance, $context, $fixKind);
         if ($main === null) {
-            return new Moves(null, null, $fixKind, $partial, $rows);
+            return new Moves(null, null, $fixKind, $partial, $rows, $rowChecks);
         }
         $merged = [];
         $mainRow = $main->row();
@@ -72,7 +72,7 @@ final class NextStep
         }
         $published = $moveIn === Moves::IN_NEXT_STEP ? $lead : ($moveIn === Moves::IN_ALSO ? $also[0] : null);
 
-        return new Moves($lead, $moveIn, $published === null ? $fixKind : $published->fixKind(), $partial, $rows);
+        return new Moves($lead, $moveIn, $published === null ? $fixKind : $published->fixKind(), $partial, $rows, $rowChecks);
     }
 
     /**
@@ -127,13 +127,15 @@ final class NextStep
     }
 
     /**
-     * Each row's score after a move to its candidate, judged as the move to it is.
+     * Each row's score after a move to its candidate, judged as the move to it is, and Composer's
+     * check of that move.
      *
-     * @return array<string, IfApplied>
+     * @return array{0: array<string, IfApplied>, 1: array<string, \Lockrot\Solver\MoveCheck>}
      */
     private static function rowsIfApplied(MoveContext $context): array
     {
         $out = [];
+        $checks = [];
         $fixes = $context->fixes();
         foreach ($fixes === null ? [] : $fixes->branches() as $branch) {
             $candidate = $branch->candidate();
@@ -141,13 +143,17 @@ final class NextStep
             if ($candidate === null || $row === null) {
                 continue;
             }
-            $ifApplied = MoveBuilder::build(self::toCandidate($row, $candidate), [], $candidate->kind(), $context)->ifApplied();
+            $move = MoveBuilder::build(self::toCandidate($row, $candidate), [], $candidate->kind(), $context);
+            $ifApplied = $move->ifApplied();
             if ($ifApplied !== null) {
                 $out[$branch->branch()] = $ifApplied->asRow();
             }
+            if ($move->check() !== null) {
+                $checks[$branch->branch()] = $move->check();
+            }
         }
 
-        return $out;
+        return [$out, $checks];
     }
 
     /** `security.partial`, judged as an `update` move to that release. */

@@ -161,12 +161,12 @@ final class RunFooter
         return $parts === [] ? null : 'fix, by package: '.implode(' · ', $parts);
     }
 
-    /** `security.update_now_command`, rendered for a POSIX shell; null when no package is update-class. */
+    /** `security.update_now_command`, rendered for a POSIX shell; null when the report has none. */
     public static function updateNow(Report $report): ?string
     {
-        $packages = Report2Root::updateNow($report->sorted());
+        $command = $report->updateNowCommand();
 
-        return $packages === [] ? null : ShellCommand::posix(array_merge(['composer', 'update'], $packages));
+        return $command === null ? null : ShellCommand::posix($command);
     }
 
     /**

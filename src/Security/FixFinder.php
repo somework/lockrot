@@ -15,8 +15,8 @@ use Lockrot\Signal\PhpFloor;
 
 /**
  * The release scan: which release fixes each counted advisory, how hard it is to
- * reach, and what holds it. lockrot reads the lock as it is and does not solve dependencies: a
- * class checks the lock's links on the package, not the fixing release's own requirements.
+ * reach, and what holds it. A class checks the lock's links on the package, and the holds of each
+ * move of the package that Composer's solver refused ({@see RefusedMoves}).
  *
  * @internal
  */
@@ -24,11 +24,22 @@ final class FixFinder
 {
     private PhpFloor $floor;
     private LinkIndex $links;
+    private RefusedMoves $refused;
 
     public function __construct(PhpFloor $floor, LinkIndex $links)
     {
         $this->floor = $floor;
         $this->links = $links;
+        $this->refused = RefusedMoves::none();
+    }
+
+    /** The scan of one package, with the moves of it that the solver refused. */
+    public function withRefused(RefusedMoves $refused): self
+    {
+        $clone = clone $this;
+        $clone->refused = $refused;
+
+        return $clone;
     }
 
     /**
@@ -140,7 +151,7 @@ final class FixFinder
         if ($branch === null) {
             return null;
         }
-        $heldBy = $this->links->excluding($package, $release->normalized());
+        $heldBy = Holder::distinct(array_merge($this->links->excluding($package, $release->normalized()), $this->refused->holding($release->normalized())));
         if ($this->floor->admitsTarget($release->php()) === false) {
             $kind = Fix::BLOCKED;
         } elseif ($this->floor->admitsProject($release->php()) === false) {

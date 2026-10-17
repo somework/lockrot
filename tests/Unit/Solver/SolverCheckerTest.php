@@ -215,7 +215,7 @@ final class SolverCheckerTest extends TestCase
     public function testAMoveOfAPackageThatNoComposerRepositoryServesIsNotChecked(): void
     {
         $solver = new ComposerSolver(self::root(['acme/own' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/own', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource([]), []);
-        $checker = new SolverChecker($solver, ['acme/own'], (new VersionParser())->normalize('8.4.99'), false, Deadline::never());
+        $checker = new SolverChecker($solver, ['acme/own'], '8.4.99', false, Deadline::never());
 
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => 'not_from_composer_repository'], $checker->check(MoveQuery::update('acme/own', '^1.1', '1.1.0'))->check()->jsonSerialize());
     }
@@ -223,7 +223,7 @@ final class SolverCheckerTest extends TestCase
     public function testAnExpiredDeadlineChecksNothing(): void
     {
         $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.1.0']]]), []);
-        $checker = new SolverChecker($solver, [], (new VersionParser())->normalize('8.4.99'), false, Deadline::inSeconds(-1.0));
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::inSeconds(-1.0));
 
         self::assertSame([MoveCheck::NOT_CHECKED, 'install_time_budget'], [$checker->baseline()->check()->result(), $checker->baseline()->check()->reason()]);
         self::assertSame('install_time_budget', $checker->check(MoveQuery::update('acme/lib', '^1.1', '1.1.0'))->check()->reason());
@@ -277,7 +277,7 @@ final class SolverCheckerTest extends TestCase
     {
         $solver = new ComposerSolver(self::root($requires), LockFile::fromArray(['packages' => $locked])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, []);
 
-        return new SolverChecker($solver, [], (new VersionParser())->normalize('8.4.99'), false, Deadline::never());
+        return new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
     }
 
     /** @param array<string, string> $requires */

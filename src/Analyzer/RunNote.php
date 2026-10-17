@@ -40,6 +40,9 @@ final class RunNote
     public const BASELINE_TARGET_DIFFERS = 'baseline_target_differs';
     public const BASELINE_FIX_MODEL_DIFFERS = 'baseline_fix_model_differs';
     public const IGNORE_DOES_NOT_COVER_ADVISORIES = 'ignore_does_not_cover_advisories';
+    public const MOVES_NOT_CHECKED = 'moves_not_checked';
+    public const UPDATE_NOW_REDUCED = 'update_now_reduced';
+    public const UPDATE_NOW_REFUSED = 'update_now_refused';
     /**
      * The codes that lockrot writes, as the schemas list them in `x-known-values`, in the order of
      * the analyzer's passes. In a report, the notes of two repository hosts can interleave.
@@ -65,6 +68,9 @@ final class RunNote
         self::ABANDONED_MARKINGS_IGNORED,
         self::ABANDONED_NOT_AUDITED_BY_COMPOSER,
         self::ABANDONED_IGNORE_UNREADABLE,
+        self::MOVES_NOT_CHECKED,
+        self::UPDATE_NOW_REDUCED,
+        self::UPDATE_NOW_REFUSED,
     ];
 
     /** Each code has a section on the site at its own id. Never move one without a stub. */
@@ -445,6 +451,64 @@ final class RunNote
         }
 
         return self::of(self::IGNORE_DOES_NOT_COVER_ADVISORIES, "extra.lockrot.ignore[] accepts maintenance flags only, not advisories: ".implode('; ', $items)."; accept them in Composer's audit policy if that is the decision", false, ['entries' => $entries]);
+    }
+
+    /**
+     * D5: Composer refuses a partial update of a name outside the lock, so it would refuse every
+     * move for the same reason. The text names the first problem line, and `data.problem` holds
+     * Composer's whole problem text.
+     *
+     * @param string $targetPhp the php version that the solve ran at
+     */
+    public static function movesNotChecked(string $targetPhp, string $problem): self
+    {
+        return self::of(self::MOVES_NOT_CHECKED, \sprintf(
+            "moves not checked: Composer's solver refuses the lock itself at php %s, so it would refuse every move: %s",
+            $targetPhp,
+            self::firstProblem($problem)
+        ), false, ['reason' => 'baseline_refused', 'php' => $targetPhp, 'problem' => $problem]);
+    }
+
+    /**
+     * D9: the members of `security.update_now` that the combined command leaves out, because
+     * Composer refuses them together with the others.
+     *
+     * @param list<string> $leftOut in report order
+     */
+    public static function updateNowReduced(array $leftOut, string $problem): self
+    {
+        if ($leftOut === []) {
+            throw new \InvalidArgumentException('A note about the update now command names at least one package that it leaves out.');
+        }
+
+        return self::of(self::UPDATE_NOW_REDUCED, \sprintf(
+            "update now: the command leaves out %s, because Composer's solver refuses %s together with the others: %s",
+            implode(', ', $leftOut),
+            \count($leftOut) === 1 ? 'it' : 'them',
+            self::firstProblem($problem)
+        ), false, ['left_out' => $leftOut, 'problem' => $problem]);
+    }
+
+    /** D9: Composer refuses the members of `security.update_now` together, so the report writes no command. */
+    public static function updateNowRefused(string $problem): self
+    {
+        return self::of(self::UPDATE_NOW_REFUSED, \sprintf(
+            "update now: no command, because Composer's solver refuses these packages together; run each package's own command: %s",
+            self::firstProblem($problem)
+        ), false, ['problem' => $problem]);
+    }
+
+    /** The first line of Composer's problem text that names a rule, without its list marker. */
+    private static function firstProblem(string $problem): string
+    {
+        foreach (preg_split('/\R/', $problem) ?: [] as $line) {
+            $line = trim($line);
+            if (strpos($line, '- ') === 0) {
+                return substr($line, 2);
+            }
+        }
+
+        return trim($problem);
     }
 
     /**

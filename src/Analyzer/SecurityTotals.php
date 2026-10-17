@@ -26,15 +26,19 @@ final class SecurityTotals implements \JsonSerializable
     private array $fixes;
     /** @var list<string> */
     private array $updateNow;
+    /** @var list<string>|null */
+    private ?array $updateNowCommand;
 
     /**
      * @param array<string, int> $packages
      * @param array<string, int> $severities
      * @param array<string, int> $fixes
      * @param list<string>       $updateNow
+     * @param list<string>|null  $updateNowCommand
      */
-    private function __construct(string $check, array $packages, int $counted, int $ignored, array $severities, array $fixes, array $updateNow)
+    private function __construct(string $check, array $packages, int $counted, int $ignored, array $severities, array $fixes, array $updateNow, ?array $updateNowCommand)
     {
+        $this->updateNowCommand = $updateNowCommand;
         $this->check = $check;
         $this->packages = $packages;
         $this->counted = $counted;
@@ -44,8 +48,12 @@ final class SecurityTotals implements \JsonSerializable
         $this->updateNow = $updateNow;
     }
 
-    /** @param list<Finding> $findings */
-    public static function of(array $findings): self
+    /**
+     * @param list<Finding>      $findings         in report order
+     * @param list<string>|null  $updateNow        the report's, else counted from the findings
+     * @param list<string>|null  $updateNowCommand the report's: null exactly when Composer refuses the members together or there are none
+     */
+    public static function of(array $findings, ?array $updateNow = null, ?array $updateNowCommand = null): self
     {
         $checks = [];
         $packages = ['vulnerable' => 0, 'unchecked' => 0, 'ignored' => 0, 'clear' => 0];
@@ -69,7 +77,10 @@ final class SecurityTotals implements \JsonSerializable
             ++$fixes[$kind];
         }
 
-        return new self(\count($checks) === 1 ? reset($checks) : ($checks === [] ? 'complete' : 'partial'), $packages, $advisories['counted'], $advisories['ignored'], $severities, $fixes, Report2Root::updateNow($findings));
+        $members = $updateNow ?? Report2Root::updateNow($findings);
+        $command = $updateNow === null ? ($members === [] ? null : array_merge(['composer', 'update'], $members)) : $updateNowCommand;
+
+        return new self(\count($checks) === 1 ? reset($checks) : ($checks === [] ? 'complete' : 'partial'), $packages, $advisories['counted'], $advisories['ignored'], $severities, $fixes, $members, $command);
     }
 
     public function check(): string
@@ -109,7 +120,7 @@ final class SecurityTotals implements \JsonSerializable
             'severities' => $this->severities,
             'fixes' => $this->fixes,
             'update_now' => $this->updateNow,
-            'update_now_command' => $this->updateNow === [] ? null : array_merge(['composer', 'update'], $this->updateNow),
+            'update_now_command' => $this->updateNowCommand,
             'fix_unknown' => $this->fixes['unknown'],
         ];
     }

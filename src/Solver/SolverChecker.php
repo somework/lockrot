@@ -30,7 +30,7 @@ final class SolverChecker implements MoveChecker
     private HoldScan $scan;
     /** @var list<string> */
     private array $notFromComposerRepository;
-    private ?string $platformPhp;
+    private string $platformPhp;
     private bool $blocksAdvisories;
     private Deadline $deadline;
     private ?CheckOutcome $baseline = null;
@@ -39,9 +39,9 @@ final class SolverChecker implements MoveChecker
 
     /**
      * @param list<string> $notFromComposerRepository the locked names that no Composer repository serves
-     * @param ?string      $platformPhp              the normalized php version that the solve runs at
+     * @param string       $platformPhp              the php version that the solve runs at, as config.platform writes it
      */
-    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, ?string $platformPhp, bool $blocksAdvisories, Deadline $deadline)
+    public function __construct(ComposerSolver $solver, array $notFromComposerRepository, string $platformPhp, bool $blocksAdvisories, Deadline $deadline)
     {
         $this->solver = $solver;
         $this->scan = new HoldScan($solver->root(), $solver->locked());
@@ -93,6 +93,11 @@ final class SolverChecker implements MoveChecker
             : new CheckOutcome(MoveCheck::refused(), Holder::distinct($solution->holds()), null, $solution->problem());
     }
 
+    public function platformPhp(): string
+    {
+        return $this->platformPhp;
+    }
+
     public function composerVersion(): string
     {
         return ComposerFeatures::version();
@@ -142,7 +147,7 @@ final class SolverChecker implements MoveChecker
             $last = $solution;
         }
         $target = $this->release($query->package(), $query->version());
-        $scanned = $target === null ? [] : $this->scan->of($target, $this->platformPhp);
+        $scanned = $target === null ? [] : $this->scan->of($target, (new VersionParser())->normalize($this->platformPhp));
 
         return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)), null, $last->problem());
     }

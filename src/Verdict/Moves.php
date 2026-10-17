@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Verdict;
 
 use Lockrot\Score\IfApplied;
+use Lockrot\Solver\MoveCheck;
 
 /**
  * The moves of one finding: `next_step` with its `also[]`, where the move that clears the
@@ -24,18 +25,22 @@ final class Moves
     private ?SecurityPartial $partial;
     /** @var array<string, IfApplied> */
     private array $rows;
+    /** @var array<string, MoveCheck> */
+    private array $rowChecks;
 
     /**
-     * @param ?string                  $fixKind the fix kind of the move `move_in` names, else of the security move
-     * @param array<string, IfApplied> $rows    by branch label, the rows whose candidate a move can reach
+     * @param ?string                  $fixKind   the fix kind of the move `move_in` names, else of the security move
+     * @param array<string, IfApplied> $rows      by branch label, the rows whose candidate a move can reach
+     * @param array<string, MoveCheck> $rowChecks by branch label, Composer's check of the move to each row's candidate
      */
-    public function __construct(?Move $nextStep, ?string $moveIn, ?string $fixKind, ?SecurityPartial $partial, array $rows)
+    public function __construct(?Move $nextStep, ?string $moveIn, ?string $fixKind, ?SecurityPartial $partial, array $rows, array $rowChecks = [])
     {
         $this->nextStep = $nextStep;
         $this->moveIn = $moveIn;
         $this->fixKind = $fixKind;
         $this->partial = $partial;
         $this->rows = $rows;
+        $this->rowChecks = $rowChecks;
     }
 
     public static function none(): self
@@ -77,6 +82,12 @@ final class Moves
     public function rowIfApplied(string $branch): ?IfApplied
     {
         return $this->rows[$branch] ?? null;
+    }
+
+    /** Composer's check of the move to the row's candidate, null when the run checks no move or the row's move runs no request. */
+    public function rowCheck(string $branch): ?MoveCheck
+    {
+        return $this->rowChecks[$branch] ?? null;
     }
 
     /** @param array<string, GradedPackage> $findings by package name */

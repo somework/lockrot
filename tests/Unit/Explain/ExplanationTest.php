@@ -516,6 +516,6 @@ final class ExplanationTest extends TestCase
         self::assertSame(1, JsonPath::intAt($array, ['finding', 'rank']), "the report's row of the finding");
         $keys = array_keys(JsonPath::arrayAt($array, ['run']));
         sort($keys);
-        self::assertSame(['advisory_lookup', 'fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
+        self::assertSame(['advisory_lookup', 'fail_on', 'fail_on_source', 'fix_model', 'flag_ids', 'gates', 'graded_verdicts', 'include_dev', 'move_check', 'project_php', 'project_php_lowest', 'score_model', 'signal_ids', 'target_php', 'target_php_source', 'text_grammar', 'thresholds', 'verdicts'], $keys);
     }
 }
