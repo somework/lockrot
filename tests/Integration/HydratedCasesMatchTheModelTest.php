@@ -31,8 +31,8 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const CONTRACT = __DIR__.'/../fixtures/contract/';
 
     /**
-     * The fields that each block golden reads (SPEC-0.14.md §7.9.14): dotted keys of the finding, `run.` and `details.`; `{a,b}`
-     * reads each.
+     * The fields that each block golden reads (SPEC-0.14.md §7.9.14): dotted keys of the finding, `run.` and `details.`.
+     * `{a,b}` reads each.
      */
     private const LINES = [
         'verdict_line' => [
