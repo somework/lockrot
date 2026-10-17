@@ -193,7 +193,7 @@ high (15)
       left-behind  branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1
                    above the project's php >=7.4; no releasing branch within reach
       pulls in 1 flagged package: pagerfanta/core (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   roots/wp-config 1.0.0  direct  ·  old-promise
       16 = old-promise 16 (baseline: new package)
       do: test it on PHP 8.4

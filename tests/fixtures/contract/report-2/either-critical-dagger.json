@@ -1469,7 +1469,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v3.4.47 (CVE-2026-00003); fixed by v4.4.44",
+                    "summary": "1 security advisory affects v3.4.47 (CVE-2026-00003); fixed in v4.4.0",
                     "data": {
                         "advisories": [
                             {

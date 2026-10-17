@@ -1392,7 +1392,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -2670,7 +2670,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -4083,7 +4083,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed by v5.4.53",
+                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -4501,7 +4501,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed by v1.43.0",
+                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
                     "data": {
                         "advisories": [
                             {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Signal\Rule;
 
+use Lockrot\Clock;
 use Lockrot\Data\Advisory\Advisory;
 use Lockrot\Data\Advisory\AdvisoryNameCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
@@ -16,8 +17,10 @@ use Lockrot\Lock\ProjectConfig;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
 use Lockrot\Signal\PackageFacts;
+use Lockrot\Signal\Rule\LeftBehindRule;
 use Lockrot\Signal\Rule\NotCheckedRule;
 use Lockrot\Signal\Signal;
+use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SignalDataStub;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
@@ -30,7 +33,13 @@ final class NotCheckedRuleTest extends TestCase
 
     private function rule(): NotCheckedRule
     {
-        return new NotCheckedRule();
+        return new NotCheckedRule(new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()));
+    }
+
+    /** F::metadata()'s branches, with the newest tag undated, as PackageMetadata::fromPackages() leaves a tag that a shared commit dates. */
+    private static function newestUndated(PackageMetadata $metadata): PackageMetadata
+    {
+        return new PackageMetadata('vendor/pkg', false, null, true, null, null, 12, null, 'library', new \DateTimeImmutable(self::NOW), $metadata->latestStableByBranch());
     }
 
     /** Metadata that dates its newest release, so only the activity round can be missing. */
@@ -168,11 +177,10 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), self::undated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S2, Signal::S8], JsonPath::decoded($signal->data())['blocks']);
         self::assertStringContainsString('the age of the package was not read', $signal->summary());
         $unchecked = JsonPath::decoded($signal->data())['unchecked'];
         self::assertIsArray($unchecked);
-        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2, Signal::S8]]], $unchecked);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2]]], $unchecked, 'no branch row is undated, so S8 has its input');
     }
 
     public function testBothChecksCanBeMissingAtOnce(): void
@@ -180,7 +188,7 @@ final class NotCheckedRuleTest extends TestCase
         $signal = $this->rule()->evaluate(new PackageFacts(F::package(), self::undated(), null, [], NotCheckedRule::OFFLINE));
 
         self::assertNotNull($signal);
-        self::assertSame([Signal::S2, Signal::S3, Signal::S4, Signal::S8], JsonPath::decoded($signal->data())['blocks'], 'in signal order');
+        self::assertSame([Signal::S2, Signal::S3, Signal::S4], JsonPath::decoded($signal->data())['blocks'], 'in signal order');
         $unchecked = JsonPath::decoded($signal->data())['unchecked'];
         self::assertIsArray($unchecked);
         self::assertCount(2, $unchecked);
@@ -203,13 +211,55 @@ final class NotCheckedRuleTest extends TestCase
         self::assertStringNotContainsString('S8', $signal->summary());
     }
 
-    public function testAVersionOnAReleaseBranchBlocksBothAgeSignals(): void
+    /**
+     * scheb/2fa-google-authenticator v5.13.2 on wallabag: the newest tag is undated, and S8 fires
+     * from the dated release of its own branch and of a higher one. Only S2 lost its input.
+     */
+    public function testAnUndatedNewestReleaseDoesNotBlockAnS8ThatFired(): void
     {
-        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), self::undated(), F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+        $metadata = self::newestUndated(F::metadata([['v7.0.0', null], ['v6.1.0', '2026-03-01T00:00:00+00:00'], ['v5.13.2', '2021-12-01T00:00:00+00:00']]));
+        $facts = new PackageFacts(F::package(['version' => 'v5.13.2']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []);
+
+        $signal = $this->rule()->evaluate($facts);
+
+        self::assertNotNull((new LeftBehindRule(Clock::fixed(self::NOW), new Thresholds()))->evaluate($facts), 'S8 fires on these facts, or this test proves nothing');
+        self::assertNotNull($signal);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S2]]], JsonPath::decoded($signal->data())['unchecked']);
+    }
+
+    /** The installed branch's release is undated, the newest release is dated: S8 alone lost its input. */
+    public function testAnUndatedInstalledBranchBlocksS8Alone(): void
+    {
+        $metadata = F::metadata([['v2.0.0', '2026-01-01T00:00:00+00:00'], ['v1.2.0', null]]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertSame([['check' => 'release_dates', 'reason' => 'undated_releases', 'blocks' => [Signal::S8]]], JsonPath::decoded($signal->data())['unchecked']);
+        self::assertStringContainsString('so S8 could not measure it', $signal->summary());
+    }
+
+    /** The installed branch is quiet past `release-warn-years`, and the only higher branch is undated: that branch could have raised S8. */
+    public function testAnUndatedHigherBranchBlocksS8OnAQuietBranch(): void
+    {
+        $metadata = self::newestUndated(F::metadata([['v2.0.0', null], ['v1.2.0', '2019-01-01T00:00:00+00:00']]));
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
 
         self::assertNotNull($signal);
         self::assertSame([Signal::S2, Signal::S8], JsonPath::decoded($signal->data())['blocks']);
         self::assertStringContainsString('so S2 and S8 could not measure it', $signal->summary());
+    }
+
+    /** An installed branch within `release-warn-years` raises no S8 whatever a higher branch's date: S8 lost nothing. */
+    public function testAnUndatedHigherBranchDoesNotBlockS8OnAReleasingBranch(): void
+    {
+        $metadata = self::newestUndated(F::metadata([['v2.0.0', null], ['v1.2.0', '2026-01-01T00:00:00+00:00']]));
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertSame([Signal::S2], JsonPath::decoded($signal->data())['blocks']);
     }
 
     public function testAPackageWithoutMetadataIsNotToldItsAgeWasNotRead(): void

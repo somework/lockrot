@@ -1419,7 +1419,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "4 security advisories affect 1.9.1 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); fixed by 3.1.0",
+                    "summary": "4 security advisories affect 1.9.1 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); 1 fixed in 2.12.1, 2 fixed in 2.10.2, 1 fixed in 2.12.3",
                     "data": {
                         "advisories": [
                             {

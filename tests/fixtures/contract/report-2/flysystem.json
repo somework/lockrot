@@ -1429,7 +1429,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects 1.1.9 (CVE-2026-102601); fixed by 3.36.0",
+                    "summary": "1 security advisory affects 1.1.9 (CVE-2026-102601); fixed in 3.36.0",
                     "data": {
                         "advisories": [
                             {

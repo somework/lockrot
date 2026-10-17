@@ -6,7 +6,6 @@ namespace Lockrot\Signal\Rule;
 
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Forge\ActivityLookup;
-use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Lock\PackageOrigin;
 use Lockrot\Signal\Data\Check;
 use Lockrot\Signal\Data\NotCheckedData;
@@ -72,6 +71,13 @@ final class NotCheckedRule implements SignalRule
     /** The S10 checks about the package's upkeep, which a raised S1 makes moot. */
     private const MAINTENANCE_CHECKS = ['repository_activity', 'release_dates', 'release_metadata'];
 
+    private LeftBehindRule $leftBehind;
+
+    public function __construct(LeftBehindRule $leftBehind)
+    {
+        $this->leftBehind = $leftBehind;
+    }
+
     public function evaluate(PackageFacts $facts): ?Signal
     {
         $unchecked = [];
@@ -85,13 +91,16 @@ final class NotCheckedRule implements SignalRule
         }
 
         $metadata = $facts->metadata();
-        // PackageMetadata::fromPackages() leaves the newest tag undated where a shared commit
-        // dates it: S2 cannot measure that.
+        // PackageMetadata::fromPackages() leaves a tag undated where a shared commit dates it.
+        // `blocks` names only the signals whose input that leaves unmeasured.
+        $ageBlocks = [];
         if ($metadata !== null && $metadata->hasStableRelease() && $metadata->lastStableReleaseAt() === null) {
-            // A branch snapshot is on no release branch, so S8 misses nothing there. S2 reads the
-            // package's newest release whatever the lock installs, and with S4 it can make
-            // the snapshot `silent`, not `pinned`.
-            $ageBlocks = ReleaseBranch::of($facts->package()->version()) === null ? [Signal::S2] : [Signal::S2, Signal::S8];
+            $ageBlocks[] = Signal::S2;
+        }
+        if ($this->leftBehind->missesAnUndatedRelease($facts)) {
+            $ageBlocks[] = Signal::S8;
+        }
+        if ($ageBlocks !== []) {
             $unchecked[] = new Check('release_dates', 'undated_releases', $ageBlocks);
         }
 

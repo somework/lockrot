@@ -124,7 +124,7 @@
           major brings its own requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-bundle v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: require scheb/2fa-bundle ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0,
@@ -152,7 +152,7 @@
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 3 flagged packages: spomky-labs/otphp (left-behind · vulnerable), symfony/security-guard (abandoned),
       thecodingmachine/safe (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-trusted-device v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: require scheb/2fa-trusted-device ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
@@ -160,7 +160,7 @@
           major brings its own requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   symfony/web-server-bundle v4.4.44  direct  ·  abandoned (baseline)
       16 = abandoned 32 ÷ 2 dev (baseline: known)
       gate 0 = min(16, 2 × 0) (the new facts bound it); new: 0

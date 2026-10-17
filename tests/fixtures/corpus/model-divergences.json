@@ -8846,6 +8846,81 @@
         }
       ],
       "reason": "lockrot reads the dev-master releases of the wallabag/rulerz packages from their ~dev answers, so it reads the require names of the installed release. The model reads only the tagged releases, so the installed release is installed_unlisted for it."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "scheb/2fa-backup-code",
+      "path": "checks_missing",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "reason": "Only the newest tag is undated. S8 reads the dated release of the installed branch and of a higher branch and fires, so lockrot lists only S2 in blocks. The model lists S8 beside S2."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "scheb/2fa-google-authenticator",
+      "path": "checks_missing",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "reason": "Only the newest tag is undated. S8 reads the dated release of the installed branch and of a higher branch and fires, so lockrot lists only S2 in blocks. The model lists S8 beside S2."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "scheb/2fa-trusted-device",
+      "path": "checks_missing",
+      "lockrot": [
+        {
+          "blocks": [
+            "S2"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "model": [
+        {
+          "blocks": [
+            "S2",
+            "S8"
+          ],
+          "check": "release_dates",
+          "reason": "undated_releases"
+        }
+      ],
+      "reason": "Only the newest tag is undated. S8 reads the dated release of the installed branch and of a higher branch and fires, so lockrot lists only S2 in blocks. The model lists S8 beside S2."
     }
   ]
 }

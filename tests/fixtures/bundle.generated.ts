@@ -1344,7 +1344,7 @@ export const d_A_baselined_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -3194,7 +3194,7 @@ export const d_A_blocked_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -4989,7 +4989,7 @@ export const d_A_gate_critical = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -7249,7 +7249,7 @@ export const d_A_gate_vulnerable = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -9515,7 +9515,7 @@ export const d_A_php_star_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -11775,7 +11775,7 @@ export const d_A = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -14061,7 +14061,7 @@ export const d_B_accepted_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -15648,7 +15648,7 @@ export const d_B_also_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v2.8.52",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v2.8.52",
                     "data": {
                         "advisories": [
                             {
@@ -17163,7 +17163,7 @@ export const d_B_baselined_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -18738,7 +18738,7 @@ export const d_B_dev_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -20248,7 +20248,7 @@ export const d_B_gate_flag = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -21767,7 +21767,7 @@ export const d_B_gate_list = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -23270,7 +23270,7 @@ export const d_B_gate_none = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -27580,7 +27580,7 @@ export const d_B = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -40014,7 +40014,7 @@ export const d_E_ignored_dagger = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed by v5.4.53",
+                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -41489,7 +41489,7 @@ export const d_E_ignored_whole_dagger = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed by v5.4.53",
+                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -42920,7 +42920,7 @@ export const d_E = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed by v5.4.53",
+                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -44374,7 +44374,7 @@ export const d_F = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed by v1.43.0",
+                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
                     "data": {
                         "advisories": [
                             {
@@ -54101,7 +54101,7 @@ export const d_commonmark = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "3 security advisories affect 2.9.1 (PKSA-m4t9-vsgq-8khn, PKSA-zyf5-hrxv-hrd7, PKSA-m2dq-1fhr-29b1); fixed by 2.10.3",
+                    "summary": "3 security advisories affect 2.9.1 (PKSA-m4t9-vsgq-8khn, PKSA-zyf5-hrxv-hrd7, PKSA-m2dq-1fhr-29b1); 2 fixed in 2.10.3, 1 fixed in 2.10.0",
                     "data": {
                         "advisories": [
                             {
@@ -55633,7 +55633,7 @@ export const d_composite = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -56911,7 +56911,7 @@ export const d_composite = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -58324,7 +58324,7 @@ export const d_composite = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed by v5.4.53",
+                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -58742,7 +58742,7 @@ export const d_composite = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed by v1.43.0",
+                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
                     "data": {
                         "advisories": [
                             {
@@ -60284,7 +60284,7 @@ export const d_either_critical_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v3.4.47 (CVE-2026-00003); fixed by v4.4.44",
+                    "summary": "1 security advisory affects v3.4.47 (CVE-2026-00003); fixed in v4.4.0",
                     "data": {
                         "advisories": [
                             {
@@ -63211,7 +63211,7 @@ export const d_fail_on_config_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -64708,7 +64708,7 @@ export const d_fail_on_default_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -66133,7 +66133,7 @@ export const d_feeds_drupal_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -67990,7 +67990,7 @@ export const d_flysystem = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects 1.1.9 (CVE-2026-102601); fixed by 3.36.0",
+                    "summary": "1 security advisory affects 1.1.9 (CVE-2026-102601); fixed in 3.36.0",
                     "data": {
                         "advisories": [
                             {
@@ -71084,7 +71084,7 @@ export const d_guzzle_5 = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "14 security advisories affect 5.3.4 (CVE-2022-31043, CVE-2022-29248, CVE-2022-31042 and 11 more); fixed by 8.2.0",
+                    "summary": "14 security advisories affect 5.3.4 (CVE-2022-31043, CVE-2022-29248, CVE-2022-31042 and 11 more); 2 fixed in 6.5.7, 1 fixed in 6.5.6, 2 fixed in 7.15.2, 2 fixed in 6.5.8, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
                     "data": {
                         "advisories": [
                             {
@@ -73796,7 +73796,7 @@ export const d_guzzle_mixed = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "14 security advisories affect 5.3.4 (CVE-2022-31043, CVE-2022-29248, CVE-2022-31042 and 11 more); fixed by 8.2.0",
+                    "summary": "14 security advisories affect 5.3.4 (CVE-2022-31043, CVE-2022-29248, CVE-2022-31042 and 11 more); 2 fixed in 6.5.7, 1 fixed in 6.5.6, 2 fixed in 7.15.2, 2 fixed in 6.5.8, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
                     "data": {
                         "advisories": [
                             {
@@ -76925,7 +76925,7 @@ export const d_guzzle = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "9 security advisories affect 6.5.8 (CVE-2026-69246, CVE-2026-55767, CVE-2026-67353 and 6 more); fixed by 8.2.0",
+                    "summary": "9 security advisories affect 6.5.8 (CVE-2026-69246, CVE-2026-55767, CVE-2026-67353 and 6 more); 2 fixed in 7.15.2, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
                     "data": {
                         "advisories": [
                             {
@@ -90623,7 +90623,7 @@ export const d_joomla_filter = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed by 2.0.6",
+                    "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed in 3.0.5",
                     "data": {
                         "advisories": [
                             {
@@ -96441,7 +96441,7 @@ export const d_long_range_dagger = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed by v1.43.0",
+                    "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
                     "data": {
                         "advisories": [
                             {
@@ -103363,8 +103363,7 @@ export const d_pagerfanta = {
                     "check": "release_dates",
                     "reason": "undated_releases",
                     "blocks": [
-                        "S2",
-                        "S8"
+                        "S2"
                     ]
                 }
             ],
@@ -103468,21 +103467,19 @@ export const d_pagerfanta = {
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
                                 "check": "release_dates",
                                 "reason": "undated_releases",
                                 "blocks": [
-                                    "S2",
-                                    "S8"
+                                    "S2"
                                 ]
                             }
                         ],
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 }
@@ -105015,7 +105012,7 @@ export const d_partial_op_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect v2.4.5 (CVE-2026-00011, CVE-2026-00012); 1 fixed by v3.4.0, 1 fixed by v2.13.0",
+                    "summary": "2 security advisories affect v2.4.5 (CVE-2026-00011, CVE-2026-00012); 1 fixed in v3.0.0, 1 fixed in v2.13.0",
                     "data": {
                         "advisories": [
                             {
@@ -106638,7 +106635,7 @@ export const d_partial = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "6 security advisories affect v9.52.16 (PKSA-3r5d-mb8f-1qw9, CVE-2024-52301, CVE-2025-27515 and 3 more); 5 fixed by v13.34.0, 1 fixed by v9.52.22",
+                    "summary": "6 security advisories affect v9.52.16 (PKSA-3r5d-mb8f-1qw9, CVE-2024-52301, CVE-2025-27515 and 3 more); 2 fixed in v12.60.0, 1 fixed in v9.52.17, 1 fixed in v10.48.29, 1 fixed in v12.61.1, 1 fixed in v12.69.0",
                     "data": {
                         "advisories": [
                             {
@@ -110858,7 +110855,7 @@ export const d_policy_off_dagger = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed by 2.0.6",
+                    "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed in 3.0.5",
                     "data": {
                         "advisories": [
                             {
@@ -112358,7 +112355,7 @@ export const d_psr7 = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "4 security advisories affect 1.9.1 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); fixed by 3.1.0",
+                    "summary": "4 security advisories affect 1.9.1 (CVE-2026-55766, CVE-2026-49214, CVE-2026-48998 and 1 more); 1 fixed in 2.12.1, 2 fixed in 2.10.2, 1 fixed in 2.12.3",
                     "data": {
                         "advisories": [
                             {
@@ -119779,7 +119776,7 @@ export const d_routing = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "2 security advisories affect v4.4.41 (CVE-2026-48784, CVE-2026-45065); fixed by v8.1.8",
+                    "summary": "2 security advisories affect v4.4.41 (CVE-2026-48784, CVE-2026-45065); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -130790,7 +130787,7 @@ export const d_twig_1 = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "16 security advisories affect v1.43.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 13 more); 14 fixed by v3.30.0, 2 fixed by v1.44.8",
+                    "summary": "16 security advisories affect v1.43.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 13 more); 6 fixed in v3.26.0, 6 fixed in v3.27.0, 1 fixed in v2.15.3, 1 fixed in v2.16.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -133307,7 +133304,7 @@ export const d_twig_dev_dagger = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); fixed by v3.30.0",
+                    "summary": "15 security advisories affect v2.16.1 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 12 more); 7 fixed in v3.26.0, 6 fixed in v3.27.0, 2 fixed in v3.14.1",
                     "data": {
                         "advisories": [
                             {
@@ -137451,7 +137448,7 @@ export const d_unrated_dagger = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45304, CVE-2026-45133, CVE-2026-45305); 2 fixed by v5.4.53",
+                    "summary": "3 security advisories affect v5.4.23 (CVE-2026-45304, CVE-2026-45133, CVE-2026-45305); 2 fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -144236,7 +144233,7 @@ export const d_xmlseclibs = {
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect 3.1.1 (CVE-2026-32313, CVE-2025-66578); fixed by 3.1.5",
+                    "summary": "2 security advisories affect 3.1.1 (CVE-2026-32313, CVE-2025-66578); fixed in 3.1.5",
                     "data": {
                         "advisories": [
                             {
@@ -145770,7 +145767,7 @@ export const d_yaml_3_4 = {
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v3.4.47 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed by v8.1.8",
+                    "summary": "3 security advisories affect v3.4.47 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {

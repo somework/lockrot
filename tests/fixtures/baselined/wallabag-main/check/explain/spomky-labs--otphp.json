@@ -378,7 +378,7 @@
             {
                 "id": "S9",
                 "level": "high",
-                "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed by 11.5.0",
+                "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed in 11.4.3",
                 "data": {
                     "advisories": [
                         {

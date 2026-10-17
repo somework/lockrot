@@ -44,6 +44,7 @@ final class SignalSet
     {
         $floor = new PhpFloor($targetPhp, $projectPhp);
 
+        $leftBehind = new LeftBehindRule($clock, $thresholds, $floor);
         $set = new self([
             new AbandonedRule(),
             new NoReleaseRule($clock, $thresholds),
@@ -51,9 +52,9 @@ final class SignalSet
             new NoPushRule($clock, $thresholds),
             new OldPromiseRule(new ConstraintOpenness(), $dates, $targetPhp),
             new PinnedRule(),
-            new LeftBehindRule($clock, $thresholds, $floor),
+            $leftBehind,
             new AdvisoryRule(),
-            new NotCheckedRule(),
+            new NotCheckedRule($leftBehind),
         ], $floor);
         $set->thresholds = $thresholds;
         $set->targetMajorGa = $dates->gaDate(explode('.', PhpReleaseDates::minorOf($targetPhp))[0].'.0');

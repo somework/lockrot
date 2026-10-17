@@ -1405,7 +1405,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v2.6.13 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {

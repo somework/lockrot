@@ -42,7 +42,7 @@ final class NotCheckedReachabilityTest extends TestCase
     #[DataProvider('shapes')]
     public function testEverySignalS10NamesCouldHaveFiredHadTheCheckRun(PackageFacts $facts): void
     {
-        $signal = (new NotCheckedRule())->evaluate($facts);
+        $signal = (new NotCheckedRule(new LeftBehindRule(Clock::fixed(F::NOW), new Thresholds())))->evaluate($facts);
 
         self::assertNotNull($signal, 'the shape is one S10 is raised on, or this test proves nothing');
         $blocks = JsonPath::decoded($signal->data())['blocks'];

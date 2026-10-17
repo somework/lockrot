@@ -385,7 +385,7 @@
             {
                 "id": "S9",
                 "level": "high",
-                "summary": "2 security advisories affect v4.4.49 (CVE-2025-64500, CVE-2024-50345); fixed by v8.1.6",
+                "summary": "2 security advisories affect v4.4.49 (CVE-2025-64500, CVE-2024-50345); 1 fixed in v5.4.50, 1 fixed in v5.4.46",
                 "data": {
                     "advisories": [
                         {

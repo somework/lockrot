@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Lockrot\Signal\Rule;
 
-use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Lockrot\Data\Advisory\Advisory;
-use Lockrot\Data\Repository\ReleaseBranch;
 use Lockrot\Security\Fix;
 use Lockrot\Security\Severity;
 use Lockrot\Signal\Data\AdvisoryData;
@@ -51,8 +49,8 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * S9's summary, with the count of advisories that the highest tag outside each range fixes,
-     * and whether the releases were read.
+     * S9's summary, with each advisory's first fixing release ({@see Fix::version()}), and whether
+     * the releases were read.
      *
      * @return array{string, bool}
      */
@@ -76,24 +74,20 @@ final class AdvisoryRule implements SignalRule
             $named
         );
 
-        [$onBranch, $inPackage, $read] = self::fixCandidates($facts);
-        $fixedBy = [];
+        $fixedIn = [];
         foreach ($advisories as $advisory) {
-            $fixed = null;
-            if ($onBranch !== null && $advisory->affects($onBranch['normalized']) === false) {
-                $fixed = $onBranch['pretty'];
-            } elseif ($inPackage !== null && $advisory->affects($inPackage['normalized']) === false) {
-                $fixed = $inPackage['pretty'];
-            }
-            if ($fixed !== null) {
-                $fixedBy[$fixed] = ($fixedBy[$fixed] ?? 0) + 1;
+            $fix = self::fixOf($facts, $advisory);
+            $version = $fix->version();
+            if ($version !== null) {
+                $key = $fix->toBranch().' '.$version;
+                $fixedIn[$key] = [$version, ($fixedIn[$key][1] ?? 0) + 1];
             }
         }
-        if ($fixedBy !== []) {
-            $summary .= '; '.self::fixedClause($fixedBy, $count);
+        if ($fixedIn !== []) {
+            $summary .= '; '.self::fixedClause(array_values($fixedIn), $count);
         }
 
-        return [$summary, $read];
+        return [$summary, self::releasesRead($facts)];
     }
 
     /**
@@ -105,11 +99,9 @@ final class AdvisoryRule implements SignalRule
      */
     private static function rows(PackageFacts $facts): array
     {
-        $fixes = $facts->fixes();
         $byId = [];
         foreach ($facts->advisories() as $advisory) {
-            $fix = $fixes === null ? self::unknownFix($facts, $advisory) : $fixes->forAdvisory($advisory->id());
-            $byId[$advisory->id()] = [$advisory, $fix];
+            $byId[$advisory->id()] = [$advisory, self::fixOf($facts, $advisory)];
         }
         $rows = [];
         foreach ($byId as $id => [$advisory, $fix]) {
@@ -134,6 +126,13 @@ final class AdvisoryRule implements SignalRule
         });
 
         return $rows;
+    }
+
+    private static function fixOf(PackageFacts $facts, Advisory $advisory): Fix
+    {
+        $fixes = $facts->fixes();
+
+        return $fixes === null ? self::unknownFix($facts, $advisory) : $fixes->forAdvisory($advisory->id());
     }
 
     /** A fix the release scan did not judge: the scan runs only in a run that counts an advisory. */
@@ -161,72 +160,37 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * @param array<string, int> $fixedBy
+     * @param list<array{string, int}> $fixedIn a fixing release and its advisory count, in the order of the first advisory it fixes
      */
-    private static function fixedClause(array $fixedBy, int $count): string
+    private static function fixedClause(array $fixedIn, int $count): string
     {
-        if (\count($fixedBy) === 1 && array_sum($fixedBy) === $count) {
-            return 'fixed by '.array_key_first($fixedBy);
-        }
-        $parts = [];
-        foreach ($fixedBy as $version => $n) {
-            $parts[] = \sprintf('%d fixed by %s', $n, $version);
+        if (\count($fixedIn) === 1 && $fixedIn[0][1] === $count) {
+            return 'fixed in '.$fixedIn[0][0];
         }
 
-        return implode(', ', $parts);
+        return implode(', ', array_map(static fn (array $group): string => \sprintf('%d fixed in %s', $group[1], $group[0]), $fixedIn));
     }
 
     /**
-     * The releases that a fix is looked for in: the highest stable tag on the installed version's
-     * branch (none for a branch snapshot or an unlisted branch) and the package's highest stable tag.
-     * Either counts only above the installed version: an older tag that an advisory range spares is
-     * not a fix. For a branch snapshot, the package's highest stable tag counts as it is. The third
-     * element is false when nothing was compared: no metadata, or an installed version that no
-     * parser reads.
-     *
-     * @return array{?array{normalized: string, pretty: string}, ?array{normalized: string, pretty: string}, bool}
+     * Whether the releases were compared with the advisory ranges: false without metadata, or for
+     * an installed version that no parser reads.
      */
-    private static function fixCandidates(PackageFacts $facts): array
+    private static function releasesRead(PackageFacts $facts): bool
     {
-        $metadata = $facts->metadata();
-        if ($metadata === null) {
-            return [null, null, false];
+        if ($facts->metadata() === null) {
+            return false;
         }
         $version = $facts->package()->version();
-        $installed = null;
-        if (VersionParser::parseStability($version) !== 'dev') {
-            try {
-                $installed = (new VersionParser())->normalize($version);
-            } catch (\UnexpectedValueException $e) {
-                return [null, null, false];
-            }
+        if (VersionParser::parseStability($version) === 'dev') {
+            return true;
         }
-        $byBranch = $metadata->latestStableByBranch();
-        $branch = ReleaseBranch::of($version);
-        $onBranch = $branch !== null && isset($byBranch[$branch]) ? $byBranch[$branch]['highest'] : null;
-        $inPackage = null;
-        foreach ($byBranch as $release) {
-            if ($inPackage === null || Comparator::greaterThan($release['highest']['normalized'], $inPackage['normalized'])) {
-                $inPackage = $release['highest'];
-            }
+        try {
+            (new VersionParser())->normalize($version);
+        } catch (\UnexpectedValueException $e) {
+            return false;
         }
 
-        return [self::above($onBranch, $installed), self::above($inPackage, $installed), true];
-    }
-
-    /**
-     * @param ?array{normalized: string, pretty: string, at: ?\DateTimeImmutable} $tag
-     * @param ?string                                                             $installed normalized, null for a branch snapshot that no tag is compared with
-     *
-     * @return ?array{normalized: string, pretty: string}
-     */
-    private static function above(?array $tag, ?string $installed): ?array
-    {
-        if ($tag === null || ($installed !== null && !Comparator::greaterThan($tag['normalized'], $installed))) {
-            return null;
-        }
-
-        return ['normalized' => $tag['normalized'], 'pretty' => $tag['pretty']];
+        return true;
     }
 
     /**

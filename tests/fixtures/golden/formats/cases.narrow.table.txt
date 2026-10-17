@@ -333,7 +333,7 @@ high (15)
                    within reach
       pulls in 1 flagged package: pagerfanta/core
       (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   roots/wp-config 1.0.0  direct  ·  old-promise
       16 = old-promise 16 (baseline: new package)
       do: test it on PHP 8.4

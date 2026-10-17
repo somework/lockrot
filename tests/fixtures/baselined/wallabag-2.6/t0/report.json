@@ -1680,7 +1680,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "16 security advisories affect v3.8.0 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 13 more); fixed by v3.28.0",
+                    "summary": "16 security advisories affect v3.8.0 (CVE-2026-46633, CVE-2026-49981, CVE-2026-47732 and 13 more); 10 fixed in v3.26.0, 6 fixed in v3.27.0",
                     "data": {
                         "advisories": [
                             {
@@ -2651,7 +2651,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "14 security advisories affect 5.3.4 (CVE-2026-69246, CVE-2022-31091, CVE-2022-31090 and 11 more); fixed by 8.2.0",
+                    "summary": "14 security advisories affect 5.3.4 (CVE-2026-69246, CVE-2022-31091, CVE-2022-31090 and 11 more); 2 fixed in 7.15.2, 2 fixed in 6.5.8, 2 fixed in 6.5.7, 1 fixed in 6.5.6, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2, 2 fixed in 7.12.1",
                     "data": {
                         "advisories": [
                             {
@@ -7228,7 +7228,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect v4.4.49 (CVE-2025-64500, CVE-2024-50345); fixed by v8.1.6",
+                    "summary": "2 security advisories affect v4.4.49 (CVE-2025-64500, CVE-2024-50345); 1 fixed in v5.4.50, 1 fixed in v5.4.46",
                     "data": {
                         "advisories": [
                             {
@@ -7639,7 +7639,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect v4.4.47 (CVE-2026-45067, CVE-2026-45070); fixed by v8.1.6",
+                    "summary": "2 security advisories affect v4.4.47 (CVE-2026-45067, CVE-2026-45070); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -8061,7 +8061,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect v4.4.50 (CVE-2026-48489, CVE-2026-45063); fixed by v8.1.6",
+                    "summary": "2 security advisories affect v4.4.50 (CVE-2026-48489, CVE-2026-45063); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -8563,7 +8563,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "6 security advisories affect 6.7.4 (CVE-2024-56522, CVE-2024-56521, CVE-2024-56527 and 3 more); fixed by 6.11.4",
+                    "summary": "6 security advisories affect 6.7.4 (CVE-2024-56522, CVE-2024-56521, CVE-2024-56527 and 3 more); 4 fixed in 6.8.0, 1 fixed in 6.7.6, 1 fixed in 6.7.5",
                     "data": {
                         "advisories": [
                             {
@@ -9096,7 +9096,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "5 security advisories affect 3.0.37 (CVE-2026-44167, CVE-2026-32935, CVE-2026-84308 and 2 more); fixed by 3.0.57",
+                    "summary": "5 security advisories affect 3.0.37 (CVE-2026-44167, CVE-2026-32935, CVE-2026-84308 and 2 more); 1 fixed in 3.0.52, 1 fixed in 3.0.50, 1 fixed in 3.0.57, 1 fixed in 3.0.54, 1 fixed in 3.0.51",
                     "data": {
                         "advisories": [
                             {
@@ -9552,7 +9552,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed by 11.5.0",
+                    "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed in 11.4.3",
                     "data": {
                         "advisories": [
                             {
@@ -9952,7 +9952,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "1 security advisory affects v5.2.12 (CVE-2026-45077); fixed by v5.4.52",
+                    "summary": "1 security advisory affects v5.2.12 (CVE-2026-45077); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -21154,7 +21154,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "4 security advisories affect 0.15.4 (CVE-2026-107380, CVE-2026-107381, CVE-2026-107379 and 1 more); fixed by 1.0.0",
+                    "summary": "4 security advisories affect 0.15.4 (CVE-2026-107380, CVE-2026-107381, CVE-2026-107379 and 1 more); 3 fixed in 1.0.0, 1 fixed in 0.22.0",
                     "data": {
                         "advisories": [
                             {
@@ -21638,7 +21638,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "4 security advisories affect 2.6.2 (CVE-2026-59882, CVE-2026-55766, CVE-2026-49214 and 1 more); fixed by 2.13.1",
+                    "summary": "4 security advisories affect 2.6.2 (CVE-2026-59882, CVE-2026-55766, CVE-2026-49214 and 1 more); 1 fixed in 2.12.3, 1 fixed in 2.12.1, 2 fixed in 2.10.2",
                     "data": {
                         "advisories": [
                             {
@@ -22026,7 +22026,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v4.4.49 (CVE-2026-45068); fixed by v8.1.5",
+                    "summary": "1 security advisory affects v4.4.49 (CVE-2026-45068); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -22394,7 +22394,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "2 security advisories affect v4.4.44 (CVE-2026-48784, CVE-2026-45065); fixed by v8.1.6",
+                    "summary": "2 security advisories affect v4.4.44 (CVE-2026-48784, CVE-2026-45065); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -23082,7 +23082,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v5.4.38 (CVE-2026-45073); fixed by v5.4.53",
+                    "summary": "1 security advisory affects v5.4.38 (CVE-2026-45073); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -23463,7 +23463,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "2 security advisories affect v5.4.38 (CVE-2026-48736, CVE-2024-50342); fixed by v5.4.53",
+                    "summary": "2 security advisories affect v5.4.38 (CVE-2026-48736, CVE-2024-50342); 1 fixed in v5.4.53, 1 fixed in v5.4.47",
                     "data": {
                         "advisories": [
                             {
@@ -26508,7 +26508,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects 2.4.5 (PKSA-j5hk-b83d-1p4h); fixed by 2.5.3",
+                    "summary": "1 security advisory affects 2.4.5 (PKSA-j5hk-b83d-1p4h); fixed in 2.5.1",
                     "data": {
                         "advisories": [
                             {
@@ -26823,7 +26823,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v4.4.45 (CVE-2026-45071); fixed by v8.1.5",
+                    "summary": "1 security advisory affects v4.4.45 (CVE-2026-45071); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -27172,7 +27172,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v4.4.48 (CVE-2024-50343); fixed by v8.1.6",
+                    "summary": "1 security advisory affects v4.4.48 (CVE-2024-50343); fixed in v5.4.43",
                     "data": {
                         "advisories": [
                             {
@@ -28010,7 +28010,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects v1.29.0 (CVE-2026-46644); fixed by v1.42.0",
+                    "summary": "1 security advisory affects v1.29.0 (CVE-2026-46644); fixed in v1.38.1",
                     "data": {
                         "advisories": [
                             {
@@ -28412,7 +28412,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v5.3.14 (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133); fixed by v5.4.53",
+                    "summary": "3 security advisories affect v5.3.14 (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {
@@ -33070,8 +33070,7 @@
                     "check": "release_dates",
                     "reason": "undated_releases",
                     "blocks": [
-                        "S2",
-                        "S8"
+                        "S2"
                     ]
                 }
             ],
@@ -33126,21 +33125,19 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
                                 "check": "release_dates",
                                 "reason": "undated_releases",
                                 "blocks": [
-                                    "S2",
-                                    "S8"
+                                    "S2"
                                 ]
                             }
                         ],
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 }
@@ -34814,8 +34811,7 @@
                     "check": "release_dates",
                     "reason": "undated_releases",
                     "blocks": [
-                        "S2",
-                        "S8"
+                        "S2"
                     ]
                 }
             ],
@@ -34870,21 +34866,19 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
                                 "check": "release_dates",
                                 "reason": "undated_releases",
                                 "blocks": [
-                                    "S2",
-                                    "S8"
+                                    "S2"
                                 ]
                             }
                         ],
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 }
@@ -35240,8 +35234,7 @@
                     "check": "release_dates",
                     "reason": "undated_releases",
                     "blocks": [
-                        "S2",
-                        "S8"
+                        "S2"
                     ]
                 }
             ],
@@ -35332,21 +35325,19 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
                                 "check": "release_dates",
                                 "reason": "undated_releases",
                                 "blocks": [
-                                    "S2",
-                                    "S8"
+                                    "S2"
                                 ]
                             }
                         ],
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 }
@@ -35433,8 +35424,7 @@
                     "check": "release_dates",
                     "reason": "undated_releases",
                     "blocks": [
-                        "S2",
-                        "S8"
+                        "S2"
                     ]
                 }
             ],
@@ -35489,21 +35479,19 @@
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
                                 "check": "release_dates",
                                 "reason": "undated_releases",
                                 "blocks": [
-                                    "S2",
-                                    "S8"
+                                    "S2"
                                 ]
                             }
                         ],
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 }

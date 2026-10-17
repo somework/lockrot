@@ -138,6 +138,34 @@ final class LeftBehindRule implements SignalRule
         ));
     }
 
+    /**
+     * Whether an undated release leaves S8 undecided: the installed branch's own release, or a
+     * higher branch's release on an installed branch quiet enough to judge, when S8 did not fire.
+     * A branch snapshot is on no release branch, so S8 misses nothing there.
+     */
+    public function missesAnUndatedRelease(PackageFacts $facts): bool
+    {
+        $metadata = $facts->metadata();
+        $branch = ReleaseBranch::of($facts->package()->version());
+        if ($metadata === null || $branch === null) {
+            return false;
+        }
+        $reading = $this->age->branchRelease($facts);
+        if ($reading->unmeasured() === AgeMeasure::UNDATED_RELEASES) {
+            return true;
+        }
+        if ($reading->level() === null || $this->evaluate($facts) !== null) {
+            return false;
+        }
+        foreach ($metadata->latestStableByBranch() as $key => $release) {
+            if (ReleaseBranch::isAbove((string) $key, $branch) && ($release['at'] === null || $release['highest']['at'] === null)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** Released within `release-warn-years` of today: the branch is still where fixes land. */
     private function isAlive(\DateTimeImmutable $at): bool
     {
