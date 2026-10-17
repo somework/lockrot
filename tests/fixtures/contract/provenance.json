@@ -2,9 +2,9 @@
     "recorded_by": "tools/report/record",
     "clock": "the generated_at of each case document in tests/fixtures/schema/documents/cases/",
     "inputs": {
-        "tests/fixtures/flags/cases.json": "3c5856b212b3c16e431ce7f704b6c3b0c7574f33434570d34843b263f4fc36f1",
+        "tests/fixtures/flags/cases.json": "37a3d88a316e569c4c2441852dc48a780f8ef6d4aa33634903b51790ddf5193e",
         "tests/fixtures/flags/composite.json": "ec59fa67eb480bc91772e4c4f9fba1736e6a338042ff9eba28e4238a9cf15d39",
-        "tests/fixtures/flags/provenance.json": "eda0126d4ab3c7559b093be6966d7990468d6d9a6d6cf996c23f7846e4c480bc"
+        "tests/fixtures/flags/provenance.json": "328da152365210eeb6e3c6f5fc0363ce0fe5df7d9d30b19e2139edb3fa0f101c"
     },
     "version_mask": {
         "paths": [
@@ -50,16 +50,16 @@
     "model_goldens": {
         "compared": {
             "age_line": 89,
-            "baseline_suffix": 90,
-            "commands_cmd": 92,
-            "commands_posix": 92,
-            "gate_line": 91,
-            "next_step_text": 79,
-            "run_gate_line": 92,
-            "score_text": 91
+            "baseline_suffix": 91,
+            "commands_cmd": 93,
+            "commands_posix": 93,
+            "gate_line": 92,
+            "next_step_text": 80,
+            "run_gate_line": 93,
+            "score_text": 92
         },
         "inputs_differ": {
-            "age_line": 3,
+            "age_line": 4,
             "baseline_suffix": 2,
             "gate_line": 1,
             "next_step_text": 13,

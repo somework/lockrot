@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The engine-only relations of report-2 ({@see FindingRelations}, {@see ItemRelations}) hold strictly
- * on every committed fixture document: the model's 252 report-2 documents and the flags fixture's
+ * on every committed fixture document: the model's 253 report-2 documents and the flags fixture's
  * composite. ScoreFactsConsistencyTest reads them on the reports that lockrot writes.
  *
  * @coversNothing
@@ -34,7 +34,7 @@ final class FindingRelationsTest extends TestCase
     public function testEveryFixtureDocumentHoldsEveryRelation(): void
     {
         $paths = self::documents();
-        self::assertCount(252, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(253, $paths, 'the six sets of tests/fixtures/schema/documents/provenance.json');
         $broken = [];
         foreach (array_merge($paths, [self::COMPOSITE]) as $path) {
             $document = self::read($path);
