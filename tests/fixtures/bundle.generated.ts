@@ -100773,8 +100773,7 @@ export const d_ok_unchecked = {
                     "check": "release_dates",
                     "reason": "undated_releases",
                     "blocks": [
-                        "S2",
-                        "S8"
+                        "S2"
                     ]
                 }
             ],
@@ -100831,21 +100830,19 @@ export const d_ok_unchecked = {
                 {
                     "id": "S10",
                     "level": "info",
-                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                    "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                     "data": {
                         "unchecked": [
                             {
                                 "check": "release_dates",
                                 "reason": "undated_releases",
                                 "blocks": [
-                                    "S2",
-                                    "S8"
+                                    "S2"
                                 ]
                             }
                         ],
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 }
@@ -100881,10 +100878,6 @@ export const d_ok_unchecked = {
                             {
                                 "kind": "signal",
                                 "id": "S2"
-                            },
-                            {
-                                "kind": "signal",
-                                "id": "S8"
                             }
                         ]
                     }

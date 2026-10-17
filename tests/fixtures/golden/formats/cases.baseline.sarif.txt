@@ -105,4 +105,4 @@ lockrot/unchecked error: bower-asset/jquery 3.7.1: release metadata not checked 
 lockrot/finished note: akaunting/laravel-version 1.0.4 — finding finished, 0 (stale accepted)
 lockrot/ok note: doctrine/annotations 2.0.2 — finding ok, 0
 lockrot/ok note: scheb/2fa-google-authenticator v8.6.1 — finding ok, 0
-lockrot/unchecked note: scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it. checks missing: S2, S8 (undated releases).
+lockrot/unchecked note: scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it. checks missing: S2 (undated releases).

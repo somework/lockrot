@@ -6,8 +6,8 @@ namespace Lockrot\Tests\Support;
 
 /**
  * The invariant that an S10 entry names in `blocks` only a signal that did not fire on the same
- * finding. An entry of a check that S9 reads in part (`advisories`, `releases`) is exempt: S9 fires
- * from the advisories that it read, and the entry says that its reading is incomplete.
+ * finding. The entries of `advisories` and `releases` are exempt. S9 fires from the advisories that
+ * it read, and such an entry says that this reading is incomplete.
  */
 final class FiredSignalsUnblocked
 {

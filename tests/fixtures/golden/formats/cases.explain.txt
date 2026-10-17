@@ -927,7 +927,7 @@ do        nothing to do: nothing counts
 flags
   feeds        packagist.org: none on record
   accepted     none
-  not checked  S2, S8 (undated releases)
+  not checked  S2 (undated releases)
 
 repository metadata
      branch   highest tag   released     php        fixes

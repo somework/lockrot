@@ -42,7 +42,7 @@
 ::notice file=composer.lock,title=lockrot%3A unknown::drupal/core 10.6.18: 0.
 ::notice file=composer.lock,title=lockrot%3A finished::akaunting/laravel-version 1.0.4: 0 (stale accepted).
 ::notice file=composer.lock,title=lockrot%3A ok::doctrine/annotations 2.0.2: 0. abandoned marking ignored (policy.abandoned: doctrine/*): the annotations reader goes with the ORM 3 upgrade. (via mautic/core-lib)
-::notice file=composer.lock,title=lockrot%3A ok — unchecked::scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it. checks missing: S2, S8 (undated releases).
+::notice file=composer.lock,title=lockrot%3A ok — unchecked::scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it. checks missing: S2 (undated releases).
 ::notice title=lockrot::the baseline was written for php 8.5 (the PHP running lockrot) and this run targets php 8.4 (--target-php): fix changes against the baseline are not compared
 flags: abandoned 7 · silent 1 · pinned 4 · left-behind 14 · old-promise 12 · stale 7 · vulnerable 15 · 18 packages carry more than one
 depth: 16 of 40 flagged packages are named by no line of composer.json · direct 23 · 1 hop 11 · 2 hops 2 · 4 hops 1 · unreached 3 · deepest: robrichards/xmlseclibs, 4 hops (mautic/core-lib › lightsaml/sp-bundle › lightsaml/symfony-bridge › lightsaml/lightsaml › robrichards/xmlseclibs) · 1 more is named only in require-dev, which this run did not walk (pass --dev)

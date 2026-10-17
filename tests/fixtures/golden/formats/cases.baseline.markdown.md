@@ -48,7 +48,7 @@
 | **unknown** | `bower-asset/jquery` | 3.7.1 | unknown | `0`<br>checks missing: S2, S3, S4, S8 (origin unknown) | yiisoft/yii2, yiisoft/yii2-bootstrap5, yiisoft/yii2-symfonymailer |
 | finished | `akaunting/laravel-version` | 1.0.4 | finished · stale (accepted) | `0 (stale accepted)` | direct |
 | ok | `doctrine/annotations` | 2.0.2 | ok | `0`<br>*abandoned marking ignored* (policy.abandoned: doctrine/\*): the annotations reader goes with the ORM 3 upgrade | mautic/core-lib |
-| ok | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0`<br>`gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0`<br>checks missing: S2, S8 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
+| ok | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0`<br>`gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0`<br>checks missing: S2 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
 
 flags: abandoned 7 · silent 1 · pinned 4 · left-behind 14 · old-promise 12 · stale 7 · vulnerable 15 · 18 packages carry more than one
 depth: 16 of 40 flagged packages are named by no line of composer.json · direct 23 · 1 hop 11 · 2 hops 2 · 4 hops 1 · unreached 3 · deepest: `robrichards/xmlseclibs`, 4 hops (`mautic/core-lib` › `lightsaml/sp-bundle` › `lightsaml/symfony-bridge` › `lightsaml/lightsaml` › `robrichards/xmlseclibs`) · 1 more is named only in require-dev, which this run did not walk (pass --dev)

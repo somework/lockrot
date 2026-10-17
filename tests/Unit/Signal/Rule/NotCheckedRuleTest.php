@@ -239,6 +239,17 @@ final class NotCheckedRuleTest extends TestCase
         self::assertStringContainsString('so S8 could not measure it', $signal->summary());
     }
 
+    /** S8 compares with a higher branch, so an undated installed branch with none above takes nothing from S8. */
+    public function testAnUndatedInstalledBranchWithNoHigherBranchDoesNotBlockS8(): void
+    {
+        $metadata = F::metadata([['v1.2.0', null]]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertSame([Signal::S2], JsonPath::decoded($signal->data())['blocks']);
+    }
+
     /** The installed branch is quiet past `release-warn-years`, and the only higher branch is undated: that branch could have raised S8. */
     public function testAnUndatedHigherBranchBlocksS8OnAQuietBranch(): void
     {

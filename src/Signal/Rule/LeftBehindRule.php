@@ -139,27 +139,29 @@ final class LeftBehindRule implements SignalRule
     }
 
     /**
-     * Whether an undated release leaves S8 undecided: the installed branch's own release, or a
-     * higher branch's release on an installed branch quiet enough to judge, when S8 did not fire.
-     * A branch snapshot is on no release branch, so S8 misses nothing there.
+     * Whether an undated release leaves S8 undecided. It is the installed branch's own release,
+     * with a higher branch to compare with. Or it is a higher branch's release, while the installed
+     * branch is quiet enough for a level and S8 did not fire. A branch snapshot is on no release
+     * branch, so S8 misses nothing there.
      */
     public function missesAnUndatedRelease(PackageFacts $facts): bool
     {
         $branch = ReleaseBranch::of($facts->package()->version());
-        if ($branch === null) {
+        $metadata = $facts->metadata();
+        if ($branch === null || $metadata === null) {
             return false;
         }
+        $higher = array_filter($metadata->latestStableByBranch(), static fn ($key): bool => ReleaseBranch::isAbove((string) $key, $branch), \ARRAY_FILTER_USE_KEY);
         $reading = $this->age->branchRelease($facts);
         if ($reading->unmeasured() === AgeMeasure::UNDATED_RELEASES) {
-            return true;
+            return $higher !== [];
         }
-        $metadata = $facts->metadata();
-        if ($metadata === null || $reading->level() === null || $this->evaluate($facts) !== null) {
+        if ($reading->level() === null || $this->evaluate($facts) !== null) {
             return false;
         }
         // A branch with no dated release has an undated highest tag too.
-        foreach ($metadata->latestStableByBranch() as $key => $release) {
-            if (ReleaseBranch::isAbove((string) $key, $branch) && $release['highest']['at'] === null) {
+        foreach ($higher as $release) {
+            if ($release['highest']['at'] === null) {
                 return true;
             }
         }

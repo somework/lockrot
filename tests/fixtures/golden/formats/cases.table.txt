@@ -342,7 +342,7 @@ not flagged (5)
       abandoned marking ignored (policy.abandoned: doctrine/*): the annotations reader goes with the ORM 3 upgrade
   scheb/2fa-google-authenticator v8.6.1  via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more  ·  ok
       0
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
 
 45 packages checked · 40 flagged: critical 10 · high 15 · medium 11 · low 4
 flags: abandoned 7 · silent 1 · pinned 4 · left-behind 14 · old-promise 12 · stale 7 · vulnerable 15 ·

@@ -64,4 +64,4 @@ lockrot/unchecked major Bug Risk: bower-asset/jquery 3.7.1 — finding unknown (
 lockrot/finished info Bug Risk: akaunting/laravel-version 1.0.4 — finding finished (0 (stale accepted)).
 lockrot/ok info Bug Risk: doctrine/annotations 2.0.2 — finding ok (0). (via mautic/core-lib)
 lockrot/ok info Bug Risk: scheb/2fa-google-authenticator v8.6.1 — finding ok (0). (via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more)
-lockrot/unchecked major Bug Risk: scheb/2fa-google-authenticator v8.6.1 — finding ok (0) — checks missing: S2, S8 (undated releases). (via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more)
+lockrot/unchecked major Bug Risk: scheb/2fa-google-authenticator v8.6.1 — finding ok (0) — checks missing: S2 (undated releases). (via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more)
