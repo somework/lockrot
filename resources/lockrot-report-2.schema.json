@@ -20938,6 +20938,7 @@
               "required": [
                 "composer",
                 "blocks_advisories",
+                "ignores_extensions",
                 "baseline",
                 "reason"
               ],
@@ -20953,6 +20954,13 @@
                 "blocks_advisories": {
                   "description": "Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.",
                   "type": "boolean"
+                },
+                "ignores_extensions": {
+                  "description": "Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
+                  "type": "boolean",
+                  "enum": [
+                    true
+                  ]
                 },
                 "baseline": {
                   "description": "The partial update of a name outside the lock: `refused` means Composer refuses the lock itself, so no move is checked (the `moves_not_checked` note). Closed.",

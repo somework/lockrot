@@ -25,9 +25,19 @@ final class MoveCheckRun implements \JsonSerializable
         $this->baseline = $baseline;
     }
 
-    /** @return array{composer: ?string, blocks_advisories: bool, baseline: string, reason: ?string} */
+    public function baseline(): MoveCheck
+    {
+        return $this->baseline;
+    }
+
+    /**
+     * `ignores_extensions` is always true: the solve ignores `ext-*` requirements, as
+     * `--ignore-platform-req=ext-*` does, so the machine that runs lockrot decides no move.
+     *
+     * @return array{composer: ?string, blocks_advisories: bool, ignores_extensions: true, baseline: string, reason: ?string}
+     */
     public function jsonSerialize(): array
     {
-        return ['composer' => $this->composer, 'blocks_advisories' => $this->blocksAdvisories, 'baseline' => $this->baseline->result(), 'reason' => $this->baseline->reason()];
+        return ['composer' => $this->composer, 'blocks_advisories' => $this->blocksAdvisories, 'ignores_extensions' => true, 'baseline' => $this->baseline->result(), 'reason' => $this->baseline->reason()];
     }
 }

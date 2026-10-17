@@ -10,6 +10,7 @@ use Lockrot\Data\Forge\RepoRef;
 use Lockrot\Data\Repository\MetadataFailure;
 use Lockrot\Data\Repository\RepositoryUrl;
 use Lockrot\Signal\Rule\NotCheckedRule;
+use Lockrot\Solver\MoveCheck;
 
 /**
  * Each code has one named constructor, which derives the sentence from the facts, so the text and
@@ -466,7 +467,7 @@ final class RunNote
             "moves not checked: Composer's solver refuses the lock itself at php %s, so it would refuse every move: %s",
             $targetPhp,
             self::firstProblem($problem)
-        ), false, ['reason' => 'baseline_refused', 'php' => $targetPhp, 'problem' => $problem]);
+        ), false, ['reason' => MoveCheck::BASELINE_REFUSED, 'php' => $targetPhp, 'problem' => $problem]);
     }
 
     /**

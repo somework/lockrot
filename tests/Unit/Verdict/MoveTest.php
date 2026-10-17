@@ -274,7 +274,7 @@ final class MoveTest extends TestCase
 
         self::assertSame(['raise-php', 'left-behind', '2.x', '^2.3', '2.3.0', '2.3.0'], [$move['kind'], $move['source'], $move['to_branch'], $move['constraint'], $move['version'], $move['newest']]);
         self::assertSame([['composer', 'require', 'php:>=8.1', '--no-update'], ['composer', 'require', 'a/b:^2.3']], $move['commands']);
-        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'constraint' => '^1.0', 'holder' => null]], $move['held_by']);
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'require', 'target' => null, 'constraint' => '^1.0', 'holder' => null]], $move['held_by']);
         self::assertSame(['crosses_major'], $move['composer_moves_because']);
         self::assertSame(['left-behind', 'old-promise'], array_column(JsonPath::arrayAt($move, ['clears']), 'id'));
         self::assertSame(['total' => 0, 'verdict' => 'ok', 'lead' => null, 'deciding_advisory' => null, 'at_most' => false, 'assumes' => ['clears_hold', 'composer_resolves']], $move['if_applied']);

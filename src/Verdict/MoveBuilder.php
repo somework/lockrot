@@ -356,16 +356,38 @@ final class MoveBuilder
                 if ($phpCheck !== null && $phpCheck->raiseTo() !== null) {
                     $commands[] = ['composer', 'require', 'php:'.$phpCheck->raiseTo(), '--no-update'];
                 }
-                if ($subject->isDirect() && $constraint !== null) {
-                    $commands[] = array_merge(['composer', 'require', $package.':'.$constraint], $option);
+                if ($constraint !== null) {
+                    $commands = array_merge($commands, self::packageStep($subject, $constraint, $option, $check, $checks));
                 }
 
                 return $commands;
             case Move::TAG:
-                return $subject->isDirect() && $latest !== null ? [array_merge(['composer', 'require', $package.':^'.ltrim($latest->version(), 'vV')], $option)] : [];
+                return $latest === null ? [] : self::packageStep($subject, '^'.ltrim($latest->version(), 'vV'), $option, $check, $checks);
             default:
                 return [];
         }
+    }
+
+    /**
+     * `composer require` for a package that composer.json requires. A package that it does not
+     * require gets no root requirement: when the check resolves its `update` request, the step is
+     * that `composer update` with the constraint inline, on a Composer that takes one there.
+     *
+     * @param list<string> $option
+     *
+     * @return list<list<string>>
+     */
+    private static function packageStep(MoveSubject $subject, string $constraint, array $option, ?MoveCheck $check, ?MoveChecks $checks): array
+    {
+        $package = $subject->package();
+        if ($subject->isDirect()) {
+            return [array_merge(['composer', 'require', $package.':'.$constraint], $option)];
+        }
+        if ($check !== null && $check->isResolved() && $checks !== null && $checks->writesInline(false)) {
+            return [array_merge(['composer', 'update', $package.':'.$constraint], $option)];
+        }
+
+        return [];
     }
 
     /**

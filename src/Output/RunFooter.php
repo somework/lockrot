@@ -10,6 +10,7 @@ use Lockrot\Analyzer\Report2Root;
 use Lockrot\Analyzer\SecurityTotals;
 use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Security\Severity;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Verdict\ScoreModel;
 use Lockrot\Verdict\ShellCommand;
 
@@ -189,6 +190,27 @@ final class RunFooter
         }
 
         return 'pulled in by: '.implode(' · ', $parts);
+    }
+
+    /**
+     * The `moves:` line of `run.move_check`: which Composer checked the moves, once per run with
+     * the extensions it does not check. Null when the run checked no move.
+     */
+    public static function moveCheck(Report $report): ?string
+    {
+        $run = $report->moveCheck();
+        if ($run === null) {
+            return null;
+        }
+        $data = $run->jsonSerialize();
+        switch ($data['baseline']) {
+            case MoveCheck::RESOLVES:
+                return 'moves: checked with the solver of Composer '.$data['composer'].' against the lock; ext-* requirements not checked';
+            case MoveCheck::REFUSED:
+                return "moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)";
+            default:
+                return 'moves: not checked ('.$data['reason'].')';
+        }
     }
 
     /** The `advisories:` line of `run.advisory_lookup`, on every run. */

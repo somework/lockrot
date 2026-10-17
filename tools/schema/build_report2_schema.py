@@ -1348,6 +1348,8 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
     'move_check': nul("How Composer's solver checked the run's moves (§5.6); null when the run checked no move.", obj('The move check of the run.', {
         'composer': nul('The version of the Composer that solved; null when nothing solved.', {'type': 'string', 'minLength': 1}),
         'blocks_advisories': d('Whether the solve removed the versions that an advisory affects, as Composer 2.9 and later do in an update.', {'type': 'boolean'}),
+        'ignores_extensions': d("Always true: the solve ignores every `ext-*` requirement, as `--ignore-platform-req=ext-*` does, so the extensions of the machine that runs lockrot decide no move.",
+                                {'type': 'boolean', 'enum': [True]}),
         'baseline': closed(['resolves', 'refused', 'not_checked'], ("The partial update of a name outside the lock: `refused` means Composer refuses the lock "
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
         'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. The open set of `check.reason`.",

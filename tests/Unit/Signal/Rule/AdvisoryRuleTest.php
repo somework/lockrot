@@ -284,11 +284,11 @@ final class AdvisoryRuleTest extends TestCase
     public function testAHolderEntryNamesThePackageExceptForTheRoot(): void
     {
         self::assertSame(
-            ['source' => Holder::PACKAGE, 'package' => 'acme/b', 'version' => '2.0.0', 'link' => Holder::REQUIRE, 'constraint' => '^1.0', 'holder' => null],
+            ['source' => Holder::PACKAGE, 'package' => 'acme/b', 'version' => '2.0.0', 'link' => Holder::REQUIRE, 'target' => null, 'constraint' => '^1.0', 'holder' => null],
             JsonPath::decoded(new Holder(Holder::PACKAGE, 'acme/b', '2.0.0', Holder::REQUIRE, '^1.0'))
         );
         self::assertSame(
-            ['source' => Holder::ROOT, 'package' => null, 'version' => null, 'link' => Holder::REQUIRE_DEV, 'constraint' => '^1.0', 'holder' => null],
+            ['source' => Holder::ROOT, 'package' => null, 'version' => null, 'link' => Holder::REQUIRE_DEV, 'target' => null, 'constraint' => '^1.0', 'holder' => null],
             JsonPath::decoded(new Holder(Holder::ROOT, 'acme/app', null, Holder::REQUIRE_DEV, '^1.0'))
         );
     }

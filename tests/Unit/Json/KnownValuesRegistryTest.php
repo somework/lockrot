@@ -34,6 +34,7 @@ use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\Score;
 use Lockrot\Verdict\ScoreModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Lockrot\Solver\MoveCheck;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -74,6 +75,10 @@ final class KnownValuesRegistryTest extends TestCase
             // lockrot writes `advisories_unavailable` when every feed throws, r3 lists `lookup_failed` for it (§5.7).
             '#/definitions/advisoriesNotCheckedReason' => [array_merge(RunNote::ADVISORIES_NOT_CHECKED_REASONS, [AdvisoryCoverage::LOOKUP_FAILED]), 'RunNote and r3'],
             '#/definitions/noteCode' => [RunNote::CODES, 'RunNote'],
+            '#/definitions/moveCheck/oneOf/0/properties/reason/oneOf/0' => [MoveCheck::REASONS, 'MoveCheck'],
+            '#/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0' => [MoveCheck::REASONS, 'MoveCheck'],
+            '#/definitions/explainRun/properties/move_check/oneOf/0/properties/reason/oneOf/0' => [MoveCheck::REASONS, 'MoveCheck'],
+            '#/definitions/noteMovesNotChecked/properties/reason' => [[MoveCheck::BASELINE_REFUSED], 'RunNote::movesNotChecked()'],
             '#/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key' => [['policy', 'policy.advisories', 'policy.advisories.audit', 'COMPOSER_POLICY'], 'RunNote::advisoriesDisabledByPolicy()'],
             '#/definitions/originKind' => [PackageOrigin::KINDS, 'PackageOrigin'],
             '#/definitions/originRegistry/oneOf/0' => [PackageOrigin::REGISTRIES, 'PackageOrigin'],
