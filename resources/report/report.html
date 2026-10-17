@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TyXm77r+EV/qlX5cMAbwUOACkC1lC4FbL+ZVk8zaPsI='; style-src 'sha256-bJoDelrH+bnFHYY7nbg0U4ap8k+j4wBTTn2wlVZ+/cU='; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QU+SuuG0VwZ0LxAmpGqRKK6uvzKyoUkLjcwDL7FqqRY='; style-src 'sha256-eZOdLaCgtTCB+WWkJIjkeOojVJUeo1eT3JQ5NqNXmOg='; img-src data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <title>{{TITLE}}</title>
@@ -1982,29 +1982,22 @@ button.pill {
   flex-wrap: wrap;
   gap: 4px 5px;
 }
-.d2-reach {
+.d2-meta {
   margin-left: auto;
+  min-width: 0;
   font-size: 12px;
   color: var(--ink-2);
 }
+.d2-meta .out {
+  overflow-wrap: anywhere;
+}
 .d2-body {
   gap: 18px;
-}
-.d2-lead {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 .d2-asof {
   margin: 0;
   font-size: 11.5px;
   color: var(--muted);
-}
-.d2-answer {
-  margin: 0;
-  font: 16px/1.45 var(--serif);
-  color: var(--ink);
-  overflow-wrap: anywhere;
 }
 
 .d2-copy {
@@ -2264,8 +2257,7 @@ button.pill {
   height: 1px;
   background: var(--border-strong);
 }
-.d2-why-line.is-opening,
-.d2-why-line.is-after-the-move {
+.d2-why-line.is-opening {
   color: var(--ink);
 }
 .d2-why-foot {
@@ -2376,13 +2368,6 @@ button.pill {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 50%, transparent);
   print-color-adjust: exact;
 }
-.d2-more {
-  justify-self: start;
-  white-space: normal;
-  text-align: left;
-  font-size: 12.5px;
-}
-
 .d2-timeline {
   margin-top: 2px;
 }
@@ -2421,6 +2406,805 @@ button.pill {
   .d2-why-legend {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+}
+.d3 {
+  container: sheet / inline-size;
+  --label-w: 88px;
+}
+.d3-body {
+  gap: 20px;
+}
+.d3-q > dt,
+.d3-mf > dt,
+.d3-notes-label {
+  margin: 0;
+  font: 600 10.5px/19px var(--cond);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.d3-verdict {
+  display: grid;
+  gap: 12px;
+}
+.d3-verdict .d2-asof {
+  margin-bottom: -6px;
+}
+.d3-verdict-line {
+  margin: 0;
+  font: 22px/1.36 var(--serif);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.d3-grade {
+  font-weight: 700;
+  color: var(--tone);
+}
+.d3-inline {
+  display: inline;
+  margin: 0;
+}
+.d3-verdict-jump {
+  margin: -6px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.d3-row-wide,
+.d2-branches-line {
+  scroll-margin-top: 172px;
+}
+.d3-verdict-line a.lnk,
+.d3-reading a.lnk {
+  border-bottom-style: dotted;
+}
+.d3-readings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.d3-reading {
+  display: grid;
+  grid-template-columns: var(--label-w) minmax(0, 1fr);
+  gap: 3px 10px;
+  align-items: baseline;
+}
+.d3-reading-flag {
+  min-width: 0;
+  font: 600 12.5px/1.5 var(--sans);
+  color: var(--ink);
+}
+.d3-reading-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.d3-qualifiers {
+  margin: 0;
+  display: grid;
+  gap: 7px;
+  padding-top: 11px;
+  border-top: 1px solid var(--border);
+}
+.d3-q {
+  display: grid;
+  grid-template-columns: var(--label-w) minmax(0, 1fr);
+  gap: 1px 10px;
+  align-items: baseline;
+}
+.d3-q > dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.d3-q-line {
+  display: block;
+}
+.d3-q-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.d3-gate.is-fails {
+  color: var(--crit);
+}
+.d3-gate.is-reaches,
+.d3-gate.is-none,
+.d3-gate.is-clear {
+  color: var(--ink);
+}
+.d3-q .l1-btn {
+  font-size: 12.5px;
+}
+.d3-q code {
+  font-size: 11.5px;
+}
+.d3-move {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px 13px 17px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.d3-move > h3 {
+  margin: 0;
+}
+.d3-move.is-advice {
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  box-shadow: none;
+}
+.d3-move.is-then {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.d3-move-action {
+  margin: 0;
+  font: 600 15px/1.4 var(--sans);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.d3-move.is-advice .d3-move-action {
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.d3-move-action .out {
+  font: inherit;
+}
+.d3-cmd {
+  margin-top: 0;
+}
+.d3-cmd .d2-copy-bar .eyebrow {
+  margin-right: 0;
+}
+.d3-cmd .d2-copy-bar .tag {
+  margin-right: auto;
+  font-size: 10.5px;
+  padding: 0 5px;
+}
+.d3-cmd .d2-copy-cmd code {
+  font: inherit;
+}
+.d3-move-facts {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.d3-mf {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: baseline;
+}
+.d3-mf > dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 12px;
+  font-size: 13px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.d3-mf code {
+  font-size: 12px;
+}
+.d3-check {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  color: var(--ink-2);
+}
+.d3-check-mark {
+  font-weight: 700;
+  color: var(--none);
+}
+.d3-check.is-no .d3-check-mark {
+  color: var(--crit);
+}
+.d3-notes {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 2px 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--border);
+}
+.d3-notes ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.d3-notes li {
+  position: relative;
+  padding-left: 12px;
+}
+.d3-notes li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.66em;
+  width: 5px;
+  height: 1px;
+  background: var(--border-strong);
+}
+.d3-holders {
+  --rail: color-mix(in srgb, var(--accent) 55%, var(--border));
+  position: relative;
+  display: grid;
+  gap: 8px;
+  margin-top: -20px;
+  padding: 12px 0 0 18px;
+}
+.d3-holders::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 0;
+  bottom: 9px;
+  border-left: 1.5px solid var(--rail);
+}
+.d3-holders > h3 {
+  margin: 0;
+}
+.d3-count {
+  letter-spacing: 0.04em;
+}
+.d3-chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+.d3-holder {
+  position: relative;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.d3-holder::before {
+  content: "";
+  position: absolute;
+  left: -17px;
+  top: 0.72em;
+  width: 11px;
+  border-top: 1.5px solid var(--rail);
+}
+.d3-holder-name {
+  overflow-wrap: anywhere;
+}
+.d3-holder-pkg {
+  font-weight: 600;
+  color: var(--ink);
+}
+.d3-holder.is-root .d3-holder-pkg {
+  font-weight: 500;
+}
+.d3-holder-ver {
+  font: 12px var(--mono);
+  color: var(--muted);
+}
+.d3-holder .tag {
+  font-size: 10.5px;
+  padding: 0 5px;
+  vertical-align: 1px;
+}
+.d3-holder-meta {
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.d3-holder-step {
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.d3-holder-step-label {
+  font: 600 10px/1 var(--cond);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.d3-holder-meta code {
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+.d3-fold > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 1px 2px;
+  border-radius: var(--radius-s);
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.d3-fold > summary::after {
+  margin-left: 0;
+}
+.d3-fold > summary:hover {
+  color: var(--ink);
+}
+.d3-fold > summary:focus-visible {
+  outline-offset: 1px;
+}
+.d3-fold[open] > summary {
+  margin-bottom: 7px;
+}
+.d3-fold .d3-holder::before {
+  left: -17px;
+}
+.d3-rung-mark {
+  display: inline-block;
+  margin-left: 3px;
+  padding: 1px 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-s);
+  font: 600 9.5px/1.3 var(--cond);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  vertical-align: 1px;
+}
+.d3-rung-mark.is-move {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.d3-advs {
+  display: grid;
+  gap: 6px;
+}
+.d3-adv-cap {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.d3-adv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+.d3-adv {
+  display: grid;
+  gap: 1px;
+  padding: 5px 0 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  line-height: 1.45;
+  scroll-margin-top: 172px;
+}
+.d3-adv:last-child {
+  border-bottom: 0;
+}
+.d3-adv:target {
+  background: var(--accent-soft);
+}
+.d3-adv-head {
+  overflow-wrap: anywhere;
+}
+.d3-adv-id,
+.d3-adv-src,
+.d3-name {
+  display: inline-block;
+  max-width: 100%;
+}
+.d3-row-wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+.d3-adv-head .tag {
+  min-width: 5.6em;
+  font-size: 10.5px;
+  padding: 0 5px;
+  text-align: center;
+  vertical-align: 1px;
+}
+.d3-adv-id {
+  font: 600 12px var(--mono);
+  color: var(--ink);
+}
+.d3-adv-src {
+  font: 11px var(--mono);
+  color: var(--muted);
+}
+.d3-adv-meta {
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.d3-adv-affects {
+  color: var(--muted);
+}
+.d3-adv-affects.is-folded {
+  display: inline-block;
+  white-space: nowrap;
+}
+.d3-adv-sep {
+  color: var(--muted);
+  white-space: pre;
+}
+.d3-adv-range {
+  font-size: 11px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.d3-adv-meta > .d3-adv-range {
+  display: block;
+  margin: 3px 0 1px;
+  padding: 3px 0 3px 8px;
+  border-left: 2px solid var(--border);
+  line-height: 1.55;
+}
+.d3-adv-meta > .d3-adv-range[hidden] {
+  display: none;
+}
+.d3-range-alt {
+  display: inline-block;
+  min-width: 100%;
+}
+.d3-range-btn {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.d3-adv-same {
+  display: block;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--muted);
+}
+.d3-advs.is-grouped {
+  gap: 0;
+}
+.d3-advs.is-grouped .d3-adv-cap {
+  margin-bottom: 6px;
+}
+.d3-advs.is-grouped .d3-adv-list {
+  border-top: 0;
+  margin: 0 0 4px 3px;
+  padding-left: 11px;
+  border-left: 1px solid var(--border);
+}
+.d3-sev-group {
+  border-top: 1px solid var(--border);
+}
+.d3-sev-group:last-child {
+  border-bottom: 1px solid var(--border);
+}
+.d3-sev-head {
+  margin: 0;
+  font: inherit;
+}
+.d3-sev-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 6px 4px 6px 0;
+  border: 0;
+  background: none;
+  font: 12.5px/1.4 var(--sans);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.d3-sev-btn .tag {
+  min-width: 5.6em;
+  font-size: 10.5px;
+  padding: 0 5px;
+  text-align: center;
+}
+.d3-sev-n {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.d3-sev-word {
+  color: var(--muted);
+}
+.d3-sev-btn .l1-mark {
+  margin-left: auto;
+  color: var(--muted);
+}
+.d3-sev-btn[aria-expanded="true"] .l1-mark {
+  transform: rotate(90deg);
+}
+.d3-sev-btn:hover {
+  background: var(--accent-soft);
+}
+.d3-sev-btn:hover .d3-sev-word {
+  color: var(--ink-2);
+}
+.d3-sev-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.d3-lines,
+.d3-namelist,
+.d3-sev-counts,
+.d3-notes-sub {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.d3-lines {
+  display: grid;
+  gap: 2px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.d3-namelist {
+  display: grid;
+  gap: 1px;
+  margin: 2px 0 1px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+.d3-namelist > li[hidden] {
+  display: none;
+}
+.d3-sev-counts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin-left: 8px;
+  vertical-align: top;
+}
+.d3-sev-counts > li {
+  white-space: nowrap;
+}
+.d3-sev-counts .tag {
+  font-size: 10.5px;
+  padding: 0 5px;
+  vertical-align: 1px;
+}
+.d3-sev-jump {
+  border-bottom: 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+.d3-sev-jump > b {
+  border-bottom: 1px solid var(--accent);
+}
+.d3-sev-jump:hover > b {
+  color: var(--accent-ink);
+}
+.d3-sev-jump:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-s);
+}
+.d3-meanwhile {
+  margin-top: 2px;
+}
+.d3-meanwhile code {
+  font-size: 11.5px;
+}
+.d3-notes-sub {
+  margin-top: 1px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+.d3-mf-lines {
+  flex-direction: column;
+}
+.d3-after-cond {
+  font-size: 12px;
+  color: var(--muted);
+}
+.d3-mf .d2-after {
+  font-weight: 600;
+}
+.d3-kv {
+  margin: 0;
+  display: grid;
+  gap: 3px;
+}
+.d3-kv > div {
+  display: grid;
+  grid-template-columns: 5.5em minmax(0, 1fr);
+  gap: 0 8px;
+  align-items: baseline;
+}
+.d3-kv dt {
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.d3-kv dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.d3-rung-head {
+  color: var(--ink);
+}
+.d3-rung-line {
+  overflow-wrap: anywhere;
+}
+.d3-rung-line .d2-after {
+  font-size: 12px;
+}
+.d3-branches-lead {
+  font: 13.5px/1.5 var(--sans);
+  color: var(--ink);
+}
+.d3-tl-mark {
+  display: block;
+  width: fit-content;
+  margin: 2px 0 1px;
+  font-size: 8.5px;
+}
+.d3-tl-age {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.d3-tl-php-note {
+  display: block;
+  font: 500 10.5px/1.3 var(--sans);
+  white-space: normal;
+  color: var(--ink-2);
+}
+.detail-timeline-row .detail-timeline-latest,
+.detail-timeline-row .detail-timeline-php,
+.detail-timeline-row .detail-timeline-branch {
+  padding: 4px 0;
+}
+.detail-timeline-row.is-folded {
+  min-height: 0;
+  line-height: 1.2;
+}
+.detail-timeline-row.is-folded .detail-timeline-latest,
+.detail-timeline-row.is-folded .detail-timeline-php,
+.detail-timeline-row.is-folded .detail-timeline-branch {
+  padding: 2px 0;
+}
+.detail-timeline-row.is-folded .d3-tl-age {
+  font-size: 9.5px;
+}
+.detail-timeline-row.is-collapsed {
+  visibility: visible;
+  height: 1px;
+  margin-bottom: -1px;
+  clip-path: inset(50%);
+}
+.d3-arg {
+  display: inline-block;
+  max-width: 100%;
+}
+@container sheet (max-width: 400px) {
+  .d3 {
+    --label-w: 100%;
+  }
+  .d3-reading,
+  .d3-q {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d3-verdict-line {
+    font-size: 21px;
+  }
+  .d3-notes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d2-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d2-ruler-tick,
+  .d2-ruler-tick em {
+    font-size: 9.5px;
+  }
+}
+@media (forced-colors: active) {
+  .d3-move,
+  .d3-move.is-advice,
+  .d3-rung-mark,
+  .d3-rung-mark.is-move {
+    border-color: CanvasText;
+  }
+  .d3-holders::before,
+  .d3-holder::before {
+    border-color: CanvasText;
+  }
+  .d3-sev-btn:focus-visible,
+  .d3-sev-jump:focus-visible {
+    outline-color: Highlight;
+  }
+  .d3-sev-jump > b {
+    border-bottom-color: LinkText;
+  }
+  .d3-grade,
+  .d3-gate,
+  .d3-check-mark,
+  .d3-check.is-no .d3-check-mark {
+    color: CanvasText;
+  }
+}
+@media print {
+  .d3-move {
+    box-shadow: inset 3px 0 0 var(--accent);
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .d2-why-lines > li[hidden],
+  .d3-adv-list[hidden],
+  .d3-adv-meta > .d3-adv-range[hidden] {
+    display: block !important;
+  }
+  .d3-sev-btn .l1-mark {
+    display: none;
+  }
+  .d3-jump {
+    display: none;
+  }
+  .d3 a.d3-count-link {
+    border-bottom: none;
+  }
+  a.d3-adv-id::after,
+  .detail-head-line a.out::after {
+    content: " " attr(href);
+    font: 400 9.5px var(--mono);
+    color: var(--muted);
+    word-break: break-all;
+  }
+  .d2-rows,
+  .d3-row-wide,
+  .d3-row-wide > .d2-row-value,
+  .d3-advs {
+    display: block;
+  }
+  .d3-row-wide > .d2-row-value > * + *,
+  .d3-advs > * + * {
+    margin-top: 6px;
+  }
+  .d3-namelist > li[hidden] {
+    display: list-item !important;
+  }
+  .d3-namelist + .l1-btn {
+    display: none;
+  }
+  .detail-timeline-row.is-collapsed {
+    height: auto;
+    min-height: 30px;
+    margin-bottom: 0;
+    clip-path: none;
+    border-top: 1px solid var(--border);
+  }
+  .detail-timeline-fold,
+  .detail-timeline-rug,
+  .detail-timeline-rug-tick {
+    display: none;
+  }
+  .detail-timeline-grid {
+    display: block;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .detail-timeline-row {
+    grid-template-columns: 9ch minmax(72px, 1fr) 10ch 17ch;
+    column-gap: 12px;
+    break-inside: avoid;
+  }
+  .d3-fold > summary::after,
+  .detail-reference-summary::after,
+  .d2-btn,
+  .detail-close {
+    display: none;
+  }
+  .detail-head {
+    position: static;
   }
 }
 .pkg-link-btn {
@@ -2500,14 +3284,20 @@ button.pill {
 .tablewrap tbody tr {
   cursor: pointer;
 }
-.tablewrap tbody tr:hover td {
+.tablewrap tbody tr:hover {
   background: var(--surface-2);
 }
-.tablewrap tbody tr[aria-current="true"] td {
-  background: var(--surface-2);
+@media screen {
+  .tablewrap tbody tr[aria-current="true"] {
+    background: var(--accent-soft);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
 }
-.tablewrap tbody tr[aria-current="true"] td:first-child {
-  box-shadow: inset 3px 0 0 var(--accent);
+@media screen and (forced-colors: active) {
+  .tablewrap tbody tr[aria-current="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
 .tablewrap tbody tr:focus-visible {
   outline-offset: -2px;
@@ -4613,6 +5403,10 @@ a.legend-btn,
   font: 12px var(--mono);
   color: var(--muted);
 }
+.ov-ly-release {
+  font: 12px var(--mono);
+  color: var(--ink-2);
+}
 .ov-ly-grade {
   display: inline-block;
   padding: 2px 6px;
@@ -6571,18 +7365,6 @@ a.legend-btn,
 			asc: "A to Z"
 		}
 	};
-	var AGE_WORDS = {
-		reading: {
-			installed: "installed",
-			branch_release: "{branch}",
-			release: "newest",
-			push: "last {event}"
-		},
-		not_read: "{reading} not read ({reason words})",
-		below: "below {kind}-warn-years {warn}",
-		past: "past {kind}-{level}-years {years}",
-		dated_by: "dated by {package}"
-	};
 	var SHARE_GLYPHS = {
 		"1/4": "¼",
 		"1/2": "½",
@@ -6830,87 +7612,362 @@ a.legend-btn,
 		return `${items.slice(0, -1).join(", ")} and ${items.at(-1) ?? ""}`;
 	}
 	//#endregion
-	//#region src/domain/securityLine.ts
+	//#region src/domain/links.ts
+	function safeHref(url) {
+		const value = typeof url === "string" ? url.trim() : "";
+		return /^https?:\/\/[^\s<>"']+$/i.test(value) ? value : null;
+	}
+	function cveUrl(advisory) {
+		return advisory.cve && /^CVE-/.test(advisory.cve) ? `https://nvd.nist.gov/vuln/detail/${advisory.cve}` : null;
+	}
+	var NEW_TAB = ", opens in a new tab";
+	function hostOf(url) {
+		try {
+			return new URL(url).hostname.replace(/^www\./, "") || null;
+		} catch {
+			return null;
+		}
+	}
+	function headerLinks({ origin, activity }, repositoryLink) {
+		const links = [];
+		const repo = safeHref(repositoryLink);
+		const host = repo === null ? null : hostOf(repo);
+		if (repo !== null && host !== null) {
+			const archived = activity.archived === true ? " (archived)" : "";
+			links.push({
+				href: repo,
+				text: `${host} ↗${archived}`,
+				name: `${host} repository${archived}${NEW_TAB}`
+			});
+		}
+		const registry = safeHref(origin.package_url);
+		if (registry !== null) {
+			const page = origin.registry === null ? "registry page" : `${origin.registry} page`;
+			links.push({
+				href: registry,
+				text: `${origin.registry ?? page} ↗`,
+				name: `${page} of this package${NEW_TAB}`
+			});
+		}
+		return links;
+	}
+	//#endregion
+	//#region src/model/types.ts
+	var SIGNAL_IDS = [
+		"S1",
+		"S2",
+		"S3",
+		"S4",
+		"S5",
+		"S6",
+		"S7",
+		"S8",
+		"S9",
+		"S10"
+	];
+	var VIEWS = [
+		"overview",
+		"findings",
+		"advisories",
+		"packages",
+		"radius",
+		"run"
+	];
+	//#endregion
+	//#region src/domain/vocab.ts
+	function vocabTable(entries) {
+		return Object.assign(Object.create(null), entries);
+	}
+	var SIGNAL_NAMES = vocabTable({
+		S1: "marked abandoned",
+		S2: "no recent release",
+		S3: "repository archived",
+		S4: "no push to the repository",
+		S5: "release predates the target PHP",
+		S6: "branch snapshot or never tagged",
+		S7: "pulls in flagged packages",
+		S8: "the installed branch stopped",
+		S9: "security advisories",
+		S10: "a check could not run"
+	});
+	var SIGNAL_DEFS = vocabTable({
+		S1: "The Composer repository marks the package abandoned, sometimes naming a replacement.",
+		S2: "Time since the newest dated release, pre-releases included, against release-warn-years / release-high-years.",
+		S3: "The repository is archived — on GitHub, or on GitLab when the run has credentials there.",
+		S4: "Time since the last push to any branch, against push-warn-years / push-high-years.",
+		S5: "The installed release predates the target PHP's GA date and require.php has no upper bound.",
+		S6: "The installed version is a branch snapshot, or the package's repository lists no tag at all (a pre-release counts as one).",
+		S7: "A direct requirement pulls in flagged transitive packages. Informational, never a verdict.",
+		S8: "Time since the last stable release on the installed branch, counted only when a higher branch has released since.",
+		S9: "Security advisories affecting the installed version. Never a verdict; raises the priority where no fix is coming.",
+		S10: "A check lockrot relies on could not run for this package, so a verdict may be missing a signal; the data says which and why."
+	});
+	function annotateThresholds(text, thresholds) {
+		let annotated = text;
+		for (const [name, years] of thresholds) {
+			const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+			annotated = annotated.replace(new RegExp(`\\b${escaped}\\b`, "g"), `${years} years (${name})`);
+		}
+		return annotated;
+	}
+	var DOCS_URL = "https://lockrot.dev/verdicts/";
+	var SIGNAL_DOC = vocabTable({
+		S7: `${DOCS_URL}#transitive-exposure`,
+		S8: `${DOCS_URL}#left-behind`,
+		S9: `${DOCS_URL}#security-advisories`
+	});
+	var KNOWN_SIGNAL_IDS = new Set(SIGNAL_IDS);
+	function isKnownSignalId(id) {
+		return KNOWN_SIGNAL_IDS.has(id);
+	}
+	var LOCKROT_SIGNAL_ID = /^S[1-9][0-9]*$/;
+	var VENDOR_SIGNAL_ID = /^[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*$/;
+	function unknownSignalDef(id) {
+		if (LOCKROT_SIGNAL_ID.test(id)) return "A lockrot check this page does not know.";
+		if (VENDOR_SIGNAL_ID.test(id)) return "A check from outside lockrot, which this page does not know.";
+		return "A check this page does not know.";
+	}
+	function signalDef(id) {
+		return SIGNAL_DEFS[id] ?? unknownSignalDef(id);
+	}
+	function signalDocUrl(id) {
+		if (!isKnownSignalId(id) && !LOCKROT_SIGNAL_ID.test(id)) return null;
+		return SIGNAL_DOC[id] ?? `https://lockrot.dev/verdicts/#the-signals`;
+	}
+	//#endregion
+	//#region src/domain/rich.ts
+	var newTab = (name) => `${name}, opens in a new tab`;
+	//#endregion
+	//#region src/domain/shellArgv.ts
+	var SHELLS = [
+		"posix",
+		"cmd",
+		"powershell"
+	];
+	var SHELL_NAMES = {
+		posix: "POSIX",
+		cmd: "cmd.exe",
+		powershell: "PowerShell"
+	};
+	var REFUSED_COMMAND = "This command holds characters the page does not print.";
+	var COMMAND_ARGUMENT = /^(?! +$)[A-Za-z0-9/._:@+=,^~*<>| -]+$/;
+	var SUBCOMMANDS = new Set([
+		"update",
+		"require",
+		"why-not"
+	]);
+	var LOCKROT_OPTIONS = { require: "--no-update" };
+	var POSIX_BARE = /^[A-Za-z0-9/._:@%+=,-]+$/;
+	var CMD_SPECIAL = /[ ^|<>]/;
+	var isPrintableName = (name) => COMMAND_ARGUMENT.test(name) && !name.startsWith("-");
+	function isPrintableArgv(argv) {
+		const [program, subcommand = ""] = argv;
+		if (program !== "composer" || !SUBCOMMANDS.has(subcommand)) return false;
+		return argv.every((argument) => COMMAND_ARGUMENT.test(argument) && (!argument.startsWith("-") || LOCKROT_OPTIONS[subcommand] === argument));
+	}
+	var posixArgument = (argument) => POSIX_BARE.test(argument) && !argument.startsWith("=") ? argument : `'${argument}'`;
+	var cmdWords = (words) => words.map((word) => CMD_SPECIAL.test(word) ? `"${word}"` : word);
+	var WORDS = {
+		posix: (argv) => argv.map(posixArgument),
+		cmd: cmdWords,
+		powershell: ([program = "", ...rest]) => [
+			program,
+			"--%",
+			...cmdWords(rest)
+		]
+	};
+	function commandWords(argv, shell) {
+		return isPrintableArgv(argv) ? WORDS[shell](argv) : null;
+	}
+	function commandLine(argv, shell) {
+		return commandWords(argv, shell)?.join(" ") ?? null;
+	}
+	//#endregion
+	//#region src/domain/securityBlock.ts
 	var BLOCKED = "needs a PHP your target does not run";
-	var SECURITY_FIX_WORDS = {
+	var SECURITY_FIX_WORDS = vocabTable({
 		unknown: "not known",
 		none: "none available",
 		blocked: BLOCKED
-	};
+	});
 	var securityFixWord = (kind) => SECURITY_FIX_WORDS[kind] ?? fixLabel(kind);
+	var ladderFixWord = (kind) => kind === "blocked" ? BLOCKED : fixLabel(kind);
 	function holderWord({ source, package: name }) {
 		return source === "root" || name === null ? "composer.json" : name;
 	}
-	function afterIt({ if_applied: applied }) {
+	function afterIt(applied) {
 		if (applied === null) return null;
 		const noNew = applied.assumes.includes("no_new_advisories");
-		const atMost = applied.at_most ? noNew ? "at most, from the facts it checked, " : "at most " : "";
-		const resolves = applied.assumes.includes("composer_resolves") ? ", if Composer resolves it" : "";
-		return `after it: ${atMost}${applied.total}, ${applied.verdict}${resolves}${noNew ? ", advisories on its new versions not checked" : ""}`;
+		return `after it: ${applied.at_most ? noNew ? "at most, from the facts it checked, " : "at most " : ""}${applied.total}, ${applied.verdict}` + (applied.assumes.includes("composer_resolves") ? ", if Composer resolves it" : "") + (noNew ? ", advisories on its new versions not checked" : "");
 	}
-	function rung(branch, fixes) {
-		const label = fixes.fix_kind === "blocked" ? BLOCKED : fixLabel(fixes.fix_kind ?? "unknown");
-		const holders = fixes.held_by.map(holderWord);
-		return {
-			branch,
-			clause: `clears ${fixes.fixed} of ${fixes.of}${fixes.lowest === null ? "" : ` from ${fixes.lowest}`} (${label}` + (holders.length === 0 ? "" : `; held by ${joinAnd(holders)}`),
-			after: afterIt(fixes),
-			afterVerdict: fixes.if_applied?.verdict ?? null,
-			fixed: fixes.fixed,
-			of: fixes.of,
-			label
-		};
+	function securityRungs(finding, metadata) {
+		const move = finding.next_step;
+		const shown = (move?.held_by ?? []).map(holderWord);
+		const moveBranch = move?.to_branch ?? null;
+		const held = (holders) => shown.length < 2 || !shown.every((w) => holders.includes(w)) ? joinAnd(holders) : joinAnd([...holders.filter((w) => !shown.includes(w)), `the ${shown.length} in Held by`]);
+		return [...metadata?.branches ?? []].reverse().flatMap((row) => {
+			const fixes = row.fixes;
+			if (fixes === null || fixes.fixed === 0) return [];
+			const isMove = moveBranch !== null && row.branch === moveBranch;
+			const holders = fixes.held_by.map(holderWord);
+			return [{
+				branch: row.branch,
+				installed: row.installed,
+				move: isMove,
+				marks: [...row.installed ? ["your branch"] : [], ...isMove ? ["the move"] : []],
+				clears: `clears ${fixes.fixed} of ${fixes.of}${fixes.lowest ? ` from ${fixes.lowest}` : ""}`,
+				kind: ladderFixWord(fixes.fix_kind ?? "unknown") + (holders.length > 0 ? ` · held by ${held(holders)}` : ""),
+				after: afterIt(fixes.if_applied),
+				afterVerdict: fixes.if_applied?.verdict ?? null
+			}];
+		});
 	}
-	function ladder(metadata) {
-		return [...metadata?.branches ?? []].reverse().flatMap(({ branch, fixes }) => fixes === null || fixes.fixed === 0 ? [] : [rung(branch, fixes)]);
-	}
-	function advisoryCounts(security, run) {
-		const counts = run.score_model.severities.map(({ id }) => [id, security.counts[id]]).filter(([, count]) => count > 0);
-		const total = counts.reduce((sum, [, count]) => sum + count, 0);
-		const [[only] = []] = counts;
-		return total === 1 && only !== void 0 ? `1 ${only} advisory` : `${total} advisories: ${counts.map(([id, count]) => `${count} ${id}`).join(", ")}`;
-	}
-	function partialFix(finding, kind) {
-		const rows = advisoryRows(finding);
-		const sharing = rows.filter((row) => row.fix.kind === kind).length;
-		return (kind === "none" || kind === "unknown") && sharing > 0 && sharing < rows.length ? ` for ${sharing} of ${rows.length}` : "";
-	}
-	function ignoredLines(security) {
-		if (!isSecurityVulnerable(security)) return [];
-		return security.ignored.map(({ id, cve, severity, by, reason }) => `${cve ?? id} (${severity}) ignored by ${by}${reason === null ? ", no reason given" : `: ${reason}`}`);
-	}
-	function securityRow(finding, run, metadata) {
+	function securitySummary(finding, run) {
 		const { security } = finding;
 		const records = security.records === null ? [] : [`${security.records === 0 ? "none" : security.records} on record for this name`];
 		const ignored = security.ignored_count > 0 ? [`${security.ignored_count} ignored by Composer's audit policy`] : [];
 		const lookup = lookupWord(security.check, security.unchecked_reason, finding.origin.kind);
 		if (!isSecurityVulnerable(security)) return {
-			summary: [
-				security.status === "clear" ? "no counted advisory" : "advisories not known",
+			head: security.status === "clear" ? "no counted advisory" : "advisories not known",
+			counts: [],
+			lines: [
 				...records,
 				...ignored,
 				lookup
-			].join(" · "),
-			rungs: [],
-			ignored: ignoredLines(security)
+			]
 		};
+		const byId = security.counts;
+		const counts = run.score_model.severities.map(({ id }) => ({
+			severity: id,
+			count: byId[id] ?? 0
+		})).filter(({ count }) => count > 0);
+		const total = counts.reduce((sum, { count }) => sum + count, 0);
+		const [only] = counts;
+		const one = total === 1 && counts.length === 1 && only !== void 0;
+		const kind = security.fix_kind;
+		const rows = advisoryRows(finding);
+		const sharing = rows.filter((row) => row.fix.kind === kind).length;
+		const partly = (kind === "none" || kind === "unknown") && sharing > 0 && sharing < rows.length ? ` for ${sharing} of ${rows.length}` : "";
 		return {
-			summary: [
-				advisoryCounts(security, run),
+			head: one ? `1 ${only.severity} advisory` : `${total} advisories:`,
+			counts: one ? [] : counts,
+			lines: [
 				...records,
 				...ignored,
-				`fix: ${securityFixWord(security.fix_kind)}${partialFix(finding, security.fix_kind)}`,
+				`fix: ${securityFixWord(kind)}${partly}`,
 				lookup
-			].join(" · "),
-			rungs: ladder(metadata),
-			ignored: ignoredLines(security)
+			]
 		};
 	}
-	function moreWaysOut(rest) {
-		const labels = new Set(rest.map((r) => r.label));
-		const [only] = labels;
-		return `${rest.length} more ${rest.length === 1 ? "way" : "ways"} out: ${joinAnd(rest.map((r) => r.branch))}` + (labels.size === 1 && only !== void 0 ? ` (${only})` : "");
+	function meanwhile(finding) {
+		const partial = isSecurityVulnerable(finding.security) ? finding.security.partial : null;
+		if (partial === null) return null;
+		const applied = partial.if_applied;
+		const of = isScoreGraded(finding.score) ? finding.score.parts.security.of : 0;
+		const cleared = partial.clears.filter((c) => c.kind === "advisory").length;
+		const facts = [...partial.clears.filter((c) => c.kind === "flag").map((c) => c.id), `${cleared} of its ${of} advisories`];
+		return [
+			"Meanwhile, ",
+			isPrintableName(finding.package) ? { code: `composer update ${posixArgument(finding.package)}` } : "an update of this package",
+			` installs ${partial.version}, which clears ${joinAnd(facts)} (${applied.at_most ? "at most " : ""}${applied.total}, ${applied.verdict} after it` + (applied.assumes.includes("no_new_advisories") ? ", if that release carries no new advisory" : "") + (partial.unverified.length > 0 ? `; not checked: ${partial.unverified.map((u) => u.id).join(", ")}` : "") + ")"
+		];
 	}
+	function sortedAdvisories(finding, run) {
+		const order = run.score_model.severities.map((s) => s.id);
+		const rank = (severity) => order.includes(severity) ? order.indexOf(severity) : order.length;
+		return advisoryRows(finding).map((row, at) => ({
+			row,
+			at
+		})).sort((a, b) => {
+			const ra = rank(a.row.severity);
+			const rb = rank(b.row.severity);
+			if (ra !== rb) return ra - rb;
+			if (ra === order.length && a.row.severity !== b.row.severity) return a.row.severity < b.row.severity ? -1 : 1;
+			return a.at - b.at;
+		}).map(({ row }) => row);
+	}
+	function advisoryFixWords$1(fix) {
+		if (fix.kind === "none") return "no release fixes it";
+		if (fix.kind === "unknown" || fix.version === null) return "fix not known";
+		const where = fix.to_branch === null ? "" : ` on ${fix.to_branch}${fix.on_installed_branch ? ", your branch" : ""}`;
+		return `fix ${fix.version}${where} (${ladderFixWord(fix.kind)})`;
+	}
+	var barParts = (text) => text.split(/(?<=\|)(?!\|)/);
+	var rangeCount = (text) => text.split(/\s*\|\|?\s*/).filter((part) => part !== "").length;
+	function affects(range) {
+		if (!range) return null;
+		const n = rangeCount(range);
+		return {
+			folded: range.length > 40 ? `${n} ${pluralNoun(n, "range", "ranges")}` : null,
+			range,
+			parts: barParts(range)
+		};
+	}
+	function groupsOf(rows, run) {
+		if (rows.length <= 6) return [];
+		const runs = [];
+		rows.forEach((row, at) => {
+			const last = runs.at(-1);
+			if (last?.severity === row.severity) last.rows.push(at);
+			else runs.push({
+				severity: row.severity,
+				rows: [at]
+			});
+		});
+		return runs.map((g, i) => {
+			const countsAs = run.score_model.severities.find((s) => s.id === g.severity)?.counts_as ?? null;
+			return {
+				severity: g.severity,
+				count: g.rows.length,
+				words: pluralNoun(g.rows.length, "advisory", "advisories") + (countsAs ? `, counted as ${countsAs}` : ""),
+				open: i === 0 || g.rows.some((at) => rows[at]?.deciding === true),
+				rows: g.rows
+			};
+		});
+	}
+	function securityBlock$1(finding, run, metadata) {
+		const sorted = sortedAdvisories(finding, run);
+		const firstOfCve = new Map();
+		const rows = sorted.map((row, at) => {
+			const first = row.cve ? firstOfCve.get(row.cve) : void 0;
+			if (row.cve && first === void 0) firstOfCve.set(row.cve, at);
+			const name = row.cve ?? row.id;
+			return {
+				name,
+				href: safeHref(row.link),
+				linkName: newTab(name),
+				source: row.cve !== null && row.cve !== row.id ? row.id : null,
+				deciding: row.deciding,
+				severity: row.severity,
+				fix: advisoryFixWords$1(row.fix),
+				affects: affects(row.affected_versions),
+				sameAs: first === void 0 ? null : {
+					id: sorted[first]?.id ?? "",
+					at: first
+				}
+			};
+		});
+		const repeats = rows.filter((r) => r.sameAs !== null).length;
+		const security = finding.security;
+		return {
+			...securitySummary(finding, run),
+			meanwhile: meanwhile(finding),
+			caption: rows.length === 0 ? [] : [`By severity. Each affects your version, ${finding.version}.`, ...repeats > 0 ? [`${repeats} ${pluralNoun(repeats, "repeats", "repeat")} the CVE of another row.`] : []],
+			groups: groupsOf(sorted, run),
+			rows,
+			ignored: isSecurityVulnerable(security) ? security.ignored.map(({ id, cve, severity, by, reason }) => `${cve ?? id} (${severity}) ignored by ${by}${reason === null ? ", no reason given" : `: ${reason}`}`) : [],
+			ladder: securityRungs(finding, metadata)
+		};
+	}
+	var SECURITY_WORDS = {
+		deciding: "deciding",
+		affects: "affects ",
+		separator: " · ",
+		sameAs: "same CVE as "
+	};
+	var waysOut = (n) => `${n} ${pluralNoun(n, "way", "ways")} out`;
+	var advisoriesName = (n) => `${n} ${pluralNoun(n, "advisory", "advisories")}`;
+	var showGroupName = (count, severity) => `${count} ${severity}, show the group`;
 	//#endregion
 	//#region src/domain/advisories.ts
 	function advisoryPairs2(findings, filters) {
@@ -7522,44 +8579,86 @@ a.legend-btn,
 		return years === 0 ? "less than three weeks ago" : `${decimal(years, 1)} years ago`;
 	}
 	//#endregion
-	//#region src/domain/ageLine.ts
-	var dateOf$1 = (dateTime) => dateTime.slice(0, 10);
+	//#region src/domain/ageRows.ts
 	function when(reading) {
-		const datedBy = "dated_by" in reading && reading.dated_by !== null ? `, dated by ${reading.dated_by}` : "";
-		return `${dateOf$1(reading.at)} (${ago(reading.years)}${datedBy})`;
+		const datedBy = "dated_by" in reading && reading.dated_by ? `, dated by ${reading.dated_by}` : "";
+		return `${day(reading.at)} · ${ago(reading.years)}${datedBy}`;
 	}
-	function branchOf({ branch, age }, metadata) {
-		if (branch !== null) return branch;
-		const rows = (metadata?.branches ?? []).filter(({ newest_dated: newestDated }) => newestDated === age.branch_release?.version);
-		return rows.length === 1 ? rows[0]?.branch ?? "its branch" : "its branch";
-	}
-	function installedPart(finding, age, branch) {
-		const { version } = finding;
-		if (age.installed === null) return age.installed_unmeasured === "branch_snapshot" ? null : `installed ${version}, release date not known (${causeWord(age.installed_unmeasured ?? "", finding.origin.kind)})`;
-		const newest = age.release?.version === version ? ", its newest release" : age.branch_release?.version === version ? `, the newest on ${branch}` : "";
-		return `installed ${version} released ${when(age.installed)}${newest}`;
-	}
-	function ageLine(finding, metadata = null) {
+	function ageRows(finding, metadata) {
 		const { age, version } = finding;
-		const { release, branch_release: branchRelease, push } = age;
-		const branch = branchOf(finding, metadata);
-		const parts = [
-			installedPart(finding, age, branch),
-			branchRelease !== null && branchRelease.version !== version && release?.version !== branchRelease.version ? `${branch} last released ${branchRelease.version} ${when(branchRelease)}` : null,
-			release !== null && release.version !== version ? branchRelease?.version === release.version ? `${branch} last released ${release.version} ${when(release)}, its newest release` : `newest release ${release.version} ${when(release)}` : null,
-			push === null ? null : `last ${eventWord(finding.activity.event ?? "push")} ${when(push)}`
-		].filter((part) => part !== null);
-		return parts.length === 0 ? null : parts.join("; ");
-	}
-	function ageNotRead(finding, metadata = null) {
-		const { age } = finding;
+		const { installed, release, branch_release: last, push } = age;
+		const cause = (id) => causeWord(id, finding.origin.kind);
+		const branch = finding.branch ?? (metadata?.branches ?? []).find((r) => last !== null && r.newest_dated === last.version)?.branch ?? "its branch";
+		const rows = [];
+		if (installed === null) {
+			if (age.installed_unmeasured !== "branch_snapshot") rows.push({
+				label: "installed",
+				value: `${version} · release date not known (${cause(age.installed_unmeasured ?? "")})`
+			});
+		} else {
+			const newest = release?.version === version ? " · its newest release" : last?.version === version ? ` · the newest on ${branch}` : "";
+			rows.push({
+				label: "installed",
+				value: `${version} · ${when(installed)}${newest}`
+			});
+		}
+		if (last !== null && last.version !== version && release?.version !== last.version) rows.push({
+			label: `${branch} last`,
+			value: `${last.version} · ${when(last)}`
+		});
+		if (release !== null && release.version !== version) rows.push(last?.version === release.version ? {
+			label: `${branch} last`,
+			value: `${release.version} · ${when(release)} · its newest release`
+		} : {
+			label: "newest",
+			value: `${release.version} · ${when(release)}`
+		});
 		const event = eventWord(finding.activity.event ?? "push");
-		return [
-			[AGE_WORDS.reading.installed, age.installed_unmeasured],
-			[AGE_WORDS.reading.branch_release.replace("{branch}", branchOf(finding, metadata)), age.branch_release_unmeasured],
-			[AGE_WORDS.reading.release, age.release_unmeasured],
-			[AGE_WORDS.reading.push.replace("{event}", event), age.push_unmeasured]
-		].filter((reading) => reading[1] !== null && reading[1] !== "branch_snapshot").map(([name, cause]) => AGE_WORDS.not_read.replace("{reading}", name).replace("{reason words}", causeWord(cause, finding.origin.kind)));
+		if (push !== null) rows.push({
+			label: `last ${event}`,
+			value: when(push)
+		});
+		const notRead = [
+			["installed", age.installed_unmeasured],
+			[finding.branch ?? "its branch", age.branch_release_unmeasured],
+			["newest", age.release_unmeasured],
+			[`last ${event}`, age.push_unmeasured]
+		];
+		for (const [name, id] of notRead) if (id !== null && id !== "branch_snapshot") rows.push({
+			label: null,
+			value: `${name} not read (${cause(id)})`
+		});
+		return rows;
+	}
+	//#endregion
+	//#region src/domain/baselineSuffix.ts
+	var advisories = (count) => count === 1 ? "advisory" : "advisories";
+	function advisoryName$1(finding, id) {
+		return advisoryRows(finding).find((row) => row.id === id)?.cve ?? id;
+	}
+	function advisoryItem(finding, run, entry, comparedFixes) {
+		if (entry.kind !== "advisory" || entry.why === "new" || entry.now === null || entry.recorded === null) return null;
+		const name = advisoryName$1(finding, entry.id);
+		const lost = ` fix lost: ${entry.recorded.fix_kind} → ${entry.now.fix_kind}`;
+		if (entry.why === "fix_lost") return `${name}${lost}`;
+		const doubles = (kind) => run.score_model.fix_kinds.some(({ id, doubles: lostKind }) => id === kind && lostKind);
+		const crossed = comparedFixes && !doubles(entry.recorded.fix_kind) && doubles(entry.now.fix_kind);
+		return `${name} re-rated ${entry.recorded.severity} → ${entry.now.severity}${crossed ? `,${lost}` : ""}`;
+	}
+	function baselineSuffix(finding, run) {
+		const { baseline } = finding;
+		if (baseline === null || !isScoreGraded(finding.score)) return null;
+		if (baseline.recorded === null) return "(baseline: new package)";
+		const { advisories_now: now, worsened_by: worsened, recorded } = baseline;
+		const comparedFixes = recorded.target_php === run.target_php && recorded.fix_model === run.fix_model;
+		const items = [
+			now.known > 0 ? `${now.known} ${advisories(now.known)} known` : null,
+			...worsened.filter(({ kind }) => kind === "flag").map(({ id }) => `${id} new`),
+			now.new > 0 ? `${now.new} new ${advisories(now.new)}` : null,
+			...worsened.map((entry) => advisoryItem(finding, run, entry, comparedFixes)),
+			...finding.flags.filter(({ baseline: fact }) => fact?.state === "covered").map(({ id, baseline: fact }) => `${id} covered by the recorded ${fact?.covered_by ?? ""}`)
+		].filter((item) => item !== null);
+		return `(baseline: ${items.length === 0 ? "known" : items.join("; ")})`;
 	}
 	var capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 	var lowerFirst = (text) => text.charAt(0).toLowerCase() + text.slice(1);
@@ -7573,7 +8672,7 @@ a.legend-btn,
 		const signal = finding.signals.find((s) => s.id === id);
 		return signal ? signal.data : null;
 	}
-	function advisoryName$1(finding, id) {
+	function advisoryName(finding, id) {
 		return advisoryRows(finding).find((row) => row.id === id)?.cve ?? id;
 	}
 	function countsAs(run, severity) {
@@ -7683,88 +8782,149 @@ a.legend-btn,
 	}
 	var acceptsWholePackage = (finding) => finding.allowlist !== null && finding.allowlist.flag_ids === null;
 	//#endregion
-	//#region src/model/types.ts
-	var SIGNAL_IDS = [
-		"S1",
-		"S2",
-		"S3",
-		"S4",
-		"S5",
-		"S6",
-		"S7",
-		"S8",
-		"S9",
-		"S10"
-	];
-	var VIEWS = [
-		"overview",
-		"findings",
-		"advisories",
-		"packages",
-		"radius",
-		"run"
-	];
+	//#region src/domain/phpAlternatives.ts
+	var MANY_ALTERNATIVES = 4;
+	function phpConstraintWord(constraint) {
+		const alternatives = constraint.split(/\s*\|\|?\s*/);
+		return alternatives.length > MANY_ALTERNATIVES ? `${alternatives[0] ?? ""} … ${alternatives.at(-1) ?? ""} (${alternatives.length} alternatives)` : constraint;
+	}
 	//#endregion
-	//#region src/domain/vocab.ts
-	function vocabTable(entries) {
-		return Object.assign(Object.create(null), entries);
+	//#region src/domain/branchTimeline.ts
+	function phpWords(row) {
+		if (row.highest_admits_target_php === false) return "your target does not run it";
+		if (row.highest_admits_project_php !== false) return null;
+		return row.highest_misses_project_php === "needs_newer" ? "above your require.php" : "your require.php does not admit it";
 	}
-	var SIGNAL_NAMES = vocabTable({
-		S1: "marked abandoned",
-		S2: "no recent release",
-		S3: "repository archived",
-		S4: "no push to the repository",
-		S5: "release predates the target PHP",
-		S6: "branch snapshot or never tagged",
-		S7: "pulls in flagged packages",
-		S8: "the installed branch stopped",
-		S9: "security advisories",
-		S10: "a check could not run"
-	});
-	var SIGNAL_DEFS = vocabTable({
-		S1: "The Composer repository marks the package abandoned, sometimes naming a replacement.",
-		S2: "Time since the newest dated release, pre-releases included, against release-warn-years / release-high-years.",
-		S3: "The repository is archived — on GitHub, or on GitLab when the run has credentials there.",
-		S4: "Time since the last push to any branch, against push-warn-years / push-high-years.",
-		S5: "The installed release predates the target PHP's GA date and require.php has no upper bound.",
-		S6: "The installed version is a branch snapshot, or the package's repository lists no tag at all (a pre-release counts as one).",
-		S7: "A direct requirement pulls in flagged transitive packages. Informational, never a verdict.",
-		S8: "Time since the last stable release on the installed branch, counted only when a higher branch has released since.",
-		S9: "Security advisories affecting the installed version. Never a verdict; raises the priority where no fix is coming.",
-		S10: "A check lockrot relies on could not run for this package, so a verdict may be missing a signal; the data says which and why."
-	});
-	function annotateThresholds(text, thresholds) {
-		let annotated = text;
-		for (const [name, years] of thresholds) {
-			const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-			annotated = annotated.replace(new RegExp(`\\b${escaped}\\b`, "g"), `${years} years (${name})`);
+	var shortAge = (years) => years === null ? "undated" : years === 0 ? "< 3 wk" : `${decimal(years, 1)}y`;
+	function foldsOf(rows, moveBranch) {
+		const folded = rows.map(() => null);
+		const foldOlder = (from) => {
+			if (rows.length - from >= 3) for (let i = from; i < rows.length; i++) folded[i] = "older";
+		};
+		const at = rows.findIndex((r) => r.installed);
+		if (at < 0) {
+			foldOlder(1);
+			return folded;
 		}
-		return annotated;
+		if (at > 4) {
+			const between = Array.from({ length: at - 1 }, (_, i) => i + 1);
+			const m = between.find((i) => moveBranch !== null && rows[i]?.branch === moveBranch);
+			const runs = m === void 0 ? [between] : [between.filter((i) => i < m), between.filter((i) => i > m)];
+			for (const run of runs) if (run.length >= 2) for (const i of run) folded[i] = "between";
+		}
+		foldOlder(at + 1);
+		return folded;
 	}
-	var DOCS_URL = "https://lockrot.dev/verdicts/";
-	var SIGNAL_DOC = vocabTable({
-		S7: `${DOCS_URL}#transitive-exposure`,
-		S8: `${DOCS_URL}#left-behind`,
-		S9: `${DOCS_URL}#security-advisories`
-	});
-	var KNOWN_SIGNAL_IDS = new Set(SIGNAL_IDS);
-	function isKnownSignalId(id) {
-		return KNOWN_SIGNAL_IDS.has(id);
+	function lanesOf(finding, metadata) {
+		const rows = metadata?.branches ?? [];
+		const release = finding.age.branch_release;
+		const moveBranch = finding.next_step?.to_branch ?? null;
+		const folded = foldsOf(rows, moveBranch);
+		return rows.map((row, i) => {
+			const years = row.installed ? release?.years ?? null : row.released_years;
+			return {
+				branch: row.branch,
+				years,
+				version: row.installed ? release?.version ?? row.highest : row.highest,
+				php: row.highest_php === null ? null : phpConstraintWord(row.highest_php),
+				phpWords: phpWords(row),
+				installed: row.installed,
+				move: moveBranch !== null && row.branch === moveBranch,
+				newest: i === 0 && !row.installed,
+				datedBy: row.installed ? release?.dated_by ?? null : row.dated_by,
+				age: shortAge(years),
+				foldedIn: folded[i] ?? null
+			};
+		});
 	}
-	var LOCKROT_SIGNAL_ID = /^S[1-9][0-9]*$/;
-	var VENDOR_SIGNAL_ID = /^[a-z0-9][a-z0-9_.-]*:[a-z0-9][a-z0-9_.-]*$/;
-	function unknownSignalDef(id) {
-		if (LOCKROT_SIGNAL_ID.test(id)) return "A lockrot check this page does not know.";
-		if (VENDOR_SIGNAL_ID.test(id)) return "A check from outside lockrot, which this page does not know.";
-		return "A check this page does not know.";
+	function rowsOf(lanes) {
+		const rows = [];
+		for (const lane of lanes) {
+			const last = rows.at(-1);
+			if (lane.foldedIn === null) rows.push({
+				kind: "lane",
+				lane
+			});
+			else if (last?.kind === "fold" && last.which === lane.foldedIn) rows[rows.length - 1] = {
+				...last,
+				lanes: [...last.lanes, lane]
+			};
+			else rows.push({
+				kind: "fold",
+				which: lane.foldedIn,
+				lanes: [lane]
+			});
+		}
+		return rows;
 	}
-	function signalDef(id) {
-		return SIGNAL_DEFS[id] ?? unknownSignalDef(id);
+	function branchTimeline(finding, metadata, run) {
+		const lanes = lanesOf(finding, metadata);
+		if (lanes.length < 2) return null;
+		const dated = lanes.flatMap((l) => l.years === null ? [] : [l.years]);
+		const span = Math.max(1, Math.ceil(Math.max(0, ...dated)));
+		const thresholds = run.thresholds;
+		const guides = thresholds === null ? [] : [{
+			years: thresholds["release-warn-years"],
+			level: "warn"
+		}, {
+			years: thresholds["release-high-years"],
+			level: "high"
+		}].filter((guide) => guide.years > 0 && guide.years < span);
+		return {
+			lanes,
+			rows: rowsOf(lanes),
+			span,
+			guides,
+			installedLevel: finding.age.branch_release?.level ?? null
+		};
 	}
-	function signalDocUrl(id) {
-		if (!isKnownSignalId(id) && !LOCKROT_SIGNAL_ID.test(id)) return null;
-		return SIGNAL_DOC[id] ?? `https://lockrot.dev/verdicts/#the-signals`;
+	function xOfYears(years, span) {
+		return Math.min(100, Math.max(0, 100 - years / span * 100));
 	}
+	function laneWords(l) {
+		const released = l.years === null ? `${l.version}, undated` : `${l.version}, released ${ago(l.years)}`;
+		return l.datedBy === null ? released : `${released}, dated by ${l.datedBy}`;
+	}
+	function branchesLead(finding, metadata) {
+		const rows = metadata?.branches ?? [];
+		if (rows.length === 0) return [];
+		const at = rows.findIndex((r) => r.installed);
+		const branch = at >= 0 ? rows[at]?.branch ?? null : finding.branch;
+		const last = finding.age.branch_release;
+		const mine = branch === null ? `A branch snapshot, ${finding.version}, is installed.` : `Your branch, ${branch}, ${last === null ? "has no dated release" : `had its last release, ${last.version}, ${ago(last.years)}`}.`;
+		if (at === 0) return [mine, "It has no higher branch."];
+		const s8 = signalData(finding, "S8");
+		if (!s8) return [mine];
+		const reached = s8.reachable_branch !== null;
+		const [higher, version, years] = reached ? [
+			s8.reachable_branch,
+			s8.reachable_version,
+			s8.reachable_years
+		] : [
+			s8.newest_branch,
+			s8.newest_version,
+			s8.newest_years
+		];
+		if (higher === null) return [mine];
+		return [mine, `${higher === finding.next_step?.to_branch ? "The move's branch" : reached ? "The highest branch within reach" : "The newest branch"}, ${higher}, released ${version ?? ""}${years === null ? "" : ` ${ago(years)}`}.`];
+	}
+	var TIMELINE_WORDS = {
+		branch: "branch",
+		strip: "time since its last release, on one axis that ends at the run",
+		latest: "latest",
+		php: "PHP",
+		yours: "yours",
+		move: "the move",
+		newest: ", the newest",
+		noPhp: "none recorded",
+		you: "you",
+		newestKey: "newest",
+		line: "time since its last release",
+		guide: "age limit, in years before the run",
+		older: " branches",
+		between: " the newest branch and yours",
+		years: "{n}y"
+	};
 	//#endregion
 	//#region src/domain/findingRow.ts
 	var securityTerm = (f) => isScoreGraded(f.score) ? f.score.terms.find(isTermSecurity) : void 0;
@@ -7786,7 +8946,7 @@ a.legend-btn,
 		const term = securityTerm(f);
 		if (term === void 0 || term.multiplier !== 2 || !isScoreGraded(f.score)) return null;
 		const many = f.score.parts.security.of > 1;
-		const name = advisoryName$1(f, term.advisory);
+		const name = advisoryName(f, term.advisory);
 		if (term.fix_kind === "none") return `no release fixes ${many ? name : "it"}`;
 		return many ? `no release fixing ${name} runs on PHP ${run.target_php}` : `no fixing release runs on PHP ${run.target_php}`;
 	}
@@ -8067,486 +9227,6 @@ a.legend-btn,
 		};
 	}
 	//#endregion
-	//#region src/domain/shellArgv.ts
-	var SHELLS = [
-		"posix",
-		"cmd",
-		"powershell"
-	];
-	var SHELL_NAMES = {
-		posix: "POSIX",
-		cmd: "cmd.exe",
-		powershell: "PowerShell"
-	};
-	var REFUSED_COMMAND = "This command holds characters the page does not print.";
-	var COMMAND_ARGUMENT = /^(?! +$)[A-Za-z0-9/._:@+=,^~*<>| -]+$/;
-	var SUBCOMMANDS = new Set([
-		"update",
-		"require",
-		"why-not"
-	]);
-	var LOCKROT_OPTIONS = { require: "--no-update" };
-	var POSIX_BARE = /^[A-Za-z0-9/._:@%+=,-]+$/;
-	var CMD_SPECIAL = /[ ^|<>]/;
-	var isPrintableName = (name) => COMMAND_ARGUMENT.test(name) && !name.startsWith("-");
-	function isPrintableArgv(argv) {
-		const [program, subcommand = ""] = argv;
-		if (program !== "composer" || !SUBCOMMANDS.has(subcommand)) return false;
-		return argv.every((argument) => COMMAND_ARGUMENT.test(argument) && (!argument.startsWith("-") || LOCKROT_OPTIONS[subcommand] === argument));
-	}
-	var posixArgument = (argument) => POSIX_BARE.test(argument) && !argument.startsWith("=") ? argument : `'${argument}'`;
-	var cmdLine = (words) => words.map((word) => CMD_SPECIAL.test(word) ? `"${word}"` : word).join(" ");
-	var LINE = {
-		posix: (argv) => argv.map(posixArgument).join(" "),
-		cmd: cmdLine,
-		powershell: ([program, ...rest]) => `${program} --% ${cmdLine(rest)}`
-	};
-	function commandLine(argv, shell) {
-		return isPrintableArgv(argv) ? LINE[shell](argv) : null;
-	}
-	//#endregion
-	//#region src/domain/phpAlternatives.ts
-	var MANY_ALTERNATIVES = 4;
-	function phpConstraintWord(constraint) {
-		const alternatives = constraint.split(/\s*\|\|?\s*/);
-		return alternatives.length > MANY_ALTERNATIVES ? `${alternatives[0] ?? ""} … ${alternatives.at(-1) ?? ""} (${alternatives.length} alternatives)` : constraint;
-	}
-	//#endregion
-	//#region src/domain/findingAnswer.ts
-	var RESOLVED_KINDS = [
-		"require",
-		"raise-php",
-		"tag"
-	];
-	var NO_MOVE_WORDS = vocabTable({
-		package_quiet: "It has no recent release to move to",
-		no_higher_release: "No higher branch has released recently enough to move to",
-		higher_undated: "lockrot could not date the releases of the higher branches, so it names no move",
-		releases_unknown: "lockrot could not read its releases, so it names no fix",
-		affected_range_unknown: "No advisory names the versions it affects, so lockrot names no fix",
-		local_package: "It is installed from a local path, your own package, so lockrot names no move"
-	});
-	var BRANCH_CLASS_CLAUSES = vocabTable({
-		"raise-php": ", by a release that needs a php floor raise",
-		blocked: ", by a release your target does not run",
-		update: ""
-	});
-	var graded$1 = (finding) => isScoreGraded(finding.score) ? finding.score : null;
-	var halvingPrinted = (finding, reason) => printedModifiers(graded$1(finding)?.modifiers ?? []).some((m) => m.reason === reason);
-	function rootsWords(run) {
-		return run.include_dev ? "your composer.json's require or require-dev" : "your composer.json's require (require-dev counts only with --dev)";
-	}
-	function dependentsNamed(finding) {
-		if (!halvingPrinted(finding, "transitive")) return namesCapped(finding.direct_dependents);
-		return pluralNoun(finding.direct_dependents.length, "that package", "them");
-	}
-	function installedPhpSentences(finding, run) {
-		const php = finding.installed_php;
-		if (php.target_runs !== false) return [];
-		return [`Its installed release, ${finding.version}, needs php ${phpConstraintWord(php.requires ?? "")}, which your target, ${run.target_php}, does not run: Composer will not install it there.`];
-	}
-	function branchFixSentence(finding, branch, n) {
-		if (!isSecurityVulnerable(finding.security)) return null;
-		const fixes = finding.security.installed_branch_fixes;
-		if (!fixes) return null;
-		const { fixed, unknown, of, fix_kind: kind } = fixes;
-		const clause = fixed > 0 && kind !== null ? BRANCH_CLASS_CLAUSES[kind] ?? ` (${fixLabel(kind)})` : "";
-		const notKnown = unknown > 0 ? `; ${unknown} not known` : "";
-		if (unknown === of) return `It is not known whether ${n === 1 ? "it is" : "they are"} fixed on ${branch}`;
-		if (fixed === 0) return `${n === 1 ? "It is not" : "None is"} fixed on ${branch}${notKnown}`;
-		if (fixed === of) return `${n === 1 ? "It is" : "All are"} fixed on ${branch}${clause}`;
-		return `${fixed} of ${of} ${isAre(fixed)} fixed on ${branch}${clause}${notKnown}`;
-	}
-	function severityPhrase(run, severity, beforeVerb) {
-		const as = countsAs(run, severity);
-		if (as) return beforeVerb ? `an ${severity} advisory, counted as ${as},` : `an ${severity} one, counted as ${as}`;
-		return beforeVerb ? `a ${severity}-severity advisory` : `a ${severity} one`;
-	}
-	function vulnerableSentence(finding, run) {
-		const score = graded$1(finding);
-		const term = score?.terms.find(isTermSecurity);
-		const deciding = advisoryRows(finding).find((row) => row.deciding);
-		if (!score || !term || !deciding || !isSecurityVulnerable(finding.security)) return "";
-		const security = finding.security;
-		const name = deciding.cve ?? deciding.id;
-		const named = deciding.title === null ? name : `${name}: ${deciding.title}`;
-		const n = score.parts.security.of;
-		let text = n === 1 ? `${capitalize(severityPhrase(run, term.severity, true))} affects your version (${named})` : `${n} advisories affect your version; the ${term.severity === security.worst ? "worst" : "highest-scoring"} is ${severityPhrase(run, term.severity, false)} (${named})`;
-		const branchFix = finding.branch === null ? null : branchFixSentence(finding, finding.branch, n);
-		if (branchFix) text += `. ${branchFix}`;
-		const noFix = noReachableFix(finding, run);
-		if (noFix !== null) text += `; ${noFix}`;
-		const ignored = security.ignored_count;
-		if (ignored > 0) text += `; ${ignored} more ${isAre(ignored)} ignored by Composer's audit policy`;
-		if (!finding.from_composer_repository && finding.origin.local) text += ". It is installed from a local path (your own code); the advisory is published for the package of this name, so check the version your path holds";
-		else if (!finding.from_composer_repository && finding.origin.kind === "vcs") text += ". It is installed from vcs; the advisory is published for the package of this name";
-		return text;
-	}
-	function abandonedSentence(finding, flag) {
-		const reasons = flag.degree && "reasons" in flag.degree ? flag.degree.reasons : [];
-		const marking = signalData(finding, "S1");
-		const archive = signalData(finding, "S3");
-		const bits = [];
-		if (reasons.includes("marked")) bits.push(`it is marked abandoned ${marking?.marked_by === "lock" ? "in composer.lock" : "by its registry"}`);
-		if (reasons.includes("archived")) bits.push(`its repository is archived on ${forgeWord(archive?.forge ?? archive?.host ?? "")}`);
-		const suggestion = marking?.replacement ?? null;
-		const tail = finding.replacement !== null ? `; it names ${finding.replacement} as its replacement` : suggestion ? `; it suggests "${suggestion}", which names no package` : "; no replacement is named";
-		return capitalize(bits.join(" and ")) + tail;
-	}
-	function factSentence(finding, flag, run) {
-		switch (flag.id) {
-			case "abandoned": return abandonedSentence(finding, flag);
-			case "silent": {
-				const release = signalData(finding, "S2");
-				const push = signalData(finding, "S4");
-				return `Nothing has been released for ${oneDecimal(release?.years ?? null)} years and there has been no ${push?.event ?? "push"} for ${oneDecimal(push?.years ?? null)} years`;
-			}
-			case "stale": {
-				const value = typeof flag.headline.value === "number" ? flag.headline.value : null;
-				const text = flag.headline.source === "release" ? `Nothing has been released for ${oneDecimal(value)} years` : `There has been no ${signalData(finding, "S4")?.event ?? "push"} for ${oneDecimal(value)} years`;
-				return flag.degree.liveness_complete ? text : `${text} (read from releases only)`;
-			}
-			case "pinned": {
-				const pin = signalData(finding, "S6");
-				return pin?.reason === "branch_snapshot" ? `It is pinned to the branch snapshot ${pin.version}` : `It is installed as ${pin?.version ?? finding.version}, not a tagged release`;
-			}
-			case "left-behind": {
-				const s8 = signalData(finding, "S8");
-				if (!s8) return "";
-				const text = `Branch ${s8.branch} had its last release ${ago(s8.years)}`;
-				if (s8.reachable_branch !== null) return `${text}, while ${s8.reachable_branch} released ${s8.reachable_version ?? ""} ${s8.reachable_years === null ? "" : ago(s8.reachable_years)}`;
-				return `${text}; the newest branch, ${s8.newest_branch}, released ${s8.newest_version} ${ago(s8.newest_years)} and needs php ${s8.newest_php ?? ""}`;
-			}
-			case "old-promise": {
-				const s5 = signalData(finding, "S5");
-				return `It was written for PHP ${s5?.written_for_php ?? ""} and admits ${s5?.target_php ?? run.target_php} untested`;
-			}
-			case "vulnerable": return vulnerableSentence(finding, run);
-			default: return flag.summary;
-		}
-	}
-	function factsPhrase(finding, move) {
-		const flags = move.clears.filter((c) => c.kind === "flag").map((c) => c.id);
-		const cleared = move.clears.filter((c) => c.kind === "advisory").length;
-		const all = advisoryRows(finding).length;
-		if (move.clears_all && all <= 1 && move.clears.length === 2) return "both";
-		if (move.clears_all && all <= 1 && move.clears.length === 3) return "all three";
-		const advisories = all === 1 ? "the advisory" : cleared === all && all === 2 ? "both advisories" : cleared === all ? `all ${cleared} advisories` : `${cleared} of its ${all} advisories`;
-		const items = cleared > 0 ? [...flags, advisories] : flags;
-		return items.length > 0 ? joinAnd(items) : "nothing";
-	}
-	function moveTail(move) {
-		let tail = "";
-		if (move.leaves.length > 0) {
-			const flags = move.leaves.filter((l) => l.kind === "flag").map((l) => l.id);
-			const advisories = move.leaves.length - flags.length;
-			const items = advisories > 0 ? [...flags, `${advisories} ${pluralNoun(advisories, "advisory", "advisories")}`] : flags;
-			tail += `; ${items.join(", ")} ${items.length === 1 && advisories <= 1 ? "stays" : "stay"}`;
-		}
-		if (move.unverified.length > 0) tail += `; not checked: ${move.unverified.map((u) => u.id).join(", ")}`;
-		return tail;
-	}
-	function phpClause(move, run) {
-		const php = move.php_check;
-		if (!php?.requires) return "";
-		let clause = `; ${move.to_branch ?? ""} needs php ${phpConstraintWord(php.requires)}`;
-		if (php.project_allows === true) clause += ", which your require.php allows";
-		if (php.project_allows === false) clause += `, and your require.php still allows ${phpFloorWord(run.project_php_lowest) ?? ""} (a ${php.raise_size ?? ""} raise)`;
-		if (php.target_runs === true) clause += `, and your target, ${run.target_php}, runs it`;
-		return clause;
-	}
-	function addsClause(move) {
-		const byBasis = new Map();
-		for (const added of move.adds) byBasis.set(added.basis, [...byBasis.get(added.basis) ?? [], added.id]);
-		return [...byBasis].map(([basis, ids]) => `; ${addsBasisWord(basis)}, so ${ids.join(" and ")} would count`).join("");
-	}
-	function requireSentence(finding, move, run) {
-		const raise = move.kind === "raise-php" ? `Raise require.php to ${move.php_check?.raise_to ?? ""}, then ` : "";
-		return `${capitalize(finding.direct ? `${raise}require ${move.constraint ?? ""}` : `${raise}move it to ${move.constraint ?? ""}` + (finding.direct_dependents.length > 0 ? ` through ${dependentsNamed(finding)}` : ""))}: it clears ${factsPhrase(finding, move)}${phpClause(move, run)}${moveTail(move)}`;
-	}
-	function tagSentence(finding, move, run) {
-		const latest = move.latest?.version ?? "";
-		const what = move.crosses_major === false ? `the newest tag on its own line, ${latest}` : `its newest tag, ${latest}`;
-		let text = finding.direct ? `Require ${what}` : `Move it to ${what}` + (finding.direct_dependents.length > 0 ? `, through ${dependentsNamed(finding)}` : "");
-		if (move.latest?.relation === "older") text += "; that tag is older than your snapshot: review it first, or replace the package";
-		return text + phpClause(move, run) + addsClause(move) + moveTail(move);
-	}
-	function blockedSentence(finding, move, run) {
-		const requires = move.php_check?.requires ?? null;
-		if (move.source === "pinned") {
-			const latest = move.latest?.version ?? "";
-			const installed = finding.installed_php;
-			const nor = installed.target_runs === false ? `, nor does the version you have (${finding.version}, php ${phpConstraintWord(installed.requires ?? "")})` : "";
-			return requires ? `Its newest tag, ${latest}, needs php ${phpConstraintWord(requires)}, which your target, ${run.target_php}, does not run${nor}: replace it` : `Its newest tag, ${latest}, does not run on your target, ${run.target_php}${nor}: replace it`;
-		}
-		const branch = move.to_branch ?? "";
-		return requires ? `${branch} fixes it but needs php ${phpConstraintWord(requires)}, which your target, ${run.target_php}, does not run` : `${branch} fixes it, but your target, ${run.target_php}, does not run it`;
-	}
-	function replaceSentence(move) {
-		const replacement = move.replacement;
-		if (!replacement?.package) return "Find a replacement: the suggestion names no package to require";
-		const graded = replacement.finding;
-		return `Replace it with ${replacement.package}` + (graded ? `, itself ${graded.verdict} (${graded.flag_ids.join(" · ")}) in this lock` : "");
-	}
-	function unknownMoveSentence(move) {
-		const text = move.text.trim().replace(/\.$/, "");
-		if (text) return `Next step: ${text}`;
-		return `Next step: ${move.kind}${move.reason ? ` (${move.reason})` : ""}`;
-	}
-	var composerCommand = (subcommand, pkg) => isPrintableName(pkg) ? `composer ${subcommand} ${posixArgument(pkg)}` : null;
-	function updatePhrase(pkg) {
-		const command = composerCommand("update", pkg);
-		return command === null ? "an update of this package" : `\`${command}\``;
-	}
-	function whyPhrase(pkg) {
-		const command = composerCommand("why", pkg);
-		return command === null ? "`composer why` with this package's name" : `\`${command}\``;
-	}
-	function moveSentence(finding, move, run) {
-		const latest = move.latest;
-		return `${(() => {
-			switch (move.kind) {
-				case "update": return `${capitalize(updatePhrase(finding.package))} installs ${move.newest ?? ""}, which clears ${factsPhrase(finding, move)}${moveTail(move)}`;
-				case "require":
-				case "raise-php": return requireSentence(finding, move, run);
-				case "replace": return replaceSentence(move);
-				case "find-alternative": return move.source === "abandoned" ? "Find a replacement; none is named" : "Find a maintained alternative";
-				case "tag": return tagSentence(finding, move, run);
-				case "blocked": return blockedSentence(finding, move, run);
-				case "test": return latest?.is_installed ? `${latest.version} is its newest release: test it on PHP ${run.target_php}, or replace it` : `Test it on PHP ${run.target_php}`;
-				case "no-tag": return "It has no tagged release to move to: review the snapshot, or replace it";
-				case "no-fix": return "No release fixes it";
-				case "no-single-fix": return "No single release fixes every advisory; see each advisory's fix";
-				case "no-move":
-					if (move.reason === "metadata_not_read") return `lockrot did not read its releases (${metadataWords(finding)}), so it names no move` + (move.source === "pinned" ? ": review the snapshot" : "");
-					return move.reason !== null && NO_MOVE_WORDS[move.reason] || unknownMoveSentence(move);
-				default: return unknownMoveSentence(move);
-			}
-		})()}.`;
-	}
-	function partialFacts(finding, partial) {
-		const of = graded$1(finding)?.parts.security.of ?? 0;
-		const flags = partial.clears.filter((c) => c.kind === "flag").map((c) => c.id);
-		const advisories = partial.clears.filter((c) => c.kind === "advisory").length;
-		return joinAnd([...flags, `${advisories} of its ${of} advisories`]);
-	}
-	function holderWords(heldBy, run) {
-		if (heldBy.source === "root") return `your composer.json (requires ${heldBy.constraint})`;
-		const holder = heldBy.holder;
-		const itself = !holder || !run.graded_verdicts.includes(holder.verdict) ? "" : holder.lead ? ` (itself ${holder.lead})` : ` (itself ${holder.verdict}: ${holder.flag_ids.join(" · ")})`;
-		return `${heldBy.package ?? ""} ${heldBy.version ?? ""}${itself}`;
-	}
-	function holdersSentences(moves, run) {
-		return moves.flatMap((move, i) => {
-			if (move.held_by.length === 0) return [];
-			return [`${i === 0 ? "It is held by " : `The move to ${move.constraint ?? move.to_branch ?? move.kind} is held by `}${move.held_by.map((heldBy) => holderWords(heldBy, run)).join(" and ")}.`];
-		});
-	}
-	function throughNames(entries) {
-		const names = entries.map((e) => `${e.package} (${e.newest_stable?.version ?? ""})`);
-		return names.length > 3 ? namesCapped(names) : joinAnd(names);
-	}
-	function throughSentence(through) {
-		const gone = (through ?? []).filter((e) => e.newest_requires === false);
-		const kept = (through ?? []).filter((e) => e.newest_requires === true);
-		const [entries, verbOne, verbMany] = gone.length > 0 ? [
-			gone,
-			"no longer requires",
-			"no longer require"
-		] : [
-			kept,
-			"still requires",
-			"still require"
-		];
-		if (entries.length === 0) return "";
-		return entries.length === 1 ? ` The newest release of ${throughNames(entries)} ${verbOne} it.` : ` The newest releases of ${throughNames(entries)} ${verbMany} it.`;
-	}
-	function notYoursSentence(finding) {
-		const n = finding.direct_dependents.length;
-		if (halvingPrinted(finding, "transitive")) return `You do not require it yourself, so replace or update ${pluralNoun(n, "the package it comes in through", "the packages it comes in through")}.`;
-		return `You do not require it yourself: it comes in through ${namesCapped(finding.direct_dependents)}, so replace or update ${pluralNoun(n, "that package", "those packages")}.`;
-	}
-	function unreachedSentence(finding, move, run) {
-		const said = halvingPrinted(finding, "unreached");
-		const why = `${whyPhrase(finding.package)} names what requires it`;
-		const resolved = RESOLVED_KINDS.includes(move.kind);
-		if (finding.depth_unmeasured === "no_composer_json" && !said) return resolved ? `The run read no composer.json, so what requires it must allow it (${why}).` : `The run read no composer.json: ${why}.`;
-		if (resolved) return said ? `What requires it must allow it (${why}).` : `lockrot found no path from ${rootsWords(run)} to it, so what requires it must allow it (${why}).`;
-		return said ? `${capitalize(why)}.` : `lockrot found no path from ${rootsWords(run)} to it: ${why}.`;
-	}
-	function composerSentence(finding, reason, move, run) {
-		switch (reason) {
-			case "holders": return "The packages that hold it may need to move too.";
-			case "crosses_major": return ((move.to_branch ?? "").startsWith("0.") ? "A new 0.x line (Composer treats 0.x minors as breaking)" : "A new major") + " brings its own requirements, which lockrot does not solve.";
-			case "transitive": return (RESOLVED_KINDS.includes(move.kind) ? "What requires it must allow it." : notYoursSentence(finding)) + throughSentence("through" in move ? move.through : void 0);
-			case "unreached": return unreachedSentence(finding, move, run);
-			default: return null;
-		}
-	}
-	function composerSentences(finding, moves, run) {
-		const seen = new Map();
-		for (const move of moves) for (const reason of move.composer_moves_because) if (!seen.has(reason)) seen.set(reason, move);
-		return [...seen].flatMap(([reason, move]) => composerSentence(finding, reason, move, run) ?? []);
-	}
-	function acceptedSentences(finding) {
-		const by = allowlistBy(finding.allowlist?.by ?? "");
-		return finding.score.accepted.map(({ flag, if_counted: counted }) => {
-			const atLeast = counted.at_least ? "at least " : "";
-			return `Counting the ${flag} flag, which ${by} accepts, would make this ${atLeast}${counted.total}, ${counted.verdict}${rerunHalving(counted.modifiers)}.`;
-		});
-	}
-	function checksSentence(finding, run) {
-		const body = checksMissingBody(finding, run);
-		return body ? [`Not every check ran: ${body}.`] : [];
-	}
-	function zeroAnswer(finding, run) {
-		let first = `${capitalize(finding.verdict)}: nothing counts`;
-		if (finding.verdict === "unknown") {
-			const { names, count } = unjudgedChecks(finding);
-			first += `, but lockrot could read no release metadata (${metadataWords(finding)}), so its ${names} ${isAre(count)} not judged`;
-		}
-		const allowlist = finding.allowlist;
-		if (allowlist && acceptsWholePackage(finding)) first += `; its maintenance is accepted by ${allowlistBy(allowlist.by)} (${allowlistReasonWords(allowlist)})`;
-		else if (allowlist?.flag_ids) first += `; ${allowlist.flag_ids.join(" and ")} ${isAre(allowlist.flag_ids.length)} accepted (${allowlistReasonWords(allowlist)})`;
-		const security = finding.security;
-		const s9Blocked = finding.checks_missing.some((c) => c.blocks.includes("S9")) || finding.unchecked_accepted.some((u) => u.check === "advisories");
-		if (security.status === "unchecked" && !s9Blocked) first += `; its advisories were not looked up (${checkReasonWords(finding, security.unchecked_reason)})`;
-		const ignored = security.ignored_count;
-		if (ignored > 0) first += `; ${ignored} ${pluralNoun(ignored, "advisory is", "advisories are")} ignored by Composer's audit policy`;
-		const accepted = checksSkippedBody(finding, { acceptedOnly: true });
-		return [
-			`${first}.`,
-			...installedPhpSentences(finding, run),
-			...acceptedSentences(finding),
-			...checksSentence(finding, run),
-			...accepted ? [`lockrot did not check ${accepted}.`] : []
-		].join(" ");
-	}
-	function opening(finding, score, run) {
-		const verdict = finding.verdict;
-		const maintenance = score.parts.maintenance.alone.verdict;
-		const security = score.parts.security.alone.verdict;
-		const qualifiers = printedModifiers(score.modifiers).map((m) => m.applies_to === "maintenance" ? "maintenance halved for reach" : "both halved for packages-dev");
-		const q = qualifiers.length > 0 ? ` (${qualifiers.join("; ")})` : "";
-		switch (score.decided_by) {
-			case "combination": return maintenance === security ? `${capitalize(verdict)}: two ${grade(maintenance ?? "")} risks at once${q}.` : `${capitalize(verdict)}: a ${grade(maintenance ?? "")} and a ${grade(security ?? "")} risk at once${q}.`;
-			case "either": {
-				const advisory = score.parts.security.of === 1 ? "advisory" : "advisories";
-				return `${capitalize(verdict)} twice over: its maintenance alone and its ${advisory} alone each make it ${verdict}${q}.`;
-			}
-			case "maintenance":
-			case "security": return `${capitalize(verdict)}:`;
-			default: {
-				const lowest = run.graded_verdicts[run.graded_verdicts.length - 1] ?? "";
-				const alone = (part, grade) => grade ? `${part} alone grades it ${grade}` : `${part} alone counts below ${lowest}`;
-				return `${capitalize(verdict)} at ${score.total}: ${alone("maintenance", maintenance)}, ${alone("the advisory part", security)}.`;
-			}
-		}
-	}
-	function factSentences(finding, score, run) {
-		const counted = finding.flags.filter((flag) => score.terms.some((t) => t.flag === flag.id));
-		const securityFirst = score.decided_by === "security";
-		return (securityFirst ? [...counted.filter((f) => f.role === "security"), ...counted.filter((f) => f.role !== "security")] : counted).map((flag, i) => {
-			const sentence = factSentence(finding, flag, run);
-			return `${(flag.role === "corroborating" || securityFirst && flag.role === "lead") && i > 0 ? `Also: ${lowerFirst(sentence)}` : sentence}.`;
-		});
-	}
-	function halvingSentence(finding, reason, appliesTo, divideBy, run) {
-		switch (reason) {
-			case "transitive": return finding.named_in.length === 1 && finding.named_in[0] === "require-dev" && !run.include_dev ? `It is required directly only in require-dev, which this run did not walk; in production it comes in through ${namesCapped(finding.direct_dependents)}, so its maintenance counts half.` : `It is not required directly (through ${namesCapped(finding.direct_dependents)}), so its maintenance counts half.`;
-			case "unreached": return finding.depth_unmeasured === "no_composer_json" ? "The run read no composer.json, so lockrot found no path to it and its maintenance counts half." : `lockrot found no path from ${rootsWords(run)} to it, so its maintenance counts half.`;
-			case "dev": return "It is in packages-dev, so its whole score counts half.";
-			default: return `${appliesTo === "maintenance" ? "Its maintenance" : "Its whole score"} is divided by ${divideBy} (${reason}).`;
-		}
-	}
-	function gradedAnswer(finding, score, run) {
-		const move = finding.next_step;
-		const moves = move ? [move, ...move.also] : [];
-		const notJudged = maintenanceNotJudged(finding);
-		const installedPhp = move?.kind === "blocked" && move.source === "pinned" ? [] : installedPhpSentences(finding, run);
-		const skipped = checksSkippedBody(finding, { metadataSaid: notJudged || move?.reason === "metadata_not_read" });
-		const partial = isSecurityVulnerable(finding.security) ? finding.security.partial : null;
-		const allowlist = finding.allowlist;
-		const sentences = [
-			opening(finding, score, run),
-			...factSentences(finding, score, run),
-			...installedPhp,
-			...notJudged ? [`Its ${unjudgedChecks(finding).names} ${isAre(unjudgedChecks(finding).count)} not judged: lockrot could read no release metadata (${metadataWords(finding)}).`] : [],
-			...printedModifiers(score.modifiers).map((m) => halvingSentence(finding, m.reason, m.applies_to, m.divide_by, run)),
-			...checksSentence(finding, run),
-			...skipped ? [`lockrot did not check ${skipped}.`] : [],
-			...moves.map((m, i) => (i === 0 ? "" : "Then: ") + moveSentence(finding, m, run)),
-			...partial ? [`Meanwhile, ${updatePhrase(finding.package)} installs ${partial.version}, which clears ${partialFacts(finding, partial)} (${partial.if_applied.at_most ? "at most " : ""}${partial.if_applied.total}, ${partial.if_applied.verdict} after it` + (partial.if_applied.assumes.includes("no_new_advisories") ? ", if that release carries no new advisory" : "") + (partial.unverified.length > 0 ? `; not checked: ${partial.unverified.map((u) => u.id).join(", ")}` : "") + ")."] : [],
-			...holdersSentences(moves, run),
-			...composerSentences(finding, moves, run),
-			...allowlist && acceptsWholePackage(finding) ? [`Its maintenance is accepted by ${allowlistBy(allowlist.by)}: ${allowlistReasonWords(allowlist)}.`] : [],
-			...acceptedSentences(finding)
-		];
-		const [first = "", second = "", ...rest] = sentences;
-		return (first.endsWith(":") ? [`${first} ${lowerFirst(second)}`, ...rest] : sentences).join(" ");
-	}
-	function answerText(finding, run) {
-		const score = graded$1(finding);
-		return score ? gradedAnswer(finding, score, run) : zeroAnswer(finding, run);
-	}
-	//#endregion
-	//#region src/domain/baselineSuffix.ts
-	var advisories = (count) => count === 1 ? "advisory" : "advisories";
-	function advisoryName(finding, id) {
-		return advisoryRows(finding).find((row) => row.id === id)?.cve ?? id;
-	}
-	function advisoryItem(finding, run, entry, comparedFixes) {
-		if (entry.kind !== "advisory" || entry.why === "new" || entry.now === null || entry.recorded === null) return null;
-		const name = advisoryName(finding, entry.id);
-		const lost = ` fix lost: ${entry.recorded.fix_kind} → ${entry.now.fix_kind}`;
-		if (entry.why === "fix_lost") return `${name}${lost}`;
-		const doubles = (kind) => run.score_model.fix_kinds.some(({ id, doubles: lostKind }) => id === kind && lostKind);
-		const crossed = comparedFixes && !doubles(entry.recorded.fix_kind) && doubles(entry.now.fix_kind);
-		return `${name} re-rated ${entry.recorded.severity} → ${entry.now.severity}${crossed ? `,${lost}` : ""}`;
-	}
-	function baselineSuffix(finding, run) {
-		const { baseline } = finding;
-		if (baseline === null || !isScoreGraded(finding.score)) return null;
-		if (baseline.recorded === null) return "(baseline: new package)";
-		const { advisories_now: now, worsened_by: worsened, recorded } = baseline;
-		const comparedFixes = recorded.target_php === run.target_php && recorded.fix_model === run.fix_model;
-		const items = [
-			now.known > 0 ? `${now.known} ${advisories(now.known)} known` : null,
-			...worsened.filter(({ kind }) => kind === "flag").map(({ id }) => `${id} new`),
-			now.new > 0 ? `${now.new} new ${advisories(now.new)}` : null,
-			...worsened.map((entry) => advisoryItem(finding, run, entry, comparedFixes)),
-			...finding.flags.filter(({ baseline: fact }) => fact?.state === "covered").map(({ id, baseline: fact }) => `${id} covered by the recorded ${fact?.covered_by ?? ""}`)
-		].filter((item) => item !== null);
-		return `(baseline: ${items.length === 0 ? "known" : items.join("; ")})`;
-	}
-	//#endregion
-	//#region src/domain/branchesLine.ts
-	function installedClause(finding, installed) {
-		const branch = installed?.branch ?? finding.branch;
-		if (branch === null) return `A branch snapshot, ${finding.version}, is installed`;
-		const last = finding.age.branch_release;
-		const release = last === null ? "has no dated release" : `had its last release, ${last.version}, ${ago(last.years)}`;
-		const { requires, target_runs: targetRuns } = finding.installed_php;
-		return `Your branch, ${branch}, ${release}${targetRuns === false && requires !== null ? ` (the version you have, ${finding.version}, needs php ${phpConstraintWord(requires)}, which your target does not run)` : ""}`;
-	}
-	function phpReach(row) {
-		if (row.highest_admits_target_php === false) return ", which your target does not run";
-		if (row.highest_admits_project_php !== false) return "";
-		return row.highest_misses_project_php === "needs_newer" ? ", above your require.php" : ", which your require.php does not admit";
-	}
-	function higherBranch(row) {
-		const released = row.released_years === null ? `has ${row.highest} (undated)` : `released ${row.highest} ${ago(row.released_years)}`;
-		const needs = row.highest_php === null ? "" : ` and needs php ${phpConstraintWord(row.highest_php)}${phpReach(row)}`;
-		return `${row.branch} ${released}${needs}`;
-	}
-	function branchesLine(finding, metadata) {
-		const rows = metadata?.branches ?? [];
-		if (rows.length === 0) return null;
-		const installedAt = rows.findIndex(({ installed }) => installed);
-		const higher = [...installedAt === -1 ? rows : rows.slice(0, installedAt)].reverse();
-		return `${installedClause(finding, rows[installedAt])}; ${higher.length === 0 ? "no higher branch" : higher.map(higherBranch).join("; ")}.`;
-	}
-	//#endregion
 	//#region src/domain/checksLine.ts
 	function acceptedWords(entry, accepted, origin) {
 		const held = accepted.find(({ check }) => check === entry.check);
@@ -8577,7 +9257,7 @@ a.legend-btn,
 			return `${inState.filter((entry) => entry.words === words).map(({ id }) => id).sort((a, b) => order.indexOf(a) - order.indexOf(b)).join(", ")} ${state} (${words})`;
 		});
 	}
-	function checksLine(finding, run) {
+	function checksItems(finding, run) {
 		const order = run.signal_ids;
 		const fired = new Set(finding.signals.map(({ id }) => id));
 		const firedIds = order.filter((id) => fired.has(id));
@@ -8603,7 +9283,471 @@ a.legend-btn,
 			...ignored.length > 0 ? ["S1 ignored (Composer policy)"] : [],
 			...lists,
 			...everyCheckRan
-		].join(" · ");
+		];
+	}
+	//#endregion
+	//#region src/domain/qualifierRows.ts
+	var HALVING_REASONS = [
+		"transitive",
+		"unreached",
+		"dev"
+	];
+	var rootsWords = (run) => run.include_dev ? "your composer.json's require or require-dev" : "your composer.json's require (require-dev counts only with --dev)";
+	function noPathWords(finding, run) {
+		return finding.depth_unmeasured === "no_composer_json" ? "The run read no composer.json, so lockrot found no path to it" : `lockrot found no path from ${rootsWords(run)} to it`;
+	}
+	function foundWords(finding, run) {
+		return finding.depth_unmeasured === "no_composer_json" ? "the run read no composer.json" : `lockrot found no path from ${rootsWords(run)} to it`;
+	}
+	var dependentNames = (finding) => finding.direct_dependents.filter((name) => name !== finding.package);
+	function reachRow(finding, run) {
+		let names = dependentNames(finding);
+		const through = names.length > 1 ? "through:" : "through ";
+		let before = null;
+		let how;
+		const reach = finding.reach;
+		switch (reach) {
+			case "direct":
+				how = names.length > 0 ? `Required directly, and also ${through}` : "Required directly";
+				break;
+			case "transitive":
+				if (finding.named_in.length === 1 && finding.named_in[0] === "require-dev" && !run.include_dev) {
+					before = "Required directly only in require-dev, which this run did not walk";
+					how = `In production it comes in ${through}`;
+				} else how = `Not required directly, ${through}`;
+				break;
+			case "unreached":
+				how = noPathWords(finding, run);
+				names = [];
+				break;
+			default:
+				how = capitalize(causeWord(reach, finding.origin.kind));
+				names = [];
+		}
+		const modifiers = isScoreGraded(finding.score) ? printedModifiers(finding.score.modifiers) : [];
+		return {
+			where: finding.dev ? "Dev only: in packages-dev" : "Production: not in packages-dev",
+			before,
+			how,
+			names,
+			halving: modifiers.map((m) => {
+				const who = m.applies_to === "maintenance" ? "Its maintenance" : "Its whole score";
+				return HALVING_REASONS.includes(m.reason) ? `${who} counts half` : `${who} is divided by ${m.divide_by} (${m.reason})`;
+			})
+		};
+	}
+	function notJudgedRow(finding) {
+		const score = finding.score;
+		if (!(isScoreGraded(score) ? !finding.maintenance_judged && score.parts.maintenance.status !== "counted" : finding.verdict === "unknown")) return null;
+		const ids = [...new Set([...finding.checks_skipped, ...finding.checks_missing].filter((c) => c.check === "release_metadata").flatMap((c) => c.blocks))];
+		return `Its ${ids.length > 0 ? joinAnd(ids.map((id) => `${signalName(id)} (${id})`)) : "release checks"} ${ids.length > 0 ? isAre(ids.length) : "are"} not judged: lockrot could read no release metadata (${metadataWords(finding)})`;
+	}
+	function uncheckedRows(finding, run) {
+		const order = (id) => {
+			const at = run.signal_ids.indexOf(id);
+			return at === -1 ? run.signal_ids.length : at;
+		};
+		const fired = new Set(finding.signals.map((s) => s.id));
+		const groups = new Map();
+		for (const entry of finding.checks_missing) for (const id of entry.blocks) {
+			const state = fired.has(id) ? "incomplete" : "not checked";
+			const words = entryReasonWords(finding, entry);
+			const key = JSON.stringify([state, words]);
+			const group = groups.get(key) ?? {
+				state,
+				words,
+				ids: []
+			};
+			if (!group.ids.includes(id)) group.ids.push(id);
+			groups.set(key, group);
+		}
+		return [...groups.values()].map(({ state, words, ids }) => capitalize(`${joinAnd([...ids].sort((a, b) => order(a) - order(b)).map((id) => `${signalName(id)} (${id})`))} ${state} (${words})`));
+	}
+	function notRunRows(finding, acceptedOnly, metadataSaid) {
+		const groups = new Map();
+		for (const entry of finding.checks_skipped) {
+			const accepted = entry.reason === "accepted_by_config";
+			if (entry.reason === "branch_snapshot") continue;
+			if (metadataSaid && entry.check === "release_metadata" && !accepted) continue;
+			if (acceptedOnly && !accepted) continue;
+			const words = entryReasonWords(finding, entry);
+			groups.set(words, [...groups.get(words) ?? [], skippedCheckWord(entry.check)]);
+		}
+		return [...groups].map(([words, checks]) => capitalize(`${joinAnd(checks)} (${words})`));
+	}
+	function installedPhpWords(finding, run) {
+		const php = finding.installed_php;
+		const move = finding.next_step;
+		if (php.target_runs !== false || move?.kind === "blocked" && move.source === "pinned") return null;
+		return `its installed release, ${finding.version}, needs php ${phpConstraintWord(php.requires ?? "")}, which your target, ${run.target_php}, does not run: Composer will not install it there`;
+	}
+	function acceptedRow(finding) {
+		const allowlist = finding.allowlist;
+		if (allowlist === null) return null;
+		const by = allowlistBy(allowlist.by);
+		const ids = allowlist.flag_ids;
+		return {
+			head: ids === null ? `Its maintenance is accepted by ${by}` : `${joinAnd(ids)} ${isAre(ids.length)} accepted by ${by}`,
+			reason: capitalize(allowlistReasonWords(allowlist)),
+			entry: allowlist.pattern === null ? null : [
+				"Entry ",
+				{ code: allowlist.pattern },
+				...allowlist.expires ? [` · expires ${day(allowlist.expires)}`] : []
+			]
+		};
+	}
+	function gateValueWords(by, run) {
+		const threshold = run.gates.find((g) => g.value === by.value)?.threshold ?? null;
+		switch (by.kind) {
+			case "grade": return `grade ${threshold ?? by.value} or above`;
+			case "flag": return `the ${threshold ?? by.value} flag`;
+			case "vulnerable": return threshold === null ? "an advisory" : `an advisory of ${threshold} severity or above`;
+			case "unchecked": return "a check that did not run";
+			default: return by.value;
+		}
+	}
+	function gateRow(finding, run) {
+		const gate = finding.gate;
+		const facts = [];
+		for (const by of gate.by) for (const fact of by.facts) {
+			const name = fact.kind === "advisory" ? advisoryName(finding, fact.id) : fact.id;
+			if (!facts.includes(name)) facts.push(name);
+		}
+		const tripped = facts.length > 0 ? `Tripped by ${joinAnd(facts)}` : null;
+		if (run.gates.length === 0) return {
+			state: "none",
+			word: "",
+			rest: "No gate in this run",
+			tripped
+		};
+		if (gate.fails) return {
+			state: "fails",
+			word: "fails",
+			rest: ` the run${gate.by.length > 0 ? `: ${joinAnd(gate.by.map((by) => gateValueWords(by, run)))}` : ""}`,
+			tripped
+		};
+		if (gate.reaches_fail_on) return {
+			state: "reaches",
+			word: "reaches",
+			rest: ` the gate${typeof gate.exempt_by === "string" ? `, exempt by ${gate.exempt_by}` : ""}`,
+			tripped
+		};
+		return {
+			state: "clear",
+			word: "does not reach",
+			rest: ` the run's gate: ${joinAnd(run.gates.map((g) => gateValueWords(g, run)))}`,
+			tripped
+		};
+	}
+	function qualifiers(finding, run) {
+		const origin = finding.origin;
+		const counted = countedFlagIds(finding).includes("vulnerable");
+		const originRow = !finding.from_composer_repository && counted ? origin.local ? "It is installed from a local path (your own code); the advisory is published for the package of this name, so check the version your path holds" : origin.kind === "vcs" ? "It is installed from vcs; the advisory is published for the package of this name" : null : null;
+		const notJudged = notJudgedRow(finding);
+		const move = finding.next_step;
+		const php = move === null ? installedPhpWords(finding, run) : null;
+		return {
+			reach: finding.flags.length > 0 ? reachRow(finding, run) : null,
+			origin: originRow,
+			notJudged,
+			unchecked: uncheckedRows(finding, run),
+			notRun: notRunRows(finding, !isScoreGraded(finding.score), notJudged !== null || move?.reason === "metadata_not_read"),
+			php: php === null ? null : capitalize(php),
+			accepted: acceptedRow(finding),
+			gate: gateRow(finding, run)
+		};
+	}
+	//#endregion
+	//#region src/domain/moveCards.ts
+	var RESOLVED_KINDS = [
+		"require",
+		"raise-php",
+		"tag"
+	];
+	var RELEASE_KINDS = [
+		"update",
+		"require",
+		"raise-php",
+		"tag"
+	];
+	var NO_MOVE_WORDS = vocabTable({
+		package_quiet: "It has no recent release to move to",
+		no_higher_release: "No higher branch has released recently enough to move to",
+		higher_undated: "lockrot could not date the releases of the higher branches, so it names no move",
+		releases_unknown: "lockrot could not read its releases, so it names no fix",
+		affected_range_unknown: "No advisory names the versions it affects, so lockrot names no fix",
+		local_package: "It is installed from a local path, your own package, so lockrot names no move"
+	});
+	var WHY_WORDS = " with this package's name names what requires it";
+	function namesShown(names) {
+		if (names.length <= 3) return names.join(", ");
+		return `${names.slice(0, 3).join(", ")} and ${names.length - 3} more`;
+	}
+	function dependents(finding) {
+		const names = dependentNames(finding);
+		if (names.length === 1) return names[0] ?? "";
+		return finding.flags.length > 0 ? `the ${names.length} packages in Reach` : namesShown(names);
+	}
+	function unknownMove(move) {
+		if (move.text) return `Next step: ${move.text}`;
+		return `Next step: ${move.kind.replaceAll("-", " ")}${move.reason ? ` (${move.reason.replaceAll("_", " ")})` : ""}`;
+	}
+	function moveAction(finding, move, run) {
+		const php = move.php_check;
+		const hasDependents = finding.direct_dependents.length > 0;
+		const latest = move.latest?.version ?? "";
+		switch (move.kind) {
+			case "update": return [`Update to ${move.newest ?? move.version ?? ""}${move.to_branch ? ` on ${move.to_branch}` : ""}`];
+			case "require":
+			case "raise-php": return [capitalize((move.kind === "raise-php" ? `Raise require.php to ${php?.raise_to ?? ""}, then ` : "") + (finding.direct ? `require ${move.constraint ?? ""}` : `move it to ${move.constraint ?? ""}${hasDependents ? ` through ${dependents(finding)}` : ""}`))];
+			case "replace": {
+				const replacement = move.replacement;
+				if (!replacement?.package) return ["Find a replacement: the suggestion names no package to require"];
+				const href = safeHref(replacement.url);
+				const graded = replacement.finding;
+				return [
+					"Replace it with ",
+					href === null ? replacement.package : {
+						href,
+						text: `${replacement.package} ↗`,
+						name: newTab(`${replacement.package} on its registry`)
+					},
+					href !== null && finding.replacement === replacement.package ? ", the replacement it names" : "",
+					graded ? `, itself ${graded.verdict} (${graded.flag_ids.join(" · ")}) in this lock` : ""
+				].filter((piece) => piece !== "");
+			}
+			case "find-alternative": return [move.source === "abandoned" ? "Find a replacement; none is named" : "Find a maintained alternative"];
+			case "tag": {
+				const what = move.crosses_major === false ? `the newest tag on its own line, ${latest}` : `its newest tag, ${latest}`;
+				const older = move.latest?.relation === "older" ? "; that tag is older than your snapshot: review it first, or replace the package" : "";
+				return [(finding.direct ? `Require ${what}` : `Move it to ${what}${hasDependents ? `, through ${dependents(finding)}` : ""}`) + older];
+			}
+			case "blocked": {
+				const requires = php?.requires ?? null;
+				if (move.source === "pinned") {
+					const installed = finding.installed_php;
+					const nor = installed.target_runs === false ? `, nor does the version you have (${finding.version}, php ${phpConstraintWord(installed.requires ?? "")})` : "";
+					return [requires ? `Its newest tag, ${latest}, needs php ${phpConstraintWord(requires)}, which your target, ${run.target_php}, does not run${nor}: replace it` : `Its newest tag, ${latest}, does not run on your target, ${run.target_php}${nor}: replace it`];
+				}
+				return [requires ? `${move.to_branch ?? ""} fixes it but needs php ${phpConstraintWord(requires)}, which your target, ${run.target_php}, does not run` : `${move.to_branch ?? ""} fixes it, but your target, ${run.target_php}, does not run it`];
+			}
+			case "test": return [move.latest?.is_installed ? `${latest} is its newest release: test it on PHP ${run.target_php}, or replace it` : `Test it on PHP ${run.target_php}`];
+			case "no-tag": return ["It has no tagged release to move to: review the snapshot, or replace it"];
+			case "no-fix": return ["No release fixes it"];
+			case "no-single-fix": return ["No single release fixes every advisory; see each advisory's fix"];
+			case "no-move":
+				if (move.reason === "metadata_not_read") return [`lockrot did not read its releases (${metadataWords(finding)}), so it names no move` + (move.source === "pinned" ? ": review the snapshot" : "")];
+				return [move.reason !== null && NO_MOVE_WORDS[move.reason] || unknownMove(move)];
+			default: return [unknownMove(move)];
+		}
+	}
+	function clearsWords(finding, move) {
+		if (move.clears.length === 0) return null;
+		const all = advisoryRows(finding).length;
+		if (move.clears_all && all <= 1 && move.clears.length === 2) return "both";
+		if (move.clears_all && all <= 1 && move.clears.length === 3) return "all three";
+		const flags = move.clears.filter((c) => c.kind === "flag").map((c) => c.id);
+		const k = move.clears.filter((c) => c.kind === "advisory").length;
+		const advisories = k === 0 ? [] : [all === 1 ? "the advisory" : k === all && all === 2 ? "both advisories" : k === all ? `all ${k} advisories` : `${k} of its ${all} advisories`];
+		return joinAnd([...flags, ...advisories]);
+	}
+	var capNote = (text) => text.startsWith("lockrot ") ? text : capitalize(text);
+	function composerNotes(finding, move, run, noted) {
+		const notes = [];
+		const note = (text, items = []) => {
+			notes.push({
+				text,
+				items
+			});
+		};
+		const why = [{ code: "composer why" }, WHY_WORDS];
+		for (const reason of move.composer_moves_because) {
+			if (noted.includes(reason)) continue;
+			const id = reason;
+			switch (id) {
+				case "holders":
+					note(["The packages that hold it may need to move too"]);
+					break;
+				case "crosses_major":
+					note([`${(move.to_branch ?? "").startsWith("0.") ? "A new 0.x line (Composer treats 0.x minors as breaking)" : "A new major"} brings its own requirements, which lockrot does not solve`]);
+					break;
+				case "transitive": {
+					note([RESOLVED_KINDS.includes(move.kind) ? "What requires it must allow it" : `Replace or update ${dependents(finding)}`]);
+					const through = "through" in move ? move.through : [];
+					const gone = through.filter((e) => e.newest_requires === false);
+					const kept = through.filter((e) => e.newest_requires === true);
+					const [entries, one, many] = gone.length > 0 ? [
+						gone,
+						"no longer requires",
+						"no longer require"
+					] : [
+						kept,
+						"still requires",
+						"still require"
+					];
+					const names = entries.map((e) => `${e.package} (${e.newest_stable?.version ?? ""})`);
+					if (names.length === 1) note([`The newest release of ${names[0] ?? ""} ${one} it`]);
+					else if (names.length > 1) note([`The newest releases of these ${many} it:`], names);
+					break;
+				}
+				case "unreached": {
+					const said = finding.flags.length > 0;
+					const found = foundWords(finding, run);
+					if (RESOLVED_KINDS.includes(move.kind)) note([
+						`${capNote(said ? "what requires it must allow it" : `${found}, so what requires it must allow it`)} (`,
+						...why,
+						")"
+					]);
+					else note(said ? why : [`${capNote(`${found}:`)} `, ...why]);
+					break;
+				}
+				default: note([capitalize(id.replaceAll("_", " "))]);
+			}
+		}
+		return notes;
+	}
+	function movePhp(finding, move, run, then) {
+		const php = move.php_check;
+		const installed = then ? null : installedPhpWords(finding, run);
+		if (!php?.requires && installed === null) return null;
+		const lines = [];
+		if (php?.requires) {
+			if (php.project_allows === true) lines.push({
+				answer: "yes",
+				text: "your require.php allows it"
+			});
+			if (php.project_allows === false) lines.push({
+				answer: "no",
+				text: `your require.php still allows ${phpFloorWord(run.project_php_lowest) ?? ""} (a ${php.raise_size ?? ""} raise)`
+			});
+			if (php.target_runs === true) lines.push({
+				answer: "yes",
+				text: `your target, ${run.target_php}, runs it`
+			});
+			if (php.target_runs === false) lines.push({
+				answer: "no",
+				text: `your target, ${run.target_php}, does not run it`
+			});
+		}
+		if (installed !== null) lines.push({
+			answer: "no",
+			text: installed
+		});
+		return {
+			head: php?.requires ? [`${move.to_branch ?? ""} needs php `, { code: phpConstraintWord(php.requires) }] : null,
+			lines
+		};
+	}
+	function moveAfter(finding, move) {
+		const applied = move.if_applied;
+		if (!isScoreGraded(finding.score) || !applied) return null;
+		const noNew = applied.assumes.includes("no_new_advisories");
+		const counted = countedFlagIds(finding);
+		return {
+			result: `${applied.at_most ? noNew ? "at most, from the facts it checked, " : "at most " : ""}${applied.total}, ${applied.verdict}`,
+			verdict: applied.verdict,
+			conditions: [
+				...move.adds.length > 0 ? [`adds ${move.adds.map((a) => a.id).join(" and ")}`] : [],
+				...move.unverified.filter((u) => u.kind === "flag" && !counted.includes(u.id)).map((u) => `${u.id} not checked`),
+				...applied.assumes.includes("composer_resolves") ? ["if Composer resolves it"] : [],
+				...noNew ? ["advisories on its new versions not checked"] : []
+			]
+		};
+	}
+	var isGradedHolder = (held, run) => run.graded_verdicts.includes(held.holder?.verdict ?? "");
+	function holderItem(held, run) {
+		if (held.source === "root") return {
+			root: true,
+			name: "your composer.json",
+			version: null,
+			grade: null,
+			meta: ["requires ", { code: held.constraint }],
+			step: null
+		};
+		const holder = held.holder ?? null;
+		const flags = holder?.flag_ids ?? [];
+		const step = holder?.next_step ?? null;
+		const where = step?.to_branch ? ` on ${step.to_branch}` : "";
+		return {
+			root: false,
+			name: held.package ?? "",
+			version: held.version ?? "",
+			grade: holder !== null && isGradedHolder(held, run) ? holder.verdict : null,
+			meta: [
+				"requires ",
+				{ code: held.constraint },
+				...flags.length > 0 ? [` · itself ${flags.join(" · ")}`] : []
+			],
+			step: step === null ? null : step.kind === "require" && step.constraint ? `require ${step.constraint}${where}` : `${step.kind.replaceAll("-", " ")}${where}`
+		};
+	}
+	function foldWords(rest, run) {
+		const counts = new Map();
+		for (const held of rest) {
+			const holder = held.holder ?? null;
+			const word = isGradedHolder(held, run) ? `graded ${holder?.verdict ?? ""}` : (holder?.flag_ids ?? []).length === 0 ? "with nothing flagged" : holder?.verdict ?? "";
+			counts.set(word, (counts.get(word) ?? 0) + 1);
+		}
+		if (counts.size === 1 && counts.has("with nothing flagged")) return `${rest.length} more, nothing flagged in them`;
+		return `${rest.length} more: ${joinAnd([...counts].map(([word, n]) => `${n} ${word}`))}`;
+	}
+	function heldBy(move, run, then) {
+		const holders = move.held_by;
+		if (holders.length === 0) return null;
+		const graded = run.graded_verdicts;
+		const rank = (h) => h.source === "root" ? -1 : graded.includes(h.holder?.verdict ?? "") ? graded.indexOf(h.holder?.verdict ?? "") : graded.length;
+		const fold = holders.length > 4;
+		const ordered = fold ? holders.map((h, at) => ({
+			h,
+			at
+		})).sort((a, b) => rank(a.h) - rank(b.h) || a.at - b.at).map(({ h }) => h) : holders;
+		const shown = fold ? ordered.slice(0, 3) : ordered;
+		const rest = fold ? ordered.slice(3) : [];
+		return {
+			count: holders.length,
+			shown: shown.map((h) => holderItem(h, run)),
+			fold: rest.length === 0 ? null : {
+				summary: foldWords(rest, run),
+				holders: rest.map((h) => holderItem(h, run))
+			},
+			then: then ? `, the move to ${move.constraint ?? move.to_branch ?? move.kind}` : null
+		};
+	}
+	var COMMAND_WORDS = {
+		one: "Command",
+		several: "Commands, in order"
+	};
+	function moveCard(finding, move, run, then, noted) {
+		const names = RELEASE_KINDS.includes(move.kind);
+		const actionable = names || move.commands.length > 0 || move.kind === "replace";
+		const leftFlags = move.leaves.filter((l) => l.kind === "flag").map((l) => l.id);
+		const leftAdvisories = move.leaves.length - leftFlags.length;
+		return {
+			heading: then ? "Then" : actionable ? "The move" : "Next step",
+			advice: !actionable,
+			then,
+			action: moveAction(finding, move, run),
+			argvs: move.commands,
+			clears: clearsWords(finding, move),
+			stays: move.leaves.length > 0 && names ? [...leftFlags, ...leftAdvisories > 0 ? [`${leftAdvisories} ${pluralNoun(leftAdvisories, "advisory", "advisories")}`] : []].join(", ") : null,
+			notChecked: move.unverified.length > 0 && names ? move.unverified.map((u) => u.id).join(", ") : null,
+			adds: move.adds.map((a) => `${a.id}: ${addsBasisWord(a.basis)}`),
+			php: movePhp(finding, move, run, then),
+			after: moveAfter(finding, move),
+			composer: composerNotes(finding, move, run, noted),
+			heldBy: heldBy(move, run, then)
+		};
+	}
+	function moveCards(finding, run) {
+		const lead = finding.next_step;
+		if (lead === null) return [];
+		const cards = [];
+		const noted = [];
+		for (const [move, then] of [[lead, false], ...lead.also.map((also) => [also, true])]) {
+			cards.push(moveCard(finding, move, run, then, [...noted]));
+			noted.push(...move.composer_moves_because);
+		}
+		return cards;
 	}
 	//#endregion
 	//#region src/domain/detailWords.ts
@@ -8621,14 +9765,32 @@ a.legend-btn,
 		lockEntry: "The lock entry",
 		provenance: "Provenance",
 		showArithmetic: "Show the arithmetic",
-		firstWayOnly: "Show the first way out only",
-		move: "The move",
-		moveInOrder: "The move, in order",
 		copy: "Copy",
 		copied: "Copied",
 		copyByHand: "Select it and copy",
 		shell: "Shell",
-		shellFor: "Shell: {shell}"
+		shellFor: "Shell: {shell}",
+		verdict: "Verdict",
+		otherFlags: "The other counted flags",
+		reach: "Reach",
+		origin: "Origin",
+		notJudged: "Not judged",
+		unchecked: "Unchecked",
+		notRun: "Not run",
+		php: "PHP",
+		accepted: "Accepted",
+		gate: "Gate",
+		more: "{n} more",
+		showFewer: "show fewer",
+		clears: "Clears",
+		stays: "Stays",
+		notChecked: "Not checked",
+		adds: "Adds",
+		after: "After",
+		composer: "Composer",
+		heldBy: "Held by",
+		yes: "yes: ",
+		no: "no: "
 	};
 	var REFERENCE_WORDS = {
 		installed: "installed",
@@ -8652,8 +9814,8 @@ a.legend-btn,
 	};
 	var agesAsOf = (generatedAt) => `Ages as of ${day(generatedAt)}`;
 	var whyTitle = (verdict) => `Why ${verdict}`;
-	function detailReach(finding) {
-		const way = finding.reach === "direct" ? "direct requirement" : finding.reach === "transitive" ? `via ${namesCapped(finding.direct_dependents)}` : finding.reach;
+	function detailReach(finding, run) {
+		const way = finding.reach === "direct" ? "direct requirement" : finding.reach === "transitive" ? `via ${namesShown(dependentNames(finding))}` : noPathWords(finding, run);
 		return finding.dev ? `${way} · dev` : way;
 	}
 	//#endregion
@@ -8662,15 +9824,6 @@ a.legend-btn,
 		const { feeds } = finding.security;
 		if (feeds.length === 0) return null;
 		return feeds.map((feed) => `${feed.registry ?? feed.composer_repository} (${feedAnswerWord(feed, finding.origin.kind)})`).join(", ");
-	}
-	//#endregion
-	//#region src/domain/links.ts
-	function safeHref(url) {
-		const value = typeof url === "string" ? url.trim() : "";
-		return /^https?:\/\/[^\s<>"']+$/i.test(value) ? value : null;
-	}
-	function cveUrl(advisory) {
-		return advisory.cve && /^CVE-/.test(advisory.cve) ? `https://nvd.nist.gov/vuln/detail/${advisory.cve}` : null;
 	}
 	//#endregion
 	//#region src/domain/repositoryLine.ts
@@ -8730,7 +9883,7 @@ a.legend-btn,
 			]
 		});
 	}
-	function OutLink({ href, children, tabIndex, title }) {
+	function OutLink({ href, children, tabIndex, title, label }) {
 		const safe = safeHref(href);
 		if (safe === null) return u$1("span", {
 			className: "out",
@@ -8743,6 +9896,7 @@ a.legend-btn,
 			rel: "noopener noreferrer",
 			tabIndex,
 			title,
+			"aria-label": label,
 			children
 		});
 	}
@@ -8758,104 +9912,6 @@ a.legend-btn,
 	function presentRows(rows) {
 		return rows.filter((row) => row.value !== null && row.value !== void 0 && row.value !== "");
 	}
-	//#endregion
-	//#region src/domain/branchTimeline.ts
-	var BETWEEN_MAX = 4;
-	var FOLD_MIN = 3;
-	function lane(row, index, finding) {
-		return {
-			branch: row.branch,
-			years: row.installed ? finding.age.branch_release?.years ?? null : row.released_years,
-			version: row.installed ? finding.age.branch_release?.version ?? row.highest : row.highest,
-			php: row.highest_php === null ? null : phpConstraintWord(row.highest_php),
-			installed: row.installed,
-			newest: index === 0 && !row.installed,
-			datedBy: row.installed ? finding.age.branch_release?.dated_by ?? null : row.dated_by
-		};
-	}
-	function foldOlder(older) {
-		if (older.length >= FOLD_MIN) return [{
-			kind: "fold",
-			which: "older",
-			lanes: older
-		}];
-		return older.map((l) => ({
-			kind: "lane",
-			lane: l
-		}));
-	}
-	function rowsAround(lanes, index) {
-		const newer = lanes.slice(0, index);
-		const [first, ...between] = newer;
-		const above = first !== void 0 && newer.length > BETWEEN_MAX ? [{
-			kind: "lane",
-			lane: first
-		}, {
-			kind: "fold",
-			which: "between",
-			lanes: between
-		}] : newer.map((l) => ({
-			kind: "lane",
-			lane: l
-		}));
-		const mine = lanes[index];
-		return [
-			...above,
-			...mine === void 0 ? [] : [{
-				kind: "lane",
-				lane: mine
-			}],
-			...foldOlder(lanes.slice(index + 1))
-		];
-	}
-	function branchTimeline(finding, metadata, run) {
-		const lanes = (metadata?.branches ?? []).map((row, index) => lane(row, index, finding));
-		const [top, ...rest] = lanes;
-		if (top === void 0 || rest.length === 0) return null;
-		const dated = lanes.flatMap((l) => l.years === null ? [] : [l.years]);
-		const span = Math.max(1, Math.ceil(Math.max(0, ...dated)));
-		const thresholds = run.thresholds;
-		const guides = thresholds === null ? [] : [{
-			years: thresholds["release-warn-years"],
-			level: "warn"
-		}, {
-			years: thresholds["release-high-years"],
-			level: "high"
-		}].filter((guide) => guide.years > 0 && guide.years < span);
-		const installedAt = lanes.findIndex((l) => l.installed);
-		return {
-			rows: installedAt >= 0 ? rowsAround(lanes, installedAt) : [{
-				kind: "lane",
-				lane: top
-			}, ...foldOlder(rest)],
-			span,
-			guides,
-			installedLevel: finding.age.branch_release?.level ?? null
-		};
-	}
-	function xOfYears(years, span) {
-		return Math.min(100, Math.max(0, 100 - years / span * 100));
-	}
-	function laneWords(l) {
-		const released = l.years === null ? `${l.version}, undated` : `${l.version}, released ${ago(l.years)}`;
-		return l.datedBy === null ? released : `${released}, dated by ${l.datedBy}`;
-	}
-	var TIMELINE_WORDS = {
-		branch: "branch",
-		strip: "time since its last release, on one axis that ends at the run",
-		latest: "latest",
-		php: "PHP",
-		yours: ", yours",
-		newest: ", the newest",
-		noPhp: "none recorded",
-		you: "you",
-		newestKey: "newest",
-		line: "time since its last release",
-		guide: "age limit, in years before the run",
-		older: "older branches",
-		between: "branches, between the newest and yours",
-		years: "{n}y"
-	};
 	//#endregion
 	//#region src/ui/report/BranchTimeline.tsx
 	var at$1 = (name, x) => ({ [name]: `${x}%` });
@@ -8896,15 +9952,21 @@ a.legend-btn,
 			role: "row",
 			className: classes,
 			"data-branch": lane.branch,
-			"aria-hidden": collapsed || void 0,
 			children: [
 				u$1("span", {
 					role: "rowheader",
 					className: "detail-timeline-branch",
 					children: [
 						lane.branch,
-						lane.installed && u$1(Sr, { children: TIMELINE_WORDS.yours }),
-						lane.newest && u$1(Sr, { children: TIMELINE_WORDS.newest })
+						lane.newest && u$1(Sr, { children: TIMELINE_WORDS.newest }),
+						lane.installed && u$1(S, { children: [" ", u$1("span", {
+							className: "d3-rung-mark d3-tl-mark",
+							children: TIMELINE_WORDS.yours
+						})] }),
+						lane.move && u$1(S, { children: [" ", u$1("span", {
+							className: "d3-rung-mark is-move d3-tl-mark",
+							children: TIMELINE_WORDS.move
+						})] })
 					]
 				}),
 				u$1("span", {
@@ -8930,15 +9992,22 @@ a.legend-btn,
 				u$1("span", {
 					role: "cell",
 					className: "detail-timeline-latest",
-					children: lane.version
+					children: [lane.version, u$1("span", {
+						className: "d3-tl-age",
+						"aria-hidden": "true",
+						children: lane.age
+					})]
 				}),
 				u$1("span", {
 					role: "cell",
 					className: lane.php !== null && lane.php.length > LONG_PHP ? "detail-timeline-php is-long" : "detail-timeline-php",
-					children: lane.php ?? u$1(S, { children: [u$1("span", {
+					children: [lane.php === null ? u$1(S, { children: [u$1("span", {
 						"aria-hidden": "true",
 						children: "—"
-					}), u$1(Sr, { children: TIMELINE_WORDS.noPhp })] })
+					}), u$1(Sr, { children: TIMELINE_WORDS.noPhp })] }) : barParts(lane.php).map((part, i) => u$1(S, { children: [i > 0 && u$1("wbr", {}), part] }, i)), lane.phpWords !== null && u$1("span", {
+						className: "d3-tl-php-note",
+						children: lane.phpWords
+					})]
 				})
 			]
 		});
@@ -8959,12 +10028,7 @@ a.legend-btn,
 						className: "detail-timeline-fold-btn",
 						"aria-expanded": open,
 						onClick: onToggle,
-						children: [
-							fold.lanes.length,
-							" ",
-							fold.which,
-							u$1(Sr, { children: ` ${fold.which === "older" ? TIMELINE_WORDS.older : TIMELINE_WORDS.between}` })
-						]
+						children: [`${fold.lanes.length} ${fold.which}`, u$1(Sr, { children: fold.which === "older" ? TIMELINE_WORDS.older : TIMELINE_WORDS.between })]
 					})
 				}),
 				u$1("span", {
@@ -9005,7 +10069,7 @@ a.legend-btn,
 			collapsed: !open
 		}, lane.branch))] });
 	}
-	function BranchTimeline2({ finding, metadata, run, summaryId }) {
+	function BranchTimeline2({ finding, metadata, run, summaryId, headId }) {
 		const [openFolds, setOpenFolds] = d([]);
 		const timeline = branchTimeline(finding, metadata, run);
 		if (timeline === null) return null;
@@ -9013,10 +10077,11 @@ a.legend-btn,
 		const toggle = (which) => {
 			setOpenFolds((open) => open.includes(which) ? open.filter((w) => w !== which) : [...open, which]);
 		};
-		const lanes = timeline.rows.flatMap((row) => row.kind === "lane" ? [row.lane] : row.lanes);
+		const lanes = timeline.lanes;
 		return u$1(S, { children: [u$1("div", {
 			role: "table",
 			className: "detail-timeline-grid d2-timeline",
+			"aria-labelledby": headId,
 			"aria-describedby": summaryId,
 			children: [
 				u$1("div", {
@@ -9047,7 +10112,7 @@ a.legend-btn,
 						})
 					]
 				}),
-				timeline.rows.map((row) => row.kind === "lane" ? u$1(LaneRow, {
+				timeline.rows.map((row, i) => row.kind === "lane" ? u$1(LaneRow, {
 					lane: row.lane,
 					span,
 					guides,
@@ -9056,11 +10121,11 @@ a.legend-btn,
 					fold: row,
 					span,
 					guides,
-					open: openFolds.includes(row.which),
+					open: openFolds.includes(`${row.which}-${i}`),
 					onToggle: () => {
-						toggle(row.which);
+						toggle(`${row.which}-${i}`);
 					}
-				}, row.which)),
+				}, `${row.which}-${i}`)),
 				u$1("div", {
 					className: "detail-timeline-row detail-timeline-axis-row",
 					"aria-hidden": "true",
@@ -9099,167 +10164,6 @@ a.legend-btn,
 				})
 			]
 		})] });
-	}
-	//#endregion
-	//#region src/ui/report/CopyMove.tsx
-	var SHELL_KEY = "lockrot-shell";
-	var COPIED_MS$1 = 1400;
-	var FAILED_MS = 2600;
-	function readShell() {
-		try {
-			const saved = window.localStorage.getItem(SHELL_KEY);
-			return SHELLS.find((shell) => shell === saved) ?? "posix";
-		} catch {
-			return "posix";
-		}
-	}
-	function saveShell(shell) {
-		try {
-			window.localStorage.setItem(SHELL_KEY, shell);
-		} catch {}
-	}
-	function useCopyStatus() {
-		const [status, setStatus] = d("idle");
-		h(() => {
-			if (status === "idle") return void 0;
-			const timer = window.setTimeout(() => {
-				setStatus("idle");
-			}, status === "copied" ? COPIED_MS$1 : FAILED_MS);
-			return () => {
-				window.clearTimeout(timer);
-			};
-		}, [status]);
-		return [status, setStatus];
-	}
-	var LABELS = {
-		idle: DETAIL_WORDS.copy,
-		copied: DETAIL_WORDS.copied,
-		manual: DETAIL_WORDS.copyByHand
-	};
-	var linesFor = (argvs, shell) => argvs.map((argv) => commandLine(argv, shell) ?? "This command holds characters the page does not print.");
-	function CopyMove({ argvs, label }) {
-		const [shell, setShell] = d(readShell);
-		const [menuOpen, setMenuOpen] = d(false);
-		const [status, setStatus] = useCopyStatus();
-		const menuId = `${g()}-shells`;
-		const shellButton = A(null);
-		const menu = A(null);
-		h(() => {
-			if (!menuOpen) return void 0;
-			menu.current?.querySelector("[aria-checked=\"true\"]")?.focus();
-			const outside = (event) => {
-				const root = menu.current?.parentElement;
-				if (root && event.target instanceof Node && !root.contains(event.target)) setMenuOpen(false);
-			};
-			document.addEventListener("pointerdown", outside);
-			return () => {
-				document.removeEventListener("pointerdown", outside);
-			};
-		}, [menuOpen]);
-		if (argvs.length === 0) return null;
-		const printable = argvs.every(isPrintableArgv);
-		const lines = printable ? linesFor(argvs, shell) : [REFUSED_COMMAND];
-		const closeMenu = () => {
-			setMenuOpen(false);
-			shellButton.current?.focus();
-		};
-		const pick = (next) => {
-			setShell(next);
-			saveShell(next);
-			closeMenu();
-		};
-		const copy = () => {
-			const clipboard = navigator.clipboard;
-			if (!clipboard) {
-				setStatus("manual");
-				return;
-			}
-			clipboard.writeText(lines.join("\n")).then(() => {
-				setStatus("copied");
-			}, () => {
-				setStatus("manual");
-			});
-		};
-		const onMenuKey = (event) => {
-			const items = [...menu.current?.querySelectorAll("[role=\"menuitemradio\"]") ?? []];
-			const at = items.indexOf(document.activeElement);
-			if (event.key === "Escape") {
-				event.stopPropagation();
-				event.preventDefault();
-				closeMenu();
-			} else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-				event.preventDefault();
-				items[(at + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length]?.focus();
-			} else if (event.key === "Home" || event.key === "End") {
-				event.preventDefault();
-				(event.key === "Home" ? items[0] : items.at(-1))?.focus();
-			} else if (event.key === "Tab") setMenuOpen(false);
-		};
-		return u$1("div", {
-			className: "d2-copy",
-			children: [
-				u$1("div", {
-					className: "d2-copy-bar",
-					children: [
-						u$1("span", {
-							className: "eyebrow",
-							children: label ?? (argvs.length > 1 ? DETAIL_WORDS.moveInOrder : DETAIL_WORDS.move)
-						}),
-						printable && u$1("button", {
-							type: "button",
-							className: "d2-btn d2-copy-btn",
-							onClick: copy,
-							children: LABELS[status]
-						}),
-						u$1("button", {
-							type: "button",
-							ref: shellButton,
-							className: "d2-btn d2-shell-btn",
-							"aria-haspopup": "menu",
-							"aria-expanded": menuOpen,
-							"aria-controls": menuId,
-							"aria-label": DETAIL_WORDS.shellFor.replace("{shell}", SHELL_NAMES[shell]),
-							onClick: () => {
-								setMenuOpen((open) => !open);
-							},
-							children: SHELL_NAMES[shell]
-						}),
-						u$1("span", {
-							className: "vh",
-							"aria-live": "polite",
-							children: status === "copied" ? DETAIL_WORDS.copied : ""
-						})
-					]
-				}),
-				u$1("div", {
-					ref: menu,
-					id: menuId,
-					className: "d2-shell-menu",
-					role: "menu",
-					"aria-label": DETAIL_WORDS.shell,
-					hidden: !menuOpen,
-					onKeyDown: onMenuKey,
-					children: SHELLS.map((option) => u$1("button", {
-						type: "button",
-						role: "menuitemradio",
-						"aria-checked": option === shell,
-						tabIndex: -1,
-						className: "d2-shell-opt",
-						onClick: () => {
-							pick(option);
-						},
-						children: [SHELL_NAMES[option], printable && u$1("small", { children: linesFor(argvs.slice(0, 1), option)[0] })]
-					}, option))
-				}),
-				u$1("pre", {
-					className: "d2-copy-cmd",
-					children: lines.map((line, i) => u$1("span", {
-						className: printable ? "d2-copy-line" : "d2-copy-line is-refused",
-						children: line
-					}, i))
-				})
-			]
-		});
 	}
 	//#endregion
 	//#region src/ui/report/FlagPills.tsx
@@ -9318,6 +10222,388 @@ a.legend-btn,
 		}, pill.id)) });
 	}
 	//#endregion
+	//#region src/ui/report/CopyMove.tsx
+	var SHELL_KEY = "lockrot-shell";
+	var COPIED_MS$1 = 1400;
+	var FAILED_MS = 2600;
+	function readShell() {
+		try {
+			const saved = window.localStorage.getItem(SHELL_KEY);
+			return SHELLS.find((shell) => shell === saved) ?? "posix";
+		} catch {
+			return "posix";
+		}
+	}
+	function saveShell(shell) {
+		try {
+			window.localStorage.setItem(SHELL_KEY, shell);
+		} catch {}
+	}
+	function useCopyStatus() {
+		const [status, setStatus] = d("idle");
+		h(() => {
+			if (status === "idle") return void 0;
+			const timer = window.setTimeout(() => {
+				setStatus("idle");
+			}, status === "copied" ? COPIED_MS$1 : FAILED_MS);
+			return () => {
+				window.clearTimeout(timer);
+			};
+		}, [status]);
+		return [status, setStatus];
+	}
+	var LABELS = {
+		idle: DETAIL_WORDS.copy,
+		copied: DETAIL_WORDS.copied,
+		manual: DETAIL_WORDS.copyByHand
+	};
+	var linesFor = (argvs, shell) => argvs.map((argv) => commandLine(argv, shell) ?? "This command holds characters the page does not print.");
+	function CopyMove({ argvs, label, className }) {
+		const [shell, setShell] = d(readShell);
+		const [menuOpen, setMenuOpen] = d(false);
+		const [status, setStatus] = useCopyStatus();
+		const menuId = `${g()}-shells`;
+		const shellButton = A(null);
+		const menu = A(null);
+		h(() => {
+			if (!menuOpen) return void 0;
+			menu.current?.querySelector("[aria-checked=\"true\"]")?.focus();
+			const outside = (event) => {
+				const root = menu.current?.parentElement;
+				if (root && event.target instanceof Node && !root.contains(event.target)) setMenuOpen(false);
+			};
+			document.addEventListener("pointerdown", outside);
+			return () => {
+				document.removeEventListener("pointerdown", outside);
+			};
+		}, [menuOpen]);
+		if (argvs.length === 0) return null;
+		const printable = argvs.every(isPrintableArgv);
+		const lines = printable ? linesFor(argvs, shell) : [REFUSED_COMMAND];
+		const closeMenu = () => {
+			setMenuOpen(false);
+			shellButton.current?.focus();
+		};
+		const pick = (next) => {
+			setShell(next);
+			saveShell(next);
+			closeMenu();
+		};
+		const copy = () => {
+			const clipboard = navigator.clipboard;
+			if (!clipboard) {
+				setStatus("manual");
+				return;
+			}
+			clipboard.writeText(lines.join("\n")).then(() => {
+				setStatus("copied");
+			}, () => {
+				setStatus("manual");
+			});
+		};
+		const onMenuKey = (event) => {
+			const items = [...menu.current?.querySelectorAll("[role=\"menuitemradio\"]") ?? []];
+			const at = items.indexOf(document.activeElement);
+			if (event.key === "Escape") {
+				event.stopPropagation();
+				event.preventDefault();
+				closeMenu();
+			} else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+				event.preventDefault();
+				items[(at + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length]?.focus();
+			} else if (event.key === "Home" || event.key === "End") {
+				event.preventDefault();
+				(event.key === "Home" ? items[0] : items.at(-1))?.focus();
+			} else if (event.key === "Tab") setMenuOpen(false);
+		};
+		return u$1("div", {
+			className: className === void 0 ? "d2-copy" : `d2-copy ${className}`,
+			children: [
+				u$1("div", {
+					className: "d2-copy-bar",
+					children: [
+						u$1("span", {
+							className: "eyebrow",
+							children: label ?? (argvs.length > 1 ? COMMAND_WORDS.several : COMMAND_WORDS.one)
+						}),
+						printable && u$1("button", {
+							type: "button",
+							className: "d2-btn d2-copy-btn",
+							onClick: copy,
+							children: LABELS[status]
+						}),
+						u$1("button", {
+							type: "button",
+							ref: shellButton,
+							className: "d2-btn d2-shell-btn",
+							"aria-haspopup": "menu",
+							"aria-expanded": menuOpen,
+							"aria-controls": menuId,
+							"aria-label": DETAIL_WORDS.shellFor.replace("{shell}", SHELL_NAMES[shell]),
+							onClick: () => {
+								setMenuOpen((open) => !open);
+							},
+							children: SHELL_NAMES[shell]
+						}),
+						u$1("span", {
+							className: "vh",
+							"aria-live": "polite",
+							children: status === "copied" ? DETAIL_WORDS.copied : ""
+						})
+					]
+				}),
+				u$1("div", {
+					ref: menu,
+					id: menuId,
+					className: "d2-shell-menu",
+					role: "menu",
+					"aria-label": DETAIL_WORDS.shell,
+					hidden: !menuOpen,
+					onKeyDown: onMenuKey,
+					children: SHELLS.map((option) => u$1("button", {
+						type: "button",
+						role: "menuitemradio",
+						"aria-checked": option === shell,
+						tabIndex: -1,
+						className: "d2-shell-opt",
+						onClick: () => {
+							pick(option);
+						},
+						children: [SHELL_NAMES[option], printable && u$1("small", { children: linesFor(argvs.slice(0, 1), option)[0] })]
+					}, option))
+				}),
+				u$1("pre", {
+					className: "d2-copy-cmd",
+					children: printable ? argvs.map((argv, i) => u$1("span", {
+						className: "d2-copy-line",
+						children: (commandWords(argv, shell) ?? []).map((word, at) => u$1(S, { children: [at > 0 && " ", u$1("span", {
+							className: "d3-arg",
+							children: word
+						})] }, at))
+					}, i)) : u$1("span", {
+						className: "d2-copy-line is-refused",
+						children: REFUSED_COMMAND
+					})
+				})
+			]
+		});
+	}
+	//#endregion
+	//#region src/ui/report/RichText.tsx
+	function jumpTo(event, id) {
+		event.preventDefault();
+		requestAnimationFrame(() => {
+			const target = document.getElementById(id);
+			if (target === null) return;
+			if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+			if (typeof target.scrollIntoView === "function") target.scrollIntoView({ block: "start" });
+			target.focus({ preventScroll: true });
+		});
+	}
+	function RichText({ rich, jumps = {} }) {
+		return u$1(S, { children: rich.map((piece, i) => {
+			if (typeof piece === "string") return piece;
+			if ("code" in piece) return u$1("code", { children: piece.code }, i);
+			if ("strong" in piece) return u$1("strong", { children: piece.strong }, i);
+			if ("href" in piece) return u$1(OutLink, {
+				href: piece.href,
+				label: piece.name,
+				children: piece.text
+			}, i);
+			const target = jumps[piece.jump];
+			if (target === void 0) return (piece.lead ?? "") + piece.text;
+			const link = u$1("a", {
+				className: piece.lead === void 0 ? "lnk d3-count-link" : "lnk",
+				href: `#${target}`,
+				onClick: (event) => {
+					jumpTo(event, target);
+				},
+				children: piece.text
+			}, i);
+			return piece.lead === void 0 ? link : u$1("span", {
+				className: "d3-jump",
+				children: [piece.lead, link]
+			}, i);
+		}) });
+	}
+	//#endregion
+	//#region src/ui/report/MoveCard.tsx
+	function Fact({ label, children, lines = false }) {
+		return u$1("div", {
+			className: "d3-mf",
+			children: [u$1("dt", { children: label }), u$1("dd", {
+				className: lines ? "d3-mf-lines" : void 0,
+				children
+			})]
+		});
+	}
+	function MoveCard({ card, run }) {
+		const id = `${g()}-move`;
+		const { php, after } = card;
+		return u$1("section", {
+			className: [
+				"d3-move",
+				...card.advice ? ["is-advice"] : [],
+				...card.then ? ["is-then"] : []
+			].join(" "),
+			"aria-labelledby": id,
+			children: [
+				u$1("h3", {
+					className: "eyebrow",
+					id,
+					children: card.heading
+				}),
+				u$1("p", {
+					className: "d3-move-action",
+					children: u$1(RichText, { rich: card.action })
+				}),
+				card.argvs.length > 0 && u$1(CopyMove, {
+					argvs: card.argvs,
+					className: "d3-cmd"
+				}),
+				u$1("dl", {
+					className: "d3-move-facts",
+					children: [
+						card.clears !== null && u$1(Fact, {
+							label: DETAIL_WORDS.clears,
+							children: card.clears
+						}),
+						card.stays !== null && u$1(Fact, {
+							label: DETAIL_WORDS.stays,
+							children: card.stays
+						}),
+						card.notChecked !== null && u$1(Fact, {
+							label: DETAIL_WORDS.notChecked,
+							children: card.notChecked
+						}),
+						card.adds.length > 0 && u$1(Fact, {
+							label: DETAIL_WORDS.adds,
+							lines: true,
+							children: card.adds.map((line) => u$1("span", { children: line }, line))
+						}),
+						php !== null && u$1(Fact, {
+							label: DETAIL_WORDS.php,
+							children: [php.head !== null && u$1("span", { children: u$1(RichText, { rich: php.head }) }), php.lines.map(({ answer, text }) => u$1("span", {
+								className: `d3-check is-${answer}`,
+								children: [
+									u$1("span", {
+										className: "d3-check-mark",
+										"aria-hidden": "true",
+										children: answer === "yes" ? "✓" : "✕"
+									}),
+									u$1("span", {
+										className: "vh",
+										children: answer === "yes" ? DETAIL_WORDS.yes : DETAIL_WORDS.no
+									}),
+									text
+								]
+							}, text))]
+						}),
+						after !== null && u$1(Fact, {
+							label: DETAIL_WORDS.after,
+							children: [u$1("span", {
+								className: `d2-after ${toneClass(verdictTone(run.score_model, after.verdict))}`,
+								children: after.result
+							}), after.conditions.map((condition) => u$1("span", {
+								className: "d3-after-cond",
+								children: condition
+							}, condition))]
+						})
+					]
+				}),
+				card.composer.length > 0 && u$1("div", {
+					className: "d3-notes",
+					children: [u$1("p", {
+						className: "d3-notes-label",
+						children: DETAIL_WORDS.composer
+					}), u$1("ul", { children: card.composer.map((note, i) => u$1("li", { children: [u$1(RichText, { rich: note.text }), note.items.length > 0 && u$1("ul", {
+						className: "d3-notes-sub",
+						children: note.items.map((item) => u$1("li", { children: item }, item))
+					})] }, i)) })]
+				})
+			]
+		});
+	}
+	function HolderItem({ holder }) {
+		const tone = holder.grade === null ? null : toneClass(gradeTone(holder.grade));
+		return u$1("li", {
+			className: [
+				"d3-holder",
+				...holder.root ? ["is-root"] : [],
+				...tone === null ? [] : ["is-graded", tone]
+			].join(" "),
+			children: [
+				u$1("div", {
+					className: "d3-holder-name",
+					children: [
+						u$1("span", {
+							className: "d3-holder-pkg",
+							children: holder.name
+						}),
+						holder.version !== null && u$1(S, { children: [" ", u$1("span", {
+							className: "d3-holder-ver",
+							children: holder.version
+						})] }),
+						holder.grade !== null && u$1(S, { children: [" ", u$1("span", {
+							className: `tag ${tone ?? ""}`,
+							children: holder.grade
+						})] })
+					]
+				}),
+				u$1("div", {
+					className: "d3-holder-meta",
+					children: u$1(RichText, { rich: holder.meta })
+				}),
+				holder.step !== null && u$1("div", {
+					className: "d3-holder-step",
+					children: [
+						u$1("span", {
+							className: "d3-holder-step-label",
+							children: "its own step:"
+						}),
+						" ",
+						holder.step
+					]
+				})
+			]
+		});
+	}
+	function HeldBy({ block }) {
+		const id = `${g()}-held`;
+		return u$1("section", {
+			className: "d3-holders",
+			"aria-labelledby": id,
+			children: [
+				u$1("h3", {
+					className: "eyebrow",
+					id,
+					children: [
+						DETAIL_WORDS.heldBy,
+						block.count > 1 && u$1("span", {
+							className: "d3-count",
+							children: ` · ${block.count}`
+						}),
+						block.then !== null && u$1("span", {
+							className: "vh",
+							children: block.then
+						})
+					]
+				}),
+				u$1("ul", {
+					className: "d3-chain",
+					children: block.shown.map((holder, i) => u$1(HolderItem, { holder }, i))
+				}),
+				block.fold !== null && u$1("details", {
+					className: "d3-fold",
+					children: [u$1("summary", { children: u$1("span", { children: block.fold.summary }) }), u$1("ul", {
+						className: "d3-chain is-quiet",
+						children: block.fold.holders.map((holder, i) => u$1(HolderItem, { holder }, i))
+					})]
+				})
+			]
+		});
+	}
+	//#endregion
 	//#region src/domain/scoreWhy.ts
 	var DEV_WORD = vocabTable({ dev: "packages-dev" });
 	function notJudgedLine(finding) {
@@ -9363,10 +10649,10 @@ a.legend-btn,
 		const tied = score.parts.security.tied;
 		const worst = isSecurityVulnerable(finding.security) ? finding.security.worst : null;
 		const as = countsAs(run, term.severity);
-		let line = `vulnerable ${term.points}: ${term.severity} advisory ${advisoryName$1(finding, term.advisory)}`;
+		let line = `vulnerable ${term.points}: ${term.severity} advisory ${advisoryName(finding, term.advisory)}`;
 		if (as) line += ` (counted as ${as})`;
 		if (of > 1) line += `, ${term.severity === worst ? "the worst" : "the highest-scoring"} of ${of}`;
-		if (tied.length > 0) line += ` (tied with ${namesCapped(tied.map((id) => advisoryName$1(finding, id)))})`;
+		if (tied.length > 0) line += ` (tied with ${namesCapped(tied.map((id) => advisoryName(finding, id)))})`;
 		const doubles = run.score_model.fix_kinds.find((k) => k.id === term.fix_kind)?.doubles ?? false;
 		if (term.multiplier === 2) line += `; × 2: ${term.fix_kind === "none" ? "no release fixes it" : `no fixing release runs on PHP ${run.target_php}`}`;
 		else if (!doubles && term.fix_kind === "unknown") line += "; its fix is unknown: no × 2";
@@ -9415,26 +10701,12 @@ a.legend-btn,
 		const of = score.parts.security.of;
 		const tied = score.parts.security.tied.length > 0;
 		const { kind, id } = row.remove;
-		let text = `without ${kind === "advisory" ? advisoryName$1(finding, id) : id === "vulnerable" ? of === 1 ? "the advisory" : "the advisories" : id}: ${row.at_least ? "at least " : ""}${row.total}, ${row.verdict}`;
+		let text = `without ${kind === "advisory" ? advisoryName(finding, id) : id === "vulnerable" ? of === 1 ? "the advisory" : "the advisories" : id}: ${row.at_least ? "at least " : ""}${row.total}, ${row.verdict}`;
 		if (kind === "advisory" && tied && row.total === score.total) text += " (tied: the others weigh the same)";
 		const [revealed] = row.revealed;
 		if (revealed) text += ` (${revealed.flag} would show${revealed.role === "accepted" ? ", accepted" : ""})`;
 		else if (row.lead && row.lead !== finding.lead) text += ` (${row.lead} would lead)`;
 		return text;
-	}
-	function afterMoveLines(finding, score) {
-		const move = finding.next_step;
-		const applied = move?.if_applied;
-		if (!move || !applied) return [];
-		const counted = new Set(score.terms.map((t) => t.flag));
-		const noNewAdvisories = applied.assumes.includes("no_new_advisories");
-		const conditions = [
-			...move.adds.length > 0 ? [`adds ${move.adds.map((a) => a.id).join(" and ")}`] : [],
-			...move.unverified.filter((u) => u.kind === "flag" && !counted.has(u.id)).map((u) => `${u.id} not checked`),
-			...applied.assumes.includes("composer_resolves") ? ["if Composer resolves it"] : [],
-			...noNewAdvisories ? ["advisories on its new versions not checked"] : []
-		];
-		return [`after the move: ${applied.at_most ? noNewAdvisories ? "at most, from the facts it checked, " : "at most " : ""}${applied.total}, ${applied.verdict}` + (conditions.length > 0 ? ` (${conditions.join("; ")})` : "")];
 	}
 	function partialLines(finding) {
 		const partial = isSecurityVulnerable(finding.security) ? finding.security.partial : null;
@@ -9458,7 +10730,6 @@ a.legend-btn,
 			...tagged("not-judged", notJudged ? [notJudgedLine(finding)] : []),
 			...tagged("opening", [openingLine(finding, score, run)]),
 			...tagged("counterfactuals", counterfactuals.length > 0 ? [counterfactuals.join(" · ")] : []),
-			...tagged("after-the-move", afterMoveLines(finding, score)),
 			...tagged("partial", partialLines(finding)),
 			...tagged("checks-missing", checksMissingLines(finding, run)),
 			...tagged("checks-skipped", checksSkippedLines(finding, { metadataSaid: notJudged })),
@@ -9718,7 +10989,7 @@ a.legend-btn,
 	//#endregion
 	//#region src/ui/report/ScoreWhy.tsx
 	var WHY_KEY = "why-arithmetic";
-	var LEVEL_0 = new Set(["opening", "after-the-move"]);
+	var LEVEL_0 = new Set(["opening"]);
 	var at = (name, x) => ({ [name]: `${x}%` });
 	function Bar({ finding, report }) {
 		const { score } = finding;
@@ -9835,63 +11106,256 @@ a.legend-btn,
 	}
 	//#endregion
 	//#region src/ui/report/SecurityRow.tsx
-	var RUNGS_KEY = "security-rungs";
-	function Rung({ rung, move, hidden, run }) {
+	var severityTag = (run, severity) => u$1("span", {
+		className: `tag ${toneClass(gradeTone(advisoryBand(run, severity)))}`,
+		children: severity
+	});
+	var withBreaks = (parts) => parts.map((part, i) => u$1(S, { children: [i > 0 && u$1("wbr", {}), part] }, i));
+	function Affects({ affects }) {
+		const [open, setOpen] = d(false);
+		const id = `${g()}-range`;
+		if (affects.folded === null) return u$1("span", {
+			className: "d3-adv-affects",
+			children: [SECURITY_WORDS.affects, u$1("code", {
+				className: "d3-adv-range",
+				children: withBreaks(affects.parts)
+			})]
+		});
+		return u$1(S, { children: [u$1("span", {
+			className: "d3-adv-affects is-folded",
+			children: [SECURITY_WORDS.affects, u$1(DisclosureButton, {
+				className: "d3-range-btn",
+				label: affects.folded,
+				open,
+				controls: id,
+				onToggle: () => {
+					setOpen(!open);
+				}
+			})]
+		}), u$1("code", {
+			className: "d3-adv-range is-lines",
+			id,
+			hidden: !open,
+			children: affects.parts.map((part, i) => u$1("span", {
+				className: "d3-range-alt",
+				children: part
+			}, i))
+		})] });
+	}
+	function AdvisoryRow({ row, rowId, at, run, withTag, reveal }) {
+		const { sameAs } = row;
 		return u$1("li", {
-			className: move ? "d2-rung is-move" : "d2-rung",
-			hidden,
+			className: "d3-adv",
+			id: rowId(at),
+			children: [u$1("div", {
+				className: "d3-adv-head",
+				children: [
+					withTag && u$1(S, { children: [severityTag(run, row.severity), " "] }),
+					row.href === null ? u$1("span", {
+						className: "d3-adv-id",
+						children: row.name
+					}) : u$1("a", {
+						className: "lnk d3-adv-id",
+						href: row.href,
+						target: "_blank",
+						rel: "noopener noreferrer",
+						"aria-label": row.linkName,
+						children: row.name
+					}),
+					row.source !== null && u$1(S, { children: [" ", u$1("span", {
+						className: "d3-adv-src",
+						children: row.source
+					})] }),
+					row.deciding && u$1(S, { children: [" ", u$1("span", {
+						className: "d3-rung-mark",
+						children: SECURITY_WORDS.deciding
+					})] })
+				]
+			}), u$1("div", {
+				className: "d3-adv-meta",
+				children: [
+					u$1("span", {
+						className: "d3-adv-fix",
+						children: row.fix
+					}),
+					row.affects !== null && u$1(S, { children: [u$1("span", {
+						className: "d3-adv-sep",
+						children: SECURITY_WORDS.separator
+					}), u$1(Affects, { affects: row.affects })] }),
+					sameAs !== null && u$1("span", {
+						className: "d3-adv-same",
+						children: [SECURITY_WORDS.sameAs, u$1("a", {
+							className: "lnk",
+							href: `#${rowId(sameAs.at)}`,
+							onClick: (event) => {
+								reveal(sameAs.at);
+								jumpTo(event, rowId(sameAs.at));
+							},
+							children: sameAs.id
+						})]
+					})
+				]
+			})]
+		});
+	}
+	function Rung({ rung, run }) {
+		return u$1("li", {
+			className: rung.move ? "d2-rung is-move" : "d2-rung",
 			"data-branch": rung.branch,
 			children: [
-				u$1("span", {
-					className: "d2-rung-branch",
-					children: rung.branch
-				}),
-				" ",
-				u$1("span", {
-					className: "d2-rung-clause",
+				u$1("div", {
+					className: "d3-rung-head",
 					children: [
-						rung.clause,
-						rung.after !== null && u$1(S, { children: ["; ", u$1("span", {
-							className: `d2-after ${toneClass(verdictTone(run.score_model, rung.afterVerdict ?? ""))}`,
-							children: rung.after
-						})] }),
-						")"
+						u$1("span", {
+							className: "d2-rung-branch",
+							children: rung.branch
+						}),
+						rung.marks.map((mark) => u$1(S, { children: [" ", u$1("span", {
+							className: mark === "the move" ? "d3-rung-mark is-move" : "d3-rung-mark",
+							children: mark
+						})] }, mark)),
+						" ",
+						rung.clears
 					]
+				}),
+				u$1("div", {
+					className: "d3-rung-line",
+					children: rung.kind
+				}),
+				rung.after !== null && u$1("div", {
+					className: "d3-rung-line",
+					children: u$1("span", {
+						className: `d2-after ${toneClass(verdictTone(run.score_model, rung.afterVerdict ?? ""))}`,
+						children: rung.after
+					})
 				})
 			]
 		});
 	}
-	function SecurityRow2({ finding, run, metadata }) {
-		const disclosure = useDisclosure(RUNGS_KEY);
-		const listId = `${g()}-rungs`;
-		const { summary, rungs, ignored } = securityRow(finding, run, metadata);
-		const moveBranch = finding.next_step?.to_branch ?? null;
-		const rest = rungs.slice(1);
+	function SecurityRow2({ finding, run, metadata, id }) {
+		const block = securityBlock$1(finding, run, metadata);
+		const [openGroups, setOpenGroups] = d(() => block.groups.flatMap((group, i) => group.open ? [i] : []));
+		const rowId = (at) => `${id}-adv-${at}`;
+		const groupId = (i) => `${id}-sev-${i}`;
+		const openGroup = (i) => {
+			setOpenGroups((open) => open.includes(i) ? open : [...open, i]);
+		};
+		const toggleGroup = (i) => {
+			setOpenGroups((open) => open.includes(i) ? open.filter((g) => g !== i) : [...open, i]);
+		};
+		const groupOf = (at) => block.groups.findIndex((group) => group.rows.includes(at));
+		const reveal = (at) => {
+			const group = groupOf(at);
+			if (group >= 0) openGroup(group);
+		};
+		const grouped = block.groups.length > 0;
+		const row = (at) => {
+			const item = block.rows[at];
+			return item !== void 0 && u$1(AdvisoryRow, {
+				row: item,
+				rowId,
+				at,
+				run,
+				withTag: !grouped,
+				reveal
+			}, at);
+		};
 		return u$1(S, { children: [
-			u$1("p", {
-				className: "d2-row-text",
-				children: summary
+			u$1("ul", {
+				className: "d3-lines",
+				children: [
+					u$1("li", { children: [block.head, block.counts.length > 0 && u$1("ul", {
+						className: "d3-sev-counts",
+						children: block.counts.map(({ severity, count }) => {
+							const group = block.groups.findIndex((g) => g.severity === severity);
+							const body = u$1(S, { children: [
+								severityTag(run, severity),
+								" ",
+								u$1("b", { children: count })
+							] });
+							return u$1("li", { children: group < 0 ? body : u$1("a", {
+								className: "lnk d3-sev-jump",
+								href: `#${groupId(group)}`,
+								"aria-label": showGroupName(count, severity),
+								onClick: (event) => {
+									openGroup(group);
+									jumpTo(event, groupId(group));
+								},
+								children: body
+							}) }, severity);
+						})
+					})] }),
+					block.lines.map((line) => u$1("li", { children: line }, line)),
+					block.meanwhile !== null && u$1("li", {
+						className: "d3-meanwhile",
+						children: u$1(RichText, { rich: block.meanwhile })
+					})
+				]
 			}),
-			ignored.length > 0 && u$1("ul", {
+			block.rows.length > 0 && u$1("div", {
+				className: grouped ? "d3-advs is-grouped" : "d3-advs",
+				children: [u$1("p", {
+					className: "d3-adv-cap",
+					children: [block.caption[0], block.caption[1] !== void 0 && u$1("span", {
+						className: "d3-q-line",
+						children: block.caption[1]
+					})]
+				}), grouped ? block.groups.map((group, i) => {
+					const open = openGroups.includes(i);
+					const listId = `${groupId(i)}-rows`;
+					return u$1("div", {
+						className: "d3-sev-group",
+						children: [u$1("h4", {
+							className: "d3-sev-head",
+							id: groupId(i),
+							children: u$1("button", {
+								type: "button",
+								className: "d3-sev-btn",
+								"aria-expanded": open,
+								"aria-controls": listId,
+								onClick: () => {
+									toggleGroup(i);
+								},
+								children: [
+									severityTag(run, group.severity),
+									u$1("b", {
+										className: "d3-sev-n",
+										children: group.count
+									}),
+									u$1("span", {
+										className: "d3-sev-word",
+										children: group.words
+									}),
+									u$1("span", {
+										className: "l1-mark",
+										"aria-hidden": "true"
+									})
+								]
+							})
+						}), u$1("ul", {
+							className: "d3-adv-list",
+							id: listId,
+							hidden: !open,
+							children: group.rows.map(row)
+						})]
+					}, group.severity);
+				}) : u$1("ul", {
+					className: "d3-adv-list",
+					"aria-label": advisoriesName(block.rows.length),
+					children: block.rows.map((_, at) => row(at))
+				})]
+			}),
+			block.ignored.length > 0 && u$1("ul", {
 				className: "d2-ignored",
-				children: ignored.map((line) => u$1("li", { children: line }, line))
+				children: block.ignored.map((line) => u$1("li", { children: line }, line))
 			}),
-			rungs.length > 0 && u$1("ol", {
+			block.ladder.length > 0 && u$1("ol", {
 				className: "d2-ladder",
-				id: listId,
-				children: rungs.map((rung, i) => u$1(Rung, {
+				"aria-label": waysOut(block.ladder.length),
+				children: block.ladder.map((rung) => u$1(Rung, {
 					rung,
-					move: rung.branch === moveBranch,
-					hidden: i > 0 && !disclosure.open,
 					run
 				}, rung.branch))
-			}),
-			rest.length > 0 && !disclosure.printed && u$1(DisclosureButton, {
-				className: "d2-more",
-				label: disclosure.open ? DETAIL_WORDS.firstWayOnly : moreWaysOut(rest),
-				open: disclosure.open,
-				controls: listId,
-				onToggle: disclosure.toggle
 			})
 		] });
 	}
@@ -9901,10 +11365,389 @@ a.legend-btn,
 		return useReport().model;
 	}
 	//#endregion
+	//#region src/domain/verdictBlock.ts
+	var JUMP_TO_BRANCHES = "See Release branches";
+	function sheetContext(finding, metadata) {
+		const rows = metadata?.branches ?? [];
+		const move = finding.next_step;
+		return {
+			hasBranchRows: rows.length > 0,
+			higherRelease: (branch) => rows.find((r) => r.branch === branch)?.highest ?? null,
+			installedRung: securityRungs(finding, metadata).some((r) => r.installed),
+			replacementInMove: move?.kind === "replace" && finding.replacement !== null && safeHref(move.replacement?.url) !== null && move.replacement?.package === finding.replacement
+		};
+	}
+	var reading = (flag, text, rest = {}) => ({
+		flag,
+		count: null,
+		advisory: null,
+		after: null,
+		jump: null,
+		text,
+		...rest
+	});
+	function severityPhrase(run, severity, beforeVerb) {
+		const as = countsAs(run, severity);
+		if (as) return beforeVerb ? `an ${severity} advisory, counted as ${as},` : `an ${severity} one, counted as ${as}`;
+		return beforeVerb ? `a ${severity}-severity advisory` : `a ${severity} one`;
+	}
+	var CLASS_CLAUSES = vocabTable({
+		"raise-php": ", by a release that needs a php floor raise",
+		blocked: ", by a release your target does not run",
+		update: ""
+	});
+	function branchFixWords(finding, n, rungSays) {
+		const fixes = isSecurityVulnerable(finding.security) ? finding.security.installed_branch_fixes : null;
+		const branch = finding.branch;
+		if (!fixes || branch === null) return null;
+		const { fixed, unknown, of, fix_kind: kind } = fixes;
+		const notKnown = unknown > 0 ? `; ${unknown} not known` : "";
+		if (unknown === of) return `It is not known whether ${n === 1 ? "it is" : "they are"} fixed on ${branch}`;
+		if (fixed === 0) return `${n === 1 ? "It is not" : "None is"} fixed on ${branch}${notKnown}`;
+		if (rungSays) return null;
+		const clause = kind === null ? "" : CLASS_CLAUSES[kind] ?? ` (${fixLabel(kind)})`;
+		if (fixed === of) return `${n === 1 ? "It is" : "All are"} fixed on ${branch}${clause}`;
+		return `${fixed} of ${of} ${isAre(fixed)} fixed on ${branch}${clause}${notKnown}`;
+	}
+	function abandonedReading(finding, flag, ctx) {
+		const reasons = flag.degree && "reasons" in flag.degree ? flag.degree.reasons : [];
+		const marking = signalData(finding, "S1");
+		const bits = [];
+		if (reasons.includes("marked")) bits.push(`it is marked abandoned ${marking?.marked_by === "lock" ? "in composer.lock" : "by its registry"}`);
+		if (reasons.includes("archived")) bits.push(`its repository is archived on ${forgeWord(finding.activity.forge ?? finding.activity.host ?? "")}`);
+		const suggestion = marking?.replacement ?? null;
+		const tail = finding.replacement !== null ? ctx.replacementInMove ? "" : `. It names ${finding.replacement} as its replacement` : suggestion ? `. It suggests "${suggestion}", which names no package` : ". No replacement is named";
+		return reading(flag.id, capitalize(bits.join(" and ")) + tail);
+	}
+	function leftBehindReading(finding, flag, ctx) {
+		const s8 = signalData(finding, "S8");
+		if (!s8) return reading(flag.id, flag.summary);
+		const reached = s8.reachable_branch !== null;
+		const [branch, version, years] = reached ? [
+			s8.reachable_branch,
+			s8.reachable_version,
+			s8.reachable_years
+		] : [
+			s8.newest_branch,
+			s8.newest_version,
+			s8.newest_years
+		];
+		const higher = `${branch} released ${version ?? ""}${years === null ? "" : ` ${ago(years)}`}`;
+		if (ctx.hasBranchRows) {
+			const value = flag.headline.value;
+			const own = typeof value === "number" ? value : s8.years;
+			const tail = branch !== null && ctx.higherRelease(branch) === version ? `, behind ${branch}` : `, while ${higher}`;
+			return reading(flag.id, `Its branch, ${s8.branch}, had its last release ${ago(own)}${tail}`, { jump: JUMP_TO_BRANCHES });
+		}
+		const head = `Branch ${s8.branch} had its last release ${ago(s8.years)}`;
+		if (reached) return reading(flag.id, `${head}, while ${higher}`);
+		const php = s8.newest_php === null ? "" : ` and needs php ${s8.newest_php}`;
+		return reading(flag.id, `${head}; the newest branch, ${s8.newest_branch}, released ${s8.newest_version} ${ago(s8.newest_years)}${php}`);
+	}
+	function vulnerableReading(finding, flag, run, ctx) {
+		const score = isScoreGraded(finding.score) ? finding.score : null;
+		const term = score?.terms.find(isTermSecurity);
+		const deciding = advisoryRows(finding).find((row) => row.deciding);
+		if (!score || !term || !deciding || !isSecurityVulnerable(finding.security)) return reading(flag.id, flag.summary);
+		const n = score.parts.security.of;
+		const worst = term.severity === finding.security.worst ? "worst" : "highest-scoring";
+		return reading(flag.id, n === 1 ? `${capitalize(severityPhrase(run, term.severity, true))} affects your version` : ` affect your version. The ${worst} is ${severityPhrase(run, term.severity, false)}`, {
+			count: n === 1 ? null : `${n} advisories`,
+			advisory: {
+				name: deciding.cve ?? deciding.id,
+				title: deciding.title,
+				href: safeHref(deciding.link)
+			},
+			after: branchFixWords(finding, n, ctx.installedRung)
+		});
+	}
+	function flagReading(finding, flag, run, ctx) {
+		const { id, summary } = flag;
+		switch (flag.id) {
+			case "abandoned": return abandonedReading(finding, flag, ctx);
+			case "silent": {
+				const s2 = signalData(finding, "S2");
+				const s4 = signalData(finding, "S4");
+				const released = s2?.years ?? finding.age.release?.years ?? null;
+				const pushed = s4?.years ?? finding.age.push?.years ?? null;
+				const event = s4?.event ?? finding.activity.event ?? "push";
+				return reading(flag.id, `Nothing has been released for ${oneDecimal(released)} years and there has been no ${event} for ${oneDecimal(pushed)} years`);
+			}
+			case "stale": {
+				const value = typeof flag.headline.value === "number" ? flag.headline.value : null;
+				const text = flag.headline.source === "release" ? `Nothing has been released for ${oneDecimal(value)} years` : `There has been no ${finding.activity.event ?? "push"} for ${oneDecimal(value)} years`;
+				return reading(flag.id, !flag.degree.liveness_complete ? `${text} (read from releases only)` : text);
+			}
+			case "pinned": {
+				const pin = signalData(finding, "S6");
+				return reading(flag.id, pin?.reason === "branch_snapshot" ? `It is pinned to the branch snapshot ${pin.version}` : `It is installed as ${pin?.version ?? finding.version}, not a tagged release`);
+			}
+			case "left-behind": return leftBehindReading(finding, flag, ctx);
+			case "old-promise": {
+				const s5 = signalData(finding, "S5");
+				return reading(flag.id, `It was written for PHP ${s5?.written_for_php ?? ""} and admits ${s5?.target_php ?? run.target_php} untested`);
+			}
+			case "vulnerable": return vulnerableReading(finding, flag, run, ctx);
+			default: return reading(id, summary);
+		}
+	}
+	function readingRich(r, withJump = true) {
+		const advisory = r.advisory;
+		return [
+			...r.count === null ? [] : [{
+				jump: "security",
+				text: r.count
+			}],
+			r.text,
+			...advisory === null ? [] : [
+				" (",
+				advisory.href === null ? advisory.name : {
+					href: advisory.href,
+					text: advisory.name,
+					name: newTab(advisory.name)
+				},
+				advisory.title === null ? ")" : `: ${advisory.title})`
+			],
+			...r.after === null ? [] : [`. ${r.after}`],
+			...r.jump !== null && withJump ? [{
+				jump: "branches",
+				text: r.jump,
+				lead: ". "
+			}] : [],
+			"."
+		];
+	}
+	function countedFlags(finding, score) {
+		const ids = countedFlagIds(finding);
+		const counted = finding.flags.filter((f) => ids.includes(f.id));
+		return score.decided_by === "security" ? [...counted.filter((f) => f.role === "security"), ...counted.filter((f) => f.role !== "security")] : counted;
+	}
+	function opening(finding, score, run) {
+		const verdict = capitalize(finding.verdict);
+		const m = score.parts.maintenance.alone.verdict;
+		const s = score.parts.security.alone.verdict;
+		const q = printedModifiers(score.modifiers).map((mod) => mod.applies_to === "maintenance" ? "maintenance halved for reach" : "both halved for packages-dev");
+		const qualifier = q.length > 0 ? ` (${q.join("; ")})` : "";
+		const flagsOf = (part) => joinAnd(score.terms.filter((t) => t.part === part).map((t) => t.flag));
+		const named = (word, part) => flagsOf(part) ? `${word} (${flagsOf(part)})` : word;
+		const maintenance = named("its maintenance", "maintenance");
+		const advisory = named(score.parts.security.of === 1 ? "its advisory" : "its advisories", "security");
+		switch (score.decided_by) {
+			case "maintenance":
+			case "security": return {
+				head: `${verdict}:`,
+				inline: true
+			};
+			case "combination": return {
+				head: `${verdict}: ${m === s ? `two ${grade(m ?? "")} risks at once` : `a ${grade(m ?? "")} and a ${grade(s ?? "")} risk at once`}${qualifier}, ${maintenance} and ${advisory}.`,
+				inline: false
+			};
+			case "either": return {
+				head: `${verdict} twice over: ${maintenance} alone and ${advisory} alone each make it ${finding.verdict}${qualifier}.`,
+				inline: false
+			};
+			default: {
+				const lowest = run.graded_verdicts.at(-1) ?? "";
+				const alone = (part, g) => g ? `${part} alone grades it ${g}` : `${part} alone counts below ${lowest}`;
+				return {
+					head: `${verdict} at ${score.total}: ${alone(named("maintenance", "maintenance"), m)}, ${alone(named("the advisory part", "security"), s)}.`,
+					inline: false
+				};
+			}
+		}
+	}
+	function verdictBlock(finding, run, metadata) {
+		const score = isScoreGraded(finding.score) ? finding.score : null;
+		if (score === null) return {
+			grade: `${capitalize(finding.verdict)}:`,
+			opening: " nothing counts.",
+			inline: null,
+			readings: []
+		};
+		const { head, inline } = opening(finding, score, run);
+		const ctx = sheetContext(finding, metadata);
+		const flags = countedFlags(finding, score).map((flag) => flagReading(finding, flag, run, ctx));
+		const colon = head.indexOf(":") + 1;
+		const [first, ...rest] = flags;
+		if (inline && first !== void 0) return {
+			grade: head,
+			opening: " ",
+			inline: first.count === null ? {
+				...first,
+				text: lowerFirst(first.text)
+			} : first,
+			readings: rest
+		};
+		return {
+			grade: head.slice(0, colon),
+			opening: head.slice(colon),
+			inline: null,
+			readings: flags
+		};
+	}
+	//#endregion
+	//#region src/ui/report/VerdictBlock.tsx
+	var Name$1 = ({ name }) => u$1("span", {
+		className: "d3-name",
+		children: name
+	});
+	function Names({ names }) {
+		const [open, setOpen] = d(false);
+		const listId = `${g()}-names`;
+		const shown = names.length <= 4 ? names.length : 3;
+		const rest = names.length - shown;
+		return u$1(S, { children: [u$1("ul", {
+			className: "d3-namelist",
+			id: listId,
+			children: names.map((name, i) => u$1("li", {
+				hidden: i >= shown && !open,
+				children: u$1(Name$1, { name })
+			}, name))
+		}), rest > 0 && u$1(DisclosureButton, {
+			label: open ? DETAIL_WORDS.showFewer : DETAIL_WORDS.more.replace("{n}", String(rest)),
+			open,
+			controls: listId,
+			onToggle: () => {
+				setOpen(!open);
+			}
+		})] });
+	}
+	function Reach({ reach }) {
+		const [only] = reach.names;
+		return u$1(S, { children: [
+			u$1("span", {
+				className: "d3-q-line",
+				children: reach.where
+			}),
+			reach.before !== null && u$1("span", {
+				className: "d3-q-line",
+				children: reach.before
+			}),
+			u$1("span", {
+				className: "d3-q-line",
+				children: [reach.how, reach.names.length === 1 && only !== void 0 && u$1(Name$1, { name: only })]
+			}),
+			reach.names.length > 1 && u$1(Names, { names: reach.names }),
+			reach.halving.map((line) => u$1("span", {
+				className: "d3-q-sub",
+				children: line
+			}, line))
+		] });
+	}
+	var Lines = ({ lines }) => u$1(S, { children: lines.map((line) => u$1("span", {
+		className: "d3-q-line",
+		children: line
+	}, line)) });
+	function QualifierRows({ q }) {
+		const { gate, accepted } = q;
+		return u$1("dl", {
+			className: "d3-qualifiers",
+			children: [
+				q.reach === null ? null : [DETAIL_WORDS.reach, u$1(Reach, { reach: q.reach })],
+				q.origin === null ? null : [DETAIL_WORDS.origin, q.origin],
+				q.notJudged === null ? null : [DETAIL_WORDS.notJudged, q.notJudged],
+				q.unchecked.length === 0 ? null : [DETAIL_WORDS.unchecked, u$1(Lines, { lines: q.unchecked })],
+				q.notRun.length === 0 ? null : [DETAIL_WORDS.notRun, u$1(Lines, { lines: q.notRun })],
+				q.php === null ? null : [DETAIL_WORDS.php, q.php],
+				accepted === null ? null : [DETAIL_WORDS.accepted, u$1(S, { children: [
+					accepted.head,
+					u$1("span", {
+						className: "d3-q-sub",
+						children: accepted.reason
+					}),
+					accepted.entry !== null && u$1("span", {
+						className: "d3-q-sub",
+						children: u$1(RichText, { rich: accepted.entry })
+					})
+				] })],
+				[DETAIL_WORDS.gate, u$1(S, { children: [
+					gate.word !== "" && u$1("b", {
+						className: `d3-gate is-${gate.state}`,
+						children: gate.word
+					}),
+					gate.rest,
+					gate.tripped !== null && u$1("span", {
+						className: "d3-q-sub",
+						children: gate.tripped
+					})
+				] })]
+			].map((row) => row !== null && u$1("div", {
+				className: "d3-q",
+				children: [u$1("dt", { children: row[0] }), u$1("dd", { children: row[1] })]
+			}, row[0]))
+		});
+	}
+	function VerdictBlock({ finding, run, metadata, generatedAt, jumps }) {
+		const id = `${g()}-verdict`;
+		const block = verdictBlock(finding, run, metadata);
+		const inline = block.inline;
+		return u$1("section", {
+			className: `d3-verdict ${toneClass(verdictTone(run.score_model, finding.verdict))}`,
+			"aria-labelledby": id,
+			children: [
+				u$1("h3", {
+					className: "vh",
+					id,
+					children: DETAIL_WORDS.verdict
+				}),
+				u$1("p", {
+					className: "d2-asof",
+					children: agesAsOf(generatedAt)
+				}),
+				u$1("p", {
+					className: "d3-verdict-line",
+					children: [
+						u$1("strong", {
+							className: "d3-grade",
+							children: block.grade
+						}),
+						block.opening,
+						inline !== null && u$1("span", {
+							className: "d3-inline",
+							children: u$1(RichText, {
+								rich: readingRich(inline, false),
+								jumps
+							})
+						})
+					]
+				}),
+				inline?.jump != null && jumps.branches !== void 0 && u$1("p", {
+					className: "d3-verdict-jump d3-jump",
+					children: u$1("a", {
+						className: "lnk",
+						href: `#${jumps.branches}`,
+						onClick: (event) => {
+							if (jumps.branches !== void 0) jumpTo(event, jumps.branches);
+						},
+						children: inline.jump
+					})
+				}),
+				block.readings.length > 0 && u$1("ul", {
+					className: "d3-readings",
+					"aria-label": DETAIL_WORDS.otherFlags,
+					children: block.readings.map((reading) => u$1("li", {
+						className: "d3-reading",
+						children: [u$1("span", {
+							className: "d3-reading-flag",
+							children: reading.flag
+						}), u$1("p", {
+							className: "d3-reading-text",
+							children: u$1(RichText, {
+								rich: readingRich(reading),
+								jumps
+							})
+						})]
+					}, reading.flag))
+				}),
+				u$1(QualifierRows, { q: qualifiers(finding, run) })
+			]
+		});
+	}
+	//#endregion
 	//#region src/ui/report/Detail.tsx
-	function Row({ label, children, id }) {
+	function Row({ label, children, id, wide = false }) {
 		return u$1("div", {
-			className: "d2-row",
+			className: wide ? "d2-row d3-row-wide" : "d2-row",
 			id,
 			children: [u$1("h3", {
 				className: "d2-row-label",
@@ -10003,21 +11846,54 @@ a.legend-btn,
 			}), u$1(KeyValue, { rows })]
 		});
 	}
+	function usePrintOpen(root) {
+		h(() => {
+			const was = new Map();
+			const open = () => {
+				for (const details of root.current?.querySelectorAll("details") ?? []) {
+					was.set(details, details.open);
+					details.open = true;
+				}
+			};
+			const restore = () => {
+				for (const [details, isOpen] of was) details.open = isOpen;
+				was.clear();
+			};
+			window.addEventListener("beforeprint", open);
+			window.addEventListener("afterprint", restore);
+			return () => {
+				window.removeEventListener("beforeprint", open);
+				window.removeEventListener("afterprint", restore);
+			};
+		}, [root]);
+	}
 	function Sheet({ finding, onClose }) {
 		const { state, dispatch } = useReport();
 		const { report, details } = useReport2();
 		const closeRef = A(null);
-		const branchesId = `${g()}-branches`;
+		const sheetRef = A(null);
+		usePrintOpen(sheetRef);
+		const base = g();
+		const branchesId = `${base}-branches`;
+		const securityId = `${base}-security`;
 		const entry = details[finding.package] ?? null;
 		const metadata = entry?.metadata ?? null;
 		const { run } = report;
 		const feeds = feedsLine(finding);
-		const branches = branchesLine(finding, metadata);
-		const age = ageLine(finding, metadata);
-		const notRead = ageNotRead(finding, metadata);
+		const lead = branchesLead(finding, metadata);
+		const age = ageRows(finding, metadata);
 		const baseline = baselineSuffix(finding, run);
+		const cards = moveCards(finding, run);
+		const hasAdvisories = advisoryRows(finding).length > 0;
+		const jumps = {
+			...lead.length > 0 ? { branches: branchesId } : {},
+			...hasAdvisories ? { security: securityId } : {}
+		};
+		const reach = finding.flags.length === 0 ? detailReach(finding, run) : null;
+		const links = headerLinks(finding, entry?.repository_link ?? null);
 		return u$1("aside", {
-			className: "detail d2",
+			ref: sheetRef,
+			className: "detail d2 d3",
 			role: "complementary",
 			"aria-label": finding.package,
 			"data-surface": "detail",
@@ -10062,8 +11938,15 @@ a.legend-btn,
 								hideAccepted: state.filters.accepted.includes(HIDE_ACCEPTED)
 							})
 						}), u$1("span", {
-							className: "d2-reach",
-							children: detailReach(finding)
+							className: "d2-meta",
+							children: [reach !== null && u$1("span", {
+								className: "d2-reach",
+								children: reach
+							}), links.map((link, i) => u$1(S, { children: [(reach !== null || i > 0) && " · ", u$1(OutLink, {
+								href: link.href,
+								label: link.name,
+								children: link.text
+							})] }, link.href))]
 						})]
 					}),
 					hiddenByFilters2(report, state, finding.package) && u$1("p", {
@@ -10080,22 +11963,19 @@ a.legend-btn,
 					})
 				]
 			}), u$1("div", {
-				className: "detail-body d2-body",
+				className: "detail-body d2-body d3-body",
 				children: [
-					u$1("div", {
-						className: "d2-lead",
-						children: [
-							u$1("p", {
-								className: "d2-asof",
-								children: agesAsOf(report.generated_at)
-							}),
-							u$1("p", {
-								className: "d2-answer",
-								children: answerText(finding, run)
-							}),
-							u$1(CopyMove, { argvs: finding.next_step?.commands ?? [] }, finding.package)
-						]
+					u$1(VerdictBlock, {
+						finding,
+						run,
+						metadata,
+						generatedAt: report.generated_at,
+						jumps
 					}),
+					cards.map((card, i) => u$1(S, { children: [u$1(MoveCard, {
+						card,
+						run
+					}), card.heldBy !== null && u$1(HeldBy, { block: card.heldBy })] }, i)),
 					u$1(ScoreWhy, {
 						finding,
 						report
@@ -10105,17 +11985,20 @@ a.legend-btn,
 						children: [
 							u$1(Row, {
 								label: DETAIL_WORDS.checks,
-								children: u$1("p", {
-									className: "d2-row-text",
-									children: checksLine(finding, run)
+								children: u$1("ul", {
+									className: "d3-lines",
+									children: checksItems(finding, run).map((item) => u$1("li", { children: item }, item))
 								})
 							}),
 							u$1(Row, {
 								label: DETAIL_WORDS.security,
+								id: securityId,
+								wide: hasAdvisories,
 								children: u$1(SecurityRow2, {
 									finding,
 									run,
-									metadata
+									metadata,
+									id: securityId
 								})
 							}),
 							feeds !== null && u$1(Row, {
@@ -10125,7 +12008,7 @@ a.legend-btn,
 									children: feeds
 								})
 							}),
-							branches !== null && u$1("section", {
+							lead.length > 0 && u$1("section", {
 								className: "d2-branches",
 								"aria-labelledby": `${branchesId}-head`,
 								children: [
@@ -10135,26 +12018,28 @@ a.legend-btn,
 										children: DETAIL_WORDS.branches
 									}),
 									u$1("p", {
-										className: "d2-branches-line",
+										className: "d2-branches-line d3-branches-lead",
 										id: branchesId,
-										children: branches
+										children: lead.join(" ")
 									}),
 									u$1(BranchTimeline2, {
 										finding,
 										metadata,
 										run,
-										summaryId: branchesId
+										summaryId: branchesId,
+										headId: `${branchesId}-head`
 									}, finding.package)
 								]
 							}),
-							age !== null && u$1(Row, {
+							age.length > 0 && u$1(Row, {
 								label: DETAIL_WORDS.age,
-								children: [u$1("p", {
-									className: "d2-row-text",
-									children: age
-								}), notRead.length > 0 && u$1("p", {
-									className: "d2-row-text d2-row-note",
-									children: notRead.join(" · ")
+								wide: true,
+								children: [u$1("dl", {
+									className: "d3-kv",
+									children: age.flatMap(({ label, value }) => label === null ? [] : [u$1("div", { children: [u$1("dt", { children: label }), u$1("dd", { children: value })] }, label)])
+								}), age.some(({ label }) => label === null) && u$1("ul", {
+									className: "d3-lines d2-row-note",
+									children: age.flatMap(({ label, value }) => label === null ? [u$1("li", { children: value }, value)] : [])
 								})]
 							}),
 							u$1(Row, {
@@ -10454,7 +12339,7 @@ a.legend-btn,
 		libyearsTop: `Furthest behind, top 8`,
 		package: "Package",
 		libyears: "Libyears",
-		grade: "Grade",
+		release: "Newest release",
 		overview: "Overview"
 	};
 	var findingsLink = (filters) => ({
@@ -10476,6 +12361,9 @@ a.legend-btn,
 			link: { view: "radius" }
 		};
 	}
+	function newestRelease({ version, age, origin }) {
+		return age.release === null ? causeWord(age.release_unmeasured ?? "", origin.kind) : `${version} → ${age.release.version} (${day(age.release.at)})`;
+	}
 	function libyearsTop(report) {
 		const graded = report.run.graded_verdicts;
 		return report.findings.flatMap((f) => f.libyears === null ? [] : [{
@@ -10485,7 +12373,7 @@ a.legend-btn,
 			package: f.package,
 			version: f.version,
 			libyears: `${f.libyears_at_least ? "≥ " : ""}${decimal(years, 1)}`,
-			grade: f.verdict,
+			release: newestRelease(f),
 			link: {
 				view: graded.includes(f.verdict) ? "findings" : "packages",
 				pkg: f.package
@@ -13357,7 +15245,6 @@ a.legend-btn,
 	function LibyearsTable({ report }) {
 		const rows = libyearsTop(report);
 		if (rows.length === 0) return null;
-		const model = report.run.score_model;
 		return u$1("table", {
 			className: "ov-ly",
 			children: [
@@ -13377,7 +15264,7 @@ a.legend-btn,
 					}),
 					u$1("th", {
 						scope: "col",
-						children: OVERVIEW_TAB_WORDS.grade
+						children: OVERVIEW_TAB_WORDS.release
 					})
 				] }) }),
 				u$1("tbody", { children: rows.map((row) => u$1("tr", { children: [
@@ -13397,10 +15284,10 @@ a.legend-btn,
 						className: "num",
 						children: row.libyears
 					}),
-					u$1("td", { children: u$1("span", {
-						className: `ov-ly-grade ${toneClass(verdictTone(model, row.grade))}`,
-						children: row.grade
-					}) })
+					u$1("td", {
+						className: "ov-ly-release",
+						children: row.release
+					})
 				] }, row.package)) })
 			]
 		});
@@ -15450,7 +17337,7 @@ a.legend-btn,
 	function parse(text) {
 		return parseBundle(text);
 	}
-	var version = "0.14.0-rc.2";
+	var version = "0.14.0-rc.3";
 	function autoboot() {
 		const dataEl = document.getElementById("lockrot-data");
 		const appEl = document.getElementById("lockrot-app");
