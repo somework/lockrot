@@ -1,7 +1,7 @@
 <options=bold>not flagged (1)</options=bold>
   scheb/2fa-google-authenticator v8.6.1  via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more  ·  ok
       0
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
 
 5 packages checked · nothing flagged
 libyears: the one package could not be measured

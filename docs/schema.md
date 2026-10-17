@@ -417,6 +417,12 @@ Every shape carries `check` (`complete`, `partial` or `not_run`), `records`, `fe
 advisory's `fix`: `{kind, to_branch, version, newest, on_installed_branch, php, held_by, reason}`
 ([Fix](verdicts.md#fix)).
 
+The root `security` holds `update_now`, the packages whose advisories `composer update` fixes, and
+`update_now_command`, their argv `["composer", "update", …]`. `update_now_command` is null when
+`update_now` is empty, and the `update now:` line is then hidden. In `jq`, read it as
+`.security.update_now_command // [] | join(" ")`, which gives an empty string when there is no
+command.
+
 ### Libyears
 
 lockrot derives the root `libyears` block from the findings' `libyears`:

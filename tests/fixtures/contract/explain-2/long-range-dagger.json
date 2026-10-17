@@ -300,7 +300,7 @@
             {
                 "id": "S9",
                 "level": "warn",
-                "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed by v1.43.0",
+                "summary": "1 security advisory affects v1.37.0 (CVE-2026-46644); fixed in v1.38.1",
                 "data": {
                     "advisories": [
                         {

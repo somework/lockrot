@@ -18,7 +18,7 @@ each flag's rule, its signals, and what you and the package's maintainer can do 
 | `medium` | The score is 8 to 15 | |
 | `low` | The score is 1 to 7 | |
 | `unknown` | The score is 0, no allowlist entry applies, and lockrot read no release metadata for the package | Nothing counts, but lockrot did not judge its release age (S2) or its release branch (S8). The run's [notes](notes.md) say what failed |
-| `finished` | The score is 0, and an allowlist entry applies to the package | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why |
+| `finished` | The score is 0, and an allowlist entry applies to the package | Nothing counts, and the [allowlist](configuration.md#the-allowlist) says why: the [built-in list](configuration.md#the-built-in-list), a package type or your own entry |
 | `ok` | The score is 0 | No flag counts |
 
 Verdict order, used by the grade values of [`--fail-on`](ci.md) and the report's sort order:
@@ -743,7 +743,7 @@ formats print only under `--all`, keeps its verdict and adds the same `checks mi
 | `repository_activity` | `host_not_supported` | The repository is on a host that lockrot cannot ask ([host note](notes.md#repository_activity_host_not_supported)) | S3, S4 |
 | `repository_activity` | `not_from_composer_repository` | The package comes from vcs, or from an origin that lockrot cannot tell: lockrot asks no host for it | S3, S4 |
 | `release_metadata` | `not_from_composer_repository` | The same origins: no Composer repository serves its releases | S2, S8 |
-| `release_dates` | `undated_releases` | The package's highest tag has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 and S8. S2 alone on a branch snapshot, which has no release branch |
+| `release_dates` | `undated_releases` | A release that S2 or S8 reads has no [trusted date](#dates-from-the-monorepo), and no monorepo parent dates it | S2 when the highest tag is undated. S8 when the installed branch's release is undated and a higher branch exists. S8 also when a higher branch's release is undated, the installed branch has no release for `release-warn-years`, and S8 did not fire. Never S8 on a branch snapshot, which has no release branch |
 | `advisories` | `offline`, `composer_too_old`, `install_time_budget`, `lookup_failed`, `no_feed` | The advisory lookup did not run, or ran in part ([Security advisories](#security-advisories)) | S9 |
 | `releases` | `releases_unknown` | A counted advisory's fix is unknown because the package's release data did not come | S9 |
 

@@ -333,7 +333,7 @@ high (15)
                    within reach
       pulls in 1 flagged package: pagerfanta/core
       (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   roots/wp-config 1.0.0  direct  ·  old-promise
       16 = old-promise 16 (baseline: new package)
       do: test it on PHP 8.4
@@ -587,7 +587,7 @@ not flagged (5)
   scheb/2fa-google-authenticator v8.6.1  via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more  ·  ok
       0
       gate 0 = min(0, 2 × 0) (the new facts bound it); new: 0
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
 
 45 packages checked · 40 flagged: critical 10 · high 15 ·
 medium 11 · low 4

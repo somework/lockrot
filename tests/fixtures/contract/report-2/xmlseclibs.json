@@ -1427,7 +1427,7 @@
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect 3.1.1 (CVE-2026-32313, CVE-2025-66578); fixed by 3.1.5",
+                    "summary": "2 security advisories affect 3.1.1 (CVE-2026-32313, CVE-2025-66578); fixed in 3.1.5",
                     "data": {
                         "advisories": [
                             {

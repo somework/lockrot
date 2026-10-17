@@ -2656,7 +2656,7 @@
                     {
                         "id": "S9",
                         "level": "high",
-                        "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed by 11.5.0",
+                        "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed in 11.4.3",
                         "data": {
                             "advisories": [
                                 {
@@ -7202,8 +7202,7 @@
                         "check": "release_dates",
                         "reason": "undated_releases",
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 ],
@@ -7312,21 +7311,19 @@
                     {
                         "id": "S10",
                         "level": "info",
-                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                         "data": {
                             "unchecked": [
                                 {
                                     "check": "release_dates",
                                     "reason": "undated_releases",
                                     "blocks": [
-                                        "S2",
-                                        "S8"
+                                        "S2"
                                     ]
                                 }
                             ],
                             "blocks": [
-                                "S2",
-                                "S8"
+                                "S2"
                             ]
                         }
                     }
@@ -8336,8 +8333,7 @@
                         "check": "release_dates",
                         "reason": "undated_releases",
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 ],
@@ -8472,21 +8468,19 @@
                     {
                         "id": "S10",
                         "level": "info",
-                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                         "data": {
                             "unchecked": [
                                 {
                                     "check": "release_dates",
                                     "reason": "undated_releases",
                                     "blocks": [
-                                        "S2",
-                                        "S8"
+                                        "S2"
                                     ]
                                 }
                             ],
                             "blocks": [
-                                "S2",
-                                "S8"
+                                "S2"
                             ]
                         }
                     }
@@ -8728,8 +8722,7 @@
                         "check": "release_dates",
                         "reason": "undated_releases",
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 ],
@@ -8838,21 +8831,19 @@
                     {
                         "id": "S10",
                         "level": "info",
-                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                         "data": {
                             "unchecked": [
                                 {
                                     "check": "release_dates",
                                     "reason": "undated_releases",
                                     "blocks": [
-                                        "S2",
-                                        "S8"
+                                        "S2"
                                     ]
                                 }
                             ],
                             "blocks": [
-                                "S2",
-                                "S8"
+                                "S2"
                             ]
                         }
                     }
@@ -16627,7 +16618,7 @@
                     {
                         "id": "S9",
                         "level": "warn",
-                        "summary": "1 security advisory affects 3.0.55 (CVE-2026-84308); fixed by 3.0.57",
+                        "summary": "1 security advisory affects 3.0.55 (CVE-2026-84308); fixed in 3.0.57",
                         "data": {
                             "advisories": [
                                 {
@@ -31702,8 +31693,7 @@
                         "check": "release_dates",
                         "reason": "undated_releases",
                         "blocks": [
-                            "S2",
-                            "S8"
+                            "S2"
                         ]
                     }
                 ],
@@ -31758,21 +31748,19 @@
                     {
                         "id": "S10",
                         "level": "info",
-                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+                        "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
                         "data": {
                             "unchecked": [
                                 {
                                     "check": "release_dates",
                                     "reason": "undated_releases",
                                     "blocks": [
-                                        "S2",
-                                        "S8"
+                                        "S2"
                                     ]
                                 }
                             ],
                             "blocks": [
-                                "S2",
-                                "S8"
+                                "S2"
                             ]
                         }
                     }

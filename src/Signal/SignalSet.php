@@ -53,7 +53,7 @@ final class SignalSet
             new PinnedRule(),
             new LeftBehindRule($clock, $thresholds, $floor),
             new AdvisoryRule(),
-            new NotCheckedRule(),
+            new NotCheckedRule(new LeftBehindRule($clock, $thresholds, $floor)),
         ], $floor);
         $set->thresholds = $thresholds;
         $set->targetMajorGa = $dates->gaDate(explode('.', PhpReleaseDates::minorOf($targetPhp))[0].'.0');

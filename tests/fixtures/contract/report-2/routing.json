@@ -1422,7 +1422,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "2 security advisories affect v4.4.41 (CVE-2026-48784, CVE-2026-45065); fixed by v8.1.8",
+                    "summary": "2 security advisories affect v4.4.41 (CVE-2026-48784, CVE-2026-45065); 1 fixed in v5.4.53, 1 fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {

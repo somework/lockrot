@@ -1263,7 +1263,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed by 2.0.6",
+                    "summary": "1 security advisory affects 2.0.5 (CVE-2025-54476); fixed in 3.0.5",
                     "data": {
                         "advisories": [
                             {

@@ -190,7 +190,7 @@ high (15)
       left-behind  branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1
                    above the project's php >=7.4; no releasing branch within reach
       pulls in 1 flagged package: pagerfanta/core (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   roots/wp-config 1.0.0  direct  ·  old-promise
       16 = old-promise 16
       do: test it on PHP 8.4
@@ -342,7 +342,7 @@ not flagged (5)
       abandoned marking ignored (policy.abandoned: doctrine/*): the annotations reader goes with the ORM 3 upgrade
   scheb/2fa-google-authenticator v8.6.1  via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more  ·  ok
       0
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
 
 45 packages checked · 40 flagged: critical 10 · high 15 · medium 11 · low 4
 flags: abandoned 7 · silent 1 · pinned 4 · left-behind 14 · old-promise 12 · stale 7 · vulnerable 15 ·

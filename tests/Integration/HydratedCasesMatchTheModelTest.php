@@ -191,9 +191,29 @@ final class HydratedCasesMatchTheModelTest extends TestCase
                 [['next_step.version'], self::MOVE_VERSION],
             ],
         ],
+        'ok-unchecked' => [
+            'qualifiers' => [
+                [['checks_missing[].blocks', 'gate.by[].facts[].id', 'gate.by[].facts[].kind'], self::NO_HIGHER_BRANCH],
+            ],
+            'why' => [
+                [['checks_missing[].blocks'], self::NO_HIGHER_BRANCH],
+            ],
+            'checks' => [
+                [['checks_missing[].blocks'], self::NO_HIGHER_BRANCH],
+            ],
+        ],
         'pagerfanta' => [
             'moves' => [
                 [['next_step.version'], self::MOVE_VERSION],
+            ],
+            'qualifiers' => [
+                [['checks_missing[].blocks'], self::UNDATED_BLOCKS],
+            ],
+            'why' => [
+                [['checks_missing[].blocks'], self::UNDATED_BLOCKS],
+            ],
+            'checks' => [
+                [['checks_missing[].blocks'], self::UNDATED_BLOCKS],
             ],
         ],
         'replace-graded' => [
@@ -347,6 +367,10 @@ final class HydratedCasesMatchTheModelTest extends TestCase
     private const FIX_VERSION = 'The model reads an advisory\'s fix version from its affected range, because the reports carry only each branch\'s newest tag. lockrot reads every release of the branch and names its lowest release outside the range.';
 
     private const PHP_STAR = 'The case sets the project\'s require.php to `*` (‡). The model keeps the holder\'s own step of case A, and lockrot judges the holder under the case\'s require.php, which admits its newest line.';
+
+    private const UNDATED_BLOCKS = 'The model lists S2 and S8 in the blocks of `release_dates` whenever the highest tag is undated. lockrot lists S8 only when an undated release leaves S8 undecided, and S8 fires on this case from dated releases.';
+
+    private const NO_HIGHER_BRANCH = 'The model lists S2 and S8 in the blocks of `release_dates` whenever the highest tag is undated. S8 compares the installed branch with a higher one, and this case has no branch above the installed one, so lockrot lists S2 alone.';
 
     private const INSTALLED_COMMIT = 'The model holds the date of a shared commit only for a branch\'s highest tag, so the hydrated lock gives the installed tag no date. lockrot then reads it as undated, not as dated by a commit its tags share.';
 

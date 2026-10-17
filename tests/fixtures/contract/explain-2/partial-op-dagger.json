@@ -466,7 +466,7 @@
             {
                 "id": "S9",
                 "level": "high",
-                "summary": "2 security advisories affect v2.4.5 (CVE-2026-00011, CVE-2026-00012); 1 fixed by v3.4.0, 1 fixed by v2.13.0",
+                "summary": "2 security advisories affect v2.4.5 (CVE-2026-00011, CVE-2026-00012); 1 fixed in v3.0.0, 1 fixed in v2.13.0",
                 "data": {
                     "advisories": [
                         {
