@@ -269,13 +269,32 @@ An allowlist entry accepts a package's maintenance flags. An accepted flag stays
 `accepted`, adds nothing to the score and reaches no gate. A package with nothing else that counts
 reads `finished`.
 
+### The built-in list {#the-built-in-list}
+
 The built-in allowlist,
 [`resources/finished-packages.json`](https://github.com/somework/lockrot/blob/main/resources/finished-packages.json),
-covers packages that are complete, such as `psr/*` and `symfony/polyfill-*`. Packages of
-Composer type `metapackage` or `symfony-pack` count as finished too. Each built-in entry accepts
-every maintenance flag.
+covers packages that are complete. Each built-in entry accepts every maintenance flag. The first
+entry that matches wins.
 
-To accept a dependency of your own, add it to `extra.lockrot.ignore`:
+| Pattern | Version | `allowlist.reason_id` |
+|---|---|---|
+| `psr/*` | any | `php-fig-interfaces` |
+| `fig/*` | any | `php-fig-utilities` |
+| `symfony/polyfill-php*` | any | `symfony-polyfills` |
+| `symfony/polyfill-*` | any | `symfony-extension-polyfills` |
+| `symfony/*-pack` | any | `symfony-packs` |
+| `ralouphie/getallheaders` | any | `getallheaders-polyfill` |
+| `paragonie/random_compat` | `9.99.100` | `random-compat-empty` |
+| `paragonie/random_compat` | `9.99.99` | `random-compat-empty` |
+
+Packages of Composer type `metapackage` or `symfony-pack` count as finished too. To propose an
+addition to the built-in list, see
+[Contributing a finished package](https://github.com/somework/lockrot/blob/main/CONTRIBUTING.md#contributing-a-finished-package).
+
+### Your own entries {#your-own-entries}
+
+To accept a dependency of your own, add it to `extra.lockrot.ignore`. lockrot reads these entries
+after the built-in list, so a package that the built-in list matches keeps the built-in entry:
 
 ```json
 {
@@ -307,9 +326,6 @@ To accept a dependency of your own, add it to `extra.lockrot.ignore`:
   shape, such as `"flags": "stale"`, is exit `2`.
 - A finding's `allowlist` says who accepted its flags: `builtin`, `project` or `type`, with the
   reason and the flags the entry lists.
-
-To propose an addition to the built-in list, see
-[Contributing a finished package](https://github.com/somework/lockrot/blob/main/CONTRIBUTING.md#contributing-a-finished-package).
 
 ### Composer's abandoned ignore list {#composer-abandoned-ignore}
 

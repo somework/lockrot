@@ -95,6 +95,25 @@ carries `User-Agent: lockrot`.
 `self-update` sends the same GitHub token to GitHub's release API
 ([Keeping it updated](phar.md#keeping-it-updated)).
 
+### What a token adds {#what-a-token-adds}
+
+Credentials for a repository host feed two signals only: S3 (archived) and S4 (last activity).
+
+- lockrot asks GitHub and Bitbucket about every package, not only the candidates.
+
+- GitLab answers with the archived flag, so S3 can fire.
+
+- The answers add evidence: the finding's `activity`, its S3 and its S4.
+
+- The S10 entries with `no_token` and `anonymous_budget` leave `checks_missing[]`.
+
+- A grade changes only through S3 and S4 ([Flags](verdicts.md#flags)).
+
+- S3 raises `abandoned`, and S4 counts toward `silent` and `stale`.
+
+S1, S2, S8 and S9 read the Composer repositories with Composer's own credentials, and S5 and S6
+read the lock. A host token changes none of them.
+
 ## Self-hosted GitLab {#self-hosted-gitlab}
 
 lockrot asks a self-hosted GitLab, such as Drupal's git.drupalcode.org, once Composer lists it:

@@ -8,6 +8,7 @@ use Lockrot\Allowlist\AllowlistEntry;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Tests\Support\CorpusFloor;
+use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Unit\Signal\FactsBuilder as F;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +24,24 @@ final class BuiltinAllowlistTest extends TestCase
             @unlink($path);
         }
         $this->tempPaths = [];
+    }
+
+    /** docs/configuration.md holds a copy of the list, so this test reads both. */
+    public function testTheDocsListEveryBuiltinEntryInOrder(): void
+    {
+        $expected = [];
+        $resource = JsonPath::decodeFile(__DIR__.'/../../../resources/finished-packages.json');
+        foreach (array_keys(JsonPath::arrayAt($resource, ['entries'])) as $i) {
+            $entry = JsonPath::arrayAt($resource, ['entries', $i]);
+            $version = JsonPath::has($entry, ['version']) ? '`'.JsonPath::stringAt($entry, ['version']).'`' : 'any';
+            $expected[] = \sprintf('| `%s` | %s | `%s` |', JsonPath::stringAt($entry, ['pattern']), $version, JsonPath::stringAt($entry, ['id']));
+        }
+        $page = (string) file_get_contents(__DIR__.'/../../../docs/configuration.md');
+        $start = strpos($page, '### The built-in list');
+        self::assertIsInt($start);
+        $section = substr($page, $start, (int) strpos($page, "\n### ", $start + 1) - $start);
+
+        self::assertSame($expected, array_values(preg_grep('{^\| `[^`]+/}', explode("\n", $section)) ?: []));
     }
 
     public function testKnownFinishedPackages(): void
