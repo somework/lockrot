@@ -102,7 +102,7 @@
           requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-bundle v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-bundle ^8.6 — clears left-behind; 8.x needs php ~8.4.0 || ~8.5.0; the target php 8.4 runs
@@ -128,7 +128,7 @@
       left-behind  branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 3 flagged packages: symfony/security-guard (abandoned), spomky-labs/otphp (left-behind),
       thecodingmachine/safe (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-trusted-device v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-trusted-device ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
@@ -136,7 +136,7 @@
           requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.7 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   wallabag/rulerz dev-master  direct  ·  pinned
       16 = pinned 16
       do: no tagged release to move to; review the snapshot, or replace it
