@@ -27,6 +27,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Solver\MoveCheckers;
 use Lockrot\Tests\Support\FakeHttpClient;
+use Lockrot\Tests\Support\FindingRelations;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Verdict\MoveChecks;
@@ -98,6 +99,14 @@ final class MoveCheckWallabagTest extends TestCase
         self::assertNotContains('symfony/yaml', $members);
         self::assertContains('phpseclib/phpseclib:^3.0.57', JsonPath::arrayAt($security, ['update_now_command']));
         self::assertSame(['resolves', true], [JsonPath::stringAt($report, ['run', 'move_check', 'baseline']), JsonPath::arrayAt($report, ['run', 'move_check'])['ignores_extensions']]);
+    }
+
+    /** The relations of the move check hold on every move of the lock. */
+    public function testNoMovePrintsAStepThatItsCheckRefuses(): void
+    {
+        $broken = array_values(array_filter(FindingRelations::violations(self::report()), static fn (string $violation): bool => strpos($violation, 'next_step:') !== false));
+
+        self::assertSame([], $broken);
     }
 
     /** @return array<mixed, mixed> */

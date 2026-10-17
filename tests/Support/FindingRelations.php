@@ -36,6 +36,44 @@ final class FindingRelations
     }
 
     /**
+     * The move check's relations (SPEC §5.6): lockrot never prints a step that its own check
+     * refuses, a refused move names its holds and is no `update` fix, and a step of a form that
+     * needs the dependencies carries that form's option.
+     *
+     * @param array<mixed, mixed> $move
+     *
+     * @return list<string>
+     */
+    private static function checkedMove(array $move): array
+    {
+        $check = \is_array($move['check'] ?? null) ? $move['check'] : null;
+        if ($check === null) {
+            return [];
+        }
+        $out = [];
+        $steps = array_values(array_filter(\is_array($move['commands'] ?? null) ? $move['commands'] : [], static fn ($argv): bool => \is_array($argv) && \in_array($argv[1] ?? null, ['update', 'require'], true)));
+        if ($check['result'] === 'refused') {
+            if ($steps !== []) {
+                $out[] = 'next_step: a move that Composer\'s solver refuses has no update or require step';
+            }
+            if (($move['held_by'] ?? []) === []) {
+                $out[] = 'next_step: a refused move names its holds';
+            }
+            if (($move['fix_kind'] ?? null) === 'update') {
+                $out[] = 'next_step: a refused move is no update fix';
+            }
+        }
+        $option = ['with-dependencies' => '--with-dependencies', 'with-all-dependencies' => '--with-all-dependencies'][$check['form'] ?? ''] ?? null;
+        foreach ($option === null ? [] : $steps as $argv) {
+            if (\is_array($argv) && strpos((string) ($argv[2] ?? ''), 'php:') !== 0 && end($argv) !== $option) {
+                $out[] = 'next_step: a step of the form '.$check['form'].' ends with '.$option;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * @param array<mixed, mixed> $f
      * @param list<mixed>         $gates
      * @param list<mixed>         $repositories
@@ -120,6 +158,11 @@ final class FindingRelations
         $basis = self::arrayOrNull($f, ['gate', 'basis']);
         if ($basis !== null && (($basis['verdict'] ?? null) === null) !== (($basis['score'] ?? null) === 0)) {
             $out[] = 'gate.basis.verdict is null exactly when the gate score is 0';
+        }
+
+        $moves = JsonPath::has($f, ['next_step', 'kind']) ? array_merge([JsonPath::arrayAt($f, ['next_step'])], self::rows($f, ['next_step', 'also'])) : [];
+        foreach ($moves as $move) {
+            $out = array_merge($out, self::checkedMove($move));
         }
 
         return $out;
