@@ -1414,7 +1414,7 @@
                 {
                     "id": "S9",
                     "level": "warn",
-                    "summary": "3 security advisories affect v3.4.47 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed by v8.1.8",
+                    "summary": "3 security advisories affect v3.4.47 (CVE-2026-45133, CVE-2026-45305, CVE-2026-45304); fixed in v5.4.52",
                     "data": {
                         "advisories": [
                             {

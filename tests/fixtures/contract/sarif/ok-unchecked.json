@@ -130,7 +130,7 @@
                     "ruleIndex": 1,
                     "level": "error",
                     "message": {
-                        "text": "scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it. checks missing: S2, S8 (undated releases)."
+                        "text": "scheb/2fa-google-authenticator v8.6.1: the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it. checks missing: S2 (undated releases)."
                     },
                     "partialFingerprints": {
                         "lockrot/package": "scheb/2fa-google-authenticator"

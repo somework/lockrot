@@ -23,9 +23,10 @@ declare(strict_types=1);
 // at CLOCK, the recording day of the cache. The differential fails on a difference that
 // tests/fixtures/corpus/model-divergences.json does not allow, on an allowed difference that does not occur exactly once, on
 // a cache or a model document that provenance.json does not describe, and on a recording that neither lockrot nor the 0.13
-// PHAR reads.
+// PHAR reads. It also fails on a lockrot document that breaks Lockrot\Tests\Support\FiredSignalsUnblocked.
 require __DIR__.'/../../vendor/autoload.php';
 
+use Lockrot\Tests\Support\FiredSignalsUnblocked;
 use Lockrot\Tests\Support\FixtureCliRun;
 use Lockrot\Tests\Support\VersionMask;
 
@@ -120,7 +121,11 @@ foreach (runs() as $id => [$app, $mirrors]) {
         @mkdir($write, 0777, true);
         file_put_contents($write.'/'.$id.'.json', preg_replace('{http://127\.0\.0\.1:\d+}', 'http://127.0.0.1', VersionMask::apply($json)));
     }
-    $ours = findings(json_decode($json, true));
+    $document = json_decode($json, true);
+    foreach (FiredSignalsUnblocked::violations(is_array($document) ? $document : []) as $violation) {
+        $problems[] = $id.' '.$violation;
+    }
+    $ours = findings($document);
     $theirs = findings(json_decode((string) file_get_contents(MODEL.'/'.$id.'.json'), true));
     foreach (['lockrot' => $ours, 'model' => $theirs] as $side => $findings) {
         foreach ($id === FEED_FAILED ? [] : $findings as $finding) {

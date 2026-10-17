@@ -93,9 +93,8 @@ final class AdvisoryRuleTest extends TestCase
     }
 
     /**
-     * Whether a null `fixed_by` was looked for: no metadata, or an installed version no parser reads,
-     * leaves every row null without a release having been compared. A branch snapshot is compared
-     * with the package's highest tag, and a tagged version with both candidates.
+     * Whether the releases were read: no metadata, or an installed version no parser reads, leaves
+     * every fix unjudged. A branch snapshot and a tagged version with metadata are read.
      */
     public function testTheDataSaysWhetherTheReleasesWereRead(): void
     {
@@ -110,116 +109,99 @@ final class AdvisoryRuleTest extends TestCase
         ] as $case => [$facts, $read]) {
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
+            self::assertSame($read, JsonPath::decoded($signal->data())['releases_read'], $case);
         }
     }
-
 
     private function ranged(string $id, string $range, ?string $severity = 'high'): Advisory
     {
         return new Advisory($id, null, 'Title of '.$id, null, $severity, null, (new VersionParser())->parseConstraints($range));
     }
 
-    /** symfony/http-foundation v3.4.18: one CVE fixed on 3.x (3.4.35), one fixed only in 8.x, one open even there. */
-    public function testEachAdvisoryIsCheckedAgainstTheBranchsHighestTagThenThePackages(): void
+    /** @param Fix::UPDATE|Fix::UPGRADE|Fix::RAISE_PHP|Fix::BLOCKED $kind */
+    private static function fixIn(string $version, string $branch, string $newest, string $kind = Fix::UPDATE): Fix
     {
-        $meta = F::metadata([['v8.1.7', '2026-09-14T00:00:00+00:00'], ['v3.4.47', '2020-10-24T00:00:00+00:00'], ['v3.4.18', '2018-11-20T00:00:00+00:00']]);
-        $facts = F::facts(F::package(['version' => 'v3.4.18']), $meta, null, [
-            $this->ranged('CVE-2019-18888', '>=3.0.0,<3.4.35|>=4.0.0,<4.2.12', 'medium'),
-            $this->ranged('CVE-2024-50345', '>=2.0.0,<5.4.50|>=6.0.0,<6.4.29|>=7.0.0,<7.3.7', 'high'),
-            $this->ranged('CVE-2099-1', '>=2.0.0', 'low'),
-            $this->ranged('CVE-2025-64500', '>=2.0.0,<5.4.50|>=6.0.0,<6.4.29|>=7.0.0,<7.3.7', 'high'),
+        return Fix::to(new Candidate(new StableRelease((new VersionParser())->normalize($version), $version, null, null, false), $branch, $kind, []), $newest, '10');
+    }
+
+    /**
+     * @param list<Advisory>     $advisories
+     * @param array<string, Fix> $fixes      by advisory id
+     */
+    private static function scanned(string $version, array $advisories, array $fixes): PackageFacts
+    {
+        return (new PackageFacts(F::package(['version' => $version]), null, null, $advisories))
+            ->withFixes(new PackageFixes($fixes, [], null, null, null));
+    }
+
+    /** spomky-labs/otphp v10.0.3 on wallabag: both advisories are fixed in 11.4.3, and 11.5.0 is only the branch's newest release. */
+    public function testTheSummaryNamesTheFirstFixingReleaseNotTheNewest(): void
+    {
+        $fix = self::fixIn('11.4.3', '11', '11.5.0', Fix::UPGRADE);
+        $facts = self::scanned('v10.0.3', [$this->ranged('PKSA-a', '<11.4.3'), $this->ranged('PKSA-b', '<11.4.3')], ['PKSA-a' => $fix, 'PKSA-b' => $fix]);
+
+        $signal = (new AdvisoryRule())->evaluate($facts);
+
+        self::assertNotNull($signal);
+        self::assertSame('2 security advisories affect v10.0.3 (PKSA-a, PKSA-b); fixed in 11.4.3', $signal->summary());
+    }
+
+    /** Each group is one fixing release, counted, in the order of the named advisories. */
+    public function testAdvisoriesFixedInDifferentReleasesAreCountedPerRelease(): void
+    {
+        $facts = self::scanned('v3.4.18', [
+            $this->ranged('CVE-2019-18888', '<3.4.35', 'medium'),
+            $this->ranged('CVE-2024-50345', '<5.4.50', 'high'),
+            $this->ranged('CVE-2025-64500', '<5.4.50', 'high'),
+        ], [
+            'CVE-2019-18888' => self::fixIn('v3.4.35', '3', 'v3.4.47'),
+            'CVE-2024-50345' => self::fixIn('v5.4.50', '5', 'v5.4.52', Fix::UPGRADE),
+            'CVE-2025-64500' => self::fixIn('v5.4.50', '5', 'v5.4.52', Fix::UPGRADE),
         ]);
 
         $signal = (new AdvisoryRule())->evaluate($facts);
 
         self::assertNotNull($signal);
-        self::assertSame('4 security advisories affect v3.4.18 (CVE-2024-50345, CVE-2025-64500, CVE-2019-18888 and 1 more); 2 fixed by v8.1.7, 1 fixed by v3.4.47', $signal->summary());
-        $rows = [];
+        self::assertSame('3 security advisories affect v3.4.18 (CVE-2024-50345, CVE-2025-64500, CVE-2019-18888); 2 fixed in v5.4.50, 1 fixed in v3.4.35', $signal->summary());
     }
 
-    /** One of two fixed: the count stays on the clause, `fixed by` alone is for when every advisory is. */
+    /** One of two fixed: the count stays on the clause, `fixed in` alone is for when every advisory is. */
     public function testAPartialFixKeepsItsCountEvenWhenOneReleaseFixesEverythingItFixes(): void
     {
-        $meta = F::metadata([['2.0.0', '2026-01-01T00:00:00+00:00'], ['1.0.0', '2020-01-01T00:00:00+00:00']]);
-        $facts = F::facts(F::package(['version' => '1.0.0']), $meta, null, [$this->ranged('CVE-1', '<2.0.0'), $this->ranged('CVE-2', '>=1.0.0')]);
+        $facts = self::scanned('1.0.0', [$this->ranged('CVE-1', '<2.0.0'), $this->ranged('CVE-2', '>=1.0.0')], ['CVE-1' => self::fixIn('2.0.0', '2', '2.1.0', Fix::UPGRADE), 'CVE-2' => Fix::none()]);
 
         $signal = (new AdvisoryRule())->evaluate($facts);
 
         self::assertNotNull($signal);
-        self::assertSame('2 security advisories affect 1.0.0 (CVE-1, CVE-2); 1 fixed by 2.0.0', $signal->summary());
+        self::assertSame('2 security advisories affect 1.0.0 (CVE-1, CVE-2); 1 fixed in 2.0.0', $signal->summary());
     }
 
-    /** swiftmailer 6.1.3: the one advisory is out of range by 6.3.0, the package's highest tag and the branch's. */
-    public function testEveryAdvisoryFixedByOneReleaseReadsFixedBy(): void
+    /** A fix that the target blocks still names its release: the clause says where the fix is, `fix.kind` says whether the move runs. */
+    public function testABlockedFixStillNamesItsRelease(): void
     {
-        $meta = F::metadata([['6.3.0', '2021-10-18T00:00:00+00:00'], ['6.1.3', '2018-09-11T00:00:00+00:00']]);
-        $facts = F::facts(F::package(['version' => '6.1.3']), $meta, null, [$this->ranged('CVE-2024-28859', '>=4.0.0,<6.0.0|>=6.0.0,<6.2.5')]);
+        $facts = self::scanned('1.0.0', [$this->ranged('CVE-1', '<2.0.0')], ['CVE-1' => self::fixIn('2.0.0', '2', '2.0.0', Fix::BLOCKED)]);
 
         $signal = (new AdvisoryRule())->evaluate($facts);
 
         self::assertNotNull($signal);
-        self::assertSame('1 security advisory affects 6.1.3 (CVE-2024-28859); fixed by 6.3.0', $signal->summary());
+        self::assertSame('1 security advisory affects 1.0.0 (CVE-1); fixed in 2.0.0', $signal->summary());
     }
 
-    /** Nothing to check against: no metadata, a branch snapshot with no branch, or a range that covers every listed release. */
-    public function testWithoutAFixingReleaseTheRowsSayNullAndTheSummaryAddsNothing(): void
+    /** A fix with no version (`unknown` or `none`, or no release scan at all) adds no clause. */
+    public function testWithoutAFixingReleaseTheSummaryAddsNothing(): void
     {
         $range = $this->ranged('CVE-1', '>=1.0.0');
         $meta = F::metadata([['2.0.0', '2026-01-01T00:00:00+00:00'], ['1.0.0', '2020-01-01T00:00:00+00:00']]);
 
         foreach ([
-            'no metadata' => F::facts(F::package(['version' => '1.0.0']), null, null, [$range]),
-            'branch snapshot' => F::facts(F::package(['version' => 'dev-main']), $meta, null, [$range]),
-            'open on every release' => F::facts(F::package(['version' => '1.0.0']), $meta, null, [$range]),
+            'no release scan, though 2.0.0 is outside the range' => F::facts(F::package(['version' => '1.0.0']), $meta, null, [$this->ranged('CVE-1', '<2.0.0')]),
+            'no release outside the range' => self::scanned('1.0.0', [$range], ['CVE-1' => Fix::none()]),
+            'an unknown fix' => self::scanned('1.0.0', [$range], ['CVE-1' => Fix::unknown(Fix::RELEASES_UNKNOWN)]),
         ] as $case => $facts) {
             $signal = (new AdvisoryRule())->evaluate($facts);
             self::assertNotNull($signal, $case);
-            self::assertSame('1 security advisory affects '.$facts->package()->version().' (CVE-1)', $signal->summary(), $case);
+            self::assertSame('1 security advisory affects 1.0.0 (CVE-1)', $signal->summary(), $case);
         }
-    }
-
-    /**
-     * The repository lists nothing above what is installed — a deleted tag, a pre-release
-     * ahead of every stable tag, a pretty version no parser reads. A tag the range spares is not a
-     * fix when reaching it means going back, so none is named.
-     */
-    public function testATagBelowTheInstalledVersionIsNoFixEvenWhenTheRangeSparesIt(): void
-    {
-        $listedBelow = F::metadata([['1.9.0', '2026-01-01T00:00:00+00:00'], ['1.0.0', '2020-01-01T00:00:00+00:00']]);
-
-        foreach ([
-            'installed above every tag on its branch' => F::facts(F::package(['version' => '1.9.5']), $listedBelow, null, [$this->ranged('CVE-1', '>=1.9.1')]),
-            'a pre-release of a major with no stable tag yet' => F::facts(F::package(['version' => '2.0.0-beta1']), $listedBelow, null, [$this->ranged('CVE-1', '>=2.0.0-alpha1')]),
-            'an unparsable installed version' => F::facts(F::package(['version' => 'not-a-version']), $listedBelow, null, [$this->ranged('CVE-1', '>=1.9.1')]),
-        ] as $case => $facts) {
-            $signal = (new AdvisoryRule())->evaluate($facts);
-            self::assertNotNull($signal, $case);
-            self::assertSame('1 security advisory affects '.$facts->package()->version().' (CVE-1)', $signal->summary(), $case);
-        }
-    }
-
-    /** The branch's tag is below the installed version, the package's above it: only the second is a candidate. */
-    public function testWithTheBranchsTagBelowTheInstalledVersionOnlyThePackagesTagCounts(): void
-    {
-        $meta = F::metadata([['2.0.0', '2026-01-01T00:00:00+00:00'], ['1.9.0', '2020-01-01T00:00:00+00:00']]);
-        $facts = F::facts(F::package(['version' => '1.9.5']), $meta, null, [$this->ranged('CVE-1', '>=1.9.1,<2.0.0')]);
-
-        $signal = (new AdvisoryRule())->evaluate($facts);
-
-        self::assertNotNull($signal);
-        self::assertSame('1 security advisory affects 1.9.5 (CVE-1); fixed by 2.0.0', $signal->summary());
-    }
-
-    /** A branch snapshot has no branch, but the package's highest tag can still carry the fix. */
-    public function testABranchSnapshotIsCheckedAgainstThePackagesHighestTagOnly(): void
-    {
-        $meta = F::metadata([['2.0.0', '2026-01-01T00:00:00+00:00'], ['1.0.0', '2020-01-01T00:00:00+00:00']]);
-        $facts = F::facts(F::package(['version' => 'dev-main']), $meta, null, [$this->ranged('CVE-1', '<2.0.0')]);
-
-        $signal = (new AdvisoryRule())->evaluate($facts);
-
-        self::assertNotNull($signal);
-        self::assertSame('1 security advisory affects dev-main (CVE-1); fixed by 2.0.0', $signal->summary());
     }
 
     public function testThreeAdvisoriesAreAllNamedAndAnIdStandsInForAMissingCve(): void

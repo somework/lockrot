@@ -4,7 +4,7 @@
 
 | Verdict | Package | Version | Flags | Why | Via |
 |---|---|---|---|---|---|
-| **ok** | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0`<br>checks missing: S2, S8 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
+| **ok** | `scheb/2fa-google-authenticator` | v8.6.1 | ok | `0`<br>checks missing: S2 (undated releases) | pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more |
 
 libyears: the one package could not be measured
 advisories: 1 package asked · packagist.org answered (0 on record for 0 packages)

@@ -387,7 +387,7 @@
       left-behind  branch 3.x last released 2023-04-15 (3.5 years ago); 4.x released v4.9.0 (2025-03-08), needs php ^8.1
                    above the project's php \>=7.4; no releasing branch within reach
       pulls in 1 flagged package: pagerfanta/core (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-backup-code v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: raise require.php to \>=8.2, then require scheb/2fa-backup-code ^6.13 — clears left-behind; 6.x needs php
@@ -395,7 +395,7 @@
           composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-bundle v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: raise require.php to \>=8.2, then require scheb/2fa-bundle ^6.13 — clears left-behind; 6.x needs php ~8.2.0
@@ -423,7 +423,7 @@
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
       pulls in 2 flagged packages: spomky-labs/otphp (left-behind · vulnerable), thecodingmachine/safe (left-behind ·
       old-promise)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-trusted-device v5.13.2  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: raise require.php to \>=8.2, then require scheb/2fa-trusted-device ^6.13 — clears left-behind; 6.x needs php
@@ -432,7 +432,7 @@
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24), needs php
                    ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 above the project's php \>=7.4; no releasing branch within reach
       pulls in 1 flagged package: lcobucci/clock (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   symfony/asset v4.4.46  direct  ·  left-behind
       16 = left-behind 16 (baseline: new package)
       do: require symfony/asset ^5.4 — clears left-behind; 5.x needs php \>=7.2.5, which require.php allows; the target

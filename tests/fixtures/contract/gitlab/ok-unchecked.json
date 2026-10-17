@@ -18,7 +18,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/unchecked",
-        "description": "scheb/2fa-google-authenticator v8.6.1 \u2014 finding ok (0) \u2014 checks missing: S2, S8 (undated releases). (via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more)",
+        "description": "scheb/2fa-google-authenticator v8.6.1 \u2014 finding ok (0) \u2014 checks missing: S2 (undated releases). (via pimcore/pimcore, pimcore/quill-bundle, pimcore/studio-backend-bundle and 1 more)",
         "categories": [
             "Bug Risk"
         ],
