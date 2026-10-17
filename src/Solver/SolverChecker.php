@@ -131,25 +131,53 @@ final class SolverChecker implements MoveChecker
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::NOT_FROM_COMPOSER_REPOSITORY));
         }
         $request = $query->request();
-        $last = Solution::refused([], '', []);
-        foreach (MoveCheck::FORMS as $transitive => $form) {
-            if ($this->deadline->isPast()) {
-                return new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET));
-            }
-            $solution = $this->solver->solve($request->withTransitive($transitive));
-            if ($solution->resolves()) {
-                return new CheckOutcome(MoveCheck::resolves($form), [], $solution->installs()[$query->package()] ?? null);
-            }
-            $unloaded = $this->notLoaded($solution);
-            if ($unloaded !== null) {
-                return new CheckOutcome(MoveCheck::notChecked($unloaded));
-            }
-            $last = $solution;
+        $inline = $this->attempt($request->withTransitive(SolveRequest::LISTED));
+        if (!$inline instanceof Solution || $inline->resolves()) {
+            return $inline instanceof Solution ? $this->resolved(MoveCheck::INLINE, $inline, $query) : $inline;
         }
+        // `-W` frees more packages than `-w`, and Composer 2.9 and later then block more of their
+        // locked versions, so `-W` can refuse a move that `-w` resolves: each form is asked in turn.
+        foreach ([SolveRequest::WITH_DEPENDENCIES => MoveCheck::WITH_DEPENDENCIES, SolveRequest::WITH_ALL_DEPENDENCIES => MoveCheck::WITH_ALL_DEPENDENCIES] as $transitive => $form) {
+            $solution = $this->attempt($request->withTransitive($transitive));
+            if (!$solution instanceof Solution || $solution->resolves()) {
+                return $solution instanceof Solution ? $this->resolved($form, $solution, $query) : $solution;
+            }
+            $inline = $solution;
+        }
+
+        return $this->refusal($inline, $query);
+    }
+
+    /**
+     * The solution, or the outcome of a solve that the budget stops or that needs a name the
+     * source could not load.
+     *
+     * @return Solution|CheckOutcome
+     */
+    private function attempt(SolveRequest $request)
+    {
+        if ($this->deadline->isPast()) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET));
+        }
+        $solution = $this->solver->solve($request);
+        $unloaded = $solution->resolves() ? null : $this->notLoaded($solution);
+
+        return $unloaded === null ? $solution : new CheckOutcome(MoveCheck::notChecked($unloaded));
+    }
+
+    /** @param MoveCheck::INLINE|MoveCheck::WITH_DEPENDENCIES|MoveCheck::WITH_ALL_DEPENDENCIES $form */
+    private function resolved(string $form, Solution $solution, MoveQuery $query): CheckOutcome
+    {
+        return new CheckOutcome(MoveCheck::resolves($form), [], $solution->installs()[$query->package()] ?? null);
+    }
+
+    private function refusal(Solution $last, MoveQuery $query): CheckOutcome
+    {
         $target = $this->release($query->package(), $query->version());
         $scanned = $target === null ? [] : $this->scan->of($target, (new VersionParser())->normalize($this->platformPhp));
 
-        return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)), null, $last->problem());
+        // A move publishes its holds, never Composer's problem text, which is costly to render.
+        return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)));
     }
 
     /** The reason of a refusal that needs a name the source could not load, null for a real refusal. */

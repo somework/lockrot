@@ -20,13 +20,6 @@ final class MoveCheck implements \JsonSerializable
     public const WITH_DEPENDENCIES = 'with-dependencies';
     public const WITH_ALL_DEPENDENCIES = 'with-all-dependencies';
 
-    /** The forms in the order that the check tries them, by the request's transitive mode. */
-    public const FORMS = [
-        SolveRequest::LISTED => self::INLINE,
-        SolveRequest::WITH_DEPENDENCIES => self::WITH_DEPENDENCIES,
-        SolveRequest::WITH_ALL_DEPENDENCIES => self::WITH_ALL_DEPENDENCIES,
-    ];
-
     /** The option that a command of each form adds. */
     public const OPTIONS = [
         self::WITH_DEPENDENCIES => '--with-dependencies',

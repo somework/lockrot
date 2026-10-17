@@ -45,7 +45,7 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'refused', 'form' => null, 'reason' => null], $outcome->check()->jsonSerialize());
         self::assertContains(['source' => 'package', 'package' => 'symfony/yaml', 'version' => 'v5.4.54', 'link' => 'conflict', 'target' => 'symfony/console', 'constraint' => '<5.3'], self::rows($outcome->holds()));
         self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => 'symfony/console', 'constraint' => '^4.4'], self::rows($outcome->holds()));
-        self::assertNotNull($outcome->problem());
+        self::assertNull($outcome->problem(), "a move publishes its holds, not Composer's problem text");
     }
 
     /** wallabag 2.6.14's symfony/monolog-bridge: the target needs a http-kernel that the root keeps at 4.4. */

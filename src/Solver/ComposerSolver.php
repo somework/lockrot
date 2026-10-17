@@ -118,7 +118,13 @@ final class ComposerSolver
             foreach ($composerRequest->getLockedPackages() as $package) {
                 $stayLocked[$package->getName()] = $package->getVersion();
             }
-            [$set, $composerRequest, $pool] = $this->pool($root, $requires, $rootRequires, $temporary, $request, $policy, $stayLocked);
+            $keeps = $this->keeps($stayLocked);
+            foreach ($pool->getPackages() as $package) {
+                if (!$keeps($package)) {
+                    [$set, $composerRequest, $pool] = $this->pool($root, $requires, $rootRequires, $temporary, $request, $policy, $stayLocked);
+                    break;
+                }
+            }
         }
 
         try {
@@ -133,7 +139,7 @@ final class ComposerSolver
                 }
             }
 
-            return Solution::refused($holds->holds(), trim($e->getPrettyString($set, $composerRequest, $pool, false)), $unloaded);
+            return Solution::refused($holds->holds(), static fn (): string => trim($e->getPrettyString($set, $composerRequest, $pool, false)), $unloaded);
         }
 
         return Solution::resolved(self::installs($transaction));

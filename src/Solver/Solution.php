@@ -18,16 +18,18 @@ final class Solution
     private array $installs;
     /** @var list<Holder> */
     private array $holds;
-    private ?string $problem;
+    /** @var string|\Closure(): string|null */
+    private $problem;
     /** @var array<string, string> */
     private array $unloaded;
 
     /**
      * @param array<string, string> $installs name => the pretty version that the solve installs or keeps, for each name it changes
      * @param list<Holder>          $holds
+     * @param string|\Closure(): string|null $problem Composer's problem text, rendered when read
      * @param array<string, string> $unloaded name => {@see VersionSource} failure, by name
      */
-    private function __construct(array $installs, array $holds, ?string $problem, array $unloaded)
+    private function __construct(array $installs, array $holds, $problem, array $unloaded)
     {
         $this->installs = $installs;
         $this->holds = $holds;
@@ -42,10 +44,11 @@ final class Solution
     }
 
     /**
-     * @param list<Holder>          $holds
-     * @param array<string, string> $unloaded
+     * @param list<Holder>              $holds
+     * @param string|\Closure(): string $problem
+     * @param array<string, string>     $unloaded
      */
-    public static function refused(array $holds, string $problem, array $unloaded): self
+    public static function refused(array $holds, $problem, array $unloaded): self
     {
         return new self([], $holds, $problem, $unloaded);
     }
@@ -69,6 +72,10 @@ final class Solution
 
     public function problem(): ?string
     {
+        if ($this->problem instanceof \Closure) {
+            $this->problem = ($this->problem)();
+        }
+
         return $this->problem;
     }
 

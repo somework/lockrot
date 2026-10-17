@@ -20,8 +20,6 @@ use Lockrot\Config\LockrotConfig;
 use Lockrot\Config\UnknownKeys;
 use Lockrot\Data\Forge\Tokens;
 use Lockrot\Deadline;
-use Lockrot\Solver\MoveCheckers;
-use Lockrot\Verdict\MoveChecks;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Exception\InstallBlockedException;
 use Lockrot\Lock\LockedPackage;
@@ -31,6 +29,8 @@ use Lockrot\Output\ConsoleMarkup;
 use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Output\RunGateText;
 use Lockrot\Output\TerminalText;
+use Lockrot\Solver\MoveCheckers;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Version;
 
 /**
