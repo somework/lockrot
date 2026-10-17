@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Lock;
 
 use Composer\Package\AliasPackage;
+use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Repository\LockArrayRepository;
 use Lockrot\Exception\ConfigException;
 use Lockrot\Json\JsonReader;
 
@@ -16,12 +18,14 @@ final class LockFile
     /** @var array<string, LockedPackage> */
     private array $packages;
     private ?string $contentHash;
+    private LockArrayRepository $locked;
 
     /** @param array<string, LockedPackage> $packages */
-    private function __construct(array $packages, ?string $contentHash)
+    private function __construct(array $packages, ?string $contentHash, LockArrayRepository $locked)
     {
         $this->packages = $packages;
         $this->contentHash = $contentHash;
+        $this->locked = $locked;
     }
 
     public static function fromFile(string $path): self
@@ -34,6 +38,10 @@ final class LockFile
     {
         $packages = [];
         $loader = new ArrayLoader();
+        // Composer's Locker loads the lock for an update with these options.
+        $lockLoader = new ArrayLoader(null, true);
+        $locked = new LockArrayRepository();
+        $aliased = [];
         foreach ([['packages', false], ['packages-dev', true]] as [$key, $dev]) {
             $entries = $lock[$key] ?? null;
             $entries = \is_array($entries) ? array_values($entries) : [];
@@ -47,6 +55,7 @@ final class LockFile
                 }
                 try {
                     $loaded = $loader->load($entry);
+                    $forUpdate = $lockLoader->load($entry);
                 } catch (\UnexpectedValueException $e) {
                     throw new ConfigException(\sprintf(
                         'composer.lock entry #%d in %s cannot be loaded: %s',
@@ -75,16 +84,26 @@ final class LockFile
                 }
                 $package = LockedPackage::fromPackage($loaded, $dev)->withAliasVersions($aliasVersions);
                 $packages[$package->name()] = $package;
+                $locked->addPackage($forUpdate);
+                $aliased[$package->name()] = $forUpdate instanceof AliasPackage ? $forUpdate->getAliasOf() : $forUpdate;
+            }
+        }
+        foreach (\is_array($lock['aliases'] ?? null) ? $lock['aliases'] : [] as $alias) {
+            $of = \is_array($alias) && \is_string($alias['package'] ?? null) ? ($aliased[$alias['package']] ?? null) : null;
+            if ($of instanceof CompletePackage && \is_string($alias['alias_normalized'] ?? null) && \is_string($alias['alias'] ?? null)) {
+                $rootAlias = new CompleteAliasPackage($of, $alias['alias_normalized'], $alias['alias']);
+                $rootAlias->setRootPackageAlias(true);
+                $locked->addPackage($rootAlias);
             }
         }
         $hash = $lock['content-hash'] ?? null;
 
-        return new self($packages, \is_string($hash) ? $hash : null);
+        return new self($packages, \is_string($hash) ? $hash : null, $locked);
     }
 
     public static function empty(): self
     {
-        return new self([], null);
+        return new self([], null, new LockArrayRepository());
     }
 
     /**
@@ -107,7 +126,7 @@ final class LockFile
             $merged[$package->name()] = $package;
         }
 
-        return new self($merged, $this->contentHash);
+        return new self($merged, $this->contentHash, $this->locked);
     }
 
     /** @return list<LockedPackage> */
@@ -126,6 +145,16 @@ final class LockFile
     public function find(string $name): ?LockedPackage
     {
         return $this->packages[$name] ?? null;
+    }
+
+    /**
+     * The lock as Composer's Locker::getLockedRepository(true) reads it for an update: `packages`
+     * and `packages-dev`, with the root aliases of its `aliases`. {@see withPackages()} keeps the
+     * lock's own entries here.
+     */
+    public function lockedRepository(): LockArrayRepository
+    {
+        return $this->locked;
     }
 
     public function contentHash(): ?string

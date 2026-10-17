@@ -7,9 +7,11 @@ namespace Lockrot\Security;
 use Lockrot\Verdict\GradedPackage;
 
 /**
- * One link of the lock that excludes a candidate release: a `held_by[]` entry. A root link names no
- * package there, because the holder is composer.json. `holder` is the holder's own finding, which the
- * report fills once every finding is graded ({@see filled()}).
+ * One link that excludes a candidate release: a `held_by[]` entry. A root link names no package
+ * there, because the holder is composer.json. `target` names the package that the link points to
+ * when it is not the moved package: a requirement or a conflict of the target release, or of the
+ * root, that Composer's solver names ({@see \Lockrot\Solver\ProblemHolds}). `holder` is the
+ * holder's own finding, which the report fills once every finding is graded ({@see filled()}).
  *
  * @internal
  */
@@ -21,29 +23,37 @@ final class Holder implements \JsonSerializable
     public const REQUIRE = 'require';
     public const REQUIRE_DEV = 'require-dev';
     public const CONFLICT = 'conflict';
+    public const ROOT_REQUIRE = 'root-require';
+    public const PLATFORM = 'platform';
+
+    /** `held_by[]`'s order: the root first, then by package, then by link, then by target. */
+    private const SOURCE_ORDER = [self::ROOT => 0, self::PACKAGE => 1];
 
     /** @var self::ROOT|self::PACKAGE */
     private string $source;
     private ?string $package;
     private ?string $version;
-    /** @var self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT */
+    /** @var self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::ROOT_REQUIRE|self::PLATFORM */
     private string $link;
     private string $constraint;
+    private ?string $target;
     private ?GradedPackage $finding = null;
 
     /**
-     * @param self::ROOT|self::PACKAGE                     $source
-     * @param ?string                                      $package the root's `name` (null when composer.json has none) or the locked package
-     * @param ?string                                      $version the locked package's version, null for the root
-     * @param self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT $link    a locked package's link is `require` or `conflict`, from packages-dev too
+     * @param self::ROOT|self::PACKAGE                                                       $source
+     * @param ?string                                                                        $package the root's `name` (null when composer.json has none), the locked package, or the moved package at its target release
+     * @param ?string                                                                        $version the package's version, null for the root
+     * @param self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::ROOT_REQUIRE|self::PLATFORM $link    a locked package's link is `require` or `conflict`, from packages-dev too
+     * @param ?string                                                                        $target  the package the link points to, null when it is the moved package
      */
-    public function __construct(string $source, ?string $package, ?string $version, string $link, string $constraint)
+    public function __construct(string $source, ?string $package, ?string $version, string $link, string $constraint, ?string $target = null)
     {
         $this->source = $source;
         $this->package = $package;
         $this->version = $version;
         $this->link = $link;
         $this->constraint = $constraint;
+        $this->target = $target;
     }
 
     /** @return self::ROOT|self::PACKAGE */
@@ -62,7 +72,7 @@ final class Holder implements \JsonSerializable
         return $this->version;
     }
 
-    /** @return self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT */
+    /** @return self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::ROOT_REQUIRE|self::PLATFORM */
     public function link(): string
     {
         return $this->link;
@@ -71,6 +81,11 @@ final class Holder implements \JsonSerializable
     public function constraint(): string
     {
         return $this->constraint;
+    }
+
+    public function target(): ?string
+    {
+        return $this->target;
     }
 
     public function finding(): ?GradedPackage
@@ -97,7 +112,29 @@ final class Holder implements \JsonSerializable
         return array_map(static fn (self $holder): self => $holder->package === null ? $holder : $holder->withFinding($findings[$holder->package] ?? null), $holders);
     }
 
-    /** @return array{source: string, package: ?string, version: ?string, link: string, constraint: string, holder: ?GradedPackage} */
+    /**
+     * Each entry once, in `held_by[]`'s order. Two entries that differ only in the version keep the
+     * first: the solver can name a newer release of the moved package than the scan does.
+     *
+     * @param list<self> $holders
+     *
+     * @return list<self>
+     */
+    public static function distinct(array $holders): array
+    {
+        $kept = [];
+        foreach ($holders as $holder) {
+            $key = implode("\0", [$holder->source, $holder->source === self::ROOT ? '' : (string) $holder->package, $holder->link, (string) $holder->target, $holder->constraint]);
+            $kept[$key] ??= $holder;
+        }
+        $kept = array_values($kept);
+        usort($kept, static fn (self $a, self $b): int => [self::SOURCE_ORDER[$a->source], (string) $a->package, $a->link, (string) $a->target, $a->constraint]
+            <=> [self::SOURCE_ORDER[$b->source], (string) $b->package, $b->link, (string) $b->target, $b->constraint]);
+
+        return $kept;
+    }
+
+    /** @return array{source: string, package: ?string, version: ?string, link: string, target: ?string, constraint: string, holder: ?GradedPackage} */
     public function jsonSerialize(): array
     {
         $root = $this->source === self::ROOT;
@@ -107,6 +144,7 @@ final class Holder implements \JsonSerializable
             'package' => $root ? null : $this->package,
             'version' => $root ? null : $this->version,
             'link' => $this->link,
+            'target' => $this->target,
             'constraint' => $this->constraint,
             'holder' => $root ? null : $this->finding,
         ];
