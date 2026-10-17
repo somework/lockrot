@@ -77,6 +77,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **All formats:** Composer's own solver checks every proposed move against the lock, offline, and
+  each move carries `check` (`resolves`, `refused` or `not_checked`). A refused move names its holds
+  and prints no `update` or `require` step. An `update` step names its constraint inline, and a move
+  that needs its dependencies adds `--with-dependencies` or `--with-all-dependencies`. `held_by[]`
+  gains the links `root-require` and `platform` and the field `target`, and `run.move_check` names
+  the Composer that solved. ([The move check](docs/verdicts.md#the-move-check))
 - **CLI, Config:** `--fail-on` takes a list, one value per kind: a grade, a flag (at or above in
   flag order), `vulnerable` or `vulnerable-medium|high|critical`, and `unchecked`. ([In
   CI](docs/ci.md))
@@ -192,6 +198,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **All formats:** lockrot no longer proposes an `update` move that Composer refuses. On Composer
+  2.9 and later, the plain `composer update <package>` of such a move installed a dev snapshot, and
+  `update now:` held it beside the moves that resolve. ([The move check](docs/verdicts.md#the-move-check))
 - **All formats:** Symfony's extension polyfills keep their place on the built-in finished list
   under their own reason, because "intentionally frozen" was false for them.
 - **CLI:** `--explain` prints "archived flag not read" for a repository whose host did not send the

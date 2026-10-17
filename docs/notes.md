@@ -287,6 +287,36 @@ Composer rejected the project's abandoned ignore list, so every abandoned markin
 - Findings: no change.
 - `sets_network_failures`: no.
 
+## Moves
+
+### Moves not checked {#moves_not_checked}
+
+Composer's solver refuses a partial update of a name outside the lock: the lock itself does not
+install at the target PHP. Every move would be refused for the same reason, so lockrot checks none,
+and each move's `check.reason` reads `baseline_refused`. Run lockrot with the PHP that the project
+runs on (`--target-php` or `config.platform.php`), or update the lock.
+
+- `data`: `reason` (`baseline_refused`), `php` (the version that the solve ran at), `problem`
+  (Composer's problem text).
+- `sets_network_failures`: no.
+
+### Update now reduced {#update_now_reduced}
+
+Composer's solver refuses the members of `update now:` together. The command leaves out the members
+that the refusal names, and Composer resolves the others together. Update each member that it
+leaves out with its own move.
+
+- `data`: `left_out` (the members that the command leaves out), `problem` (Composer's problem text).
+- `sets_network_failures`: no.
+
+### Update now refused {#update_now_refused}
+
+Composer's solver refuses the members of `update now:` together, even without the members that the
+refusal names. The report writes no `update now:` command. Update each member with its own move.
+
+- `data`: `problem` (Composer's problem text).
+- `sets_network_failures`: no.
+
 ## Gate and baseline
 
 ### Baseline target differs {#baseline_target_differs}

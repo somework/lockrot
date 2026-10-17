@@ -39,6 +39,9 @@ final class NotesPageTest extends TestCase
         'https://lockrot.dev/notes/#baseline_target_differs',
         'https://lockrot.dev/notes/#baseline_fix_model_differs',
         'https://lockrot.dev/notes/#ignore_does_not_cover_advisories',
+        'https://lockrot.dev/notes/#moves_not_checked',
+        'https://lockrot.dev/notes/#update_now_reduced',
+        'https://lockrot.dev/notes/#update_now_refused',
     ];
 
     public function testEveryCodeLinksToAUrlAlreadyPublished(): void
