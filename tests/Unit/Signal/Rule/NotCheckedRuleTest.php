@@ -262,6 +262,36 @@ final class NotCheckedRuleTest extends TestCase
         self::assertSame([Signal::S2], JsonPath::decoded($signal->data())['blocks']);
     }
 
+    /** The higher branch's dated release is older than the installed branch's, and its highest tag is undated: that tag could have raised S8. */
+    public function testAnUndatedHighestTagOnAHigherBranchBlocksS8(): void
+    {
+        $metadata = F::metadata([['v2.1.0', null], ['v2.0.0', '2018-01-01T00:00:00+00:00'], ['v1.2.0', '2019-01-01T00:00:00+00:00']]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v1.2.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertSame([Signal::S8], JsonPath::decoded($signal->data())['blocks']);
+    }
+
+    /** S8 looks only above the installed branch, so an undated lower branch takes nothing from it. */
+    public function testAnUndatedLowerBranchBlocksNothing(): void
+    {
+        $metadata = F::metadata([['v2.0.0', '2019-01-01T00:00:00+00:00'], ['v1.0.0', null]]);
+
+        self::assertNull($this->rule()->evaluate(new PackageFacts(F::package(['version' => 'v2.0.0']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), [])));
+    }
+
+    /** S8 judges no branch snapshot, a branch-alias one included, whatever its line's dates. */
+    public function testABranchAliasSnapshotOnAnUndatedLineDoesNotBlockS8(): void
+    {
+        $metadata = F::metadata([['v1.0.0', null]]);
+
+        $signal = $this->rule()->evaluate(new PackageFacts(F::package(['version' => '1.x-dev']), $metadata, F::activity(false, '2026-09-01T00:00:00+00:00'), []));
+
+        self::assertNotNull($signal);
+        self::assertSame([Signal::S2], JsonPath::decoded($signal->data())['blocks']);
+    }
+
     public function testAPackageWithoutMetadataIsNotToldItsAgeWasNotRead(): void
     {
         // Its activity is dated, but without its metadata the verdict is `unknown`, and that verdict says it. The run's notes carry why.

@@ -76,15 +76,13 @@ final class AdvisoryRule implements SignalRule
 
         $fixedIn = [];
         foreach ($advisories as $advisory) {
-            $fix = self::fixOf($facts, $advisory);
-            $version = $fix->version();
+            $version = self::fixOf($facts, $advisory)->version();
             if ($version !== null) {
-                $key = $fix->toBranch().' '.$version;
-                $fixedIn[$key] = [$version, ($fixedIn[$key][1] ?? 0) + 1];
+                $fixedIn[$version] = ($fixedIn[$version] ?? 0) + 1;
             }
         }
         if ($fixedIn !== []) {
-            $summary .= '; '.self::fixedClause(array_values($fixedIn), $count);
+            $summary .= '; '.self::fixedClause($fixedIn, $count);
         }
 
         return [$summary, self::releasesRead($facts)];
@@ -160,15 +158,20 @@ final class AdvisoryRule implements SignalRule
     }
 
     /**
-     * @param list<array{string, int}> $fixedIn a fixing release and its advisory count, in the order of the first advisory it fixes
+     * @param array<string, int> $fixedIn the advisory count by fixing release, in the order of the
+     *                                   first advisory it fixes. A release names its `fix.to_branch` too.
      */
     private static function fixedClause(array $fixedIn, int $count): string
     {
-        if (\count($fixedIn) === 1 && $fixedIn[0][1] === $count) {
-            return 'fixed in '.$fixedIn[0][0];
+        if (\count($fixedIn) === 1 && array_sum($fixedIn) === $count) {
+            return 'fixed in '.array_key_first($fixedIn);
+        }
+        $parts = [];
+        foreach ($fixedIn as $version => $n) {
+            $parts[] = \sprintf('%d fixed in %s', $n, $version);
         }
 
-        return implode(', ', array_map(static fn (array $group): string => \sprintf('%d fixed in %s', $group[1], $group[0]), $fixedIn));
+        return implode(', ', $parts);
     }
 
     /**
@@ -180,12 +183,8 @@ final class AdvisoryRule implements SignalRule
         if ($facts->metadata() === null) {
             return false;
         }
-        $version = $facts->package()->version();
-        if (VersionParser::parseStability($version) === 'dev') {
-            return true;
-        }
         try {
-            (new VersionParser())->normalize($version);
+            (new VersionParser())->normalize($facts->package()->version());
         } catch (\UnexpectedValueException $e) {
             return false;
         }

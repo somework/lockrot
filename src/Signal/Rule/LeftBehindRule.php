@@ -145,20 +145,21 @@ final class LeftBehindRule implements SignalRule
      */
     public function missesAnUndatedRelease(PackageFacts $facts): bool
     {
-        $metadata = $facts->metadata();
         $branch = ReleaseBranch::of($facts->package()->version());
-        if ($metadata === null || $branch === null) {
+        if ($branch === null) {
             return false;
         }
         $reading = $this->age->branchRelease($facts);
         if ($reading->unmeasured() === AgeMeasure::UNDATED_RELEASES) {
             return true;
         }
-        if ($reading->level() === null || $this->evaluate($facts) !== null) {
+        $metadata = $facts->metadata();
+        if ($metadata === null || $reading->level() === null || $this->evaluate($facts) !== null) {
             return false;
         }
+        // A branch with no dated release has an undated highest tag too.
         foreach ($metadata->latestStableByBranch() as $key => $release) {
-            if (ReleaseBranch::isAbove((string) $key, $branch) && ($release['at'] === null || $release['highest']['at'] === null)) {
+            if (ReleaseBranch::isAbove((string) $key, $branch) && $release['highest']['at'] === null) {
                 return true;
             }
         }
