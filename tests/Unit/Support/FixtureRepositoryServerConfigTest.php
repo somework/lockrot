@@ -51,7 +51,8 @@ final class FixtureRepositoryServerConfigTest extends TestCase
             $server->stop();
         }
 
-        self::assertSame([[], []], [$config->get('github-oauth'), $config->get('http-basic')]);
+        // Composer 2.2 gives null for a key that no source sets.
+        self::assertSame([[], []], [$config->get('github-oauth') ?? [], $config->get('http-basic') ?? []]);
         self::assertNotSame([], $repositories);
         self::assertSame((string) json_encode(['github-oauth' => ['github.com' => 'not a valid token!']]), Platform::getEnv('COMPOSER_AUTH'), 'the environment of the test process is restored');
     }
