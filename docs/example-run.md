@@ -154,7 +154,7 @@ high (39)
           requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-bundle v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-bundle ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0,
@@ -202,7 +202,7 @@ high (39)
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 3 flagged packages: spomky-labs/otphp (left-behind · vulnerable), symfony/security-guard (abandoned),
       thecodingmachine/safe (left-behind)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   scheb/2fa-trusted-device v5.13.2  direct  ·  left-behind
       16 = left-behind 16
       do: require scheb/2fa-trusted-device ^7.14 — clears left-behind; 7.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 ||
@@ -213,7 +213,7 @@ high (39)
           move too; a new major brings its own requirements; Composer's solver refuses it against the lock
       left-behind  branch 5.x last released 2022-01-03 (4.8 years ago); 7.x released v7.14.0 (2026-01-24)
       pulls in 1 flagged package: symfony/security-guard (abandoned)
-      checks missing: S2, S8 (undated releases)
+      checks missing: S2 (undated releases)
   symfony/webpack-encore-bundle v1.17.2  direct  ·  left-behind
       16 = left-behind 16
       do: require symfony/webpack-encore-bundle ^2.4 — clears left-behind; 2.x needs php >=8.1.0, which require.php
@@ -466,7 +466,7 @@ scheb/2fa-google-authenticator 3 · friendsofsymfony/oauth-server-bundle 2 · �
 advisories: 200 packages asked · packagist.org answered (184 on record for 50 packages)
 moves: checked with the solver of Composer 2.10.3 against the lock; ext-* requirements not checked
 gate: off · --fail-on=none (default) · target php 8.4 (--target-php)
-Data as of 2026-10-18 (package repositories; repository activity from lockrot's cache, up to 20 h old) · score model 1.
+Data as of 2026-10-18 (package repositories; repository activity from lockrot's cache, up to 21 h old) · score model 1.
 Run composer lockrot --format=json for details.
 ```
 
@@ -532,7 +532,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         "version": "0.13.0",
         "schema": 2
     },
-    "generated_at": "2026-10-18T13:55:00+00:00",
+    "generated_at": "2026-10-18T14:33:08+00:00",
     "run": {
         "project": "wallabag/wallabag",
         "root_package": "wallabag/wallabag",
@@ -880,7 +880,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         }
     },
     "activity_cache_oldest_at": "2026-10-17T18:03:03+00:00",
-    "activity_cache_age_hours": 19.9,
+    "activity_cache_age_hours": 20.5,
     "packages_checked": 200,
     "packages_flagged": 57,
     "packages_multi_flag": 12,
@@ -1160,7 +1160,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
         ],
         "fix_unknown": 0
     },
-    "data_date": "2026-10-18T13:55:00+00:00",
+    "data_date": "2026-10-18T14:33:08+00:00",
     "notes": [],
     "note_details": [],
     "findings": [
@@ -1553,7 +1553,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
                 {
                     "id": "S9",
                     "level": "high",
-                    "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed by 11.5.0",
+                    "summary": "2 security advisories affect v10.0.3 (PKSA-kbc7-dq62-pt7d, PKSA-qv5y-crcz-9nxw); fixed in 11.4.3",
                     "data": {
                         "advisories": [
                             {
@@ -1684,7 +1684,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
             ],
             "evidence": "left-behind: branch 10.x last released 2022-03-17 (4.6 years ago); 11.x released 11.5.0 (2026-06-06); vulnerable: 2 advisories: 1 high, 1 medium — none fixed on 10.x; worst: PKSA-kbc7-dq62-pt7d Unbounded digits parameter in a provisioning URI triggers an uncaught DivisionByZeroError in OTP generation",
             "allowlist_reason": null,
-            "data_date": "2026-10-18T13:55:00+00:00",
+            "data_date": "2026-10-18T14:33:08+00:00",
             "libyears": 4.22,
             "age": {
                 "installed": {
