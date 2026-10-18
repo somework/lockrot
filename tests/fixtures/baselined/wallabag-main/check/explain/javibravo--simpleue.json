@@ -1185,7 +1185,13 @@
                 }
             ]
         },
-        "move_check": null
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        }
     },
     "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],

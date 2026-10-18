@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support\Contract;
 
 use Composer\Console\Application;
+use Composer\Factory;
+use Composer\IO\NullIO;
+use Composer\Package\Loader\RootPackageLoader;
+use Composer\Repository\RepositoryFactory;
 use Lockrot\Allowlist\BuiltinAllowlist;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Analyzer;
@@ -27,6 +31,7 @@ use Lockrot\Data\Http\HttpResult;
 use Lockrot\Data\Http\RecordedHttpClient;
 use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Deadline;
 use Lockrot\Explain\Explanation;
 use Lockrot\Html\PageData;
 use Lockrot\Html\ReportDocument;
@@ -39,11 +44,13 @@ use Lockrot\Output\FormatContext;
 use Lockrot\Output\Formatters;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Solver\MoveCheckers;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\SplitStreamTester;
 use Lockrot\Tests\Support\VersionMask;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Version;
 
 /**
@@ -186,7 +193,7 @@ final class BaselinedScenario
         if ($baseline !== null) {
             BaselineFile::resolve($dir, self::BASELINE, Version::STRING)->write($baseline);
         }
-        $factory = fn (): Analyzer => $this->analyzer(Clock::fixed($now), self::argValue($argv, '--target-php'), self::projectPhp($side));
+        $factory = fn (): Analyzer => $this->analyzer(Clock::fixed($now), self::argValue($argv, '--target-php'), $side);
         $command = new LockrotCommand($factory);
         $app = new Application();
         $app->setAutoExit(false);
@@ -338,28 +345,39 @@ final class BaselinedScenario
         $lock = LockFile::fromFile(self::FIXTURES.$dir.'/composer.lock');
         $dev = $this->scenario['dev'];
 
-        return $this->analyzer(Clock::fixed($now), $target, $project->requirePhp())->analyzeWithFacts($lock->packages($dev), $lock, $project, $dev);
+        return $this->analyzer(Clock::fixed($now), $target, $dir)->analyzeWithFacts($lock->packages($dev), $lock, $project, $dev);
     }
 
-    private function analyzer(Clock $clock, string $target, ?string $projectPhp): Analyzer
+    /** An Analyzer that checks the moves of the project in $side, as lockrot run in it does. */
+    private function analyzer(Clock $clock, string $target, string $side): Analyzer
     {
         $server = $this->server;
         if ($server === null) {
             throw new \LogicException('the fixture server is not started');
         }
         $auth = ForgeAuth::withTokens(new Tokens('recorded', null));
+        $project = ProjectConfig::fromFile(self::FIXTURES.$side.'/composer.json');
+        $json = JsonPath::decodeFile(self::FIXTURES.$side.'/composer.json');
+        $config = $server->config();
+        $settings = \is_array($json['config'] ?? null) ? $json['config'] : [];
+        $platform = $settings['platform'] ?? [];
+        $config->merge(['config' => ['platform' => \is_array($platform) ? $platform : []]]);
+        $io = new NullIO();
+        /** @var array<string, mixed> $json */
+        $root = (new RootPackageLoader(RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config)), $config, null, null, $io))->load($json + ['version' => '1.0.0']);
+        $checks = MoveChecks::of(MoveCheckers::forProject($root, LockFile::fromFile(self::FIXTURES.$side.'/composer.lock'), $project, $config, $server->repositories(), $target, false, Deadline::never()));
 
-        return new Analyzer(
+        return (new Analyzer(
             new RepositoryMetadataLoader($server->repositories(), $clock),
             new ActivityClient(new RecordedHttpClient($this->github), $auth),
             new ActivityFetchPlanner($auth),
             new RepoLocator(),
             BuiltinAllowlist::load(),
-            SignalSet::default($clock, new Thresholds(), $target, PhpReleaseDates::load(), $projectPhp),
+            SignalSet::default($clock, new Thresholds(), $target, PhpReleaseDates::load(), $project->requirePhp()),
             $clock,
             false,
             new RepositoryAdvisoryLoader($server->repositories())
-        );
+        ))->withMoveChecks($checks);
     }
 
     private function server(): FixtureRepositoryServer

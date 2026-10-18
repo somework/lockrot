@@ -760,7 +760,13 @@
                 }
             ]
         },
-        "move_check": null,
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": true,
+            "ignores_extensions": true,
+            "baseline": "refused",
+            "reason": null
+        },
         "score_rules_used": {
             "counted": 9,
             "lead-first": 102,
@@ -1259,33 +1265,27 @@
             "blocked": 0,
             "none": 1
         },
-        "update_now": [
-            "phpseclib/phpseclib",
-            "symfony/monolog-bridge",
-            "guzzlehttp/psr7",
-            "symfony/cache",
-            "symfony/http-client",
-            "j0k3r/graby",
-            "symfony/polyfill-intl-idn",
-            "symfony/yaml"
-        ],
-        "update_now_command": [
-            "composer",
-            "update",
-            "phpseclib/phpseclib",
-            "symfony/monolog-bridge",
-            "guzzlehttp/psr7",
-            "symfony/cache",
-            "symfony/http-client",
-            "j0k3r/graby",
-            "symfony/polyfill-intl-idn",
-            "symfony/yaml"
-        ],
+        "update_now": [],
+        "update_now_command": null,
         "fix_unknown": 0
     },
     "data_date": "2026-10-14T00:00:00+00:00",
-    "notes": [],
-    "note_details": [],
+    "notes": [
+        "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested."
+    ],
+    "note_details": [
+        {
+            "code": "moves_not_checked",
+            "text": "moves not checked: Composer's solver refuses the lock itself at php 8.4.99, so it would refuse every move: laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.",
+            "docs_url": "https://lockrot.dev/notes/#moves_not_checked",
+            "sets_network_failures": false,
+            "data": {
+                "reason": "baseline_refused",
+                "php": "8.4.99",
+                "problem": "Problem 1\n    - laminas/laminas-code is locked to version 4.7.1 and an update of this package was not requested.\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.\n  Problem 2\n    - php-http/guzzle5-adapter is locked to version 2.0.0 and an update of this package was not requested.\n    - php-http/guzzle5-adapter 2.0.0 requires php ^7.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.\n  Problem 3\n    - friendsoftwig/twigcs is locked to version v6.1.0 and an update of this package was not requested.\n    - friendsoftwig/twigcs v6.1.0 requires php ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement.\n  Problem 4\n    - friendsofphp/proxy-manager-lts is locked to version v1.0.18 and an update of this package was not requested.\n    - friendsofphp/proxy-manager-lts v1.0.18 requires laminas/laminas-code ~3.4.1|^4.0 -> satisfiable by laminas/laminas-code[4.7.1].\n    - laminas/laminas-code 4.7.1 requires php >=7.4, <8.2 -> your php version (8.4.99; overridden via config.platform, actual: 8.5.11) does not satisfy that requirement."
+            }
+        }
+    ],
     "findings": [
         {
             "package": "twig/twig",
@@ -1493,7 +1493,11 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -1510,7 +1514,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it"
+                "text": "raise require.php to >=8.1, then require twig/twig ^3.27.0 \u2014 clears 15 advisories; 3.x needs php >=8.1.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -1554,7 +1558,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -2577,7 +2585,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -2591,7 +2603,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require guzzlehttp/guzzle ^8.2 \u2014 clears left-behind, old-promise and 14 advisories; 8.x needs php ^7.4 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^5.3.4) and bdunogier/guzzle-site-authenticator 1.1.0 (requires ^5.3.1; itself stale) and php-http/guzzle5-adapter 2.0.0 (requires ^5.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -4216,7 +4228,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -4229,7 +4245,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/http-foundation ^5.4.50 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -4759,7 +4775,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -4772,7 +4792,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/mime ^5.4.52 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/mime ^5.4.52 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -5292,7 +5312,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.20",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -5352,7 +5376,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -5366,7 +5394,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/security-http ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50) and symfony/security-bundle v4.4.50 (requires ^4.4.50; itself left-behind) and symfony/security-guard v4.4.46 (requires ^4.4.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/security-http ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50) and symfony/security-bundle v4.4.50 (requires ^4.4.50; itself left-behind) and symfony/security-guard v4.4.46 (requires ^4.4.1; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -5551,7 +5579,11 @@
                                                     "kind": "require",
                                                     "to_branch": "5.x",
                                                     "constraint": "^5.4.20",
-                                                    "check": null
+                                                    "check": {
+                                                        "result": "not_checked",
+                                                        "form": null,
+                                                        "reason": "baseline_refused"
+                                                    }
                                                 }
                                             }
                                         },
@@ -5634,7 +5666,11 @@
                                                     "kind": "require",
                                                     "to_branch": "5.x",
                                                     "constraint": "^5.4.20",
-                                                    "check": null
+                                                    "check": {
+                                                        "result": "not_checked",
+                                                        "form": null,
+                                                        "reason": "baseline_refused"
+                                                    }
                                                 }
                                             }
                                         },
@@ -9612,7 +9648,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "6.x",
                                 "constraint": "^6.13",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -9649,7 +9689,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -9676,7 +9720,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move spomky-labs/otphp to ^11.5 through scheb/2fa-google-authenticator \u2014 clears left-behind and 2 advisories; 11.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-google-authenticator v5.13.2 (requires ^9.1|^10.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -9838,7 +9882,11 @@
                                                     "kind": "raise-php",
                                                     "to_branch": "6.x",
                                                     "constraint": "^6.13",
-                                                    "check": null
+                                                    "check": {
+                                                        "result": "not_checked",
+                                                        "form": null,
+                                                        "reason": "baseline_refused"
+                                                    }
                                                 }
                                             }
                                         }
@@ -9889,7 +9937,11 @@
                                                     "kind": "raise-php",
                                                     "to_branch": "6.x",
                                                     "constraint": "^6.13",
-                                                    "check": null
+                                                    "check": {
+                                                        "result": "not_checked",
+                                                        "form": null,
+                                                        "reason": "baseline_refused"
+                                                    }
                                                 }
                                             }
                                         }
@@ -10485,13 +10537,17 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "phpseclib/phpseclib"
+                        "phpseclib/phpseclib:^3.0.57"
                     ]
                 ],
                 "through": [
@@ -10519,7 +10575,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update phpseclib/phpseclib (gets 3.0.57) \u2014 clears 5 advisories"
+                "text": "composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) \u2014 clears 5 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -10563,7 +10619,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -11010,13 +11070,17 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/monolog-bridge"
+                        "symfony/monolog-bridge:^5.4.52"
                     ]
                 ],
                 "through": [
@@ -11033,7 +11097,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/monolog-bridge (gets v5.4.52) \u2014 clears the advisory"
+                "text": "composer update 'symfony/monolog-bridge:^5.4.52' (gets v5.4.52) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -11077,7 +11141,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -11485,7 +11553,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -11498,7 +11570,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require enshrined/svg-sanitize ^1.0 \u2014 clears left-behind and 4 advisories; 1.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.15.4); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require enshrined/svg-sanitize ^1.0 \u2014 clears left-behind and 4 advisories; 1.x needs php ^7.1 || ^8.0, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^0.15.4); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -12054,7 +12126,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -12067,7 +12143,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/mailer ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/mailer ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -12529,7 +12605,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -12542,7 +12622,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/routing ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/routing ^5.4.53 \u2014 clears left-behind and 2 advisories; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -13046,7 +13126,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -13059,7 +13143,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/dom-crawler ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.45); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/dom-crawler ^5.4.52 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.45); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -13524,7 +13608,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -13538,7 +13626,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/validator ^5.4.43 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and kphoen/rulerz-bridge 1.1.1 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/validator ^5.4.43 \u2014 clears left-behind and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and kphoen/rulerz-bridge 1.1.1 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -19746,7 +19834,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -19765,7 +19857,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require babdev/pagerfanta-bundle ^4.6 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require babdev/pagerfanta-bundle ^4.6 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -20095,7 +20187,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -20114,7 +20210,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require doctrine/collections ^2.6 \u2014 clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.8); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require doctrine/collections ^2.6 \u2014 clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.8); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -20421,7 +20517,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -20448,7 +20548,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -20468,7 +20572,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v4.4.48 (requires ~1.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require doctrine/event-manager ^2.1 \u2014 clears left-behind; 2.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^1.2) and symfony/doctrine-bridge v4.4.48 (requires ~1.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -20784,7 +20888,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.52",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -20811,7 +20919,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -20831,7 +20943,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require egulias/email-validator ^4.0 \u2014 clears left-behind; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.2.6) and symfony/mailer v4.4.49 (requires ^2.1.10|^3; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require egulias/email-validator ^4.0 \u2014 clears left-behind; 4.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.2.6) and symfony/mailer v4.4.49 (requires ^2.1.10|^3; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -21141,7 +21253,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -21160,7 +21276,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.0, then require friendsofsymfony/jsrouting-bundle ^3.6 \u2014 clears left-behind; 3.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.8); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.0, then require friendsofsymfony/jsrouting-bundle ^3.6 \u2014 clears left-behind; 3.x needs php ^8.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^2.8); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -21486,7 +21602,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "6.x",
                                 "constraint": "^6.13",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -21513,7 +21633,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -21533,7 +21657,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires 4.1.5) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require lcobucci/jwt ^5.6 \u2014 clears left-behind; 5.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires 4.1.5) and scheb/2fa-trusted-device v5.13.2 (requires ^3.4|^4.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -21864,7 +21988,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -21883,7 +22011,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require pagerfanta/doctrine-orm-adapter ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require pagerfanta/doctrine-orm-adapter ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -22239,7 +22367,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -22258,7 +22390,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then require pagerfanta/twig ^4.9 \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^3.8); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -22609,7 +22741,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -22628,7 +22764,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-backup-code ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-backup-code ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -22952,7 +23088,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "6.x",
                                 "constraint": "^6.13",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -22974,7 +23114,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "6.x",
                                 "constraint": "^6.13",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -22996,7 +23140,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "6.x",
                                 "constraint": "^6.13",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -23040,7 +23188,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "6.x",
                                 "constraint": "^6.13",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -23067,7 +23219,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -23087,7 +23243,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-bundle ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2) and scheb/2fa-backup-code v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-email v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-google-authenticator v5.13.2 (requires self.version; itself left-behind) and scheb/2fa-qr-code v5.13.2 (requires self.version; itself abandoned) and scheb/2fa-trusted-device v5.13.2 (requires self.version; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -23400,7 +23556,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -23419,7 +23579,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-email ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-email ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -23727,7 +23887,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -23746,7 +23910,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-google-authenticator ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-google-authenticator ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24112,7 +24276,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -24131,7 +24299,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "raise require.php to >=8.2, then require scheb/2fa-trusted-device ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.2, then require scheb/2fa-trusted-device ^6.13 \u2014 clears left-behind; 6.x needs php ~8.2.0 || ~8.3.0 || ~8.4.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by composer.json (requires ^5.13.2); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24483,7 +24651,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -24496,7 +24668,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/asset ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.46); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/asset ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.46); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -24802,7 +24974,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -24829,7 +25005,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -24843,7 +25023,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/config ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/dependency-injection v4.4.49 (conflicts with <4.3|>=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/config ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/dependency-injection v4.4.49 (conflicts with <4.3|>=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -25199,7 +25379,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -25213,7 +25397,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/console ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49) and symfony/http-kernel v4.4.51 (conflicts with >=5); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/console ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49) and symfony/http-kernel v4.4.51 (conflicts with >=5); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -25535,7 +25719,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -25548,7 +25736,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/dependency-injection ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/dependency-injection ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -25890,7 +26078,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -25903,7 +26095,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/doctrine-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/doctrine-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -26232,7 +26424,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -26246,7 +26442,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/error-handler ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/http-kernel v4.4.51 (requires ^4.4); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/error-handler ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/http-kernel v4.4.51 (requires ^4.4); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -26585,7 +26781,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -26607,7 +26807,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -26645,7 +26849,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.52",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -26667,7 +26875,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -26690,7 +26902,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.53",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -26717,7 +26933,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -26731,7 +26951,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/event-dispatcher ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/console v4.4.49 (conflicts with <4.3|>=5; itself left-behind) and symfony/form v4.4.48 (requires ^4.3; itself left-behind) and symfony/http-kernel v4.4.51 (requires ^4.4) and symfony/mailer v4.4.49 (requires ^4.3; itself left-behind) and symfony/security-core v4.4.48 (conflicts with <4.3|>=5; itself left-behind) and symfony/security-http v4.4.50 (conflicts with >=5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/event-dispatcher ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/console v4.4.49 (conflicts with <4.3|>=5; itself left-behind) and symfony/form v4.4.48 (requires ^4.3; itself left-behind) and symfony/http-kernel v4.4.51 (requires ^4.4) and symfony/mailer v4.4.49 (requires ^4.3; itself left-behind) and symfony/security-core v4.4.48 (conflicts with <4.3|>=5; itself left-behind) and symfony/security-http v4.4.50 (conflicts with >=5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -27078,7 +27298,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -27091,7 +27315,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/finder ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/finder ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -27449,7 +27673,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -27463,7 +27691,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/form ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and kphoen/rulerz-bridge 1.1.1 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/form ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and kphoen/rulerz-bridge 1.1.1 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -27801,7 +28029,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -27815,7 +28047,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/framework-bundle ^5.4.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.51) and kphoen/rulerz-bundle 0.15.0 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/framework-bundle ^5.4.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.51) and kphoen/rulerz-bundle 0.15.0 (requires ^3.0|^4.0; itself silent); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28148,7 +28380,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -28161,7 +28397,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/google-mailer ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.41); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/google-mailer ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.41); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28472,7 +28708,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -28485,7 +28725,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/options-resolver ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/options-resolver ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -28807,7 +29047,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -28820,7 +29064,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/proxy-manager-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.39); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/proxy-manager-bridge ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.39); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29131,7 +29375,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -29144,7 +29392,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/security-bundle ^5.4.20 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/security-bundle ^5.4.20 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.50); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29458,7 +29706,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.20",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -29481,7 +29733,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.53",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -29508,7 +29764,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -29522,7 +29782,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/security-core ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and symfony/security-bundle v4.4.50 (requires ^4.4; itself left-behind) and symfony/security-http v4.4.50 (requires ^4.4.8; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/security-core ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.48) and symfony/security-bundle v4.4.50 (requires ^4.4; itself left-behind) and symfony/security-http v4.4.50 (requires ^4.4.8; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -29845,7 +30105,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -29858,7 +30122,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/templating ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/templating ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -30169,7 +30433,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -30182,7 +30450,7 @@
                 ],
                 "through": [],
                 "also": [],
-                "text": "require symfony/twig-bundle ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.41); a new major brings its own requirements, which lockrot does not solve"
+                "text": "require symfony/twig-bundle ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.41); a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -36300,18 +36568,22 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "guzzlehttp/psr7"
+                        "guzzlehttp/psr7:^2.12.3"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update guzzlehttp/psr7 (gets 2.13.1) \u2014 clears 4 advisories"
+                "text": "composer update 'guzzlehttp/psr7:^2.12.3' (gets 2.13.1) \u2014 clears 4 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -36355,7 +36627,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -36771,13 +37047,17 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/cache"
+                        "symfony/cache:^5.4.52"
                     ]
                 ],
                 "through": [
@@ -37069,7 +37349,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/cache (gets v5.4.53) \u2014 clears the advisory"
+                "text": "composer update 'symfony/cache:^5.4.52' (gets v5.4.53) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -37113,7 +37393,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -37452,13 +37736,17 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/http-client"
+                        "symfony/http-client:^5.4.53"
                     ]
                 ],
                 "through": [
@@ -37486,7 +37774,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/http-client (gets v5.4.53) \u2014 clears the advisory"
+                "text": "composer update 'symfony/http-client:^5.4.53' (gets v5.4.53) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -37530,7 +37818,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -37897,7 +38189,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "11.x",
                                 "constraint": "^11.5",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -37929,7 +38225,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -37956,7 +38256,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move thecodingmachine/safe to ^3.4 through scheb/2fa-google-authenticator \u2014 clears left-behind and old-promise; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by spomky-labs/otphp v10.0.3 (requires ^0.1.14|^1.0|^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -38330,7 +38630,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "3.x",
                                 "constraint": "^3.6",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -38362,7 +38666,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -38393,7 +38701,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move willdurand/jsonp-callback-validator to ^2.0.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; stale stays; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move willdurand/jsonp-callback-validator to ^2.0.0 through friendsofsymfony/jsrouting-bundle, friendsofsymfony/rest-bundle \u2014 clears old-promise; 2.x needs php >=7.1.0, which require.php allows; the target php 8.4 runs it; stale stays; held by friendsofsymfony/jsrouting-bundle 2.8.0 (requires ~1.1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -40257,7 +40565,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "5.x",
                                 "constraint": "^5.1",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -40284,7 +40596,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -40311,7 +40627,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move bacon/bacon-qr-code to ^3.1 through scheb/2fa-qr-code \u2014 clears left-behind; 3.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -40617,7 +40933,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -40710,7 +41030,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.4, then move doctrine/instantiator to ^2.1 through doctrine/orm, jms/serializer, jms/serializer-bundle and 4 more \u2014 clears left-behind; 2.x needs php ^8.4, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of doctrine/orm (3.7.1) and jms/serializer (3.32.9) still require it"
+                "text": "raise require.php to >=8.4, then move doctrine/instantiator to ^2.1 through doctrine/orm, jms/serializer, jms/serializer-bundle and 4 more \u2014 clears left-behind; 2.x needs php ^8.4, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of doctrine/orm (3.7.1) and jms/serializer (3.32.9) still require it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -41044,7 +41364,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -41071,7 +41395,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move endroid/qr-code to ^5.1 through scheb/2fa-qr-code \u2014 clears left-behind; 5.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-qr-code v5.13.2 (requires ^3.0; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move endroid/qr-code to ^5.1 through scheb/2fa-qr-code \u2014 clears left-behind; 5.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by scheb/2fa-qr-code v5.13.2 (requires ^3.0; itself abandoned); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -41372,7 +41696,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "5.x",
                                 "constraint": "^5.1",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -41399,7 +41727,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -41426,7 +41758,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move khanamiryan/qrcode-detector-decoder to ^2.0 through scheb/2fa-qr-code \u2014 clears left-behind; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^1.0.5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move khanamiryan/qrcode-detector-decoder to ^2.0 through scheb/2fa-qr-code \u2014 clears left-behind; 2.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by endroid/qr-code 3.9.7 (requires ^1.0.5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -41728,7 +42060,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "5.x",
                                 "constraint": "^5.6",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -41755,7 +42091,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -41799,7 +42139,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6 through lcobucci/jwt, scheb/2fa-trusted-device \u2014 clears left-behind; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by lcobucci/jwt 4.1.5 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.4, then move lcobucci/clock to ^3.6 through lcobucci/jwt, scheb/2fa-trusted-device \u2014 clears left-behind; 3.x needs php ~8.4.0 || ~8.5.0, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by lcobucci/jwt 4.1.5 (requires ^2.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -42101,7 +42441,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "4.x",
                                 "constraint": "^4.6",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -42123,7 +42467,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "4.x",
                                 "constraint": "^4.9",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     },
@@ -42145,7 +42493,11 @@
                                 "kind": "raise-php",
                                 "to_branch": "4.x",
                                 "constraint": "^4.9",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -42172,7 +42524,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -42221,7 +42577,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move pagerfanta/core to ^4.9 through babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter, pagerfanta/twig \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by babdev/pagerfanta-bundle v3.8.0 (requires ^3.1; itself left-behind) and pagerfanta/doctrine-orm-adapter v3.8.0 (requires ^3.0; itself left-behind) and pagerfanta/twig v3.8.0 (requires ^3.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "raise require.php to >=8.1, then move pagerfanta/core to ^4.9 through babdev/pagerfanta-bundle, pagerfanta/doctrine-orm-adapter, pagerfanta/twig \u2014 clears left-behind; 4.x needs php ^8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; held by babdev/pagerfanta-bundle v3.8.0 (requires ^3.1; itself left-behind) and pagerfanta/doctrine-orm-adapter v3.8.0 (requires ^3.0; itself left-behind) and pagerfanta/twig v3.8.0 (requires ^3.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -42524,7 +42880,11 @@
                                 "kind": "update",
                                 "to_branch": "2.x",
                                 "constraint": null,
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -42551,7 +42911,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -42571,7 +42935,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move smalot/pdfparser to ^2.12 through j0k3r/graby \u2014 clears left-behind; 2.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby v2.5.0 (requires ^1.1; itself low: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move smalot/pdfparser to ^2.12 through j0k3r/graby \u2014 clears left-behind; 2.x needs php >=7.1, which require.php allows; the target php 8.4 runs it; held by j0k3r/graby v2.5.0 (requires ^1.1; itself low: vulnerable); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -42875,7 +43239,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -42902,7 +43270,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -43329,7 +43701,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more \u2014 clears left-behind; 2.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/event-dispatcher v4.4.44 (requires ^1.1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more \u2014 clears left-behind; 2.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/event-dispatcher v4.4.44 (requires ^1.1; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -43698,7 +44070,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -43894,7 +44270,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/property-access to ^5.4 through babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by kphoen/rulerz 0.21.1 (requires ~3.0|~4.0; itself old-promise); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move symfony/property-access to ^5.4 through babdev/pagerfanta-bundle, craue/config-bundle, friendsofsymfony/oauth-server-bundle and 14 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by kphoen/rulerz 0.21.1 (requires ~3.0|~4.0; itself old-promise); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -44218,7 +44594,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -44245,7 +44625,7 @@
                     }
                 ],
                 "also": [],
-                "text": "raise require.php to >=8.1, then move symfony/psr-http-message-bridge to ^6.4 through sentry/sentry-symfony \u2014 clears left-behind; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of sentry/sentry-symfony (5.13.0) still requires it"
+                "text": "raise require.php to >=8.1, then move symfony/psr-http-message-bridge to ^6.4 through sentry/sentry-symfony \u2014 clears left-behind; 6.x needs php >=8.1, require.php allows 7.4 (a major raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of sentry/sentry-symfony (5.13.0) still requires it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -44547,7 +44927,11 @@
                                 "kind": "require",
                                 "to_branch": "5.x",
                                 "constraint": "^5.4.43",
-                                "check": null
+                                "check": {
+                                    "result": "not_checked",
+                                    "form": null,
+                                    "reason": "baseline_refused"
+                                }
                             }
                         }
                     }
@@ -44574,7 +44958,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -44594,7 +44982,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+                "text": "move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -44912,7 +45300,11 @@
                         "composer_resolves"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -45295,7 +45687,7 @@
                     }
                 ],
                 "also": [],
-                "text": "move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47); a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.5) still requires it"
+                "text": "move symfony/var-dumper to ^5.4 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 31 more \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.47); a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest release of symfony/error-handler (v8.1.5) still requires it; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "clear",
@@ -45628,18 +46020,22 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "j0k3r/graby"
+                        "j0k3r/graby:^2.5.1"
                     ]
                 ],
                 "through": [],
                 "also": [],
-                "text": "composer update j0k3r/graby (gets 2.5.3) \u2014 clears the advisory"
+                "text": "composer update 'j0k3r/graby:^2.5.1' (gets 2.5.3) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -45683,7 +46079,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -46032,13 +46432,17 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/polyfill-intl-idn"
+                        "symfony/polyfill-intl-idn:^1.38.1"
                     ]
                 ],
                 "through": [
@@ -46473,7 +46877,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/polyfill-intl-idn (gets v1.42.0) \u2014 clears the advisory"
+                "text": "composer update 'symfony/polyfill-intl-idn:^1.38.1' (gets v1.42.0) \u2014 clears the advisory; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -46517,7 +46921,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -46905,13 +47313,17 @@
                         "clears_hold"
                     ]
                 },
-                "check": null,
+                "check": {
+                    "result": "not_checked",
+                    "form": null,
+                    "reason": "baseline_refused"
+                },
                 "composer_moves_because": [],
                 "commands": [
                     [
                         "composer",
                         "update",
-                        "symfony/yaml"
+                        "symfony/yaml:^5.4.52"
                     ]
                 ],
                 "through": [
@@ -46950,7 +47362,7 @@
                     }
                 ],
                 "also": [],
-                "text": "composer update symfony/yaml (gets v5.4.53) \u2014 clears 3 advisories"
+                "text": "composer update 'symfony/yaml:^5.4.52' (gets v5.4.53) \u2014 clears 3 advisories; not checked with Composer's solver (Composer refuses the lock itself), so it holds only if Composer resolves it"
             },
             "security": {
                 "status": "vulnerable",
@@ -46994,7 +47406,11 @@
                             "clears_hold"
                         ]
                     },
-                    "check": null
+                    "check": {
+                        "result": "not_checked",
+                        "form": null,
+                        "reason": "baseline_refused"
+                    }
                 },
                 "move_in": "next_step",
                 "gets": {
