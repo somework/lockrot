@@ -110,6 +110,7 @@
      "package": "joomla/filter",
      "version": "2.0.5",
      "link": "require",
+     "target": null,
      "constraint": "^2.0",
      "holder": {
       "verdict": "medium",
@@ -121,7 +122,8 @@
       "next_step": {
        "kind": "raise-php",
        "to_branch": "3.x",
-       "constraint": "^3.0.5"
+       "constraint": "^3.0.5",
+       "check": null
       }
      }
     }
@@ -148,6 +150,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "holders",
     "crosses_major"

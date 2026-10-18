@@ -200,6 +200,7 @@
      "package": "symfony/monolog-bundle",
      "version": "v3.8.0",
      "link": "conflict",
+     "target": null,
      "constraint": ">=5.0",
      "holder": null
     }
@@ -236,6 +237,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "holders",
     "crosses_major"
@@ -285,7 +287,8 @@
     "lowest": null,
     "newest": "v2.8.52",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -425,6 +428,7 @@
           "package": "symfony/monolog-bundle",
           "version": "v3.8.0",
           "link": "conflict",
+          "target": null,
           "constraint": ">=5.0",
           "holder": null
          }

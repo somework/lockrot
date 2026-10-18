@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -1235,6 +1236,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -1266,6 +1268,7 @@
                                 "package": null,
                                 "version": null,
                                 "link": "require",
+                                "target": null,
                                 "constraint": "~3.4",
                                 "holder": null
                             }
@@ -1303,6 +1306,7 @@
                                 "composer_resolves"
                             ]
                         },
+                        "check": null,
                         "composer_moves_because": [
                             "crosses_major"
                         ],
@@ -1352,7 +1356,8 @@
                     "lowest": null,
                     "newest": "v3.4.47",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "also",
                 "gets": null,
@@ -1497,6 +1502,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~3.4",
                                             "holder": null
                                         }

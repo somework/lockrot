@@ -342,6 +342,7 @@
          "package": null,
          "version": null,
          "link": "require",
+         "target": null,
          "constraint": "^2.6",
          "holder": null
         }

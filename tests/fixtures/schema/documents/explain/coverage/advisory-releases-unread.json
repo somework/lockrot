@@ -137,6 +137,7 @@
    ],
    "clears_all": false,
    "if_applied": null,
+   "check": null,
    "composer_moves_because": [],
    "commands": [],
    "through": [],
@@ -177,7 +178,8 @@
     "lowest": null,
     "newest": null,
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": null,

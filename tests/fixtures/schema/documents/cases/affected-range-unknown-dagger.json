@@ -777,7 +777,8 @@
      "records": 1
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": null,
  "activity_cache_age_hours": null,
@@ -1135,6 +1136,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [],
     "commands": [
      [
@@ -1194,7 +1196,8 @@
      "lowest": null,
      "newest": "v1.43.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": {

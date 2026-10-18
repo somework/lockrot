@@ -221,6 +221,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -275,7 +276,8 @@
     "lowest": null,
     "newest": "v2.16.1",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": null,
@@ -817,7 +819,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -848,7 +851,8 @@
      "lowest": null,
      "newest": "v2.16.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -879,7 +883,8 @@
      "lowest": null,
      "newest": "v1.44.8",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]

@@ -186,6 +186,7 @@
             ],
             "clears_all": false,
             "if_applied": null,
+            "check": null,
             "composer_moves_because": [
                 "transitive"
             ],
@@ -1365,7 +1366,8 @@
                     "records": 193
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],

@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 5,
             "lead-first": 52,
@@ -1458,6 +1459,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -1517,7 +1519,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -2326,6 +2329,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.3.4",
                         "holder": null
                     },
@@ -2334,6 +2338,7 @@
                         "package": "bdunogier/guzzle-site-authenticator",
                         "version": "1.1.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.3.1",
                         "holder": {
                             "verdict": "ok",
@@ -2348,6 +2353,7 @@
                         "package": "php-http/guzzle5-adapter",
                         "version": "2.0.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.1",
                         "holder": {
                             "verdict": "critical",
@@ -2359,7 +2365,8 @@
                             "next_step": {
                                 "kind": "replace",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -2461,6 +2468,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -2510,7 +2518,8 @@
                     "lowest": null,
                     "newest": "5.3.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -2679,6 +2688,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2687,6 +2697,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -2701,6 +2712,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2712,7 +2724,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2746,6 +2759,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2754,6 +2768,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -2768,6 +2783,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2779,7 +2795,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2813,6 +2830,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2821,6 +2839,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -2835,6 +2854,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2846,7 +2866,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2880,6 +2901,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2888,6 +2910,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -2902,6 +2925,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2913,7 +2937,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -2947,6 +2972,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -2955,6 +2981,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -2969,6 +2996,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -2980,7 +3008,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3014,6 +3043,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3022,6 +3052,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3036,6 +3067,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3047,7 +3079,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3081,6 +3114,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3089,6 +3123,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3103,6 +3138,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3114,7 +3150,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3148,6 +3185,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3156,6 +3194,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3170,6 +3209,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3181,7 +3221,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3215,6 +3256,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3223,6 +3265,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3237,6 +3280,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3248,7 +3292,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3282,6 +3327,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3290,6 +3336,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3304,6 +3351,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3315,7 +3363,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3349,6 +3398,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3357,6 +3407,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3371,6 +3422,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3382,7 +3434,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3416,6 +3469,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3424,6 +3478,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3438,6 +3493,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3449,7 +3505,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3483,6 +3540,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3491,6 +3549,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3505,6 +3564,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3516,7 +3576,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3550,6 +3611,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -3558,6 +3620,7 @@
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "ok",
@@ -3572,6 +3635,7 @@
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -3583,7 +3647,8 @@
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -3801,6 +3866,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4115,6 +4181,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4614,6 +4681,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -4892,6 +4960,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -5197,6 +5266,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -5448,6 +5518,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -5724,6 +5795,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -6000,6 +6072,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -6282,6 +6355,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -6627,6 +6701,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -6670,6 +6745,7 @@
                                 "package": "j0k3r/graby",
                                 "version": "2.4.5",
                                 "link": "require",
+                                "target": null,
                                 "constraint": "^2.0",
                                 "holder": {
                                     "verdict": "low",
@@ -6681,7 +6757,8 @@
                                     "next_step": {
                                         "kind": "update",
                                         "to_branch": "2.x",
-                                        "constraint": null
+                                        "constraint": null,
+                                        "check": null
                                     }
                                 }
                             }
@@ -6718,6 +6795,7 @@
                                 "composer_resolves"
                             ]
                         },
+                        "check": null,
                         "composer_moves_because": [
                             "holders",
                             "crosses_major"
@@ -6762,7 +6840,8 @@
                     "lowest": null,
                     "newest": "v2.0.2",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -7058,6 +7137,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.49",
                         "holder": null
                     }
@@ -7089,6 +7169,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -7137,7 +7218,8 @@
                     "lowest": null,
                     "newest": "v4.4.49",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -7256,6 +7338,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.49",
                                             "holder": null
                                         }
@@ -7289,6 +7372,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.49",
                                             "holder": null
                                         }
@@ -7466,6 +7550,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.47",
                         "holder": null
                     }
@@ -7497,6 +7582,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -7545,7 +7631,8 @@
                     "lowest": null,
                     "newest": "v4.4.47",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -7667,6 +7754,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.47",
                                             "holder": null
                                         }
@@ -7700,6 +7788,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.47",
                                             "holder": null
                                         }
@@ -7879,6 +7968,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.50",
                         "holder": null
                     },
@@ -7887,6 +7977,7 @@
                         "package": "symfony/security-bundle",
                         "version": "v4.4.50",
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.50",
                         "holder": {
                             "verdict": "ok",
@@ -7901,6 +7992,7 @@
                         "package": "symfony/security-guard",
                         "version": "v4.4.46",
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.1",
                         "holder": {
                             "verdict": "high",
@@ -7912,7 +8004,8 @@
                             "next_step": {
                                 "kind": "find-alternative",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -7944,6 +8037,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -7993,7 +8087,8 @@
                     "lowest": null,
                     "newest": "v4.4.50",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -8089,6 +8184,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.50",
                                             "holder": null
                                         },
@@ -8097,6 +8193,7 @@
                                             "package": "symfony/security-bundle",
                                             "version": "v4.4.50",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.50",
                                             "holder": {
                                                 "verdict": "ok",
@@ -8111,6 +8208,7 @@
                                             "package": "symfony/security-guard",
                                             "version": "v4.4.46",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.1",
                                             "holder": {
                                                 "verdict": "high",
@@ -8122,7 +8220,8 @@
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -8156,6 +8255,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.50",
                                             "holder": null
                                         },
@@ -8164,6 +8264,7 @@
                                             "package": "symfony/security-bundle",
                                             "version": "v4.4.50",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.50",
                                             "holder": {
                                                 "verdict": "ok",
@@ -8178,6 +8279,7 @@
                                             "package": "symfony/security-guard",
                                             "version": "v4.4.46",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.1",
                                             "holder": {
                                                 "verdict": "high",
@@ -8189,7 +8291,8 @@
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -8410,6 +8513,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -8463,7 +8567,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -8925,6 +9030,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -9001,7 +9107,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -9396,6 +9503,7 @@
                         "package": "scheb/2fa-google-authenticator",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "^9.1|^10.0",
                         "holder": {
                             "verdict": "ok",
@@ -9433,6 +9541,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -9495,7 +9604,8 @@
                     "lowest": null,
                     "newest": "v10.0.3",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -9580,6 +9690,7 @@
                                             "package": "scheb/2fa-google-authenticator",
                                             "version": "v5.13.2",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.1|^10.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -9619,6 +9730,7 @@
                                             "package": "scheb/2fa-google-authenticator",
                                             "version": "v5.13.2",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.1|^10.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -9813,6 +9925,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -9878,7 +9991,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -10199,6 +10313,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -10527,6 +10642,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -11035,6 +11151,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -11342,6 +11459,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -11664,6 +11782,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12000,6 +12119,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12335,6 +12455,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -12682,6 +12803,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13091,6 +13213,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13494,6 +13617,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -13862,6 +13986,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14197,6 +14322,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14532,6 +14658,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -14878,6 +15005,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15184,6 +15312,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15452,6 +15581,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -15794,6 +15924,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16152,6 +16283,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16460,6 +16592,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -16769,6 +16902,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17077,6 +17211,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17385,6 +17520,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -17694,6 +17830,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18003,6 +18140,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18311,6 +18449,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18620,6 +18759,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -18927,6 +19067,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -19236,6 +19377,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -19546,6 +19688,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -19854,6 +19997,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -20168,6 +20312,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -20630,6 +20775,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -21007,6 +21153,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^0.15.4",
                         "holder": null
                     }
@@ -21048,6 +21195,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -21096,7 +21244,8 @@
                     "lowest": null,
                     "newest": "0.15.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -21182,6 +21331,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^0.15.4",
                                             "holder": null
                                         }
@@ -21215,6 +21365,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^0.15.4",
                                             "holder": null
                                         }
@@ -21248,6 +21399,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^0.15.4",
                                             "holder": null
                                         }
@@ -21281,6 +21433,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^0.15.4",
                                             "holder": null
                                         }
@@ -21493,6 +21646,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -21546,7 +21700,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -21893,6 +22048,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.49",
                         "holder": null
                     }
@@ -21919,6 +22075,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -21967,7 +22124,8 @@
                     "lowest": null,
                     "newest": "v4.4.49",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -22054,6 +22212,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.49",
                                             "holder": null
                                         }
@@ -22233,6 +22392,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.44",
                         "holder": null
                     }
@@ -22264,6 +22424,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -22312,7 +22473,8 @@
                     "lowest": null,
                     "newest": "v4.4.44",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -22422,6 +22584,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.44",
                                             "holder": null
                                         }
@@ -22455,6 +22618,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.44",
                                             "holder": null
                                         }
@@ -22643,6 +22807,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -22983,7 +23148,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -23307,6 +23473,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -23383,7 +23550,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -23746,6 +23914,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -24086,6 +24255,7 @@
                         "package": "friendsofsymfony/jsrouting-bundle",
                         "version": "2.8.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "~1.1",
                         "holder": {
                             "verdict": "ok",
@@ -24123,6 +24293,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -24483,6 +24654,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -24756,6 +24928,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -25019,6 +25192,7 @@
                         "package": "scheb/2fa-qr-code",
                         "version": "v5.13.2",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0",
                         "holder": {
                             "verdict": "critical",
@@ -25030,7 +25204,8 @@
                             "next_step": {
                                 "kind": "find-alternative",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -25057,6 +25232,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -25334,6 +25510,7 @@
                         "package": "j0k3r/graby",
                         "version": "2.4.5",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.1",
                         "holder": {
                             "verdict": "low",
@@ -25345,7 +25522,8 @@
                             "next_step": {
                                 "kind": "update",
                                 "to_branch": "2.x",
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -25372,6 +25550,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -25668,6 +25847,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -26331,6 +26511,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -26384,7 +26565,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -26691,6 +26873,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.45",
                         "holder": null
                     }
@@ -26717,6 +26900,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -26765,7 +26949,8 @@
                     "lowest": null,
                     "newest": "v4.4.45",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -26851,6 +27036,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.45",
                                             "holder": null
                                         }
@@ -27015,6 +27201,7 @@
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^4.4.48",
                         "holder": null
                     },
@@ -27023,6 +27210,7 @@
                         "package": "kphoen/rulerz-bridge",
                         "version": "1.1.1",
                         "link": "require",
+                        "target": null,
                         "constraint": "^3.0|^4.0",
                         "holder": {
                             "verdict": "high",
@@ -27035,7 +27223,8 @@
                             "next_step": {
                                 "kind": "find-alternative",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -27062,6 +27251,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -27111,7 +27301,8 @@
                     "lowest": null,
                     "newest": "v4.4.48",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -27200,6 +27391,7 @@
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^4.4.48",
                                             "holder": null
                                         },
@@ -27208,6 +27400,7 @@
                                             "package": "kphoen/rulerz-bridge",
                                             "version": "1.1.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^3.0|^4.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -27220,7 +27413,8 @@
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -27409,6 +27603,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -27881,7 +28076,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -28239,6 +28435,7 @@
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -28326,7 +28523,8 @@
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -28650,6 +28848,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -28903,6 +29102,7 @@
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [

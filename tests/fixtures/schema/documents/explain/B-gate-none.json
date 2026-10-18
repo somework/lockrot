@@ -200,6 +200,7 @@
      "package": null,
      "version": null,
      "link": "require",
+     "target": null,
      "constraint": "^2.6",
      "holder": null
     }
@@ -236,6 +237,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -284,7 +286,8 @@
     "lowest": null,
     "newest": "v2.8.52",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -424,6 +427,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^2.6",
           "holder": null
          }
@@ -538,6 +542,7 @@
        "package": null,
        "version": null,
        "link": "require",
+       "target": null,
        "constraint": "^2.6",
        "holder": null
       }
@@ -550,7 +555,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -586,6 +592,7 @@
        "package": null,
        "version": null,
        "link": "require",
+       "target": null,
        "constraint": "^2.6",
        "holder": null
       }
@@ -598,7 +605,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -634,6 +642,7 @@
        "package": null,
        "version": null,
        "link": "require",
+       "target": null,
        "constraint": "^2.6",
        "holder": null
       }
@@ -646,7 +655,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -682,6 +692,7 @@
        "package": null,
        "version": null,
        "link": "require",
+       "target": null,
        "constraint": "^2.6",
        "holder": null
       }
@@ -694,7 +705,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -725,7 +737,8 @@
      "lowest": null,
      "newest": "v4.4.43",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -756,7 +769,8 @@
      "lowest": null,
      "newest": "v3.4.47",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -787,7 +801,8 @@
      "lowest": null,
      "newest": "v2.8.52",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]

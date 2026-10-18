@@ -210,6 +210,7 @@
      "clears_hold"
     ]
    },
+   "check": null,
    "composer_moves_because": [],
    "commands": [
     [
@@ -272,7 +273,8 @@
      "assumes": [
       "clears_hold"
      ]
-    }
+    },
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -542,7 +544,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -580,7 +583,8 @@
       "assumes": [
        "clears_hold"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -611,7 +615,8 @@
      "lowest": null,
      "newest": "2.1.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -642,7 +647,8 @@
      "lowest": null,
      "newest": "1.4.3",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]

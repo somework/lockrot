@@ -216,6 +216,7 @@
      "package": null,
      "version": null,
      "link": "require",
+     "target": null,
      "constraint": "^5.3.4",
      "holder": null
     },
@@ -224,6 +225,7 @@
      "package": "bdunogier/guzzle-site-authenticator",
      "version": "1.1.0",
      "link": "require",
+     "target": null,
      "constraint": "^5.3.1",
      "holder": {
       "verdict": "medium",
@@ -235,7 +237,8 @@
       "next_step": {
        "kind": "no-move",
        "to_branch": null,
-       "constraint": null
+       "constraint": null,
+       "check": null
       }
      }
     },
@@ -244,6 +247,7 @@
      "package": "php-http/guzzle5-adapter",
      "version": "2.0.0",
      "link": "require",
+     "target": null,
      "constraint": "^5.1",
      "holder": {
       "verdict": "critical",
@@ -255,7 +259,8 @@
       "next_step": {
        "kind": "replace",
        "to_branch": null,
-       "constraint": null
+       "constraint": null,
+       "check": null
       }
      }
     }
@@ -357,6 +362,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "holders",
     "crosses_major"
@@ -406,7 +412,8 @@
     "lowest": null,
     "newest": "5.3.4",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": null,
@@ -574,6 +581,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -582,6 +590,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -593,7 +602,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -602,6 +612,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -613,7 +624,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -647,6 +659,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -655,6 +668,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -666,7 +680,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -675,6 +690,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -686,7 +702,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -720,6 +737,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -728,6 +746,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -739,7 +758,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -748,6 +768,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -759,7 +780,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -793,6 +815,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -801,6 +824,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -812,7 +836,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -821,6 +846,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -832,7 +858,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -866,6 +893,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -874,6 +902,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -885,7 +914,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -894,6 +924,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -905,7 +936,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -939,6 +971,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -947,6 +980,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -958,7 +992,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -967,6 +1002,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -978,7 +1014,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1012,6 +1049,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1020,6 +1058,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1031,7 +1070,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1040,6 +1080,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1051,7 +1092,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1085,6 +1127,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1093,6 +1136,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1104,7 +1148,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1113,6 +1158,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1124,7 +1170,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1158,6 +1205,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1166,6 +1214,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1177,7 +1226,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1186,6 +1236,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1197,7 +1248,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1231,6 +1283,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1239,6 +1292,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1250,7 +1304,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1259,6 +1314,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1270,7 +1326,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1304,6 +1361,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1312,6 +1370,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1323,7 +1382,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1332,6 +1392,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1343,7 +1404,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1377,6 +1439,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1385,6 +1448,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1396,7 +1460,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1405,6 +1470,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1416,7 +1482,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1450,6 +1517,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1458,6 +1526,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1469,7 +1538,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1478,6 +1548,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1489,7 +1560,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1523,6 +1595,7 @@
           "package": null,
           "version": null,
           "link": "require",
+          "target": null,
           "constraint": "^5.3.4",
           "holder": null
          },
@@ -1531,6 +1604,7 @@
           "package": "bdunogier/guzzle-site-authenticator",
           "version": "1.1.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.3.1",
           "holder": {
            "verdict": "medium",
@@ -1542,7 +1616,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          },
@@ -1551,6 +1626,7 @@
           "package": "php-http/guzzle5-adapter",
           "version": "2.0.0",
           "link": "require",
+          "target": null,
           "constraint": "^5.1",
           "holder": {
            "verdict": "critical",
@@ -1562,7 +1638,8 @@
            "next_step": {
             "kind": "replace",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -1692,6 +1769,7 @@
        "package": null,
        "version": null,
        "link": "require",
+       "target": null,
        "constraint": "^5.3.4",
        "holder": null
       },
@@ -1700,6 +1778,7 @@
        "package": "bdunogier/guzzle-site-authenticator",
        "version": "1.1.0",
        "link": "require",
+       "target": null,
        "constraint": "^5.3.1",
        "holder": {
         "verdict": "medium",
@@ -1711,7 +1790,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       },
@@ -1720,6 +1800,7 @@
        "package": "php-http/guzzle5-adapter",
        "version": "2.0.0",
        "link": "require",
+       "target": null,
        "constraint": "^5.1",
        "holder": {
         "verdict": "critical",
@@ -1731,7 +1812,8 @@
         "next_step": {
          "kind": "replace",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       }
@@ -1744,7 +1826,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -1780,6 +1863,7 @@
        "package": null,
        "version": null,
        "link": "require",
+       "target": null,
        "constraint": "^5.3.4",
        "holder": null
       },
@@ -1788,6 +1872,7 @@
        "package": "bdunogier/guzzle-site-authenticator",
        "version": "1.1.0",
        "link": "require",
+       "target": null,
        "constraint": "^5.3.1",
        "holder": {
         "verdict": "medium",
@@ -1799,7 +1884,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       },
@@ -1808,6 +1894,7 @@
        "package": "php-http/guzzle5-adapter",
        "version": "2.0.0",
        "link": "require",
+       "target": null,
        "constraint": "^5.1",
        "holder": {
         "verdict": "critical",
@@ -1819,7 +1906,8 @@
         "next_step": {
          "kind": "replace",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       }
@@ -1832,7 +1920,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -1868,6 +1957,7 @@
        "package": null,
        "version": null,
        "link": "require",
+       "target": null,
        "constraint": "^5.3.4",
        "holder": null
       },
@@ -1876,6 +1966,7 @@
        "package": "bdunogier/guzzle-site-authenticator",
        "version": "1.1.0",
        "link": "require",
+       "target": null,
        "constraint": "^5.3.1",
        "holder": {
         "verdict": "medium",
@@ -1887,7 +1978,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       },
@@ -1896,6 +1988,7 @@
        "package": "php-http/guzzle5-adapter",
        "version": "2.0.0",
        "link": "require",
+       "target": null,
        "constraint": "^5.1",
        "holder": {
         "verdict": "critical",
@@ -1907,7 +2000,8 @@
         "next_step": {
          "kind": "replace",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       }
@@ -1920,7 +2014,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -1951,7 +2046,8 @@
      "lowest": null,
      "newest": "5.3.4",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -1982,7 +2078,8 @@
      "lowest": null,
      "newest": "4.2.4",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -2013,7 +2110,8 @@
      "lowest": null,
      "newest": "v3.8.1",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -2044,7 +2142,8 @@
      "lowest": null,
      "newest": "v2.8.8",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -2075,7 +2174,8 @@
      "lowest": null,
      "newest": "v1.0.4",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]

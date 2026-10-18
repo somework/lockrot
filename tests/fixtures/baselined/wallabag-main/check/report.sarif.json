@@ -805,6 +805,7 @@
                                     "package": "scheb/2fa-google-authenticator",
                                     "version": "v5.13.2",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^9.1|^10.0",
                                     "holder": {
                                         "verdict": "high",
@@ -816,7 +817,8 @@
                                         "next_step": {
                                             "kind": "require",
                                             "to_branch": "7.x",
-                                            "constraint": "^7.14"
+                                            "constraint": "^7.14",
+                                            "check": null
                                         }
                                     }
                                 }
@@ -898,6 +900,7 @@
                                     "package": "scheb/2fa-google-authenticator",
                                     "version": "v5.13.2",
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "^9.1|^10.0",
                                     "holder": {
                                         "verdict": "high",
@@ -909,7 +912,8 @@
                                         "next_step": {
                                             "kind": "require",
                                             "to_branch": "7.x",
-                                            "constraint": "^7.14"
+                                            "constraint": "^7.14",
+                                            "check": null
                                         }
                                     }
                                 }

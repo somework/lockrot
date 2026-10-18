@@ -1282,7 +1282,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/left-behind",
-        "description": "symfony/config v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-20), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.46 (2024-10-30). Do: require symfony/config ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/dependency-injection v4.4.49 (requires <4.3|>=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "description": "symfony/config v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-20), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.46 (2024-10-30). Do: require symfony/config ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/dependency-injection v4.4.49 (conflicts with <4.3|>=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Bug Risk"
         ],
@@ -1298,7 +1298,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/left-behind",
-        "description": "symfony/console v4.4.49 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-11-05 (3.9 years ago); 8.x released v8.1.6 (2026-08-25), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.47 (2024-11-06). Do: require symfony/console ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49) and symfony/http-kernel v4.4.51 (requires >=5); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "description": "symfony/console v4.4.49 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-11-05 (3.9 years ago); 8.x released v8.1.6 (2026-08-25), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.47 (2024-11-06). Do: require symfony/console ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.49) and symfony/http-kernel v4.4.51 (conflicts with >=5); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Bug Risk"
         ],
@@ -1362,7 +1362,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/left-behind",
-        "description": "symfony/event-dispatcher v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/event-dispatcher ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/console v4.4.49 (requires <4.3|>=5; itself left-behind) and symfony/form v4.4.48 (requires ^4.3; itself left-behind) and symfony/http-kernel v4.4.51 (requires ^4.4) and symfony/mailer v4.4.49 (requires ^4.3; itself left-behind) and symfony/security-core v4.4.48 (requires <4.3|>=5; itself left-behind) and symfony/security-http v4.4.50 (requires >=5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
+        "description": "symfony/event-dispatcher v4.4.44 \u2014 finding high (16 = left-behind 16) \u2014 left-behind: branch 4.x last released 2022-07-20 (4.2 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: require symfony/event-dispatcher ^5.4 \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by composer.json (requires ^4.4.44) and symfony/console v4.4.49 (conflicts with <4.3|>=5; itself left-behind) and symfony/form v4.4.48 (requires ^4.3; itself left-behind) and symfony/http-kernel v4.4.51 (requires ^4.4) and symfony/mailer v4.4.49 (requires ^4.3; itself left-behind) and symfony/security-core v4.4.48 (conflicts with <4.3|>=5; itself left-behind) and symfony/security-http v4.4.50 (conflicts with >=5; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve.",
         "categories": [
             "Bug Risk"
         ],
@@ -2146,7 +2146,7 @@
     {
         "type": "issue",
         "check_name": "lockrot/left-behind",
-        "description": "symfony/translation v4.4.47 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (requires >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via friendsofsymfony/user-bundle)",
+        "description": "symfony/translation v4.4.47 \u2014 finding medium (8 = left-behind 16 \u00f7 2 transitive) \u2014 left-behind: branch 4.x last released 2022-10-03 (4.0 years ago); 8.x released v8.1.5 (2026-08-21), needs php >=8.4.1 above the project's php >=7.4; 5.x released v5.4.45 (2024-09-25). Do: move symfony/translation to ^5.4 through friendsofsymfony/user-bundle \u2014 clears left-behind; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/validator v4.4.48 (conflicts with >=5.0; itself left-behind); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve. (via friendsofsymfony/user-bundle)",
         "categories": [
             "Bug Risk"
         ],

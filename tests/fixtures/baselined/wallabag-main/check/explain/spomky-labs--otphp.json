@@ -188,6 +188,7 @@
                     "package": "scheb/2fa-google-authenticator",
                     "version": "v5.13.2",
                     "link": "require",
+                    "target": null,
                     "constraint": "^9.1|^10.0",
                     "holder": {
                         "verdict": "high",
@@ -199,7 +200,8 @@
                         "next_step": {
                             "kind": "require",
                             "to_branch": "7.x",
-                            "constraint": "^7.14"
+                            "constraint": "^7.14",
+                            "check": null
                         }
                     }
                 }
@@ -236,6 +238,7 @@
                     "composer_resolves"
                 ]
             },
+            "check": null,
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
@@ -291,7 +294,8 @@
                 "lowest": null,
                 "newest": "v10.0.3",
                 "held_by": [],
-                "if_applied": null
+                "if_applied": null,
+                "check": null
             },
             "move_in": "next_step",
             "gets": null,
@@ -406,6 +410,7 @@
                                         "package": "scheb/2fa-google-authenticator",
                                         "version": "v5.13.2",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^9.1|^10.0",
                                         "holder": {
                                             "verdict": "high",
@@ -417,7 +422,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "7.x",
-                                                "constraint": "^7.14"
+                                                "constraint": "^7.14",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -455,6 +461,7 @@
                                         "package": "scheb/2fa-google-authenticator",
                                         "version": "v5.13.2",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^9.1|^10.0",
                                         "holder": {
                                             "verdict": "high",
@@ -466,7 +473,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "7.x",
-                                                "constraint": "^7.14"
+                                                "constraint": "^7.14",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -637,6 +645,7 @@
                             "package": "scheb/2fa-google-authenticator",
                             "version": "v5.13.2",
                             "link": "require",
+                            "target": null,
                             "constraint": "^9.1|^10.0",
                             "holder": {
                                 "verdict": "high",
@@ -648,7 +657,8 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "7.x",
-                                    "constraint": "^7.14"
+                                    "constraint": "^7.14",
+                                    "check": null
                                 }
                             }
                         }
@@ -661,7 +671,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -692,7 +703,8 @@
                     "lowest": null,
                     "newest": "v10.0.3",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -723,7 +735,8 @@
                     "lowest": null,
                     "newest": "v9.1.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -754,7 +767,8 @@
                     "lowest": null,
                     "newest": "v8.3.3",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -785,7 +799,8 @@
                     "lowest": null,
                     "newest": "v7.0.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -816,7 +831,8 @@
                     "lowest": null,
                     "newest": "v6.0.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -847,7 +863,8 @@
                     "lowest": null,
                     "newest": "v5.0.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -878,7 +895,8 @@
                     "lowest": null,
                     "newest": "v4.0.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -909,7 +927,8 @@
                     "lowest": null,
                     "newest": "v3.1.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -940,7 +959,8 @@
                     "lowest": null,
                     "newest": "v2.0.2-stable",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -971,7 +991,8 @@
                     "lowest": null,
                     "newest": "1.0.1-stable",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             }
         ],
@@ -1726,7 +1747,8 @@
                     "records": 187
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-14T00:00:00+00:00",
     "notes": [],

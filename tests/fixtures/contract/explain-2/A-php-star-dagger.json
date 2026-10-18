@@ -126,6 +126,7 @@
                     "package": null,
                     "version": null,
                     "link": "require",
+                    "target": null,
                     "constraint": "^2.0",
                     "holder": null
                 },
@@ -134,6 +135,7 @@
                     "package": "symfony/twig-bridge",
                     "version": "v3.4.47",
                     "link": "require",
+                    "target": null,
                     "constraint": "^1.41|^2.10",
                     "holder": {
                         "verdict": "high",
@@ -147,7 +149,8 @@
                         "next_step": {
                             "kind": "require",
                             "to_branch": "8.x",
-                            "constraint": "^8.1"
+                            "constraint": "^8.1",
+                            "check": null
                         }
                     }
                 }
@@ -244,6 +247,7 @@
                     "composer_resolves"
                 ]
             },
+            "check": null,
             "composer_moves_because": [
                 "holders",
                 "crosses_major"
@@ -293,7 +297,8 @@
                 "lowest": null,
                 "newest": "v2.16.1",
                 "held_by": [],
-                "if_applied": null
+                "if_applied": null,
+                "check": null
             },
             "move_in": "next_step",
             "gets": null,
@@ -380,6 +385,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -388,6 +394,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -401,7 +408,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -435,6 +443,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -443,6 +452,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -456,7 +466,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -490,6 +501,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -498,6 +510,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -511,7 +524,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -545,6 +559,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -553,6 +568,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -566,7 +582,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -600,6 +617,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -608,6 +626,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -621,7 +640,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -655,6 +675,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -663,6 +684,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -676,7 +698,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -710,6 +733,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -718,6 +742,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -731,7 +756,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -765,6 +791,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -773,6 +800,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -786,7 +814,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -820,6 +849,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -828,6 +858,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -841,7 +872,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -875,6 +907,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -883,6 +916,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -896,7 +930,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -930,6 +965,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -938,6 +974,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -951,7 +988,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -985,6 +1023,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -993,6 +1032,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -1006,7 +1046,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -1040,6 +1081,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -1048,6 +1090,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -1061,7 +1104,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -1095,6 +1139,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -1103,6 +1148,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -1116,7 +1162,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -1150,6 +1197,7 @@
                                         "package": null,
                                         "version": null,
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^2.0",
                                         "holder": null
                                     },
@@ -1158,6 +1206,7 @@
                                         "package": "symfony/twig-bridge",
                                         "version": "v3.4.47",
                                         "link": "require",
+                                        "target": null,
                                         "constraint": "^1.41|^2.10",
                                         "holder": {
                                             "verdict": "high",
@@ -1171,7 +1220,8 @@
                                             "next_step": {
                                                 "kind": "require",
                                                 "to_branch": "8.x",
-                                                "constraint": "^8.1"
+                                                "constraint": "^8.1",
+                                                "check": null
                                             }
                                         }
                                     }
@@ -1296,6 +1346,7 @@
                             "package": null,
                             "version": null,
                             "link": "require",
+                            "target": null,
                             "constraint": "^2.0",
                             "holder": null
                         },
@@ -1304,6 +1355,7 @@
                             "package": "symfony/twig-bridge",
                             "version": "v3.4.47",
                             "link": "require",
+                            "target": null,
                             "constraint": "^1.41|^2.10",
                             "holder": {
                                 "verdict": "high",
@@ -1317,7 +1369,8 @@
                                 "next_step": {
                                     "kind": "require",
                                     "to_branch": "8.x",
-                                    "constraint": "^8.1"
+                                    "constraint": "^8.1",
+                                    "check": null
                                 }
                             }
                         }
@@ -1330,7 +1383,8 @@
                             "clears_hold",
                             "composer_resolves"
                         ]
-                    }
+                    },
+                    "check": null
                 }
             },
             {
@@ -1361,7 +1415,8 @@
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             },
             {
@@ -1392,7 +1447,8 @@
                     "lowest": null,
                     "newest": "v1.44.8",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 }
             }
         ],
@@ -2147,7 +2203,8 @@
                     "records": 28
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],

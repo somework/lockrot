@@ -198,6 +198,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "crosses_major",
     "transitive"

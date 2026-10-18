@@ -137,6 +137,7 @@
    ],
    "clears_all": false,
    "if_applied": null,
+   "check": null,
    "composer_moves_because": [],
    "commands": [],
    "through": [],
@@ -184,7 +185,8 @@
      "assumes": [
       "clears_hold"
      ]
-    }
+    },
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
