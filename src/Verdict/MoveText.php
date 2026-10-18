@@ -194,6 +194,10 @@ final class MoveText
         $where = $latest !== null ? 'the newest tag, '.$latest->version().',' : ($move->toBranch() ?? 'the fix');
         $check = $move->phpCheck();
         $requires = $check === null ? null : $check->requires();
+        $solve = $move->check();
+        if ($solve !== null && $solve->isRefused() && ($check === null || $check->targetRuns() !== false)) {
+            return 'no move installs '.$where.': Composer names no hold';
+        }
         $text = $requires !== null
             ? 'no move runs on the target: '.$where.' needs php '.$requires.' and the target php '.$subject->targetPhp().' does not run it'
             : 'no move runs on the target: the target php '.$subject->targetPhp().' does not run '.$where;
@@ -281,7 +285,13 @@ final class MoveText
     private static function linkWords(Holder $holder): string
     {
         $target = $holder->target();
-        $verb = $holder->link() === Holder::CONFLICT ? 'conflicts with ' : 'requires ';
+        if ($holder->link() === Holder::ROOT_REQUIRE && $target === null) {
+            return 'no release of '.$holder->constraint().' can install';
+        }
+        if ($holder->link() === Holder::REPLACE && $target === null) {
+            return 'replaces it';
+        }
+        $verb = ['conflict' => 'conflicts with ', 'replace' => 'replaces '][$holder->link()] ?? 'requires ';
 
         return $verb.($target === null ? '' : $target.' ').$holder->constraint();
     }

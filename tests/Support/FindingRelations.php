@@ -69,8 +69,8 @@ final class FindingRelations
 
     /**
      * The move check's relations (SPEC §5.6): lockrot never prints a step that its own check
-     * refuses, a refused move names its holds and is no `update` fix, and a step of a form that
-     * needs the dependencies carries that form's option.
+     * refuses, a refused move names its holds or is `blocked`, it is no `update` fix, and a step of a
+     * form that needs the dependencies carries that form's option.
      *
      * @param array<mixed, mixed> $move
      *
@@ -88,8 +88,8 @@ final class FindingRelations
             if ($steps !== []) {
                 $out[] = 'next_step: a move that Composer\'s solver refuses has no update or require step';
             }
-            if (($move['held_by'] ?? []) === []) {
-                $out[] = 'next_step: a refused move names its holds';
+            if (($move['held_by'] ?? []) === [] && (($move['kind'] ?? null) !== 'blocked' || !\in_array($move['fix_kind'] ?? null, ['blocked', null], true))) {
+                $out[] = 'next_step: a refused move names its holds, or is blocked with no reachable fix';
             }
             if (($move['fix_kind'] ?? null) === 'update') {
                 $out[] = 'next_step: a refused move is no update fix';

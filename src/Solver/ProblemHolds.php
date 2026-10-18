@@ -22,7 +22,9 @@ use Lockrot\Security\Holder;
  * |---|---|
  * | root requirement | the root: `require` on a moved name, `platform` on a platform name, else `root-require` |
  * | package requirement | the requiring package: `platform` on a platform name, else `require` |
- * | package conflict | the package that declares it: `conflict` |
+ * | package conflict | the package or the root that declares it: `conflict` |
+ * | same name | the package or the root that replaces the name: `replace` |
+ * | root requirement of a requested name | the root, when the pool holds no release of it and no other rule names a hold: `root-require` on the moved package |
  *
  * A root requirement of a dependency is no rule of its own: the dependency shows as a requirement
  * with no candidate left, and the hold names the root's constraint on it as `root-require`.
@@ -35,6 +37,8 @@ final class ProblemHolds
     private array $holds = [];
     /** @var array<string, true> */
     private array $wanted = [];
+    /** The request's own requirement when the pool holds no release of it. */
+    private ?Holder $noRelease = null;
 
     /**
      * @param list<string>          $moved     the names on the allow list: a link to one of them has no target
@@ -52,6 +56,10 @@ final class ProblemHolds
                     }
                 }
             }
+        }
+        // The request's own requirement holds nothing while another hold explains the refusal.
+        if ($out->holds === [] && $out->noRelease !== null) {
+            $out->holds[] = $out->noRelease;
         }
 
         return $out;
@@ -82,6 +90,10 @@ final class ProblemHolds
                 /** @var array{packageName: string, constraint: ConstraintInterface} $data */
                 $name = $data['packageName'];
                 if (isset($requested[$name])) {
+                    if ($rule->getLiterals() === []) {
+                        $this->noRelease = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $data['constraint']->getPrettyString());
+                    }
+
                     return;
                 }
                 $this->holds[] = self::rootHold($rootName, $name, $data['constraint']->getPrettyString(), $moved);
@@ -104,12 +116,29 @@ final class ProblemHolds
                 // A conflict rule can name the moved package as either side: the target is the other one.
                 $declarer = $data->getSource();
                 $other = \in_array($target, $moved, true) ? null : $target;
-                $this->holds[] = new Holder(Holder::PACKAGE, $declarer, $source->getPrettyVersion(), $link, $data->getPrettyConstraint(), $other);
+                $this->holds[] = $declarer === $rootName
+                    ? new Holder(Holder::ROOT, $rootName, null, $link, $data->getPrettyConstraint(), $other)
+                    : new Holder(Holder::PACKAGE, $declarer, $source->getPrettyVersion(), $link, $data->getPrettyConstraint(), $other);
                 if ($isRequire && \count($literals) === 1 && !$platform) {
                     $this->wanted[$target] = true;
                     $byRoot = $rootRequires[$target] ?? null;
                     if ($byRoot !== null && $other !== null) {
                         $this->holds[] = new Holder(Holder::ROOT, $rootName, null, Holder::ROOT_REQUIRE, $byRoot->getPrettyConstraint(), $target);
+                    }
+                }
+
+                return;
+            case Rule::RULE_PACKAGE_SAME_NAME:
+                /** @var string $data */
+                foreach ($rule->getLiterals() as $literal) {
+                    $package = $pool->literalToPackage($literal);
+                    $package = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
+                    $replace = $package->getReplaces()[$data] ?? null;
+                    if ($replace !== null) {
+                        $target = \in_array($data, $moved, true) ? null : $data;
+                        $this->holds[] = $package->getName() === $rootName
+                            ? new Holder(Holder::ROOT, $rootName, null, Holder::REPLACE, $replace->getPrettyConstraint(), $target)
+                            : new Holder(Holder::PACKAGE, $package->getName(), $package->getPrettyVersion(), Holder::REPLACE, $replace->getPrettyConstraint(), $target);
                     }
                 }
 

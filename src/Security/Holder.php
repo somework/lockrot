@@ -23,18 +23,19 @@ final class Holder implements \JsonSerializable
     public const REQUIRE = 'require';
     public const REQUIRE_DEV = 'require-dev';
     public const CONFLICT = 'conflict';
+    public const REPLACE = 'replace';
     public const ROOT_REQUIRE = 'root-require';
     public const PLATFORM = 'platform';
 
     /** `held_by[]`'s order: the root first, then by package, then by link in this order, then by target. */
     private const SOURCE_ORDER = [self::ROOT => 0, self::PACKAGE => 1];
-    private const LINK_ORDER = [self::REQUIRE => 0, self::REQUIRE_DEV => 1, self::CONFLICT => 2, self::ROOT_REQUIRE => 3, self::PLATFORM => 4];
+    private const LINK_ORDER = [self::REQUIRE => 0, self::REQUIRE_DEV => 1, self::CONFLICT => 2, self::REPLACE => 3, self::ROOT_REQUIRE => 4, self::PLATFORM => 5];
 
     /** @var self::ROOT|self::PACKAGE */
     private string $source;
     private ?string $package;
     private ?string $version;
-    /** @var self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::ROOT_REQUIRE|self::PLATFORM */
+    /** @var self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::REPLACE|self::ROOT_REQUIRE|self::PLATFORM */
     private string $link;
     private string $constraint;
     private ?string $target;
@@ -44,7 +45,7 @@ final class Holder implements \JsonSerializable
      * @param self::ROOT|self::PACKAGE                                                       $source
      * @param ?string                                                                        $package the root's `name` (null when composer.json has none), the locked package, or the moved package at its target release
      * @param ?string                                                                        $version the package's version, null for the root
-     * @param self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::ROOT_REQUIRE|self::PLATFORM $link    a locked package's link is `require` or `conflict`, from packages-dev too
+     * @param self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::REPLACE|self::ROOT_REQUIRE|self::PLATFORM $link    a locked package's link is `require`, `conflict` or `replace`, from packages-dev too
      * @param ?string                                                                        $target  the package the link points to, null when it is the moved package
      */
     public function __construct(string $source, ?string $package, ?string $version, string $link, string $constraint, ?string $target = null)
@@ -73,7 +74,7 @@ final class Holder implements \JsonSerializable
         return $this->version;
     }
 
-    /** @return self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::ROOT_REQUIRE|self::PLATFORM */
+    /** @return self::REQUIRE|self::REQUIRE_DEV|self::CONFLICT|self::REPLACE|self::ROOT_REQUIRE|self::PLATFORM */
     public function link(): string
     {
         return $this->link;

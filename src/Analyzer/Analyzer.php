@@ -91,6 +91,7 @@ final class Analyzer
     private AbandonedIgnore $abandonedIgnore;
     private UncheckedAcceptance $acceptance;
     private ?MoveChecks $checks = null;
+    private int $checkPasses = self::CHECK_PASSES;
 
     public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null, ?AbandonedIgnore $abandonedIgnore = null)
     {
@@ -137,10 +138,12 @@ final class Analyzer
     }
 
     /** A copy whose moves Composer's solver checks (docs/verdicts.md#the-move-check). */
-    public function withMoveChecks(MoveChecks $checks): self
+    /** @param positive-int $passes the cap on the passes that ask Composer ({@see CHECK_PASSES}) */
+    public function withMoveChecks(MoveChecks $checks, int $passes = self::CHECK_PASSES): self
     {
         $clone = clone $this;
         $clone->checks = $checks;
+        $clone->checkPasses = $passes;
 
         return $clone;
     }
@@ -248,7 +251,13 @@ final class Analyzer
                 $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks);
                 $known = $refused->count();
                 $refused = $checks === null ? $refused : $checks->refused($package->name());
-            } while ($refused->count() > $known && ++$pass < self::CHECK_PASSES);
+            } while ($refused->count() > $known && ++$pass < $this->checkPasses);
+            if ($checks !== null && $refused->count() > $known) {
+                // The refusals of the last pass set the class and the verdict. Its new moves are not asked.
+                $scan = $finder->withRefused($refused);
+                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every);
+                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks->answeredOnly());
+            }
             $findings[] = $finding->withMoves($moves);
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;

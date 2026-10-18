@@ -24,6 +24,7 @@ final class MoveChecks
     private bool $inlineOnAnyPackage;
     /** @var array<string, array{0: MoveQuery, 1: CheckOutcome}> */
     private array $asked = [];
+    private bool $asksNew = true;
 
     /** @param bool $inlineOnAnyPackage whether the Composer that runs the command takes an inline constraint on a package that is not a root requirement */
     public function __construct(MoveChecker $checker, bool $inlineOnAnyPackage)
@@ -55,9 +56,21 @@ final class MoveChecks
         return new self($this->checker->withBlockedAdvisories($ranges), $this->inlineOnAnyPackage);
     }
 
+    /** A copy that answers only the requests asked so far, and leaves every other one not checked. */
+    public function answeredOnly(): self
+    {
+        $clone = clone $this;
+        $clone->asksNew = false;
+
+        return $clone;
+    }
+
     public function check(MoveQuery $query): CheckOutcome
     {
         $key = $query->key();
+        if (!isset($this->asked[$key]) && !$this->asksNew) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::PASS_CAP));
+        }
         if (!isset($this->asked[$key])) {
             $this->asked[$key] = [$query, $this->checker->check($query)];
         }

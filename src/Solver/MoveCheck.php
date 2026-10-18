@@ -33,9 +33,10 @@ final class MoveCheck implements \JsonSerializable
     public const NOT_FROM_COMPOSER_REPOSITORY = 'not_from_composer_repository';
     public const NO_COMPOSER_JSON = 'no_composer_json';
     public const NO_RELEASE_READ = 'no_release_read';
+    public const PASS_CAP = 'pass_cap';
 
     /** The reasons that lockrot writes, in the order that the schema lists them. */
-    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::NO_RELEASE_READ];
+    public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::NO_COMPOSER_JSON, self::NO_RELEASE_READ, self::PASS_CAP];
 
     /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
     public const BASELINE_REASONS = [self::INSTALL_TIME_BUDGET, self::NO_COMPOSER_JSON];
@@ -49,6 +50,7 @@ final class MoveCheck implements \JsonSerializable
         self::NOT_FROM_COMPOSER_REPOSITORY => 'no Composer repository serves it',
         self::NO_COMPOSER_JSON => 'the project has no composer.json',
         self::NO_RELEASE_READ => 'no release of the row was read',
+        self::PASS_CAP => 'Composer refused each move before it',
     ];
 
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */

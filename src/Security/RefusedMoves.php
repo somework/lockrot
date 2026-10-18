@@ -51,6 +51,19 @@ final class RefusedMoves
         return \count($this->refused);
     }
 
+    /** Whether a refused constraint admits the release. */
+    public function refuses(string $normalized): bool
+    {
+        $release = new Constraint('==', $normalized);
+        foreach ($this->refused as [$constraint]) {
+            if ($constraint->matches($release)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** @return list<Holder> the holds of every refused constraint that admits the release */
     public function holding(string $normalized): array
     {

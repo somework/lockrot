@@ -259,6 +259,49 @@ final class SolverCheckerTest extends TestCase
         self::assertContains(['source' => 'package', 'package' => 'acme/a', 'version' => '1.1.0', 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($combined->holds()));
     }
 
+    /** A release that starts to replace a package that the root keeps: Composer can install only one of the two. */
+    public function testAMoveWhoseTargetReplacesALockedPackageIsRefusedWithTheReplace(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0', 'acme/legacy' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0'], ['name' => 'acme/legacy', 'version' => '1.0.0']],
+            ['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0', 'replace' => ['acme/legacy' => '2.0.*']]], 'acme/legacy' => [['version' => '1.0.0']]]
+        );
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'package', 'package' => 'acme/lib', 'version' => '1.1.0', 'link' => 'replace', 'target' => 'acme/legacy', 'constraint' => '2.0.*'], self::rows($outcome->holds()));
+    }
+
+    /** D8: every release that the new constraint admits is blocked, so no release of it can install. */
+    public function testARequireThatNoReleaseInThePoolAdmitsIsRefusedWithTheRootRequirementItWrites(): void
+    {
+        $range = (new VersionParser())->parseConstraints('>=2.0.0,<2.1.0');
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '2.0.0']]]);
+        $solver = new ComposerSolver(self::root(['acme/lib' => '^1.0']), LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, ['acme/lib' => [$range]]);
+        $checker = new SolverChecker($solver, [], '8.4.99', true, Deadline::never());
+
+        $outcome = $checker->check(MoveQuery::require('acme/lib', '^2.0', '2.0.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertSame([['source' => 'root', 'package' => null, 'version' => null, 'link' => 'root-require', 'target' => null, 'constraint' => '^2.0']], self::rows($outcome->holds()));
+    }
+
+    public function testAMoveThatTheRootConflictExcludesIsRefusedWithTheRootConflict(): void
+    {
+        $root = (new ArrayLoader())->load(['name' => 'acme/app', 'version' => '1.0.0', 'require' => ['acme/lib' => '^1.0'], 'conflict' => ['acme/lib' => '>=1.1']], RootPackage::class);
+        self::assertInstanceOf(RootPackageInterface::class, $root);
+        $solver = new ComposerSolver($root, LockFile::fromArray(['packages' => [['name' => 'acme/lib', 'version' => '1.0.0']]])->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), new ArrayVersionSource(['acme/lib' => [['version' => '1.0.0'], ['version' => '1.1.0']]]), []);
+        $checker = new SolverChecker($solver, [], '8.4.99', false, Deadline::never());
+
+        $outcome = $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'));
+
+        self::assertSame(MoveCheck::REFUSED, $outcome->check()->result());
+        self::assertContains(['source' => 'root', 'package' => null, 'version' => null, 'link' => 'conflict', 'target' => null, 'constraint' => '>=1.1'], self::rows($outcome->holds()));
+        self::assertNotContains('package', array_column(self::rows($outcome->holds()), 'source'), 'the root is no locked package');
+    }
+
     /**
      * @param array<string, string>                     $requires
      * @param list<array<string, mixed>>                $locked

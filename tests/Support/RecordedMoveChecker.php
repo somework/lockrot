@@ -14,7 +14,7 @@ use Lockrot\Solver\MoveQuery;
  * The move checks that a case records (`inputs.checks`, keyed by {@see MoveQuery::key()}), as
  * Composer's solver answered them. lockrot also asks about moves that it does not publish, so a
  * request that the case does not record is `not_checked`: a published one then differs from the
- * case's move.
+ * case's move. A test can record `*`: the answer to every request that it does not record.
  */
 final class RecordedMoveChecker implements MoveChecker
 {
@@ -40,7 +40,7 @@ final class RecordedMoveChecker implements MoveChecker
 
     public function check(MoveQuery $query): CheckOutcome
     {
-        $check = $this->checks[$query->key()] ?? null;
+        $check = $this->checks[$query->key()] ?? $this->checks['*'] ?? null;
         if ($check === null) {
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME));
         }
@@ -49,7 +49,7 @@ final class RecordedMoveChecker implements MoveChecker
             self::assertArray($hold);
             $source = self::required($hold, 'source');
             $link = self::required($hold, 'link');
-            if (!\in_array($source, [Holder::ROOT, Holder::PACKAGE], true) || !\in_array($link, [Holder::REQUIRE, Holder::REQUIRE_DEV, Holder::CONFLICT, Holder::ROOT_REQUIRE, Holder::PLATFORM], true)) {
+            if (!\in_array($source, [Holder::ROOT, Holder::PACKAGE], true) || !\in_array($link, [Holder::REQUIRE, Holder::REQUIRE_DEV, Holder::CONFLICT, Holder::REPLACE, Holder::ROOT_REQUIRE, Holder::PLATFORM], true)) {
                 throw new \InvalidArgumentException('a recorded hold has an unknown source or link');
             }
             $holds[] = new Holder($source, self::text($hold, 'package'), self::text($hold, 'version'), $link, self::required($hold, 'constraint'), self::text($hold, 'target'));

@@ -361,7 +361,8 @@ final class CaseHydrator
 
         $checks = self::moveChecksOf($inputs);
         if ($checks !== null) {
-            $analyzer = $analyzer->withMoveChecks($checks);
+            $passes = $inputs['check_passes'] ?? Analyzer::CHECK_PASSES;
+            $analyzer = $analyzer->withMoveChecks($checks, \is_int($passes) && $passes > 0 ? $passes : Analyzer::CHECK_PASSES);
         }
 
         $includeDev = ($run['include_dev'] ?? false) === true;
