@@ -17,6 +17,15 @@ final class LockFileTest extends TestCase
 {
     private const MINI = __DIR__.'/../../fixtures/mini/composer.lock';
 
+    /** A name that is no Composer package name never reaches a finding or a command. */
+    public function testAnEntryWhoseNameIsNoComposerPackageNameIsSkippedAndNamed(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => '--with-all-dependencies', 'version' => '1.0.0'], ['name' => 'acme/lib', 'version' => '1.0.0']], 'packages-dev' => [['name' => 'acme/x;calc', 'version' => '1.0.0']]]);
+
+        self::assertSame(['acme/lib'], array_map(static fn ($package): string => $package->name(), $lock->packages(true)));
+        self::assertSame(['--with-all-dependencies', 'acme/x;calc'], $lock->skippedNames());
+    }
+
     public function testReadsProdAndDevPackages(): void
     {
         $lock = LockFile::fromFile(self::MINI);

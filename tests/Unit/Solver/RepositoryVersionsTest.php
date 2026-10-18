@@ -16,7 +16,7 @@ final class RepositoryVersionsTest extends TestCase
     /** A repository answer that does not parse is a failed load of that name, never a stopped run. */
     public function testANameWhoseRepositoryAnswerDoesNotParseFailsToLoad(): void
     {
-        $repository = new class() extends ComposerRepository {
+        $repository = new class () extends ComposerRepository {
             public function __construct()
             {
             }

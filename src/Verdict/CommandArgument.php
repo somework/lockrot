@@ -14,7 +14,7 @@ namespace Lockrot\Verdict;
  */
 final class CommandArgument
 {
-    /** The Composer options that lockrot writes, by subcommand: anywhere else, a leading `-` came from data. */
+    /** The Composer options that lockrot writes, by subcommand, after every package argument: anywhere else, a leading `-` came from data. */
     private const OPTIONS = [
         'update' => ['--with-dependencies' => true, '--with-all-dependencies' => true],
         'require' => ['--no-update' => true, '--with-dependencies' => true, '--with-all-dependencies' => true],
@@ -34,9 +34,21 @@ final class CommandArgument
         if (($argv[0] ?? null) !== 'composer' || !isset(self::SUBCOMMANDS[$subcommand])) {
             return false;
         }
-        foreach ($argv as $argument) {
-            if (!self::passes($argument) || ($argument[0] === '-' && !isset(self::OPTIONS[$subcommand][$argument]))) {
+        $packages = 0;
+        $options = 0;
+        foreach (\array_slice($argv, 2) as $argument) {
+            if (!self::passes($argument)) {
                 return false;
+            }
+            $isOption = $argument[0] === '-';
+            // An option before a package, or a package after an option, came from data.
+            if ($isOption ? !isset(self::OPTIONS[$subcommand][$argument]) || $packages === 0 : $options > 0) {
+                return false;
+            }
+            if ($isOption) {
+                ++$options;
+            } else {
+                ++$packages;
             }
         }
 

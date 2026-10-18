@@ -21,6 +21,7 @@ use Lockrot\Solver\MoveCheck;
  */
 final class RunNote
 {
+    public const PACKAGE_NAME_INVALID = 'package_name_invalid';
     public const OFFLINE = 'offline';
     public const METADATA_UNAVAILABLE = 'metadata_unavailable';
     public const MONOREPO_PARENT_UNAVAILABLE = 'monorepo_parent_unavailable';
@@ -51,6 +52,7 @@ final class RunNote
      * the analyzer's passes. In a report, the notes of two repository hosts can interleave.
      */
     public const CODES = [
+        self::PACKAGE_NAME_INVALID,
         self::OFFLINE,
         self::METADATA_UNAVAILABLE,
         self::MONOREPO_PARENT_UNAVAILABLE,
@@ -133,6 +135,21 @@ final class RunNote
     private static function of(string $code, string $text, bool $setsNetworkFailures, array $data = []): self
     {
         return new self($code, $text, self::DOCS_URL.$code, $setsNetworkFailures, $data);
+    }
+
+    /**
+     * The lock entries whose name is no Composer package name. The text names none of them: a name
+     * from data can carry anything.
+     *
+     * @param list<string> $names in lock order
+     */
+    public static function packageNameInvalid(array $names): self
+    {
+        if ($names === []) {
+            throw new \InvalidArgumentException('A note about invalid package names names at least one.');
+        }
+
+        return self::of(self::PACKAGE_NAME_INVALID, \sprintf('lock: lockrot skips %d %s whose name is no Composer package name', \count($names), \count($names) === 1 ? 'entry' : 'entries'), false, ['packages' => $names]);
     }
 
     public static function offline(): self

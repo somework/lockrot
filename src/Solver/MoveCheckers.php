@@ -57,12 +57,13 @@ final class MoveCheckers
     }
 
     /**
-     * `config.platform.php` when it lies in the target minor, else the target minor at
-     * {@see NEWEST_PATCH}.
+     * `config.platform.php` when it lies in the target minor, with or without a patch, else the
+     * target minor at {@see NEWEST_PATCH}.
      */
     public static function platformPhp(string $targetMinor, ?string $platform): string
     {
-        if ($platform !== null && preg_match('/^'.preg_quote($targetMinor, '/').'\.\d+/', $platform) === 1) {
+        // Composer reads a version with no patch as patch 0 (`8.4` is 8.4.0).
+        if ($platform !== null && preg_match('/^'.preg_quote($targetMinor, '/').'(\.\d+)*$/', $platform) === 1) {
             return $platform;
         }
 

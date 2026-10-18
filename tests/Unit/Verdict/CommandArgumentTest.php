@@ -80,6 +80,15 @@ final class CommandArgumentTest extends TestCase
         self::assertFalse(CommandArgument::allPass(['composer', 'update', 'a/b', '-w']));
     }
 
+    /** A lock package named like an option cannot add it: lockrot's options follow every package argument. */
+    public function testAnOptionPassesOnlyAfterEveryPackageArgument(): void
+    {
+        self::assertTrue(CommandArgument::allPass(['composer', 'update', 'a/b:^1.2', 'c/d:^2.0', '--with-all-dependencies']));
+        foreach ([['composer', 'update', '--with-all-dependencies'], ['composer', 'update', '--with-all-dependencies', 'a/b'], ['composer', 'require', 'a/b:^1', '--with-dependencies', 'c/d:^2'], ['composer', 'require', '--no-update']] as $argv) {
+            self::assertFalse(CommandArgument::allPass($argv), implode(' ', $argv));
+        }
+    }
+
     public function testAnEmptyArgumentFails(): void
     {
         self::assertFalse(CommandArgument::passes(''));

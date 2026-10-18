@@ -369,6 +369,7 @@ final class RunNoteTest extends TestCase
     public function testTheCodesAreListedInTheOrderTheAnalyzersPassesRun(): void
     {
         self::assertSame([
+            'package_name_invalid',
             'offline',
             'metadata_unavailable',
             'monorepo_parent_unavailable',

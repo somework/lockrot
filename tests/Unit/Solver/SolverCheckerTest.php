@@ -190,6 +190,19 @@ final class SolverCheckerTest extends TestCase
         self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
     }
 
+    /**
+     * D6: the moved package's own versions did not load, so the solve has no target to refuse.
+     *
+     * @dataProvider unloadedNames
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('unloadedNames')]
+    public function testAMoveWhosePackageTheSourceCouldNotLoadIsNotChecked(string $failure, string $reason): void
+    {
+        $checker = self::checker(['acme/lib' => '^1.0'], [['name' => 'acme/lib', 'version' => '1.0.0']], [], ['acme/lib' => $failure]);
+
+        self::assertSame(['result' => 'not_checked', 'form' => null, 'reason' => $reason], $checker->check(MoveQuery::update('acme/lib', '^1.1.0', '1.1.0'))->check()->jsonSerialize());
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function unloadedNames(): iterable
     {
@@ -242,6 +255,21 @@ final class SolverCheckerTest extends TestCase
         self::assertFalse($blocked->solve(\Lockrot\Solver\SolveRequest::update(['acme/lib' => '^1.1.0']))->resolves());
         self::assertTrue($open->solve(\Lockrot\Solver\SolveRequest::update(['acme/lib' => '^1.1.0']))->resolves());
         self::assertTrue($blocked->solve(\Lockrot\Solver\SolveRequest::baseline())->resolves(), 'the locked 1.1.0 of a name that stays locked is kept');
+    }
+
+    /** A root alias of a locked release (`1.2.3 as 1.3.0`) keeps the release itself locked too. */
+    public function testABlockedRangeKeepsALockedReleaseThatTheRootAliases(): void
+    {
+        $range = (new VersionParser())->parseConstraints('>=1.2.0,<1.2.5');
+        $root = self::root(['acme/lib' => '1.2.3 as 1.3.0', 'acme/other' => '^1.0']);
+        self::assertInstanceOf(RootPackage::class, $root);
+        $root->setAliases([['package' => 'acme/lib', 'version' => '1.2.3.0', 'alias' => '1.3.0', 'alias_normalized' => '1.3.0.0']]);
+        $lock = ['packages' => [['name' => 'acme/lib', 'version' => '1.2.3'], ['name' => 'acme/other', 'version' => '1.0.0']], 'aliases' => [['package' => 'acme/lib', 'version' => '1.2.3.0', 'alias' => '1.3.0', 'alias_normalized' => '1.3.0.0']]];
+        $source = new ArrayVersionSource(['acme/lib' => [['version' => '1.2.3'], ['version' => '1.2.5']], 'acme/other' => [['version' => '1.0.0'], ['version' => '1.1.0']]]);
+        $solver = new ComposerSolver($root, LockFile::fromArray($lock)->lockedRepository(), new PlatformRepository([], ['php' => '8.4.99']), $source, ['acme/lib' => [$range]]);
+
+        self::assertTrue($solver->solve(\Lockrot\Solver\SolveRequest::baseline())->resolves(), 'the locked 1.2.3 stays');
+        self::assertTrue($solver->solve(\Lockrot\Solver\SolveRequest::update(['acme/other' => '^1.1.0']))->resolves());
     }
 
     public function testTheCombinedUpdateOfTwoMovesThatExcludeEachOtherIsRefused(): void

@@ -192,9 +192,11 @@ final class ComposerSolver
         }
         // Composer 2.9 and later filter the built pool, then optimize it: the builder marks the packages that stay locked.
         $pool = $set->createPool($composerRequest, new NullIO());
+        // By name and version, as Composer's isLockedPackage() reads it: a root alias of a locked release keeps the release.
         $stayLocked = [];
         foreach ($composerRequest->getLockedPackages() as $package) {
-            $stayLocked[$package->getName()] = $package->getVersion();
+            $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
+            $stayLocked[$base->getName().' '.$base->getVersion()] = true;
         }
         $kept = array_values(array_filter($pool->getPackages(), $this->keeps($stayLocked)));
         if (\count($kept) < \count($pool->getPackages())) {
@@ -209,7 +211,7 @@ final class ComposerSolver
      * version of a name that stays locked, and a version outside every range, as
      * SecurityAdvisoryPoolFilter keeps them.
      *
-     * @param array<string, string> $stayLocked
+     * @param array<string, true> $stayLocked by `name version`
      *
      * @return \Closure(BasePackage): bool
      */
@@ -219,7 +221,7 @@ final class ComposerSolver
 
         return static function (BasePackage $package) use ($blocked, $stayLocked): bool {
             $base = $package instanceof AliasPackage ? $package->getAliasOf() : $package;
-            if ($base->isDev() || ($stayLocked[$base->getName()] ?? null) === $base->getVersion()) {
+            if ($base->isDev() || isset($stayLocked[$base->getName().' '.$base->getVersion()])) {
                 return true;
             }
             $exact = new Constraint('==', $base->getVersion());

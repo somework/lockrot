@@ -188,7 +188,7 @@ final class Analyzer
         $packages = array_map(static fn (LockedPackage $package): LockedPackage => $package->withRepositories($repositories), $packages);
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
-        $notes = [];
+        $notes = $lock->skippedNames() === [] ? [] : [RunNote::packageNameInvalid($lock->skippedNames())];
         if ($this->offline) {
             $notes[] = RunNote::offline();
         }
