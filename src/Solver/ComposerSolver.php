@@ -111,21 +111,7 @@ final class ComposerSolver
             $temporary = [];
         }
         $policy = new DefaultPolicy($root->getPreferStable(), false);
-        [$set, $composerRequest, $pool] = $this->pool($root, $requires, $rootRequires, $temporary, $request, $policy, null);
-        if ($this->blocked !== []) {
-            // The first pool tells which packages stay locked. Composer blocks every other affected version.
-            $stayLocked = [];
-            foreach ($composerRequest->getLockedPackages() as $package) {
-                $stayLocked[$package->getName()] = $package->getVersion();
-            }
-            $keeps = $this->keeps($stayLocked);
-            foreach ($pool->getPackages() as $package) {
-                if (!$keeps($package)) {
-                    [$set, $composerRequest, $pool] = $this->pool($root, $requires, $rootRequires, $temporary, $request, $policy, $stayLocked);
-                    break;
-                }
-            }
-        }
+        [$set, $composerRequest, $pool] = $this->pool($root, $requires, $rootRequires, $temporary, $request, $policy);
 
         try {
             $transaction = (new Solver($policy, $pool, new NullIO()))->solve($composerRequest, $this->filter);
@@ -149,11 +135,10 @@ final class ComposerSolver
      * @param array<string, ConstraintInterface> $requires
      * @param array<string, ConstraintInterface> $rootRequires
      * @param array<string, ConstraintInterface> $temporary
-     * @param array<string, string>|null         $stayLocked the version of each name that stays locked, null to block no advisory
      *
      * @return array{0: RepositorySet, 1: Request, 2: Pool}
      */
-    private function pool(RootPackageInterface $root, array $requires, array $rootRequires, array $temporary, SolveRequest $request, DefaultPolicy $policy, ?array $stayLocked): array
+    private function pool(RootPackageInterface $root, array $requires, array $rootRequires, array $temporary, SolveRequest $request, DefaultPolicy $policy): array
     {
         $flags = $root->getStabilityFlags();
         $flags[$root->getName()] = BasePackage::$stabilities[VersionParser::parseStability($root->getVersion())];
@@ -171,7 +156,7 @@ final class ComposerSolver
         $fixedRoot->setDevRequires([]);
         $set->addRepository(new RootPackageRepository($fixedRoot));
         $set->addRepository($this->platform);
-        $set->addRepository(new LoadedVersions($this->source, $this->keeps($stayLocked)));
+        $set->addRepository(new LoadedVersions($this->source));
         $set->addRepository($this->locked);
 
         $composerRequest = new Request($this->locked);
@@ -190,23 +175,34 @@ final class ComposerSolver
         $allow = $request->allow();
         $composerRequest->setUpdateAllowList(array_combine($allow, $allow), $request->transitive());
 
-        return [$set, $composerRequest, $set->createPool($composerRequest, new NullIO(), null, new PoolOptimizer($policy))];
+        if ($this->blocked === []) {
+            return [$set, $composerRequest, $set->createPool($composerRequest, new NullIO(), null, new PoolOptimizer($policy))];
+        }
+        // Composer 2.9 and later filter the built pool, then optimize it: the builder marks the packages that stay locked.
+        $pool = $set->createPool($composerRequest, new NullIO());
+        $stayLocked = [];
+        foreach ($composerRequest->getLockedPackages() as $package) {
+            $stayLocked[$package->getName()] = $package->getVersion();
+        }
+        $kept = array_values(array_filter($pool->getPackages(), $this->keeps($stayLocked)));
+        if (\count($kept) < \count($pool->getPackages())) {
+            $pool = new Pool($kept, $pool->getUnacceptableFixedOrLockedPackages(), $pool->getAllRemovedVersions(), $pool->getAllRemovedVersionsByPackage());
+        }
+
+        return [$set, $composerRequest, (new PoolOptimizer($policy))->optimize($composerRequest, $pool)];
     }
 
     /**
-     * Whether the pool may offer a loaded version: every version, or with advisories to block,
-     * a dev version, the locked version of a name that stays locked, and a version outside every
-     * range, as SecurityAdvisoryPoolFilter keeps them.
+     * Whether the pool may offer a version with advisories to block: a dev version, the locked
+     * version of a name that stays locked, and a version outside every range, as
+     * SecurityAdvisoryPoolFilter keeps them.
      *
-     * @param array<string, string>|null $stayLocked
+     * @param array<string, string> $stayLocked
      *
      * @return \Closure(BasePackage): bool
      */
-    private function keeps(?array $stayLocked): \Closure
+    private function keeps(array $stayLocked): \Closure
     {
-        if ($stayLocked === null) {
-            return static fn (BasePackage $package): bool => true;
-        }
         $blocked = $this->blocked;
 
         return static function (BasePackage $package) use ($blocked, $stayLocked): bool {

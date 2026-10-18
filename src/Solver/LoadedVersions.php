@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lockrot\Solver;
 
-use Composer\Package\BasePackage;
 use Composer\Repository\ArrayRepository;
 
 /**
@@ -17,17 +16,13 @@ use Composer\Repository\ArrayRepository;
 final class LoadedVersions extends ArrayRepository
 {
     private VersionSource $source;
-    /** @var \Closure(BasePackage): bool */
-    private \Closure $keeps;
     /** @var array<string, true> */
     private array $asked = [];
 
-    /** @param \Closure(BasePackage): bool $keeps whether the pool may offer a loaded version */
-    public function __construct(VersionSource $source, \Closure $keeps)
+    public function __construct(VersionSource $source)
     {
         parent::__construct();
         $this->source = $source;
-        $this->keeps = $keeps;
     }
 
     /** @return list<string> the names that the pool builder asked for, in order */
@@ -46,9 +41,7 @@ final class LoadedVersions extends ArrayRepository
             }
             $this->asked[$name] = true;
             foreach ($this->source->versions($name) as $package) {
-                if (($this->keeps)($package)) {
-                    $this->packages[] = $package;
-                }
+                $this->packages[] = $package;
             }
             $this->packageMap = null;
         }
