@@ -21,7 +21,7 @@ final class AdvisoryBlockingTest extends TestCase
     protected function setUp(): void
     {
         if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('this Composer blocks no advisory in an update');
+            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks no advisory in an update');
         }
     }
 

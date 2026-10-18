@@ -305,7 +305,7 @@ final class SolverCheckerTest extends TestCase
     public function testAnAdvisoryOfANewDependencyThatTheRunDidNotLookUpBlocksTheMove(): void
     {
         if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('this Composer blocks nothing in an update');
+            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
         }
         $asked = [];
         $lookup = static function (array $names, bool $complete) use (&$asked): array {
@@ -328,7 +328,7 @@ final class SolverCheckerTest extends TestCase
     public function testAMoveToAnAbandonedReleaseIsRefusedWhenTheConfigBlocksAbandonedPackages(): void
     {
         if (!ComposerFeatures::blocksAdvisories()) {
-            self::markTestSkipped('this Composer blocks nothing in an update');
+            self::markTestSkipped('Composer below 2.9 has no SecurityAdvisoryPoolFilter: it blocks nothing in an update');
         }
         $config = new Config(false);
         $config->merge(['config' => ['audit' => ['block-abandoned' => true]]]);

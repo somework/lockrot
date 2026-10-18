@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Composer;
 
+use Composer\Command\BaseCommand;
 use Composer\Composer;
 use Composer\Config;
 use Composer\Console\Application;
@@ -1227,6 +1228,10 @@ final class LockrotCommandTest extends TestCase
      */
     public function testAComposerJsonThatComposerCannotLoadLeavesEveryMoveUncheckedForThatReason(): void
     {
+        // @phpstan-ignore function.alreadyNarrowedType (the guard is for Composer 2.2 LTS)
+        if (!method_exists(BaseCommand::class, 'tryComposer')) {
+            self::markTestSkipped('Composer 2.2 has no BaseCommand::tryComposer(): it stops the run on such a composer.json');
+        }
         $project = $this->tempDir('lockrot-invalid-manifest-');
         file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0']]));
         file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));

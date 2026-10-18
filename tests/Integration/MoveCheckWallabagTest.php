@@ -50,7 +50,7 @@ final class MoveCheckWallabagTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         if (!interface_exists(AdvisoryProviderInterface::class)) {
-            self::markTestSkipped('Composer 2.2 has no advisory API, so no move reaches a vulnerable package.');
+            self::markTestSkipped('Composer 2.2 has no AdvisoryProviderInterface: no move reaches a vulnerable package');
         }
         $server = FixtureRepositoryServer::fromLockFiles([self::SITE.'composer.lock'], self::SITE.'http/p2');
         $server->withRecordedAdvisoryApi(self::SITE, self::SITE.'http/advisories');

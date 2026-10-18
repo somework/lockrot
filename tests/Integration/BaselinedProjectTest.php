@@ -62,10 +62,11 @@ final class BaselinedProjectTest extends TestCase
         $dir = BaselinedScenario::FIXTURES.'baselined/'.$scenario.'/';
         $files = BaselinedScenario::record($scenario);
 
-        // Composer below 2.4 has no advisory API, so lockrot checks no advisory there. The recording ran with one.
-        // On such a Composer, the files differ: only the floors that need no advisory and the invariants hold.
+        // The recording holds the move check of the Composer that made it, and another Composer solves,
+        // blocks and words it otherwise: the exact files hold only on that Composer. Composer below 2.4 has
+        // no advisory API either, so there only the floors that need no advisory and the invariants hold.
         $advisories = version_compare(Composer::VERSION, '2.4', '>=');
-        if ($advisories) {
+        if (Composer::VERSION === self::recordedComposer($scenario)) {
             self::assertSame(self::committed($dir), array_keys($files), $scenario.': the recorder writes every committed file and no other');
             foreach ($files as $path => $contents) {
                 self::assertSame((string) @file_get_contents($dir.$path), $contents, $scenario.'/'.$path.': re-record with tools/report/record --baselined '.$scenario);
@@ -81,6 +82,32 @@ final class BaselinedProjectTest extends TestCase
         self::assertRootCountsAreTheFindingsCounts($check);
         self::assertRecordedValuesAreSet($check);
         self::assertTheRegeneratedFileKeepsItsHistory(json_decode($files['lockrot-baseline.json'], true), json_decode($files['regenerate/lockrot-baseline.json'], true), $check, substr(BaselinedScenario::SCENARIOS[$scenario]['t1'], 0, 10));
+    }
+
+    /**
+     * A bump of composer/composer in lockrot's lock fails here and asks for a re-record, so no CI row
+     * compares only the invariants unnoticed.
+     *
+     * @dataProvider scenarios
+     */
+    #[DataProvider('scenarios')]
+    public function testTheRecordingRanOnTheComposerOfLockrotsLock(string $scenario): void
+    {
+        $lock = JsonPath::decodeFile(__DIR__.'/../../composer.lock');
+        $locked = [];
+        foreach (array_merge(JsonPath::arrayAt($lock, ['packages']), JsonPath::arrayAt($lock, ['packages-dev'])) as $package) {
+            if (\is_array($package) && ($package['name'] ?? null) === 'composer/composer') {
+                $locked[] = $package['version'] ?? null;
+            }
+        }
+
+        self::assertSame($locked, [self::recordedComposer($scenario)], $scenario.': re-record with tools/report/record --baselined '.$scenario);
+    }
+
+    /** The Composer whose solver checked the moves of the scenario's recorded check. */
+    private static function recordedComposer(string $scenario): string
+    {
+        return JsonPath::stringAt(JsonPath::decodeFile(BaselinedScenario::FIXTURES.'baselined/'.$scenario.'/check/report.json'), ['run', 'move_check', 'composer']);
     }
 
     /** @return list<string> the recorded files of the scenario directory, by their path below it: its inputs left out */

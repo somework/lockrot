@@ -610,7 +610,7 @@ Limits of the check:
 - A run without composer.json checks no move (`check.reason` `no_composer_json`).
 - A run whose composer.json Composer cannot load checks no move (`check.reason`
   `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
-  is no package name.
+  is no package name. Composer 2.2 stops the run with its own error instead.
 
 ## The score {#score}
 
