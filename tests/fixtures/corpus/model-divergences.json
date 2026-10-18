@@ -1063,6 +1063,30 @@
     {
       "app": "grokability_snipe-it",
       "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-6j95-1jtb-x6wc]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-8j6w-3kr7-s9xk]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-cbx2-m9db-bmzd]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "enshrined/svg-sanitize",
       "path": "S9.fix.version[PKSA-6j95-1jtb-x6wc]",
       "lockrot": "1.0.0",
       "model": null,
@@ -1137,6 +1161,48 @@
       "lockrot": "1.0.0",
       "model": null,
       "reason": "A 0.13 report lists only the highest release of each branch, so the model does not know the lowest release that the move's constraint admits and writes null."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "enshrined/svg-sanitize",
+      "path": "score.terms",
+      "lockrot": [
+        {
+          "advisory": "PKSA-6j95-1jtb-x6wc",
+          "contribution": 8,
+          "fix_kind": "upgrade",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 8,
+          "role": "security",
+          "severity": "medium",
+          "weight": 8
+        }
+      ],
+      "model": [
+        {
+          "advisory": "PKSA-6j95-1jtb-x6wc",
+          "contribution": 8,
+          "fix_kind": "update",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 8,
+          "role": "security",
+          "severity": "medium",
+          "weight": 8
+        }
+      ],
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "grokability_snipe-it",
+      "package": "enshrined/svg-sanitize",
+      "path": "security.fix_kind",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "grokability_snipe-it",
@@ -1778,6 +1844,30 @@
     {
       "app": "koel_koel",
       "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-6j95-1jtb-x6wc]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "koel_koel",
+      "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-8j6w-3kr7-s9xk]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "koel_koel",
+      "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-cbx2-m9db-bmzd]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "koel_koel",
+      "package": "enshrined/svg-sanitize",
       "path": "S9.fix.version[PKSA-6j95-1jtb-x6wc]",
       "lockrot": "1.0.0",
       "model": null,
@@ -1852,6 +1942,48 @@
       "lockrot": "1.0.0",
       "model": null,
       "reason": "A 0.13 report lists only the highest release of each branch, so the model does not know the lowest release that the move's constraint admits and writes null."
+    },
+    {
+      "app": "koel_koel",
+      "package": "enshrined/svg-sanitize",
+      "path": "score.terms",
+      "lockrot": [
+        {
+          "advisory": "PKSA-6j95-1jtb-x6wc",
+          "contribution": 8,
+          "fix_kind": "upgrade",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 8,
+          "role": "security",
+          "severity": "medium",
+          "weight": 8
+        }
+      ],
+      "model": [
+        {
+          "advisory": "PKSA-6j95-1jtb-x6wc",
+          "contribution": 8,
+          "fix_kind": "update",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 8,
+          "role": "security",
+          "severity": "medium",
+          "weight": 8
+        }
+      ],
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "koel_koel",
+      "package": "enshrined/svg-sanitize",
+      "path": "security.fix_kind",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "koel_koel",
@@ -3698,6 +3830,14 @@
     {
       "app": "monicahq_monica",
       "package": "firebase/php-jwt",
+      "path": "S9.fix.kind[PKSA-y2cr-5h3j-g3ys]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "monicahq_monica",
+      "package": "firebase/php-jwt",
       "path": "next_step.composer_moves_because",
       "lockrot": [
         "holders",
@@ -3732,6 +3872,48 @@
       ],
       "model": [],
       "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
+    },
+    {
+      "app": "monicahq_monica",
+      "package": "firebase/php-jwt",
+      "path": "score.terms",
+      "lockrot": [
+        {
+          "advisory": "PKSA-y2cr-5h3j-g3ys",
+          "contribution": 2,
+          "fix_kind": "upgrade",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 2,
+          "role": "security",
+          "severity": "low",
+          "weight": 2
+        }
+      ],
+      "model": [
+        {
+          "advisory": "PKSA-y2cr-5h3j-g3ys",
+          "contribution": 2,
+          "fix_kind": "update",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 2,
+          "role": "security",
+          "severity": "low",
+          "weight": 2
+        }
+      ],
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "monicahq_monica",
+      "package": "firebase/php-jwt",
+      "path": "security.fix_kind",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "monicahq_monica",
@@ -7598,6 +7780,14 @@
     {
       "app": "nextcloud_3rdparty",
       "package": "web-auth/webauthn-lib",
+      "path": "S9.fix.kind[PKSA-zk1n-qbm6-d3rq]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "nextcloud_3rdparty",
+      "package": "web-auth/webauthn-lib",
       "path": "next_step.held_by",
       "lockrot": [
         {
@@ -7612,6 +7802,48 @@
       ],
       "model": [],
       "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
+    },
+    {
+      "app": "nextcloud_3rdparty",
+      "package": "web-auth/webauthn-lib",
+      "path": "score.terms",
+      "lockrot": [
+        {
+          "advisory": "PKSA-zk1n-qbm6-d3rq",
+          "contribution": 2,
+          "fix_kind": "upgrade",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 2,
+          "role": "security",
+          "severity": "low",
+          "weight": 2
+        }
+      ],
+      "model": [
+        {
+          "advisory": "PKSA-zk1n-qbm6-d3rq",
+          "contribution": 2,
+          "fix_kind": "update",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 2,
+          "role": "security",
+          "severity": "low",
+          "weight": 2
+        }
+      ],
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "nextcloud_3rdparty",
+      "package": "web-auth/webauthn-lib",
+      "path": "security.fix_kind",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -7742,6 +7974,30 @@
     {
       "app": "wallabag_wallabag",
       "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-6j95-1jtb-x6wc]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-8j6w-3kr7-s9xk]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "enshrined/svg-sanitize",
+      "path": "S9.fix.kind[PKSA-cbx2-m9db-bmzd]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "enshrined/svg-sanitize",
       "path": "S9.fix.version[PKSA-6j95-1jtb-x6wc]",
       "lockrot": "1.0.0",
       "model": null,
@@ -7816,6 +8072,48 @@
       "lockrot": "1.0.0",
       "model": null,
       "reason": "A 0.13 report lists only the highest release of each branch, so the model does not know the lowest release that the move's constraint admits and writes null."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "enshrined/svg-sanitize",
+      "path": "score.terms",
+      "lockrot": [
+        {
+          "advisory": "PKSA-6j95-1jtb-x6wc",
+          "contribution": 8,
+          "fix_kind": "upgrade",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 8,
+          "role": "security",
+          "severity": "medium",
+          "weight": 8
+        }
+      ],
+      "model": [
+        {
+          "advisory": "PKSA-6j95-1jtb-x6wc",
+          "contribution": 8,
+          "fix_kind": "update",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 8,
+          "role": "security",
+          "severity": "medium",
+          "weight": 8
+        }
+      ],
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "enshrined/svg-sanitize",
+      "path": "security.fix_kind",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -8784,6 +9082,22 @@
     {
       "app": "wallabag_wallabag",
       "package": "spomky-labs/otphp",
+      "path": "S9.fix.kind[PKSA-kbc7-dq62-pt7d]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "spomky-labs/otphp",
+      "path": "S9.fix.kind[PKSA-qv5y-crcz-9nxw]",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "spomky-labs/otphp",
       "path": "next_step.composer_moves_because",
       "lockrot": [
         "holders",
@@ -8825,6 +9139,66 @@
       ],
       "model": [],
       "reason": "The model reads no constraint of composer.json or of a dependent in the lock, so it names no holder."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "spomky-labs/otphp",
+      "path": "score.terms",
+      "lockrot": [
+        {
+          "contribution": 8,
+          "divisor": 1,
+          "flag": "left-behind",
+          "part": "maintenance",
+          "points": 16,
+          "role": "lead",
+          "weight": 16
+        },
+        {
+          "advisory": "PKSA-kbc7-dq62-pt7d",
+          "contribution": 16,
+          "fix_kind": "upgrade",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 16,
+          "role": "security",
+          "severity": "high",
+          "weight": 16
+        }
+      ],
+      "model": [
+        {
+          "contribution": 8,
+          "divisor": 1,
+          "flag": "left-behind",
+          "part": "maintenance",
+          "points": 16,
+          "role": "lead",
+          "weight": 16
+        },
+        {
+          "advisory": "PKSA-kbc7-dq62-pt7d",
+          "contribution": 16,
+          "fix_kind": "update",
+          "flag": "vulnerable",
+          "multiplier": 1,
+          "part": "security",
+          "points": 16,
+          "role": "security",
+          "severity": "high",
+          "weight": 16
+        }
+      ],
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
+    },
+    {
+      "app": "wallabag_wallabag",
+      "package": "spomky-labs/otphp",
+      "path": "security.fix_kind",
+      "lockrot": "upgrade",
+      "model": "update",
+      "reason": "The model reads no lock link, so it classes a higher branch `update` (SPEC §5.3: `upgrade` needs a hold). lockrot reads the lock's links, and one of them excludes the release."
     },
     {
       "app": "wallabag_wallabag",
@@ -8931,81 +9305,6 @@
         }
       ],
       "reason": "lockrot reads the dev-master releases of the wallabag/rulerz packages from their ~dev answers, so it reads the require names of the installed release. The model reads only the tagged releases, so the installed release is installed_unlisted for it."
-    },
-    {
-      "app": "wallabag_wallabag",
-      "package": "scheb/2fa-backup-code",
-      "path": "checks_missing",
-      "lockrot": [
-        {
-          "blocks": [
-            "S2"
-          ],
-          "check": "release_dates",
-          "reason": "undated_releases"
-        }
-      ],
-      "model": [
-        {
-          "blocks": [
-            "S2",
-            "S8"
-          ],
-          "check": "release_dates",
-          "reason": "undated_releases"
-        }
-      ],
-      "reason": "Only the newest tag is undated. S8 reads the dated release of the installed branch and of a higher branch and fires, so lockrot lists only S2 in blocks. The model lists S8 beside S2."
-    },
-    {
-      "app": "wallabag_wallabag",
-      "package": "scheb/2fa-google-authenticator",
-      "path": "checks_missing",
-      "lockrot": [
-        {
-          "blocks": [
-            "S2"
-          ],
-          "check": "release_dates",
-          "reason": "undated_releases"
-        }
-      ],
-      "model": [
-        {
-          "blocks": [
-            "S2",
-            "S8"
-          ],
-          "check": "release_dates",
-          "reason": "undated_releases"
-        }
-      ],
-      "reason": "Only the newest tag is undated. S8 reads the dated release of the installed branch and of a higher branch and fires, so lockrot lists only S2 in blocks. The model lists S8 beside S2."
-    },
-    {
-      "app": "wallabag_wallabag",
-      "package": "scheb/2fa-trusted-device",
-      "path": "checks_missing",
-      "lockrot": [
-        {
-          "blocks": [
-            "S2"
-          ],
-          "check": "release_dates",
-          "reason": "undated_releases"
-        }
-      ],
-      "model": [
-        {
-          "blocks": [
-            "S2",
-            "S8"
-          ],
-          "check": "release_dates",
-          "reason": "undated_releases"
-        }
-      ],
-      "reason": "Only the newest tag is undated. S8 reads the dated release of the installed branch and of a higher branch and fires, so lockrot lists only S2 in blocks. The model lists S8 beside S2."
     }
   ]
 }

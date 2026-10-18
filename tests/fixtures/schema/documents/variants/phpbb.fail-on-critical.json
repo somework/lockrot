@@ -1036,19 +1036,23 @@
    "low": 10
   },
   "fixes": {
-   "update": 1,
-   "upgrade": 2,
+   "update": 3,
+   "upgrade": 0,
    "raise-php": 7,
    "unknown": 0,
    "blocked": 0,
    "none": 0
   },
   "update_now": [
+   "symfony/twig-bridge",
+   "symfony/http-kernel",
    "symfony/polyfill-intl-idn"
   ],
   "update_now_command": [
    "composer",
    "update",
+   "symfony/twig-bridge",
+   "symfony/http-kernel",
    "symfony/polyfill-intl-idn"
   ],
   "fix_unknown": 0
@@ -5140,7 +5144,7 @@
       "role": "security",
       "advisory": "PKSA-ztgh-x9c8-k66g",
       "severity": "medium",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 8,
       "multiplier": 1,
       "points": 8,
@@ -5195,7 +5199,7 @@
     "merged": [
      "vulnerable"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -5285,7 +5289,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -5412,7 +5416,7 @@
         "points": 8,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "4.x",
          "version": "v4.4.51",
          "newest": "v4.4.51",
@@ -5564,7 +5568,7 @@
       "role": "security",
       "advisory": "PKSA-hr4y-jwk2-1yb9",
       "severity": "medium",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 8,
       "multiplier": 1,
       "points": 8,
@@ -5607,7 +5611,7 @@
     "merged": [
      "vulnerable"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -5692,7 +5696,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -5806,7 +5810,7 @@
         "points": 8,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "4.x",
          "version": "v4.4.50",
          "newest": "v4.4.51",

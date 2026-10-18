@@ -33,7 +33,7 @@
     "PKSA-y2cr-5h3j-g3ys": {
      "known_since": "2026-09-24",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   },

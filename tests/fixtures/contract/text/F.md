@@ -11,7 +11,7 @@ depth: 1 of 1 flagged package is named by no line of composer.json · 1 hop 1 ·
 security: 1 vulnerable package · 1 advisory: 1 low
 libyears: the one package could not be measured
 pulled in by: `guzzlehttp/guzzle` 1
-advisories: 1 package asked · packagist.org answered (1 on record for 1 package)
+advisories: 1 package asked · packagist.org answered (16 on record for 2 packages)
 
 **Update now:** `composer update symfony/polyfill-intl-idn`
 

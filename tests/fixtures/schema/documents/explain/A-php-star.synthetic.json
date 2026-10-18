@@ -433,11 +433,45 @@
        "fix": {
         "kind": "upgrade",
         "to_branch": "3.x",
-        "version": null,
+        "version": "v3.27.0",
         "newest": "v3.30.0",
         "on_installed_branch": false,
         "php": ">=8.1.0",
-        "held_by": [],
+        "held_by": [
+         {
+          "source": "root",
+          "package": null,
+          "version": null,
+          "link": "require",
+          "target": null,
+          "constraint": "^2.0",
+          "holder": null
+         },
+         {
+          "source": "package",
+          "package": "symfony/twig-bridge",
+          "version": "v3.4.47",
+          "link": "require",
+          "target": null,
+          "constraint": "^1.41|^2.10",
+          "holder": {
+           "verdict": "high",
+           "lead": "left-behind",
+           "flag_ids": [
+            "left-behind",
+            "old-promise",
+            "vulnerable"
+           ],
+           "replacement": null,
+           "next_step": {
+            "kind": "require",
+            "to_branch": "4.x",
+            "constraint": "^4.4.51",
+            "check": null
+           }
+          }
+         }
+        ],
         "reason": null
        },
        "baseline": null

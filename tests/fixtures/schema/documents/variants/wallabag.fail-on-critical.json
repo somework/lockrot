@@ -1244,16 +1244,25 @@
    "low": 13
   },
   "fixes": {
-   "update": 8,
-   "upgrade": 9,
+   "update": 17,
+   "upgrade": 0,
    "raise-php": 2,
    "unknown": 0,
    "blocked": 0,
    "none": 0
   },
   "update_now": [
+   "guzzlehttp/guzzle",
+   "symfony/http-foundation",
+   "symfony/mime",
+   "symfony/security-http",
    "phpseclib/phpseclib",
    "symfony/monolog-bridge",
+   "enshrined/svg-sanitize",
+   "symfony/mailer",
+   "symfony/routing",
+   "symfony/dom-crawler",
+   "symfony/validator",
    "guzzlehttp/psr7",
    "symfony/cache",
    "symfony/http-client",
@@ -1264,8 +1273,17 @@
   "update_now_command": [
    "composer",
    "update",
+   "guzzlehttp/guzzle",
+   "symfony/http-foundation",
+   "symfony/mime",
+   "symfony/security-http",
    "phpseclib/phpseclib",
    "symfony/monolog-bridge",
+   "enshrined/svg-sanitize",
+   "symfony/mailer",
+   "symfony/routing",
+   "symfony/dom-crawler",
+   "symfony/validator",
    "guzzlehttp/psr7",
    "symfony/cache",
    "symfony/http-client",
@@ -2368,7 +2386,7 @@
       "role": "security",
       "advisory": "PKSA-2z36-j4q9-rsfy",
       "severity": "high",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 16,
       "multiplier": 1,
       "points": 16,
@@ -2433,7 +2451,7 @@
     "kind": "require",
     "source": "left-behind",
     "merged": [],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -2588,7 +2606,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -2754,7 +2772,7 @@
         "points": 16,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "6.x",
          "version": "6.5.7",
          "newest": "6.5.8",
@@ -2778,7 +2796,7 @@
         "points": 16,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "6.x",
          "version": "6.5.6",
          "newest": "6.5.8",
@@ -2802,7 +2820,7 @@
         "points": 16,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "6.x",
          "version": "6.5.7",
          "newest": "6.5.8",
@@ -2826,7 +2844,7 @@
         "points": 16,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.15.2",
          "newest": "7.15.5",
@@ -2850,7 +2868,7 @@
         "points": 16,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "6.x",
          "version": "6.5.8",
          "newest": "6.5.8",
@@ -2874,7 +2892,7 @@
         "points": 16,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "6.x",
          "version": "6.5.8",
          "newest": "6.5.8",
@@ -2898,7 +2916,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.12.1",
          "newest": "7.15.5",
@@ -2922,7 +2940,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.15.1",
          "newest": "7.15.5",
@@ -2946,7 +2964,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.12.3",
          "newest": "7.15.5",
@@ -2970,7 +2988,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.15.2",
          "newest": "7.15.5",
@@ -2994,7 +3012,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.15.1",
          "newest": "7.15.5",
@@ -3018,7 +3036,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.12.1",
          "newest": "7.15.5",
@@ -3042,7 +3060,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.14.2",
          "newest": "7.15.5",
@@ -3066,7 +3084,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "7.x",
          "version": "7.15.1",
          "newest": "7.15.5",
@@ -3233,7 +3251,7 @@
       "role": "security",
       "advisory": "PKSA-365x-2zjk-pt47",
       "severity": "high",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 16,
       "multiplier": 1,
       "points": 16,
@@ -3288,7 +3306,7 @@
     "merged": [
      "left-behind"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -3378,7 +3396,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -3525,7 +3543,7 @@
         "points": 16,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.50",
          "newest": "v5.4.50",
@@ -3549,7 +3567,7 @@
         "points": 2,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.46",
          "newest": "v5.4.50",
@@ -3716,7 +3734,7 @@
       "role": "security",
       "advisory": "PKSA-2n2k-66v2-bwg3",
       "severity": "high",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 16,
       "multiplier": 1,
       "points": 16,
@@ -3771,7 +3789,7 @@
     "merged": [
      "left-behind"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -3861,7 +3879,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -4011,7 +4029,7 @@
         "points": 16,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.52",
          "newest": "v5.4.52",
@@ -4035,7 +4053,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.52",
          "newest": "v5.4.52",
@@ -4204,7 +4222,7 @@
       "role": "security",
       "advisory": "PKSA-c28x-6bj5-8spx",
       "severity": "high",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 16,
       "multiplier": 1,
       "points": 16,
@@ -4259,7 +4277,7 @@
     "merged": [
      "left-behind"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -4349,7 +4367,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -4473,7 +4491,7 @@
         "points": 16,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.53",
          "newest": "v5.4.53",
@@ -4497,7 +4515,7 @@
         "points": 16,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.52",
          "newest": "v5.4.53",
@@ -9359,7 +9377,7 @@
       "role": "security",
       "advisory": "PKSA-4g5g-4rkv-myqs",
       "severity": "medium",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 8,
       "multiplier": 1,
       "points": 8,
@@ -9400,7 +9418,7 @@
     "kind": "require",
     "source": "left-behind",
     "merged": [],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -9485,7 +9503,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -9599,7 +9617,7 @@
         "points": 8,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "0.22.x",
          "version": "0.22.0",
          "newest": "0.22.0",
@@ -9751,7 +9769,7 @@
       "role": "security",
       "advisory": "PKSA-28rh-rzzn-djk4",
       "severity": "medium",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 8,
       "multiplier": 1,
       "points": 8,
@@ -9794,7 +9812,7 @@
     "merged": [
      "vulnerable"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -9879,7 +9897,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -9994,7 +10012,7 @@
         "points": 8,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.52",
          "newest": "v5.4.52",
@@ -10148,7 +10166,7 @@
       "role": "security",
       "advisory": "PKSA-bf7t-jnpz-492k",
       "severity": "medium",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 8,
       "multiplier": 1,
       "points": 8,
@@ -10203,7 +10221,7 @@
     "merged": [
      "vulnerable"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -10293,7 +10311,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -10431,7 +10449,7 @@
         "points": 8,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.53",
          "newest": "v5.4.53",
@@ -10455,7 +10473,7 @@
         "points": 8,
         "deciding": false,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.52",
          "newest": "v5.4.53",
@@ -10607,7 +10625,7 @@
       "role": "security",
       "advisory": "PKSA-5r1g-c7b7-y1zg",
       "severity": "low",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 2,
       "multiplier": 1,
       "points": 2,
@@ -10650,7 +10668,7 @@
     "merged": [
      "vulnerable"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -10735,7 +10753,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -10849,7 +10867,7 @@
         "points": 2,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.52",
          "newest": "v5.4.52",
@@ -11001,7 +11019,7 @@
       "role": "security",
       "advisory": "PKSA-w2tw-kmfg-rt9s",
       "severity": "low",
-      "fix_kind": "upgrade",
+      "fix_kind": "update",
       "weight": 2,
       "multiplier": 1,
       "points": 2,
@@ -11044,7 +11062,7 @@
     "merged": [
      "vulnerable"
     ],
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "reason": null,
     "replacement": null,
     "quiet_years": null,
@@ -11129,7 +11147,7 @@
     },
     "ignored": [],
     "ignored_count": 0,
-    "fix_kind": "upgrade",
+    "fix_kind": "update",
     "installed_branch_fixes": {
      "fixed": 0,
      "unknown": 0,
@@ -11246,7 +11264,7 @@
         "points": 2,
         "deciding": true,
         "fix": {
-         "kind": "upgrade",
+         "kind": "update",
          "to_branch": "5.x",
          "version": "v5.4.43",
          "newest": "v5.4.48",
@@ -19040,8 +19058,7 @@
      "check": "release_dates",
      "reason": "undated_releases",
      "blocks": [
-      "S2",
-      "S8"
+      "S2"
      ]
     }
    ],
@@ -19145,21 +19162,19 @@
     {
      "id": "S10",
      "level": "info",
-     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
      "data": {
       "unchecked": [
        {
         "check": "release_dates",
         "reason": "undated_releases",
         "blocks": [
-         "S2",
-         "S8"
+         "S2"
         ]
        }
       ],
       "blocks": [
-       "S2",
-       "S8"
+       "S2"
       ]
      }
     }
@@ -19366,8 +19381,7 @@
      "check": "release_dates",
      "reason": "undated_releases",
      "blocks": [
-      "S2",
-      "S8"
+      "S2"
      ]
     }
    ],
@@ -19449,21 +19463,19 @@
     {
      "id": "S10",
      "level": "info",
-     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
      "data": {
       "unchecked": [
        {
         "check": "release_dates",
         "reason": "undated_releases",
         "blocks": [
-         "S2",
-         "S8"
+         "S2"
         ]
        }
       ],
       "blocks": [
-       "S2",
-       "S8"
+       "S2"
       ]
      }
     }
@@ -20235,8 +20247,7 @@
      "check": "release_dates",
      "reason": "undated_releases",
      "blocks": [
-      "S2",
-      "S8"
+      "S2"
      ]
     }
    ],
@@ -20355,21 +20366,19 @@
     {
      "id": "S10",
      "level": "info",
-     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
      "data": {
       "unchecked": [
        {
         "check": "release_dates",
         "reason": "undated_releases",
         "blocks": [
-         "S2",
-         "S8"
+         "S2"
         ]
        }
       ],
       "blocks": [
-       "S2",
-       "S8"
+       "S2"
       ]
      }
     }
@@ -20576,8 +20585,7 @@
      "check": "release_dates",
      "reason": "undated_releases",
      "blocks": [
-      "S2",
-      "S8"
+      "S2"
      ]
     }
    ],
@@ -20682,21 +20690,19 @@
     {
      "id": "S10",
      "level": "info",
-     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+     "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
      "data": {
       "unchecked": [
        {
         "check": "release_dates",
         "reason": "undated_releases",
         "blocks": [
-         "S2",
-         "S8"
+         "S2"
         ]
        }
       ],
       "blocks": [
-       "S2",
-       "S8"
+       "S2"
       ]
      }
     }

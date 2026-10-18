@@ -777,7 +777,8 @@
           "records": 181
         }
       ]
-    }
+    },
+    "move_check": null
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
@@ -1142,19 +1143,23 @@
       "low": 0
     },
     "fixes": {
-      "update": 1,
-      "upgrade": 2,
+      "update": 3,
+      "upgrade": 0,
       "raise-php": 0,
       "unknown": 0,
       "blocked": 0,
       "none": 1
     },
     "update_now": [
+      "spomky-labs/otphp",
+      "enshrined/svg-sanitize",
       "phpseclib/phpseclib"
     ],
     "update_now_command": [
       "composer",
       "update",
+      "spomky-labs/otphp",
+      "enshrined/svg-sanitize",
       "phpseclib/phpseclib"
     ],
     "fix_unknown": 0
@@ -1323,6 +1328,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1648,6 +1654,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1932,6 +1939,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -2218,7 +2226,7 @@
             "role": "security",
             "advisory": "PKSA-kbc7-dq62-pt7d",
             "severity": "high",
-            "fix_kind": "upgrade",
+            "fix_kind": "update",
             "weight": 16,
             "multiplier": 1,
             "points": 16,
@@ -2281,7 +2289,7 @@
         "merged": [
           "left-behind"
         ],
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "reason": null,
         "replacement": null,
         "quiet_years": null,
@@ -2331,6 +2339,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major",
           "transitive"
@@ -2377,7 +2386,7 @@
         },
         "ignored": [],
         "ignored_count": 0,
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "installed_branch_fixes": {
           "fixed": 0,
           "unknown": 0,
@@ -2386,7 +2395,8 @@
           "lowest": null,
           "newest": "v10.0.3",
           "held_by": [],
-          "if_applied": null
+          "if_applied": null,
+          "check": null
         },
         "move_in": "next_step",
         "gets": null,
@@ -2489,7 +2499,7 @@
                 "points": 16,
                 "deciding": true,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "11.x",
                   "version": "11.4.3",
                   "newest": "11.5.0",
@@ -2513,7 +2523,7 @@
                 "points": 8,
                 "deciding": false,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "11.x",
                   "version": "11.4.3",
                   "newest": "11.5.0",
@@ -2703,6 +2713,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -2755,7 +2766,8 @@
           "lowest": null,
           "newest": "v3.0.1",
           "held_by": [],
-          "if_applied": null
+          "if_applied": null,
+          "check": null
         },
         "move_in": "next_step",
         "gets": null,
@@ -3070,6 +3082,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3423,6 +3436,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -3756,6 +3770,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -4103,6 +4118,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -4449,6 +4465,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -4796,6 +4813,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -5153,6 +5171,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -5525,6 +5544,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -5871,6 +5891,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -6170,6 +6191,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -6480,6 +6502,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -6779,6 +6802,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7067,6 +7091,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7104,8 +7129,7 @@
           "check": "release_dates",
           "reason": "undated_releases",
           "blocks": [
-            "S2",
-            "S8"
+            "S2"
           ]
         }
       ],
@@ -7214,21 +7238,19 @@
         {
           "id": "S10",
           "level": "info",
-          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
           "data": {
             "unchecked": [
               {
                 "check": "release_dates",
                 "reason": "undated_releases",
                 "blocks": [
-                  "S2",
-                  "S8"
+                  "S2"
                 ]
               }
             ],
             "blocks": [
-              "S2",
-              "S8"
+              "S2"
             ]
           }
         }
@@ -7402,6 +7424,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -7716,6 +7739,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -8027,6 +8051,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -8064,8 +8089,7 @@
           "check": "release_dates",
           "reason": "undated_releases",
           "blocks": [
-            "S2",
-            "S8"
+            "S2"
           ]
         }
       ],
@@ -8200,21 +8224,19 @@
         {
           "id": "S10",
           "level": "info",
-          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
           "data": {
             "unchecked": [
               {
                 "check": "release_dates",
                 "reason": "undated_releases",
                 "blocks": [
-                  "S2",
-                  "S8"
+                  "S2"
                 ]
               }
             ],
             "blocks": [
-              "S2",
-              "S8"
+              "S2"
             ]
           }
         }
@@ -8388,6 +8410,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -8425,8 +8448,7 @@
           "check": "release_dates",
           "reason": "undated_releases",
           "blocks": [
-            "S2",
-            "S8"
+            "S2"
           ]
         }
       ],
@@ -8535,21 +8557,19 @@
         {
           "id": "S10",
           "level": "info",
-          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 and S8 could not measure it",
+          "summary": "the age of the package was not read (its newest releases are dated by a commit their tags share), so S2 could not measure it",
           "data": {
             "unchecked": [
               {
                 "check": "release_dates",
                 "reason": "undated_releases",
                 "blocks": [
-                  "S2",
-                  "S8"
+                  "S2"
                 ]
               }
             ],
             "blocks": [
-              "S2",
-              "S8"
+              "S2"
             ]
           }
         }
@@ -8723,6 +8743,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -8993,6 +9014,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -9433,6 +9455,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -9914,6 +9937,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -10204,6 +10228,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -10473,6 +10498,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -10829,6 +10855,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -11142,6 +11169,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -11456,6 +11484,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -11769,6 +11798,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -12082,6 +12112,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -12396,6 +12427,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -12710,6 +12742,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -13023,6 +13056,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -13337,6 +13371,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -13649,6 +13684,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -13963,6 +13999,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -14278,6 +14315,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -14591,6 +14629,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -14904,6 +14943,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [
           "transitive"
         ],
@@ -15227,7 +15267,7 @@
             "role": "security",
             "advisory": "PKSA-6j95-1jtb-x6wc",
             "severity": "medium",
-            "fix_kind": "upgrade",
+            "fix_kind": "update",
             "weight": 8,
             "multiplier": 1,
             "points": 8,
@@ -15256,7 +15296,7 @@
         "kind": "require",
         "source": "vulnerable",
         "merged": [],
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "reason": null,
         "replacement": null,
         "quiet_years": null,
@@ -15306,6 +15346,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -15345,7 +15386,7 @@
         },
         "ignored": [],
         "ignored_count": 0,
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "installed_branch_fixes": {
           "fixed": 0,
           "unknown": 0,
@@ -15354,7 +15395,8 @@
           "lowest": null,
           "newest": "0.22.0",
           "held_by": [],
-          "if_applied": null
+          "if_applied": null,
+          "check": null
         },
         "move_in": "next_step",
         "gets": null,
@@ -15428,7 +15470,7 @@
                 "points": 8,
                 "deciding": true,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "1.x",
                   "version": null,
                   "newest": "1.0.0",
@@ -15452,7 +15494,7 @@
                 "points": 8,
                 "deciding": false,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "1.x",
                   "version": null,
                   "newest": "1.0.0",
@@ -15476,7 +15518,7 @@
                 "points": 8,
                 "deciding": false,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "1.x",
                   "version": null,
                   "newest": "1.0.0",
@@ -15667,6 +15709,7 @@
             "clears_hold"
           ]
         },
+        "check": null,
         "composer_moves_because": [],
         "commands": [
           [
@@ -15743,7 +15786,8 @@
             "assumes": [
               "clears_hold"
             ]
-          }
+          },
+          "check": null
         },
         "move_in": "next_step",
         "gets": {
@@ -16000,6 +16044,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -16234,6 +16279,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -16491,6 +16537,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -16825,6 +16872,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major",
           "transitive"
@@ -17115,6 +17163,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major",
           "transitive"
@@ -17405,6 +17454,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major",
           "transitive"
@@ -17679,6 +17729,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -17925,6 +17976,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -18179,6 +18231,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [
@@ -18458,6 +18511,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [

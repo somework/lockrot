@@ -933,97 +933,97 @@
     "PKSA-13hy-qbkf-1ty7": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-19z7-hn1j-mtcg": {
      "known_since": "2026-10-01",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-29h7-kzb3-pdfy": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-2xjm-ff52-fzd5": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-2zh8-n335-x575": {
      "known_since": "2026-10-01",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-3f27-q682-kfn9": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-9sj3-tcvg-s7g4": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-9ss4-yr44-h3bt": {
      "known_since": "2026-10-01",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-j6yc-z95h-xyjq": {
      "known_since": "2026-10-01",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-jdmc-h4p3-hds2": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-nqwp-2kdm-491t": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-nshj-ydrr-y3c1": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-pjp2-q1z1-mmvn": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-qgpb-b2wz-rty6": {
      "known_since": "2026-10-01",
      "severity": "medium",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-rb2q-qy38-2dj7": {
      "known_since": "2026-10-01",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-vxd1-4ssb-3qdw": {
      "known_since": "2026-10-01",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-wps4-zyhx-xws4": {
      "known_since": "2026-10-01",
      "severity": "low",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-wyg9-y12c-3kdv": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     },
     "PKSA-z2fd-3m4y-rrss": {
      "known_since": "2026-10-01",
      "severity": "high",
-     "fix_kind": "upgrade"
+     "fix_kind": "update"
     }
    }
   },

@@ -22,7 +22,10 @@ final class PageGoldensTest extends TestCase
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/';
     private const GRADES = ['critical', 'high', 'medium', 'low'];
 
-    /** The Overview lines of SPEC §7.9.4 that lockrot-report computes from report-2 fields. An empty lock shows none of them. */
+    /**
+     * The Overview lines of SPEC §7.9.4 that lockrot-report computes from report-2 fields. An empty lock
+     * shows none of them, and a lock with nothing graded shows no load line.
+     */
     private const OVERVIEW_LINES = ['grade_line', 'figure_line', 'load_line'];
 
     /** The goldens whose PHP inputs differ from the model's, with the reason. */
@@ -98,11 +101,13 @@ final class PageGoldensTest extends TestCase
     public function testEveryGoldenHoldsTheOverviewLines(string $id): void
     {
         $golden = JsonPath::arrayAt(JsonPath::decodeFile(self::CONTRACT.'page-goldens.json'), ['goldens', $id]);
-        $empty = JsonPath::intAt(self::modelDocument(JsonPath::stringAt($golden, ['document'])), ['packages_checked']) === 0;
+        $model = self::modelDocument(JsonPath::stringAt($golden, ['document']));
+        $empty = JsonPath::intAt($model, ['packages_checked']) === 0;
+        $graded = JsonPath::intAt($model, ['packages_flagged']) > 0;
 
         foreach (self::OVERVIEW_LINES as $line) {
             self::assertArrayHasKey($line, $golden, $id.': re-record page-goldens.json from the model');
-            if ($empty) {
+            if ($empty || ($line === 'load_line' && !$graded)) {
                 self::assertNull($golden[$line], $id.': '.$line);
             } else {
                 self::assertNotSame('', JsonPath::stringAt($golden, [$line]), $id.': '.$line);

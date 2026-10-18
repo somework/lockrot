@@ -1,6 +1,38 @@
 [
     {
         "type": "issue",
+        "check_name": "lockrot/pinned",
+        "description": "mautic/core-lib 4.3.x-dev \u2014 finding critical (32 = pinned 16 + vulnerable 16 [high advisory]) \u2014 pinned: pinned to branch snapshot 4.3.x-dev. Do: no move: it is installed from a local path (your own package).",
+        "categories": [
+            "Bug Risk"
+        ],
+        "severity": "major",
+        "fingerprint": "311da5afef02dcf33a18150b036bd89ee31a1dc00b9b626a9e3995cbe28155fd",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 28
+            }
+        }
+    },
+    {
+        "type": "issue",
+        "check_name": "lockrot/vulnerable",
+        "description": "mautic/core-lib 4.3.x-dev \u2014 finding critical (32 = pinned 16 + vulnerable 16 [high advisory]) \u2014 vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process. Do: no move: it is installed from a local path (your own package).",
+        "categories": [
+            "Security"
+        ],
+        "severity": "major",
+        "fingerprint": "8faadba515e425d6331c3cfcb9cb7a645503388572c59326e62020d6f5492072",
+        "location": {
+            "path": "composer.lock",
+            "lines": {
+                "begin": 28
+            }
+        }
+    },
+    {
+        "type": "issue",
         "check_name": "lockrot/old-promise",
         "description": "robrichards/xmlseclibs 3.1.1 \u2014 finding high (24 = old-promise 16 \u00f7 2 transitive + vulnerable 16 [high advisory]) \u2014 old-promise: released 2020-09-05 for PHP 5 (php \">= 5.4\"), before PHP 8 existed (8.0 GA 2020-11-26); admits 8.4 untested. Do: composer update robrichards/xmlseclibs (gets 3.1.5) \u2014 clears old-promise and 2 advisories. (via mautic/core-lib)",
         "categories": [
@@ -11,7 +43,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 35
+                "begin": 40
             }
         }
     },
@@ -27,7 +59,7 @@
         "location": {
             "path": "composer.lock",
             "lines": {
-                "begin": 35
+                "begin": 40
             }
         }
     }

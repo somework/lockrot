@@ -777,7 +777,8 @@
           "records": 153
         }
       ]
-    }
+    },
+    "move_check": null
   },
   "activity_cache_oldest_at": "2026-10-14T00:00:00+00:00",
   "activity_cache_age_hours": 0,
@@ -1050,8 +1051,8 @@
       "low": 2
     },
     "fixes": {
-      "update": 5,
-      "upgrade": 1,
+      "update": 6,
+      "upgrade": 0,
       "raise-php": 0,
       "unknown": 0,
       "blocked": 0,
@@ -1060,6 +1061,7 @@
     "update_now": [
       "league/commonmark",
       "zbateson/mail-mime-parser",
+      "enshrined/svg-sanitize",
       "phpseclib/phpseclib",
       "laravel/framework",
       "league/flysystem"
@@ -1069,6 +1071,7 @@
       "update",
       "league/commonmark",
       "zbateson/mail-mime-parser",
+      "enshrined/svg-sanitize",
       "phpseclib/phpseclib",
       "laravel/framework",
       "league/flysystem"
@@ -1252,6 +1255,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -1566,6 +1570,7 @@
             "clears_hold"
           ]
         },
+        "check": null,
         "composer_moves_because": [],
         "commands": [
           [
@@ -1642,7 +1647,8 @@
             "assumes": [
               "clears_hold"
             ]
-          }
+          },
+          "check": null
         },
         "move_in": "next_step",
         "gets": {
@@ -1984,6 +1990,7 @@
             "clears_hold"
           ]
         },
+        "check": null,
         "composer_moves_because": [],
         "commands": [
           [
@@ -2049,7 +2056,8 @@
             "assumes": [
               "clears_hold"
             ]
-          }
+          },
+          "check": null
         },
         "move_in": "next_step",
         "gets": {
@@ -2360,6 +2368,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -2647,6 +2656,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -2934,6 +2944,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -3171,7 +3182,7 @@
             "role": "security",
             "advisory": "PKSA-6j95-1jtb-x6wc",
             "severity": "medium",
-            "fix_kind": "upgrade",
+            "fix_kind": "update",
             "weight": 8,
             "multiplier": 1,
             "points": 8,
@@ -3200,7 +3211,7 @@
         "kind": "require",
         "source": "vulnerable",
         "merged": [],
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "reason": null,
         "replacement": null,
         "quiet_years": null,
@@ -3250,6 +3261,7 @@
             "composer_resolves"
           ]
         },
+        "check": null,
         "composer_moves_because": [
           "crosses_major"
         ],
@@ -3289,7 +3301,7 @@
         },
         "ignored": [],
         "ignored_count": 0,
-        "fix_kind": "upgrade",
+        "fix_kind": "update",
         "installed_branch_fixes": {
           "fixed": 0,
           "unknown": 0,
@@ -3298,7 +3310,8 @@
           "lowest": null,
           "newest": "0.22.0",
           "held_by": [],
-          "if_applied": null
+          "if_applied": null,
+          "check": null
         },
         "move_in": "next_step",
         "gets": null,
@@ -3372,7 +3385,7 @@
                 "points": 8,
                 "deciding": true,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "1.x",
                   "version": null,
                   "newest": "1.0.0",
@@ -3396,7 +3409,7 @@
                 "points": 8,
                 "deciding": false,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "1.x",
                   "version": null,
                   "newest": "1.0.0",
@@ -3420,7 +3433,7 @@
                 "points": 8,
                 "deciding": false,
                 "fix": {
-                  "kind": "upgrade",
+                  "kind": "update",
                   "to_branch": "1.x",
                   "version": null,
                   "newest": "1.0.0",
@@ -3611,6 +3624,7 @@
             "clears_hold"
           ]
         },
+        "check": null,
         "composer_moves_because": [],
         "commands": [
           [
@@ -3687,7 +3701,8 @@
             "assumes": [
               "clears_hold"
             ]
-          }
+          },
+          "check": null
         },
         "move_in": "next_step",
         "gets": {
@@ -3944,6 +3959,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [],
@@ -4195,6 +4211,7 @@
             "clears_hold"
           ]
         },
+        "check": null,
         "composer_moves_because": [],
         "commands": [
           [
@@ -4248,7 +4265,8 @@
             "assumes": [
               "clears_hold"
             ]
-          }
+          },
+          "check": null
         },
         "move_in": "next_step",
         "gets": {
@@ -4578,6 +4596,7 @@
             "clears_hold"
           ]
         },
+        "check": null,
         "composer_moves_because": [],
         "commands": [
           [
@@ -4698,7 +4717,8 @@
             "assumes": [
               "clears_hold"
             ]
-          }
+          },
+          "check": null
         },
         "move_in": "next_step",
         "gets": {
@@ -4967,6 +4987,7 @@
         ],
         "clears_all": false,
         "if_applied": null,
+        "check": null,
         "composer_moves_because": [],
         "commands": [],
         "through": [

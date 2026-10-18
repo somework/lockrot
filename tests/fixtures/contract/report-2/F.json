@@ -755,8 +755,8 @@
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 1
+                    "packages_with_records": 2,
+                    "records": 16
                 }
             ]
         },

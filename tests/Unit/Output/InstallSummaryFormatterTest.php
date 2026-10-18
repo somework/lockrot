@@ -50,12 +50,12 @@ final class InstallSummaryFormatterTest extends TestCase
         $lines = self::lines(CaseHydrator::composite());
 
         self::assertCount(10, $lines);
-        self::assertSame('lockrot: 7 of 7 changed packages flagged — critical 3 · high 2 · low 2', $lines[0]);
+        self::assertSame('lockrot: 9 of 9 changed packages flagged — critical 4 · high 2 · low 3', $lines[0]);
         self::assertStringStartsWith('  critical [32] twig/twig v2.16.1: vulnerable (critical advisory; 15 in all) — raise require.php to >=8.1, then require twig/twig ^3.27.0', $lines[1]);
-        self::assertSame('  critical [36] symfony/debug v3.4.47: abandoned · old-promise — replace with symfony/error-handler (named by its registry)', $lines[3]);
-        self::assertSame('  … and 2 more', $lines[6]);
+        self::assertSame('  critical [36] symfony/debug v3.4.47: abandoned · old-promise — replace with symfony/error-handler (named by its registry)', $lines[4]);
+        self::assertSame('  … and 4 more', $lines[6]);
         self::assertSame('  update now: composer update symfony/yaml symfony/polyfill-intl-idn (2 not shown above)', $lines[7]);
-        self::assertSame('  gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)', $lines[8]);
+        self::assertSame('  gate: fails · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)', $lines[8]);
         self::assertSame('Run composer lockrot for details.', $lines[9]);
     }
 
@@ -78,7 +78,7 @@ final class InstallSummaryFormatterTest extends TestCase
         self::assertCount(10, $lines);
         self::assertMatchesRegularExpression('/^  note: target php from the running PHP \\(\\d+\\.\\d+\\); /', $first);
         self::assertStringEndsWith('); fix changes against the baseline not compared', $first);
-        self::assertContains('  … and 3 more', $lines, 'the note takes the slot of one finding');
+        self::assertContains('  … and 5 more', $lines, 'the note takes the slot of one finding');
     }
 
     public function testTwentyFindingsThreeNotesAndAFailingGateFillTenLinesAndCountTheThirdNote(): void

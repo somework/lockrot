@@ -65,6 +65,7 @@ final class CaseHydrator
     public const CASES = __DIR__.'/../fixtures/flags/cases.json';
     private const DOCUMENTS = __DIR__.'/../fixtures/schema/documents/cases/';
     private const COMPOSITE = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    private const COMPOSITE_FILE = __DIR__.'/../fixtures/flags/composite.json';
     private const PACKAGIST = 'https://packagist.org/downloads/';
 
     /** @var array<string, array<mixed, mixed>>|null */
@@ -156,13 +157,19 @@ final class CaseHydrator
     }
 
     /**
-     * The seven-package composite of tests/fixtures/flags/composite.json: the case finding of each
-     * of the cases A to G in one report, its advisory lookup summed per repository, at
-     * `--fail-on=high` against target PHP 8.4 (`--target-php`).
+     * The composite of tests/fixtures/flags/composite.json: the case finding of each of the cases A
+     * to G and every other finding that the composite holds, each from the lock of the case that
+     * reaches it, in one report, its advisory lookup summed per repository, at `--fail-on=high`
+     * against target PHP 8.4 (`--target-php`).
      */
     public static function composite(): Report
     {
-        return self::ofCases(self::COMPOSITE);
+        $packages = [];
+        foreach (JsonPath::arrayAt(JsonPath::decodeFile(self::COMPOSITE_FILE), ['findings']) as $finding) {
+            $packages[] = JsonPath::stringAt($finding, ['package']);
+        }
+
+        return self::ofCases(self::COMPOSITE, $packages);
     }
 
     /**
@@ -203,8 +210,12 @@ final class CaseHydrator
         return self::ofCases(array_map('strval', array_keys(self::findings())));
     }
 
-    /** @param list<string> $ids */
-    private static function ofCases(array $ids): Report
+    /**
+     * @param list<string> $ids
+     * @param list<string> $others the other packages that the report holds, each taken from the
+     *                             first case whose lock gives it a finding
+     */
+    private static function ofCases(array $ids, array $others = []): Report
     {
         $findings = [];
         $records = [];
@@ -217,17 +228,22 @@ final class CaseHydrator
             if (isset($findings[$package])) {
                 continue;
             }
+            $held = [];
             foreach ($report->findings() as $finding) {
-                if ($finding->package() === $package) {
-                    $findings[$package] = $finding;
+                $name = $finding->package();
+                if (!isset($findings[$name]) && ($name === $package || \in_array($name, $others, true))) {
+                    $findings[$name] = $finding;
+                    $held[] = $finding;
                 }
             }
-            // The composite holds the case packages only, so it counts their records, not the related packages'.
-            $named = isset($findings[$package]) ? $findings[$package]->details()->advisoryLookup() : null;
-            $count = $named === null ? 0 : (int) $named->records();
-            foreach ($report->advisoryLookup()->repositories() as $repository) {
-                $name = $repository->composerRepository();
-                $records[$name] = [($records[$name][0] ?? 0) + $count, ($records[$name][1] ?? 0) + ($count === 0 ? 0 : 1)];
+            // The report counts the records of the findings it holds, not those of the case lock's other packages.
+            foreach ($held as $finding) {
+                $named = $finding->details()->advisoryLookup();
+                $count = $named === null ? 0 : (int) $named->records();
+                foreach ($report->advisoryLookup()->repositories() as $repository) {
+                    $name = $repository->composerRepository();
+                    $records[$name] = [($records[$name][0] ?? 0) + $count, ($records[$name][1] ?? 0) + ($count === 0 ? 0 : 1)];
+                }
             }
             $at = $report->activityCacheOldestAt();
             $oldest = $at !== null && ($oldest === null || $at < $oldest) ? $at : $oldest;

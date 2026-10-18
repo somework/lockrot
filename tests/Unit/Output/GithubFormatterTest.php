@@ -132,7 +132,7 @@ final class GithubFormatterTest extends TestCase
 
         self::assertSame('::error file=composer.lock,line=4,title=lockrot%3A critical — abandoned::acme/abandoned 1.0.0: 32 = abandoned 32. abandoned: marked abandoned by its registry.', $lines[0]);
         self::assertStringStartsWith('::warning file=composer.lock,line=8,title=lockrot%3A high — silent::acme/silent 2.0.8: 16 = silent 32 ÷ 2 transitive. silent: ', $lines[1]);
-        self::assertStringEndsWith('::symfony/polyfill-intl-idn v1.37.0: 2 = vulnerable 2 [low advisory]. Do: composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory. vulnerable: 1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence. maintenance accepted (lockrot\'s list): polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace. (via guzzlehttp/guzzle)', explode("\n", $this->formatter('high', null)->format(CaseHydrator::composite()))[6]);
+        self::assertStringEndsWith('::symfony/polyfill-intl-idn v1.37.0: 2 = vulnerable 2 [low advisory]. Do: composer update symfony/polyfill-intl-idn (gets v1.43.0) — clears the advisory. vulnerable: 1 advisory: 1 low — all fixed on 1.x; advisory: CVE-2026-46644 symfony/polyfill-intl-idn accepts xn-- labels whose Punycode payload decodes to ASCII-only: insecure equivalence. maintenance accepted (lockrot\'s list): polyfills for PHP extensions; released with Symfony and complete for the API of the extension they replace. (via guzzlehttp/guzzle)', explode("\n", $this->formatter('high', null)->format(CaseHydrator::composite()))[7]);
         self::assertStringStartsWith('::warning file=composer.lock,title=lockrot%3A medium — stale::acme/absent 3.0.0: 8 = stale 8.', $lines[2]);
     }
 
@@ -140,9 +140,9 @@ final class GithubFormatterTest extends TestCase
     {
         $lines = explode("\n", trim($this->formatter('high', null)->format(CaseHydrator::composite())));
 
-        self::assertSame('gate: fails · --fail-on=high · 5 findings fail it · target php 8.4 (--target-php)', end($lines));
+        self::assertSame('gate: fails · --fail-on=high · 6 findings fail it · target php 8.4 (--target-php)', end($lines));
         self::assertSame('update now: composer update symfony/yaml symfony/polyfill-intl-idn', $lines[\count($lines) - 2]);
-        self::assertStringStartsWith('security: 4 vulnerable packages · 20 advisories: ', $lines[\count($lines) - 3]);
+        self::assertStringStartsWith('security: 5 vulnerable packages · 29 advisories: ', $lines[\count($lines) - 3]);
         self::assertStringStartsWith('depth: ', $lines[\count($lines) - 4]);
         self::assertStringStartsWith('flags: ', $lines[\count($lines) - 5]);
     }

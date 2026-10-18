@@ -44083,8 +44083,8 @@ export const d_F = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 1
+                    "packages_with_records": 2,
+                    "records": 16
                 }
             ]
         },
@@ -53766,7 +53766,7 @@ export const d_commonmark = {
         "advisory_lookup": {
             "scope": "all",
             "scope_source": "default",
-            "packages_asked": 1,
+            "packages_asked": 4,
             "packages_not_asked": 0,
             "other_repositories": 0,
             "repositories": [
@@ -53776,8 +53776,8 @@ export const d_commonmark = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 18
+                    "packages_with_records": 2,
+                    "records": 46
                 }
             ]
         },
@@ -53786,7 +53786,7 @@ export const d_commonmark = {
             "counted": 0,
             "lead-first": 0,
             "corroborating-share": 0,
-            "advisory-points": 1,
+            "advisory-points": 2,
             "no-reachable-fix-multiplier": 0,
             "security-max": 1,
             "divide-reach": 0,
@@ -53794,8 +53794,8 @@ export const d_commonmark = {
             "sum": 0,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 1,
-            "zero-verdicts": 0,
+            "band-floors": 2,
+            "zero-verdicts": 2,
             "sort": null,
             "gate-bounded-new": 0,
             "baseline-cover": 0
@@ -53804,7 +53804,7 @@ export const d_commonmark = {
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
     "packages_checked": 4,
-    "packages_flagged": 1,
+    "packages_flagged": 2,
     "packages_multi_flag": 0,
     "include_dev": false,
     "not_from_composer_repository": 0,
@@ -53814,10 +53814,10 @@ export const d_commonmark = {
         "critical": 0,
         "high": 1,
         "medium": 0,
-        "low": 0,
+        "low": 1,
         "unknown": 0,
         "finished": 0,
-        "ok": 0
+        "ok": 2
     },
     "abandoned": {
         "total": 0,
@@ -53828,8 +53828,8 @@ export const d_commonmark = {
         "critical": 0,
         "high": 1,
         "medium": 0,
-        "low": 0,
-        "none": 0
+        "low": 1,
+        "none": 2
     },
     "flags": {
         "abandoned": {
@@ -53917,14 +53917,14 @@ export const d_commonmark = {
             }
         },
         "vulnerable": {
-            "carrying": 1,
+            "carrying": 2,
             "leading": null,
             "accepted": null,
             "by_verdict": {
                 "critical": 0,
                 "high": 1,
                 "medium": 0,
-                "low": 0
+                "low": 1
             }
         }
     },
@@ -53947,25 +53947,25 @@ export const d_commonmark = {
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 1,
-        "measured": 1,
+        "flagged": 2,
+        "measured": 2,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
-            "direct": 0,
+            "direct": 1,
             "transitive": 1,
             "unreached": 0
         },
         "not_in_composer_json": 1,
         "require_dev_not_walked": 0,
-        "production": 1,
+        "production": 2,
         "development": 0,
         "by_depth": [
             {
                 "depth": 0,
-                "flagged": 0
+                "flagged": 1
             },
             {
                 "depth": 1,
@@ -53984,9 +53984,9 @@ export const d_commonmark = {
         ]
     },
     "libyears": {
-        "total": 0.12,
-        "direct_requirements": 0,
-        "measured": 1,
+        "total": 0.38,
+        "direct_requirements": 0.26,
+        "measured": 4,
         "at_least_count": 0,
         "unmeasured": {
             "not_from_composer_repository": 0,
@@ -53999,12 +53999,12 @@ export const d_commonmark = {
             "undated_releases": 0
         },
         "furthest_behind": {
-            "package": "league/commonmark",
-            "version": "2.9.1",
-            "libyears": 0.12,
+            "package": "laravel/framework",
+            "version": "v12.65.0",
+            "libyears": 0.15,
             "at_least": false
         },
-        "packages": 1
+        "packages": 4
     },
     "baseline": null,
     "gate": {
@@ -54030,13 +54030,13 @@ export const d_commonmark = {
     "security": {
         "check": "complete",
         "packages": {
-            "vulnerable": 1,
+            "vulnerable": 2,
             "unchecked": 0,
             "ignored": 0,
-            "clear": 0
+            "clear": 2
         },
         "advisories": {
-            "counted": 3,
+            "counted": 4,
             "ignored": 0
         },
         "severities": {
@@ -54044,10 +54044,10 @@ export const d_commonmark = {
             "high": 2,
             "medium": 1,
             "unrated": 0,
-            "low": 0
+            "low": 1
         },
         "fixes": {
-            "update": 1,
+            "update": 2,
             "upgrade": 0,
             "raise-php": 0,
             "unknown": 0,
@@ -54055,12 +54055,14 @@ export const d_commonmark = {
             "none": 0
         },
         "update_now": [
-            "league/commonmark"
+            "league/commonmark",
+            "laravel/framework"
         ],
         "update_now_command": [
             "composer",
             "update",
-            "league/commonmark"
+            "league/commonmark",
+            "laravel/framework"
         ],
         "fix_unknown": 0
     },
@@ -54531,6 +54533,667 @@ export const d_commonmark = {
                         ]
                     }
                 ],
+                "basis": null
+            }
+        },
+        {
+            "package": "laravel/framework",
+            "version": "v12.65.0",
+            "branch": "12.x",
+            "installed_php": {
+                "requires": "^8.2",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": null,
+            "rank": 2,
+            "flags": [
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 1,
+                        "source": null
+                    },
+                    "summary": "1 advisory: 1 low \u2014 all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 2,
+                "exact": 2,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 6
+                },
+                "decided_by": "security",
+                "parts": {
+                    "maintenance": {
+                        "status": "none",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 2,
+                        "alone": {
+                            "total": 2,
+                            "verdict": "low"
+                        },
+                        "of": 1,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-d5tc-s1qs-h781",
+                        "severity": "low",
+                        "fix_kind": "update",
+                        "weight": 2,
+                        "multiplier": 1,
+                        "points": 2,
+                        "contribution": 2
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [],
+                "text": "2 = vulnerable 2 [low advisory]"
+            },
+            "next_step": {
+                "kind": "update",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "update",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "12.x",
+                "version": "v12.69.0",
+                "newest": "v12.69.3",
+                "constraint": null,
+                "latest": null,
+                "php_check": {
+                    "requires": "^8.2",
+                    "project_allows": true,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-d5tc-s1qs-h781",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": null,
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "update",
+                        "laravel/framework"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "composer update laravel/framework (gets v12.69.3) \u2014 clears the advisory"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 28,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 28,
+                        "reason": null
+                    }
+                ],
+                "worst": "low",
+                "counts": {
+                    "critical": 0,
+                    "high": 0,
+                    "medium": 0,
+                    "unrated": 0,
+                    "low": 1
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "update",
+                "installed_branch_fixes": {
+                    "fixed": 1,
+                    "unknown": 0,
+                    "of": 1,
+                    "fix_kind": "update",
+                    "lowest": "v12.69.0",
+                    "newest": "v12.69.3",
+                    "held_by": [],
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold"
+                        ]
+                    },
+                    "check": null
+                },
+                "move_in": "next_step",
+                "gets": {
+                    "version": "v12.69.3",
+                    "php_check": {
+                        "requires": "^8.2",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-d5tc-s1qs-h781",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "clears_all": true
+                },
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laravel/framework",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laravel/framework",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "laravel/framework"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "laravel/framework"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "laravel/framework",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "S9",
+                    "level": "warn",
+                    "summary": "1 security advisory affects v12.65.0 (CVE-2026-102279); fixed in v12.69.0",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-d5tc-s1qs-h781",
+                                "cve": "CVE-2026-102279",
+                                "title": "Laravel: XSS in Debug Page Information",
+                                "link": "https://github.com/advisories/GHSA-jh5r-qr3c-85q8",
+                                "reported_at": "2026-09-29T18:24:25+00:00",
+                                "severity": "low",
+                                "severity_published": "low",
+                                "affected_versions": ">=13.0.0,<13.30.0|<12.69.0",
+                                "counted": true,
+                                "points": 2,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "update",
+                                    "to_branch": "12.x",
+                                    "version": "v12.69.0",
+                                    "newest": "v12.69.3",
+                                    "on_installed_branch": true,
+                                    "php": "^8.2",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "vulnerable: 1 advisory: 1 low \u2014 all fixed on 12.x; advisory: CVE-2026-102279 Laravel: XSS in Debug Page Information",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0.15,
+            "age": {
+                "installed": {
+                    "at": "2026-08-05T15:33:16+00:00",
+                    "years": 0.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v11.57.0",
+                    "at": "2026-09-29T15:33:27+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v12.69.3",
+                    "at": "2026-09-29T12:53:25+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-30T21:54:48+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "laravel/nightwatch",
+            "version": "v1.28.6",
+            "branch": "1.x",
+            "installed_php": {
+                "requires": null,
+                "target_runs": null,
+                "project_allows": null
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 3,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "laravel/nightwatch",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/laravel/nightwatch",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "laravel/nightwatch"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "laravel/nightwatch"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "laravel/nightwatch",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0.11,
+            "age": {
+                "installed": {
+                    "at": "2026-08-07T01:18:48+00:00",
+                    "years": 0.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v1.30.2",
+                    "at": "2026-09-18T00:37:28+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v1.30.2",
+                    "at": "2026-09-18T00:37:28+00:00",
+                    "years": 0,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-30T03:25:25+00:00",
+                    "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "spatie/laravel-markdown",
+            "version": "2.8.0",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": null,
+                "target_runs": null,
+                "project_allows": null
+            },
+            "verdict": "ok",
+            "priority": "none",
+            "lead": null,
+            "rank": 4,
+            "flags": [],
+            "score": {
+                "model": 1,
+                "total": 0,
+                "exact": 0,
+                "accepted": [],
+                "text": "0"
+            },
+            "next_step": null,
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 0,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 0,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "spatie/laravel-markdown",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/spatie/laravel-markdown",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "spatie/laravel-markdown"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "spatie/laravel-markdown"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: league/commonmark (vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "league/commonmark",
+                                "chain": [
+                                    "spatie/laravel-markdown",
+                                    "league/commonmark"
+                                ],
+                                "verdict": "high",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "evidence": "",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2026-02-22T18:53:36+00:00",
+                    "years": 0.6,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "2.8.0",
+                    "at": "2026-02-22T18:53:36+00:00",
+                    "years": 0.6,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "2.8.0",
+                    "at": "2026-02-22T18:53:36+00:00",
+                    "years": 0.6,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-06-15T14:28:41+00:00",
+                    "years": 0.3,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
                 "basis": null
             }
         }
@@ -55284,7 +55947,7 @@ export const d_composite = {
         "advisory_lookup": {
             "scope": "all",
             "scope_source": "default",
-            "packages_asked": 7,
+            "packages_asked": 9,
             "packages_not_asked": 0,
             "other_repositories": 0,
             "repositories": [
@@ -55294,25 +55957,25 @@ export const d_composite = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 4,
-                    "records": 33
+                    "packages_with_records": 6,
+                    "records": 49
                 }
             ]
         },
         "move_check": null,
         "score_rules_used": {
             "counted": 0,
-            "lead-first": 4,
+            "lead-first": 6,
             "corroborating-share": 4,
-            "advisory-points": 4,
+            "advisory-points": 5,
             "no-reachable-fix-multiplier": 0,
-            "security-max": 2,
-            "divide-reach": 0,
+            "security-max": 3,
+            "divide-reach": 1,
             "security-exempt-from-reach": 1,
-            "sum": 1,
+            "sum": 2,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 7,
+            "band-floors": 9,
             "zero-verdicts": 0,
             "sort": null,
             "gate-bounded-new": 0,
@@ -55321,18 +55984,18 @@ export const d_composite = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 7,
-    "packages_flagged": 7,
-    "packages_multi_flag": 4,
+    "packages_checked": 9,
+    "packages_flagged": 9,
+    "packages_multi_flag": 5,
     "include_dev": false,
     "not_from_composer_repository": 0,
     "packages_unchecked_accepted": 0,
     "network_failures": false,
     "counts": {
-        "critical": 3,
+        "critical": 4,
         "high": 2,
         "medium": 0,
-        "low": 2,
+        "low": 3,
         "unknown": 0,
         "finished": 0,
         "ok": 0
@@ -55343,10 +56006,10 @@ export const d_composite = {
         "with_suggestion": 0
     },
     "priorities": {
-        "critical": 3,
+        "critical": 4,
         "high": 2,
         "medium": 0,
-        "low": 2,
+        "low": 3,
         "none": 0
     },
     "flags": {
@@ -55393,14 +56056,14 @@ export const d_composite = {
             }
         },
         "left-behind": {
-            "carrying": 1,
-            "leading": 1,
+            "carrying": 2,
+            "leading": 2,
             "accepted": {
                 "all": 0,
                 "in_graded": 0
             },
             "by_verdict": {
-                "critical": 1,
+                "critical": 2,
                 "high": 0,
                 "medium": 0,
                 "low": 0
@@ -55421,8 +56084,8 @@ export const d_composite = {
             }
         },
         "stale": {
-            "carrying": 2,
-            "leading": 0,
+            "carrying": 3,
+            "leading": 1,
             "accepted": {
                 "all": 0,
                 "in_graded": 0
@@ -55431,15 +56094,15 @@ export const d_composite = {
                 "critical": 0,
                 "high": 2,
                 "medium": 0,
-                "low": 0
+                "low": 1
             }
         },
         "vulnerable": {
-            "carrying": 4,
+            "carrying": 5,
             "leading": null,
             "accepted": null,
             "by_verdict": {
-                "critical": 2,
+                "critical": 3,
                 "high": 0,
                 "medium": 0,
                 "low": 2
@@ -55447,6 +56110,10 @@ export const d_composite = {
         }
     },
     "exposure": [
+        {
+            "package": "friendsofsymfony/oauth-server-bundle",
+            "flagged": 1
+        },
         {
             "package": "guzzlehttp/guzzle",
             "flagged": 1
@@ -55457,33 +56124,40 @@ export const d_composite = {
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 7,
-        "measured": 7,
+        "flagged": 9,
+        "measured": 9,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
-            "direct": 6,
-            "transitive": 1,
+            "direct": 7,
+            "transitive": 2,
             "unreached": 0
         },
-        "not_in_composer_json": 1,
+        "not_in_composer_json": 2,
         "require_dev_not_walked": 0,
-        "production": 7,
+        "production": 9,
         "development": 0,
         "by_depth": [
             {
                 "depth": 0,
-                "flagged": 6
+                "flagged": 7
             },
             {
                 "depth": 1,
-                "flagged": 1
+                "flagged": 2
             }
         ],
         "max_depth": 1,
         "deepest": [
+            {
+                "package": "friendsofsymfony/oauth2-php",
+                "chain": [
+                    "friendsofsymfony/oauth-server-bundle",
+                    "friendsofsymfony/oauth2-php"
+                ]
+            },
             {
                 "package": "symfony/polyfill-intl-idn",
                 "chain": [
@@ -55494,9 +56168,9 @@ export const d_composite = {
         ]
     },
     "libyears": {
-        "total": 17.85,
-        "direct_requirements": 17.85,
-        "measured": 5,
+        "total": 22.06,
+        "direct_requirements": 22.06,
+        "measured": 7,
         "at_least_count": 0,
         "unmeasured": {
             "not_from_composer_repository": 0,
@@ -55514,7 +56188,7 @@ export const d_composite = {
             "libyears": 10.62,
             "at_least": false
         },
-        "packages": 7
+        "packages": 9
     },
     "baseline": null,
     "gate": {
@@ -55523,43 +56197,43 @@ export const d_composite = {
             "fail_on"
         ],
         "fail_on_applied": true,
-        "reaching": 5,
-        "failing": 5,
+        "reaching": 6,
+        "failing": 6,
         "exempt": {
             "baseline": 0
         },
         "failing_by": [
             {
                 "value": "high",
-                "failing": 5
+                "failing": 6
             }
         ],
         "not_applied": [],
-        "text": "gate: fails \u00b7 --fail-on=high \u00b7 5 findings fail it \u00b7 target php 8.4 (--target-php)"
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 6 findings fail it \u00b7 target php 8.4 (--target-php)"
     },
     "security": {
         "check": "complete",
         "packages": {
-            "vulnerable": 4,
+            "vulnerable": 5,
             "unchecked": 0,
             "ignored": 0,
-            "clear": 3
+            "clear": 4
         },
         "advisories": {
-            "counted": 20,
+            "counted": 29,
             "ignored": 0
         },
         "severities": {
             "critical": 1,
-            "high": 4,
-            "medium": 4,
+            "high": 5,
+            "medium": 12,
             "unrated": 2,
             "low": 9
         },
         "fixes": {
             "update": 2,
             "upgrade": 1,
-            "raise-php": 1,
+            "raise-php": 2,
             "unknown": 0,
             "blocked": 0,
             "none": 0
@@ -57365,6 +58039,684 @@ export const d_composite = {
             }
         },
         {
+            "package": "guzzlehttp/guzzle",
+            "version": "6.5.8",
+            "branch": "6.x",
+            "installed_php": {
+                "requires": ">=5.5",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "critical",
+            "priority": "critical",
+            "lead": "left-behind",
+            "rank": 3,
+            "flags": [
+                {
+                    "id": "left-behind",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S8"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "years",
+                        "value": 4.3,
+                        "source": "branch"
+                    },
+                    "summary": "branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach"
+                },
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 9,
+                        "source": null
+                    },
+                    "summary": "9 advisories: 1 high, 8 medium \u2014 none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 32,
+                "exact": 32,
+                "rounded_down": false,
+                "band": {
+                    "floor": 32,
+                    "next": null,
+                    "to_next": null
+                },
+                "decided_by": "combination",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        },
+                        "of": 9,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "left-behind",
+                        "role": "lead",
+                        "weight": 16,
+                        "divisor": 1,
+                        "points": 16,
+                        "contribution": 16
+                    },
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-gcrk-3vtt-1r14",
+                        "severity": "high",
+                        "fix_kind": "raise-php",
+                        "weight": 16,
+                        "multiplier": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "left-behind"
+                        },
+                        "revealed": [],
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": null,
+                        "deciding_advisory": "PKSA-gcrk-3vtt-1r14",
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "vulnerable"
+                        },
+                        "revealed": [],
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "advisory",
+                            "id": "PKSA-gcrk-3vtt-1r14"
+                        },
+                        "revealed": [],
+                        "total": 24,
+                        "verdict": "high",
+                        "lead": "left-behind",
+                        "deciding_advisory": "PKSA-93qv-9n9h-6k6p",
+                        "at_least": false
+                    }
+                ],
+                "text": "32 = left-behind 16 + vulnerable 16 [high advisory]"
+            },
+            "next_step": {
+                "kind": "raise-php",
+                "source": "vulnerable",
+                "merged": [
+                    "left-behind"
+                ],
+                "fix_kind": "raise-php",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "7.x",
+                "version": "7.15.2",
+                "newest": "7.15.5",
+                "constraint": "^7.15.2",
+                "latest": null,
+                "php_check": {
+                    "requires": "^7.2.5 || ^8.0",
+                    "project_allows": false,
+                    "target_runs": true,
+                    "raise_to": ">=7.2.5",
+                    "raise_size": "patch"
+                },
+                "crosses_major": true,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "flag",
+                        "id": "left-behind",
+                        "basis": "branch_releasing"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-gcrk-3vtt-1r14",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-93qv-9n9h-6k6p",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-bbs6-q5q9-f3t4",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-bcdd-5xc7-gwfb",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-cnw1-2ytm-cgr8",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-fy2t-3c5f-827y",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-k22t-f949-t9g6",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-pwsk-hy21-4gby",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-qxvb-2bpp-dnk6",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold",
+                        "composer_resolves"
+                    ]
+                },
+                "check": null,
+                "composer_moves_because": [
+                    "crosses_major"
+                ],
+                "commands": [
+                    [
+                        "composer",
+                        "require",
+                        "php:>=7.2.5",
+                        "--no-update"
+                    ],
+                    [
+                        "composer",
+                        "require",
+                        "guzzlehttp/guzzle:^7.15.2"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "raise require.php to >=7.2.5, then require guzzlehttp/guzzle ^7.15.2 \u2014 clears left-behind and 9 advisories; 7.x needs php ^7.2.5 || ^8.0, require.php allows 7.2 (a patch raise); the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 15,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 15,
+                        "reason": null
+                    }
+                ],
+                "worst": "high",
+                "counts": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 8,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "raise-php",
+                "installed_branch_fixes": {
+                    "fixed": 0,
+                    "unknown": 0,
+                    "of": 9,
+                    "fix_kind": null,
+                    "lowest": null,
+                    "newest": "6.5.8",
+                    "held_by": [],
+                    "if_applied": null,
+                    "check": null
+                },
+                "move_in": "next_step",
+                "gets": null,
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "guzzle/guzzle",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/guzzlehttp/guzzle",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "guzzlehttp/guzzle"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "guzzlehttp/guzzle"
+            ],
+            "signals": [
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: symfony/polyfill-intl-idn (vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "symfony/polyfill-intl-idn",
+                                "chain": [
+                                    "guzzlehttp/guzzle",
+                                    "symfony/polyfill-intl-idn"
+                                ],
+                                "verdict": "low",
+                                "lead": null,
+                                "flag_ids": [
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "S8",
+                    "level": "warn",
+                    "summary": "branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach",
+                    "data": {
+                        "branch": "6.x",
+                        "branch_last_release": "2022-06-20T22:16:07+00:00",
+                        "branch_last_version": "6.5.8",
+                        "years": 4.3,
+                        "newest_branch": "8.x",
+                        "newest_version": "8.2.0",
+                        "newest_release": "2026-09-06T13:55:09+00:00",
+                        "newest_php": "^7.4 || ^8.0",
+                        "newest_within_reach": false,
+                        "floor_php": "^7.2 || ^8.0.0",
+                        "floor_source": "project",
+                        "reachable_branch": null,
+                        "reachable_version": null,
+                        "reachable_release": null,
+                        "suggested_constraint": null,
+                        "dated_by": null,
+                        "reachable_php": null,
+                        "reachable_admits": null,
+                        "newest_years": 0.1,
+                        "reachable_years": null
+                    }
+                },
+                {
+                    "id": "S9",
+                    "level": "high",
+                    "summary": "9 security advisories affect 6.5.8 (CVE-2026-69246, CVE-2026-55767, CVE-2026-67353 and 6 more); 2 fixed in 7.15.2, 2 fixed in 7.12.1, 3 fixed in 7.15.1, 1 fixed in 7.12.3, 1 fixed in 7.14.2",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-gcrk-3vtt-1r14",
+                                "cve": "CVE-2026-69246",
+                                "title": "Guzzle: Noncanonical host can bypass host-based checks",
+                                "link": "https://github.com/advisories/GHSA-v5mv-p594-2x33",
+                                "reported_at": "2026-08-03T21:07:26+00:00",
+                                "severity": "high",
+                                "severity_published": "high",
+                                "affected_versions": ">=8.0.0,<8.0.1|<7.15.2",
+                                "counted": true,
+                                "points": 16,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.15.2",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-93qv-9n9h-6k6p",
+                                "cve": "CVE-2026-55767",
+                                "title": "Dot-only cookie domains match all hosts",
+                                "link": "https://github.com/guzzle/guzzle/security/advisories/GHSA-cwxw-98qj-8qjx",
+                                "reported_at": "2026-06-18T14:12:49+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<7.12.1",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.12.1",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-bbs6-q5q9-f3t4",
+                                "cve": "CVE-2026-67353",
+                                "title": "Guzzle: Unbounded response cookies risk denial of service",
+                                "link": "https://github.com/advisories/GHSA-f283-ghqc-fg79",
+                                "reported_at": "2026-07-20T23:27:02+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<7.15.1",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.15.1",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-bcdd-5xc7-gwfb",
+                                "cve": "CVE-2026-59883",
+                                "title": "Guzzle: Cookie Disclosure and Injection via IP-Address Domains",
+                                "link": "https://github.com/advisories/GHSA-g446-98w2-8p5w",
+                                "reported_at": "2026-07-20T22:00:09+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<7.12.3",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.12.3",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-cnw1-2ytm-cgr8",
+                                "cve": "CVE-2026-69245",
+                                "title": "Guzzle: Noncanonical cookie domain keeps subdomain scope",
+                                "link": "https://github.com/advisories/GHSA-f7vp-7xgx-4w4r",
+                                "reported_at": "2026-08-03T21:05:26+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": ">=8.0.0,<8.0.1|<7.15.2",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.15.2",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-fy2t-3c5f-827y",
+                                "cve": "CVE-2026-67354",
+                                "title": "Guzzle: URI fragments disclosed in redirect Referer headers",
+                                "link": "https://github.com/advisories/GHSA-h95v-h523-3mw8",
+                                "reported_at": "2026-07-20T23:28:36+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<7.15.1",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.15.1",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-k22t-f949-t9g6",
+                                "cve": "CVE-2026-55568",
+                                "title": "Silent HTTPS proxy downgrade to cleartext",
+                                "link": "https://github.com/guzzle/guzzle/security/advisories/GHSA-wpwq-4j6v-78m3",
+                                "reported_at": "2026-06-18T14:12:49+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<7.12.1",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.12.1",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-pwsk-hy21-4gby",
+                                "cve": "CVE-2026-67339",
+                                "title": "Guzzle: Proxy-Authorization headers can be sent to origin servers",
+                                "link": "https://github.com/advisories/GHSA-94pj-82f3-465w",
+                                "reported_at": "2026-07-20T21:46:02+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<7.14.2",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.14.2",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-qxvb-2bpp-dnk6",
+                                "cve": "CVE-2026-67355",
+                                "title": "Guzzle: Host-only cookie scope is not preserved",
+                                "link": "https://github.com/advisories/GHSA-wm3w-8rrp-j577",
+                                "reported_at": "2026-07-20T23:27:49+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<7.15.1",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "raise-php",
+                                    "to_branch": "7.x",
+                                    "version": "7.15.1",
+                                    "newest": "7.15.5",
+                                    "on_installed_branch": false,
+                                    "php": "^7.2.5 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "left-behind: branch 6.x last released 2022-06-20 (4.3 years ago); 8.x released 8.2.0 (2026-09-06), needs php ^7.4 || ^8.0 above the project's php ^7.2 || ^8.0.0; no releasing branch within reach; vulnerable: 9 advisories: 1 high, 8 medium \u2014 none fixed on 6.x; worst: CVE-2026-69246 Guzzle: Noncanonical host can bypass host-based checks",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 4.21,
+            "age": {
+                "installed": {
+                    "at": "2022-06-20T22:16:07+00:00",
+                    "years": 4.3,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "8.2.0",
+                    "at": "2026-09-06T13:55:09+00:00",
+                    "years": 0.1,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "6.5.8",
+                    "at": "2022-06-20T22:16:07+00:00",
+                    "years": 4.3,
+                    "level": "warn",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-09-06T13:55:34+00:00",
+                    "years": 0.1,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "flag",
+                                "id": "left-behind"
+                            },
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-gcrk-3vtt-1r14"
+                            }
+                        ]
+                    }
+                ],
+                "basis": null
+            }
+        },
+        {
             "package": "symfony/debug",
             "version": "v3.4.47",
             "branch": "3.x",
@@ -57376,7 +58728,7 @@ export const d_composite = {
             "verdict": "critical",
             "priority": "critical",
             "lead": "abandoned",
-            "rank": 3,
+            "rank": 4,
             "flags": [
                 {
                     "id": "abandoned",
@@ -57741,7 +59093,7 @@ export const d_composite = {
             "verdict": "high",
             "priority": "high",
             "lead": "pinned",
-            "rank": 4,
+            "rank": 5,
             "flags": [
                 {
                     "id": "pinned",
@@ -58087,7 +59439,7 @@ export const d_composite = {
             "verdict": "high",
             "priority": "high",
             "lead": "old-promise",
-            "rank": 5,
+            "rank": 6,
             "flags": [
                 {
                     "id": "old-promise",
@@ -58405,7 +59757,7 @@ export const d_composite = {
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 6,
+            "rank": 7,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -58818,7 +60170,7 @@ export const d_composite = {
             "verdict": "low",
             "priority": "low",
             "lead": null,
-            "rank": 7,
+            "rank": 8,
             "flags": [
                 {
                     "id": "vulnerable",
@@ -59160,6 +60512,260 @@ export const d_composite = {
                 "branch_release_unmeasured": null,
                 "push": null,
                 "push_unmeasured": "allowlisted"
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        },
+        {
+            "package": "friendsofsymfony/oauth2-php",
+            "version": "1.3.1",
+            "branch": "1.x",
+            "installed_php": {
+                "requires": "^5.5.9 || ^7.0.8 || ^7.1.3 || ^7.2.5 || ^8.0.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "low",
+            "priority": "low",
+            "lead": "stale",
+            "rank": 9,
+            "flags": [
+                {
+                    "id": "stale",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S2"
+                    ],
+                    "degree": {
+                        "liveness_complete": true
+                    },
+                    "headline": {
+                        "unit": "years",
+                        "value": 5.5,
+                        "source": "release"
+                    },
+                    "summary": "last release 2021-04-06 (5.5 years ago)"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 4,
+                "exact": 4,
+                "rounded_down": false,
+                "band": {
+                    "floor": 1,
+                    "next": "medium",
+                    "to_next": 4
+                },
+                "decided_by": "maintenance",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 4,
+                        "alone": {
+                            "total": 4,
+                            "verdict": "low"
+                        }
+                    },
+                    "security": {
+                        "status": "clear",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        },
+                        "of": 0,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "stale",
+                        "role": "lead",
+                        "weight": 8,
+                        "divisor": 1,
+                        "points": 8,
+                        "contribution": 4
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "reason": "transitive",
+                        "applies_to": "maintenance",
+                        "divide_by": 2,
+                        "before": 8,
+                        "after": 4
+                    }
+                ],
+                "accepted": [],
+                "without": [],
+                "text": "4 = stale 8 \u00f7 2 transitive"
+            },
+            "next_step": {
+                "kind": "no-move",
+                "source": "stale",
+                "merged": [],
+                "fix_kind": null,
+                "reason": "package_quiet",
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": null,
+                "version": null,
+                "newest": null,
+                "constraint": null,
+                "latest": null,
+                "php_check": null,
+                "crosses_major": null,
+                "held_by": [],
+                "clears": [],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "stale"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": null,
+                "check": null,
+                "composer_moves_because": [],
+                "commands": [],
+                "through": [
+                    {
+                        "package": "friendsofsymfony/oauth-server-bundle",
+                        "installed_version": "dev-master",
+                        "installed_requires": false,
+                        "newest_stable": {
+                            "version": "1.6.2",
+                            "released": "2019-01-23T15:23:04+00:00"
+                        },
+                        "newest_requires": null,
+                        "newest_requires_unmeasured": "through_other_package"
+                    }
+                ],
+                "also": [],
+                "text": "\u2014"
+            },
+            "security": {
+                "status": "clear",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 1,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 1,
+                        "reason": null
+                    }
+                ],
+                "ignored": [],
+                "ignored_count": 0
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "FriendsOfSymfony/oauth2-php",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/friendsofsymfony/oauth2-php",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": false,
+            "dev": false,
+            "reach": "transitive",
+            "chain": [
+                "friendsofsymfony/oauth-server-bundle",
+                "friendsofsymfony/oauth2-php"
+            ],
+            "depth": 1,
+            "depth_unmeasured": null,
+            "named_in": [],
+            "direct_dependents": [
+                "friendsofsymfony/oauth-server-bundle"
+            ],
+            "signals": [
+                {
+                    "id": "S2",
+                    "level": "high",
+                    "summary": "last release 2021-04-06 (5.5 years ago)",
+                    "data": {
+                        "last_release": "2021-04-06T17:14:49+00:00",
+                        "last_version": "1.3.1",
+                        "years": 5.5,
+                        "dated_by": null
+                    }
+                }
+            ],
+            "evidence": "stale: last release 2021-04-06 (5.5 years ago)",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 0,
+            "age": {
+                "installed": {
+                    "at": "2021-04-06T17:14:49+00:00",
+                    "years": 5.5,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "1.3.1",
+                    "at": "2021-04-06T17:14:49+00:00",
+                    "years": 5.5,
+                    "level": "high",
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "1.3.1",
+                    "at": "2021-04-06T17:14:49+00:00",
+                    "years": 5.5,
+                    "level": "high",
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2024-01-12T10:20:26+00:00",
+                    "years": 2.7,
+                    "level": null
+                },
+                "push_unmeasured": null
             },
             "baseline": null,
             "gate": {
@@ -97938,7 +99544,7 @@ export const d_many_dependents = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 39,
+    "packages_checked": 1,
     "packages_flagged": 1,
     "packages_multi_flag": 0,
     "include_dev": false,
@@ -145770,7 +147376,7 @@ export const d_xmlseclibs = {
         "advisory_lookup": {
             "scope": "all",
             "scope_source": "default",
-            "packages_asked": 1,
+            "packages_asked": 2,
             "packages_not_asked": 0,
             "other_repositories": 0,
             "repositories": [
@@ -145780,25 +147386,25 @@ export const d_xmlseclibs = {
                     "outcome": "answered",
                     "reason": null,
                     "message": null,
-                    "packages_with_records": 1,
-                    "records": 4
+                    "packages_with_records": 2,
+                    "records": 9
                 }
             ]
         },
         "move_check": null,
         "score_rules_used": {
             "counted": 0,
-            "lead-first": 1,
+            "lead-first": 2,
             "corroborating-share": 0,
-            "advisory-points": 1,
+            "advisory-points": 2,
             "no-reachable-fix-multiplier": 0,
-            "security-max": 1,
+            "security-max": 2,
             "divide-reach": 1,
             "security-exempt-from-reach": 1,
-            "sum": 1,
+            "sum": 2,
             "divide-dev": 0,
             "floor-once": 0,
-            "band-floors": 1,
+            "band-floors": 2,
             "zero-verdicts": 0,
             "sort": null,
             "gate-bounded-new": 0,
@@ -145807,15 +147413,15 @@ export const d_xmlseclibs = {
     },
     "activity_cache_oldest_at": null,
     "activity_cache_age_hours": null,
-    "packages_checked": 5,
-    "packages_flagged": 1,
-    "packages_multi_flag": 1,
+    "packages_checked": 2,
+    "packages_flagged": 2,
+    "packages_multi_flag": 2,
     "include_dev": false,
     "not_from_composer_repository": 1,
     "packages_unchecked_accepted": 0,
     "network_failures": false,
     "counts": {
-        "critical": 0,
+        "critical": 1,
         "high": 1,
         "medium": 0,
         "low": 0,
@@ -145829,7 +147435,7 @@ export const d_xmlseclibs = {
         "with_suggestion": 0
     },
     "priorities": {
-        "critical": 0,
+        "critical": 1,
         "high": 1,
         "medium": 0,
         "low": 0,
@@ -145865,14 +147471,14 @@ export const d_xmlseclibs = {
             }
         },
         "pinned": {
-            "carrying": 0,
-            "leading": 0,
+            "carrying": 1,
+            "leading": 1,
             "accepted": {
                 "all": 0,
                 "in_graded": 0
             },
             "by_verdict": {
-                "critical": 0,
+                "critical": 1,
                 "high": 0,
                 "medium": 0,
                 "low": 0
@@ -145921,11 +147527,11 @@ export const d_xmlseclibs = {
             }
         },
         "vulnerable": {
-            "carrying": 1,
+            "carrying": 2,
             "leading": null,
             "accepted": null,
             "by_verdict": {
-                "critical": 0,
+                "critical": 1,
                 "high": 1,
                 "medium": 0,
                 "low": 0
@@ -145943,25 +147549,25 @@ export const d_xmlseclibs = {
     },
     "unattributed": [],
     "rot_depth": {
-        "flagged": 1,
-        "measured": 1,
+        "flagged": 2,
+        "measured": 2,
         "unmeasured": {
             "unreached": 0,
             "no_composer_json": 0
         },
         "by_reach": {
-            "direct": 0,
+            "direct": 1,
             "transitive": 1,
             "unreached": 0
         },
         "not_in_composer_json": 1,
         "require_dev_not_walked": 0,
-        "production": 1,
+        "production": 2,
         "development": 0,
         "by_depth": [
             {
                 "depth": 0,
-                "flagged": 0
+                "flagged": 1
             },
             {
                 "depth": 1,
@@ -146000,7 +147606,7 @@ export const d_xmlseclibs = {
         "measured": 1,
         "at_least_count": 0,
         "unmeasured": {
-            "not_from_composer_repository": 0,
+            "not_from_composer_repository": 1,
             "unavailable": 0,
             "not_found": 0,
             "branch_snapshot": 0,
@@ -146015,7 +147621,7 @@ export const d_xmlseclibs = {
             "libyears": 5.96,
             "at_least": false
         },
-        "packages": 1
+        "packages": 2
     },
     "baseline": null,
     "gate": {
@@ -146024,36 +147630,36 @@ export const d_xmlseclibs = {
             "fail_on"
         ],
         "fail_on_applied": true,
-        "reaching": 1,
-        "failing": 1,
+        "reaching": 2,
+        "failing": 2,
         "exempt": {
             "baseline": 0
         },
         "failing_by": [
             {
                 "value": "high",
-                "failing": 1
+                "failing": 2
             }
         ],
         "not_applied": [],
-        "text": "gate: fails \u00b7 --fail-on=high \u00b7 1 finding fails it \u00b7 target php 8.4 (--target-php)"
+        "text": "gate: fails \u00b7 --fail-on=high \u00b7 2 findings fail it \u00b7 target php 8.4 (--target-php)"
     },
     "security": {
         "check": "complete",
         "packages": {
-            "vulnerable": 1,
+            "vulnerable": 2,
             "unchecked": 0,
             "ignored": 0,
             "clear": 0
         },
         "advisories": {
-            "counted": 2,
+            "counted": 7,
             "ignored": 0
         },
         "severities": {
             "critical": 0,
-            "high": 1,
-            "medium": 1,
+            "high": 2,
+            "medium": 5,
             "unrated": 0,
             "low": 0
         },
@@ -146061,7 +147667,7 @@ export const d_xmlseclibs = {
             "update": 1,
             "upgrade": 0,
             "raise-php": 0,
-            "unknown": 0,
+            "unknown": 1,
             "blocked": 0,
             "none": 0
         },
@@ -146073,7 +147679,7 @@ export const d_xmlseclibs = {
             "update",
             "robrichards/xmlseclibs"
         ],
-        "fix_unknown": 0
+        "fix_unknown": 1
     },
     "data_date": "2026-10-01T17:41:20+00:00",
     "notes": [
@@ -146093,6 +147699,509 @@ export const d_xmlseclibs = {
     ],
     "findings": [
         {
+            "package": "mautic/core-lib",
+            "version": "4.3.x-dev",
+            "branch": null,
+            "installed_php": {
+                "requires": ">=7.4.0 <8.1",
+                "target_runs": false,
+                "project_allows": null
+            },
+            "verdict": "critical",
+            "priority": "critical",
+            "lead": "pinned",
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "pinned",
+                    "role": "lead",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S6"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "reason",
+                        "value": "branch_snapshot",
+                        "source": null
+                    },
+                    "summary": "pinned to branch snapshot 4.3.x-dev"
+                },
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 5,
+                        "source": null
+                    },
+                    "summary": "5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 32,
+                "exact": 32,
+                "rounded_down": false,
+                "band": {
+                    "floor": 32,
+                    "next": null,
+                    "to_next": null
+                },
+                "decided_by": "combination",
+                "parts": {
+                    "maintenance": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 16,
+                        "alone": {
+                            "total": 16,
+                            "verdict": "high"
+                        },
+                        "of": 5,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "maintenance",
+                        "flag": "pinned",
+                        "role": "lead",
+                        "weight": 16,
+                        "divisor": 1,
+                        "points": 16,
+                        "contribution": 16
+                    },
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-j4xy-fb9q-x9h7",
+                        "severity": "high",
+                        "fix_kind": "unknown",
+                        "weight": 16,
+                        "multiplier": 1,
+                        "points": 16,
+                        "contribution": 16
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "pinned"
+                        },
+                        "revealed": [],
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": null,
+                        "deciding_advisory": "PKSA-j4xy-fb9q-x9h7",
+                        "at_least": true
+                    },
+                    {
+                        "remove": {
+                            "kind": "flag",
+                            "id": "vulnerable"
+                        },
+                        "revealed": [],
+                        "total": 16,
+                        "verdict": "high",
+                        "lead": "pinned",
+                        "deciding_advisory": null,
+                        "at_least": false
+                    },
+                    {
+                        "remove": {
+                            "kind": "advisory",
+                            "id": "PKSA-j4xy-fb9q-x9h7"
+                        },
+                        "revealed": [],
+                        "total": 24,
+                        "verdict": "high",
+                        "lead": "pinned",
+                        "deciding_advisory": "PKSA-81ww-1p5d-6c6k",
+                        "at_least": false
+                    }
+                ],
+                "text": "32 = pinned 16 + vulnerable 16 [high advisory]"
+            },
+            "next_step": {
+                "kind": "no-move",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "unknown",
+                "reason": "local_package",
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": null,
+                "version": null,
+                "newest": null,
+                "constraint": null,
+                "latest": null,
+                "php_check": null,
+                "crosses_major": null,
+                "held_by": [],
+                "clears": [],
+                "unverified": [],
+                "adds": [],
+                "leaves": [
+                    {
+                        "kind": "flag",
+                        "id": "pinned"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-j4xy-fb9q-x9h7"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-81ww-1p5d-6c6k"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-bxhd-1cmh-djg9"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-krjy-6tb4-skgg"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-ydwx-2n98-5dyf"
+                    }
+                ],
+                "clears_all": false,
+                "if_applied": null,
+                "check": null,
+                "composer_moves_because": [],
+                "commands": [],
+                "through": [],
+                "also": [],
+                "text": "no move: it is installed from a local path (your own package)"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 5,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 5,
+                        "reason": null
+                    }
+                ],
+                "worst": "high",
+                "counts": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 4,
+                    "unrated": 0,
+                    "low": 0
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "unknown",
+                "installed_branch_fixes": null,
+                "move_in": "next_step",
+                "gets": null,
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [
+                {
+                    "check": "repository_activity",
+                    "reason": "not_from_composer_repository",
+                    "blocks": [
+                        "S3",
+                        "S4"
+                    ]
+                },
+                {
+                    "check": "release_metadata",
+                    "reason": "not_from_composer_repository",
+                    "blocks": [
+                        "S2",
+                        "S8"
+                    ]
+                }
+            ],
+            "unchecked_accepted": [],
+            "maintenance_judged": false,
+            "metadata": {
+                "status": "not_from_composer_repository",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "not_read",
+                "reason": "not_from_composer_repository",
+                "forge": null,
+                "host": null,
+                "repo": null,
+                "event": null,
+                "archived": null,
+                "fetched_at": null,
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": false,
+            "origin": {
+                "kind": "path",
+                "registry": null,
+                "package_url": null,
+                "local": true
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": "not from a Composer repository, not checked",
+            "libyears_unmeasured": "not_from_composer_repository",
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "mautic/core-lib"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "mautic/core-lib"
+            ],
+            "signals": [
+                {
+                    "id": "S6",
+                    "level": "warn",
+                    "summary": "pinned to branch snapshot 4.3.x-dev",
+                    "data": {
+                        "version": "4.3.x-dev",
+                        "reason": "branch_snapshot",
+                        "has_stable_release": null,
+                        "last_stable_release": null,
+                        "last_stable_version": null,
+                        "last_stable_dated_by": null,
+                        "snapshot_time": null,
+                        "tag_relation": null
+                    }
+                },
+                {
+                    "id": "S7",
+                    "level": "info",
+                    "summary": "pulls in 1 flagged package: robrichards/xmlseclibs (old-promise \u00b7 vulnerable)",
+                    "data": {
+                        "flagged": 1,
+                        "packages": [
+                            {
+                                "package": "robrichards/xmlseclibs",
+                                "chain": [
+                                    "mautic/core-lib",
+                                    "lightsaml/sp-bundle",
+                                    "lightsaml/symfony-bridge",
+                                    "lightsaml/lightsaml",
+                                    "robrichards/xmlseclibs"
+                                ],
+                                "verdict": "high",
+                                "lead": "old-promise",
+                                "flag_ids": [
+                                    "old-promise",
+                                    "vulnerable"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "S9",
+                    "level": "high",
+                    "summary": "5 security advisories affect 4.3.x-dev (CVE-2022-25768, CVE-2024-47058, CVE-2024-47050 and 2 more)",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-j4xy-fb9q-x9h7",
+                                "cve": "CVE-2022-25768",
+                                "title": "Mautic vulnerable to Improper Access Control in UI upgrade process",
+                                "link": "https://github.com/advisories/GHSA-x3jx-5w6m-q2fc",
+                                "reported_at": "2024-09-18T17:43:36+00:00",
+                                "severity": "high",
+                                "severity_published": "high",
+                                "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.1.3,<4.4.13",
+                                "counted": true,
+                                "points": 16,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "unknown",
+                                    "to_branch": null,
+                                    "version": null,
+                                    "newest": null,
+                                    "on_installed_branch": null,
+                                    "php": null,
+                                    "held_by": [],
+                                    "reason": "not_from_composer_repository"
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-81ww-1p5d-6c6k",
+                                "cve": "CVE-2024-47058",
+                                "title": "Mautic vulnerable to Cross-site Scripting (XSS) - stored (edit form HTML field)",
+                                "link": "https://github.com/advisories/GHSA-xv68-rrmw-9xwf",
+                                "reported_at": "2024-09-18T22:05:00+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": ">=1.0.0-beta,<4.4.13|>=5.0.0-alpha,<5.1.1",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "unknown",
+                                    "to_branch": null,
+                                    "version": null,
+                                    "newest": null,
+                                    "on_installed_branch": null,
+                                    "php": null,
+                                    "held_by": [],
+                                    "reason": "not_from_composer_repository"
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-bxhd-1cmh-djg9",
+                                "cve": "CVE-2024-47050",
+                                "title": "Mautic vulnerable to XSS in contact/company tracking (no authentication)",
+                                "link": "https://github.com/advisories/GHSA-73gr-32wg-qhh7",
+                                "reported_at": "2024-09-18T22:05:30+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": ">=5.0.0-alpha,<5.1.1|>=2.6.0,<4.4.13",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "unknown",
+                                    "to_branch": null,
+                                    "version": null,
+                                    "newest": null,
+                                    "on_installed_branch": null,
+                                    "php": null,
+                                    "held_by": [],
+                                    "reason": "not_from_composer_repository"
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-krjy-6tb4-skgg",
+                                "cve": "CVE-2021-27917",
+                                "title": "Mautic has an XSS in contact tracking and page hits report",
+                                "link": "https://github.com/advisories/GHSA-xpc5-rr39-v8v2",
+                                "reported_at": "2024-09-18T22:05:59+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta4,<4.4.13",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "unknown",
+                                    "to_branch": null,
+                                    "version": null,
+                                    "newest": null,
+                                    "on_installed_branch": null,
+                                    "php": null,
+                                    "held_by": [],
+                                    "reason": "not_from_composer_repository"
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-ydwx-2n98-5dyf",
+                                "cve": "CVE-2022-25770",
+                                "title": "Mautic has insufficient authentication in upgrade flow",
+                                "link": "https://github.com/advisories/GHSA-qf6m-6m4g-rmrc",
+                                "reported_at": "2024-09-18T22:06:13+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": ">=5.0.0-alpha,<5.1.1|>=1.0.0-beta3,<4.4.13",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "unknown",
+                                    "to_branch": null,
+                                    "version": null,
+                                    "newest": null,
+                                    "on_installed_branch": null,
+                                    "php": null,
+                                    "held_by": [],
+                                    "reason": "not_from_composer_repository"
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": false,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "pinned: pinned to branch snapshot 4.3.x-dev; vulnerable: 5 advisories: 1 high, 4 medium; worst: CVE-2022-25768 Mautic vulnerable to Improper Access Control in UI upgrade process",
+            "allowlist_reason": null,
+            "data_date": null,
+            "libyears": null,
+            "age": {
+                "installed": null,
+                "installed_unmeasured": "branch_snapshot",
+                "release": null,
+                "release_unmeasured": "not_from_composer_repository",
+                "branch_release": null,
+                "branch_release_unmeasured": "not_from_composer_repository",
+                "push": null,
+                "push_unmeasured": "not_from_composer_repository"
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": true,
+                "fails": true,
+                "exempt_by": null,
+                "by": [
+                    {
+                        "value": "high",
+                        "kind": "grade",
+                        "facts": [
+                            {
+                                "kind": "flag",
+                                "id": "pinned"
+                            },
+                            {
+                                "kind": "advisory",
+                                "id": "PKSA-j4xy-fb9q-x9h7"
+                            }
+                        ]
+                    }
+                ],
+                "basis": null
+            }
+        },
+        {
             "package": "robrichards/xmlseclibs",
             "version": "3.1.1",
             "branch": "3.x",
@@ -146104,7 +148213,7 @@ export const d_xmlseclibs = {
             "verdict": "high",
             "priority": "high",
             "lead": "old-promise",
-            "rank": 1,
+            "rank": 2,
             "flags": [
                 {
                     "id": "old-promise",
