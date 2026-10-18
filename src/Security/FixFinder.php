@@ -144,7 +144,7 @@ final class FixFinder
         return $candidates;
     }
 
-    /** The release with its class: the class reads only PHP, and the links fill the holders. Null off every branch. */
+    /** The release with its class, from PHP and the solver's refusals. The links and the refusals fill the holders. Null off every branch. */
     public function candidate(string $package, StableRelease $release): ?Candidate
     {
         $branch = ReleaseBranch::of($release->normalized());
