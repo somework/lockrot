@@ -126,7 +126,7 @@ final class RecordedMoveChecker implements MoveChecker
     private static function assertArray($value): void
     {
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException('a recorded hold is an object');
+            throw new \InvalidArgumentException('a recorded hold is not an object');
         }
     }
 }

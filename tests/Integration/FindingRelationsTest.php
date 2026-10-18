@@ -173,8 +173,10 @@ final class FindingRelationsTest extends TestCase
      */
     public function testEveryRecordedReportWithAMoveCheckSaysHowTheRunChecked(): void
     {
+        $paths = glob(__DIR__.'/../fixtures/contract/report-2/*.json') ?: [];
+        self::assertNotSame([], $paths);
         $broken = [];
-        foreach (glob(__DIR__.'/../fixtures/contract/report-2/*.json') ?: [] as $path) {
+        foreach ($paths as $path) {
             $document = JsonPath::decodeFile($path);
             $findings = array_values(array_filter(JsonPath::arrayAt($document, ['findings']), 'is_array'));
             foreach (FindingRelations::checksWithoutARunCheck($document, $findings) as $violation) {
