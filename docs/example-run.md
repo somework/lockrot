@@ -529,7 +529,7 @@ one finding, spomky-labs/otphp. `…` marks each cut: the other findings, the re
 {
     "$schema": "https://lockrot.dev/schema/report-2.json",
     "lockrot": {
-        "version": "0.13.0",
+        "version": "0.14.0",
         "schema": 2
     },
     "generated_at": "2026-10-18T14:33:08+00:00",
