@@ -526,7 +526,8 @@ def recorded_checks(f, rows):
         out[key] = dict(check, holds=[{k: h[k] for k in ('source', 'package', 'version', 'link', 'target', 'constraint')} for h in held]
                         if check['result'] == 'refused' else [])
     for m in [m for m in [f.get('next_step')] if m] + ((f.get('next_step') or {}).get('also') or []):
-        if m.get('check') is None:
+        # A move with no release read names no version, so it sends no request.
+        if m.get('check') is None or m['check'].get('reason') == 'no_release_read':
             continue
         if m['kind'] == 'update':
             key = 'update %s ^%s ' % (pkg, m['version'].lstrip('vV'))

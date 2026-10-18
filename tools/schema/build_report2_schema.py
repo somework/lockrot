@@ -211,9 +211,9 @@ MOVE_CHECK_REASONS = ['baseline_refused', 'unloaded_name', 'offline', 'install_t
                       'no_release_read', 'pass_cap', 'solver_error']
 # The reasons that leave the baseline itself unchecked: the budget, a run that cannot solve at all, or a solve that Composer failed on.
 BASELINE_CHECK_REASONS = ['install_time_budget', 'no_composer_json', 'solver_error']
-defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether `composer update --dry-run` or `composer require --dry-run` installs it from the lock, in which form, "
-                         "or why lockrot did not ask. Null on a kind that runs no Composer request (`replace find-alternative test blocked` and the `no-*` kinds), "
-                         "and in a run that checks no move."),
+defs['moveCheck'] = nul(("Composer's solver on the move (§5.6): whether the move's `composer update` or `composer require` installs from the lock. "
+                         "It names the form that resolves, or why lockrot did not ask. "
+                         "Null on a kind that runs no Composer request, and in a run that checks no move."),
     obj('The check of one move.', {
         'result': closed(['resolves', 'refused', 'not_checked'], ("`resolves`: the solver installs the move in `form`; `refused`: no form installs it, and "
                                                                  "`held_by` names the holds; `not_checked`: lockrot did not ask, `reason` says why. Closed (§8.2).")),
@@ -1360,7 +1360,9 @@ defs['run'] = obj("What the run was told to do (§7.6 \"The report-2 run keys\",
                                                                    "itself, so no move is checked (the `moves_not_checked` note). Closed.")),
         'reason': nul("Why the baseline was not checked; null unless `baseline` is `not_checked`. An open set, with the values of `check.reason` that a whole run can have.",
                       {'type': 'string', 'pattern': SNAKE, 'x-known-values': BASELINE_CHECK_REASONS}),
-    })),
+    }, allOf=[{'description': '`reason` is set exactly on a `baseline` of `not_checked`.',
+               'anyOf': [{'properties': {'baseline': {'enum': ['resolves', 'refused']}, 'reason': {'type': 'null'}}},
+                         {'properties': {'baseline': {'enum': ['not_checked']}, 'reason': {'type': 'string'}}}]}])),
     'score_rules_used': {'description': ("Rule id → the number of findings on which the rule changed or decided a number (each count's predicate is a field test: "
                                          "graded findings; score-0 findings for `zero-verdicts`; every finding with a non-empty `score.accepted[]` for `counted`), null only for "
                                          "`sort`. Keyed by `score_model.rules[].id`; an id absent from it shows no count. Keys follow the rule-id grammar, so a later id validates "

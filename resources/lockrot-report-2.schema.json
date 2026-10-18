@@ -1521,7 +1521,7 @@
       ]
     },
     "moveCheck": {
-      "description": "Composer's solver on the move: whether `composer update --dry-run` or `composer require --dry-run` installs it from the lock, in which form, or why lockrot did not ask. Null on a kind that runs no Composer request (`replace find-alternative test blocked` and the `no-*` kinds), and in a run that checks no move.",
+      "description": "Composer's solver on the move: whether the move's `composer update` or `composer require` installs from the lock. It names the form that resolves, or why lockrot did not ask. Null on a kind that runs no Composer request, and in a run that checks no move.",
       "oneOf": [
         {
           "description": "The check of one move.",
@@ -20991,7 +20991,39 @@
                     }
                   ]
                 }
-              }
+              },
+              "allOf": [
+                {
+                  "description": "`reason` is set exactly on a `baseline` of `not_checked`.",
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "baseline": {
+                          "enum": [
+                            "resolves",
+                            "refused"
+                          ]
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "baseline": {
+                          "enum": [
+                            "not_checked"
+                          ]
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "null"
