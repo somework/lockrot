@@ -44,6 +44,11 @@ final class UncheckedMoves implements MoveChecker
         return null;
     }
 
+    public function solverError(): ?array
+    {
+        return null;
+    }
+
     public function blocksAdvisories(): bool
     {
         return false;

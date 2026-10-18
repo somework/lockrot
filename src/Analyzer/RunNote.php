@@ -44,6 +44,8 @@ final class RunNote
     public const MOVES_NOT_CHECKED = 'moves_not_checked';
     public const UPDATE_NOW_REDUCED = 'update_now_reduced';
     public const UPDATE_NOW_REFUSED = 'update_now_refused';
+    public const UPDATE_NOW_NOT_CHECKED = 'update_now_not_checked';
+    public const MOVE_CHECK_FAILED = 'move_check_failed';
     /**
      * The codes that lockrot writes, as the schemas list them in `x-known-values`, in the order of
      * the analyzer's passes. In a report, the notes of two repository hosts can interleave.
@@ -72,6 +74,8 @@ final class RunNote
         self::MOVES_NOT_CHECKED,
         self::UPDATE_NOW_REDUCED,
         self::UPDATE_NOW_REFUSED,
+        self::UPDATE_NOW_NOT_CHECKED,
+        self::MOVE_CHECK_FAILED,
     ];
 
     /** Each code has a section on the site at its own id. Never move one without a stub. */
@@ -500,6 +504,26 @@ final class RunNote
     }
 
     /** The first line of Composer's problem text that names a rule, without its list marker. */
+    /**
+     * D9: Composer's solver did not check the combined update, so `update now` names no package.
+     *
+     * @param list<string> $packages the candidates, in report order
+     */
+    public static function updateNowNotChecked(string $reason, array $packages): self
+    {
+        return self::of(self::UPDATE_NOW_NOT_CHECKED, \sprintf(
+            "update now: not checked with Composer's solver (%s), so lockrot writes no command for %s",
+            MoveCheck::reasonWords($reason),
+            implode(', ', $packages)
+        ), false, ['reason' => $reason, 'packages' => $packages]);
+    }
+
+    /** Composer's solver failed on a request: the run's first such failure, by exception class and message. */
+    public static function moveCheckFailed(string $class, string $message): self
+    {
+        return self::of(self::MOVE_CHECK_FAILED, \sprintf("moves: Composer's solver failed on a request (%s: %s), so lockrot did not check that move", $class, $message), false, ['class' => $class, 'message' => $message]);
+    }
+
     private static function firstProblem(string $problem): string
     {
         foreach (preg_split('/\R/', $problem) ?: [] as $line) {

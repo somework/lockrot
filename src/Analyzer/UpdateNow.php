@@ -11,10 +11,11 @@ use Lockrot\Verdict\Move;
 use Lockrot\Verdict\MoveChecks;
 
 /**
- * `security.update_now` and its command (D9). The members are the vulnerable findings whose lead
+ * `security.update_now` and its command (D9). The candidates are the vulnerable findings whose lead
  * move is an `update` that Composer's solver resolves inline. The command updates them in one
- * request. When Composer refuses them together, the command leaves out the members that the
- * refusal names and asks once more. When that fails too, the report writes no command.
+ * request. When Composer refuses them together, the command leaves out the candidates that the
+ * refusal names and asks once more. The members are the names of a command that Composer resolves:
+ * with none, `update now` is empty and a run note says why.
  *
  * @internal
  */
@@ -53,8 +54,11 @@ final class UpdateNow
             return new self([], null, null);
         }
         $outcome = $checks->checker()->combined($inline);
+        if ($outcome->check()->isResolved()) {
+            return self::resolved($inline, $checks, $findings, null);
+        }
         if (!$outcome->check()->isRefused()) {
-            return new self($members, self::argv($inline, $checks, $findings), null);
+            return new self([], null, RunNote::updateNowNotChecked((string) $outcome->check()->reason(), $members));
         }
         $named = [];
         foreach ($outcome->holds() as $hold) {
@@ -63,11 +67,27 @@ final class UpdateNow
         }
         $kept = array_diff_key($inline, array_flip(array_filter($named, 'is_string')));
         $retry = $kept === [] || $kept === $inline ? null : $checks->checker()->combined($kept);
+        if ($retry !== null && $retry->check()->isResolved()) {
+            return self::resolved($kept, $checks, $findings, RunNote::updateNowReduced(array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()));
+        }
         if ($retry !== null && !$retry->check()->isRefused()) {
-            return new self($members, self::argv($kept, $checks, $findings), RunNote::updateNowReduced(array_keys(array_diff_key($inline, $kept)), (string) $outcome->problem()));
+            return new self([], null, RunNote::updateNowNotChecked((string) $retry->check()->reason(), $members));
         }
 
-        return new self($members, null, RunNote::updateNowRefused((string) ($retry === null ? $outcome->problem() : $retry->problem())));
+        return new self([], null, RunNote::updateNowRefused((string) ($retry === null ? $outcome->problem() : $retry->problem())));
+    }
+
+    /**
+     * The members are exactly the names of the command that Composer resolved.
+     *
+     * @param array<string, string> $inline
+     * @param list<Finding>         $findings
+     */
+    private static function resolved(array $inline, MoveChecks $checks, array $findings, ?RunNote $note): self
+    {
+        $argv = self::argv($inline, $checks, $findings);
+
+        return new self($argv === null ? [] : array_keys($inline), $argv, $note);
     }
 
     /** @return list<string> */

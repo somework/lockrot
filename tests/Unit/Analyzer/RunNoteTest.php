@@ -392,6 +392,8 @@ final class RunNoteTest extends TestCase
             'moves_not_checked',
             'update_now_reduced',
             'update_now_refused',
+            'update_now_not_checked',
+            'move_check_failed',
         ], RunNote::CODES);
         self::assertSame(['offline', 'composer_too_old', 'install_time_budget'], RunNote::ADVISORIES_NOT_CHECKED_REASONS);
         self::assertSame(['install_time_budget'], RunNote::REPOSITORY_ACTIVITY_NOT_CHECKED_REASONS);

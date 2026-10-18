@@ -277,6 +277,10 @@ final class Analyzer
         $report = new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage());
         if ($checks !== null && $baseline !== null) {
             $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $baseline->check()), UpdateNow::of($report->sorted(), $checks));
+            $error = $checks->checker()->solverError();
+            if ($error !== null) {
+                $report = $report->withNote(RunNote::moveCheckFailed($error['class'], $error['message']));
+            }
         }
 
         return new Analysis($report, $factsByPackage);

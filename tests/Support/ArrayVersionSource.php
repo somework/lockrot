@@ -8,7 +8,7 @@ use Composer\Package\BasePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Lockrot\Solver\VersionSource;
 
-/** Remote versions written in the test, as Composer's p2 entries, and the names that fail to load. */
+/** Remote versions written in the test, as Composer's p2 entries, the names that fail to load and the names whose load throws. */
 final class ArrayVersionSource implements VersionSource
 {
     /** @var array<string, list<array<string, mixed>>> */
@@ -19,20 +19,27 @@ final class ArrayVersionSource implements VersionSource
     private array $loaded = [];
     /** @var list<string> */
     private array $asked = [];
+    /** @var array<string, \Throwable> */
+    private array $throws;
 
     /**
      * @param array<string, list<array<string, mixed>>> $entries  name => its versions, each without `name`
      * @param array<string, string>                     $failures name => a VersionSource failure
+     * @param array<string, \Throwable>                 $throws   name => what its load throws
      */
-    public function __construct(array $entries, array $failures = [])
+    public function __construct(array $entries, array $failures = [], array $throws = [])
     {
         $this->entries = $entries;
         $this->failures = $failures;
+        $this->throws = $throws;
     }
 
     public function versions(string $name): array
     {
         $this->asked[] = $name;
+        if (isset($this->throws[$name])) {
+            throw $this->throws[$name];
+        }
         if (!isset($this->loaded[$name])) {
             $loader = new ArrayLoader();
             $this->loaded[$name] = array_map(static fn (array $entry): BasePackage => $loader->load(['name' => $name] + $entry), $this->entries[$name] ?? []);

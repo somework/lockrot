@@ -31,6 +31,13 @@ interface MoveChecker
     /** The version of the Composer that solves, null when nothing solves. */
     public function composerVersion(): ?string;
 
+    /**
+     * The first exception that Composer's solver failed with in this run, null when it failed on none.
+     *
+     * @return array{class: string, message: string}|null
+     */
+    public function solverError(): ?array;
+
     /** Whether the solve removes the versions that an advisory affects, as Composer 2.9 and later do. */
     public function blocksAdvisories(): bool;
 

@@ -152,6 +152,14 @@ final class Report
         return $copy;
     }
 
+    public function withNote(RunNote $note): self
+    {
+        $copy = clone $this;
+        $copy->notes[] = $note;
+
+        return $copy;
+    }
+
     /** `run.move_check`, null when the run checked no move. */
     public function moveCheck(): ?MoveCheckRun
     {

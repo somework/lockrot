@@ -78,7 +78,8 @@ final class RepositoryVersions implements VersionSource
             foreach ([self::STABLE, self::DEV] as $stabilities) {
                 try {
                     $result = $repository->loadPackages([$name => null], $stabilities, []);
-                } catch (\RuntimeException $e) {
+                } catch (\Exception $e) {
+                    // A transport failure or an answer that does not parse (Seld\JsonLint\ParsingException).
                     $failed = true;
                     continue 2;
                 }

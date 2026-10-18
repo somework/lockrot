@@ -85,7 +85,17 @@ final class ComposerSolver
         return $this->source;
     }
 
+    /** A move check never stops the run: an exception other than a refusal is a failed solve, and an \Error passes up. */
     public function solve(SolveRequest $request): Solution
+    {
+        try {
+            return $this->solveOrThrow($request);
+        } catch (\Exception $e) {
+            return Solution::failed($e);
+        }
+    }
+
+    private function solveOrThrow(SolveRequest $request): Solution
     {
         $root = $this->rootWith($request->rootChanges());
         $links = array_merge($root->getRequires(), $root->getDevRequires());
@@ -98,6 +108,7 @@ final class ComposerSolver
             }
         }
         $parser = new VersionParser();
+        $requested = $request->rootChanges();
         $temporary = [];
         foreach ($request->inline() as $name => $constraint) {
             $temporary[$name] = $parser->parseConstraints($constraint);
@@ -108,6 +119,7 @@ final class ComposerSolver
                 $requires[$name] = isset($requires[$name]) ? MultiConstraint::create([$requires[$name], $constraint], true) : $constraint;
                 $rootRequires[$name] = $requires[$name];
             }
+            $requested += $request->inline();
             $temporary = [];
         }
         $policy = new DefaultPolicy($root->getPreferStable(), false);
@@ -116,7 +128,7 @@ final class ComposerSolver
         try {
             $transaction = (new Solver($policy, $pool, new NullIO()))->solve($composerRequest, $this->filter);
         } catch (SolverProblemsException $e) {
-            $holds = ProblemHolds::of($e, $pool, $root, $request->allow(), $request->rootChanges());
+            $holds = ProblemHolds::of($e, $pool, $root, $request->allow(), $requested);
             $unloaded = [];
             foreach ($holds->wanted() as $name) {
                 $failure = $this->source->failure($name);

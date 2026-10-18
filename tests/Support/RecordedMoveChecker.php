@@ -14,7 +14,8 @@ use Lockrot\Solver\MoveQuery;
  * The move checks that a case records (`inputs.checks`, keyed by {@see MoveQuery::key()}), as
  * Composer's solver answered them. lockrot also asks about moves that it does not publish, so a
  * request that the case does not record is `not_checked`: a published one then differs from the
- * case's move. A test can record `*`: the answer to every request that it does not record.
+ * case's move. A test can record `*`: the answer to every request that it does not record, and
+ * `combined`: the answer to the combined update, which resolves when the case records none.
  */
 final class RecordedMoveChecker implements MoveChecker
 {
@@ -41,9 +42,13 @@ final class RecordedMoveChecker implements MoveChecker
     public function check(MoveQuery $query): CheckOutcome
     {
         $check = $this->checks[$query->key()] ?? $this->checks['*'] ?? null;
-        if ($check === null) {
-            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME));
-        }
+
+        return $check === null ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::UNLOADED_NAME)) : self::outcome($check);
+    }
+
+    /** @param array<mixed, mixed> $check */
+    private static function outcome(array $check): CheckOutcome
+    {
         $holds = [];
         foreach (\is_array($check['holds'] ?? null) ? $check['holds'] : [] as $hold) {
             self::assertArray($hold);
@@ -55,12 +60,16 @@ final class RecordedMoveChecker implements MoveChecker
             $holds[] = new Holder($source, self::text($hold, 'package'), self::text($hold, 'version'), $link, self::required($hold, 'constraint'), self::text($hold, 'target'));
         }
 
-        return new CheckOutcome(self::checkOf($check), $holds);
+        $outcome = self::checkOf($check);
+
+        return new CheckOutcome($outcome, $holds, null, $outcome->isRefused() ? 'Your requirements could not be resolved to an installable set of packages.' : null);
     }
 
     public function combined(array $inline): CheckOutcome
     {
-        return new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE));
+        $check = $this->checks['combined'] ?? null;
+
+        return $check === null ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : self::outcome($check);
     }
 
     public function platformPhp(): ?string
@@ -71,6 +80,14 @@ final class RecordedMoveChecker implements MoveChecker
     public function composerVersion(): ?string
     {
         return self::text($this->run, 'composer');
+    }
+
+    /** A case can record `error`, `{class, message}`, in `inputs.move_check`. */
+    public function solverError(): ?array
+    {
+        $error = \is_array($this->run['error'] ?? null) ? $this->run['error'] : null;
+
+        return $error === null ? null : ['class' => self::required($error, 'class'), 'message' => self::required($error, 'message')];
     }
 
     public function blocksAdvisories(): bool

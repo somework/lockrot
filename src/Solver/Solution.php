@@ -8,7 +8,8 @@ use Lockrot\Security\Holder;
 
 /**
  * What one solve gave: the versions it installs, or the holds and Composer's problem text of a
- * refusal, with the names that a refusal needs and that the {@see VersionSource} could not load.
+ * refusal, with the names that a refusal needs and that the {@see VersionSource} could not load, or
+ * the exception that Composer failed with.
  *
  * @internal
  */
@@ -22,6 +23,8 @@ final class Solution
     private $problem;
     /** @var array<string, string> */
     private array $unloaded;
+    /** @var array{class: string, message: string}|null */
+    private ?array $error = null;
 
     /**
      * @param array<string, string> $installs name => the pretty version that the solve installs or keeps, for each name it changes
@@ -53,9 +56,24 @@ final class Solution
         return new self([], $holds, $problem, $unloaded);
     }
 
+    /** A solve that Composer failed on with an exception other than a refusal. */
+    public static function failed(\Exception $e): self
+    {
+        $failed = new self([], [], null, []);
+        $failed->error = ['class' => \get_class($e), 'message' => $e->getMessage()];
+
+        return $failed;
+    }
+
     public function resolves(): bool
     {
-        return $this->problem === null;
+        return $this->problem === null && $this->error === null;
+    }
+
+    /** @return array{class: string, message: string}|null */
+    public function error(): ?array
+    {
+        return $this->error;
     }
 
     /** @return array<string, string> */

@@ -352,7 +352,7 @@ final class RootRecount
             'advisories' => $advisories,
             'severities' => $severities,
             'fixes' => $fixes,
-            'update_now' => array_keys($updateNow),
+            'update_now' => self::updateNow($updateNow, $checked, $notes),
             'update_now_command' => self::updateNowCommand($updateNow, $checked, $notes),
             'fix_unknown' => $fixes['unknown'],
         ];
@@ -366,12 +366,28 @@ final class RootRecount
      */
     private static function updateNowCommand(array $updateNow, bool $checked, array $notes): ?array
     {
-        if ($updateNow === [] || ($checked && isset($notes['update_now_refused']))) {
-            return null;
+        $members = self::updateNow($updateNow, $checked, $notes);
+
+        return $members === [] ? null : array_merge(['composer', 'update'], array_values(array_intersect_key($updateNow, array_flip($members))));
+    }
+
+    /**
+     * With a move check, the members are the names of a command that Composer resolves: none when
+     * it refuses them together or did not check them, the candidates less those it left out else.
+     *
+     * @param array<string, string>              $updateNow each candidate's argument, by package
+     * @param array<string, array<mixed, mixed>> $notes
+     *
+     * @return list<string>
+     */
+    private static function updateNow(array $updateNow, bool $checked, array $notes): array
+    {
+        if ($checked && (isset($notes['update_now_refused']) || isset($notes['update_now_not_checked']))) {
+            return [];
         }
         $leftOut = $checked && \is_array($notes['update_now_reduced']['left_out'] ?? null) ? $notes['update_now_reduced']['left_out'] : [];
 
-        return array_merge(['composer', 'update'], array_values(array_diff_key($updateNow, array_flip(array_filter($leftOut, 'is_string')))));
+        return array_values(array_diff(array_keys($updateNow), array_filter($leftOut, 'is_string')));
     }
 
     /**

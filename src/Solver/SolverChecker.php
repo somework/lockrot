@@ -36,6 +36,8 @@ final class SolverChecker implements MoveChecker
     private ?CheckOutcome $baseline = null;
     /** @var array<string, CheckOutcome> */
     private array $checked = [];
+    /** @var array{class: string, message: string}|null */
+    private ?array $error = null;
 
     /**
      * @param list<string> $notFromComposerRepository the locked names that no Composer repository serves
@@ -55,9 +57,11 @@ final class SolverChecker implements MoveChecker
     {
         if ($this->baseline === null) {
             $solution = $this->deadline->isPast() ? null : $this->solver->solve(SolveRequest::baseline());
-            $this->baseline = $solution === null
-                ? new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET))
-                : ($solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], null, $solution->problem()));
+            if ($solution === null || $this->failed($solution)) {
+                $this->baseline = new CheckOutcome(MoveCheck::notChecked($solution === null ? MoveCheck::INSTALL_TIME_BUDGET : MoveCheck::SOLVER_ERROR));
+            } else {
+                $this->baseline = $solution->resolves() ? new CheckOutcome(MoveCheck::resolves(MoveCheck::INLINE)) : new CheckOutcome(MoveCheck::refused(), [], null, $solution->problem());
+            }
         }
 
         return $this->baseline;
@@ -83,6 +87,9 @@ final class SolverChecker implements MoveChecker
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET));
         }
         $solution = $this->solver->solve(SolveRequest::update($inline));
+        if ($this->failed($solution)) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::SOLVER_ERROR));
+        }
         $unloaded = $this->notLoaded($solution);
         if ($unloaded !== null) {
             return new CheckOutcome(MoveCheck::notChecked($unloaded));
@@ -101,6 +108,11 @@ final class SolverChecker implements MoveChecker
     public function composerVersion(): string
     {
         return ComposerFeatures::version();
+    }
+
+    public function solverError(): ?array
+    {
+        return $this->error;
     }
 
     public function blocksAdvisories(): bool
@@ -160,6 +172,9 @@ final class SolverChecker implements MoveChecker
             return new CheckOutcome(MoveCheck::notChecked(MoveCheck::INSTALL_TIME_BUDGET));
         }
         $solution = $this->solver->solve($request);
+        if ($this->failed($solution)) {
+            return new CheckOutcome(MoveCheck::notChecked(MoveCheck::SOLVER_ERROR));
+        }
         $unloaded = $solution->resolves() ? null : $this->notLoaded($solution);
 
         return $unloaded === null ? $solution : new CheckOutcome(MoveCheck::notChecked($unloaded));
@@ -178,6 +193,15 @@ final class SolverChecker implements MoveChecker
 
         // A move publishes its holds, never Composer's problem text, which is costly to render.
         return new CheckOutcome(MoveCheck::refused(), Holder::distinct(array_merge($last->holds(), $scanned)));
+    }
+
+    /** Whether Composer failed on the solve: the first failure of the run is kept for its run note. */
+    private function failed(Solution $solution): bool
+    {
+        $error = $solution->error();
+        $this->error ??= $error;
+
+        return $error !== null;
     }
 
     /** The reason of a refusal that needs a name the source could not load, null for a real refusal. */
