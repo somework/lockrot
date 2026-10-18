@@ -1213,9 +1213,9 @@ final class LockrotCommandTest extends TestCase
 
     /**
      * A lock name that looks like markup is no Composer package name: lockrot skips the entry and
-     * says so in a run note that names no package. The table is written past Symfony's tag
-     * formatter, on a decorated stdout too, and the formatter, which throws on `<<fg=red>>` in some
-     * symfony/console 5.4 releases, is not even asked.
+     * says so in a run note whose text names no package. lockrot writes the table past Symfony's
+     * tag formatter, on a decorated stdout too, and the formatter, which throws on `<<fg=red>>` in
+     * some symfony/console 5.4 releases, is not even asked.
      *
      * @dataProvider namesThatLookLikeMarkup
      */
