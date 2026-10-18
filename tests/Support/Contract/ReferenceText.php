@@ -49,8 +49,8 @@ final class ReferenceText
         'offline' => "a package it needs is not in Composer's cache",
         'install_time_budget' => 'the install-time budget ran out',
         'not_from_composer_repository' => 'no Composer repository serves it',
-        'composer_too_old' => 'this Composer has no solver that lockrot can use',
         'no_composer_json' => 'the project has no composer.json',
+        'composer_json_invalid' => 'Composer cannot load composer.json',
     ];
     private const GRADES = ['critical', 'high', 'medium', 'low'];
 

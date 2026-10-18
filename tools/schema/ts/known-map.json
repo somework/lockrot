@@ -349,6 +349,7 @@
    "install_time_budget",
    "not_from_composer_repository",
    "no_composer_json",
+   "composer_json_invalid",
    "no_release_read",
    "pass_cap",
    "solver_error"
@@ -2877,6 +2878,7 @@
   "values": [
    "install_time_budget",
    "no_composer_json",
+   "composer_json_invalid",
    "solver_error"
   ],
   "open": true,
@@ -2984,6 +2986,7 @@
    "install_time_budget",
    "not_from_composer_repository",
    "no_composer_json",
+   "composer_json_invalid",
    "no_release_read",
    "pass_cap",
    "solver_error"

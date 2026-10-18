@@ -27,10 +27,12 @@ use Lockrot\Data\Php\PhpReleaseDates;
 use Lockrot\Data\Repository\MetadataBatch;
 use Lockrot\Data\Repository\MetadataLoaderInterface;
 use Lockrot\Data\Repository\RepositoryMetadataLoader;
+use Lockrot\Deadline;
 use Lockrot\Json\JsonReader;
 use Lockrot\Lock\LockFile;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
+use Lockrot\Solver\MoveCheck;
 use Lockrot\Tests\Support\BaselineEntries;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
 use Lockrot\Tests\Support\JsonPath;
@@ -39,6 +41,7 @@ use Lockrot\Tests\Support\MemoisingMetadataLoader;
 use Lockrot\Tests\Support\RecordingOutput;
 use Lockrot\Tests\Support\SplitStreamOutput;
 use Lockrot\Tests\Support\SplitStreamTester;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -134,6 +137,12 @@ final class LockrotCommandTest extends TestCase
         };
 
         return $this->buildCommand($factory);
+    }
+
+    /** @param (\Closure(): MoveChecks)|null $checks the run's move check, as LockrotCommand hands it to the factory */
+    private static function withChecks(Analyzer $analyzer, ?\Closure $checks): Analyzer
+    {
+        return $checks === null ? $analyzer : $analyzer->withMoveChecks($checks());
     }
 
     /** The analyzer every test factory in this class builds: fixture metadata and recorded GitHub envelopes, never the network. */
@@ -1209,6 +1218,30 @@ final class LockrotCommandTest extends TestCase
             self::assertStringEndsWith("\033[39;49m", $line);
         }
         self::assertStringStartsWith("\033[37;41mlockrot: extra.lockrot is invalid:", $lines[0]);
+    }
+
+    /**
+     * A composer.json that Composer refuses to load, here for a requirement name that is no package
+     * name, gives Composer no root package to solve for. The move check is not run, and its reason
+     * says that the file is there.
+     */
+    public function testAComposerJsonThatComposerCannotLoadLeavesEveryMoveUncheckedForThatReason(): void
+    {
+        $project = $this->tempDir('lockrot-invalid-manifest-');
+        file_put_contents($project.'/composer.json', (string) json_encode(['name' => 'lockrot/invalid-manifest-test', 'require' => ['acme/<<fg=red>>' => '1.0.0']]));
+        file_put_contents($project.'/composer.lock', (string) json_encode(['packages' => [['name' => 'acme/kept', 'version' => '1.0.0']], 'packages-dev' => []]));
+        chdir($project);
+        $loader = $this->emptyLoader();
+        $command = $this->buildCommand(static fn (IOInterface $io, Config $config, array $repositories, LockrotConfig $lockrot, Tokens $tokens, Clock $clock, ?Deadline $deadline = null, ?string $projectPhp = null, ?\Closure $checks = null): Analyzer => self::withChecks(self::testAnalyzer($loader, $lockrot, $clock), $checks));
+
+        $this->withComposerEnv($this->tempDir('lockrot-invalid-manifest-cache-'), $this->tempDir('lockrot-invalid-manifest-home-'), function () use ($command): void {
+            [$code, $stdout, $stderr] = $this->runCommandWithSplitStreams($command, ['--format' => 'json', '--target-php' => '8.4']);
+
+            self::assertSame(0, $code, $stderr);
+            $json = json_decode($stdout, true);
+            self::assertIsArray($json);
+            self::assertSame(['not_checked', MoveCheck::COMPOSER_JSON_INVALID], [JsonPath::stringAt($json, ['run', 'move_check', 'baseline']), JsonPath::stringAt($json, ['run', 'move_check', 'reason'])]);
+        });
     }
 
     /**

@@ -608,6 +608,9 @@ Limits of the check:
 - The solver stops at the first failing chain. The scan adds what `composer prohibits` names, but
   `held_by[]` can still miss a hold that a deeper chain holds.
 - A run without composer.json checks no move (`check.reason` `no_composer_json`).
+- A run whose composer.json Composer cannot load checks no move (`check.reason`
+  `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
+  is no package name.
 
 ## The score {#score}
 

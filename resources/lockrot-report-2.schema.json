@@ -1558,7 +1558,7 @@
               ]
             },
             "reason": {
-              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
+              "description": "Why lockrot did not ask; null unless `result` is `not_checked`: `baseline_refused` (Composer refuses the lock itself, see the `moves_not_checked` note), `unloaded_name` (a package that the move needs did not load), `offline` (`--offline`, and Composer's cache has no answer for it), `install_time_budget`, `not_from_composer_repository`, `no_composer_json`, `composer_json_invalid` (Composer cannot load the project's composer.json), `no_release_read` (no release of the row was read, so the move names no version), `pass_cap` (Composer refused each move before it, and lockrot stops asking at its cap of passes), `solver_error` (Composer's solver failed on the request: the `move_check_failed` note). An open set.",
               "oneOf": [
                 {
                   "type": "string",
@@ -1570,6 +1570,7 @@
                     "install_time_budget",
                     "not_from_composer_repository",
                     "no_composer_json",
+                    "composer_json_invalid",
                     "no_release_read",
                     "pass_cap",
                     "solver_error"
@@ -20983,6 +20984,7 @@
                       "x-known-values": [
                         "install_time_budget",
                         "no_composer_json",
+                        "composer_json_invalid",
                         "solver_error"
                       ]
                     },
@@ -21995,6 +21997,7 @@
             "install_time_budget",
             "not_from_composer_repository",
             "no_composer_json",
+            "composer_json_invalid",
             "no_release_read",
             "pass_cap",
             "solver_error"

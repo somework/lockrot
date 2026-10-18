@@ -199,7 +199,8 @@ final class LockrotCommand extends BaseCommand
             $cwd = (string) getcwd();
             $composerFile = self::composerFile();
             $project = ProjectConfig::fromFile($composerFile);
-            [$config, $repositories, $root] = $this->composerBootstrap($io, is_file($composerFile));
+            $hasComposerJson = is_file($composerFile);
+            [$config, $repositories, $root] = $this->composerBootstrap($io, $hasComposerJson);
             // LOCKROT_DISABLE needs no check here: run() answered it before any of this was read.
             $lockrot = LockrotConfig::fromSources($project->lockrotExtra(), $env, $this->cliOptions($input), \PHP_VERSION, $project->platformPhp());
             if (self::wantsUpgradeNotice($input, $lockrot)) {
@@ -230,7 +231,7 @@ final class LockrotCommand extends BaseCommand
             $targets = ReportTargets::resolve($specs, $cwd, $specs === [] ? [] : self::protectedFiles($cwd, $composerFile, $lockPath, $baselineFile, $project));
             $markdownMaxBytes = self::markdownMaxBytes($input);
             // No time budget, unlike the install-time summary (docs/install-time.md#time-budget).
-            $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never()));
+            $checks = static fn (): MoveChecks => MoveChecks::of($root === null ? new UncheckedMoves($hasComposerJson ? MoveCheck::COMPOSER_JSON_INVALID : MoveCheck::NO_COMPOSER_JSON) : MoveCheckers::forProject($root, $lock, $project, $config, $repositories, $lockrot->targetPhp(), $lockrot->offline(), Deadline::never()));
             $analyzer = AnalyzerBootstrap::create($this->analyzerFactory, $io, $config, $repositories, $project, $lockrot, $env, Deadline::never(), $checks);
             // Before the baseline is read: an explanation ignores it, so a missing or unreadable
             // baseline must not block it.
