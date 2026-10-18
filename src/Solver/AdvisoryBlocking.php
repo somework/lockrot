@@ -114,6 +114,16 @@ final class AdvisoryBlocking
             return [];
         }
         $ranges = [];
+        // Composer before 2.9 has no public processAdvisories(): with no ignore rule, every record blocks.
+        if ($this->list === [] && $this->severities === []) {
+            foreach ($records as $name => $advisories) {
+                foreach ($advisories as $advisory) {
+                    $ranges[(string) $name][] = $advisory->affectedVersions;
+                }
+            }
+
+            return $ranges;
+        }
         // @phpstan-ignore argument.type (the list keeps the shape that this Composer's Auditor reads)
         foreach ((new Auditor())->processAdvisories($records, $this->list, $this->severities)['advisories'] as $name => $advisories) {
             foreach ($advisories as $advisory) {

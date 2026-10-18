@@ -223,7 +223,10 @@ final class ComposerSolver
         }
         $kept = array_values(array_filter($pool->getPackages(), self::keeps($blocked, $stayLocked, $blocking)));
         if (\count($kept) < \count($pool->getPackages())) {
-            $pool = new Pool($kept, $pool->getUnacceptableFixedOrLockedPackages(), $pool->getAllRemovedVersions(), $pool->getAllRemovedVersionsByPackage());
+            // Composer before 2.9 keeps the removed versions private: they only word the problem text.
+            // @phpstan-ignore function.alreadyNarrowedType (Composer before 2.9 has no getAllRemovedVersions())
+            $removed = method_exists($pool, 'getAllRemovedVersions') ? [$pool->getAllRemovedVersions(), $pool->getAllRemovedVersionsByPackage()] : [[], []];
+            $pool = new Pool($kept, $pool->getUnacceptableFixedOrLockedPackages(), ...$removed);
         }
 
         return [$set, $composerRequest, (new PoolOptimizer($policy))->optimize($composerRequest, $pool)];
