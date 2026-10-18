@@ -100,7 +100,7 @@ final class ReferenceText
     {
         foreach (Fields::objects($move, 'commands') as $argv) {
             if (($argv[1] ?? null) === 'update') {
-                $rendered = ShellCommand::posix(array_values(array_map('strval', $argv)));
+                $rendered = ShellCommand::posix(Fields::strings(['argv' => $argv], 'argv'));
                 if ($rendered !== null) {
                     return $rendered;
                 }

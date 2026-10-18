@@ -291,7 +291,7 @@
             {
                 "id": "S9",
                 "level": "warn",
-                "summary": "2 security advisories affect v2.2.0 (CVE-2026-47345, CVE-2026-47344); fixed by v2.3.2",
+                "summary": "2 security advisories affect v2.2.0 (CVE-2026-47345, CVE-2026-47344); fixed in v2.3.2",
                 "data": {
                     "advisories": [
                         {

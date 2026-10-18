@@ -299,7 +299,8 @@ final class RootRecount
     }
 
     /**
-     * @param list<array<mixed, mixed>> $findings
+     * @param list<array<mixed, mixed>>          $findings
+     * @param array<string, array<mixed, mixed>> $notes
      *
      * @return array<string, mixed>
      */
