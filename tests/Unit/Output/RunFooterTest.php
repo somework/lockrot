@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Lockrot\Tests\Unit\Output;
 
+use Lockrot\Analyzer\MoveCheckRun;
 use Lockrot\Analyzer\Report;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
 use Lockrot\Data\Advisory\AdvisoryRepository;
 use Lockrot\Lock\ProjectConfig;
 use Lockrot\Output\RunFooter;
+use Lockrot\Solver\MoveCheck;
+use Lockrot\Solver\UncheckedMoves;
 use Lockrot\Tests\Support\CaseHydrator;
 use Lockrot\Tests\Support\FindingBuilder;
 use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\Verdict;
 use PHPUnit\Framework\TestCase;
 
@@ -125,5 +130,13 @@ final class RunFooterTest extends TestCase
         $coverage = new AdvisoryCoverage(AdvisoryCoverage::SCOPE_ALL, AdvisoryCoverage::SOURCE_DEFAULT, [AdvisoryRepository::of(self::PACKAGIST, AdvisoryRepository::ANSWERED)->withRecords(3, 2)], 2, []);
 
         self::assertSame('advisories: 0 packages asked, 1 not asked · packagist.org answered (3 on record for 2 packages) · 2 other repositories publish no advisories', RunFooter::advisories(self::report([self::notAsked('a/one')], $coverage)));
+    }
+
+    public function testTheMovesLineOfARunWithNoCheckSaysWhyInWords(): void
+    {
+        $checks = new MoveChecks(new UncheckedMoves(MoveCheck::NO_COMPOSER_JSON), true);
+        $report = self::report([])->withMoveChecks(new MoveCheckRun(null, false, MoveCheck::notChecked(MoveCheck::NO_COMPOSER_JSON)), UpdateNow::of([], $checks));
+
+        self::assertSame('moves: not checked (the project has no composer.json)', RunFooter::moveCheck($report));
     }
 }

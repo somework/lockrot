@@ -209,7 +209,7 @@ final class RunFooter
             case MoveCheck::REFUSED:
                 return "moves: not checked, because Composer's solver refuses the lock itself (see the moves_not_checked note)";
             default:
-                return 'moves: not checked ('.$data['reason'].')';
+                return 'moves: not checked ('.MoveCheck::reasonWords((string) $data['reason']).')';
         }
     }
 

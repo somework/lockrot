@@ -29,16 +29,6 @@ final class MoveText
         'local_package' => 'no move: it is installed from a local path (your own package)',
     ];
 
-    /** Why lockrot did not ask Composer's solver about the move, by `check.reason`. */
-    private const NOT_CHECKED = [
-        MoveCheck::BASELINE_REFUSED => 'Composer refuses the lock itself',
-        MoveCheck::UNLOADED_NAME => 'a package it needs could not be loaded',
-        MoveCheck::OFFLINE => "a package it needs is not in Composer's cache",
-        MoveCheck::INSTALL_TIME_BUDGET => 'the install-time budget ran out',
-        MoveCheck::NOT_FROM_COMPOSER_REPOSITORY => 'no Composer repository serves it',
-        MoveCheck::COMPOSER_TOO_OLD => 'this Composer has no solver that lockrot can use',
-        MoveCheck::NO_COMPOSER_JSON => 'the project has no composer.json',
-    ];
 
     private const ADDS = [
         MoveFact::RELEASED_BEFORE_GA => "it was released before your target PHP's major",
@@ -80,9 +70,7 @@ final class MoveText
             case MoveCheck::REFUSED:
                 return "; Composer's solver refuses it against the lock";
             default:
-                $reason = (string) $check->reason();
-
-                return '; not checked with Composer\'s solver ('.(self::NOT_CHECKED[$reason] ?? $reason).'), so it holds only if Composer resolves it';
+                return '; not checked with Composer\'s solver ('.MoveCheck::reasonWords((string) $check->reason()).'), so it holds only if Composer resolves it';
         }
     }
 

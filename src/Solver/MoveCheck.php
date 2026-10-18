@@ -40,6 +40,17 @@ final class MoveCheck implements \JsonSerializable
     /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
     public const BASELINE_REASONS = [self::INSTALL_TIME_BUDGET, self::COMPOSER_TOO_OLD, self::NO_COMPOSER_JSON];
 
+    /** Why lockrot did not ask Composer's solver about the move, by `check.reason`. */
+    private const REASON_WORDS = [
+        self::BASELINE_REFUSED => 'Composer refuses the lock itself',
+        self::UNLOADED_NAME => 'a package it needs could not be loaded',
+        self::OFFLINE => "a package it needs is not in Composer's cache",
+        self::INSTALL_TIME_BUDGET => 'the install-time budget ran out',
+        self::NOT_FROM_COMPOSER_REPOSITORY => 'no Composer repository serves it',
+        self::COMPOSER_TOO_OLD => 'this Composer has no solver that lockrot can use',
+        self::NO_COMPOSER_JSON => 'the project has no composer.json',
+    ];
+
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */
     private string $result;
     private ?string $form;
@@ -62,6 +73,12 @@ final class MoveCheck implements \JsonSerializable
     public static function refused(): self
     {
         return new self(self::REFUSED, null, null);
+    }
+
+    /** The words of a `check.reason`, or the reason itself when it is unknown. */
+    public static function reasonWords(string $reason): string
+    {
+        return self::REASON_WORDS[$reason] ?? $reason;
     }
 
     public static function notChecked(string $reason): self
