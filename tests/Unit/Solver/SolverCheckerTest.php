@@ -125,6 +125,7 @@ final class SolverCheckerTest extends TestCase
 
         self::assertSame(MoveCheck::REFUSED, $refused->check()->result());
         self::assertContains(['source' => 'package', 'package' => 'acme/user', 'version' => '1.0.0', 'link' => 'require', 'target' => null, 'constraint' => '^1.0'], self::rows($refused->holds()));
+        self::assertNotContains('^2.0', array_column(self::rows($refused->holds()), 'constraint'), 'the root requirement that the request writes holds nothing');
         self::assertSame([MoveCheck::RESOLVES, MoveCheck::INLINE, '2.0.0'], [$free->check()->result(), $free->check()->form(), $free->installs()]);
     }
 

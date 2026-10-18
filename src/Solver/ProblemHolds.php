@@ -36,8 +36,11 @@ final class ProblemHolds
     /** @var array<string, true> */
     private array $wanted = [];
 
-    /** @param list<string> $moved the names on the allow list: a link to one of them has no target */
-    public static function of(SolverProblemsException $e, Pool $pool, RootPackageInterface $root, array $moved): self
+    /**
+     * @param list<string>          $moved     the names on the allow list: a link to one of them has no target
+     * @param array<string, string> $requested the root requirements that the request writes: a refusal of one names the request, not a hold
+     */
+    public static function of(SolverProblemsException $e, Pool $pool, RootPackageInterface $root, array $moved, array $requested = []): self
     {
         $out = new self();
         $rootRequires = array_merge($root->getDevRequires(), $root->getRequires());
@@ -45,7 +48,7 @@ final class ProblemHolds
             foreach ($problem->getReasons() as $section) {
                 foreach ((array) $section as $rule) {
                     if ($rule instanceof Rule) {
-                        $out->add($rule, $pool, $root->getName(), $rootRequires, $moved);
+                        $out->add($rule, $pool, $root->getName(), $rootRequires, $moved, $requested);
                     }
                 }
             }
@@ -67,16 +70,20 @@ final class ProblemHolds
     }
 
     /**
-     * @param array<string, Link> $rootRequires
-     * @param list<string>        $moved
+     * @param array<string, Link>   $rootRequires
+     * @param list<string>          $moved
+     * @param array<string, string> $requested
      */
-    private function add(Rule $rule, Pool $pool, string $rootName, array $rootRequires, array $moved): void
+    private function add(Rule $rule, Pool $pool, string $rootName, array $rootRequires, array $moved, array $requested): void
     {
         $data = $rule->getReasonData();
         switch ($rule->getReason()) {
             case Rule::RULE_ROOT_REQUIRE:
                 /** @var array{packageName: string, constraint: ConstraintInterface} $data */
                 $name = $data['packageName'];
+                if (isset($requested[$name])) {
+                    return;
+                }
                 $this->holds[] = self::rootHold($rootName, $name, $data['constraint']->getPrettyString(), $moved);
 
                 return;

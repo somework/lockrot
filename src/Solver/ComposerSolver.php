@@ -116,7 +116,7 @@ final class ComposerSolver
         try {
             $transaction = (new Solver($policy, $pool, new NullIO()))->solve($composerRequest, $this->filter);
         } catch (SolverProblemsException $e) {
-            $holds = ProblemHolds::of($e, $pool, $root, $request->allow());
+            $holds = ProblemHolds::of($e, $pool, $root, $request->allow(), $request->rootChanges());
             $unloaded = [];
             foreach ($holds->wanted() as $name) {
                 $failure = $this->source->failure($name);
