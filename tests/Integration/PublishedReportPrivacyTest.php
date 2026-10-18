@@ -35,6 +35,7 @@ use Lockrot\Output\InstallSummaryFormatter;
 use Lockrot\Output\JsonFormatter;
 use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
+use Lockrot\Tests\Support\HermeticComposerConfig;
 use Lockrot\Tests\Support\JsonPath;
 use Lockrot\Tests\Support\PhpBuiltinServer;
 use Lockrot\Tests\Support\ValidatesJsonSchemas;
@@ -71,6 +72,13 @@ final class PublishedReportPrivacyTest extends TestCase
             @unlink($this->dir.'/'.$file);
         }
         @rmdir($this->dir.'/cache');
+        if (is_dir($this->dir.'/home')) {
+            /** @var \SplFileInfo $file */
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir.'/home', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+                $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+            }
+            rmdir($this->dir.'/home');
+        }
         @rmdir($this->dir);
     }
 
@@ -182,7 +190,7 @@ final class PublishedReportPrivacyTest extends TestCase
     private function repositories(array $repositories): array
     {
         $io = new NullIO();
-        $config = Factory::createConfig($io);
+        $config = HermeticComposerConfig::create($this->dir.'/home', $io);
         $config->merge(['config' => ['cache-dir' => $this->dir.'/cache', 'secure-http' => false], 'repositories' => ['packagist.org' => false] + $repositories]);
 
         return array_values(RepositoryFactory::defaultRepos($io, $config, RepositoryFactory::manager($io, $config, Factory::createHttpDownloader($io, $config))));
