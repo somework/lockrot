@@ -12,14 +12,15 @@ use Composer\Util\Platform;
 
 /**
  * Composer's config without the machine's: Factory::createConfig() reads `auth.json` and
- * `config.json` below COMPOSER_HOME and the COMPOSER_AUTH variable. This config reads an empty home
- * that the caller owns and no COMPOSER_AUTH, and the process environment is restored after.
+ * `config.json` below COMPOSER_HOME and the COMPOSER_AUTH variable, and it creates the home, cache
+ * and data directories. This config reads and writes only an empty home that the caller owns, with
+ * its cache below it and no COMPOSER_AUTH. The process environment is restored after.
  */
 final class HermeticComposerConfig
 {
-    private const VARIABLES = ['COMPOSER_HOME', 'COMPOSER_AUTH'];
+    private const VARIABLES = ['COMPOSER_HOME', 'COMPOSER_CACHE_DIR', 'COMPOSER_AUTH'];
 
-    /** @param string $home a directory that the caller creates and removes */
+    /** @param string $home a directory that the caller removes, with everything below it */
     public static function create(string $home, ?IOInterface $io = null): Config
     {
         $saved = [];
@@ -27,6 +28,7 @@ final class HermeticComposerConfig
             $saved[$name] = Platform::getEnv($name);
         }
         Platform::putEnv('COMPOSER_HOME', $home);
+        Platform::putEnv('COMPOSER_CACHE_DIR', $home.'/cache');
         Platform::clearEnv('COMPOSER_AUTH');
         try {
             return Factory::createConfig($io ?? new NullIO());

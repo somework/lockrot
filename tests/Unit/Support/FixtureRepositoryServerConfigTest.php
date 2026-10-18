@@ -6,6 +6,7 @@ namespace Lockrot\Tests\Unit\Support;
 
 use Composer\Util\Platform;
 use Lockrot\Tests\Support\FixtureRepositoryServer;
+use Lockrot\Tests\Support\HermeticComposerConfig;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,7 +21,7 @@ final class FixtureRepositoryServerConfigTest extends TestCase
 
     protected function setUp(): void
     {
-        foreach (['COMPOSER_AUTH', 'COMPOSER_HOME'] as $name) {
+        foreach (['COMPOSER_AUTH', 'COMPOSER_HOME', 'COMPOSER_CACHE_DIR'] as $name) {
             $this->saved[$name] = Platform::getEnv($name);
         }
         $this->home = sys_get_temp_dir().'/lockrot-machine-home-'.bin2hex(random_bytes(8));
@@ -35,10 +36,25 @@ final class FixtureRepositoryServerConfigTest extends TestCase
         foreach ($this->saved as $name => $value) {
             $value === false ? Platform::clearEnv($name) : Platform::putEnv($name, $value);
         }
-        foreach (array_diff(scandir($this->home) ?: [], ['.', '..']) as $file) {
-            unlink($this->home.'/'.$file);
+        /** @var \SplFileInfo $file */
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->home, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+            $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
         }
-        @rmdir($this->home);
+        rmdir($this->home);
+    }
+
+    /** Composer creates its home, cache and data directories when it builds the config. */
+    public function testTheConfigWritesOnlyBelowTheHomeThatTheCallerOwns(): void
+    {
+        $machineCache = $this->home.'/machine-cache';
+        Platform::putEnv('COMPOSER_CACHE_DIR', $machineCache);
+        $home = $this->home.'/hermetic';
+
+        HermeticComposerConfig::create($home);
+
+        self::assertDirectoryExists($home.'/cache');
+        self::assertDirectoryDoesNotExist($machineCache);
+        self::assertSame($machineCache, Platform::getEnv('COMPOSER_CACHE_DIR'), 'the environment of the test process is restored');
     }
 
     public function testTheConfigHoldsNoAuthOfTheMachine(): void
