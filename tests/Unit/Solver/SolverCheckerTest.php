@@ -278,6 +278,26 @@ final class SolverCheckerTest extends TestCase
     }
 
     /**
+     * lockrot overrides `php` with the target PHP, and Composer appends the PHP that runs lockrot to
+     * the override. The problem text names the override without the running PHP, so it is the same on
+     * every machine.
+     */
+    public function testTheProblemTextOfARefusedBaselineOmitsThePhpThatRunsLockrot(): void
+    {
+        $checker = self::checker(
+            ['acme/lib' => '^1.0'],
+            [['name' => 'acme/lib', 'version' => '1.0.0', 'require' => ['php' => '~8.1.0']]],
+            ['acme/lib' => [['version' => '1.0.0', 'require' => ['php' => '~8.1.0']]]]
+        );
+
+        $problem = (string) $checker->baseline()->problem();
+
+        self::assertStringContainsString('8.4.99', $problem);
+        self::assertStringNotContainsString('actual', $problem);
+        self::assertStringNotContainsString(\PHP_VERSION, $problem);
+    }
+
+    /**
      * D8: Composer looks up the advisories of every pool name that the update can move, so a new
      * dependency that the run never analysed is blocked too. One lookup asks the names that the
      * run's own lookup did not cover, and its answer is kept.

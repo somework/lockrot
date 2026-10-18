@@ -147,7 +147,7 @@ final class ComposerSolver
                 }
             }
 
-            return Solution::refused($holds->holds(), static fn (): string => trim($e->getPrettyString($set, $composerRequest, $pool, false)), $unloaded);
+            return Solution::refused($holds->holds(), static fn (): string => self::problemText($e->getPrettyString($set, $composerRequest, $pool, false)), $unloaded);
         }
 
         return Solution::resolved(self::installs($transaction));
@@ -290,6 +290,15 @@ final class ComposerSolver
         $root->setDevRequires($devRequires);
 
         return $root;
+    }
+
+    /**
+     * Composer's text without the version of the platform that runs lockrot: Composer appends it to
+     * each override (`actual: 8.5.1`, `same as actual`), and lockrot overrides `php` with the target.
+     */
+    private static function problemText(string $text): string
+    {
+        return trim((string) preg_replace('/, (?:actual: [^)]*|same as actual)\)/', ')', $text));
     }
 
     /** @return array<string, string> name => the pretty version that the solve installs, for each name it installs or moves */
