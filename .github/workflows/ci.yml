@@ -38,7 +38,8 @@ jobs:
       - name: Pin composer/composer for the matrix
         run: |
           if [ "${{ matrix.composer }}" = "2.2" ]; then composer require --dev --no-update "composer/composer:~2.2.25"; fi
-          if [ "${{ matrix.composer }}" = "2.6" ]; then composer require --dev --no-update "composer/composer:~2.6.6"; fi
+          # Composer 2.9 and later block every 2.6 release of composer/composer for its advisories. The job tests lockrot against that library and never runs it.
+          if [ "${{ matrix.composer }}" = "2.6" ]; then composer require --dev --no-update "composer/composer:~2.6.6" && composer config --json policy.advisories.ignore '["composer/composer"]'; fi
           composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
         run: |
