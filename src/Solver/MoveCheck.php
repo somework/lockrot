@@ -37,6 +37,9 @@ final class MoveCheck implements \JsonSerializable
     /** The reasons that lockrot writes, in the order that the schema lists them. */
     public const REASONS = [self::BASELINE_REFUSED, self::UNLOADED_NAME, self::OFFLINE, self::INSTALL_TIME_BUDGET, self::NOT_FROM_COMPOSER_REPOSITORY, self::COMPOSER_TOO_OLD, self::NO_COMPOSER_JSON];
 
+    /** The reasons that leave the baseline itself unchecked (`run.move_check.reason`), in the schema's order. */
+    public const BASELINE_REASONS = [self::INSTALL_TIME_BUDGET, self::COMPOSER_TOO_OLD, self::NO_COMPOSER_JSON];
+
     /** @var self::RESOLVES|self::REFUSED|self::NOT_CHECKED */
     private string $result;
     private ?string $form;

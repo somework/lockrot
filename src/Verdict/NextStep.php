@@ -140,7 +140,8 @@ final class NextStep
         foreach ($fixes === null ? [] : $fixes->branches() as $branch) {
             $candidate = $branch->candidate();
             $row = $context->row($branch->branch());
-            if ($candidate === null || $row === null) {
+            // A row that fixes no advisory names no move, so it has no score after one and no check.
+            if ($candidate === null || $row === null || $branch->fixed() === 0) {
                 continue;
             }
             $move = MoveBuilder::build(self::toCandidate($row, $candidate), [], $candidate->kind(), $context);
