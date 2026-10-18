@@ -302,7 +302,7 @@ final class FixFinder
         $release = null;
         $blocked = null;
         foreach ($onInstalled as $candidate) {
-            if ($candidate->heldBy() !== []) {
+            if ($candidate->heldBy() !== [] || $this->refused->refuses($candidate->release()->normalized())) {
                 continue;
             }
             if ($candidate->kind() === Fix::BLOCKED) {

@@ -46,4 +46,20 @@ final class MoveCheckFailureTest extends TestCase
         self::assertSame("moves: Composer's solver failed on a request (Seld\\JsonLint\\ParsingException: does not contain valid JSON), so lockrot did not check that move", JsonPath::stringAt($notes[0], ['text']));
         self::assertSame('solver_error', JsonPath::stringAt($document, ['findings', 0, 'next_step', 'check', 'reason']));
     }
+
+    /** A transport message can name a repository URL with credentials: the note keeps its first line, without them. */
+    public function testTheNoteOfASolverFailureNamesNoCredential(): void
+    {
+        $case = CaseHydrator::case('move-check‡');
+        $inputs = JsonPath::arrayAt($case, ['inputs']);
+        $inputs['checks'] = ['*' => ['result' => 'not_checked', 'form' => null, 'reason' => 'solver_error', 'holds' => []]];
+        $inputs['move_check'] = JsonPath::arrayAt($inputs, ['move_check']) + ['error' => ['class' => 'Composer\Downloader\TransportException', 'message' => "The \"https://ci-user:s3cr3t@repo.example.org/p2/acme/lib.json\" file could not be downloaded\nsecond line"]];
+        $case['inputs'] = $inputs;
+
+        $document = (string) json_encode(JsonPath::decoded(CaseHydrator::report($case)->toArray()));
+
+        self::assertStringNotContainsString('s3cr3t', $document);
+        self::assertStringNotContainsString('second line', $document);
+        self::assertStringContainsString('repo.example.org', $document);
+    }
 }

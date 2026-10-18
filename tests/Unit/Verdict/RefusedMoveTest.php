@@ -28,6 +28,7 @@ final class RefusedMoveTest extends TestCase
         self::assertSame('refused', JsonPath::stringAt($finding, ['next_step', 'check', 'result']));
         self::assertSame([], FindingRelations::violations($document));
         self::assertSame('blocked', JsonPath::stringAt($finding, ['security', 'fix_kind']), 'the verdict counts no reachable fix');
+        self::assertNull(JsonPath::arrayAt($finding, ['security'])['gets'], 'composer update installs no release that Composer refuses');
     }
 
     public function testTheTextOfAMoveThatComposerRefusesWithNoHoldNamesTheRefusal(): void

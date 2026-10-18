@@ -520,7 +520,6 @@ final class RunNote
         ), false, ['problem' => $problem]);
     }
 
-    /** The first line of Composer's problem text that names a rule, without its list marker. */
     /**
      * D9: Composer's solver did not check the combined update, so `update now` names no package.
      *
@@ -535,12 +534,19 @@ final class RunNote
         ), false, ['reason' => $reason, 'packages' => $packages]);
     }
 
-    /** Composer's solver failed on a request: the run's first such failure, by exception class and message. */
+    /**
+     * Composer's solver failed on a request: the run's first such failure, by exception class and
+     * the first line of its message. A message can carry a repository URL with credentials:
+     * {@see RepositoryUrl::inText()}.
+     */
     public static function moveCheckFailed(string $class, string $message): self
     {
+        $message = RepositoryUrl::inText((string) strtok($message, "\r\n"));
+
         return self::of(self::MOVE_CHECK_FAILED, \sprintf("moves: Composer's solver failed on a request (%s: %s), so lockrot did not check that move", $class, $message), false, ['class' => $class, 'message' => $message]);
     }
 
+    /** The first line of Composer's problem text that names a rule, without its list marker. */
     private static function firstProblem(string $problem): string
     {
         foreach (preg_split('/\R/', $problem) ?: [] as $line) {

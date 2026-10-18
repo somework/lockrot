@@ -229,9 +229,6 @@ final class Analyzer
         $finder = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
         $checks = $this->checks === null ? null : $this->checks->withAdvisories($advisories->records(), $advisories->asked());
         $baseline = $checks === null ? null : $checks->checker()->baseline();
-        if ($baseline !== null && $baseline->check()->isRefused()) {
-            $notes[] = RunNote::movesNotChecked((string) $checks->checker()->platformPhp(), (string) $baseline->problem());
-        }
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;
@@ -267,6 +264,9 @@ final class Analyzer
         }
         $uncovered = UncoveredAdvisories::of($findings);
         $notes = array_merge($notes, $uncovered === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($uncovered)], $this->abandonedNotes($findings));
+        if ($checks !== null && $baseline !== null && $baseline->check()->isRefused()) {
+            $notes[] = RunNote::movesNotChecked((string) $checks->checker()->platformPhp(), (string) $baseline->problem());
+        }
         $findings = TransitiveExposure::attach($findings, $graph);
         $graded = [];
         foreach ($findings as $finding) {
