@@ -1,7 +1,7 @@
 {
  "$expect": {
   "strict": false,
-  "error": "security"
+  "error": "findings[1].next_step.check"
  },
  "$schema": "https://lockrot.dev/schema/report-2.json",
  "lockrot": {
@@ -1043,7 +1043,12 @@
    "symfony/yaml",
    "symfony/polyfill-intl-idn"
   ],
-  "update_now_command": null,
+  "update_now_command": [
+   "composer",
+   "update",
+   "symfony/yaml",
+   "symfony/polyfill-intl-idn"
+  ],
   "fix_unknown": 0
  },
  "data_date": "2026-10-01T17:39:31+00:00",
@@ -2571,7 +2576,11 @@
       "composer_resolves"
      ]
     },
-    "check": null,
+    "check": {
+     "result": "refused",
+     "form": "inline",
+     "reason": null
+    },
     "composer_moves_because": [
      "crosses_major"
     ],

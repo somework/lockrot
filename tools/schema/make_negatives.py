@@ -509,8 +509,8 @@ def _(d): sig(d['findings'][tw], 'S9')['data']['advisories'][0]['points'] = 7
 def _(d): d['findings'][OAUTH]['checks_skipped'] = [c for c in d['findings'][OAUTH]['checks_skipped'] if c['check'] != 'release_branch']
 @case('a4-headline-null-value-with-a-source', 'composite', f + '.flags[0]')
 def _(d): d['findings'][m]['flags'][0]['headline'].update(value=None, source='branch')
-@case('a4-update-now-command-null-beside-update-now', 'composite', 'security')
-def _(d): d['security']['update_now_command'] = None
+@case('move-check-form-on-a-refusal', 'composite', f + '.next_step.check')
+def _(d): d['findings'][m]['next_step']['check'] = {'result': 'refused', 'form': 'inline', 'reason': None}
 @case('a4-update-now-command-without-update-now', 'composite', 'security')
 def _(d): d['security']['update_now'] = []
 @case('a4-update-now-command-a-shell-pipe', 'composite', 'security.update_now_command')
