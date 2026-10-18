@@ -183,6 +183,7 @@
      "no_new_advisories"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -1310,7 +1311,8 @@
      "records": null
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

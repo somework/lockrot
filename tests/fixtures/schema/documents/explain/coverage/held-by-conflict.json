@@ -200,6 +200,7 @@
      "package": "symfony/monolog-bundle",
      "version": "v3.8.0",
      "link": "conflict",
+     "target": null,
      "constraint": ">=5.0",
      "holder": null
     }
@@ -236,6 +237,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "holders",
     "crosses_major"
@@ -249,7 +251,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/monolog-bundle v3.8.0 (requires >=5.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
+   "text": "require symfony/monolog-bridge ^5.4.52 — clears left-behind, old-promise and the advisory; 5.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; held by symfony/monolog-bundle v3.8.0 (conflicts with >=5.0); the packages that hold it may need to move too; a new major brings its own requirements, which lockrot does not solve"
   },
   "security": {
    "status": "vulnerable",
@@ -285,7 +287,8 @@
     "lowest": null,
     "newest": "v2.8.52",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -425,6 +428,7 @@
           "package": "symfony/monolog-bundle",
           "version": "v3.8.0",
           "link": "conflict",
+          "target": null,
           "constraint": ">=5.0",
           "holder": null
          }
@@ -1271,7 +1275,8 @@
      "records": 1
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

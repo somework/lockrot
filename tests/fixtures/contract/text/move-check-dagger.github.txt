@@ -1,0 +1,5 @@
+::warning file=composer.lock,line=4,title=lockrot%3A medium — vulnerable (medium advisory)::typo3/html-sanitizer v2.2.0: 8 = vulnerable 8 [medium advisory]. Do: composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies (gets v2.3.2) — clears 2 advisories; Composer's solver checked it against the lock. vulnerable: 2 advisories: 1 medium, 1 low — all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting.
+flags: vulnerable 1
+depth: every flagged package is named in composer.json · direct 1
+security: 1 vulnerable package · 2 advisories: 1 medium, 1 low
+gate: passes · --fail-on=high · no finding fails it · target php 8.4 (--target-php)

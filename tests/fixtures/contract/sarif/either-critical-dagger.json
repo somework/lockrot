@@ -331,6 +331,7 @@
                                     "package": null,
                                     "version": null,
                                     "link": "require",
+                                    "target": null,
                                     "constraint": "~3.4",
                                     "holder": null
                                 }

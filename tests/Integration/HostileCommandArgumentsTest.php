@@ -71,18 +71,23 @@ final class HostileCommandArgumentsTest extends TestCase
         self::assertSame('8.2.0+%PATH%', JsonPath::stringAt($move, ['through', 0, 'newest_stable', 'version']));
     }
 
-    /** The `do:` sentence names the action in words when the step is refused, and never prints the name as a shell word. */
-    public function testAHostilePackageNameWritesNoUpdateCommandAndNoCommandText(): void
+    /** A hostile name is no Composer package name: the lock entry gets no finding, and no command or text names it. */
+    public function testAHostilePackageNameGetsNoFindingAndNoCommand(): void
     {
         foreach (self::HOSTILE_NAMES as $class => $name) {
             $report = $this->report('E', static function (array $inputs) use ($name): array {
-                return self::with($inputs, ['lock', 0, 'name'], $name);
-            });
-            $move = JsonPath::arrayAt($report, ['findings', 0, 'next_step']);
+                $lock = JsonPath::arrayAt($inputs, ['lock']);
+                $lock[] = ['name' => $name, 'version' => '1.0.0', 'dev' => false, 'origin' => 'packagist'];
 
-            self::assertSame(['update', []], [$move['kind'], $move['commands']], $class);
-            self::assertSame('update it with Composer (gets v5.4.53) — clears 3 advisories', $move['text'], $class);
-            self::assertSame([[], null], [JsonPath::arrayAt($report, ['security', 'update_now']), JsonPath::arrayAt($report, ['security'])['update_now_command']], $class);
+                return self::with($inputs, ['lock'], $lock);
+            });
+            $notes = array_values(array_filter(JsonPath::arrayAt($report, ['note_details']), static fn ($note): bool => \is_array($note) && $note['code'] === 'package_name_invalid'));
+
+            self::assertNotContains($name, array_column(JsonPath::arrayAt($report, ['findings']), 'package'), $class);
+            self::assertCount(1, $notes, $class);
+            self::assertSame([$name], JsonPath::arrayAt($notes[0], ['data', 'packages']), $class);
+            // Both sides go through json_encode(), which escapes `/` and quotes alike.
+            self::assertStringNotContainsString(substr((string) json_encode($name), 1, -1), (string) json_encode([$report['notes'], JsonPath::arrayAt($report, ['findings'])]), $class.': no text or command names it');
             self::assertSame([], RootRecount::mismatches($report), $class.': the independent recount of the root blocks');
         }
     }

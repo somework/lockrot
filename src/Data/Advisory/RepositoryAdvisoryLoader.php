@@ -75,7 +75,43 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
         }
         [$repositories, $answers, $askNotes] = $this->ask(array_keys($asked));
 
-        return $this->batch($versionByName, $outside, $aliasVersionsByName, $repositories, $answers, array_merge($notes, $askNotes));
+        return $this->batch($versionByName, $outside, $aliasVersionsByName, $repositories, $answers, array_merge($notes, $askNotes))
+            ->withRecords(self::merged($answers), array_map('strval', array_keys($asked)));
+    }
+
+    /**
+     * Every record of each name, ignored ones included: the move check's lookup of the names that
+     * a solve's pool holds and the run did not ask. A partial record comes from the metadata that
+     * the solve loaded. A name that no repository answers has no record.
+     *
+     * @param list<string> $names
+     *
+     * @return array<string, list<PartialSecurityAdvisory>>
+     */
+    public function records(array $names, bool $complete): array
+    {
+        if ($names === [] || $this->notAskedReason(array_fill_keys($names, '')) !== null) {
+            return [];
+        }
+
+        return self::merged($this->ask($names, !$complete)[1]);
+    }
+
+    /**
+     * @param array<int, array<string, list<PartialSecurityAdvisory>>> $answers
+     *
+     * @return array<string, list<PartialSecurityAdvisory>>
+     */
+    private static function merged(array $answers): array
+    {
+        $records = [];
+        foreach ($answers as $answer) {
+            foreach ($answer as $name => $advisories) {
+                $records[(string) $name] = array_merge($records[(string) $name] ?? [], array_values($advisories));
+            }
+        }
+
+        return $records;
     }
 
     /**
@@ -119,11 +155,12 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
      * Each advisory-capable repository once, in configured order, with every asked name.
      *
      * @param list<string> $names
+     * @param bool         $partial whether a repository can answer from its packages' metadata, with partial records
      *
      * @return array{list<AdvisoryRepository>, array<int, array<string, list<PartialSecurityAdvisory>>>, list<RunNote>}
      *                     the repositories, the answer of each one that answered by its index there, and the notes
      */
-    private function ask(array $names): array
+    private function ask(array $names, bool $partial = false): array
     {
         $map = array_fill_keys($names, new MatchAllConstraint());
         $repositories = [];
@@ -150,7 +187,7 @@ final class RepositoryAdvisoryLoader implements AdvisoryLoaderInterface
                     $repositories[] = AdvisoryRepository::of($repository->getRepoName(), AdvisoryCoverage::NO_FEED);
                     continue;
                 }
-                $answers[\count($repositories)] = $repository->getSecurityAdvisories($map, false)['advisories'];
+                $answers[\count($repositories)] = $repository->getSecurityAdvisories($map, $partial)['advisories'];
                 $repositories[] = AdvisoryRepository::of($repository->getRepoName(), AdvisoryCoverage::ANSWERED);
             } catch (\Throwable $e) {
                 // ComposerRepository::fetchFile() can throw a ParsingException, a

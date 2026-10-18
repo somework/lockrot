@@ -763,6 +763,7 @@ export const d_A_baselined_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -1231,6 +1232,7 @@ export const d_A_baselined_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1285,7 +1287,8 @@ export const d_A_baselined_dagger = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -2658,6 +2661,7 @@ export const d_A_blocked_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -3095,6 +3099,7 @@ export const d_A_blocked_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -3135,7 +3140,8 @@ export const d_A_blocked_dagger = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -4382,6 +4388,7 @@ export const d_A_gate_critical = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -4757,6 +4764,7 @@ export const d_A_gate_critical = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": null
                     },
@@ -4765,6 +4773,7 @@ export const d_A_gate_critical = {
                         "package": "symfony/twig-bridge",
                         "version": "v3.4.47",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.41|^2.10",
                         "holder": {
                             "verdict": "high",
@@ -4778,7 +4787,8 @@ export const d_A_gate_critical = {
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "4.x",
-                                "constraint": "^4.4.51"
+                                "constraint": "^4.4.51",
+                                "check": null
                             }
                         }
                     }
@@ -4875,6 +4885,7 @@ export const d_A_gate_critical = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -4930,7 +4941,8 @@ export const d_A_gate_critical = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -5017,6 +5029,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5025,6 +5038,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5038,7 +5052,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5072,6 +5087,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5080,6 +5096,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5093,7 +5110,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5127,6 +5145,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5135,6 +5154,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5148,7 +5168,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5182,6 +5203,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5190,6 +5212,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5203,7 +5226,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5237,6 +5261,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5245,6 +5270,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5258,7 +5284,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5292,6 +5319,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5300,6 +5328,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5313,7 +5342,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5347,6 +5377,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5355,6 +5386,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5368,7 +5400,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5402,6 +5435,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5410,6 +5444,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5423,7 +5458,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5457,6 +5493,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5465,6 +5502,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5478,7 +5516,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5512,6 +5551,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5520,6 +5560,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5533,7 +5574,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5567,6 +5609,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5575,6 +5618,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5588,7 +5632,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5622,6 +5667,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5630,6 +5676,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5643,7 +5690,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5677,6 +5725,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5685,6 +5734,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5698,7 +5748,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5732,6 +5783,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5740,6 +5792,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5753,7 +5806,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -5787,6 +5841,7 @@ export const d_A_gate_critical = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -5795,6 +5850,7 @@ export const d_A_gate_critical = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -5808,7 +5864,8 @@ export const d_A_gate_critical = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -6642,6 +6699,7 @@ export const d_A_gate_vulnerable = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -7017,6 +7075,7 @@ export const d_A_gate_vulnerable = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": null
                     },
@@ -7025,6 +7084,7 @@ export const d_A_gate_vulnerable = {
                         "package": "symfony/twig-bridge",
                         "version": "v3.4.47",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.41|^2.10",
                         "holder": {
                             "verdict": "high",
@@ -7038,7 +7098,8 @@ export const d_A_gate_vulnerable = {
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "4.x",
-                                "constraint": "^4.4.51"
+                                "constraint": "^4.4.51",
+                                "check": null
                             }
                         }
                     }
@@ -7135,6 +7196,7 @@ export const d_A_gate_vulnerable = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -7190,7 +7252,8 @@ export const d_A_gate_vulnerable = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -7277,6 +7340,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7285,6 +7349,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7298,7 +7363,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7332,6 +7398,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7340,6 +7407,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7353,7 +7421,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7387,6 +7456,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7395,6 +7465,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7408,7 +7479,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7442,6 +7514,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7450,6 +7523,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7463,7 +7537,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7497,6 +7572,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7505,6 +7581,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7518,7 +7595,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7552,6 +7630,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7560,6 +7639,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7573,7 +7653,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7607,6 +7688,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7615,6 +7697,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7628,7 +7711,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7662,6 +7746,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7670,6 +7755,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7683,7 +7769,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7717,6 +7804,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7725,6 +7813,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7738,7 +7827,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7772,6 +7862,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7780,6 +7871,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7793,7 +7885,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7827,6 +7920,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7835,6 +7929,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7848,7 +7943,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7882,6 +7978,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7890,6 +7987,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7903,7 +8001,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7937,6 +8036,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -7945,6 +8045,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -7958,7 +8059,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -7992,6 +8094,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -8000,6 +8103,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -8013,7 +8117,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -8047,6 +8152,7 @@ export const d_A_gate_vulnerable = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -8055,6 +8161,7 @@ export const d_A_gate_vulnerable = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -8068,7 +8175,8 @@ export const d_A_gate_vulnerable = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -8914,6 +9022,7 @@ export const d_A_php_star_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -9289,6 +9398,7 @@ export const d_A_php_star_dagger = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": null
                     },
@@ -9297,6 +9407,7 @@ export const d_A_php_star_dagger = {
                         "package": "symfony/twig-bridge",
                         "version": "v3.4.47",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.41|^2.10",
                         "holder": {
                             "verdict": "high",
@@ -9310,7 +9421,8 @@ export const d_A_php_star_dagger = {
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "8.x",
-                                "constraint": "^8.1"
+                                "constraint": "^8.1",
+                                "check": null
                             }
                         }
                     }
@@ -9407,6 +9519,7 @@ export const d_A_php_star_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -9456,7 +9569,8 @@ export const d_A_php_star_dagger = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -9543,6 +9657,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9551,6 +9666,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9564,7 +9680,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9598,6 +9715,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9606,6 +9724,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9619,7 +9738,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9653,6 +9773,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9661,6 +9782,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9674,7 +9796,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9708,6 +9831,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9716,6 +9840,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9729,7 +9854,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9763,6 +9889,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9771,6 +9898,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9784,7 +9912,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9818,6 +9947,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9826,6 +9956,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9839,7 +9970,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9873,6 +10005,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9881,6 +10014,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9894,7 +10028,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9928,6 +10063,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9936,6 +10072,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -9949,7 +10086,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -9983,6 +10121,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -9991,6 +10130,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -10004,7 +10144,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -10038,6 +10179,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -10046,6 +10188,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -10059,7 +10202,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -10093,6 +10237,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -10101,6 +10246,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -10114,7 +10260,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -10148,6 +10295,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -10156,6 +10304,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -10169,7 +10318,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -10203,6 +10353,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -10211,6 +10362,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -10224,7 +10376,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -10258,6 +10411,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -10266,6 +10420,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -10279,7 +10434,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -10313,6 +10469,7 @@ export const d_A_php_star_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -10321,6 +10478,7 @@ export const d_A_php_star_dagger = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -10334,7 +10492,8 @@ export const d_A_php_star_dagger = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "8.x",
-                                                    "constraint": "^8.1"
+                                                    "constraint": "^8.1",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -11168,6 +11327,7 @@ export const d_A = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -11543,6 +11703,7 @@ export const d_A = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": null
                     },
@@ -11551,6 +11712,7 @@ export const d_A = {
                         "package": "symfony/twig-bridge",
                         "version": "v3.4.47",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.41|^2.10",
                         "holder": {
                             "verdict": "high",
@@ -11564,7 +11726,8 @@ export const d_A = {
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "4.x",
-                                "constraint": "^4.4.51"
+                                "constraint": "^4.4.51",
+                                "check": null
                             }
                         }
                     }
@@ -11661,6 +11824,7 @@ export const d_A = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -11716,7 +11880,8 @@ export const d_A = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -11803,6 +11968,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -11811,6 +11977,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -11824,7 +11991,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -11858,6 +12026,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -11866,6 +12035,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -11879,7 +12049,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -11913,6 +12084,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -11921,6 +12093,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -11934,7 +12107,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -11968,6 +12142,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -11976,6 +12151,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -11989,7 +12165,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12023,6 +12200,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12031,6 +12209,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12044,7 +12223,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12078,6 +12258,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12086,6 +12267,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12099,7 +12281,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12133,6 +12316,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12141,6 +12325,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12154,7 +12339,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12188,6 +12374,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12196,6 +12383,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12209,7 +12397,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12243,6 +12432,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12251,6 +12441,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12264,7 +12455,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12298,6 +12490,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12306,6 +12499,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12319,7 +12513,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12353,6 +12548,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12361,6 +12557,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12374,7 +12571,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12408,6 +12606,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12416,6 +12615,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12429,7 +12629,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12463,6 +12664,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12471,6 +12673,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12484,7 +12687,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12518,6 +12722,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12526,6 +12731,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12539,7 +12745,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -12573,6 +12780,7 @@ export const d_A = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -12581,6 +12789,7 @@ export const d_A = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -12594,7 +12803,8 @@ export const d_A = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -13428,6 +13638,7 @@ export const d_B_accepted_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 1,
             "lead-first": 0,
@@ -13863,6 +14074,7 @@ export const d_B_accepted_dagger = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -13889,6 +14101,7 @@ export const d_B_accepted_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -13937,7 +14150,8 @@ export const d_B_accepted_dagger = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -14089,6 +14303,7 @@ export const d_B_accepted_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -14922,6 +15137,7 @@ export const d_B_also_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -15400,6 +15616,7 @@ export const d_B_also_dagger = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -15437,6 +15654,7 @@ export const d_B_also_dagger = {
                                 "package": null,
                                 "version": null,
                                 "link": "require",
+                                "target": null,
                                 "constraint": "^2.6",
                                 "holder": null
                             }
@@ -15474,6 +15692,7 @@ export const d_B_also_dagger = {
                                 "composer_resolves"
                             ]
                         },
+                        "check": null,
                         "composer_moves_because": [
                             "crosses_major"
                         ],
@@ -15530,7 +15749,8 @@ export const d_B_also_dagger = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -16504,6 +16724,7 @@ export const d_B_baselined_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -16967,6 +17188,7 @@ export const d_B_baselined_dagger = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -17003,6 +17225,7 @@ export const d_B_baselined_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -17051,7 +17274,8 @@ export const d_B_baselined_dagger = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -17191,6 +17415,7 @@ export const d_B_baselined_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -18085,6 +18310,7 @@ export const d_B_dev_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -18542,6 +18768,7 @@ export const d_B_dev_dagger = {
                         "package": null,
                         "version": null,
                         "link": "require-dev",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -18578,6 +18805,7 @@ export const d_B_dev_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -18626,7 +18854,8 @@ export const d_B_dev_dagger = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -18766,6 +18995,7 @@ export const d_B_dev_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require-dev",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -19603,6 +19833,7 @@ export const d_B_gate_flag = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -20052,6 +20283,7 @@ export const d_B_gate_flag = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -20088,6 +20320,7 @@ export const d_B_gate_flag = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -20136,7 +20369,8 @@ export const d_B_gate_flag = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -20276,6 +20510,7 @@ export const d_B_gate_flag = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -21118,6 +21353,7 @@ export const d_B_gate_list = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -21571,6 +21807,7 @@ export const d_B_gate_list = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -21607,6 +21844,7 @@ export const d_B_gate_list = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -21655,7 +21893,8 @@ export const d_B_gate_list = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -21795,6 +22034,7 @@ export const d_B_gate_list = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -22632,6 +22872,7 @@ export const d_B_gate_none = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -23074,6 +23315,7 @@ export const d_B_gate_none = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -23110,6 +23352,7 @@ export const d_B_gate_none = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -23158,7 +23401,8 @@ export const d_B_gate_none = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -23298,6 +23542,7 @@ export const d_B_gate_none = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -24125,6 +24370,7 @@ export const d_B_offline_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -24561,6 +24807,7 @@ export const d_B_offline_dagger = {
                         "no_new_advisories"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -25534,6 +25781,7 @@ export const d_B_offline_high_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -25972,6 +26220,7 @@ export const d_B_offline_high_dagger = {
                         "no_new_advisories"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -26935,6 +27184,7 @@ export const d_B = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -27384,6 +27634,7 @@ export const d_B = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -27420,6 +27671,7 @@ export const d_B = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -27468,7 +27720,8 @@ export const d_B = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -27608,6 +27861,7 @@ export const d_B = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -28445,6 +28699,7 @@ export const d_C_baselined_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -28889,6 +29144,7 @@ export const d_C_baselined_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -29863,6 +30119,7 @@ export const d_C_bitbucket_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -30293,6 +30550,7 @@ export const d_C_bitbucket_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -31235,6 +31493,7 @@ export const d_C_gitlab_hosted_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -31667,6 +31926,7 @@ export const d_C_gitlab_hosted_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -32624,6 +32884,7 @@ export const d_C_offline_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -33084,6 +33345,7 @@ export const d_C_offline_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -34047,6 +34309,7 @@ export const d_C_tokenless_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -34491,6 +34754,7 @@ export const d_C_tokenless_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -35425,6 +35689,7 @@ export const d_C = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -35857,6 +36122,7 @@ export const d_C = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -36809,6 +37075,7 @@ export const d_D_partial_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 1,
             "lead-first": 1,
@@ -37198,6 +37465,7 @@ export const d_D_partial_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -38126,6 +38394,7 @@ export const d_D = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -38541,6 +38810,7 @@ export const d_D = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -39458,6 +39728,7 @@ export const d_E_ignored_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -39866,6 +40137,7 @@ export const d_E_ignored_dagger = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -39929,7 +40201,8 @@ export const d_E_ignored_dagger = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -40903,6 +41176,7 @@ export const d_E_ignored_whole_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -41333,6 +41607,7 @@ export const d_E_ignored_whole_dagger = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -41386,7 +41661,8 @@ export const d_E_ignored_whole_dagger = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -42374,6 +42650,7 @@ export const d_E = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -42782,6 +43059,7 @@ export const d_E = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -42835,7 +43113,8 @@ export const d_E = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -43809,6 +44088,7 @@ export const d_F = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -44211,6 +44491,7 @@ export const d_F = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -44282,7 +44563,8 @@ export const d_F = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -45207,6 +45489,7 @@ export const d_G_tag_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -45645,6 +45928,7 @@ export const d_G_tag_dagger = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -46590,6 +46874,7 @@ export const d_G = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -47011,6 +47296,7 @@ export const d_G = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -47950,6 +48236,7 @@ export const d_abandoned_audit_ignore_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -48382,6 +48669,7 @@ export const d_abandoned_audit_ignore_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -49334,6 +49622,7 @@ export const d_abandoned_ignore_unreadable_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -49766,6 +50055,7 @@ export const d_abandoned_ignore_unreadable_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -50718,6 +51008,7 @@ export const d_affected_range_unknown_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -51098,6 +51389,7 @@ export const d_affected_range_unknown_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -51157,7 +51449,8 @@ export const d_affected_range_unknown_dagger = {
                     "lowest": null,
                     "newest": "v1.43.0",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -52076,6 +52369,7 @@ export const d_cache_subscriber = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -52497,6 +52791,7 @@ export const d_cache_subscriber = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -53486,6 +53781,7 @@ export const d_commonmark = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -53928,6 +54224,7 @@ export const d_commonmark = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -54015,7 +54312,8 @@ export const d_commonmark = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -55001,6 +55299,7 @@ export const d_composite = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 4,
@@ -55401,6 +55700,7 @@ export const d_composite = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": null
                     },
@@ -55409,6 +55709,7 @@ export const d_composite = {
                         "package": "symfony/twig-bridge",
                         "version": "v3.4.47",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.41|^2.10",
                         "holder": {
                             "verdict": "high",
@@ -55422,7 +55723,8 @@ export const d_composite = {
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "4.x",
-                                "constraint": "^4.4.51"
+                                "constraint": "^4.4.51",
+                                "check": null
                             }
                         }
                     }
@@ -55519,6 +55821,7 @@ export const d_composite = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -55574,7 +55877,8 @@ export const d_composite = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -55661,6 +55965,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -55669,6 +55974,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -55682,7 +55988,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -55716,6 +56023,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -55724,6 +56032,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -55737,7 +56046,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -55771,6 +56081,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -55779,6 +56090,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -55792,7 +56104,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -55826,6 +56139,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -55834,6 +56148,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -55847,7 +56162,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -55881,6 +56197,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -55889,6 +56206,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -55902,7 +56220,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -55936,6 +56255,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -55944,6 +56264,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -55957,7 +56278,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -55991,6 +56313,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -55999,6 +56322,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56012,7 +56336,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56046,6 +56371,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56054,6 +56380,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56067,7 +56394,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56101,6 +56429,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56109,6 +56438,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56122,7 +56452,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56156,6 +56487,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56164,6 +56496,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56177,7 +56510,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56211,6 +56545,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56219,6 +56554,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56232,7 +56568,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56266,6 +56603,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56274,6 +56612,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56287,7 +56626,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56321,6 +56661,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56329,6 +56670,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56342,7 +56684,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56376,6 +56719,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56384,6 +56728,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56397,7 +56742,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56431,6 +56777,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.0",
                                             "holder": null
                                         },
@@ -56439,6 +56786,7 @@ export const d_composite = {
                                             "package": "symfony/twig-bridge",
                                             "version": "v3.4.47",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "high",
@@ -56452,7 +56800,8 @@ export const d_composite = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.4.51"
+                                                    "constraint": "^4.4.51",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -56715,6 +57064,7 @@ export const d_composite = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -56751,6 +57101,7 @@ export const d_composite = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -56799,7 +57150,8 @@ export const d_composite = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -56939,6 +57291,7 @@ export const d_composite = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -57188,6 +57541,7 @@ export const d_composite = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -57546,6 +57900,7 @@ export const d_composite = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -57885,6 +58240,7 @@ export const d_composite = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -58186,6 +58542,7 @@ export const d_composite = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -58239,7 +58596,8 @@ export const d_composite = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -58579,6 +58937,7 @@ export const d_composite = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -58650,7 +59009,8 @@ export const d_composite = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -59575,6 +59935,7 @@ export const d_either_critical_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -60050,6 +60411,7 @@ export const d_either_critical_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -60081,6 +60443,7 @@ export const d_either_critical_dagger = {
                                 "package": null,
                                 "version": null,
                                 "link": "require",
+                                "target": null,
                                 "constraint": "~3.4",
                                 "holder": null
                             }
@@ -60118,6 +60481,7 @@ export const d_either_critical_dagger = {
                                 "composer_resolves"
                             ]
                         },
+                        "check": null,
                         "composer_moves_because": [
                             "crosses_major"
                         ],
@@ -60167,7 +60531,8 @@ export const d_either_critical_dagger = {
                     "lowest": null,
                     "newest": "v3.4.47",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "also",
                 "gets": null,
@@ -60312,6 +60677,7 @@ export const d_either_critical_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~3.4",
                                             "holder": null
                                         }
@@ -61149,6 +61515,7 @@ export const d_either_low_dev_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -61592,6 +61959,7 @@ export const d_either_low_dev_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [
@@ -61644,7 +62012,8 @@ export const d_either_low_dev_dagger = {
                     "lowest": null,
                     "newest": "v1.0.2",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -62566,6 +62935,7 @@ export const d_fail_on_config_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -63015,6 +63385,7 @@ export const d_fail_on_config_dagger = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -63051,6 +63422,7 @@ export const d_fail_on_config_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -63099,7 +63471,8 @@ export const d_fail_on_config_dagger = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -63239,6 +63612,7 @@ export const d_fail_on_config_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -64070,6 +64444,7 @@ export const d_fail_on_default_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -64512,6 +64887,7 @@ export const d_fail_on_default_dagger = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.6",
                         "holder": null
                     }
@@ -64548,6 +64924,7 @@ export const d_fail_on_default_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -64596,7 +64973,8 @@ export const d_fail_on_default_dagger = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -64736,6 +65114,7 @@ export const d_fail_on_default_dagger = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^2.6",
                                             "holder": null
                                         }
@@ -65558,6 +65937,7 @@ export const d_feeds_drupal_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -66020,6 +66400,7 @@ export const d_feeds_drupal_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -66074,7 +66455,8 @@ export const d_feeds_drupal_dagger = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -67321,6 +67703,7 @@ export const d_flysystem = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -67775,6 +68158,7 @@ export const d_flysystem = {
                         "package": "barryvdh/elfinder-flysystem-driver",
                         "version": "v0.2.1",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.0",
                         "holder": {
                             "verdict": "medium",
@@ -67787,7 +68171,8 @@ export const d_flysystem = {
                             "next_step": {
                                 "kind": "require",
                                 "to_branch": "0.6.x",
-                                "constraint": "^0.6.0"
+                                "constraint": "^0.6.0",
+                                "check": null
                             }
                         }
                     },
@@ -67796,6 +68181,7 @@ export const d_flysystem = {
                         "package": "league/flysystem-cached-adapter",
                         "version": "1.1.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "~1.0",
                         "holder": {
                             "verdict": "low",
@@ -67807,7 +68193,8 @@ export const d_flysystem = {
                             "next_step": {
                                 "kind": "no-move",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -67839,6 +68226,7 @@ export const d_flysystem = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -67891,7 +68279,8 @@ export const d_flysystem = {
                     "lowest": null,
                     "newest": "1.1.10",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -68018,6 +68407,7 @@ export const d_flysystem = {
                                             "package": "barryvdh/elfinder-flysystem-driver",
                                             "version": "v0.2.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.0",
                                             "holder": {
                                                 "verdict": "medium",
@@ -68030,7 +68420,8 @@ export const d_flysystem = {
                                                 "next_step": {
                                                     "kind": "require",
                                                     "to_branch": "0.6.x",
-                                                    "constraint": "^0.6.0"
+                                                    "constraint": "^0.6.0",
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -68039,6 +68430,7 @@ export const d_flysystem = {
                                             "package": "league/flysystem-cached-adapter",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~1.0",
                                             "holder": {
                                                 "verdict": "low",
@@ -68050,7 +68442,8 @@ export const d_flysystem = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -68873,6 +69266,7 @@ export const d_gitlab_anon_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -69327,6 +69721,7 @@ export const d_gitlab_anon_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -70289,6 +70684,7 @@ export const d_guzzle_5 = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -70754,6 +71150,7 @@ export const d_guzzle_5 = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.3.4",
                         "holder": null
                     },
@@ -70762,6 +71159,7 @@ export const d_guzzle_5 = {
                         "package": "bdunogier/guzzle-site-authenticator",
                         "version": "1.1.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.3.1",
                         "holder": {
                             "verdict": "medium",
@@ -70773,7 +71171,8 @@ export const d_guzzle_5 = {
                             "next_step": {
                                 "kind": "no-move",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     },
@@ -70782,6 +71181,7 @@ export const d_guzzle_5 = {
                         "package": "php-http/guzzle5-adapter",
                         "version": "2.0.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.1",
                         "holder": {
                             "verdict": "critical",
@@ -70793,7 +71193,8 @@ export const d_guzzle_5 = {
                             "next_step": {
                                 "kind": "replace",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -70895,6 +71296,7 @@ export const d_guzzle_5 = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -70944,7 +71346,8 @@ export const d_guzzle_5 = {
                     "lowest": null,
                     "newest": "5.3.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -71112,6 +71515,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71120,6 +71524,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71131,7 +71536,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71140,6 +71546,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71151,7 +71558,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71185,6 +71593,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71193,6 +71602,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71204,7 +71614,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71213,6 +71624,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71224,7 +71636,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71258,6 +71671,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71266,6 +71680,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71277,7 +71692,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71286,6 +71702,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71297,7 +71714,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71331,6 +71749,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71339,6 +71758,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71350,7 +71770,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71359,6 +71780,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71370,7 +71792,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71404,6 +71827,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71412,6 +71836,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71423,7 +71848,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71432,6 +71858,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71443,7 +71870,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71477,6 +71905,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71485,6 +71914,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71496,7 +71926,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71505,6 +71936,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71516,7 +71948,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71550,6 +71983,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71558,6 +71992,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71569,7 +72004,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71578,6 +72014,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71589,7 +72026,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71623,6 +72061,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71631,6 +72070,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71642,7 +72082,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71651,6 +72092,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71662,7 +72104,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71696,6 +72139,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71704,6 +72148,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71715,7 +72160,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71724,6 +72170,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71735,7 +72182,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71769,6 +72217,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71777,6 +72226,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71788,7 +72238,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71797,6 +72248,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71808,7 +72260,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71842,6 +72295,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71850,6 +72304,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71861,7 +72316,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71870,6 +72326,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71881,7 +72338,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71915,6 +72373,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71923,6 +72382,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -71934,7 +72394,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -71943,6 +72404,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -71954,7 +72416,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -71988,6 +72451,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -71996,6 +72460,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -72007,7 +72472,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -72016,6 +72482,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -72027,7 +72494,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -72061,6 +72529,7 @@ export const d_guzzle_5 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.4",
                                             "holder": null
                                         },
@@ -72069,6 +72538,7 @@ export const d_guzzle_5 = {
                                             "package": "bdunogier/guzzle-site-authenticator",
                                             "version": "1.1.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3.1",
                                             "holder": {
                                                 "verdict": "medium",
@@ -72080,7 +72550,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -72089,6 +72560,7 @@ export const d_guzzle_5 = {
                                             "package": "php-http/guzzle5-adapter",
                                             "version": "2.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.1",
                                             "holder": {
                                                 "verdict": "critical",
@@ -72100,7 +72572,8 @@ export const d_guzzle_5 = {
                                                 "next_step": {
                                                     "kind": "replace",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -72938,6 +73411,7 @@ export const d_guzzle_mixed = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -73418,6 +73892,7 @@ export const d_guzzle_mixed = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "~5.0",
                         "holder": null
                     },
@@ -73426,6 +73901,7 @@ export const d_guzzle_mixed = {
                         "package": "csa/guzzle-bundle",
                         "version": "dev-compat-php",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.3",
                         "holder": {
                             "verdict": "high",
@@ -73437,7 +73913,8 @@ export const d_guzzle_mixed = {
                             "next_step": {
                                 "kind": "no-move",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     },
@@ -73446,6 +73923,7 @@ export const d_guzzle_mixed = {
                         "package": "guzzlehttp/cache-subscriber",
                         "version": "0.2.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "~5.0",
                         "holder": {
                             "verdict": "critical",
@@ -73458,7 +73936,8 @@ export const d_guzzle_mixed = {
                             "next_step": {
                                 "kind": "find-alternative",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     },
@@ -73467,6 +73946,7 @@ export const d_guzzle_mixed = {
                         "package": "guzzlehttp/log-subscriber",
                         "version": "1.0.1",
                         "link": "require",
+                        "target": null,
                         "constraint": "~4.0 | ~5.0",
                         "holder": {
                             "verdict": "high",
@@ -73479,7 +73959,8 @@ export const d_guzzle_mixed = {
                             "next_step": {
                                 "kind": "find-alternative",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     },
@@ -73488,6 +73969,7 @@ export const d_guzzle_mixed = {
                         "package": "prestashop/circuit-breaker",
                         "version": "v3.0.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5",
                         "holder": {
                             "verdict": "high",
@@ -73500,7 +73982,8 @@ export const d_guzzle_mixed = {
                             "next_step": {
                                 "kind": "raise-php",
                                 "to_branch": "4.x",
-                                "constraint": "^4.0"
+                                "constraint": "^4.0",
+                                "check": null
                             }
                         }
                     }
@@ -73603,6 +74086,7 @@ export const d_guzzle_mixed = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -73658,7 +74142,8 @@ export const d_guzzle_mixed = {
                     "lowest": null,
                     "newest": "5.3.4",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -73824,6 +74309,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -73832,6 +74318,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -73843,7 +74330,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -73852,6 +74340,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -73864,7 +74353,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -73873,6 +74363,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -73885,7 +74376,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -73894,6 +74386,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -73906,7 +74399,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -73940,6 +74434,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -73948,6 +74443,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -73959,7 +74455,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -73968,6 +74465,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -73980,7 +74478,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -73989,6 +74488,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74001,7 +74501,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74010,6 +74511,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74022,7 +74524,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74056,6 +74559,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74064,6 +74568,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74075,7 +74580,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74084,6 +74590,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74096,7 +74603,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74105,6 +74613,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74117,7 +74626,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74126,6 +74636,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74138,7 +74649,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74172,6 +74684,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74180,6 +74693,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74191,7 +74705,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74200,6 +74715,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74212,7 +74728,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74221,6 +74738,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74233,7 +74751,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74242,6 +74761,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74254,7 +74774,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74288,6 +74809,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74296,6 +74818,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74307,7 +74830,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74316,6 +74840,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74328,7 +74853,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74337,6 +74863,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74349,7 +74876,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74358,6 +74886,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74370,7 +74899,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74404,6 +74934,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74412,6 +74943,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74423,7 +74955,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74432,6 +74965,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74444,7 +74978,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74453,6 +74988,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74465,7 +75001,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74474,6 +75011,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74486,7 +75024,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74520,6 +75059,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74528,6 +75068,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74539,7 +75080,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74548,6 +75090,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74560,7 +75103,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74569,6 +75113,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74581,7 +75126,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74590,6 +75136,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74602,7 +75149,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74636,6 +75184,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74644,6 +75193,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74655,7 +75205,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74664,6 +75215,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74676,7 +75228,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74685,6 +75238,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74697,7 +75251,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74706,6 +75261,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74718,7 +75274,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74752,6 +75309,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74760,6 +75318,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74771,7 +75330,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74780,6 +75340,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74792,7 +75353,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74801,6 +75363,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74813,7 +75376,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74822,6 +75386,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74834,7 +75399,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74868,6 +75434,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74876,6 +75443,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -74887,7 +75455,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74896,6 +75465,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -74908,7 +75478,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74917,6 +75488,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -74929,7 +75501,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -74938,6 +75511,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -74950,7 +75524,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -74984,6 +75559,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -74992,6 +75568,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -75003,7 +75580,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75012,6 +75590,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -75024,7 +75603,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75033,6 +75613,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -75045,7 +75626,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75054,6 +75636,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -75066,7 +75649,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -75100,6 +75684,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -75108,6 +75693,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -75119,7 +75705,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75128,6 +75715,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -75140,7 +75728,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75149,6 +75738,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -75161,7 +75751,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75170,6 +75761,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -75182,7 +75774,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -75216,6 +75809,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -75224,6 +75818,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -75235,7 +75830,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75244,6 +75840,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -75256,7 +75853,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75265,6 +75863,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -75277,7 +75876,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75286,6 +75886,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -75298,7 +75899,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -75332,6 +75934,7 @@ export const d_guzzle_mixed = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": null
                                         },
@@ -75340,6 +75943,7 @@ export const d_guzzle_mixed = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.3",
                                             "holder": {
                                                 "verdict": "high",
@@ -75351,7 +75955,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75360,6 +75965,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/cache-subscriber",
                                             "version": "0.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~5.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -75372,7 +75978,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75381,6 +75988,7 @@ export const d_guzzle_mixed = {
                                             "package": "guzzlehttp/log-subscriber",
                                             "version": "1.0.1",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.0 | ~5.0",
                                             "holder": {
                                                 "verdict": "high",
@@ -75393,7 +76001,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "find-alternative",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -75402,6 +76011,7 @@ export const d_guzzle_mixed = {
                                             "package": "prestashop/circuit-breaker",
                                             "version": "v3.0.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5",
                                             "holder": {
                                                 "verdict": "high",
@@ -75414,7 +76024,8 @@ export const d_guzzle_mixed = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "4.x",
-                                                    "constraint": "^4.0"
+                                                    "constraint": "^4.0",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -76252,6 +76863,7 @@ export const d_guzzle = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -76739,6 +77351,7 @@ export const d_guzzle = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -76793,7 +77406,8 @@ export const d_guzzle = {
                     "lowest": null,
                     "newest": "6.5.8",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -77973,6 +78587,7 @@ export const d_hoa_tokenless_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -78441,6 +79056,7 @@ export const d_hoa_tokenless_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -79387,6 +80003,7 @@ export const d_hoa = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -79843,6 +80460,7 @@ export const d_hoa = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -80807,6 +81425,7 @@ export const d_holder_vuln_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -81166,6 +81785,7 @@ export const d_holder_vuln_dagger = {
                         "package": "joomla/filter",
                         "version": "2.0.5",
                         "link": "require",
+                        "target": null,
                         "constraint": "^2.0",
                         "holder": {
                             "verdict": "medium",
@@ -81177,7 +81797,8 @@ export const d_holder_vuln_dagger = {
                             "next_step": {
                                 "kind": "raise-php",
                                 "to_branch": "3.x",
-                                "constraint": "^3.0.5"
+                                "constraint": "^3.0.5",
+                                "check": null
                             }
                         }
                     }
@@ -81204,6 +81825,7 @@ export const d_holder_vuln_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -82148,6 +82770,7 @@ export const d_ignored_marking_archived_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -82593,6 +83216,7 @@ export const d_ignored_marking_archived_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -83551,6 +84175,7 @@ export const d_ignored_marking_only_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -84725,6 +85350,7 @@ export const d_ignored_marking_partial_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 1,
             "lead-first": 0,
@@ -85962,6 +86588,7 @@ export const d_ignored_marking_stale_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -86342,6 +86969,7 @@ export const d_ignored_marking_stale_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -87258,6 +87886,7 @@ export const d_ignored_marking_unchecked_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -87732,6 +88361,7 @@ export const d_ignored_marking_unchecked_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -88713,6 +89343,7 @@ export const d_installed_php_halved = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -89167,6 +89798,7 @@ export const d_installed_php_halved = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -90120,6 +90752,7 @@ export const d_joomla_filter = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -90497,6 +91130,7 @@ export const d_joomla_filter = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -90551,7 +91185,8 @@ export const d_joomla_filter = {
                     "lowest": "2.0.6",
                     "newest": "2.0.6",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -91464,6 +92099,7 @@ export const d_local_path_advisory = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -91915,6 +92551,7 @@ export const d_local_path_advisory = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -94495,6 +95132,7 @@ export const d_lock_only_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -94930,6 +95568,7 @@ export const d_lock_only_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "unreached"
                 ],
@@ -95876,6 +96515,7 @@ export const d_long_range_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -96278,6 +96918,7 @@ export const d_long_range_dagger = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -96349,7 +96990,8 @@ export const d_long_range_dagger = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -97274,6 +97916,7 @@ export const d_many_dependents = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -97678,6 +98321,7 @@ export const d_many_dependents = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -98270,6 +98914,1416 @@ export const d_many_dependents = {
                 "push": {
                     "at": "2026-09-16T14:21:11+00:00",
                     "years": 0,
+                    "level": null
+                },
+                "push_unmeasured": null
+            },
+            "baseline": null,
+            "gate": {
+                "reaches_fail_on": false,
+                "fails": false,
+                "exempt_by": null,
+                "by": [],
+                "basis": null
+            }
+        }
+    ]
+} satisfies Report2;
+
+export const d_move_check_dagger = {
+    "$schema": "https://lockrot.dev/schema/report-2.json",
+    "lockrot": {
+        "version": "0.14.0",
+        "schema": 2
+    },
+    "generated_at": "2026-10-01T17:41:20+00:00",
+    "run": {
+        "project": "typo3/cms",
+        "root_package": "typo3/cms",
+        "target_php": "8.4",
+        "target_php_source": "option",
+        "project_php": "^8.1",
+        "project_php_lowest": "8.1.0",
+        "lock_file": "composer.lock",
+        "fail_on": "high",
+        "fail_on_source": "option",
+        "gates": [
+            {
+                "value": "high",
+                "kind": "grade",
+                "threshold": "high"
+            }
+        ],
+        "strict_network": false,
+        "mode": "check",
+        "include_dev": false,
+        "thresholds": {
+            "release-warn-years": 3,
+            "release-high-years": 5,
+            "push-warn-years": 3,
+            "push-high-years": 5
+        },
+        "flag_ids": [
+            "abandoned",
+            "silent",
+            "pinned",
+            "left-behind",
+            "old-promise",
+            "stale",
+            "vulnerable"
+        ],
+        "verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "unknown",
+            "finished",
+            "ok"
+        ],
+        "graded_verdicts": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+        ],
+        "signal_ids": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10"
+        ],
+        "fix_model": 1,
+        "text_grammar": 1,
+        "score_model": {
+            "id": 1,
+            "score_text_grammar": 1,
+            "flag_order": [
+                "abandoned",
+                "silent",
+                "pinned",
+                "left-behind",
+                "old-promise",
+                "stale",
+                "vulnerable"
+            ],
+            "parts": [
+                {
+                    "id": "maintenance",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "pinned",
+                        "left-behind",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "combine": "lead_plus_share"
+                },
+                {
+                    "id": "security",
+                    "flag_ids": [
+                        "vulnerable"
+                    ],
+                    "combine": "max"
+                }
+            ],
+            "flags": [
+                {
+                    "id": "abandoned",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "abandoned",
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S1",
+                        "S3"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "silent",
+                    "part": "maintenance",
+                    "points": 32,
+                    "band": "critical",
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": 40,
+                    "max_maintenance_flags": [
+                        "silent",
+                        "pinned",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-high-years",
+                        "push-high-years"
+                    ],
+                    "basis": {
+                        "v013_base": "critical",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "pinned",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 22,
+                    "max_maintenance_flags": [
+                        "pinned",
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S6"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "left-behind",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 20,
+                    "max_maintenance_flags": [
+                        "left-behind",
+                        "old-promise"
+                    ],
+                    "raised_by": [
+                        "S8"
+                    ],
+                    "thresholds": [
+                        "release-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "old-promise",
+                    "part": "maintenance",
+                    "points": 16,
+                    "band": "high",
+                    "can_corroborate": true,
+                    "corroborating_points": 4,
+                    "max_maintenance": 18,
+                    "max_maintenance_flags": [
+                        "old-promise",
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S5"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": "high",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "stale",
+                    "part": "maintenance",
+                    "points": 8,
+                    "band": "medium",
+                    "can_corroborate": true,
+                    "corroborating_points": 2,
+                    "max_maintenance": 8,
+                    "max_maintenance_flags": [
+                        "stale"
+                    ],
+                    "raised_by": [
+                        "S2",
+                        "S4"
+                    ],
+                    "thresholds": [
+                        "release-warn-years",
+                        "push-warn-years"
+                    ],
+                    "basis": {
+                        "v013_base": "medium",
+                        "points": "band_floor"
+                    },
+                    "points_from": null
+                },
+                {
+                    "id": "vulnerable",
+                    "part": "security",
+                    "points": null,
+                    "band": null,
+                    "can_corroborate": false,
+                    "corroborating_points": null,
+                    "max_maintenance": null,
+                    "max_maintenance_flags": null,
+                    "raised_by": [
+                        "S9"
+                    ],
+                    "thresholds": [],
+                    "basis": {
+                        "v013_base": null,
+                        "points": "severities"
+                    },
+                    "points_from": "severities"
+                }
+            ],
+            "severities": [
+                {
+                    "id": "critical",
+                    "points": 32,
+                    "band": "critical",
+                    "points_no_reachable_fix": 64,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 4,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "high",
+                    "points": 16,
+                    "band": "high",
+                    "points_no_reachable_fix": 32,
+                    "band_no_reachable_fix": "critical",
+                    "gate_rank": 3,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "band_floor"
+                    }
+                },
+                {
+                    "id": "unrated",
+                    "points": 8,
+                    "band": "medium",
+                    "points_no_reachable_fix": 16,
+                    "band_no_reachable_fix": "high",
+                    "gate_rank": 2,
+                    "counts_as": "medium",
+                    "basis": {
+                        "points": "counts_as"
+                    }
+                },
+                {
+                    "id": "low",
+                    "points": 2,
+                    "band": "low",
+                    "points_no_reachable_fix": 4,
+                    "band_no_reachable_fix": "low",
+                    "gate_rank": 1,
+                    "counts_as": null,
+                    "basis": {
+                        "points": "share",
+                        "of": "medium",
+                        "share": {
+                            "num": 1,
+                            "den": 4
+                        }
+                    }
+                }
+            ],
+            "fix_kinds": [
+                {
+                    "id": "update",
+                    "ease": 1,
+                    "doubles": false
+                },
+                {
+                    "id": "upgrade",
+                    "ease": 2,
+                    "doubles": false
+                },
+                {
+                    "id": "raise-php",
+                    "ease": 3,
+                    "doubles": false
+                },
+                {
+                    "id": "unknown",
+                    "ease": 4,
+                    "doubles": false
+                },
+                {
+                    "id": "blocked",
+                    "ease": 5,
+                    "doubles": true
+                },
+                {
+                    "id": "none",
+                    "ease": 6,
+                    "doubles": true
+                }
+            ],
+            "bands": [
+                {
+                    "verdict": "critical",
+                    "floor": 32
+                },
+                {
+                    "verdict": "high",
+                    "floor": 16
+                },
+                {
+                    "verdict": "medium",
+                    "floor": 8
+                },
+                {
+                    "verdict": "low",
+                    "floor": 1
+                }
+            ],
+            "zero_verdicts": [
+                {
+                    "verdict": "finished",
+                    "when": "allowlisted"
+                },
+                {
+                    "verdict": "unknown",
+                    "when": "no_metadata"
+                },
+                {
+                    "verdict": "ok",
+                    "when": "otherwise"
+                }
+            ],
+            "exact_unit": 0.5,
+            "rounding": "floor_once",
+            "max_total": 104,
+            "bar_max": 64,
+            "bar_overflow": "clip",
+            "exclusive_groups": [
+                {
+                    "id": "liveness",
+                    "flag_ids": [
+                        "abandoned",
+                        "silent",
+                        "stale"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "branch",
+                    "flag_ids": [
+                        "pinned",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_age",
+                    "flag_ids": [
+                        "silent",
+                        "left-behind"
+                    ],
+                    "holds_unless": null
+                },
+                {
+                    "id": "release_push",
+                    "flag_ids": [
+                        "left-behind",
+                        "stale"
+                    ],
+                    "holds_unless": {
+                        "threshold": "push-warn-years",
+                        "below": "release-warn-years"
+                    }
+                }
+            ],
+            "sort": [
+                {
+                    "key": "verdict",
+                    "path": "verdict",
+                    "dir": "order",
+                    "order": [
+                        [
+                            "critical"
+                        ],
+                        [
+                            "high"
+                        ],
+                        [
+                            "medium"
+                        ],
+                        [
+                            "low"
+                        ],
+                        [
+                            "unknown"
+                        ],
+                        [
+                            "finished",
+                            "ok"
+                        ]
+                    ],
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "security",
+                    "path": "score.parts.security.contribution",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "score",
+                    "path": "score.exact",
+                    "dir": "desc",
+                    "default": 0,
+                    "collation": null
+                },
+                {
+                    "key": "direct",
+                    "path": "direct",
+                    "dir": "true_first",
+                    "default": null,
+                    "collation": null
+                },
+                {
+                    "key": "package",
+                    "path": "package",
+                    "dir": "asc",
+                    "collation": "bytes",
+                    "default": null
+                }
+            ],
+            "rules": [
+                {
+                    "id": "counted",
+                    "stage": 1,
+                    "kind": "select",
+                    "applies_to": "flags",
+                    "accept_group": "liveness",
+                    "accept_covers": "listed_and_below",
+                    "why": "accepted-facts-shown-not-counted",
+                    "doc": "score-counted",
+                    "illustration": null
+                },
+                {
+                    "id": "lead-first",
+                    "stage": 2,
+                    "kind": "select",
+                    "applies_to": "maintenance",
+                    "order": "flag_order",
+                    "share": {
+                        "num": 1,
+                        "den": 1
+                    },
+                    "why": "strongest-fact-in-full",
+                    "doc": "score-lead-first",
+                    "illustration": null
+                },
+                {
+                    "id": "corroborating-share",
+                    "stage": 3,
+                    "kind": "share",
+                    "applies_to": "maintenance",
+                    "share": {
+                        "num": 1,
+                        "den": 4
+                    },
+                    "why": "correlated-evidence",
+                    "doc": "score-corroborating-share",
+                    "illustration": {
+                        "lead": "left-behind",
+                        "flag": "old-promise",
+                        "weight": 16,
+                        "points": 4
+                    }
+                },
+                {
+                    "id": "advisory-points",
+                    "stage": 4,
+                    "kind": "lookup",
+                    "applies_to": "security",
+                    "table": "severities",
+                    "why": "severity-points",
+                    "doc": "score-advisory-points",
+                    "illustration": null
+                },
+                {
+                    "id": "no-reachable-fix-multiplier",
+                    "stage": 5,
+                    "kind": "multiply",
+                    "applies_to": "advisory",
+                    "factor": 2,
+                    "when_fix": [
+                        "none",
+                        "blocked"
+                    ],
+                    "why": "one-band-up",
+                    "doc": "score-no-reachable-fix-multiplier",
+                    "illustration": {
+                        "severity": "high",
+                        "before": 16,
+                        "after": 32,
+                        "band_before": "high",
+                        "band_after": "critical"
+                    }
+                },
+                {
+                    "id": "security-max",
+                    "stage": 6,
+                    "kind": "max",
+                    "applies_to": "security",
+                    "tie_break": [
+                        {
+                            "key": "points",
+                            "dir": "desc",
+                            "collation": null
+                        },
+                        {
+                            "key": "severity",
+                            "dir": "order",
+                            "collation": null
+                        },
+                        {
+                            "key": "id",
+                            "dir": "asc",
+                            "collation": "bytes"
+                        }
+                    ],
+                    "why": "one-number-per-part",
+                    "doc": "score-security-max",
+                    "illustration": null
+                },
+                {
+                    "id": "divide-reach",
+                    "stage": 7,
+                    "kind": "divide",
+                    "applies_to": "maintenance",
+                    "by": 2,
+                    "when": [
+                        "transitive",
+                        "unreached"
+                    ],
+                    "why": "reach-halves-maintenance",
+                    "doc": "score-divide-reach",
+                    "illustration": {
+                        "flag": "abandoned",
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "security-exempt-from-reach",
+                    "stage": 8,
+                    "kind": "exempt",
+                    "applies_to": "security",
+                    "of": "divide-reach",
+                    "why": "exploitability-independent-of-reach",
+                    "doc": "score-security-exempt-from-reach",
+                    "illustration": {
+                        "severity": "critical",
+                        "reach": "transitive",
+                        "total": 32
+                    }
+                },
+                {
+                    "id": "sum",
+                    "stage": 9,
+                    "kind": "combine",
+                    "applies_to": "total",
+                    "op": "sum",
+                    "ratio_from": "medium",
+                    "why": "parts-add",
+                    "doc": "score-sum",
+                    "illustration": {
+                        "maintenance": 16,
+                        "security": 16,
+                        "total": 32,
+                        "band": "critical",
+                        "low_maintenance": 4,
+                        "low_security": 4,
+                        "low_total": 8,
+                        "low_band": "medium"
+                    }
+                },
+                {
+                    "id": "divide-dev",
+                    "stage": 10,
+                    "kind": "divide",
+                    "applies_to": "total",
+                    "by": 2,
+                    "when": [
+                        "dev"
+                    ],
+                    "why": "dev-halves-total",
+                    "doc": "score-divide-dev",
+                    "illustration": {
+                        "before": 32,
+                        "after": 16,
+                        "band_before": "critical",
+                        "band_after": "high"
+                    }
+                },
+                {
+                    "id": "floor-once",
+                    "stage": 11,
+                    "kind": "floor",
+                    "applies_to": "total",
+                    "why": "integer-band-edges",
+                    "doc": "score-floor-once",
+                    "illustration": {
+                        "exact": 4.5,
+                        "total": 4
+                    }
+                },
+                {
+                    "id": "band-floors",
+                    "stage": 12,
+                    "kind": "band",
+                    "applies_to": "total",
+                    "ratio": 2,
+                    "ratio_from": "medium",
+                    "why": "two-floor-parts-make-next",
+                    "doc": "score-band-floors",
+                    "illustration": null
+                },
+                {
+                    "id": "zero-verdicts",
+                    "stage": 13,
+                    "kind": "zero",
+                    "applies_to": "total",
+                    "table": "zero_verdicts",
+                    "why": "score-zero-says-why",
+                    "doc": "score-zero-verdicts",
+                    "illustration": null
+                },
+                {
+                    "id": "sort",
+                    "stage": 14,
+                    "kind": "order",
+                    "applies_to": "findings",
+                    "why": "advisory-findings-first",
+                    "doc": "score-sort",
+                    "illustration": null
+                },
+                {
+                    "id": "gate-bounded-new",
+                    "stage": 15,
+                    "kind": "gate",
+                    "applies_to": "gate",
+                    "cap_multiplier": 2,
+                    "why": "new-fact-sets-level",
+                    "doc": "score-gate-bounded-new",
+                    "illustration": {
+                        "score": 36,
+                        "new": 16,
+                        "gate": 32
+                    }
+                },
+                {
+                    "id": "baseline-cover",
+                    "stage": 16,
+                    "kind": "cover",
+                    "applies_to": "gate",
+                    "order": "flag_order",
+                    "covers": "listed_and_below",
+                    "why": "recorded-lead-covers-below",
+                    "doc": "score-baseline-cover",
+                    "illustration": null
+                }
+            ],
+            "docs": "https://lockrot.dev/verdicts/model-1/"
+        },
+        "advisory_lookup": {
+            "scope": "all",
+            "scope_source": "default",
+            "packages_asked": 1,
+            "packages_not_asked": 0,
+            "other_repositories": 0,
+            "repositories": [
+                {
+                    "composer_repository": "composer repo (https://repo.packagist.org)",
+                    "registry": "packagist.org",
+                    "outcome": "answered",
+                    "reason": null,
+                    "message": null,
+                    "packages_with_records": 1,
+                    "records": 6
+                }
+            ]
+        },
+        "move_check": {
+            "composer": "2.10.3",
+            "blocks_advisories": false,
+            "ignores_extensions": true,
+            "baseline": "resolves",
+            "reason": null
+        },
+        "score_rules_used": {
+            "counted": 0,
+            "lead-first": 0,
+            "corroborating-share": 0,
+            "advisory-points": 1,
+            "no-reachable-fix-multiplier": 0,
+            "security-max": 1,
+            "divide-reach": 0,
+            "security-exempt-from-reach": 0,
+            "sum": 0,
+            "divide-dev": 0,
+            "floor-once": 0,
+            "band-floors": 1,
+            "zero-verdicts": 0,
+            "sort": null,
+            "gate-bounded-new": 0,
+            "baseline-cover": 0
+        }
+    },
+    "activity_cache_oldest_at": null,
+    "activity_cache_age_hours": null,
+    "packages_checked": 1,
+    "packages_flagged": 1,
+    "packages_multi_flag": 0,
+    "include_dev": false,
+    "not_from_composer_repository": 0,
+    "packages_unchecked_accepted": 0,
+    "network_failures": false,
+    "counts": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "unknown": 0,
+        "finished": 0,
+        "ok": 0
+    },
+    "abandoned": {
+        "total": 0,
+        "with_replacement": 0,
+        "with_suggestion": 0
+    },
+    "priorities": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "none": 0
+    },
+    "flags": {
+        "abandoned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "silent": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "pinned": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "left-behind": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "old-promise": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "stale": {
+            "carrying": 0,
+            "leading": 0,
+            "accepted": {
+                "all": 0,
+                "in_graded": 0
+            },
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        },
+        "vulnerable": {
+            "carrying": 1,
+            "leading": null,
+            "accepted": null,
+            "by_verdict": {
+                "critical": 0,
+                "high": 0,
+                "medium": 1,
+                "low": 0
+            }
+        }
+    },
+    "exposure": [],
+    "exposure_rule": {
+        "max_fan_in": 8
+    },
+    "unattributed": [],
+    "rot_depth": {
+        "flagged": 1,
+        "measured": 1,
+        "unmeasured": {
+            "unreached": 0,
+            "no_composer_json": 0
+        },
+        "by_reach": {
+            "direct": 1,
+            "transitive": 0,
+            "unreached": 0
+        },
+        "not_in_composer_json": 0,
+        "require_dev_not_walked": 0,
+        "production": 1,
+        "development": 0,
+        "by_depth": [
+            {
+                "depth": 0,
+                "flagged": 1
+            }
+        ],
+        "max_depth": 0,
+        "deepest": []
+    },
+    "libyears": {
+        "total": 1.91,
+        "direct_requirements": 1.91,
+        "measured": 1,
+        "at_least_count": 0,
+        "unmeasured": {
+            "not_from_composer_repository": 0,
+            "unavailable": 0,
+            "not_found": 0,
+            "branch_snapshot": 0,
+            "shared_commit": 0,
+            "undated": 0,
+            "no_stable_release": 0,
+            "undated_releases": 0
+        },
+        "furthest_behind": {
+            "package": "typo3/html-sanitizer",
+            "version": "v2.2.0",
+            "libyears": 1.91,
+            "at_least": false
+        },
+        "packages": 1
+    },
+    "baseline": null,
+    "gate": {
+        "fails": false,
+        "tripped_by": [],
+        "fail_on_applied": true,
+        "reaching": 0,
+        "failing": 0,
+        "exempt": {
+            "baseline": 0
+        },
+        "failing_by": [
+            {
+                "value": "high",
+                "failing": 0
+            }
+        ],
+        "not_applied": [],
+        "text": "gate: passes \u00b7 --fail-on=high \u00b7 no finding fails it \u00b7 target php 8.4 (--target-php)"
+    },
+    "security": {
+        "check": "complete",
+        "packages": {
+            "vulnerable": 1,
+            "unchecked": 0,
+            "ignored": 0,
+            "clear": 0
+        },
+        "advisories": {
+            "counted": 2,
+            "ignored": 0
+        },
+        "severities": {
+            "critical": 0,
+            "high": 0,
+            "medium": 1,
+            "unrated": 0,
+            "low": 1
+        },
+        "fixes": {
+            "update": 1,
+            "upgrade": 0,
+            "raise-php": 0,
+            "unknown": 0,
+            "blocked": 0,
+            "none": 0
+        },
+        "update_now": [],
+        "update_now_command": null,
+        "fix_unknown": 0
+    },
+    "data_date": "2026-10-01T17:41:20+00:00",
+    "notes": [],
+    "note_details": [],
+    "findings": [
+        {
+            "package": "typo3/html-sanitizer",
+            "version": "v2.2.0",
+            "branch": "2.x",
+            "installed_php": {
+                "requires": "^7.2 || ^8.0",
+                "target_runs": true,
+                "project_allows": true
+            },
+            "verdict": "medium",
+            "priority": "medium",
+            "lead": null,
+            "rank": 1,
+            "flags": [
+                {
+                    "id": "vulnerable",
+                    "role": "security",
+                    "baseline": null,
+                    "signal_ids": [
+                        "S9"
+                    ],
+                    "degree": null,
+                    "headline": {
+                        "unit": "advisories",
+                        "value": 2,
+                        "source": null
+                    },
+                    "summary": "2 advisories: 1 medium, 1 low \u2014 all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting"
+                }
+            ],
+            "score": {
+                "model": 1,
+                "total": 8,
+                "exact": 8,
+                "rounded_down": false,
+                "band": {
+                    "floor": 8,
+                    "next": "high",
+                    "to_next": 8
+                },
+                "decided_by": "security",
+                "parts": {
+                    "maintenance": {
+                        "status": "none",
+                        "contribution": 0,
+                        "alone": {
+                            "total": 0,
+                            "verdict": null
+                        }
+                    },
+                    "security": {
+                        "status": "counted",
+                        "contribution": 8,
+                        "alone": {
+                            "total": 8,
+                            "verdict": "medium"
+                        },
+                        "of": 2,
+                        "tied": []
+                    }
+                },
+                "terms": [
+                    {
+                        "part": "security",
+                        "flag": "vulnerable",
+                        "role": "security",
+                        "advisory": "PKSA-7jn3-yc49-35c6",
+                        "severity": "medium",
+                        "fix_kind": "update",
+                        "weight": 8,
+                        "multiplier": 1,
+                        "points": 8,
+                        "contribution": 8
+                    }
+                ],
+                "modifiers": [],
+                "accepted": [],
+                "without": [
+                    {
+                        "remove": {
+                            "kind": "advisory",
+                            "id": "PKSA-7jn3-yc49-35c6"
+                        },
+                        "revealed": [],
+                        "total": 2,
+                        "verdict": "low",
+                        "lead": null,
+                        "deciding_advisory": "PKSA-5mxx-9w1m-fqfb",
+                        "at_least": false
+                    }
+                ],
+                "text": "8 = vulnerable 8 [medium advisory]"
+            },
+            "next_step": {
+                "kind": "update",
+                "source": "vulnerable",
+                "merged": [],
+                "fix_kind": "update",
+                "reason": null,
+                "replacement": null,
+                "quiet_years": null,
+                "to_branch": "2.x",
+                "version": "v2.3.2",
+                "newest": "v2.3.2",
+                "constraint": null,
+                "latest": null,
+                "php_check": {
+                    "requires": "^7.2 || ^8.0",
+                    "project_allows": true,
+                    "target_runs": true,
+                    "raise_to": null,
+                    "raise_size": null
+                },
+                "crosses_major": false,
+                "held_by": [],
+                "clears": [
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-7jn3-yc49-35c6",
+                        "basis": "outside_range"
+                    },
+                    {
+                        "kind": "advisory",
+                        "id": "PKSA-5mxx-9w1m-fqfb",
+                        "basis": "outside_range"
+                    }
+                ],
+                "unverified": [],
+                "adds": [],
+                "leaves": [],
+                "clears_all": true,
+                "if_applied": {
+                    "total": 0,
+                    "verdict": "ok",
+                    "lead": null,
+                    "deciding_advisory": null,
+                    "at_most": false,
+                    "assumes": [
+                        "clears_hold"
+                    ]
+                },
+                "check": {
+                    "result": "resolves",
+                    "form": "with-dependencies",
+                    "reason": null
+                },
+                "composer_moves_because": [],
+                "commands": [
+                    [
+                        "composer",
+                        "update",
+                        "typo3/html-sanitizer:^2.3.2",
+                        "--with-dependencies"
+                    ]
+                ],
+                "through": [],
+                "also": [],
+                "text": "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies (gets v2.3.2) \u2014 clears 2 advisories; Composer's solver checked it against the lock"
+            },
+            "security": {
+                "status": "vulnerable",
+                "check": "complete",
+                "complete": true,
+                "unchecked_reason": null,
+                "records": 6,
+                "feeds": [
+                    {
+                        "composer_repository": "composer repo (https://repo.packagist.org)",
+                        "registry": "packagist.org",
+                        "answer": "answered",
+                        "records": 6,
+                        "reason": null
+                    }
+                ],
+                "worst": "medium",
+                "counts": {
+                    "critical": 0,
+                    "high": 0,
+                    "medium": 1,
+                    "unrated": 0,
+                    "low": 1
+                },
+                "ignored": [],
+                "ignored_count": 0,
+                "fix_kind": "update",
+                "installed_branch_fixes": {
+                    "fixed": 2,
+                    "unknown": 0,
+                    "of": 2,
+                    "fix_kind": "update",
+                    "lowest": "v2.3.2",
+                    "newest": "v2.3.2",
+                    "held_by": [],
+                    "if_applied": {
+                        "total": 0,
+                        "verdict": "ok",
+                        "at_most": false,
+                        "assumes": [
+                            "clears_hold"
+                        ]
+                    },
+                    "check": {
+                        "result": "resolves",
+                        "form": "with-dependencies",
+                        "reason": null
+                    }
+                },
+                "move_in": "next_step",
+                "gets": {
+                    "version": "v2.3.2",
+                    "php_check": {
+                        "requires": "^7.2 || ^8.0",
+                        "project_allows": true,
+                        "target_runs": true,
+                        "raise_to": null,
+                        "raise_size": null
+                    },
+                    "clears": [
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-7jn3-yc49-35c6",
+                            "basis": "outside_range"
+                        },
+                        {
+                            "kind": "advisory",
+                            "id": "PKSA-5mxx-9w1m-fqfb",
+                            "basis": "outside_range"
+                        }
+                    ],
+                    "clears_all": true
+                },
+                "partial": null
+            },
+            "checks_missing": [],
+            "checks_skipped": [],
+            "unchecked_accepted": [],
+            "maintenance_judged": true,
+            "metadata": {
+                "status": "read",
+                "reason": null,
+                "message": null
+            },
+            "activity": {
+                "status": "read",
+                "reason": null,
+                "forge": "github",
+                "host": "github.com",
+                "repo": "TYPO3/html-sanitizer",
+                "event": "push",
+                "archived": false,
+                "fetched_at": "2026-09-14T00:00:00+00:00",
+                "cached_at": null
+            },
+            "allowlist": null,
+            "abandoned_ignored": null,
+            "from_composer_repository": true,
+            "origin": {
+                "kind": "packagist",
+                "registry": "packagist.org",
+                "package_url": "https://packagist.org/packages/typo3/html-sanitizer",
+                "local": false
+            },
+            "replacement": null,
+            "replacement_url": null,
+            "note": null,
+            "libyears_unmeasured": null,
+            "libyears_at_least": false,
+            "direct": true,
+            "dev": false,
+            "reach": "direct",
+            "chain": [
+                "typo3/html-sanitizer"
+            ],
+            "depth": 0,
+            "depth_unmeasured": null,
+            "named_in": [
+                "require"
+            ],
+            "direct_dependents": [
+                "typo3/html-sanitizer"
+            ],
+            "signals": [
+                {
+                    "id": "S9",
+                    "level": "warn",
+                    "summary": "2 security advisories affect v2.2.0 (CVE-2026-47345, CVE-2026-47344); fixed in v2.3.2",
+                    "data": {
+                        "advisories": [
+                            {
+                                "id": "PKSA-7jn3-yc49-35c6",
+                                "cve": "CVE-2026-47345",
+                                "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+                                "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
+                                "reported_at": "2026-06-08T20:00:00+00:00",
+                                "severity": "medium",
+                                "severity_published": "medium",
+                                "affected_versions": "<2.3.2",
+                                "counted": true,
+                                "points": 8,
+                                "deciding": true,
+                                "fix": {
+                                    "kind": "update",
+                                    "to_branch": "2.x",
+                                    "version": "v2.3.2",
+                                    "newest": "v2.3.2",
+                                    "on_installed_branch": true,
+                                    "php": "^7.2 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            },
+                            {
+                                "id": "PKSA-5mxx-9w1m-fqfb",
+                                "cve": "CVE-2026-47344",
+                                "title": "TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+                                "link": "https://typo3.org/security/advisory/typo3-core-sa-2026-006",
+                                "reported_at": "2026-06-08T20:00:00+00:00",
+                                "severity": "low",
+                                "severity_published": "low",
+                                "affected_versions": "<2.3.2",
+                                "counted": true,
+                                "points": 2,
+                                "deciding": false,
+                                "fix": {
+                                    "kind": "update",
+                                    "to_branch": "2.x",
+                                    "version": "v2.3.2",
+                                    "newest": "v2.3.2",
+                                    "on_installed_branch": true,
+                                    "php": "^7.2 || ^8.0",
+                                    "held_by": [],
+                                    "reason": null
+                                },
+                                "baseline": null
+                            }
+                        ],
+                        "releases_read": true,
+                        "complete": true
+                    }
+                }
+            ],
+            "evidence": "vulnerable: 2 advisories: 1 medium, 1 low \u2014 all fixed on 2.x; worst: CVE-2026-47345 TYPO3-CORE-SA-2026-006: TYPO3 HTML Sanitizer allows Cross-Site Scripting",
+            "allowlist_reason": null,
+            "data_date": "2026-10-01T17:41:20+00:00",
+            "libyears": 1.91,
+            "age": {
+                "installed": {
+                    "at": "2024-07-12T15:52:25+00:00",
+                    "years": 2.2,
+                    "dated_by": null
+                },
+                "installed_unmeasured": null,
+                "release": {
+                    "version": "v2.3.2",
+                    "at": "2026-06-08T15:19:36+00:00",
+                    "years": 0.3,
+                    "level": null,
+                    "dated_by": null
+                },
+                "release_unmeasured": null,
+                "branch_release": {
+                    "version": "v2.3.2",
+                    "at": "2026-06-08T15:19:36+00:00",
+                    "years": 0.3,
+                    "level": null,
+                    "dated_by": null
+                },
+                "branch_release_unmeasured": null,
+                "push": {
+                    "at": "2026-06-08T15:24:23+00:00",
+                    "years": 0.3,
                     "level": null
                 },
                 "push_unmeasured": null
@@ -99053,6 +101107,7 @@ export const d_not_found_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -99528,6 +101583,7 @@ export const d_not_found_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -100479,6 +102535,7 @@ export const d_ok_unchecked = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -101650,6 +103707,7 @@ export const d_op_update = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -102025,6 +104083,7 @@ export const d_op_update = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -102937,6 +104996,7 @@ export const d_pagerfanta = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -103313,6 +105373,7 @@ export const d_pagerfanta = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -104290,6 +106351,7 @@ export const d_partial_op_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -104783,6 +106845,7 @@ export const d_partial_op_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -104844,7 +106907,8 @@ export const d_partial_op_dagger = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -105885,6 +107949,7 @@ export const d_partial = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -106262,6 +108327,7 @@ export const d_partial = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^9.0",
                         "holder": null
                     },
@@ -106270,6 +108336,7 @@ export const d_partial = {
                         "package": "pragmarx/google2fa-laravel",
                         "version": "v2.2.0",
                         "link": "require",
+                        "target": null,
                         "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                         "holder": {
                             "verdict": "ok",
@@ -106327,6 +108394,7 @@ export const d_partial = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -106389,7 +108457,8 @@ export const d_partial = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -106656,6 +108725,7 @@ export const d_partial = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.0",
                                             "holder": null
                                         },
@@ -106664,6 +108734,7 @@ export const d_partial = {
                                             "package": "pragmarx/google2fa-laravel",
                                             "version": "v2.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -106727,6 +108798,7 @@ export const d_partial = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.0",
                                             "holder": null
                                         }
@@ -106760,6 +108832,7 @@ export const d_partial = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.0",
                                             "holder": null
                                         },
@@ -106768,6 +108841,7 @@ export const d_partial = {
                                             "package": "pragmarx/google2fa-laravel",
                                             "version": "v2.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -106807,6 +108881,7 @@ export const d_partial = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.0",
                                             "holder": null
                                         },
@@ -106815,6 +108890,7 @@ export const d_partial = {
                                             "package": "pragmarx/google2fa-laravel",
                                             "version": "v2.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -106854,6 +108930,7 @@ export const d_partial = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^9.0",
                                             "holder": null
                                         },
@@ -106862,6 +108939,7 @@ export const d_partial = {
                                             "package": "pragmarx/google2fa-laravel",
                                             "version": "v2.2.0",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^5.4.36|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                                             "holder": {
                                                 "verdict": "ok",
@@ -107701,6 +109779,7 @@ export const d_php_null = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -108100,6 +110179,7 @@ export const d_php_null = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -109033,6 +111113,7 @@ export const d_pinned_unread = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -109400,6 +111481,7 @@ export const d_pinned_unread = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -110341,6 +112423,7 @@ export const d_policy_off_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -110722,6 +112805,7 @@ export const d_policy_off_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -110776,7 +112860,8 @@ export const d_policy_off_dagger = {
                     "lowest": "2.0.6",
                     "newest": "2.0.6",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -111689,6 +113774,7 @@ export const d_psr7 = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -112143,6 +114229,7 @@ export const d_psr7 = {
                         "package": "guzzlehttp/guzzle",
                         "version": "6.5.8",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.9",
                         "holder": {
                             "verdict": "critical",
@@ -112155,7 +114242,8 @@ export const d_psr7 = {
                             "next_step": {
                                 "kind": "raise-php",
                                 "to_branch": "7.x",
-                                "constraint": "^7.15.2"
+                                "constraint": "^7.15.2",
+                                "check": null
                             }
                         }
                     }
@@ -112202,6 +114290,7 @@ export const d_psr7 = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -112264,7 +114353,8 @@ export const d_psr7 = {
                     "lowest": null,
                     "newest": "1.9.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -112376,6 +114466,7 @@ export const d_psr7 = {
                                             "package": "guzzlehttp/guzzle",
                                             "version": "6.5.8",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.9",
                                             "holder": {
                                                 "verdict": "critical",
@@ -112388,7 +114479,8 @@ export const d_psr7 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "7.x",
-                                                    "constraint": "^7.15.2"
+                                                    "constraint": "^7.15.2",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -112422,6 +114514,7 @@ export const d_psr7 = {
                                             "package": "guzzlehttp/guzzle",
                                             "version": "6.5.8",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.9",
                                             "holder": {
                                                 "verdict": "critical",
@@ -112434,7 +114527,8 @@ export const d_psr7 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "7.x",
-                                                    "constraint": "^7.15.2"
+                                                    "constraint": "^7.15.2",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -112468,6 +114562,7 @@ export const d_psr7 = {
                                             "package": "guzzlehttp/guzzle",
                                             "version": "6.5.8",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.9",
                                             "holder": {
                                                 "verdict": "critical",
@@ -112480,7 +114575,8 @@ export const d_psr7 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "7.x",
-                                                    "constraint": "^7.15.2"
+                                                    "constraint": "^7.15.2",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -112514,6 +114610,7 @@ export const d_psr7 = {
                                             "package": "guzzlehttp/guzzle",
                                             "version": "6.5.8",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.9",
                                             "holder": {
                                                 "verdict": "critical",
@@ -112526,7 +114623,8 @@ export const d_psr7 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "7.x",
-                                                    "constraint": "^7.15.2"
+                                                    "constraint": "^7.15.2",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -113364,6 +115462,7 @@ export const d_replace_graded = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -113735,6 +115834,7 @@ export const d_replace_graded = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -114669,6 +116769,7 @@ export const d_replace_text = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -115038,6 +117139,7 @@ export const d_replace_text = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -115997,6 +118099,7 @@ export const d_require_dev_name_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -116401,6 +118504,7 @@ export const d_require_dev_name_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -117725,6 +119829,7 @@ export const d_rounded_dev_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -118187,6 +120292,7 @@ export const d_rounded_dev_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major",
                     "transitive"
@@ -119107,6 +121213,7 @@ export const d_routing = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -119570,6 +121677,7 @@ export const d_routing = {
                         "package": "mautic/core-lib",
                         "version": "4.3.x-dev",
                         "link": "require",
+                        "target": null,
                         "constraint": "~4.4.0",
                         "holder": {
                             "verdict": "critical",
@@ -119582,7 +121690,8 @@ export const d_routing = {
                             "next_step": {
                                 "kind": "no-move",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     }
@@ -119619,6 +121728,7 @@ export const d_routing = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -119671,7 +121781,8 @@ export const d_routing = {
                     "lowest": null,
                     "newest": "v4.4.44",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -119797,6 +121908,7 @@ export const d_routing = {
                                             "package": "mautic/core-lib",
                                             "version": "4.3.x-dev",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.4.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -119809,7 +121921,8 @@ export const d_routing = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -119843,6 +121956,7 @@ export const d_routing = {
                                             "package": "mautic/core-lib",
                                             "version": "4.3.x-dev",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "~4.4.0",
                                             "holder": {
                                                 "verdict": "critical",
@@ -119855,7 +121969,8 @@ export const d_routing = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -120693,6 +122808,7 @@ export const d_silent = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -121103,6 +123219,7 @@ export const d_silent = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -122056,6 +124173,7 @@ export const d_snapshot_alias = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -122469,6 +124587,7 @@ export const d_snapshot_alias = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -123380,6 +125499,7 @@ export const d_snapshot_dead_line_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -123799,6 +125919,7 @@ export const d_snapshot_dead_line_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -124710,6 +126831,7 @@ export const d_snapshot_undated_line_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -125134,6 +127256,7 @@ export const d_snapshot_undated_line_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],
@@ -126039,6 +128162,7 @@ export const d_stale_accepted_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 1,
             "lead-first": 0,
@@ -127246,6 +129370,7 @@ export const d_stale_only = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -127601,6 +129726,7 @@ export const d_stale_only = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -128507,6 +130633,7 @@ export const d_tie_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -128982,6 +131109,7 @@ export const d_tie_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -129029,6 +131157,7 @@ export const d_tie_dagger = {
                         ],
                         "clears_all": false,
                         "if_applied": null,
+                        "check": null,
                         "composer_moves_because": [],
                         "commands": [],
                         "text": "no release fixes it"
@@ -129070,7 +131199,8 @@ export const d_tie_dagger = {
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "also",
                 "gets": {
@@ -130038,6 +132168,7 @@ export const d_twig_1 = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -130474,6 +132605,7 @@ export const d_twig_1 = {
                         "package": null,
                         "version": null,
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.38",
                         "holder": null
                     },
@@ -130482,6 +132614,7 @@ export const d_twig_1 = {
                         "package": "csa/guzzle-bundle",
                         "version": "dev-compat-php",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.34|^2.4",
                         "holder": {
                             "verdict": "high",
@@ -130493,7 +132626,8 @@ export const d_twig_1 = {
                             "next_step": {
                                 "kind": "no-move",
                                 "to_branch": null,
-                                "constraint": null
+                                "constraint": null,
+                                "check": null
                             }
                         }
                     },
@@ -130502,6 +132636,7 @@ export const d_twig_1 = {
                         "package": "symfony/symfony",
                         "version": "v3.4.49",
                         "link": "require",
+                        "target": null,
                         "constraint": "^1.41|^2.10",
                         "holder": {
                             "verdict": "critical",
@@ -130514,7 +132649,8 @@ export const d_twig_1 = {
                             "next_step": {
                                 "kind": "raise-php",
                                 "to_branch": "5.x",
-                                "constraint": "^5.4.53"
+                                "constraint": "^5.4.53",
+                                "check": null
                             }
                         }
                     }
@@ -130622,6 +132758,7 @@ export const d_twig_1 = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "holders",
                     "crosses_major"
@@ -130684,7 +132821,8 @@ export const d_twig_1 = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -130808,6 +132946,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -130816,6 +132955,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -130827,7 +132967,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -130836,6 +132977,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -130848,7 +132990,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -130882,6 +133025,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -130890,6 +133034,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -130901,7 +133046,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -130910,6 +133056,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -130922,7 +133069,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -130956,6 +133104,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -130964,6 +133113,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -130975,7 +133125,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -130984,6 +133135,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -130996,7 +133148,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131030,6 +133183,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         }
@@ -131063,6 +133217,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131071,6 +133226,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131082,7 +133238,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131091,6 +133248,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131103,7 +133261,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131137,6 +133296,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131145,6 +133305,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131156,7 +133317,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131165,6 +133327,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131177,7 +133340,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131211,6 +133375,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         }
@@ -131244,6 +133409,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131252,6 +133418,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131263,7 +133430,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131272,6 +133440,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131284,7 +133453,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131318,6 +133488,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131326,6 +133497,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131337,7 +133509,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131346,6 +133519,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131358,7 +133532,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131392,6 +133567,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131400,6 +133576,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131411,7 +133588,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131420,6 +133598,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131432,7 +133611,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131466,6 +133646,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131474,6 +133655,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131485,7 +133667,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131494,6 +133677,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131506,7 +133690,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131540,6 +133725,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131548,6 +133734,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131559,7 +133746,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131568,6 +133756,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131580,7 +133769,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131614,6 +133804,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131622,6 +133813,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131633,7 +133825,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131642,6 +133835,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131654,7 +133848,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131688,6 +133883,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131696,6 +133892,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131707,7 +133904,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131716,6 +133914,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131728,7 +133927,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131762,6 +133962,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131770,6 +133971,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131781,7 +133983,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131790,6 +133993,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131802,7 +134006,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -131836,6 +134041,7 @@ export const d_twig_1 = {
                                             "package": null,
                                             "version": null,
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.38",
                                             "holder": null
                                         },
@@ -131844,6 +134050,7 @@ export const d_twig_1 = {
                                             "package": "csa/guzzle-bundle",
                                             "version": "dev-compat-php",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.34|^2.4",
                                             "holder": {
                                                 "verdict": "high",
@@ -131855,7 +134062,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "no-move",
                                                     "to_branch": null,
-                                                    "constraint": null
+                                                    "constraint": null,
+                                                    "check": null
                                                 }
                                             }
                                         },
@@ -131864,6 +134072,7 @@ export const d_twig_1 = {
                                             "package": "symfony/symfony",
                                             "version": "v3.4.49",
                                             "link": "require",
+                                            "target": null,
                                             "constraint": "^1.41|^2.10",
                                             "holder": {
                                                 "verdict": "critical",
@@ -131876,7 +134085,8 @@ export const d_twig_1 = {
                                                 "next_step": {
                                                     "kind": "raise-php",
                                                     "to_branch": "5.x",
-                                                    "constraint": "^5.4.53"
+                                                    "constraint": "^5.4.53",
+                                                    "check": null
                                                 }
                                             }
                                         }
@@ -132714,6 +134924,7 @@ export const d_twig_dev_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -133184,6 +135395,7 @@ export const d_twig_dev_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -133238,7 +135450,8 @@ export const d_twig_dev_dagger = {
                     "lowest": null,
                     "newest": "v2.16.1",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -134490,6 +136703,7 @@ export const d_unknown_origin = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -135702,6 +137916,7 @@ export const d_unknown = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -136907,6 +139122,7 @@ export const d_unrated_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 0,
@@ -137290,6 +139506,7 @@ export const d_unrated_dagger = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -137337,7 +139554,8 @@ export const d_unrated_dagger = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -138341,6 +140559,7 @@ export const d_unreached_dev_dagger = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -138718,6 +140937,7 @@ export const d_unreached_dev_dagger = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major",
                     "unreached"
@@ -139631,6 +141851,7 @@ export const d_unreached_move = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -140063,6 +142284,7 @@ export const d_unreached_move = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major",
                     "unreached"
@@ -140989,6 +143211,7 @@ export const d_unreached = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -141355,6 +143578,7 @@ export const d_unreached = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [
                     "unreached"
                 ],
@@ -142288,6 +144512,7 @@ export const d_wp_config = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -142653,6 +144878,7 @@ export const d_wp_config = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],
@@ -143559,6 +145785,7 @@ export const d_xmlseclibs = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -144069,6 +146296,7 @@ export const d_xmlseclibs = {
                         "clears_hold"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [
                     [
@@ -144131,7 +146359,8 @@ export const d_xmlseclibs = {
                         "assumes": [
                             "clears_hold"
                         ]
-                    }
+                    },
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": {
@@ -145106,6 +147335,7 @@ export const d_yaml_3_4 = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -145608,6 +147838,7 @@ export const d_yaml_3_4 = {
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -145662,7 +147893,8 @@ export const d_yaml_3_4 = {
                     "lowest": null,
                     "newest": "v3.4.47",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "next_step",
                 "gets": null,
@@ -146660,6 +148892,7 @@ export const d_zero_n = {
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -147014,6 +149247,7 @@ export const d_zero_n = {
                 ],
                 "clears_all": false,
                 "if_applied": null,
+                "check": null,
                 "composer_moves_because": [],
                 "commands": [],
                 "through": [],

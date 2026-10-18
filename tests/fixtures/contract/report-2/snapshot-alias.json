@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -1173,6 +1174,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "transitive"
                 ],

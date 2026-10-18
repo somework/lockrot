@@ -15,8 +15,8 @@ use Lockrot\Signal\PhpFloor;
 
 /**
  * The release scan: which release fixes each counted advisory, how hard it is to
- * reach, and what holds it. lockrot reads the lock as it is and does not solve dependencies: a
- * class checks the lock's links on the package, not the fixing release's own requirements.
+ * reach, and what holds it. A class checks the lock's links on the package, and the holds of each
+ * move of the package that Composer's solver refused ({@see RefusedMoves}).
  *
  * @internal
  */
@@ -24,11 +24,22 @@ final class FixFinder
 {
     private PhpFloor $floor;
     private LinkIndex $links;
+    private RefusedMoves $refused;
 
     public function __construct(PhpFloor $floor, LinkIndex $links)
     {
         $this->floor = $floor;
         $this->links = $links;
+        $this->refused = RefusedMoves::none();
+    }
+
+    /** The scan of one package, with the moves of it that the solver refused. */
+    public function withRefused(RefusedMoves $refused): self
+    {
+        $clone = clone $this;
+        $clone->refused = $refused;
+
+        return $clone;
     }
 
     /**
@@ -133,15 +144,16 @@ final class FixFinder
         return $candidates;
     }
 
-    /** The release with its class: the class reads only PHP, and the links fill the holders. Null off every branch. */
+    /** The release with its class, from PHP and the solver's refusals. The links and the refusals fill the holders. Null off every branch. */
     public function candidate(string $package, StableRelease $release): ?Candidate
     {
         $branch = ReleaseBranch::of($release->normalized());
         if ($branch === null) {
             return null;
         }
-        $heldBy = $this->links->excluding($package, $release->normalized());
-        if ($this->floor->admitsTarget($release->php()) === false) {
+        $heldBy = Holder::distinct(array_merge($this->links->excluding($package, $release->normalized()), $this->refused->holding($release->normalized())));
+        // A refusal that names no hold leaves no move that lockrot can name: no reachable fix (SPEC §5.3).
+        if ($this->floor->admitsTarget($release->php()) === false || ($heldBy === [] && $this->refused->refuses($release->normalized()))) {
             $kind = Fix::BLOCKED;
         } elseif ($this->floor->admitsProject($release->php()) === false) {
             $kind = Fix::RAISE_PHP;
@@ -290,7 +302,7 @@ final class FixFinder
         $release = null;
         $blocked = null;
         foreach ($onInstalled as $candidate) {
-            if ($candidate->heldBy() !== []) {
+            if ($candidate->heldBy() !== [] || $this->refused->refuses($candidate->release()->normalized())) {
                 continue;
             }
             if ($candidate->kind() === Fix::BLOCKED) {

@@ -48,6 +48,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\MoveChecks;
 
 /**
  * Turns a case of tests/fixtures/flags/cases.json into the report that the real {@see Analyzer}
@@ -264,6 +265,23 @@ final class CaseHydrator
     }
 
     /**
+     * The move checks that a case's `inputs.checks` records, or null when it records none.
+     *
+     * @param array<mixed, mixed> $inputs a case's `inputs` block
+     */
+    public static function moveChecksOf(array $inputs): ?MoveChecks
+    {
+        if (!\is_array($inputs['checks'] ?? null)) {
+            return null;
+        }
+        /** @var array<string, array<mixed, mixed>> $checks */
+        $checks = $inputs['checks'];
+
+        // The Composer of a recorded check takes an inline constraint on any package, as 2.4 and later do.
+        return new MoveChecks(new RecordedMoveChecker($checks, \is_array($inputs['move_check'] ?? null) ? $inputs['move_check'] : []), true);
+    }
+
+    /**
      * @param array<mixed, mixed> $case
      *
      * @throws \InvalidArgumentException for a case without an `inputs` block
@@ -339,6 +357,12 @@ final class CaseHydrator
             $entry = \is_array($inputs['allowlist'] ?? null) ? $inputs['allowlist'] : [];
             $expires = self::optional($entry, 'expires');
             $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(new Allowlist([new AllowlistEntry(self::optional($entry, 'pattern') ?? $package, self::optional($entry, 'version'), self::optional($entry, 'reason') ?? 'accepted by the test', $expires === null ? null : new \DateTimeImmutable($expires), AllowlistEntry::BY_PROJECT, $accept)])));
+        }
+
+        $checks = self::moveChecksOf($inputs);
+        if ($checks !== null) {
+            $passes = $inputs['check_passes'] ?? Analyzer::CHECK_PASSES;
+            $analyzer = $analyzer->withMoveChecks($checks, \is_int($passes) && $passes > 0 ? $passes : Analyzer::CHECK_PASSES);
         }
 
         $includeDev = ($run['include_dev'] ?? false) === true;

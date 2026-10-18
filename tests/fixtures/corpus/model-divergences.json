@@ -207,6 +207,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -224,6 +225,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -241,6 +243,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -278,6 +281,7 @@
           "link": "require",
           "package": "prestashop/ps_facetedsearch",
           "source": "package",
+          "target": null,
           "version": "v5.0.0"
         }
       ],
@@ -311,6 +315,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^4.0",
               "kind": "require",
               "to_branch": "4.x"
@@ -321,6 +326,7 @@
           "link": "require",
           "package": "mrclay/minify",
           "source": "package",
+          "target": null,
           "version": "3.0.14"
         }
       ],
@@ -346,6 +352,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -387,6 +394,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^4.0",
               "kind": "require",
               "to_branch": "4.x"
@@ -397,6 +405,7 @@
           "link": "require",
           "package": "mrclay/minify",
           "source": "package",
+          "target": null,
           "version": "3.0.14"
         }
       ],
@@ -414,6 +423,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -431,6 +441,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -931,6 +942,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         },
         {
@@ -942,6 +954,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^4.0",
               "kind": "require",
               "to_branch": "4.x"
@@ -952,6 +965,7 @@
           "link": "require",
           "package": "pragmarx/google2fa-qrcode",
           "source": "package",
+          "target": null,
           "version": "v1.0.3"
         }
       ],
@@ -977,6 +991,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1002,6 +1017,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1019,6 +1035,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1036,6 +1053,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1105,6 +1123,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1130,6 +1149,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1598,6 +1618,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1682,6 +1703,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^2.3",
               "kind": "require",
               "to_branch": "2.x"
@@ -1692,6 +1714,7 @@
           "link": "require",
           "package": "pragmarx/google2fa-laravel",
           "source": "package",
+          "target": null,
           "version": "v1.4.1"
         }
       ],
@@ -1709,6 +1732,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1726,6 +1750,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1743,6 +1768,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1812,6 +1838,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -1837,6 +1864,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -2644,6 +2672,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -2661,6 +2690,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -3121,6 +3151,7 @@
             ],
             "lead": "pinned",
             "next_step": {
+              "check": null,
               "constraint": null,
               "kind": "no-move",
               "to_branch": null
@@ -3131,6 +3162,7 @@
           "link": "require",
           "package": "mautic/core-lib",
           "source": "package",
+          "target": null,
           "version": "7.0.0-dev"
         }
       ],
@@ -3168,6 +3200,7 @@
           "link": "require",
           "package": "ramsey/uuid",
           "source": "package",
+          "target": null,
           "version": "4.7.5"
         }
       ],
@@ -3185,6 +3218,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -3218,6 +3252,7 @@
             ],
             "lead": "pinned",
             "next_step": {
+              "check": null,
               "constraint": null,
               "kind": "no-move",
               "to_branch": null
@@ -3228,6 +3263,7 @@
           "link": "require",
           "package": "mautic/core-lib",
           "source": "package",
+          "target": null,
           "version": "7.0.0-dev"
         }
       ],
@@ -3261,6 +3297,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^0.6.0",
               "kind": "require",
               "to_branch": "0.6.x"
@@ -3271,6 +3308,7 @@
           "link": "require",
           "package": "barryvdh/elfinder-flysystem-driver",
           "source": "package",
+          "target": null,
           "version": "v0.4.3"
         }
       ],
@@ -3312,6 +3350,7 @@
             ],
             "lead": "pinned",
             "next_step": {
+              "check": null,
               "constraint": null,
               "kind": "no-move",
               "to_branch": null
@@ -3322,6 +3361,7 @@
           "link": "require",
           "package": "mautic/core-lib",
           "source": "package",
+          "target": null,
           "version": "7.0.0-dev"
         }
       ],
@@ -3367,6 +3407,7 @@
           "link": "require",
           "package": "gaufrette/aws-s3-adapter",
           "source": "package",
+          "target": null,
           "version": "v0.4.0"
         },
         {
@@ -3377,6 +3418,7 @@
             ],
             "lead": "silent",
             "next_step": {
+              "check": null,
               "constraint": null,
               "kind": "find-alternative",
               "to_branch": null
@@ -3387,6 +3429,7 @@
           "link": "require",
           "package": "gaufrette/extras",
           "source": "package",
+          "target": null,
           "version": "v0.1.0"
         },
         {
@@ -3397,6 +3440,7 @@
             ],
             "lead": "pinned",
             "next_step": {
+              "check": null,
               "constraint": null,
               "kind": "no-move",
               "to_branch": null
@@ -3407,6 +3451,7 @@
           "link": "require",
           "package": "mautic/core-lib",
           "source": "package",
+          "target": null,
           "version": "7.0.0-dev"
         }
       ],
@@ -3504,6 +3549,7 @@
             ],
             "lead": "pinned",
             "next_step": {
+              "check": null,
               "constraint": null,
               "kind": "no-move",
               "to_branch": null
@@ -3514,6 +3560,7 @@
           "link": "require",
           "package": "mautic/core-lib",
           "source": "package",
+          "target": null,
           "version": "7.0.0-dev"
         }
       ],
@@ -3582,6 +3629,7 @@
           "link": "require",
           "package": "knuckleswtf/scribe",
           "source": "package",
+          "target": null,
           "version": "5.3.0"
         }
       ],
@@ -3640,6 +3688,7 @@
           "link": "require",
           "package": "laravel/socialite",
           "source": "package",
+          "target": null,
           "version": "v5.23.0"
         }
       ],
@@ -3677,6 +3726,7 @@
           "link": "require",
           "package": "laravel/socialite",
           "source": "package",
+          "target": null,
           "version": "v5.23.0"
         }
       ],
@@ -7538,6 +7588,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -7555,6 +7606,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -7572,6 +7624,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -7602,6 +7655,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         },
         {
@@ -7616,6 +7670,7 @@
           "link": "require",
           "package": "symfony/doctrine-bridge",
           "source": "package",
+          "target": null,
           "version": "v5.4.48"
         }
       ],
@@ -7641,6 +7696,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -7658,6 +7714,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -7675,6 +7732,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -7744,6 +7802,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -8386,6 +8445,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         },
         {
@@ -8396,6 +8456,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8406,6 +8467,7 @@
           "link": "require",
           "package": "scheb/2fa-trusted-device",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         }
       ],
@@ -8431,6 +8493,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -8461,6 +8524,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         },
         {
@@ -8471,6 +8535,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8481,6 +8546,7 @@
           "link": "require",
           "package": "scheb/2fa-backup-code",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         },
         {
@@ -8491,6 +8557,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8501,6 +8568,7 @@
           "link": "require",
           "package": "scheb/2fa-email",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         },
         {
@@ -8511,6 +8579,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8521,6 +8590,7 @@
           "link": "require",
           "package": "scheb/2fa-google-authenticator",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         },
         {
@@ -8531,6 +8601,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8541,6 +8612,7 @@
           "link": "require",
           "package": "scheb/2fa-trusted-device",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         }
       ],
@@ -8558,6 +8630,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -8575,6 +8648,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -8592,6 +8666,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -8629,6 +8704,7 @@
           "link": "require",
           "package": "j0k3r/graby",
           "source": "package",
+          "target": null,
           "version": "2.5.2"
         }
       ],
@@ -8656,6 +8732,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8666,6 +8743,7 @@
           "link": "require",
           "package": "scheb/2fa-google-authenticator",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         }
       ],
@@ -8685,6 +8763,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8695,6 +8774,7 @@
           "link": "require",
           "package": "scheb/2fa-google-authenticator",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         }
       ],
@@ -8728,6 +8808,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^7.14",
               "kind": "require",
               "to_branch": "7.x"
@@ -8738,6 +8819,7 @@
           "link": "require",
           "package": "scheb/2fa-google-authenticator",
           "source": "package",
+          "target": null,
           "version": "v5.13.2"
         }
       ],
@@ -8763,6 +8845,7 @@
           "link": "require",
           "package": null,
           "source": "root",
+          "target": null,
           "version": null
         }
       ],
@@ -8805,6 +8888,7 @@
             ],
             "lead": "left-behind",
             "next_step": {
+              "check": null,
               "constraint": "^11.5",
               "kind": "require",
               "to_branch": "11.x"
@@ -8815,6 +8899,7 @@
           "link": "require",
           "package": "spomky-labs/otphp",
           "source": "package",
+          "target": null,
           "version": "v10.0.3"
         }
       ],

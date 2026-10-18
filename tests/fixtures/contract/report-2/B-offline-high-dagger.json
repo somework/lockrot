@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -1198,6 +1199,7 @@
                         "no_new_advisories"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],

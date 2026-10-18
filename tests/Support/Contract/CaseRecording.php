@@ -7,6 +7,7 @@ namespace Lockrot\Tests\Support\Contract;
 use Lockrot\Analyzer\Analysis;
 use Lockrot\Analyzer\Report;
 use Lockrot\Analyzer\RunSettings;
+use Lockrot\Analyzer\UpdateNow;
 use Lockrot\Baseline\Baseline;
 use Lockrot\Baseline\BaselineComparison;
 use Lockrot\Data\Advisory\AdvisoryCoverage;
@@ -70,6 +71,11 @@ final class CaseRecording
         $coverage = new AdvisoryCoverage($lookup->scope(), JsonPath::stringAt(JsonPath::decoded($lookup), ['scope_source']), $lookup->repositories(), $lookup->otherRepositories(), []);
         $report = (new Report([$finding], $full->runNotes(), $full->generatedAt(), $full->packagesChecked(), $full->notFromComposerRepository(), null, $full->activityCacheOldestAt(), $full->includesDev(), $coverage))
             ->withRun(self::run(JsonPath::arrayAt($case, ['run'])));
+        $checks = CaseHydrator::moveChecksOf(JsonPath::arrayAt($case, ['inputs']));
+        $moveCheck = $full->moveCheck();
+        if ($checks !== null && $moveCheck !== null) {
+            $report = $report->withMoveChecks($moveCheck, UpdateNow::of($report->sorted(), $checks));
+        }
         $baseline = self::baselineOf(JsonPath::stringAt($case, ['id']));
         if ($baseline !== null) {
             $report = $report->withBaseline(BaselineComparison::compare($baseline, $report, self::BASELINE_PATH, [$package]));

@@ -130,6 +130,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -184,7 +185,8 @@
     "lowest": "2.0.6",
     "newest": "2.0.6",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -392,7 +394,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -431,7 +434,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -462,7 +466,8 @@
      "lowest": "2.0.6",
      "newest": "2.0.6",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -493,7 +498,8 @@
      "lowest": null,
      "newest": "1.4.7",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]
@@ -1252,7 +1258,8 @@
      "records": 2
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",

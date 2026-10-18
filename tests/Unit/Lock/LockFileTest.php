@@ -17,6 +17,15 @@ final class LockFileTest extends TestCase
 {
     private const MINI = __DIR__.'/../../fixtures/mini/composer.lock';
 
+    /** A name that is no Composer package name never reaches a finding or a command. */
+    public function testAnEntryWhoseNameIsNoComposerPackageNameIsSkippedAndNamed(): void
+    {
+        $lock = LockFile::fromArray(['packages' => [['name' => '--with-all-dependencies', 'version' => '1.0.0'], ['name' => 'acme/lib', 'version' => '1.0.0']], 'packages-dev' => [['name' => 'acme/x;calc', 'version' => '1.0.0']]]);
+
+        self::assertSame(['acme/lib'], array_map(static fn ($package): string => $package->name(), $lock->packages(true)));
+        self::assertSame(['--with-all-dependencies', 'acme/x;calc'], $lock->skippedNames());
+    }
+
     public function testReadsProdAndDevPackages(): void
     {
         $lock = LockFile::fromFile(self::MINI);
@@ -357,5 +366,24 @@ final class LockFileTest extends TestCase
         self::assertSame(['vendor/bad' => '<1.4'], $pkg->conflicts());
         self::assertSame(['vendor/old' => 'self.version'], $pkg->replaces());
         self::assertSame(['psr/log-implementation' => '1.0|2.0'], $pkg->provides());
+    }
+
+    /** The solver's lock: both sections, with each `aliases` entry as a root alias of its package. */
+    public function testTheLockedRepositoryHoldsBothSectionsAndTheRootAliases(): void
+    {
+        $lock = LockFile::fromArray([
+            'packages' => [['name' => 'vendor/a', 'version' => 'dev-main', 'source' => ['type' => 'git', 'url' => 'https://example.org/a.git', 'reference' => 'abc']]],
+            'packages-dev' => [['name' => 'vendor/b', 'version' => '2.0.0']],
+            'aliases' => [['package' => 'vendor/a', 'version' => 'dev-main', 'alias' => '1.0.x-dev', 'alias_normalized' => '1.0.9999999.9999999-dev']],
+        ]);
+
+        $versions = [];
+        foreach ($lock->lockedRepository()->getPackages() as $package) {
+            $versions[] = $package->getName().' '.$package->getPrettyVersion();
+        }
+        sort($versions);
+
+        self::assertSame(['vendor/a 1.0.x-dev', 'vendor/a dev-main', 'vendor/b 2.0.0'], $versions);
+        self::assertCount(0, LockFile::empty()->lockedRepository()->getPackages());
     }
 }

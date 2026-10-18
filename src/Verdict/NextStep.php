@@ -28,22 +28,17 @@ final class NextStep
         $security = $score->deciding() === null ? null : self::securityDraft($context);
         $maintenance = $finding->lead() === null ? null : MaintenanceMove::draft($context, $finding->lead());
         $fixKind = $security === null ? null : $security->fixKind();
-        $rows = self::rowsIfApplied($context);
+        [$rows, $rowChecks] = self::rowsIfApplied($context);
         $partial = self::partial($context);
         [$main, $other] = self::lead($security, $maintenance, $context, $fixKind);
         if ($main === null) {
-            return new Moves(null, null, $fixKind, $partial, $rows);
+            return new Moves(null, null, $fixKind, $partial, $rows, $rowChecks);
         }
         $merged = [];
         $mainRow = $main->row();
         $otherRow = $other === null ? null : $other->row();
         if ($other !== null && $main->isRowMove() && $other->isRowMove() && $mainRow !== null && $otherRow !== null && $mainRow->branch() === $otherRow->branch()) {
-            if (version_compare((string) self::lowerOf($other), (string) self::lowerOf($main), '>')) {
-                $lower = $other->lower();
-                $kind = $lower === null ? $main->kind() : MaintenanceMove::kindOf($lower, $mainRow);
-                $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $other->constraint() : null;
-                $main = MoveDraft::of($kind, $main->source())->to($mainRow, $lower, $constraint)->withFixKind($main->fixKind());
-            }
+            $main = self::merge($main, $other);
             $merged = [$other->source()];
             $other = null;
         }
@@ -72,7 +67,7 @@ final class NextStep
         }
         $published = $moveIn === Moves::IN_NEXT_STEP ? $lead : ($moveIn === Moves::IN_ALSO ? $also[0] : null);
 
-        return new Moves($lead, $moveIn, $published === null ? $fixKind : $published->fixKind(), $partial, $rows);
+        return new Moves($lead, $moveIn, $published === null ? $fixKind : $published->fixKind(), $partial, $rows, $rowChecks);
     }
 
     /**
@@ -127,27 +122,34 @@ final class NextStep
     }
 
     /**
-     * Each row's score after a move to its candidate, judged as the move to it is.
+     * Each row's score after a move to its candidate, judged as the move to it is, and Composer's
+     * check of that move.
      *
-     * @return array<string, IfApplied>
+     * @return array{0: array<string, IfApplied>, 1: array<string, \Lockrot\Solver\MoveCheck>}
      */
     private static function rowsIfApplied(MoveContext $context): array
     {
         $out = [];
+        $checks = [];
         $fixes = $context->fixes();
         foreach ($fixes === null ? [] : $fixes->branches() as $branch) {
             $candidate = $branch->candidate();
             $row = $context->row($branch->branch());
-            if ($candidate === null || $row === null) {
+            // A row that fixes no advisory names no move, so it has no score after one and no check.
+            if ($candidate === null || $row === null || $branch->fixed() === 0) {
                 continue;
             }
-            $ifApplied = MoveBuilder::build(self::toCandidate($row, $candidate), [], $candidate->kind(), $context)->ifApplied();
+            $move = MoveBuilder::build(self::toCandidate($row, $candidate), [], $candidate->kind(), $context);
+            $ifApplied = $move->ifApplied();
             if ($ifApplied !== null) {
                 $out[$branch->branch()] = $ifApplied->asRow();
             }
+            if ($move->check() !== null) {
+                $checks[$branch->branch()] = $move->check();
+            }
         }
 
-        return $out;
+        return [$out, $checks];
     }
 
     /** `security.partial`, judged as an `update` move to that release. */
@@ -196,6 +198,21 @@ final class NextStep
         }
 
         return $byPart >= 0 ? [$security, $maintenance] : [$maintenance, $security];
+    }
+
+    /** Two moves to one branch as one move: the higher lower bound of the two, in the lead's source. */
+    public static function merge(MoveDraft $main, MoveDraft $other): MoveDraft
+    {
+        $row = $main->row();
+        $lower = $other->lower();
+        // A move with no release names no version, so the merge keeps the lead's release.
+        if ($row === null || $lower === null || !version_compare((string) self::lowerOf($other), (string) self::lowerOf($main), '>')) {
+            return $main;
+        }
+        $kind = MaintenanceMove::kindOf($lower, $row);
+        $constraint = \in_array($kind, [Move::REQUIRE, Move::RAISE_PHP], true) ? $other->constraint() : null;
+
+        return MoveDraft::of($kind, $main->source())->to($row, $lower, $constraint)->withFixKind($main->fixKind());
     }
 
     /** The normalized lower bound of a move: its constraint's, else the release it names. */

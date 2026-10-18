@@ -32,7 +32,78 @@ final class FindingRelations
             }
         }
 
-        return array_merge($out, self::root($document, $findings, $gates));
+        return array_merge($out, self::root($document, $findings, $gates), self::moveCheckRelation($document, $findings));
+    }
+
+    /**
+     * SPEC §7.6.4: a move carries a `check` exactly in a run whose `run.move_check` says how
+     * Composer's solver checked it, and there every move that runs a Composer request has one.
+     *
+     * @param array<mixed, mixed>       $document
+     * @param list<array<mixed, mixed>> $findings
+     *
+     * @return list<string>
+     */
+    public static function moveCheckRelation(array $document, array $findings): array
+    {
+        $checked = JsonPath::has($document, ['run', 'move_check']) && \is_array(JsonPath::arrayAt($document, ['run'])['move_check']);
+        $out = [];
+        foreach ($findings as $finding) {
+            $move = \is_array($finding['next_step'] ?? null) ? $finding['next_step'] : [];
+            foreach (array_merge([$move], \is_array($move['also'] ?? null) ? $move['also'] : []) as $each) {
+                if (!\is_array($each)) {
+                    continue;
+                }
+                $hasCheck = \is_array($each['check'] ?? null);
+                if (!$checked && $hasCheck) {
+                    $out[] = JsonPath::stringAt($finding, ['package']).': a move check needs run.move_check';
+                }
+                if ($checked && !$hasCheck && \in_array($each['kind'] ?? null, ['update', 'require', 'raise-php', 'tag'], true)) {
+                    $out[] = JsonPath::stringAt($finding, ['package']).': a move that runs a Composer request in a checked run has a check';
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * The move check's relations (SPEC §5.6): lockrot never prints a step that its own check
+     * refuses, a refused move names its holds or is `blocked`, it is no `update` fix, and a step of a
+     * form that needs the dependencies carries that form's option.
+     *
+     * @param array<mixed, mixed> $move
+     *
+     * @return list<string>
+     */
+    private static function checkedMove(array $move): array
+    {
+        $check = \is_array($move['check'] ?? null) ? $move['check'] : null;
+        if ($check === null) {
+            return [];
+        }
+        $out = [];
+        $steps = array_values(array_filter(\is_array($move['commands'] ?? null) ? $move['commands'] : [], static fn ($argv): bool => \is_array($argv) && \in_array($argv[1] ?? null, ['update', 'require'], true)));
+        if ($check['result'] === 'refused') {
+            if ($steps !== []) {
+                $out[] = 'next_step: a move that Composer\'s solver refuses has no update or require step';
+            }
+            if (($move['held_by'] ?? []) === [] && (($move['kind'] ?? null) !== 'blocked' || !\in_array($move['fix_kind'] ?? null, ['blocked', null], true))) {
+                $out[] = 'next_step: a refused move names its holds, or is blocked with no reachable fix';
+            }
+            if (($move['fix_kind'] ?? null) === 'update') {
+                $out[] = 'next_step: a refused move is no update fix';
+            }
+        }
+        $form = \is_string($check['form'] ?? null) ? $check['form'] : '';
+        $option = ['with-dependencies' => '--with-dependencies', 'with-all-dependencies' => '--with-all-dependencies'][$form] ?? null;
+        foreach ($option === null ? [] : $steps as $argv) {
+            if (\is_array($argv) && !(\is_string($argv[2] ?? null) && strpos($argv[2], 'php:') === 0) && end($argv) !== $option) {
+                $out[] = 'next_step: a step of the form '.$form.' ends with '.$option;
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -120,6 +191,11 @@ final class FindingRelations
         $basis = self::arrayOrNull($f, ['gate', 'basis']);
         if ($basis !== null && (($basis['verdict'] ?? null) === null) !== (($basis['score'] ?? null) === 0)) {
             $out[] = 'gate.basis.verdict is null exactly when the gate score is 0';
+        }
+
+        $moves = JsonPath::has($f, ['next_step', 'kind']) ? array_merge([JsonPath::arrayAt($f, ['next_step'])], self::rows($f, ['next_step', 'also'])) : [];
+        foreach ($moves as $move) {
+            $out = array_merge($out, self::checkedMove($move));
         }
 
         return $out;

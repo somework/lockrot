@@ -175,7 +175,7 @@ final class Explanation
             'finding' => $this->report->findingRows()[$package->name()] ?? $this->finding->toArray(),
             'lock' => $this->lock(),
             'metadata' => $this->metadata(),
-            'run' => $run->toExplainArray($this->report->advisoryLookup()),
+            'run' => $run->toExplainArray($this->report->advisoryLookup(), $this->report->moveCheck()),
             'generated_at' => self::date($this->report->generatedAt()),
             'notes' => $this->report->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->report->runNotes()),

@@ -24,6 +24,10 @@ jobs:
         composer: ['2.2', 'latest']
         exclude:
           - {php: '8.5', composer: '2.2'}
+        # The move check solves with the classes of composer/composer, which change at 2.4, 2.6 and
+        # 2.9 (src/Solver). The 2.2 and latest rows cover the ends, and this row the middle.
+        include:
+          - {php: '8.3', composer: '2.6'}
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -34,12 +38,17 @@ jobs:
       - name: Pin composer/composer for the matrix
         run: |
           if [ "${{ matrix.composer }}" = "2.2" ]; then composer require --dev --no-update "composer/composer:~2.2.25"; fi
+          # Composer 2.9 and later block every 2.6 release of composer/composer for its advisories. The job tests lockrot against that library and never runs it.
+          if [ "${{ matrix.composer }}" = "2.6" ]; then composer require --dev --no-update "composer/composer:~2.6.6" && composer config --json policy.advisories.ignore '["composer/composer"]'; fi
           composer update --no-interaction --prefer-dist
       - name: Run tests with the matrix Composer binary
         run: |
           if [ "${{ matrix.composer }}" = "2.2" ]; then composer self-update --2.2; fi
           composer -V
-          if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ]; then
+          # Composer 2.4 to 2.6 write no advisory severity, which the advisory tests read. This row tests the move check.
+          if [ "${{ matrix.composer }}" = "2.6" ]; then
+            vendor/bin/phpunit tests/Unit/Solver tests/Unit/Verdict tests/Unit/Analyzer
+          elif [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ]; then
             vendor/bin/phpunit -c phpunit9.xml.dist
           else
             vendor/bin/phpunit
@@ -136,7 +145,7 @@ jobs:
         shard:
           - {name: verdicts and score, filter: 'src/Verdict src/Score', min_msi: 98}
           - {name: output and security, filter: 'src/Output src/Html src/Explain src/Security', min_msi: 98}
-          - {name: signals and analyzer, filter: 'src/Signal src/Analyzer', min_msi: 98}
+          - {name: signals and analyzer, filter: 'src/Signal src/Analyzer src/Solver', min_msi: 98}
           - {name: composer and self-update, filter: 'src/Composer src/Config src/SelfUpdate', min_msi: 96}
           - {name: repository data, filter: 'src/Data/Repository', min_msi: 96}
           - {name: data and the rest, filter: 'src/Data/Forge src/Data/Http src/Data/Cache src/Data/Php src/Data/Advisory src/Data/Abandoned src/Graph src/Baseline src/Filesystem src/Allowlist src/Lock src/Json src/Exception src/Version.php src/Clock.php src/Deadline.php', min_msi: 96}

@@ -191,6 +191,7 @@
    ],
    "clears_all": false,
    "if_applied": null,
+   "check": null,
    "composer_moves_because": [
     "unreached"
    ],
@@ -1213,7 +1214,8 @@
      "records": 0
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "abandoned",

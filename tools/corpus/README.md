@@ -80,8 +80,11 @@ against a report-2 run prints `report-1 vs report-2: verdicts not compared`. It 
 
 ## The differential against the model
 
-`php tools/corpus/differential.php` runs `bin/lockrot` on each app of `tests/fixtures/apps` and
-compares each finding of report-2 with the model's document for the same lock. drupal runs twice:
+`php tools/corpus/differential.php` runs lockrot without the move check on each app of
+`tests/fixtures/apps`, because the model records no Composer check. The entry
+`tools/corpus/lockrot-without-move-check` is the lockrot command with an Analyzer that checks no
+move, so `run.move_check` is null. The differential compares each finding of report-2 with the
+model's document for the same lock. drupal runs twice:
 once with its packages.drupal.org answers, and once with that advisory lookup failed. Both sides read
 only the answers in `tests/fixtures/corpus/cache/`, at one clock.
 
@@ -153,7 +156,8 @@ inherit lockrot's PHP floor.** It has no `requirements.txt`, ruff or pytest and 
 | `lockrot_corpus/runner.py` | running an archive over the corpus, resumably |
 | `lockrot_corpus/load.py` | turning a finished run into documents, and refusing what is not one |
 | `lockrot_corpus/diff.py` | comparing two runs, and refusing incomparable ones |
-| `differential.php` | lockrot's report-2 on the apps of `tests/fixtures/apps` against the model's documents |
+| `differential.php` | lockrot's report-2 without the move check on the apps of `tests/fixtures/apps` against the model's documents |
+| `lockrot-without-move-check` | the lockrot command that `differential.php` runs: an Analyzer that checks no move |
 
 ## When to run it
 

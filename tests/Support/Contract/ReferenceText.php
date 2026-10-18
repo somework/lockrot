@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lockrot\Tests\Support\Contract;
 
 use Lockrot\Tests\Support\ScoreLineFromJson;
+use Lockrot\Verdict\ShellCommand;
 
 /**
  * The strings of SPEC-0.14.md §7.11, rendered again from a decoded document alone, as the reference
@@ -42,6 +43,15 @@ final class ReferenceText
     private const ADDS = ['released_before_ga' => "it was released before your target PHP's major", 'branch_not_releasing' => 'that line no longer releases while a higher line does'];
     private const LIMITED_BY = ['score' => 'the score is lower', 'cap' => 'the new facts bound it', 'equal' => 'both agree'];
     private const LOST = ['none', 'blocked'];
+    private const NOT_CHECKED = [
+        'baseline_refused' => 'Composer refuses the lock itself',
+        'unloaded_name' => 'a package it needs could not be loaded',
+        'offline' => "a package it needs is not in Composer's cache",
+        'install_time_budget' => 'the install-time budget ran out',
+        'not_from_composer_repository' => 'no Composer repository serves it',
+        'no_composer_json' => 'the project has no composer.json',
+        'composer_json_invalid' => 'Composer cannot load composer.json',
+    ];
     private const GRADES = ['critical', 'high', 'medium', 'low'];
 
     /** @param array<mixed, mixed> $in a finding's fields with `run`; `next_step` is the move to render */
@@ -66,7 +76,38 @@ final class ReferenceText
             $text .= '; '.$through;
         }
 
-        return $text;
+        return $text.self::checked(Fields::nullableObject($move, 'check'));
+    }
+
+    /** @param array<mixed, mixed>|null $check */
+    private static function checked(?array $check): string
+    {
+        if ($check === null) {
+            return '';
+        }
+        switch (Fields::string($check, 'result')) {
+            case 'resolves':
+                return "; Composer's solver checked it against the lock";
+            case 'refused':
+                return "; Composer's solver refuses it against the lock";
+            default:
+                return "; not checked with Composer's solver (".self::word(self::NOT_CHECKED, Fields::string($check, 'reason'))."), so it holds only if Composer resolves it";
+        }
+    }
+
+    /** @param array<mixed, mixed> $move */
+    private static function update(array $move): string
+    {
+        foreach (Fields::objects($move, 'commands') as $argv) {
+            if (($argv[1] ?? null) === 'update') {
+                $rendered = ShellCommand::posix(Fields::strings(['argv' => $argv], 'argv'));
+                if ($rendered !== null) {
+                    return $rendered;
+                }
+            }
+        }
+
+        return 'update it with Composer';
     }
 
     /**
@@ -341,7 +382,7 @@ final class ReferenceText
 
                 return 'test it on PHP '.$target.($latest !== null && Fields::bool($latest, 'is_installed') ? ' — '.Fields::string($latest, 'version').' is its newest release' : '');
             case 'update':
-                return 'composer update '.$package.' (gets '.Fields::string($move, 'newest').')'.self::clears($move);
+                return self::update($move).' (gets '.Fields::string($move, 'newest').')'.self::clears($move);
             case 'require':
             case 'raise-php':
                 $raise = $check !== null && ($check['project_allows'] ?? null) === false && \is_string($check['raise_to'] ?? null) ? 'raise require.php to '.$check['raise_to'].', then ' : '';
@@ -359,6 +400,10 @@ final class ReferenceText
                 $latest = Fields::nullableObject($move, 'latest');
                 $pinned = Fields::string($move, 'source') === 'pinned';
                 $where = $pinned && $latest !== null ? 'the newest tag, '.Fields::string($latest, 'version').',' : (Fields::nullableString($move, 'to_branch') ?? 'the fix');
+                $solve = Fields::nullableObject($move, 'check');
+                if ($solve !== null && Fields::string($solve, 'result') === 'refused' && ($check === null || ($check['target_runs'] ?? null) !== false)) {
+                    return 'no move installs '.$where.': Composer names no hold';
+                }
                 $text = $check !== null && \is_string($check['requires'] ?? null)
                     ? 'no move runs on the target: '.$where.' needs php '.Fields::string($check, 'requires').' and the target php '.$target.' does not run it'
                     : 'no move runs on the target: the target php '.$target.' does not run '.$where;
@@ -486,10 +531,16 @@ final class ReferenceText
     private static function holder(array $holder): string
     {
         $constraint = \is_string($holder['constraint'] ?? null) ? $holder['constraint'] : null;
-        if (Fields::string($holder, 'source') === 'root') {
-            return 'composer.json'.($constraint === null ? '' : ' (requires '.$constraint.')');
+        $target = \is_string($holder['target'] ?? null) ? $holder['target'].' ' : '';
+        $kind = Fields::string($holder, 'link');
+        $link = (['conflict' => 'conflicts with ', 'replace' => 'replaces '][$kind] ?? 'requires ').$target.$constraint;
+        if ($target === '' && \in_array($kind, ['root-require', 'replace'], true)) {
+            $link = $kind === 'replace' ? 'replaces it' : 'no release of '.$constraint.' can install';
         }
-        $bits = $constraint === null ? [] : ['requires '.$constraint];
+        if (Fields::string($holder, 'source') === 'root') {
+            return 'composer.json'.($constraint === null ? '' : ' ('.$link.')');
+        }
+        $bits = $constraint === null ? [] : [$link];
         $finding = Fields::nullableObject($holder, 'holder');
         if ($finding !== null && \in_array(Fields::string($finding, 'verdict'), self::GRADES, true)) {
             $bits[] = \is_string($finding['lead'] ?? null) ? 'itself '.$finding['lead'] : 'itself '.Fields::string($finding, 'verdict').': '.implode(' · ', Fields::strings($finding, 'flag_ids'));
@@ -508,7 +559,10 @@ final class ReferenceText
             case 'crosses_major':
                 $toBranch = Fields::object($in, 'next_step')['to_branch'] ?? '';
 
-                return (\is_string($toBranch) && strpos($toBranch, '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements, which lockrot does not solve';
+                $check = Fields::nullableObject(Fields::object($in, 'next_step'), 'check');
+                $solved = $check !== null && Fields::string($check, 'result') !== 'not_checked';
+
+                return (\is_string($toBranch) && strpos($toBranch, '0.') === 0 ? 'a new 0.x line (Composer treats 0.x minors as breaking)' : 'a new major').' brings its own requirements'.($solved ? '' : ', which lockrot does not solve');
             case 'transitive':
                 return $resolved ? 'what requires it must allow it' : 'it comes in through '.self::dependents($in).': replace or update '.(\count(Fields::strings($in, 'direct_dependents')) === 1 ? 'that package' : 'them');
             case 'unreached':

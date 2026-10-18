@@ -287,6 +287,54 @@ Composer rejected the project's abandoned ignore list, so every abandoned markin
 - Findings: no change.
 - `sets_network_failures`: no.
 
+## Moves
+
+### Moves not checked {#moves_not_checked}
+
+Composer's solver refuses a partial update of a name outside the lock: the lock itself does not
+install at the target PHP. Every move would be refused for the same reason, so lockrot checks none,
+and each move's `check.reason` reads `baseline_refused`. Run lockrot with the PHP that the project
+runs on (`--target-php` or `config.platform.php`), or update the lock.
+
+- `data`: `reason` (`baseline_refused`), `php` (the version that the solve ran at), `problem`
+  (Composer's problem text).
+- `sets_network_failures`: no.
+
+### Update now reduced {#update_now_reduced}
+
+Composer's solver refuses the members of `update now:` together. The command leaves out the members
+that the refusal names, and Composer resolves the others together. Update each member that it
+leaves out with its own move.
+
+- `data`: `left_out` (the members that the command leaves out), `problem` (Composer's problem text).
+- `sets_network_failures`: no.
+
+### Update now refused {#update_now_refused}
+
+Composer's solver refuses the members of `update now:` together, even without the members that the
+refusal names. The report writes no `update now:` command. Update each member with its own move.
+
+- `data`: `problem` (Composer's problem text).
+- `sets_network_failures`: no.
+
+### Update now not checked {#update_now_not_checked}
+
+Composer's solver did not check the candidates of `update now:` together, for example because the
+install-time budget ran out. The report writes no `update now:` command, and
+`security.update_now` is empty. Update each candidate with its own move.
+
+- `data`: `reason` (a value of `check.reason`), `packages` (the candidates).
+- `sets_network_failures`: no.
+
+### Move check failed {#move_check_failed}
+
+Composer's solver failed on a request with an error other than a refusal, such as an answer of a
+repository that does not parse. That move's `check.reason` reads `solver_error`, and the run goes
+on. The note names the first such failure of the run.
+
+- `data`: `class` and `message` of the failure, Composer's own words.
+- `sets_network_failures`: no.
+
 ## Gate and baseline
 
 ### Baseline target differs {#baseline_target_differs}
@@ -336,6 +384,16 @@ operator of such a repository can make it advertise one.
 - A `vcs` or `unknown` origin carries S10 `not_from_composer_repository` for its release metadata
   and its repository activity. A `path`, `artifact` or `package` origin carries both as
   `checks_skipped` entries ([what was not checked](verdicts.md#what-was-not-checked)).
+- `sets_network_failures`: no.
+
+### Package name invalid {#package_name_invalid}
+
+Some lock entries carry a name that is no Composer package name, such as a name that reads as a
+command option. lockrot skips them: they get no finding, and no printed command names them. The
+text names none of them.
+
+- `data`: `packages`, the names as the lock writes them.
+- Findings: the entries have none.
 - `sets_network_failures`: no.
 
 ## Related

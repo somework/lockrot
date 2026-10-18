@@ -44,6 +44,8 @@ final class Report
      *                         A copy keeps it: the order reads the findings alone.
      */
     private ?array $sorted = null;
+    private ?MoveCheckRun $moveCheck = null;
+    private ?UpdateNow $updateNow = null;
 
     /**
      * @param list<Finding> $findings
@@ -103,6 +105,8 @@ final class Report
         $copy->notes = array_merge($this->notes, $baseline->notes());
         $copy->run = $this->run;
         $copy->sorted = $this->sorted;
+        $copy->moveCheck = $this->moveCheck;
+        $copy->updateNow = $this->updateNow;
 
         return $copy;
     }
@@ -128,8 +132,60 @@ final class Report
         );
         $copy->run = $run;
         $copy->sorted = $this->sorted;
+        $copy->moveCheck = $this->moveCheck;
+        $copy->updateNow = $this->updateNow;
 
         return $copy;
+    }
+
+    /** A copy with how Composer's solver checked the moves, and the `update_now` that it solved, with its note. */
+    public function withMoveChecks(MoveCheckRun $moveCheck, UpdateNow $updateNow): self
+    {
+        $copy = clone $this;
+        $copy->moveCheck = $moveCheck;
+        $copy->updateNow = $updateNow;
+        $note = $updateNow->note();
+        if ($note !== null) {
+            $copy->notes[] = $note;
+        }
+
+        return $copy;
+    }
+
+    public function withNote(RunNote $note): self
+    {
+        $copy = clone $this;
+        $copy->notes[] = $note;
+
+        return $copy;
+    }
+
+    /** `run.move_check`, null when the run checked no move. */
+    public function moveCheck(): ?MoveCheckRun
+    {
+        return $this->moveCheck;
+    }
+
+    /**
+     * `security.update_now`: with checked moves, the members of {@see UpdateNow}; else the
+     * vulnerable packages whose fix is a `composer update`, in report order.
+     *
+     * @return list<string>
+     */
+    public function updateNow(): array
+    {
+        return $this->updateNow === null ? Report2Root::updateNow($this->sorted()) : $this->updateNow->members();
+    }
+
+    /** @return list<string>|null `security.update_now_command`, null when it has no members or Composer refuses them together */
+    public function updateNowCommand(): ?array
+    {
+        if ($this->updateNow !== null) {
+            return $this->updateNow->command();
+        }
+        $members = Report2Root::updateNow($this->sorted());
+
+        return $members === [] ? null : array_merge(['composer', 'update'], $members);
     }
 
     /** @return list<Finding> */
@@ -367,7 +423,7 @@ final class Report
 
         return [
             'generated_at' => $this->generatedAt->format(\DATE_ATOM),
-            'run' => $run->toArray(ScoreRulesUsed::of($sorted), $this->includesDev, $this->advisoryLookup()),
+            'run' => $run->toArray(ScoreRulesUsed::of($sorted), $this->includesDev, $this->advisoryLookup(), $this->moveCheck),
             'activity_cache_oldest_at' => $oldest === null ? null : $oldest->format(\DATE_ATOM),
             'activity_cache_age_hours' => $oldest === null ? null : round(max(0, $this->generatedAt->getTimestamp() - $oldest->getTimestamp()) / 3600, 1),
             'packages_checked' => $this->packagesChecked,
@@ -388,7 +444,7 @@ final class Report
             'libyears' => Report2Root::toLibyearsArray($this->libyears(), $sorted),
             'baseline' => $this->baseline === null ? null : $this->baseline->toArray(),
             'gate' => ($gate ?? Gate::ofFindings($this, FailOn::none()))->toArray($run),
-            'security' => SecurityTotals::of($sorted),
+            'security' => SecurityTotals::of($sorted, $this->updateNow(), $this->updateNowCommand()),
             'data_date' => Report2Root::dataDate($sorted),
             'notes' => $this->notes(),
             'note_details' => array_map(static fn (RunNote $note): array => $note->toArray(), $this->notes),

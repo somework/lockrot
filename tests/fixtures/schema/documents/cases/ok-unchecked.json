@@ -782,7 +782,8 @@
      "records": 0
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:29+00:00",
  "activity_cache_age_hours": 1.6,

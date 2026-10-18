@@ -184,6 +184,7 @@
      "package": "mautic/core-lib",
      "version": "4.3.x-dev",
      "link": "require",
+     "target": null,
      "constraint": "~4.4.0",
      "holder": {
       "verdict": "critical",
@@ -196,7 +197,8 @@
       "next_step": {
        "kind": "no-move",
        "to_branch": null,
-       "constraint": null
+       "constraint": null,
+       "check": null
       }
      }
     }
@@ -233,6 +235,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "holders",
     "crosses_major"
@@ -285,7 +288,8 @@
     "lowest": null,
     "newest": "v4.4.44",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -411,6 +415,7 @@
           "package": "mautic/core-lib",
           "version": "4.3.x-dev",
           "link": "require",
+          "target": null,
           "constraint": "~4.4.0",
           "holder": {
            "verdict": "critical",
@@ -423,7 +428,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -457,6 +463,7 @@
           "package": "mautic/core-lib",
           "version": "4.3.x-dev",
           "link": "require",
+          "target": null,
           "constraint": "~4.4.0",
           "holder": {
            "verdict": "critical",
@@ -469,7 +476,8 @@
            "next_step": {
             "kind": "no-move",
             "to_branch": null,
-            "constraint": null
+            "constraint": null,
+            "check": null
            }
           }
          }
@@ -599,6 +607,7 @@
        "package": "friendsofsymfony/rest-bundle",
        "version": "3.3.0",
        "link": "require",
+       "target": null,
        "constraint": "^4.4|^5.3|^6.0",
        "holder": {
         "verdict": "ok",
@@ -613,6 +622,7 @@
        "package": "mautic/core-lib",
        "version": "4.3.x-dev",
        "link": "require",
+       "target": null,
        "constraint": "~4.4.0",
        "holder": {
         "verdict": "critical",
@@ -625,7 +635,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       },
@@ -634,6 +645,7 @@
        "package": "symfony/framework-bundle",
        "version": "v4.4.41",
        "link": "require",
+       "target": null,
        "constraint": "^4.4.12|^5.1.4",
        "holder": {
         "verdict": "medium",
@@ -645,7 +657,8 @@
         "next_step": {
          "kind": "require",
          "to_branch": "8.x",
-         "constraint": "^8.1"
+         "constraint": "^8.1",
+         "check": null
         }
        }
       }
@@ -658,7 +671,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -694,6 +708,7 @@
        "package": "friendsofsymfony/rest-bundle",
        "version": "3.3.0",
        "link": "require",
+       "target": null,
        "constraint": "^4.4|^5.3|^6.0",
        "holder": {
         "verdict": "ok",
@@ -708,6 +723,7 @@
        "package": "mautic/core-lib",
        "version": "4.3.x-dev",
        "link": "require",
+       "target": null,
        "constraint": "~4.4.0",
        "holder": {
         "verdict": "critical",
@@ -720,7 +736,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       },
@@ -729,6 +746,7 @@
        "package": "symfony/framework-bundle",
        "version": "v4.4.41",
        "link": "require",
+       "target": null,
        "constraint": "^4.4.12|^5.1.4",
        "holder": {
         "verdict": "medium",
@@ -740,7 +758,8 @@
         "next_step": {
          "kind": "require",
          "to_branch": "8.x",
-         "constraint": "^8.1"
+         "constraint": "^8.1",
+         "check": null
         }
        }
       }
@@ -753,7 +772,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -789,6 +809,7 @@
        "package": "mautic/core-lib",
        "version": "4.3.x-dev",
        "link": "require",
+       "target": null,
        "constraint": "~4.4.0",
        "holder": {
         "verdict": "critical",
@@ -801,7 +822,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       },
@@ -810,6 +832,7 @@
        "package": "symfony/framework-bundle",
        "version": "v4.4.41",
        "link": "require",
+       "target": null,
        "constraint": "^4.4.12|^5.1.4",
        "holder": {
         "verdict": "medium",
@@ -821,7 +844,8 @@
         "next_step": {
          "kind": "require",
          "to_branch": "8.x",
-         "constraint": "^8.1"
+         "constraint": "^8.1",
+         "check": null
         }
        }
       }
@@ -834,7 +858,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -870,6 +895,7 @@
        "package": "mautic/core-lib",
        "version": "4.3.x-dev",
        "link": "require",
+       "target": null,
        "constraint": "~4.4.0",
        "holder": {
         "verdict": "critical",
@@ -882,7 +908,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       }
@@ -895,7 +922,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -926,7 +954,8 @@
      "lowest": null,
      "newest": "v4.4.44",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -957,7 +986,8 @@
      "lowest": null,
      "newest": "v3.4.47",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -988,7 +1018,8 @@
      "lowest": null,
      "newest": "v2.8.52",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]
@@ -1742,7 +1773,8 @@
      "records": 4
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

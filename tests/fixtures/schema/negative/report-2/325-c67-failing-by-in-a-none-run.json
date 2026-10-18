@@ -775,7 +775,8 @@
      "records": 1
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": "2026-10-01T16:03:43+00:00",
  "activity_cache_age_hours": 1.6,
@@ -1205,6 +1206,7 @@
       "package": null,
       "version": null,
       "link": "require",
+      "target": null,
       "constraint": "^2.6",
       "holder": null
      }
@@ -1241,6 +1243,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "crosses_major"
     ],
@@ -1289,7 +1292,8 @@
      "lowest": null,
      "newest": "v2.8.52",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": {
@@ -1429,6 +1433,7 @@
            "package": null,
            "version": null,
            "link": "require",
+           "target": null,
            "constraint": "^2.6",
            "holder": null
           }

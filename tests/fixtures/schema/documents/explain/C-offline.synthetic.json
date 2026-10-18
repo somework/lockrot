@@ -180,6 +180,7 @@
    ],
    "clears_all": false,
    "if_applied": null,
+   "check": null,
    "composer_moves_because": [],
    "commands": [],
    "through": [],
@@ -1224,7 +1225,8 @@
      "records": null
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "abandoned",

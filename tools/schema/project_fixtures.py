@@ -504,11 +504,45 @@ def inputs_of(case):
     if allowlist is not None and allowlist['by'] == 'project':
         inputs['accept'] = allowlist['flag_ids']
         inputs['allowlist'] = {k: allowlist[k] for k in ('pattern', 'version', 'reason', 'expires')}
+    # The move checks that Composer's solver answered, keyed as lockrot keys each request (MoveQuery::key()).
+    checks = recorded_checks(f, rows)
+    if checks:
+        inputs['checks'] = checks
+        inputs['move_check'] = run['move_check']
     act = f.get('activity') or {}
     if f['origin']['kind'] == 'vcs' and act.get('host') and inputs['root'] is not None:
         # The project's vcs repository serves the package: lockrot names its origin from it.
         inputs['root']['repositories'] = [{'type': 'vcs', 'url': 'https://%s/%s.git' % (act['host'], act['repo'])}]
     return inputs
+
+
+def recorded_checks(f, rows):
+    """Each checked move of the finding and each checked branch row, by request key: `verb package constraint php`."""
+    pkg, direct = f['package'], bool(f['direct'])
+    verb = 'require' if direct else 'update'
+    out = {}
+
+    def keep(key, check, held=()):
+        out[key] = dict(check, holds=[{k: h[k] for k in ('source', 'package', 'version', 'link', 'target', 'constraint')} for h in held]
+                        if check['result'] == 'refused' else [])
+    for m in [m for m in [f.get('next_step')] if m] + ((f.get('next_step') or {}).get('also') or []):
+        # A move with no release read names no version, so it sends no request.
+        if m.get('check') is None or m['check'].get('reason') == 'no_release_read':
+            continue
+        if m['kind'] == 'update':
+            key = 'update %s ^%s ' % (pkg, m['version'].lstrip('vV'))
+        elif m['kind'] in ('require', 'raise-php'):
+            key = '%s %s %s %s' % (verb, pkg, m['constraint'], (m.get('php_check') or {}).get('raise_to') or '')
+        else:
+            key = '%s %s ^%s ' % (verb, pkg, m['latest']['version'].lstrip('vV'))
+        keep(key, m['check'], m['held_by'])
+    for r in rows:
+        fx = r.get('fixes') or {}
+        if fx.get('check') is None:
+            continue
+        on_installed = r['branch'] == f['branch'] and fx['fix_kind'] == 'update'
+        keep('update %s ^%s ' % (pkg, fx['lowest'].lstrip('vV')) if on_installed else '%s %s ^%s ' % (verb, pkg, fx['lowest'].lstrip('vV')), fx['check'], fx['held_by'])
+    return out
 
 
 def unhydrated(case):

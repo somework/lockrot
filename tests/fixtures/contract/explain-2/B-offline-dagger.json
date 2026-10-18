@@ -183,6 +183,7 @@
                     "no_new_advisories"
                 ]
             },
+            "check": null,
             "composer_moves_because": [
                 "crosses_major"
             ],
@@ -1325,7 +1326,8 @@
                     "records": null
                 }
             ]
-        }
+        },
+        "move_check": null
     },
     "generated_at": "2026-10-01T17:41:20+00:00",
     "notes": [],

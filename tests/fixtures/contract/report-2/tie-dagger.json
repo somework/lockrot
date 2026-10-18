@@ -760,6 +760,7 @@
                 }
             ]
         },
+        "move_check": null,
         "score_rules_used": {
             "counted": 0,
             "lead-first": 1,
@@ -1235,6 +1236,7 @@
                         "composer_resolves"
                     ]
                 },
+                "check": null,
                 "composer_moves_because": [
                     "crosses_major"
                 ],
@@ -1282,6 +1284,7 @@
                         ],
                         "clears_all": false,
                         "if_applied": null,
+                        "check": null,
                         "composer_moves_because": [],
                         "commands": [],
                         "text": "no release fixes it"
@@ -1323,7 +1326,8 @@
                     "lowest": null,
                     "newest": "v2.8.52",
                     "held_by": [],
-                    "if_applied": null
+                    "if_applied": null,
+                    "check": null
                 },
                 "move_in": "also",
                 "gets": {

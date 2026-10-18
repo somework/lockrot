@@ -777,7 +777,8 @@
      "records": 1
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:36+00:00",
  "activity_cache_age_hours": 1.6,
@@ -1140,6 +1141,7 @@
     ],
     "clears_all": false,
     "if_applied": null,
+    "check": null,
     "composer_moves_because": [],
     "commands": [],
     "through": [],

@@ -40,6 +40,7 @@ use Lockrot\Score\CountedAdvisory;
 use Lockrot\Security\FixFinder;
 use Lockrot\Security\LinkIndex;
 use Lockrot\Security\PackageFixes;
+use Lockrot\Security\RefusedMoves;
 use Lockrot\Signal\AgeMeasure;
 use Lockrot\Signal\BranchRow;
 use Lockrot\Signal\Data\AbandonedData;
@@ -56,6 +57,7 @@ use Lockrot\Verdict\Finding;
 use Lockrot\Verdict\FindingDetails;
 use Lockrot\Verdict\FlagSet;
 use Lockrot\Verdict\GradedPackage;
+use Lockrot\Verdict\MoveChecks;
 use Lockrot\Verdict\MoveContext;
 use Lockrot\Verdict\Moves;
 use Lockrot\Verdict\MoveSubject;
@@ -66,6 +68,13 @@ use Lockrot\Verdict\ThroughCheck;
 /** @internal */
 final class Analyzer
 {
+    /**
+     * A refusal holds the releases that its constraint admits, so the release scan and the moves of
+     * the package run again with it (SPEC §5.3). The checks are kept, so a pass asks Composer only
+     * the requests that a new move needs. The cap stops a chain of refusals that each name a new move.
+     */
+    public const CHECK_PASSES = 3;
+
     private MetadataLoaderInterface $metadata;
     private ActivityClient $activity;
     private ActivityFetchPlanner $planner;
@@ -80,6 +89,8 @@ final class Analyzer
     private MonorepoParents $parents;
     private AbandonedIgnore $abandonedIgnore;
     private UncheckedAcceptance $acceptance;
+    private ?MoveChecks $checks = null;
+    private int $checkPasses = self::CHECK_PASSES;
 
     public function __construct(MetadataLoaderInterface $metadata, ActivityClient $activity, ActivityFetchPlanner $planner, RepoLocator $locator, Allowlist $allowlist, SignalSet $signals, Clock $clock, bool $offline, ?AdvisoryLoaderInterface $advisories = null, ?MonorepoParents $parents = null, ?AbandonedIgnore $abandonedIgnore = null)
     {
@@ -125,6 +136,17 @@ final class Analyzer
         return $clone;
     }
 
+    /** A copy whose moves Composer's solver checks (docs/verdicts.md#the-move-check). */
+    /** @param positive-int $passes the cap on the passes that ask Composer ({@see CHECK_PASSES}) */
+    public function withMoveChecks(MoveChecks $checks, int $passes = self::CHECK_PASSES): self
+    {
+        $clone = clone $this;
+        $clone->checks = $checks;
+        $clone->checkPasses = $passes;
+
+        return $clone;
+    }
+
     /**
      * Give the metadata loader the same {@see Deadline} instance: it keeps its own copy of the
      * budget ({@see \Lockrot\Composer\ServiceFactory}).
@@ -165,7 +187,7 @@ final class Analyzer
         $packages = array_map(static fn (LockedPackage $package): LockedPackage => $package->withRepositories($repositories), $packages);
         $graph = DependencyGraph::fromLock($lock, $project, $includeDev);
         $now = $this->clock->now();
-        $notes = [];
+        $notes = $lock->skippedNames() === [] ? [] : [RunNote::packageNameInvalid($lock->skippedNames())];
         if ($this->offline) {
             $notes[] = RunNote::offline();
         }
@@ -205,7 +227,8 @@ final class Analyzer
         $activity = $activityBatch->activity();
 
         $finder = new FixFinder($this->signals->phpFloor(), LinkIndex::of($lock, $project));
-        $fixes = $advisories->byName() === [] ? null : $finder;
+        $checks = $this->checks === null ? null : $this->checks->withAdvisories($advisories->records(), $advisories->asked());
+        $baseline = $checks === null ? null : $checks->checker()->baseline();
         $findings = [];
         $factsByPackage = [];
         $notInRepository = 0;
@@ -216,8 +239,22 @@ final class Analyzer
                 ->withActivityLookup($lookups[$package->name()]);
             $factsByPackage[$package->name()] = $facts;
             $every = $advisories->every($package->name());
-            $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $fixes, $advisories->ignored($package->name()), $every);
-            $findings[] = $finding->withMoves($this->moves($finding, $facts, $finder, $lock, $metadata, $every));
+            $refused = RefusedMoves::none();
+            $pass = 0;
+            do {
+                $scan = $finder->withRefused($refused);
+                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every);
+                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks);
+                $known = $refused->count();
+                $refused = $checks === null ? $refused : $checks->refused($package->name());
+            } while ($refused->count() > $known && ++$pass < $this->checkPasses);
+            if ($checks !== null && $refused->count() > $known) {
+                // The refusals of the last pass set the class and the verdict. Its new moves are not asked.
+                $scan = $finder->withRefused($refused);
+                $finding = $this->buildFinding($facts, $entry, $graph, $project->isRead(), $batch, $advisories->byName() === [] ? null : $scan, $advisories->ignored($package->name()), $every);
+                $moves = $this->moves($finding, $facts, $scan, $lock, $metadata, $every, $checks->answeredOnly());
+            }
+            $findings[] = $finding->withMoves($moves);
             if (!$package->isFromComposerRepository()) {
                 ++$notInRepository;
             }
@@ -227,17 +264,25 @@ final class Analyzer
         }
         $uncovered = UncoveredAdvisories::of($findings);
         $notes = array_merge($notes, $uncovered === [] ? [] : [RunNote::ignoreDoesNotCoverAdvisories($uncovered)], $this->abandonedNotes($findings));
+        if ($checks !== null && $baseline !== null && $baseline->check()->isRefused()) {
+            $notes[] = RunNote::movesNotChecked((string) $checks->checker()->platformPhp(), (string) $baseline->problem());
+        }
         $findings = TransitiveExposure::attach($findings, $graph);
         $graded = [];
         foreach ($findings as $finding) {
             $graded[$finding->package()] = GradedPackage::of($finding);
         }
         $findings = array_map(static fn (Finding $finding): Finding => $finding->withHolders($graded), $findings);
+        $report = new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage());
+        if ($checks !== null && $baseline !== null) {
+            $report = $report->withMoveChecks(new MoveCheckRun($checks->checker()->composerVersion(), $checks->checker()->blocksAdvisories(), $baseline->check()), UpdateNow::of($report->sorted(), $checks));
+            $error = $checks->checker()->solverError();
+            if ($error !== null) {
+                $report = $report->withNote(RunNote::moveCheckFailed($error['class'], $error['message']));
+            }
+        }
 
-        return new Analysis(
-            new Report($findings, $notes, $now, \count($packages), $notInRepository, null, self::oldestCachedActivity($activity), $includeDev, $advisories->coverage()),
-            $factsByPackage
-        );
+        return new Analysis($report, $factsByPackage);
     }
 
     /**
@@ -619,7 +664,7 @@ final class Analyzer
      * @param array<string, PackageMetadata> $metadata by package name, what the run read
      * @param list<Advisory>                 $every    every advisory of the package on any version
      */
-    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, LockFile $lock, array $metadata, array $every): Moves
+    private function moves(Finding $finding, PackageFacts $facts, FixFinder $finder, LockFile $lock, array $metadata, array $every, ?MoveChecks $checks): Moves
     {
         if (!$finding->isGraded()) {
             return Moves::none();
@@ -648,6 +693,9 @@ final class Analyzer
             FixFinder::otherVersionRanges($facts->advisories(), $every),
             $details->advisoriesComplete()
         );
+        if ($checks !== null) {
+            $context = $context->withChecks($checks);
+        }
 
         return NextStep::plan($context, ThroughCheck::of($finding->package(), $finding->isDirect(), $finding->directDependents(), $lock, $metadata));
     }

@@ -147,6 +147,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "transitive"
    ],
@@ -1222,7 +1223,8 @@
      "records": 0
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "pinned",

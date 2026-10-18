@@ -476,8 +476,9 @@ every `conflict`.
 
 - A fix that lockrot could not judge reads "not known", never "not fixed".
 
-Limits: lockrot reads the lock as it is and does not solve dependencies. An `update` checks the
-links on the package, not the fixing release's own requirements. The suggested constraint is the
+Limits: a class reads the lock's links on the package, and Composer's solver checks the move to
+the release ([The move check](#the-move-check)). A refused move holds every release that its
+constraint admits, so its class is `upgrade`, with the holds. The suggested constraint is the
 lowest release that fixes every counted advisory on that branch.
 
 ### Accepting advisories {#accepting-advisories}
@@ -510,7 +511,7 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
 ```text
   phpseclib/phpseclib 3.0.55  via php-amqplib/php-amqplib, php-amqplib/rabbitmq-bundle  ·  vulnerable
       8 = vulnerable 8 [medium advisory]
-      do: composer update phpseclib/phpseclib (gets 3.0.57) — clears the advisory
+      do: composer update phpseclib/phpseclib:^3.0.57 (gets 3.0.57) — clears the advisory; Composer's solver checked it against the lock
 ```
 
 | Kind | For | The line |
@@ -539,11 +540,77 @@ writes the move as `next_step`. Abridged from the [example run](example-run.md):
   comes in through. When the newest release of such a package no longer requires it, the line says
   so, and `next_step.commands[]` holds a `composer why-not` command to check the path.
 
-- **A new major.** A move to a higher branch says that a new major brings its own requirements,
-  which lockrot does not solve.
+- **A new major.** A move to a higher branch says that a new major brings its own requirements.
 
-The `update now:` footer line lists every package whose advisories `composer update` fixes, with
-the command.
+The `update now:` footer line lists every package whose `update` move Composer's solver resolves
+with the constraint inline, with one command for all of them.
+
+### The move check {#the-move-check}
+
+lockrot asks Composer's own solver about every move that runs a Composer request: the lead move,
+each move in `next_step.also[]`, and the move to each branch row's candidate. It builds the request
+of `composer update <package>:<constraint> --dry-run`, or of `composer require` for a package that
+composer.json requires, and solves it offline, on the lock and the versions that Composer's cache
+holds. JSON writes the answer as the move's `check`.
+
+| `check.result` | What it says | The steps in `commands[]` |
+|---|---|---|
+| `resolves` | Composer installs the move from the lock in `form`: `inline`, `with-dependencies` or `with-all-dependencies` | the form that resolves, with `--with-dependencies` or `--with-all-dependencies` when it needs one |
+| `refused` | no form installs it: `held_by[]` names the holds that the refusal and a `composer prohibits`-style scan find | no `update` or `require` step |
+| `not_checked` | lockrot did not ask. `check.reason` says why | the inline form, unchecked |
+
+- **Holds.** `held_by[]` adds the links that the solver names, with the package that a link points
+  to in `target`:
+    - `root-require`: a root requirement on another package that the move needs at another
+      version. With no `target`, it is the move's own constraint, and no release that Composer can
+      install meets it.
+    - `platform`: a requirement on `php`.
+    - `require` or `conflict` of the target release, or a `conflict` that composer.json declares.
+    - `replace`: a package that replaces `target`, or the moved package when `target` is null.
+      Composer installs only one of the two.
+
+- **A refusal that names no hold.** The release is `blocked`, so the advisory counts as having no
+  reachable fix. The text says that Composer names no hold.
+- **A package that you do not require.** When its check resolves, the step is `composer update
+  <package>:<constraint>`, which adds no root requirement.
+- **Update now.** lockrot solves the candidates of `update now:` as one request. It leaves out the
+  candidates that Composer refuses together with the others, and writes a run note. The members of
+  `security.update_now` are the names of the command that Composer resolves. When Composer refuses
+  them together, or does not check them, `update now:` is empty, and the note
+  [`update_now_refused`](notes.md#update_now_refused) or
+  [`update_now_not_checked`](notes.md#update_now_not_checked) says why. When the baseline does not
+  resolve, `update now:` is empty too.
+- **The baseline.** First, lockrot solves a partial update of a name outside the lock. When
+  Composer refuses it, the lock itself does not install on the target PHP. Then no move is checked,
+  and the run note [`moves_not_checked`](notes.md#moves_not_checked) gives Composer's problem text.
+
+Limits of the check:
+
+- It ignores `ext-*` requirements, as `--ignore-platform-req=ext-*` does. `run.move_check` says so
+  once per run (`ignores_extensions`), and the `moves:` footer line names it.
+- It solves at `config.platform.php` when that version is in the target PHP's minor, else at the
+  newest patch of the target minor (`8.4.99`). Composer reads `8.4` as `8.4.0`. It keeps every
+  other `config.platform` override.
+- It offers the tagged releases of a package, and its dev versions only when it has no tagged
+  release. A move to a dev snapshot is not a move that lockrot proposes.
+- On Composer 2.9 and later, it removes the versions that an advisory affects, as Composer does in
+  an update. It reads the settings of Composer's `block` operation: the ignore list, the ignored
+  severities and the blocking of abandoned packages. It blocks every name that the update can move,
+  packages-dev and new dependencies included.
+- It stops a chain of refusals after `Analyzer::CHECK_PASSES` passes. A new request after the
+  last one is not checked (`check.reason` `pass_cap`).
+- When Composer's solver fails on a request, the move is not checked (`check.reason`
+  `solver_error`), and the run note [`move_check_failed`](notes.md#move_check_failed) names the
+  failure. The run still writes its report.
+- Composer 2.2 and 2.3 accept an inline constraint only on a root requirement. There, the step of
+  a package that composer.json does not require is the plain `composer update <package>`, and a
+  package that you do not require gets no `update` step.
+- The solver stops at the first failing chain. The scan adds what `composer prohibits` names, but
+  `held_by[]` can still miss a hold that a deeper chain holds.
+- A run without composer.json checks no move (`check.reason` `no_composer_json`).
+- A run whose composer.json Composer cannot load checks no move (`check.reason`
+  `composer_json_invalid`). Composer refuses such a file, for example for a requirement name that
+  is no package name. Composer 2.2 stops the run with its own error instead.
 
 ## The score {#score}
 

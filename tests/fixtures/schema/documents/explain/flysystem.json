@@ -172,6 +172,7 @@
      "package": "barryvdh/elfinder-flysystem-driver",
      "version": "v0.2.1",
      "link": "require",
+     "target": null,
      "constraint": "^1.0",
      "holder": {
       "verdict": "medium",
@@ -184,7 +185,8 @@
       "next_step": {
        "kind": "require",
        "to_branch": "0.6.x",
-       "constraint": "^0.6.0"
+       "constraint": "^0.6.0",
+       "check": null
       }
      }
     },
@@ -193,6 +195,7 @@
      "package": "league/flysystem-cached-adapter",
      "version": "1.1.0",
      "link": "require",
+     "target": null,
      "constraint": "~1.0",
      "holder": {
       "verdict": "low",
@@ -204,7 +207,8 @@
       "next_step": {
        "kind": "no-move",
        "to_branch": null,
-       "constraint": null
+       "constraint": null,
+       "check": null
       }
      }
     }
@@ -236,6 +240,7 @@
      "composer_resolves"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "holders",
     "crosses_major"
@@ -288,7 +293,8 @@
     "lowest": null,
     "newest": "1.1.10",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": {
@@ -520,6 +526,7 @@
        "package": "barryvdh/elfinder-flysystem-driver",
        "version": "v0.2.1",
        "link": "require",
+       "target": null,
        "constraint": "^1.0",
        "holder": {
         "verdict": "medium",
@@ -532,7 +539,8 @@
         "next_step": {
          "kind": "require",
          "to_branch": "0.6.x",
-         "constraint": "^0.6.0"
+         "constraint": "^0.6.0",
+         "check": null
         }
        }
       },
@@ -541,6 +549,7 @@
        "package": "league/flysystem-cached-adapter",
        "version": "1.1.0",
        "link": "require",
+       "target": null,
        "constraint": "~1.0",
        "holder": {
         "verdict": "low",
@@ -552,7 +561,8 @@
         "next_step": {
          "kind": "no-move",
          "to_branch": null,
-         "constraint": null
+         "constraint": null,
+         "check": null
         }
        }
       }
@@ -565,7 +575,8 @@
        "clears_hold",
        "composer_resolves"
       ]
-     }
+     },
+     "check": null
     }
    },
    {
@@ -596,7 +607,8 @@
      "lowest": null,
      "newest": "2.5.0",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -627,7 +639,8 @@
      "lowest": null,
      "newest": "1.1.10",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -658,7 +671,8 @@
      "lowest": null,
      "newest": "0.5.12",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -689,7 +703,8 @@
      "lowest": null,
      "newest": "0.4.5",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -720,7 +735,8 @@
      "lowest": null,
      "newest": "0.3.5",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -751,7 +767,8 @@
      "lowest": null,
      "newest": "0.2.15",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    },
    {
@@ -782,7 +799,8 @@
      "lowest": null,
      "newest": "0.1.20",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     }
    }
   ]
@@ -1536,7 +1554,8 @@
      "records": 2
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "left-behind",

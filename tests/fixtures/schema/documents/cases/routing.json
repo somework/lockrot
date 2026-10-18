@@ -777,7 +777,8 @@
      "records": 4
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "activity_cache_oldest_at": "2026-10-01T16:04:29+00:00",
  "activity_cache_age_hours": 1.6,
@@ -1205,6 +1206,7 @@
       "package": "mautic/core-lib",
       "version": "4.3.x-dev",
       "link": "require",
+      "target": null,
       "constraint": "~4.4.0",
       "holder": {
        "verdict": "critical",
@@ -1217,7 +1219,8 @@
        "next_step": {
         "kind": "no-move",
         "to_branch": null,
-        "constraint": null
+        "constraint": null,
+        "check": null
        }
       }
      }
@@ -1254,6 +1257,7 @@
       "composer_resolves"
      ]
     },
+    "check": null,
     "composer_moves_because": [
      "holders",
      "crosses_major"
@@ -1306,7 +1310,8 @@
      "lowest": null,
      "newest": "v4.4.44",
      "held_by": [],
-     "if_applied": null
+     "if_applied": null,
+     "check": null
     },
     "move_in": "next_step",
     "gets": {
@@ -1432,6 +1437,7 @@
            "package": "mautic/core-lib",
            "version": "4.3.x-dev",
            "link": "require",
+           "target": null,
            "constraint": "~4.4.0",
            "holder": {
             "verdict": "critical",
@@ -1444,7 +1450,8 @@
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
-             "constraint": null
+             "constraint": null,
+             "check": null
             }
            }
           }
@@ -1478,6 +1485,7 @@
            "package": "mautic/core-lib",
            "version": "4.3.x-dev",
            "link": "require",
+           "target": null,
            "constraint": "~4.4.0",
            "holder": {
             "verdict": "critical",
@@ -1490,7 +1498,8 @@
             "next_step": {
              "kind": "no-move",
              "to_branch": null,
-             "constraint": null
+             "constraint": null,
+             "check": null
             }
            }
           }

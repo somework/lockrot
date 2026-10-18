@@ -214,6 +214,7 @@
      "no_new_advisories"
     ]
    },
+   "check": null,
    "composer_moves_because": [
     "crosses_major"
    ],
@@ -275,7 +276,8 @@
     "lowest": null,
     "newest": "v2.16.1",
     "held_by": [],
-    "if_applied": null
+    "if_applied": null,
+    "check": null
    },
    "move_in": "next_step",
    "gets": null,
@@ -1567,7 +1569,8 @@
      "records": 26
     }
    ]
-  }
+  },
+  "move_check": null
  },
  "legacy": {
   "verdict": "ok",
