@@ -309,6 +309,52 @@
   "integer": false
  },
  {
+  "name": "MoveCheckResult",
+  "pointer": "#/definitions/moveCheck/oneOf/0/properties/result",
+  "pointers": [
+   "#/definitions/moveCheck/oneOf/0/properties/result"
+  ],
+  "values": [
+   "resolves",
+   "refused",
+   "not_checked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "MoveCheckForm",
+  "pointer": "#/definitions/moveCheck/oneOf/0/properties/form/oneOf/0",
+  "pointers": [
+   "#/definitions/moveCheck/oneOf/0/properties/form/oneOf/0"
+  ],
+  "values": [
+   "inline",
+   "with-dependencies",
+   "with-all-dependencies"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "MoveCheckReason",
+  "pointer": "#/definitions/moveCheck/oneOf/0/properties/reason/oneOf/0",
+  "pointers": [
+   "#/definitions/moveCheck/oneOf/0/properties/reason/oneOf/0"
+  ],
+  "values": [
+   "baseline_refused",
+   "unloaded_name",
+   "offline",
+   "install_time_budget",
+   "not_from_composer_repository",
+   "composer_too_old",
+   "no_composer_json"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
   "name": "HolderNextStepKind",
   "pointer": "#/definitions/holder/oneOf/0/properties/next_step/oneOf/0/properties/kind",
   "pointers": [
@@ -355,7 +401,9 @@
   "values": [
    "require",
    "require-dev",
-   "conflict"
+   "conflict",
+   "root-require",
+   "platform"
   ],
   "open": false,
   "integer": false
@@ -2792,6 +2840,46 @@
   "integer": false
  },
  {
+  "name": "RunMoveCheckIgnoresExtensions",
+  "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions",
+  "pointers": [
+   "#/definitions/run/properties/move_check/oneOf/0/properties/ignores_extensions"
+  ],
+  "values": [
+   true
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "RunMoveCheckBaseline",
+  "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/baseline",
+  "pointers": [
+   "#/definitions/run/properties/move_check/oneOf/0/properties/baseline"
+  ],
+  "values": [
+   "resolves",
+   "refused",
+   "not_checked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "RunMoveCheckReason",
+  "pointer": "#/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0",
+  "pointers": [
+   "#/definitions/run/properties/move_check/oneOf/0/properties/reason/oneOf/0"
+  ],
+  "values": [
+   "install_time_budget",
+   "composer_too_old",
+   "no_composer_json"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
   "name": "NoteAdvisoriesDisabledByPolicyPolicyKey",
   "pointer": "#/definitions/noteAdvisoriesDisabledByPolicy/properties/policy_key",
   "pointers": [
@@ -2869,6 +2957,18 @@
   "integer": false
  },
  {
+  "name": "NoteMovesNotCheckedReason",
+  "pointer": "#/definitions/noteMovesNotChecked/properties/reason",
+  "pointers": [
+   "#/definitions/noteMovesNotChecked/properties/reason"
+  ],
+  "values": [
+   "baseline_refused"
+  ],
+  "open": true,
+  "integer": false
+ },
+ {
   "name": "NoteCode",
   "pointer": "#/definitions/noteCode",
   "pointers": [
@@ -2894,7 +2994,10 @@
    "abandoned_markings_ignored",
    "abandoned_not_audited_by_composer",
    "abandoned_ignore_unreadable",
-   "repository_activity_host_not_supported"
+   "repository_activity_host_not_supported",
+   "moves_not_checked",
+   "update_now_reduced",
+   "update_now_refused"
   ],
   "open": true,
   "integer": false
@@ -3135,6 +3238,42 @@
   ],
   "values": [
    "repository_activity_host_not_supported"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode21",
+  "pointer": "#/definitions/noteDetail/anyOf/20/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/20/properties/code"
+  ],
+  "values": [
+   "moves_not_checked"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode22",
+  "pointer": "#/definitions/noteDetail/anyOf/21/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/21/properties/code"
+  ],
+  "values": [
+   "update_now_reduced"
+  ],
+  "open": false,
+  "integer": false
+ },
+ {
+  "name": "NoteDetailCode23",
+  "pointer": "#/definitions/noteDetail/anyOf/22/properties/code",
+  "pointers": [
+   "#/definitions/noteDetail/anyOf/22/properties/code"
+  ],
+  "values": [
+   "update_now_refused"
   ],
   "open": false,
   "integer": false
