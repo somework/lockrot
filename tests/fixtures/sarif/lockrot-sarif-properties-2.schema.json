@@ -1255,7 +1255,7 @@
           ]
         },
         "link": {
-          "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock or the root, `replace` (the package replaces `target`, or the moved package when `target` is null, so Composer installs only one of the two), `root-require` (a root requirement on `target`, a package that the move needs at another version; with `target` null, the move's own constraint, which no release in Composer's pool meets), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
+          "description": "The link that excludes it: `require`, `require-dev` and `conflict` of the lock or the root, `replace` (the package replaces `target`, or the moved package when `target` is null, so Composer installs one of the two, not both), `root-require` (a root requirement on `target`, a package that the move needs at another version; with `target` null, the move's own constraint, which no release in Composer's pool meets), `platform` (a requirement on the platform package `target`, such as `php`). Closed.",
           "type": "string",
           "enum": [
             "require",
@@ -1593,7 +1593,7 @@
       ]
     },
     "moveCheck": {
-      "description": "Composer's solver on the move: whether `composer update --dry-run` or `composer require --dry-run` installs it from the lock, in which form, or why lockrot did not ask. Null on a kind that runs no Composer request (`replace find-alternative test blocked` and the `no-*` kinds), and in a run that checks no move.",
+      "description": "Composer's solver on the move: whether the move's `composer update` or `composer require` installs from the lock. It names the form that resolves, or why lockrot did not ask. Null on a kind that runs no Composer request, and in a run that checks no move.",
       "oneOf": [
         {
           "description": "The check of one move.",
