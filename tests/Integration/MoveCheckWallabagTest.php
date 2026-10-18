@@ -74,7 +74,7 @@ final class MoveCheckWallabagTest extends TestCase
     {
         $move = self::move('symfony/yaml');
 
-        self::assertSame('refused', $move['check']['result']);
+        self::assertSame('refused', JsonPath::stringAt($move, ['check', 'result']));
         self::assertSame([], self::packageSteps($move));
         self::assertContains(['source' => 'package', 'link' => 'conflict', 'target' => 'symfony/console', 'constraint' => '<5.3'], self::holds($move));
         self::assertContains(['source' => 'root', 'link' => 'root-require', 'target' => 'symfony/console', 'constraint' => '^4.4.49'], self::holds($move));
@@ -145,7 +145,7 @@ final class MoveCheckWallabagTest extends TestCase
      */
     private static function holds(array $move): array
     {
-        return array_map(static fn ($hold): array => \is_array($hold) ? array_intersect_key($hold, array_flip(['source', 'link', 'target', 'constraint'])) : [], JsonPath::arrayAt($move, ['held_by']));
+        return array_values(array_map(static fn ($hold): array => \is_array($hold) ? array_intersect_key($hold, array_flip(['source', 'link', 'target', 'constraint'])) : [], JsonPath::arrayAt($move, ['held_by'])));
     }
 
     private static function analyze(FixtureRepositoryServer $server): Report

@@ -63,10 +63,11 @@ final class FindingRelations
                 $out[] = 'next_step: a refused move is no update fix';
             }
         }
-        $option = ['with-dependencies' => '--with-dependencies', 'with-all-dependencies' => '--with-all-dependencies'][$check['form'] ?? ''] ?? null;
+        $form = \is_string($check['form'] ?? null) ? $check['form'] : '';
+        $option = ['with-dependencies' => '--with-dependencies', 'with-all-dependencies' => '--with-all-dependencies'][$form] ?? null;
         foreach ($option === null ? [] : $steps as $argv) {
-            if (\is_array($argv) && strpos((string) ($argv[2] ?? ''), 'php:') !== 0 && end($argv) !== $option) {
-                $out[] = 'next_step: a step of the form '.$check['form'].' ends with '.$option;
+            if (\is_array($argv) && !(\is_string($argv[2] ?? null) && strpos($argv[2], 'php:') === 0) && end($argv) !== $option) {
+                $out[] = 'next_step: a step of the form '.$form.' ends with '.$option;
             }
         }
 
