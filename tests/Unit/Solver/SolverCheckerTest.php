@@ -284,6 +284,9 @@ final class SolverCheckerTest extends TestCase
      */
     public function testAnAdvisoryOfANewDependencyThatTheRunDidNotLookUpBlocksTheMove(): void
     {
+        if (!ComposerFeatures::blocksAdvisories()) {
+            self::markTestSkipped('this Composer blocks nothing in an update');
+        }
         $asked = [];
         $lookup = static function (array $names, bool $complete) use (&$asked): array {
             $asked[] = $names;

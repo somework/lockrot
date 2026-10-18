@@ -188,8 +188,9 @@ final class AcceptanceTest extends TestCase
             // The PHAR runs under PHP's default 128M memory_limit: analysing wallabag's lock must not
             // retain the expanded Packagist release history. The exact peak, not the allocated chunks,
             // whose 2M rounding moves with the PHP version and the dependency set. The cap leaves room
-            // for report-2's measurements and feeds, which every finding carries.
-            self::assertLessThan(72 * 1024 * 1024, memory_get_peak_usage(), 'peak memory');
+            // for report-2's measurements and feeds, which every finding carries, and for the lock as
+            // Composer loads it for an update, which LockFile keeps for the move check.
+            self::assertLessThan(80 * 1024 * 1024, memory_get_peak_usage(), 'peak memory');
         } finally {
             $server->stop();
         }

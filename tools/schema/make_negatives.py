@@ -823,6 +823,11 @@ def _(d): del d['packages_unchecked_accepted']
 @case('strict-o9-accepted-reason-a-rerun-closes', 'host-accepted-dagger', 'findings[0].unchecked_accepted[0].reason', strict=True)
 def _(d): d['findings'][0]['unchecked_accepted'][0]['reason'] = 'rate_limit'  # open set: a later reason validates as published
 
+@case('run-move-check-reason-on-a-checked-baseline', 'move-check-dagger', 'run.move_check')
+def _(d): d['run']['move_check']['reason'] = 'solver_error'
+@case('run-move-check-not-checked-without-a-reason', 'move-check-dagger', 'run.move_check')
+def _(d): d['run']['move_check']['baseline'] = 'not_checked'
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for old in glob.glob(os.path.join(OUT, '*.json')):

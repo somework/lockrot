@@ -31,7 +31,7 @@ final class CorpusSchemaSweepTest extends TestCase
         foreach (['corpus/*.json.gz', 'coverage/baselined/*.json.gz', 'coverage/variants/*.json.gz'] as $pattern) {
             $paths = array_merge($paths, glob(self::DOCUMENTS.$pattern) ?: []);
         }
-        self::assertCount(137, $paths, 'tests/fixtures/schema/documents/provenance.json');
+        self::assertCount(148, $paths, 'tests/fixtures/schema/documents/provenance.json');
         $invalid = [];
         foreach ($paths as $path) {
             $errors = $this->errors('report', (string) file_get_contents('compress.zlib://'.$path), false);
