@@ -144,7 +144,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "composer update laravel/framework (gets v12.69.3) — clears the advisory; Composer's solver checked it against the lock"
+   "text": "composer update 'laravel/framework:^12.69.0' (gets v12.69.3) — clears the advisory; Composer's solver checked it against the lock"
   },
   "security": {
    "status": "vulnerable",

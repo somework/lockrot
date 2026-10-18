@@ -5664,6 +5664,99 @@
             "text": "move symfony/event-dispatcher-contracts to ^2.5 through babdev/pagerfanta-bundle, bdunogier/guzzle-site-authenticator, craue/config-bundle and 35 more \u2014 clears left-behind; 2.x needs php >=7.2.5, which require.php allows; the target php 8.4 runs it; a new major brings its own requirements, which lockrot does not solve; what requires it must allow it; the newest releases of friendsofsymfony/user-bundle (v4.1.0), symfony/event-dispatcher (v8.1.5) and symfony/security-core (v8.1.8) still require it"
         }
     },
+    "move-check\u2021": {
+        "next_step": {
+            "kind": "update",
+            "source": "vulnerable",
+            "merged": [],
+            "fix_kind": "update",
+            "reason": null,
+            "replacement": null,
+            "quiet_years": null,
+            "to_branch": "2.x",
+            "version": "v2.3.2",
+            "newest": "v2.3.2",
+            "constraint": null,
+            "latest": null,
+            "php_check": {
+                "requires": "^7.2 || ^8.0",
+                "project_allows": true,
+                "target_runs": true,
+                "raise_to": null,
+                "raise_size": null
+            },
+            "crosses_major": false,
+            "held_by": [],
+            "clears": [
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-7jn3-yc49-35c6",
+                    "basis": "outside_range"
+                },
+                {
+                    "kind": "advisory",
+                    "id": "PKSA-5mxx-9w1m-fqfb",
+                    "basis": "outside_range"
+                }
+            ],
+            "unverified": [],
+            "adds": [],
+            "leaves": [],
+            "clears_all": true,
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "lead": null,
+                "deciding_advisory": null,
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "with-dependencies",
+                "reason": null
+            },
+            "composer_moves_because": [],
+            "commands": [
+                [
+                    "composer",
+                    "update",
+                    "typo3/html-sanitizer:^2.3.2",
+                    "--with-dependencies"
+                ]
+            ],
+            "through": [],
+            "also": [],
+            "text": "composer update 'typo3/html-sanitizer:^2.3.2' --with-dependencies (gets v2.3.2) \u2014 clears 2 advisories; Composer's solver checked it against the lock"
+        },
+        "fix_kind": "update",
+        "installed_branch_fixes": {
+            "fixed": 2,
+            "unknown": 0,
+            "of": 2,
+            "fix_kind": "update",
+            "lowest": "v2.3.2",
+            "newest": "v2.3.2",
+            "held_by": [],
+            "if_applied": {
+                "total": 0,
+                "verdict": "ok",
+                "at_most": false,
+                "assumes": [
+                    "clears_hold"
+                ]
+            },
+            "check": {
+                "result": "resolves",
+                "form": "with-dependencies",
+                "reason": null
+            }
+        },
+        "move_in": "next_step",
+        "partial": null
+    },
     "not-found\u2021": {
         "next_step": {
             "kind": "find-alternative",

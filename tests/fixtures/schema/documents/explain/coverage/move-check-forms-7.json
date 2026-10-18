@@ -195,7 +195,7 @@
     }
    ],
    "also": [],
-   "text": "composer update phpseclib/phpseclib (gets 3.0.57) — clears 2 advisories; not checked with Composer's solver (a package it needs is not in Composer's cache), so it holds only if Composer resolves it"
+   "text": "composer update 'phpseclib/phpseclib:^3.0.57' (gets 3.0.57) — clears 2 advisories; not checked with Composer's solver (a package it needs is not in Composer's cache), so it holds only if Composer resolves it"
   },
   "security": {
    "status": "vulnerable",

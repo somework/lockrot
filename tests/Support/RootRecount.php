@@ -26,7 +26,7 @@ final class RootRecount
      */
     public static function mismatches(array $document): array
     {
-        $expected = self::recounted(self::findings($document));
+        $expected = self::recounted(self::findings($document), self::notes($document));
         $written = [
             'flags' => $document['flags'] ?? null,
             'abandoned' => $document['abandoned'] ?? null,
@@ -63,7 +63,7 @@ final class RootRecount
     {
         $findings = self::findings($document);
         $counters = [];
-        self::count(self::recounted($findings), '', $counters);
+        self::count(self::recounted($findings, self::notes($document)), '', $counters);
         foreach (array_keys($counters) as $path) {
             foreach (array_keys($counters) as $other) {
                 if (strncmp($other, $path.'.', \strlen($path) + 1) === 0) {
@@ -101,11 +101,29 @@ final class RootRecount
     }
 
     /**
-     * @param list<array<mixed, mixed>> $findings
+     * @param array<mixed, mixed> $document
+     *
+     * @return array<string, array<mixed, mixed>> each run note's `data`, by its code
+     */
+    private static function notes(array $document): array
+    {
+        $notes = [];
+        foreach (\is_array($document['notes'] ?? null) ? $document['notes'] : [] as $note) {
+            if (\is_array($note) && \is_string($note['code'] ?? null)) {
+                $notes[$note['code']] = \is_array($note['data'] ?? null) ? $note['data'] : [];
+            }
+        }
+
+        return $notes;
+    }
+
+    /**
+     * @param list<array<mixed, mixed>>          $findings
+     * @param array<string, array<mixed, mixed>> $notes
      *
      * @return array{flags: mixed, abandoned: mixed, priorities: mixed, libyears: array<string, mixed>, gate: array<string, mixed>, security: mixed, data_date: ?string, 'run.score_rules_used': mixed}
      */
-    private static function recounted(array $findings): array
+    private static function recounted(array $findings, array $notes): array
     {
         return [
             'flags' => self::flags($findings),
@@ -113,7 +131,7 @@ final class RootRecount
             'priorities' => self::priorities($findings),
             'libyears' => self::libyears($findings),
             'gate' => self::gate($findings),
-            'security' => self::security($findings),
+            'security' => self::security($findings, $notes),
             'data_date' => self::dataDate($findings),
             'run.score_rules_used' => self::scoreRulesUsed($findings),
         ];
@@ -285,8 +303,9 @@ final class RootRecount
      *
      * @return array<string, mixed>
      */
-    private static function security(array $findings): array
+    private static function security(array $findings, array $notes): array
     {
+        $checked = false;
         $checks = [];
         $packages = ['vulnerable' => 0, 'unchecked' => 0, 'ignored' => 0, 'clear' => 0];
         $advisories = ['counted' => 0, 'ignored' => 0];
@@ -313,8 +332,16 @@ final class RootRecount
             }
             $kind = self::str($security, 'fix_kind');
             $fixes[$kind] = ($fixes[$kind] ?? 0) + 1;
-            if ($kind === 'update' && CommandArgument::allPass(['composer', 'update', self::str($finding, 'package')])) {
-                $updateNow[] = self::str($finding, 'package');
+            $move = self::map($finding, 'next_step');
+            if (isset($move['check'])) {
+                // With a move check, a member is a lead `update` that Composer's solver resolves inline.
+                $checked = true;
+                $check = self::map($move, 'check');
+                if (self::str($move, 'kind') === 'update' && self::str($check, 'result') === 'resolves' && self::str($check, 'form') === 'inline') {
+                    $updateNow[self::str($finding, 'package')] = self::inlineArgument($move);
+                }
+            } elseif ($kind === 'update' && CommandArgument::allPass(['composer', 'update', self::str($finding, 'package')])) {
+                $updateNow[self::str($finding, 'package')] = self::str($finding, 'package');
             }
         }
 
@@ -324,10 +351,39 @@ final class RootRecount
             'advisories' => $advisories,
             'severities' => $severities,
             'fixes' => $fixes,
-            'update_now' => $updateNow,
-            'update_now_command' => $updateNow === [] ? null : array_merge(['composer', 'update'], $updateNow),
+            'update_now' => array_keys($updateNow),
+            'update_now_command' => self::updateNowCommand($updateNow, $checked, $notes),
             'fix_unknown' => $fixes['unknown'],
         ];
+    }
+
+    /**
+     * @param array<string, string>              $updateNow each member's argument, by package
+     * @param array<string, array<mixed, mixed>> $notes
+     *
+     * @return list<string>|null
+     */
+    private static function updateNowCommand(array $updateNow, bool $checked, array $notes): ?array
+    {
+        if ($updateNow === [] || ($checked && isset($notes['update_now_refused']))) {
+            return null;
+        }
+        $leftOut = $checked && \is_array($notes['update_now_reduced']['left_out'] ?? null) ? $notes['update_now_reduced']['left_out'] : [];
+
+        return array_merge(['composer', 'update'], array_values(array_diff_key($updateNow, array_flip(array_filter($leftOut, 'is_string')))));
+    }
+
+    /**
+     * @param array<mixed, mixed> $move
+     */
+    private static function inlineArgument(array $move): string
+    {
+        foreach (\is_array($move['commands'] ?? null) ? $move['commands'] : [] as $argv) {
+            if (\is_array($argv) && ($argv[1] ?? null) === 'update' && \is_string($argv[2] ?? null)) {
+                return $argv[2];
+            }
+        }
+        throw new \UnexpectedValueException('an update move has no update command');
     }
 
     /** @param list<array<mixed, mixed>> $findings */

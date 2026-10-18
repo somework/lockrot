@@ -144,7 +144,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "composer update laravel/framework (gets v12.69.3) — clears the advisory; not checked with Composer's solver (the install-time budget ran out), so it holds only if Composer resolves it"
+   "text": "composer update 'laravel/framework:^12.69.0' (gets v12.69.3) — clears the advisory; not checked with Composer's solver (the install-time budget ran out), so it holds only if Composer resolves it"
   },
   "security": {
    "status": "vulnerable",

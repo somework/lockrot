@@ -144,7 +144,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "composer update livewire/livewire (gets v4.4.7) — clears the advisory; Composer's solver checked it against the lock"
+   "text": "composer update 'livewire/livewire:^4.4.7' (gets v4.4.7) — clears the advisory; Composer's solver checked it against the lock"
   },
   "security": {
    "status": "vulnerable",

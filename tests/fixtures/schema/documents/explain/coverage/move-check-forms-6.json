@@ -164,7 +164,7 @@
     }
    ],
    "also": [],
-   "text": "composer update mtdowling/jmespath.php (gets 2.9.2) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it"
+   "text": "composer update 'mtdowling/jmespath.php:^2.9.1' (gets 2.9.2) — clears the advisory; not checked with Composer's solver (a package it needs could not be loaded), so it holds only if Composer resolves it"
   },
   "security": {
    "status": "vulnerable",

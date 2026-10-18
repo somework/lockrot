@@ -48,6 +48,7 @@ use Lockrot\Signal\SignalSet;
 use Lockrot\Signal\Thresholds;
 use Lockrot\Tests\Support\Contract\CaseRecording;
 use Lockrot\Verdict\FailOn;
+use Lockrot\Verdict\MoveChecks;
 
 /**
  * Turns a case of tests/fixtures/flags/cases.json into the report that the real {@see Analyzer}
@@ -339,6 +340,13 @@ final class CaseHydrator
             $entry = \is_array($inputs['allowlist'] ?? null) ? $inputs['allowlist'] : [];
             $expires = self::optional($entry, 'expires');
             $analyzer = $analyzer->withAllowlist($analyzer->allowlist()->merge(new Allowlist([new AllowlistEntry(self::optional($entry, 'pattern') ?? $package, self::optional($entry, 'version'), self::optional($entry, 'reason') ?? 'accepted by the test', $expires === null ? null : new \DateTimeImmutable($expires), AllowlistEntry::BY_PROJECT, $accept)])));
+        }
+
+        if (\is_array($inputs['checks'] ?? null)) {
+            // The Composer of a recorded check takes an inline constraint on any package, as 2.4 and later do.
+            /** @var array<string, array<mixed, mixed>> $checks */
+            $checks = $inputs['checks'];
+            $analyzer = $analyzer->withMoveChecks(new MoveChecks(new RecordedMoveChecker($checks, \is_array($inputs['move_check'] ?? null) ? $inputs['move_check'] : []), true));
         }
 
         $includeDev = ($run['include_dev'] ?? false) === true;

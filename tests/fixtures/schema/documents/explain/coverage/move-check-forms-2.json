@@ -163,7 +163,7 @@
    ],
    "through": [],
    "also": [],
-   "text": "composer update league/commonmark (gets 2.10.3) — clears 2 advisories; Composer's solver checked it against the lock"
+   "text": "composer update 'league/commonmark:^2.10.3' --with-dependencies (gets 2.10.3) — clears 2 advisories; Composer's solver checked it against the lock"
   },
   "security": {
    "status": "vulnerable",
